@@ -223,14 +223,6 @@ Panel {
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         model: photoModel.uploads
-/*
-        model: ListModel {
-            ListElement { name: 'Foo Bar.png'; avatar: 'file.png' }
-            ListElement { name: 'Foo Bar.png'; avatar: 'file.png' }
-            ListElement { name: 'Foo Bar.png'; avatar: 'file.png' }
-            ListElement { name: 'Foo Bar.png'; avatar: 'file.png' }
-        } 
-*/
         z: 1
     }
 

@@ -67,7 +67,9 @@ PhotoCache::PhotoCache()
 {
 }
 
-void PhotoCache::commandFinished(int cmd, bool error, const FileInfoList &results)
+/** When a download finishes, process the results.
+ */
+void PhotoCache::_q_commandFinished(int cmd, bool error, const FileInfoList &results)
 {
     Q_UNUSED(results);
     if (cmd != FileSystem::Get)
@@ -149,7 +151,7 @@ void PhotoCache::processQueue()
     if (!m_fileSystems.contains(job->fs)) {
         m_fileSystems << job->fs;
         connect(job->fs, SIGNAL(commandFinished(int, bool, const FileInfoList&)),
-                this, SLOT(commandFinished(int, bool, const FileInfoList&)));
+                this, SLOT(_q_commandFinished(int, bool, const FileInfoList&)));
     }
     m_downloadItem = job;
     m_downloadDevice = job->fs->get(job->url, job->type);
@@ -198,44 +200,7 @@ PhotoModel::PhotoModel(QObject *parent)
     m_uploads = new PhotoUploadModel(this);
 
     connect(PhotoCache::instance(), SIGNAL(photoChanged(QUrl)),
-            this, SLOT(photoChanged(QUrl)));
-}
-
-/** When a command finishes, process its results.
- *
- * @param cmd
- * @param error
- * @param results
- */
-void PhotoModel::commandFinished(int cmd, bool error, const FileInfoList &results)
-{
-    Q_ASSERT(m_fs);
-
-    if (error) {
-        qWarning() << m_fs->commandName(cmd) << "command failed";
-        return;
-    }
-
-    switch (cmd)
-    {
-    case FileSystem::Open:
-    case FileSystem::Mkdir:
-    case FileSystem::Put:
-    case FileSystem::Remove:
-        refresh();
-        break;
-    case FileSystem::List:
-        removeRows(0, rootItem->children.size());
-        foreach (const FileInfo& info, results) {
-            if (info.isDir() || isImage(info.name())) {
-                PhotoItem *item = new PhotoItem(info);
-                addItem(item, rootItem);
-            }
-        }
-        break;
-    default:
-        break;
-    }
+            this, SLOT(_q_photoChanged(QUrl)));
 }
 
 QVariant PhotoModel::data(const QModelIndex &index, int role) const
@@ -280,15 +245,6 @@ void PhotoModel::createAlbum(const QString &name)
     m_fs->mkdir(newUrl);
 }
 
-void PhotoModel::photoChanged(const QUrl &url)
-{
-    foreach (ChatModelItem *ptr, rootItem->children) {
-        PhotoItem *item = static_cast<PhotoItem*>(ptr);
-        if (item->url() == url)
-            emit dataChanged(createIndex(item), createIndex(item));
-    }
-}
-
 /** Refresh the contents of the current folder.
  */
 void PhotoModel::refresh()
@@ -314,15 +270,15 @@ void PhotoModel::setRootUrl(const QUrl &rootUrl)
 
         m_fs = FileSystem::factory(m_rootUrl, this);
         check = connect(m_fs, SIGNAL(commandFinished(int, bool, const FileInfoList&)),
-                        this, SLOT(commandFinished(int, bool, const FileInfoList&)));
+                        this, SLOT(_q_commandFinished(int, bool, const FileInfoList&)));
         Q_ASSERT(check);
 
         check = connect(m_fs, SIGNAL(commandFinished(int, bool, const FileInfoList&)),
-                        m_uploads, SLOT(commandFinished(int, bool, const FileInfoList&)));
+                        m_uploads, SLOT(_q_commandFinished(int, bool, const FileInfoList&)));
         Q_ASSERT(check);
 
         check = connect(m_fs, SIGNAL(putProgress(int, int)),
-                        m_uploads, SLOT(putProgress(int, int)));
+                        m_uploads, SLOT(_q_putProgress(int, int)));
         Q_ASSERT(check);
 
         m_fs->open(m_rootUrl);
@@ -345,6 +301,54 @@ void PhotoModel::upload(const QString &filePath)
 PhotoUploadModel *PhotoModel::uploads() const
 {
     return m_uploads;
+}
+
+/** When a command finishes, process its results.
+ *
+ * @param cmd
+ * @param error
+ * @param results
+ */
+void PhotoModel::_q_commandFinished(int cmd, bool error, const FileInfoList &results)
+{
+    Q_ASSERT(m_fs);
+
+    if (error) {
+        qWarning() << m_fs->commandName(cmd) << "command failed";
+        return;
+    }
+
+    switch (cmd)
+    {
+    case FileSystem::Open:
+    case FileSystem::Mkdir:
+    case FileSystem::Put:
+    case FileSystem::Remove:
+        refresh();
+        break;
+    case FileSystem::List:
+        removeRows(0, rootItem->children.size());
+        foreach (const FileInfo& info, results) {
+            if (info.isDir() || isImage(info.name())) {
+                PhotoItem *item = new PhotoItem(info);
+                addItem(item, rootItem);
+            }
+        }
+        break;
+    default:
+        break;
+    }
+}
+
+/** When a photo changes, emit notifications.
+ */
+void PhotoModel::_q_photoChanged(const QUrl &url)
+{
+    foreach (ChatModelItem *ptr, rootItem->children) {
+        PhotoItem *item = static_cast<PhotoItem*>(ptr);
+        if (item->url() == url)
+            emit dataChanged(createIndex(item), createIndex(item));
+    }
 }
 
 class PhotoUploadItem : public ChatModelItem
@@ -384,26 +388,6 @@ void PhotoUploadModel::append(const QString &filePath, FileSystem *fileSystem, c
     item->destinationPath = destinationPath;
     item->fileSystem = fileSystem;
     addItem(item, rootItem);
-
-    processQueue();
-}
-
-void PhotoUploadModel::commandFinished(int cmd, bool error, const FileInfoList &results)
-{
-    Q_UNUSED(error);
-    Q_UNUSED(results);
-
-    if (cmd != FileSystem::Put)
-        return;
-
-    if (m_uploadItem) {
-        m_uploadItem->finished = true;
-        emit dataChanged(createIndex(m_uploadItem), createIndex(m_uploadItem));
-        m_uploadItem = 0;
-
-        delete m_uploadDevice;
-        m_uploadDevice = 0;
-    }
 
     processQueue();
 }
@@ -457,9 +441,31 @@ void PhotoUploadModel::processQueue()
     }
 }
 
-/** TODO: Update the progress bar for the current upload.
+/** When an upload finishes, process the results.
  */
-void PhotoUploadModel::putProgress(int done, int total)
+void PhotoUploadModel::_q_commandFinished(int cmd, bool error, const FileInfoList &results)
+{
+    Q_UNUSED(error);
+    Q_UNUSED(results);
+
+    if (cmd != FileSystem::Put)
+        return;
+
+    if (m_uploadItem) {
+        m_uploadItem->finished = true;
+        emit dataChanged(createIndex(m_uploadItem), createIndex(m_uploadItem));
+        m_uploadItem = 0;
+
+        delete m_uploadDevice;
+        m_uploadDevice = 0;
+    }
+
+    processQueue();
+}
+
+/** When upload progress changes, emit notifications.
+ */
+void PhotoUploadModel::_q_putProgress(int done, int total)
 {
     if (m_uploadItem) {
         m_uploadItem->size = total;

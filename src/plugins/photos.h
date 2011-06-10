@@ -47,11 +47,12 @@ signals:
     void photoChanged(const QUrl &url);
 
 private slots:
-    void commandFinished(int cmd, bool error, const FileInfoList &results);
-    void processQueue();
+    void _q_commandFinished(int cmd, bool error, const FileInfoList &results);
 
 private:
     PhotoCache();
+    void processQueue();
+
     QSet<FileSystem*> m_fileSystems;
     QList<PhotoDownloadItem*> m_downloadQueue;
     PhotoDownloadItem *m_downloadItem;
@@ -91,8 +92,8 @@ public slots:
     void upload(const QString &filePath);
 
 private slots:
-    void commandFinished(int cmd, bool error, const FileInfoList &results);
-    void photoChanged(const QUrl &url);
+    void _q_commandFinished(int cmd, bool error, const FileInfoList &results);
+    void _q_photoChanged(const QUrl &url);
 
 private:
     FileSystem *m_fs;
@@ -113,11 +114,12 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
 private slots:
-    void commandFinished(int cmd, bool error, const FileInfoList &results);
-    void processQueue();
-    void putProgress(int done, int total);
+    void _q_commandFinished(int cmd, bool error, const FileInfoList &results);
+    void _q_putProgress(int done, int total);
 
 private:
+    void processQueue();
+
     PhotoModel *m_photoModel;
     QIODevice *m_uploadDevice;
     PhotoUploadItem *m_uploadItem;
