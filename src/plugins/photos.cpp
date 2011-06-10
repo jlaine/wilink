@@ -77,14 +77,14 @@ void PhotoCache::commandFinished(int cmd, bool error, const FileInfoList &result
         m_downloadDevice->deleteLater();
         m_downloadDevice = 0;
 
-        photoImageCache.insert(m_downloadUrl, image);
-        emit photoChanged(m_downloadUrl);
+        photoImageCache.insert(m_downloadItem.url, image);
+        emit photoChanged(m_downloadItem.url);
     }
 
     processQueue();
 }
 
-QUrl PhotoCache::imageUrl(const QUrl &url, FileSystem *fs)
+QUrl PhotoCache::imageUrl(const QUrl &url, FileSystem::Type type, FileSystem *fs)
 {
     if (photoImageCache.contains(url)) {
         QUrl cacheUrl("image://photo");
@@ -94,15 +94,18 @@ QUrl PhotoCache::imageUrl(const QUrl &url, FileSystem *fs)
 
     // check if the url is already queued
     bool found = false;
-    QPair<QUrl, FileSystem*> job;
+    DownloadItem job;
     foreach (job, m_downloadQueue) {
-        if (job.first == url) {
+        if (job.url == url && job.type == type) {
             found = true;
             break;
         }
     }
     if (!found) {
-        m_downloadQueue.append(qMakePair(url, fs));
+        job.fs = fs;
+        job.type = type;
+        job.url = url;
+        m_downloadQueue.append(job);
         processQueue();
     }
 
@@ -121,15 +124,14 @@ void PhotoCache::processQueue()
     if (m_downloadDevice || m_downloadQueue.isEmpty())
         return;
 
-    QPair<QUrl, FileSystem*> job = m_downloadQueue.takeFirst();
-    FileSystem *fs = job.second;
-    if (!m_fileSystems.contains(fs)) {
-        m_fileSystems << fs;
-        connect(fs, SIGNAL(commandFinished(int, bool, const FileInfoList&)),
+    DownloadItem job = m_downloadQueue.takeFirst();
+    if (!m_fileSystems.contains(job.fs)) {
+        m_fileSystems << job.fs;
+        connect(job.fs, SIGNAL(commandFinished(int, bool, const FileInfoList&)),
                 this, SLOT(commandFinished(int, bool, const FileInfoList&)));
     }
-    m_downloadUrl = job.first;
-    m_downloadDevice = fs->get(m_downloadUrl, FileSystem::MediumSize);
+    m_downloadItem = job;
+    m_downloadDevice = job.fs->get(job.url, job.type);
 }
 
 PhotoImageProvider::PhotoImageProvider()
@@ -225,7 +227,7 @@ QVariant PhotoModel::data(const QModelIndex &index, int role) const
         if (item->isDir()) {
             return QUrl("qrc:/album-128.png");
         } else {
-            return PhotoCache::instance()->imageUrl(item->url(), m_fs);
+            return PhotoCache::instance()->imageUrl(item->url(), FileSystem::MediumSize, m_fs);
         }
     } else if (role == IsDirRole)
         return item->isDir();
