@@ -147,8 +147,13 @@ Panel {
 
         delegate: Item {
             id: item
+
             width: view.cellWidth
             height: view.cellHeight
+
+            function clicked() {
+                crumbBar.push(model);
+            }
 
             Column {
                 anchors.fill: parent
@@ -180,8 +185,19 @@ Panel {
 
                 onClicked: {
                     view.currentIndex = model.index;
-                    crumbBar.push(model);
+                    item.clicked();
                 }
+            }
+        }
+
+        Keys.onPressed: {
+            if (event.key == Qt.Key_Back || event.key == Qt.Key_Backspace) {
+                if (crumbBar.model.count > 1) {
+                    crumbBar.pop();
+                }
+            }
+            else if (event.key == Qt.Key_Return || event.key == Qt.Key_Enter) {
+                view.currentItem.clicked();
             }
         }
     }
@@ -220,6 +236,14 @@ Panel {
                     height: displayView.height
                     source: model.image
                     fillMode: Image.PreserveAspectFit
+                }
+            }
+
+            Keys.onPressed: {
+                if (event.key == Qt.Key_Back || event.key == Qt.Key_Backspace) {
+                    if (crumbBar.model.count > 1) {
+                        crumbBar.pop();
+                    }
                 }
             }
         }
