@@ -39,7 +39,7 @@ class PhotoCache : public QObject
 
 public:
     static PhotoCache *instance();
-    QUrl imageUrl(const QUrl &url, FileSystem *fs);
+    QUrl imageUrl(const QUrl &url, FileSystem::Type size, FileSystem *fs);
 
 signals:
     void photoChanged(const QUrl &url);
@@ -49,10 +49,17 @@ private slots:
     void processQueue();
 
 private:
+    class DownloadItem {
+    public:
+        FileSystem *fs;
+        FileSystem::Type type;
+        QUrl url;
+    };
+
     PhotoCache();
     QSet<FileSystem*> m_fileSystems;
-    QList<QPair<QUrl, FileSystem*> > m_downloadQueue;
-    QUrl m_downloadUrl;
+    QList<DownloadItem> m_downloadQueue;
+    DownloadItem m_downloadItem;
     QIODevice *m_downloadDevice;
 };
 
