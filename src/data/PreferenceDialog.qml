@@ -77,29 +77,46 @@ Dialog {
             anchors.left: tabList.right
             anchors.right: parent.right
 
-            Image {
-                id: appIcon
+            Item {
                 anchors.left: parent.left
-                source: 'wiLink-64.png'
+                anchors.right: parent.right
+
+                CheckBox {
+                    id: check
+                    onClicked: checked = !checked
+                }
+
+                Text {
+
+                }
             }
 
-            Text {
-                id: appName
+            Item {
+                anchors.fill: parent
+                Image {
+                    id: appIcon
+                    anchors.left: parent.left
+                    source: 'wiLink-64.png'
+                }
 
-                anchors.left: appIcon.right
-                anchors.top: appIcon.top
-                anchors.margins: 6
-                font.bold: true
-                font.pixelSize: 20
-                text: application.applicationName
-            }
+                Text {
+                    id: appName
 
-            Text {
-                anchors.left: appIcon.right
-                anchors.top: appName.bottom
-                anchors.margins: 6
-                font.pixelSize: 16
-                text: qsTr('version %1').replace('%1', application.applicationVersion)
+                    anchors.left: appIcon.right
+                    anchors.top: appIcon.top
+                    anchors.margins: 6
+                    font.bold: true
+                    font.pixelSize: 20
+                    text: application.applicationName
+                }
+
+                Text {
+                    anchors.left: appIcon.right
+                    anchors.top: appName.bottom
+                    anchors.margins: 6
+                    font.pixelSize: 16
+                    text: qsTr('version %1').replace('%1', application.applicationVersion)
+                }
             }
         }
         
