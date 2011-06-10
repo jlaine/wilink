@@ -86,7 +86,7 @@ void PhotoCache::_q_commandFinished(int cmd, bool error, const FileInfoList &res
         m_downloadDevice->close();
 
         photoImageCache.insert(QString::number(m_downloadItem->type) + m_downloadItem->url.toString(), image);
-        emit photoChanged(m_downloadItem->url);
+        emit photoChanged(m_downloadItem->url, m_downloadItem->type);
     }
 
     m_downloadDevice->deleteLater();
@@ -191,6 +191,8 @@ PhotoModel::PhotoModel(QObject *parent)
     : ChatModel(parent),
     m_fs(0)
 {
+    bool check;
+
     QHash<int, QByteArray> names = roleNames();
     names.insert(ImageRole, "image");
     names.insert(IsDirRole, "isDir");
@@ -199,8 +201,9 @@ PhotoModel::PhotoModel(QObject *parent)
 
     m_uploads = new PhotoUploadModel(this);
 
-    connect(PhotoCache::instance(), SIGNAL(photoChanged(QUrl)),
-            this, SLOT(_q_photoChanged(QUrl)));
+    check = connect(PhotoCache::instance(), SIGNAL(photoChanged(QUrl,FileSystem::Type)),
+                    this, SLOT(_q_photoChanged(QUrl,FileSystem::Type)));
+    Q_ASSERT(check);
 }
 
 QVariant PhotoModel::data(const QModelIndex &index, int role) const
@@ -342,12 +345,16 @@ void PhotoModel::_q_commandFinished(int cmd, bool error, const FileInfoList &res
 
 /** When a photo changes, emit notifications.
  */
-void PhotoModel::_q_photoChanged(const QUrl &url)
+void PhotoModel::_q_photoChanged(const QUrl &url, FileSystem::Type size)
 {
     foreach (ChatModelItem *ptr, rootItem->children) {
         PhotoItem *item = static_cast<PhotoItem*>(ptr);
-        if (item->url() == url)
+        if (item->url() == url) {
             emit dataChanged(createIndex(item), createIndex(item));
+            if (size == FileSystem::LargeSize) {
+                emit photoChanged(url, data(createIndex(item), ImageRole).toUrl());
+            }
+        }
     }
 }
 

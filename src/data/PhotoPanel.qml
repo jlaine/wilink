@@ -119,8 +119,10 @@ Panel {
         onLocationChanged: {
             if (location.isDir) {
                 photoModel.rootUrl = location.url;
+                image.url = '';
                 image.source = '';
             } else {
+                image.url = location.url;
                 image.source = location.image;
             }
         }
@@ -211,8 +213,19 @@ Panel {
         Image {
             id: image
 
+            property variant url
+
             anchors.fill: parent
             fillMode: Image.PreserveAspectFit
+
+            Connections {
+                target: view.model
+                onPhotoChanged: {
+                    if (url == image.url) {
+                        image.source = source;
+                    }
+                }
+            }
         }
     }
 

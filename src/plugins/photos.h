@@ -44,7 +44,7 @@ public:
     QUrl imageUrl(const QUrl &url, FileSystem::Type size, FileSystem *fs);
 
 signals:
-    void photoChanged(const QUrl &url);
+    void photoChanged(const QUrl &url, FileSystem::Type size);
 
 private slots:
     void _q_commandFinished(int cmd, bool error, const FileInfoList &results);
@@ -55,8 +55,8 @@ private:
 
     QSet<FileSystem*> m_fileSystems;
     QList<PhotoDownloadItem*> m_downloadQueue;
-    PhotoDownloadItem *m_downloadItem;
     QIODevice *m_downloadDevice;
+    PhotoDownloadItem *m_downloadItem;
 };
 
 class PhotoImageProvider : public QDeclarativeImageProvider
@@ -84,6 +84,7 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
 signals:
+    void photoChanged(const QUrl &url, const QUrl &source);
     void rootUrlChanged(const QUrl &rootUrl);
 
 public slots:
@@ -93,7 +94,7 @@ public slots:
 
 private slots:
     void _q_commandFinished(int cmd, bool error, const FileInfoList &results);
-    void _q_photoChanged(const QUrl &url);
+    void _q_photoChanged(const QUrl &url, FileSystem::Type size);
 
 private:
     FileSystem *m_fs;
