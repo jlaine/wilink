@@ -23,12 +23,22 @@ Dialog {
     id: dialog
     title: qsTr("Preferences")
 
+/*
+    QtObject {
+        id: application
+
+        property string applicationName: 'wiLink'
+        property string applicationVersion: '1.1.7'
+    }
+*/
+
     Item {
         anchors.fill: contents
         anchors.margins: 6
 
         ListView {
             id: tabList
+
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             anchors.left: parent.left
@@ -61,15 +71,38 @@ Dialog {
             }
         }
 
-        Text {
+        Item {
             anchors.top: parent.top
             anchors.bottom: parent.bottom
-            anchors.left: tabList.left
+            anchors.left: tabList.right
             anchors.right: parent.right
-            text: application.applicationName
+
+            Image {
+                id: appIcon
+                anchors.left: parent.left
+                source: 'wiLink-64.png'
+            }
+
+            Text {
+                id: appName
+
+                anchors.left: appIcon.right
+                anchors.top: appIcon.top
+                anchors.margins: 6
+                font.bold: true
+                font.pixelSize: 20
+                text: application.applicationName
+            }
+
+            Text {
+                anchors.left: appIcon.right
+                anchors.top: appName.bottom
+                anchors.margins: 6
+                font.pixelSize: 16
+                text: qsTr('version %1').replace('%1', application.applicationVersion)
+            }
         }
         
     }
-
 }
 
