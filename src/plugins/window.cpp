@@ -18,12 +18,7 @@
  */
 
 #include <QApplication>
-#include <QAudioDeviceInfo>
-#include <QAudioInput>
 #include <QAuthenticator>
-#include <QBuffer>
-#include <QCheckBox>
-#include <QComboBox>
 #include <QDeclarativeContext>
 #include <QDeclarativeEngine>
 #include <QDeclarativeItem>
@@ -33,24 +28,19 @@
 #include <QDesktopWidget>
 #include <QDialogButtonBox>
 #include <QFileDialog>
-#include <QGroupBox>
 #include <QLabel>
 #include <QLayout>
 #include <QList>
 #include <QMenuBar>
 #include <QMessageBox>
-#include <QPluginLoader>
-#include <QPushButton>
 #include <QShortcut>
 #include <QStringList>
 #include <QTimer>
 
-#include "QSoundMeter.h"
 #include "QSoundPlayer.h"
 
 #include "QXmppCallManager.h"
 #include "QXmppConfiguration.h"
-#include "QXmppConstants.h"
 #include "QXmppDiscoveryManager.h"
 #include "QXmppLogger.h"
 #include "QXmppMessage.h"
