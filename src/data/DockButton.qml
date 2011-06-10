@@ -40,6 +40,28 @@ Rectangle {
     width: 28
     state: mouseArea.pressed ? 'pressed' : (mouseArea.hovered ? 'hovered' : '')
 
+    Rectangle {
+        id: dockBackground
+
+        height: parent.width - 29
+        width: 42
+        anchors.bottom: parent.top
+        anchors.bottomMargin: 10
+        anchors.left: parent.left
+        anchors.leftMargin: 29
+
+        gradient: Gradient {
+            GradientStop { position:0.0; color: '#aa597fbe' }
+            GradientStop { position:1.0; color: '#aa9fb7dd' }
+        }
+
+        transform: Rotation {
+            angle: 90
+            origin.x: 0
+            origin.y: dockBackground.height
+        }
+    }
+
     Image {
         id: image
 
