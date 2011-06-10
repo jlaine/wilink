@@ -351,9 +351,6 @@ void PhotoModel::_q_photoChanged(const QUrl &url, FileSystem::Type size)
         PhotoItem *item = static_cast<PhotoItem*>(ptr);
         if (item->url() == url) {
             emit dataChanged(createIndex(item), createIndex(item));
-            if (size == FileSystem::LargeSize) {
-                emit photoChanged(url, data(createIndex(item), ImageRole).toUrl());
-            }
         }
     }
 }

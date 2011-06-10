@@ -22,7 +22,7 @@ import wiLink 1.2
 
 Panel {
     id: panel
-
+    focus: true
     property variant url
 
     onUrlChanged: {
@@ -105,17 +105,29 @@ Panel {
         anchors.top: header.bottom
         anchors.left: parent.left
         anchors.right: parent.right
+        focus: true
+        z: 1
 
         onLocationChanged: {
             if (location.isDir) {
                 photoModel.rootUrl = location.url;
                 panel.state = '';
             } else {
-                displayView.positionViewAtIndex(view.currentIndex, ListView.Beginning);
+                displayView.currentIndex = view.currentIndex;
+                displayView.positionViewAtIndex(displayView.currentIndex, ListView.Beginning);
                 panel.state = 'details';
             }
         }
-        z: 1
+
+        Keys.onLeftPressed: {
+            displayView.decrementCurrentIndex();
+            displayView.positionViewAtIndex(displayView.currentIndex, ListView.Beginning);
+        }
+
+        Keys.onRightPressed: {
+            displayView.incrementCurrentIndex();
+            displayView.positionViewAtIndex(displayView.currentIndex, ListView.Beginning);
+        }
     }
 
     PanelHelp {

@@ -84,7 +84,6 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
 signals:
-    void photoChanged(const QUrl &url, const QUrl &source);
     void rootUrlChanged(const QUrl &rootUrl);
 
 public slots:
