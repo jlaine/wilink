@@ -30,6 +30,15 @@ Item {
     // width: view.cellWidth + scrollBar.width
     width: 91
 
+    Rectangle {
+        id: background
+
+        anchors.fill:  parent
+        color: 'transparent'
+        border.color: '#597fbe'
+        border.width: 1
+    }
+
     GridView {
         id: view
 
@@ -37,6 +46,7 @@ Item {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: scrollBar.left
+        anchors.margins: 2
         cellWidth: 80
         cellHeight: 54
 
