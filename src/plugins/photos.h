@@ -30,6 +30,8 @@
 using namespace QNetIO;
 
 class Chat;
+class PhotoCachePrivate;
+class PhotoDownloadItem;
 class PhotoUploadItem;
 class PhotoUploadModel;
 
@@ -49,17 +51,10 @@ private slots:
     void processQueue();
 
 private:
-    class DownloadItem {
-    public:
-        FileSystem *fs;
-        FileSystem::Type type;
-        QUrl url;
-    };
-
     PhotoCache();
     QSet<FileSystem*> m_fileSystems;
-    QList<DownloadItem> m_downloadQueue;
-    DownloadItem m_downloadItem;
+    QList<PhotoDownloadItem*> m_downloadQueue;
+    PhotoDownloadItem *m_downloadItem;
     QIODevice *m_downloadDevice;
 };
 

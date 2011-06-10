@@ -35,7 +35,15 @@
 static const QSize UPLOAD_SIZE(2048, 2048);
 
 static PhotoCache *photoCache = 0;
-static QCache<QUrl, QImage> photoImageCache;
+static QCache<QString, QImage> photoImageCache;
+
+class PhotoDownloadItem
+{
+public:
+    FileSystem *fs;
+    FileSystem::Type type;
+    QUrl url;
+};
 
 enum PhotoRole
 {
@@ -65,47 +73,49 @@ void PhotoCache::commandFinished(int cmd, bool error, const FileInfoList &result
         return;
 
     Q_ASSERT(m_downloadDevice);
+    Q_ASSERT(m_downloadItem);
 
-    if (error) {
-        m_downloadDevice->deleteLater();
-        m_downloadDevice = 0;
-    } else {
+    if (!error) {
         // load image
         m_downloadDevice->reset();
         QImage *image = new QImage;
         image->load(m_downloadDevice, NULL);
         m_downloadDevice->close();
-        m_downloadDevice->deleteLater();
-        m_downloadDevice = 0;
 
-        photoImageCache.insert(m_downloadItem.url, image);
-        emit photoChanged(m_downloadItem.url);
+        photoImageCache.insert(m_downloadItem->url.toString(), image);
+        emit photoChanged(m_downloadItem->url);
     }
+
+    m_downloadDevice->deleteLater();
+    m_downloadDevice = 0;
+    delete m_downloadItem;
+    m_downloadItem = 0;
 
     processQueue();
 }
 
 QUrl PhotoCache::imageUrl(const QUrl &url, FileSystem::Type type, FileSystem *fs)
 {
-    if (photoImageCache.contains(url)) {
+    const QString key = url.toString();
+    if (photoImageCache.contains(key)) {
         QUrl cacheUrl("image://photo");
-        cacheUrl.setPath("/" + url.toString());
+        cacheUrl.setPath("/" + key);
         return cacheUrl;
     }
 
     // check if the url is already queued
-    bool found = false;
-    DownloadItem job;
-    foreach (job, m_downloadQueue) {
-        if (job.url == url && job.type == type) {
-            found = true;
+    PhotoDownloadItem *job = 0;
+    foreach (PhotoDownloadItem *ptr, m_downloadQueue) {
+        if (ptr->url == url && ptr->type == type) {
+            job = ptr;
             break;
         }
     }
-    if (!found) {
-        job.fs = fs;
-        job.type = type;
-        job.url = url;
+    if (!job) {
+        job = new PhotoDownloadItem;
+        job->fs = fs;
+        job->type = type;
+        job->url = url;
         m_downloadQueue.append(job);
         processQueue();
     }
@@ -125,14 +135,14 @@ void PhotoCache::processQueue()
     if (m_downloadDevice || m_downloadQueue.isEmpty())
         return;
 
-    DownloadItem job = m_downloadQueue.takeFirst();
-    if (!m_fileSystems.contains(job.fs)) {
-        m_fileSystems << job.fs;
-        connect(job.fs, SIGNAL(commandFinished(int, bool, const FileInfoList&)),
+    PhotoDownloadItem *job = m_downloadQueue.takeFirst();
+    if (!m_fileSystems.contains(job->fs)) {
+        m_fileSystems << job->fs;
+        connect(job->fs, SIGNAL(commandFinished(int, bool, const FileInfoList&)),
                 this, SLOT(commandFinished(int, bool, const FileInfoList&)));
     }
     m_downloadItem = job;
-    m_downloadDevice = job.fs->get(job.url, job.type);
+    m_downloadDevice = job->fs->get(job->url, job->type);
 }
 
 PhotoImageProvider::PhotoImageProvider()
@@ -143,7 +153,7 @@ PhotoImageProvider::PhotoImageProvider()
 QImage PhotoImageProvider::requestImage(const QString &id, QSize *size, const QSize &requestedSize)
 {
     QImage image;
-    QImage *cached = photoImageCache.object(QUrl(id));
+    QImage *cached = photoImageCache.object(id);
     if (cached) {
         image = *cached;
     } else {
