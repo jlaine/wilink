@@ -535,6 +535,10 @@ Acceptez-vous?</translation>
         <source>version %1</source>
         <translation>version %1</translation>
     </message>
+    <message>
+        <source>Show offline contacts</source>
+        <translation>Afficher les contacts déconnectés</translation>
+    </message>
 </context>
 <context>
     <name>RoomInviteDialog</name>

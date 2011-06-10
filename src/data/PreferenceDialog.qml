@@ -23,6 +23,10 @@ Dialog {
     id: dialog
     title: qsTr("Preferences")
 
+    onAccepted: {
+        generalOptions.save();
+        dialog.hide();
+    }
 /*
     QtObject {
         id: application
@@ -60,10 +64,12 @@ Dialog {
             }
             delegate: Row {
                 spacing: 4
+
                 Image {
                     anchors.verticalCenter: parent.verticalCenter
                     source: model.avatar
                 }
+
                 Text {
                     anchors.verticalCenter: parent.verticalCenter
                     text: model.name
@@ -72,27 +78,45 @@ Dialog {
         }
 
         Item {
+            id: generalOptions
+
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             anchors.left: tabList.right
             anchors.right: parent.right
 
-            Item {
+            function save() {
+                application.showOfflineContacts = check.checked
+            }
+
+            Row {
+                id: prefs
+
+                anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.right: parent.right
+                spacing: 4
 
                 CheckBox {
                     id: check
-                    onClicked: checked = !checked
+
+                    anchors.verticalCenter: parent.verticalCenter
+                    checked: application.showOfflineContacts
+                    onClicked: check.checked = !check.checked
                 }
 
                 Text {
-
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: qsTr('Show offline contacts')
                 }
             }
 
             Item {
-                anchors.fill: parent
+                anchors.top: prefs.bottom
+                anchors.bottom: parent.bottom
+                anchors.left: parent.left
+                anchors.right: parent.right
+
                 Image {
                     id: appIcon
                     anchors.left: parent.left

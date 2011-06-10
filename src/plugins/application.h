@@ -43,6 +43,8 @@ class ApplicationPrivate;
 class Application : public QApplication
 {
     Q_OBJECT
+    Q_PROPERTY(QString applicationName READ applicationName CONSTANT)
+    Q_PROPERTY(QString applicationVersion READ applicationVersion CONSTANT)
     Q_PROPERTY(QString downloadsLocation READ downloadsLocation CONSTANT)
     Q_PROPERTY(QString incomingMessageSound READ incomingMessageSound WRITE setIncomingMessageSound)
     Q_PROPERTY(QString outgoingMessageSound READ outgoingMessageSound WRITE setOutgoingMessageSound)
