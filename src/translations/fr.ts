@@ -718,6 +718,13 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>ShareView</name>
+    <message>
+        <source>Download</source>
+        <translation>Télécharger</translation>
+    </message>
+</context>
+<context>
     <name>SoundOptions</name>
     <message>
         <source>Sound</source>
