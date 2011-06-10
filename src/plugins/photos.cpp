@@ -62,7 +62,8 @@ static bool isImage(const QString &fileName)
 }
 
 PhotoCache::PhotoCache()
-    : m_downloadDevice(0)
+    : m_downloadDevice(0),
+      m_downloadItem(0)
 {
 }
 
@@ -82,7 +83,7 @@ void PhotoCache::commandFinished(int cmd, bool error, const FileInfoList &result
         image->load(m_downloadDevice, NULL);
         m_downloadDevice->close();
 
-        photoImageCache.insert(m_downloadItem->url.toString(), image);
+        photoImageCache.insert(QString::number(m_downloadItem->type) + m_downloadItem->url.toString(), image);
         emit photoChanged(m_downloadItem->url);
     }
 
@@ -96,7 +97,7 @@ void PhotoCache::commandFinished(int cmd, bool error, const FileInfoList &result
 
 QUrl PhotoCache::imageUrl(const QUrl &url, FileSystem::Type type, FileSystem *fs)
 {
-    const QString key = url.toString();
+    const QString key = QString::number(type) + url.toString();
     if (photoImageCache.contains(key)) {
         QUrl cacheUrl("image://photo");
         cacheUrl.setPath("/" + key);
@@ -120,6 +121,15 @@ QUrl PhotoCache::imageUrl(const QUrl &url, FileSystem::Type type, FileSystem *fs
         processQueue();
     }
 
+    // try returning a lower resolution
+    for (int i = type - 1; i >= FileSystem::SmallSize; --i) {
+        const QString key = QString::number(i) + url.toString();
+        if (photoImageCache.contains(key)) {
+            QUrl cacheUrl("image://photo");
+            cacheUrl.setPath("/" + key);
+            return cacheUrl;
+        }
+    }
     return QUrl(":/file-128.png");
 }
 
