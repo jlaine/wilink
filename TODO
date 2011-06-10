@@ -8,6 +8,7 @@ HIGH PRIORITY
 - fix crash on account add / remove
 - fix faulty contact ordering
 - set setting 'hide offline contacts' upon upgrade
+- fix duplicate confirmation when adding a contact
 
 LOW PRIORITY
 
@@ -17,8 +18,8 @@ LOW PRIORITY
 - add contact status in chat conversation
 - fix unreaded messages count in chat conversation
 - fix translation in 'add contact' dialog
+- fix translation in confim dialog
 - fix link 'download folder' in share panel
-- rework dock
 
 ENHANCEMENTS
 
