@@ -22,7 +22,6 @@ import wiLink 1.2
 
 Panel {
     id: panel
-    focus: true
     property variant url
 
     onUrlChanged: {
@@ -105,7 +104,6 @@ Panel {
         anchors.top: header.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        focus: true
         z: 1
 
         onLocationChanged: {
@@ -117,16 +115,6 @@ Panel {
                 displayView.positionViewAtIndex(displayView.currentIndex, ListView.Beginning);
                 panel.state = 'details';
             }
-        }
-
-        Keys.onLeftPressed: {
-            displayView.decrementCurrentIndex();
-            displayView.positionViewAtIndex(displayView.currentIndex, ListView.Beginning);
-        }
-
-        Keys.onRightPressed: {
-            displayView.incrementCurrentIndex();
-            displayView.positionViewAtIndex(displayView.currentIndex, ListView.Beginning);
         }
     }
 
@@ -150,6 +138,8 @@ Panel {
         cellWidth: 130
         cellHeight: 150
 
+        highlight: Highlight {}
+
         model:  PhotoModel {
             id: photoModel
         }
@@ -158,13 +148,6 @@ Panel {
             id: item
             width: view.cellWidth
             height: view.cellHeight
-
-            Highlight {
-                id: highlight
-
-                anchors.fill: parent
-                state: 'inactive'
-            }
 
             Column {
                 anchors.fill: parent
@@ -193,14 +176,11 @@ Panel {
 
             MouseArea {
                 anchors.fill: parent
-                hoverEnabled: true
 
                 onClicked: {
                     view.currentIndex = model.index;
                     crumbBar.push(model);
                 }
-                onEntered: highlight.state = ''
-                onExited: highlight.state = 'inactive'
             }
         }
     }
@@ -228,6 +208,7 @@ Panel {
             id: displayView
 
             anchors.fill: parent
+            focus: true
             model: view.model
             orientation: Qt.Horizontal
             delegate: Component {
