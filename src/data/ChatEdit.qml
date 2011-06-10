@@ -67,7 +67,7 @@ Rectangle {
         x: 4
         y: 4
         height: input.paintedHeight + 16
-        width: parent.width - 8
+        width: parent.width - sendButton.width - 12
 
         ListHelper {
             id: listHelper
@@ -167,5 +167,15 @@ Rectangle {
                 }
             }
         }
+    }
+
+    Button {
+        id: sendButton
+
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: parent.right
+        anchors.rightMargin: 4
+        iconSource: 'upload.png'
+        onClicked: chatEdit.returnPressed()
     }
 }
