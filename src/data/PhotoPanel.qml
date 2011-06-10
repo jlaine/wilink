@@ -209,6 +209,7 @@ Panel {
             id: displayView
 
             anchors.fill: parent
+            highlightMoveDuration: 500
             model: view.model
             orientation: Qt.Horizontal
             delegate: Component {
