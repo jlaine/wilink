@@ -109,11 +109,10 @@ Panel {
         onLocationChanged: {
             if (location.isDir) {
                 photoModel.rootUrl = location.url;
-                image.url = '';
-                image.source = '';
+                panel.state = '';
             } else {
-                image.url = location.url;
-                image.source = location.image;
+                displayView.positionViewAtIndex(view.currentIndex, ListView.Beginning);
+                panel.state = 'details';
             }
         }
         z: 1
@@ -184,7 +183,10 @@ Panel {
                 anchors.fill: parent
                 hoverEnabled: true
 
-                onClicked: crumbBar.push(model)
+                onClicked: {
+                    view.currentIndex = model.index;
+                    crumbBar.push(model);
+                }
                 onEntered: highlight.state = ''
                 onExited: highlight.state = 'inactive'
             }
@@ -210,20 +212,20 @@ Panel {
         opacity: 0
         z: 1
 
-        Image {
-            id: image
-
-            property variant url
+        ListView {
+            id: displayView
 
             anchors.fill: parent
-            fillMode: Image.PreserveAspectFit
+            model: view.model
+            orientation: Qt.Horizontal
+            delegate: Component {
+                Image {
+                    id: image
 
-            Connections {
-                target: view.model
-                onPhotoChanged: {
-                    if (url == image.url) {
-                        image.source = source;
-                    }
+                    width: displayView.width
+                    height: displayView.height
+                    source: model.image
+                    fillMode: Image.PreserveAspectFit
                 }
             }
         }
@@ -239,7 +241,6 @@ Panel {
         z: 1
     }
 
-    state: image.source  != '' ? 'details' : ''
     states: State {
         name: 'details'
         PropertyChanges { target: display; opacity: 1 }
