@@ -100,6 +100,7 @@ Item {
                 anchors.right: parent.right
                 anchors.margins: 2
                 iconSource: 'close.png'
+                text: qsTr('Cancel')
 
                 onClicked: view.model.cancel(model.index)
             }

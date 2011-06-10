@@ -156,6 +156,7 @@ Item {
                 height: thumbnail.height
                 iconSource: 'download.png'
                 state: 'inactive'
+                text: qsTr('Download')
                 visible: model.canDownload
 
                 onClicked: {

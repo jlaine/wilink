@@ -716,6 +716,17 @@ Acceptez-vous?</translation>
         <source>%1 files</source>
         <translation>%1 fichiers</translation>
     </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
+    </message>
+</context>
+<context>
+    <name>ShareView</name>
+    <message>
+        <source>Download</source>
+        <translation>Télécharger</translation>
+    </message>
 </context>
 <context>
     <name>SoundOptions</name>
