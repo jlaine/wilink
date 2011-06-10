@@ -17,11 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QAbstractProxyModel>
-#include <QDebug>
 #include <QDesktopServices>
 #include <QFileDialog>
-#include <QFileSystemModel>
 #include <QGroupBox>
 #include <QLabel>
 #include <QLayout>
@@ -36,30 +33,12 @@
 
 #include "options.h"
 
-class FoldersModel : public QFileSystemModel
-{
-public:
-    FoldersModel(QObject *parent = 0);
-    QVariant data(const QModelIndex &index, int role) const;
-    bool setData(const QModelIndex & index, const QVariant &value, int role = Qt::EditRole);
-    Qt::ItemFlags flags(const QModelIndex &index) const;
-
-    void setForcedFolder(const QString &excluded);
-
-    QStringList selectedFolders() const;
-    void setSelectedFolders(const QStringList &selected);
-
-private:
-    QString m_forced;
-    QStringList m_selected;
-};
-
-FoldersModel::FoldersModel(QObject *parent)
+FolderModel::FolderModel(QObject *parent)
     : QFileSystemModel(parent)
 {
 }
 
-QVariant FoldersModel::data(const QModelIndex &index, int role) const
+QVariant FolderModel::data(const QModelIndex &index, int role) const
 {
     if (role == Qt::CheckStateRole && index.isValid() && !index.column())
     {
@@ -85,7 +64,7 @@ QVariant FoldersModel::data(const QModelIndex &index, int role) const
         return QFileSystemModel::data(index, role);
 }
 
-bool FoldersModel::setData(const QModelIndex &changedIndex, const QVariant &value, int role)
+bool FolderModel::setData(const QModelIndex &changedIndex, const QVariant &value, int role)
 {
     if (role == Qt::CheckStateRole && changedIndex.isValid() && !changedIndex.column())
     {
@@ -132,14 +111,14 @@ bool FoldersModel::setData(const QModelIndex &changedIndex, const QVariant &valu
         return false;
 }
 
-Qt::ItemFlags FoldersModel::flags(const QModelIndex &index) const
+Qt::ItemFlags FolderModel::flags(const QModelIndex &index) const
 {
     Qt::ItemFlags flags = QFileSystemModel::flags(index);
     flags |= Qt::ItemIsUserCheckable;
     return flags;
 }
 
-void FoldersModel::setForcedFolder(const QString &forced)
+void FolderModel::setForcedFolder(const QString &forced)
 {
     if (forced == m_forced)
         return;
@@ -170,17 +149,17 @@ void FoldersModel::setForcedFolder(const QString &forced)
     }
 }
 
-QStringList FoldersModel::selectedFolders() const
+QStringList FolderModel::selectedFolders() const
 {
     return m_selected;
 }
 
-void FoldersModel::setSelectedFolders(const QStringList &selected)
+void FolderModel::setSelectedFolders(const QStringList &selected)
 {
     m_selected = selected;
 }
 
-PlacesModel::PlacesModel(QObject *parent)
+PlaceModel::PlaceModel(QObject *parent)
     : QAbstractProxyModel(parent)
 {
     QList<QDesktopServices::StandardLocation> locations;
@@ -198,7 +177,7 @@ PlacesModel::PlacesModel(QObject *parent)
     }
 }
 
-QModelIndex PlacesModel::index(int row, int column, const QModelIndex& parent) const
+QModelIndex PlaceModel::index(int row, int column, const QModelIndex& parent) const
 {
     if (parent.isValid() || row < 0 || row >= m_paths.size())
         return QModelIndex();
@@ -206,17 +185,17 @@ QModelIndex PlacesModel::index(int row, int column, const QModelIndex& parent) c
     return createIndex(row, column, 0);
 }
 
-QModelIndex PlacesModel::parent(const QModelIndex &index) const
+QModelIndex PlaceModel::parent(const QModelIndex &index) const
 {
     return QModelIndex();
 }
 
-int PlacesModel::columnCount(const QModelIndex &parent) const
+int PlaceModel::columnCount(const QModelIndex &parent) const
 {
     return 1;
 }
 
-int PlacesModel::rowCount(const QModelIndex &parent) const
+int PlaceModel::rowCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
         return 0;
@@ -224,7 +203,7 @@ int PlacesModel::rowCount(const QModelIndex &parent) const
         return m_paths.size();
 }
 
-QModelIndex PlacesModel::mapFromSource(const QModelIndex &sourceIndex) const
+QModelIndex PlaceModel::mapFromSource(const QModelIndex &sourceIndex) const
 {
     if (!sourceIndex.isValid())
         return QModelIndex();
@@ -237,7 +216,7 @@ QModelIndex PlacesModel::mapFromSource(const QModelIndex &sourceIndex) const
         return createIndex(row, sourceIndex.column(), 0);
 }
 
-QModelIndex PlacesModel::mapToSource(const QModelIndex &proxyIndex) const
+QModelIndex PlaceModel::mapToSource(const QModelIndex &proxyIndex) const
 {
     if (!proxyIndex.isValid())
         return QModelIndex();
@@ -249,7 +228,7 @@ QModelIndex PlacesModel::mapToSource(const QModelIndex &proxyIndex) const
         return m_fsModel->index(m_paths.at(row));
 }
 
-void PlacesModel::sourceDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
+void PlaceModel::sourceDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
 {
     QModelIndex proxyTopLeft = mapFromSource(topLeft);
     QModelIndex proxyBottomRight = mapFromSource(bottomRight);
@@ -257,7 +236,7 @@ void PlacesModel::sourceDataChanged(const QModelIndex &topLeft, const QModelInde
         emit dataChanged(proxyTopLeft, proxyBottomRight);
 }
 
-void PlacesModel::setSourceModel(QFileSystemModel *sourceModel)
+void PlaceModel::setSourceModel(QFileSystemModel *sourceModel)
 {
     m_fsModel = sourceModel;
     connect(m_fsModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
@@ -277,7 +256,7 @@ ShareOptions::ShareOptions(QXmppShareDatabase *database)
     vbox->addWidget(sharesLabel);
 
     // full view
-    m_fsModel = new FoldersModel(this);
+    m_fsModel = new FolderModel(this);
     m_fsModel->setFilter(QDir::Dirs | QDir::Drives | QDir::NoDotAndDotDot);
     m_fsModel->setForcedFolder(m_database->directory());
     m_fsModel->setSelectedFolders(m_database->mappedDirectories());
@@ -292,7 +271,7 @@ ShareOptions::ShareOptions(QXmppShareDatabase *database)
     vbox->addWidget(m_fsView);
 
     // simple view
-    m_placesModel = new PlacesModel(this);
+    m_placesModel = new PlaceModel(this);
     m_placesModel->setSourceModel(m_fsModel);
     m_placesView = new QTreeView;
     m_placesView->setModel(m_placesModel);

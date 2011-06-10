@@ -21,22 +21,40 @@
 #define __WILINK_SHARES_OPTIONS_H__
 
 #include <QAbstractProxyModel>
-#include <QDialog>
+#include <QFileSystemModel>
 
 #include "plugins/preferences.h"
 
-class FoldersModel;
-class QFileSystemModel;
 class QLineEdit;
 class QTreeView;
 class QXmppShareDatabase;
 
-class PlacesModel : public QAbstractProxyModel
+class FolderModel : public QFileSystemModel
 {
     Q_OBJECT
 
 public:
-    PlacesModel(QObject *parent = 0);
+    FolderModel(QObject *parent = 0);
+    QVariant data(const QModelIndex &index, int role) const;
+    bool setData(const QModelIndex & index, const QVariant &value, int role = Qt::EditRole);
+    Qt::ItemFlags flags(const QModelIndex &index) const;
+
+    void setForcedFolder(const QString &excluded);
+
+    QStringList selectedFolders() const;
+    void setSelectedFolders(const QStringList &selected);
+
+private:
+    QString m_forced;
+    QStringList m_selected;
+};
+
+class PlaceModel : public QAbstractProxyModel
+{
+    Q_OBJECT
+
+public:
+    PlaceModel(QObject *parent = 0);
     QModelIndex index(int row, int column, const QModelIndex& parent) const;
     QModelIndex parent(const QModelIndex &index) const;
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
@@ -79,9 +97,9 @@ private:
     QPushButton *m_fewerButton;
     QXmppShareDatabase *m_database;
     QLineEdit *m_directoryEdit;
-    PlacesModel *m_placesModel;
+    PlaceModel *m_placesModel;
     QTreeView *m_placesView;
-    FoldersModel *m_fsModel;
+    FolderModel *m_fsModel;
     QTreeView *m_fsView;
 };
 
