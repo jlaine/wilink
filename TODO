@@ -13,3 +13,16 @@ LOW PRIORITY
 - add a "do not disturb" option for SIP
 - restore "find" feature
 - save / restore window size and position
+- add contact status in chat conversation
+- fix unreaded messages count in chat conversation
+- fix translation in 'add contact' dialog
+- fix duplicate names in share crumbs
+- fix link 'download folder' in share panel
+- restore text to download and cancel buttons in share panel
+- rework dock
+
+ENHANCEMENTS
+
+- allow user to scroll photos with arrows keys
+- display users list in share panel
+- restore smileys
