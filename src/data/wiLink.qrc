@@ -84,6 +84,7 @@
     <file>PhotoPanel.qml</file>
     <file>PhotoUploadView.qml</file>
     <file>PlayerPanel.qml</file>
+    <file>PreferenceDialog.qml</file>
     <file>ProgressBar.qml</file>
     <file>RoomPanel.qml</file>
     <file>RoomParticipantView.qml</file>
