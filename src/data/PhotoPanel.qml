@@ -137,6 +137,7 @@ Panel {
         anchors.right: scrollBar.left
         cellWidth: 130
         cellHeight: 150
+        focus: true
 
         highlight: Highlight {}
 
@@ -208,7 +209,6 @@ Panel {
             id: displayView
 
             anchors.fill: parent
-            focus: true
             model: view.model
             orientation: Qt.Horizontal
             delegate: Component {
@@ -237,7 +237,8 @@ Panel {
     states: State {
         name: 'details'
         PropertyChanges { target: display; opacity: 1 }
-        PropertyChanges { target: view; opacity: 0 }
+        PropertyChanges { target: displayView; focus: true }
+        PropertyChanges { target: view; opacity: 0; focus: false }
         PropertyChanges { target: help; height: 0; opacity: 0 }
     }
 
