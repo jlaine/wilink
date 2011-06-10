@@ -130,7 +130,7 @@ Item {
 
                 onClicked: {
                     itemHovered = false
-                    if (model.isDir) {
+                    if (model.isDir && (model.jid != view.model.rootJid || model.node != view.model.rootNode)) {
                         crumbBar.push(model);
                     }
                 }
