@@ -226,6 +226,7 @@ Panel {
 
             anchors.fill: parent
             highlightMoveDuration: 500
+            highlightRangeMode: ListView.StrictlyEnforceRange
             model: view.model
             orientation: Qt.Horizontal
             snapMode: ListView.SnapToItem
