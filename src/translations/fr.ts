@@ -396,6 +396,10 @@ Acceptez-vous?</translation>
         <source>Chat</source>
         <translation>Chat</translation>
     </message>
+    <message>
+        <source>Preferences</source>
+        <translation>Préférences</translation>
+    </message>
 </context>
 <context>
     <name>LogPanel</name>
@@ -519,6 +523,13 @@ Acceptez-vous?</translation>
     <message>
         <source>Home</source>
         <translation>Accueil</translation>
+    </message>
+</context>
+<context>
+    <name>PreferenceDialog</name>
+    <message>
+        <source>Preferences</source>
+        <translation>Préférences</translation>
     </message>
 </context>
 <context>

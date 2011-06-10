@@ -112,6 +112,15 @@ Rectangle {
         }
 
         DockButton {
+            iconSource: 'options.png'
+            text: qsTr('Preferences')
+            onClicked: {
+                dialog.source = 'PreferenceDialog.qml';
+                dialog.item.show();
+            }
+        }
+
+        DockButton {
             iconSource: 'diagnostics.png'
             shortcut: Qt.ControlModifier + Qt.Key_I
             text: qsTr('Diagnostics')

@@ -123,6 +123,7 @@ if(RELOAD_TRANSLATIONS)
         data/PhoneHistoryView.qml
         data/PhonePanel.qml
         data/PhotoPanel.qml
+        data/PreferenceDialog.qml
         data/RoomPanel.qml
         data/SharePanel.qml
         data/ShareQueueView.qml
