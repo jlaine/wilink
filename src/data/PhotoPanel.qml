@@ -99,20 +99,10 @@ Panel {
         }
     }
 
-    PanelHelp {
-        id: help
-
-        anchors.top: header.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        text: qsTr('To upload your photos to wifirst.net, simply drag and drop them to an album.')
-        z: 1
-    }
-
     CrumbBar {
         id: crumbBar
 
-        anchors.top: help.bottom
+        anchors.top: header.bottom
         anchors.left: parent.left
         anchors.right: parent.right
 
@@ -129,10 +119,20 @@ Panel {
         z: 1
     }
 
+    PanelHelp {
+        id: help
+
+        anchors.top: crumbBar.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        text: qsTr('To upload your photos to wifirst.net, simply drag and drop them to an album.')
+        z: 1
+    }
+
     GridView {
         id: view
 
-        anchors.top: crumbBar.bottom
+        anchors.top: help.bottom
         anchors.bottom: footer.top
         anchors.left: parent.left
         anchors.right: scrollBar.left
