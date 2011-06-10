@@ -89,6 +89,7 @@ Item {
                         anchors.top: parent.top
                         anchors.bottom: parent.bottom
                         color: '#000000'
+                        font.bold: !isLast
                         text: model.name
                         verticalAlignment: Text.AlignVCenter
                     }
