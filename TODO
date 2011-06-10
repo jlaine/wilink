@@ -7,6 +7,7 @@ HIGH PRIORITY
 - auto-join bookmarked rooms
 - fix crash on account add / remove
 - fix faulty contact ordering
+- set setting 'hide offline contacts' upon upgrade
 
 LOW PRIORITY
 
@@ -21,6 +22,5 @@ LOW PRIORITY
 
 ENHANCEMENTS
 
-- allow user to scroll photos with arrows keys
 - display users list in share panel
 - restore smileys
