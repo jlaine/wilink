@@ -339,4 +339,14 @@ Panel {
             }
         }
     }
+
+    states: State {
+        name: 'noroster'
+
+        PropertyChanges { target: left; width: 0 }
+    }
+
+    transitions: Transition {
+        PropertyAnimation { target: left; properties: 'width'; duration: 200 }
+    }
 }

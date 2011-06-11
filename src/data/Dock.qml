@@ -58,7 +58,17 @@ Rectangle {
         DockButton {
             iconSource: 'chat.png'
             text: qsTr('Chat')
-            onClicked: swapper.showPanel('ChatPanel.qml')
+            onClicked: {
+                var panel = swapper.findPanel('ChatPanel.qml');
+                if (panel == swapper.currentItem) {
+                    if (panel.state == 'noroster')
+                        panel.state = '';
+                    else
+                        panel.state = 'noroster';
+                } else {
+                    swapper.setCurrentItem(panel);
+                }
+            }
         }
 
         DockButton {
