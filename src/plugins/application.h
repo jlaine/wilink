@@ -49,7 +49,7 @@ class Application : public QApplication
     Q_PROPERTY(QString incomingMessageSound READ incomingMessageSound WRITE setIncomingMessageSound)
     Q_PROPERTY(QString outgoingMessageSound READ outgoingMessageSound WRITE setOutgoingMessageSound)
     Q_PROPERTY(bool showOfflineContacts READ showOfflineContacts WRITE setShowOfflineContacts NOTIFY showOfflineContactsChanged)
-    Q_PROPERTY(bool sortContactsByStatus READ sortContactsByStatus NOTIFY sortContactsByStatusChanged)
+    Q_PROPERTY(bool sortContactsByStatus READ sortContactsByStatus WRITE setSortContactsByStatus NOTIFY sortContactsByStatusChanged)
     Q_PROPERTY(QSoundPlayer* soundPlayer READ soundPlayer CONSTANT)
 
 public:
