@@ -121,6 +121,7 @@ Rectangle {
             }
         }
 
+/*
         DockButton {
             iconSource: 'options.png'
             text: qsTr('Preferences')
@@ -129,6 +130,7 @@ Rectangle {
                 dialog.item.show();
             }
         }
+*/
 
         DockButton {
             iconSource: 'diagnostics.png'
