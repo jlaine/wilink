@@ -125,9 +125,10 @@ Panel {
             currentJid: (Qt.isQtObject(chatSwapper.currentItem) && chatSwapper.currentItem.jid != undefined) ? chatSwapper.currentItem.jid : ''
             model: SortFilterProxyModel {
                 dynamicSortFilter: true
-                filterKeyColumn: 1
+                filterRole: RosterModel.SortingRole
                 filterRegExp: application.showOfflineContacts ? /.*/ : /^(?!offline).+/
                 sortCaseSensitivity: Qt.CaseInsensitive
+                sortRole: application.sortContactsByStatus ? RosterModel.SortingRole : RosterModel.NameRole
                 sourceModel: window.rosterModel
                 Component.onCompleted: sort(0)
             }

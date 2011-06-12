@@ -73,8 +73,8 @@ Dialog {
         clip: true
         model: SortFilterProxyModel {
             dynamicSortFilter: true
-            filterKeyColumn: 1
             filterRegExp: /^(?!offline).+/
+            filterRole: RosterModel.SortingRole
             sortCaseSensitivity: Qt.CaseInsensitive
             sourceModel: window.rosterModel
             Component.onCompleted: sort(0)

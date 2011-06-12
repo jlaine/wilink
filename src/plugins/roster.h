@@ -47,17 +47,19 @@ public:
 class ChatRosterModel : public ChatModel
 {
     Q_OBJECT
+    Q_ENUMS(Role)
 
 public:
     enum Role {
+        NameRole = ChatModel::NameRole,
         StatusRole = ChatModel::UserRole,
+        SortingRole,
     };
 
     ChatRosterModel(ChatClient *client, QObject *parent = 0);
     ~ChatRosterModel();
 
     // QAbstractItemModel interface
-    int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
 

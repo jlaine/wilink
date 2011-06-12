@@ -47,12 +47,6 @@ static const QChar sortSeparator('\0');
 
 static VCardCache *vcardCache = 0;
 
-enum RosterColumns {
-    ContactColumn = 0,
-    SortingColumn,
-    MaxColumn,
-};
-
 // Try to read an IQ from disk cache.
 template <class T>
 bool readIq(QAbstractNetworkCache *cache, const QUrl &url, T *iq)
@@ -199,6 +193,7 @@ ChatRosterModel::ChatRosterModel(ChatClient *xmppClient, QObject *parent)
 
     // set additionals role names
     QHash<int, QByteArray> names = roleNames();
+    names.insert(ChatRosterModel::SortingRole, "sorting");
     names.insert(ChatRosterModel::StatusRole, "status");
     setRoleNames(names);
 
@@ -242,12 +237,6 @@ ChatRosterModel::~ChatRosterModel()
     delete d;
 }
 
-int ChatRosterModel::columnCount(const QModelIndex &parent) const
-{
-    Q_UNUSED(parent);
-    return MaxColumn;
-}
-
 static QString contactStatus(const QModelIndex &index)
 {
     const int typeVal = index.data(ChatRosterModel::StatusRole).toInt();
@@ -277,12 +266,13 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
     } else if (role == NameRole) {
         VCard card;
         card.setJid(item->jid);
-        if (index.column() == SortingColumn)
-            return contactStatus(index) + sortSeparator + card.name().toLower() + sortSeparator + item->jid.toLower();
-        else
-            return card.name();
+        return card.name();
     } else if (role == UrlRole) {
         return VCardCache::instance()->profileUrl(item->jid);
+    } else if (role == SortingRole) {
+        VCard card;
+        card.setJid(item->jid);
+        return contactStatus(index) + sortSeparator + card.name().toLower() + sortSeparator + item->jid.toLower();
     } else if (role == StatusRole) {
         QXmppPresence::Status::Type statusType = QXmppPresence::Status::Offline;
         // NOTE : we test the connection status, otherwise we encounter a race
@@ -334,8 +324,7 @@ void ChatRosterModel::_q_disconnected()
     {
         ChatModelItem *first = rootItem->children.first();
         ChatModelItem *last = rootItem->children.last();
-        emit dataChanged(createIndex(first, ContactColumn),
-                         createIndex(last, SortingColumn));
+        emit dataChanged(createIndex(first), createIndex(last));
     }
 }
 
@@ -363,8 +352,7 @@ void ChatRosterModel::itemChanged(const QString &jid)
     if (!item)
         return;
 
-    emit dataChanged(createIndex(item, ContactColumn),
-                     createIndex(item, SortingColumn));
+    emit dataChanged(createIndex(item), createIndex(item));
 }
 
 /** Handles an item being removed from the roster.
@@ -381,8 +369,7 @@ void ChatRosterModel::presenceChanged(const QString& bareJid, const QString& res
     Q_UNUSED(resource);
     ChatRosterItem *item = d->find(bareJid);
     if (item)
-        emit dataChanged(createIndex(item, ContactColumn),
-                         createIndex(item, SortingColumn));
+        emit dataChanged(createIndex(item), createIndex(item));
 }
 
 void ChatRosterModel::rosterReceived()
@@ -417,8 +404,7 @@ void ChatRosterModel::addPendingMessage(const QString &bareJid)
     if (item)
     {
         item->messages++;
-        emit dataChanged(createIndex(item, ContactColumn),
-                         createIndex(item, SortingColumn));
+        emit dataChanged(createIndex(item), createIndex(item));
         emit pendingMessages(d->countPendingMessages());
     }
 }
@@ -428,8 +414,7 @@ void ChatRosterModel::clearPendingMessages(const QString &bareJid)
     ChatRosterItem *item = d->find(bareJid);
     if (item && item->messages) {
         item->messages = 0;
-        emit dataChanged(createIndex(item, ContactColumn),
-                         createIndex(item, SortingColumn));
+        emit dataChanged(createIndex(item), createIndex(item));
         emit pendingMessages(d->countPendingMessages());
     }
 }

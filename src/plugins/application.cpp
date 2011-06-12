@@ -627,7 +627,7 @@ bool Application::sortContactsByStatus() const
  */
 void Application::setSortContactsByStatus(bool sort)
 {
-    if (sort != showOfflineContacts())
+    if (sort != sortContactsByStatus())
     {
         d->settings->setValue("SortContactsByStatus", sort);
         emit sortContactsByStatusChanged(sort);
