@@ -121,16 +121,15 @@ Rectangle {
             }
         }
 
-/*
         DockButton {
             iconSource: 'options.png'
             text: qsTr('Preferences')
+            visible: false
             onClicked: {
                 dialog.source = 'PreferenceDialog.qml';
                 dialog.item.show();
             }
         }
-*/
 
         DockButton {
             iconSource: 'diagnostics.png'
