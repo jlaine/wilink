@@ -49,6 +49,7 @@ class Application : public QApplication
     Q_PROPERTY(QString incomingMessageSound READ incomingMessageSound WRITE setIncomingMessageSound)
     Q_PROPERTY(QString outgoingMessageSound READ outgoingMessageSound WRITE setOutgoingMessageSound)
     Q_PROPERTY(bool showOfflineContacts READ showOfflineContacts WRITE setShowOfflineContacts NOTIFY showOfflineContactsChanged)
+    Q_PROPERTY(bool sortContactsByStatus READ sortContactsByStatus NOTIFY sortContactsByStatusChanged)
     Q_PROPERTY(QSoundPlayer* soundPlayer READ soundPlayer CONSTANT)
 
 public:
@@ -79,6 +80,8 @@ public:
     void setOutgoingMessageSound(const QString &soundFile);
     bool showOfflineContacts() const;
     void setShowOfflineContacts(bool show);
+    bool sortContactsByStatus() const;
+    void setSortContactsByStatus(bool sort);
     QAudioDeviceInfo audioInputDevice() const;
     void setAudioInputDevice(const QAudioDeviceInfo &device);
     QAudioDeviceInfo audioOutputDevice() const;
@@ -90,6 +93,7 @@ signals:
     void messageClicked(QObject *context);
     void openAtLoginChanged(bool run);
     void showOfflineContactsChanged(bool show);
+    void sortContactsByStatusChanged(bool sort);
 
 public slots:
     void showMessage(QObject *context, const QString &title, const QString &message);

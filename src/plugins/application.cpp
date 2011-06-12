@@ -452,9 +452,9 @@ void Application::resetChats()
         else
             chat->setWindowTitle(QString("%1 - %2").arg(jid, qApp->applicationName()));
 
-#ifdef Q_OS_SYMBIAN
+#ifdef WILINK_EMBEDDED
         Q_UNUSED(ypos);
-        chat->showMaximized();
+        chat->showFullScreen();
 #else
         chat->move(xpos, ypos);
         chat->show();
@@ -611,6 +611,26 @@ void Application::setShowOfflineContacts(bool show)
     {
         d->settings->setValue("ShowOfflineContacts", show);
         emit showOfflineContactsChanged(show);
+    }
+}
+
+/** Returns true if offline contacts should be displayed.
+ */
+bool Application::sortContactsByStatus() const
+{
+    return d->settings->value("SortContactsByStatus", true).toBool();
+}
+
+/** Sets whether contacts should be sorted by status.
+ *
+ * @param sort
+ */
+void Application::setSortContactsByStatus(bool sort)
+{
+    if (sort != showOfflineContacts())
+    {
+        d->settings->setValue("SortContactsByStatus", sort);
+        emit sortContactsByStatusChanged(sort);
     }
 }
 
