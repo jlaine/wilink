@@ -171,6 +171,10 @@ ChatOptions::ChatOptions()
     showOfflineContacts->setChecked(wApp->showOfflineContacts());
     vbox->addWidget(showOfflineContacts);
 
+    sortContactsByStatus = new QCheckBox(tr("Sort contacts by status"));
+    sortContactsByStatus->setChecked(wApp->sortContactsByStatus());
+    vbox->addWidget(sortContactsByStatus);
+
     // ABOUT
     group = new QGroupBox(tr("About %1").arg(wApp->applicationName()));
     group->setLayout(aboutBox());
@@ -186,6 +190,7 @@ bool ChatOptions::save()
     if (openAtLogin)
         wApp->setOpenAtLogin(openAtLogin->isChecked());
     wApp->setShowOfflineContacts(showOfflineContacts->isChecked());
+    wApp->setSortContactsByStatus(sortContactsByStatus->isChecked());
     return true;
 }
 

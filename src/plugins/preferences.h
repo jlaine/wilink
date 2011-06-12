@@ -76,6 +76,7 @@ public:
 private:
     QCheckBox *openAtLogin;
     QCheckBox *showOfflineContacts;
+    QCheckBox *sortContactsByStatus;
 };
 
 class SoundOptions : public ChatPreferencesTab

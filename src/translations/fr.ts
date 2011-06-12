@@ -173,6 +173,10 @@
         <source>About %1</source>
         <translation>À propos de %1</translation>
     </message>
+    <message>
+        <source>Sort contacts by status</source>
+        <translation>Trier les contacts par état</translation>
+    </message>
 </context>
 <context>
     <name>ChatPanel</name>
