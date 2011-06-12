@@ -180,13 +180,11 @@ Item {
                     id: status
                     anchors.right: parent.right
                     anchors.rightMargin: 5
-                    anchors.leftMargin: 3
                     anchors.verticalCenter: parent.verticalCenter
                     presenceStatus: model.status
                     width: 10
                     height: 10
                 }
-
 
                 MouseArea {
                     acceptedButtons: Qt.LeftButton | Qt.RightButton

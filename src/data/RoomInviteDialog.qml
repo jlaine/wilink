@@ -129,9 +129,19 @@ Dialog {
             Text {
                 anchors.left: image.right
                 anchors.leftMargin: 4
-                anchors.right: parent.right
+                anchors.right: status.left
                 anchors.verticalCenter: parent.verticalCenter
                 text: model.name
+            }
+
+            StatusPill {
+                id: status
+                anchors.right: parent.right
+                anchors.rightMargin: 5
+                anchors.verticalCenter: parent.verticalCenter
+                presenceStatus: model.status
+                width: 10
+                height: 10
             }
 
             MouseArea {
