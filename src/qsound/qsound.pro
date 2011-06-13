@@ -11,6 +11,10 @@ DESTDIR = $$QSOUND_LIBRARY_DIR
 
 INCLUDEPATH += $$QXMPP_INCLUDE_DIR
 
+android {
+    HEADERS += fake/QAudioOutput
+}
+
 HEADERS += \
     QSoundFile.h \
     QSoundMeter.h \

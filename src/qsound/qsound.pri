@@ -1,10 +1,15 @@
 # Common definitions
 
-CONFIG += mobility
-MOBILITY += multimedia
 QSOUND_INCLUDE_DIR = $$PWD
 QSOUND_LIBRARY_DIR = $$PWD
 QSOUND_LIBRARY_NAME = qsound
+
+android {
+    QSOUND_INCLUDE_DIR += $$PWD/fake
+} else {
+    CONFIG += mobility
+    MOBILITY += multimedia
+}
 
 # Libraries for apps which use QNetIO
 symbian {
