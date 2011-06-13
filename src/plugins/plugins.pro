@@ -32,6 +32,7 @@ SOURCES += \
     rooms.cpp \
     roster.cpp \
     shares.cpp \
+    shares/options.cpp \
     systeminfo.cpp \
     updates.cpp \
     updatesdialog.cpp \
@@ -59,6 +60,7 @@ HEADERS += \
     rooms.h \
     roster.h \
     shares.h \
+    shares/options.h \
     systeminfo.h \
     updates.h \
     updatesdialog.h \
