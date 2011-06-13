@@ -5,7 +5,6 @@ HIGH PRIORITY
 - restore shares initial config dialog
 - auto-join bookmarked rooms
 - fix faulty contact ordering
-- set setting 'hide offline contacts' upon upgrade
 - fix duplicate confirmation when adding a contact
 
 LOW PRIORITY
@@ -14,7 +13,6 @@ LOW PRIORITY
 - restore "find" feature
 - save / restore window size and position
 - add contact status in chat conversation
-- fix unreaded messages count in chat conversation
 - fix translation in 'add contact' dialog
 - fix translation in confim dialog
 
