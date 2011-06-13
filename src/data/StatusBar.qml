@@ -48,6 +48,71 @@ Rectangle {
         anchors.right: parent.right
         anchors.left: parent.left
         anchors.margins: 4
+        delegate: Item {
+            id: item
+
+            height: 25
+            width: parent.width
+
+            Rectangle {
+                id: background
+
+                anchors.fill: parent
+                border.width: 1
+                border.color: 'transparent'
+                color: 'transparent'
+                radius: block.radius
+                smooth: block.smooth
+            }
+
+            StatusPill {
+                id: statusPill
+
+                anchors.left:  parent.left
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.margins: 5
+                height: 16
+                width: 16
+                presenceStatus: model.status
+            }
+
+            Text {
+                id: text
+
+                anchors.left: statusPill.right
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.margins: 5
+                color: 'white'
+                text: model.name
+            }
+
+            MouseArea {
+                property variant positionPressed
+                property int pressedIndex
+
+                anchors.fill: parent
+                hoverEnabled: true
+
+                onEntered: {
+                    item.state = 'hovered'
+                }
+
+                onExited: {
+                    item.state = ''
+                }
+
+                onPressed: {
+                    if (block.state != 'expanded') {
+                        block.state = 'expanded'
+                    } else {
+                        var pos = mapToItem(view, mouse.x, mouse.y)
+                        currentIndex = view.indexAt(pos.x, pos.y)
+                        block.state = ''
+                    }
+                }
+            }
+        }
+
         model: ListModel {}
     }
 
