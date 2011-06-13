@@ -30,11 +30,13 @@ Item {
 
         property alias font: fontItem
 
+        opacity: 0
+
         Item {
             id: fontItem
 
             property int normalSize: textItem.font.pixelSize
-            property int smallSize: Math.round((normalSize * 11) / 13)
+            property int smallSize: Math.ceil((normalSize * 11) / 13)
         }
 
         Text {
