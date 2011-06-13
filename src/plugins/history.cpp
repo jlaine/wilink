@@ -80,6 +80,18 @@ bool ChatMessage::groupWith(const ChatMessage &other) const
 QString ChatMessage::html(const QString &meName) const
 {
     QString bodyHtml = Qt::escape(body);
+
+#ifdef USE_SMILEYS
+    bodyHtml.replace(":@", "<img alt=\":@\" src=\":/smiley-angry.png\" />");
+    bodyHtml.replace(":s", "<img alt=\":s\" rc=\":/smiley-confused.png\" />");
+    bodyHtml.replace(":)", "<img alt=\":)\" src=\":/smiley-happy.png\" />");
+    bodyHtml.replace(":|", "<img alt=\":|\" src=\":/smiley-neutral.png\" />");
+    bodyHtml.replace(":p", "<img alt=\":p\" src=\":/smiley-raspberry.png\" />");
+    bodyHtml.replace(":(", "<img alt=\":(\" src=\":/smiley-sad.png\" />");
+    // FIXME: wink smiley corrupt HTML entities
+    bodyHtml.replace(";)", "<img alt=\";)\" src=\":/smiley-wink.png\" />");
+#endif
+
     bodyHtml.replace(linkRegex, "<a href=\"\\1\">\\1</a>");
     bodyHtml.replace("\n", "<br/>");
     if (!meName.isEmpty())
