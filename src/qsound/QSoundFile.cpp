@@ -21,6 +21,7 @@
 #include <QBuffer>
 #include <QByteArray>
 #include <QFile>
+#include <QStringList>
 
 #include "QSoundFile.h"
 #ifdef USE_MAD
