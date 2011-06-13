@@ -69,7 +69,7 @@ Item {
 
                     Item {
                         id: header
-                        height: 14
+                        height: appStyle.font.smallSize + 4
                         width: parent.width
                         visible: !model.action
 
