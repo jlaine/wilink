@@ -3,6 +3,9 @@ include(idle.pri)
 TEMPLATE = lib
 CONFIG += staticlib
 
+TARGET = $$IDLE_LIBRARY_NAME
+DESTDIR = $$IDLE_LIBRARY_DIR
+
 HEADERS = idle.h
 SOURCES = idle.cpp
 LIBS += $$IDLE_INTERNAL_LIBS
