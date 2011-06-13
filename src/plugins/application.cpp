@@ -26,6 +26,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QMenu>
+#include <QNetworkDiskCache>
 #include <QProcess>
 #include <QSettings>
 #include <QSslSocket>
@@ -40,6 +41,7 @@
 
 #include "accounts.h"
 #include "application.h"
+#include "updates.h"
 #include "utils.h"
 #include "window.h"
 
@@ -98,11 +100,6 @@ Application::Application(int &argc, char **argv)
     setWindowIcon(QIcon(":/wiLink.png"));
 #endif
 
-    /* initialise cache and wallet */
-    const QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
-    QDir().mkpath(dataPath);
-    QNetIO::Wallet::setDataPath(QDir(dataPath).filePath("wallet"));
-
     /* initialise settings */
     migrateFromWdesktop();
     d->settings = new QSettings(this);
@@ -122,6 +119,18 @@ Application::Application(int &argc, char **argv)
             break;
         }
     }
+
+    /* initialise cache and wallet */
+    const QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+    QDir().mkpath(dataPath);
+    const QString lastRunVersion = d->settings->value("LastRunVersion").toString();
+    if (lastRunVersion.isEmpty() || Updates::compareVersions(lastRunVersion, "1.1.900") < 0) {
+        QNetworkDiskCache cache;
+        cache.setCacheDirectory(QDir(dataPath).filePath("cache"));
+        cache.clear();
+    }
+    d->settings->setValue("LastRunVersion", WILINK_VERSION);
+    QNetIO::Wallet::setDataPath(QDir(dataPath).filePath("wallet"));
 
     /* initialise style */
     QFile css(":/wiLink.css");
