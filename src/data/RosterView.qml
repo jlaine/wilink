@@ -169,7 +169,7 @@ Item {
                         anchors.horizontalCenter: parent.horizontalCenter
                         color: 'white'
                         font.bold: true
-                        font.pixelSize: 10
+                        font.pixelSize: appStyle.font.smallSize
                         text: model.messages
                         verticalAlignment: Text.AlignVCenter
                     }

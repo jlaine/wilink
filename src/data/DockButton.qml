@@ -116,7 +116,7 @@ Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         opacity: 0
         color: 'white'
-        font.pixelSize: 11
+        font.pixelSize: appStyle.font.smallSize
         text: '<b>' + listViewItem.text + '</b>' + shortcutText(listViewItem.shortcut)
     }
 

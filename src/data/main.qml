@@ -25,6 +25,23 @@ Item {
     id: root
     focus: true
 
+    Item {
+        id: appStyle
+
+        property alias font: fontItem
+
+        Item {
+            id: fontItem
+
+            property int normalSize: textItem.font.pixelSize
+            property int smallSize: Math.round((normalSize * 11) / 13)
+        }
+
+        Text {
+            id: textItem
+        }
+    }
+
     Dock {
         id: dock
 

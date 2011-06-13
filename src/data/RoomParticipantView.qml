@@ -79,7 +79,7 @@ Item {
                     color: '#2689d6'
                     elide: Text.ElideRight
                     horizontalAlignment: Text.AlignHCenter
-                    font.pixelSize: 10
+                    font.pixelSize: appStyle.font.smallSize
                     text: model.name
                 }
             }

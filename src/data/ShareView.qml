@@ -90,7 +90,7 @@ Item {
 
                         anchors.centerIn: parent
                         color: '#ffffff'
-                        font.pixelSize: 10
+                        font.pixelSize: appStyle.font.smallSize
                         font.bold: true
                         text: model.popularity > 0 ? model.popularity : ''
                     }

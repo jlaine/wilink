@@ -82,7 +82,7 @@ Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         opacity: listViewItem.enabled ? 1 : 0.5
         color: 'white'
-        font.pixelSize: 11
+        font.pixelSize: appStyle.font.smallSize
     }
 
     states: [

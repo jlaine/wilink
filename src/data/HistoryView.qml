@@ -78,7 +78,7 @@ Item {
                             anchors.left: parent.left
                             anchors.leftMargin: 10
                             color: model.received ? '#2689d6': '#7b7b7b'
-                            font.pixelSize: 10
+                            font.pixelSize: appStyle.font.smallSize
                             text: model.from
 
                             MouseArea {
@@ -91,7 +91,7 @@ Item {
                             anchors.right: parent.right
                             anchors.rightMargin: 10
                             color: model.received ? '#2689d6': '#7b7b7b'
-                            font.pixelSize: 10
+                            font.pixelSize: appStyle.font.smallSize
                             text: Qt.formatDateTime(model.date, 'dd MMM hh:mm')
                         }
                     }
