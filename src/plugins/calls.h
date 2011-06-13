@@ -20,7 +20,6 @@
 #ifndef __WILINK_CALLS_H__
 #define __WILINK_CALLS_H__
 
-#include <QAudioInput>
 #include <QDeclarativeItem>
 #include <QWidget>
 
