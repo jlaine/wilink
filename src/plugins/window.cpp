@@ -70,6 +70,7 @@
 #include "rooms.h"
 #include "roster.h"
 #include "shares.h"
+#include "shares/options.h"
 #include "updatesdialog.h"
 #include "window.h"
 
@@ -449,6 +450,7 @@ void Chat::showPreferences(const QString &focusTab)
 
     dialog->addTab(new ChatOptions);
     dialog->addTab(new SoundOptions);
+    dialog->addTab(new ShareOptions(ShareModel::database()));
 
     dialog->setCurrentTab(focusTab);
 #ifdef WILINK_EMBEDDED

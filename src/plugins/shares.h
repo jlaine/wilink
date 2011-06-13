@@ -26,6 +26,7 @@
 
 class ChatClient;
 class QXmppPresence;
+class QXmppShareDatabase;
 class QXmppShareManager;
 class ShareModelPrivate;
 class ShareQueueModel;
@@ -79,6 +80,8 @@ public:
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
     QModelIndex parent(const QModelIndex &index) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
+
+    static QXmppShareDatabase *database();
 
 signals:
     void clientChanged(ChatClient *client);

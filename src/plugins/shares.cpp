@@ -35,7 +35,6 @@
 #include "shares.h"
 
 static QXmppShareDatabase *globalDatabase = 0;
-static int globalDatabaseRefs = 0;
 static const int parallelDownloadLimit = 2;
 
 static void copy(QXmppShareItem *oldChild, const QXmppShareItem *newChild)
@@ -59,43 +58,6 @@ static void totals(const QXmppShareItem *item, qint64 &bytes, qint64 &files)
         } else {
             totals(child, bytes, files);
         }
-    }
-}
-
-static QXmppShareDatabase *refDatabase()
-{
-    if (!globalDatabase)
-    {
-        // initialise database
-        const QString databaseName = QDir(QDesktopServices::storageLocation(QDesktopServices::DataLocation)).filePath("database.sqlite");
-        QSqlDatabase sharesDb = QSqlDatabase::addDatabase("QSQLITE");
-        sharesDb.setDatabaseName(databaseName);
-        Q_ASSERT(sharesDb.open());
-        QDjango::setDatabase(sharesDb);
-        // drop wiLink <= 0.9.4 table
-        sharesDb.exec("DROP TABLE files");
-
-        // sanitize settings
-        QSettings settings;
-        QString sharesDirectory = settings.value("SharesLocation",  QDir::home().filePath("Public")).toString();
-        if (sharesDirectory.endsWith("/"))
-            sharesDirectory.chop(1);
-        QStringList mappedDirectories = settings.value("SharesDirectories").toStringList();
-
-        // create shares database
-        globalDatabase = new QXmppShareDatabase;
-        globalDatabase->setDirectory(sharesDirectory);
-        globalDatabase->setMappedDirectories(mappedDirectories);
-    }
-    globalDatabaseRefs++;
-    return globalDatabase;
-}
-
-static void unrefDatabase()
-{
-    if (!(--globalDatabaseRefs) && globalDatabase) {
-        delete globalDatabase;
-        globalDatabase = 0; 
     }
 }
 
@@ -331,6 +293,33 @@ QVariant ShareModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
+QXmppShareDatabase *ShareModel::database()
+{
+    if (!globalDatabase) {
+        // initialise database
+        const QString databaseName = QDir(QDesktopServices::storageLocation(QDesktopServices::DataLocation)).filePath("database.sqlite");
+        QSqlDatabase sharesDb = QSqlDatabase::addDatabase("QSQLITE");
+        sharesDb.setDatabaseName(databaseName);
+        Q_ASSERT(sharesDb.open());
+        QDjango::setDatabase(sharesDb);
+        // drop wiLink <= 0.9.4 table
+        sharesDb.exec("DROP TABLE files");
+
+        // sanitize settings
+        QSettings settings;
+        QString sharesDirectory = settings.value("SharesLocation",  QDir::home().filePath("Public")).toString();
+        if (sharesDirectory.endsWith("/"))
+            sharesDirectory.chop(1);
+        QStringList mappedDirectories = settings.value("SharesDirectories").toStringList();
+
+        // create shares database
+        globalDatabase = new QXmppShareDatabase;
+        globalDatabase->setDirectory(sharesDirectory);
+        globalDatabase->setMappedDirectories(mappedDirectories);
+    }
+    return globalDatabase;
+}
+
 void ShareModel::download(int row)
 {
     if (row < 0 || row > rootItem->size() - 1)
@@ -432,7 +421,7 @@ void ShareModel::_q_presenceReceived(const QXmppPresence &presence)
         if (!shareManager) {
             bool check;
 
-            shareManager = new QXmppShareManager(d->shareClient, refDatabase());
+            shareManager = new QXmppShareManager(d->shareClient, database());
             d->shareClient->addExtension(shareManager);
 
             check = connect(shareManager, SIGNAL(shareSearchIqReceived(QXmppShareSearchIq)),
