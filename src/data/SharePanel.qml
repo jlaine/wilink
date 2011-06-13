@@ -98,15 +98,13 @@ Panel {
             anchors.margins: 8
             border.color: '#c3c3c3'
             color: '#ffffff'
-            height: 22
+            height: searchEdit.paintedHeight + 8
 
             TextEdit {
                 id: searchEdit
 
                 anchors.fill: parent
-                anchors.margins: 2
-                anchors.leftMargin: 4
-                anchors.rightMargin: 4
+                anchors.margins: 4
                 focus: true
                 text: ''
 
