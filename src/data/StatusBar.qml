@@ -83,7 +83,17 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.margins: 5
                 color: 'white'
-                text: model.name
+                text: {
+                    if (combo.state == '' && model.status != QXmppPresence.Offline) {
+                        switch (window.client.state) {
+                        case QXmppClient.ConnectingState:
+                            return qsTranslate('StatusBar', 'Connecting..');
+                        case QXmppClient.DisconnectedState:
+                            return qsTranslate('StatusBar', 'Offline');
+                        }
+                    }
+                    return model.name;
+                }
             }
 
             MouseArea {
@@ -127,7 +137,7 @@ Rectangle {
         combo.model.append({'name': qsTr('Away'), 'status': QXmppPresence.Away});
         combo.model.append({'name': qsTr('Busy'), 'status': QXmppPresence.DND});
         combo.model.append({'name': qsTr('Offline'), 'status': QXmppPresence.Offline});
-        combo.setStatusType(window.client.statusType)
+        combo.setStatusType(QXmppPresence.Online);
     }
 
     Connections {
@@ -154,12 +164,5 @@ Rectangle {
             if (statusType != window.client.statusType)
                 window.client.statusType = statusType;
         }
-    }
-
-    Connections {
-        target: window.client
-
-        onConnected: combo.setStatusType(window.client.statusType)
-        onDisconnected: combo.setStatusType(QXmppPresence.Offline)
     }
 }

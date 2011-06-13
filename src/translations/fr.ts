@@ -812,6 +812,10 @@ Acceptez-vous?</translation>
         <source>Offline</source>
         <translation>Déconnecté</translation>
     </message>
+    <message>
+        <source>Connecting..</source>
+        <translation>Connexion..</translation>
+    </message>
 </context>
 <context>
     <name>UpdatesDialog</name>
