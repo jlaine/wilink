@@ -168,6 +168,9 @@ ShareModel::ShareModel(QObject *parent)
     d->timer->setSingleShot(true);
     d->timer->setInterval(100);
     connect(d->timer, SIGNAL(timeout()), this, SLOT(refresh()));
+
+    connect(database(), SIGNAL(directoryChanged(QString)),
+            this, SIGNAL(shareUrlChanged()));
 }
 
 ShareModel::~ShareModel()
@@ -240,6 +243,11 @@ void ShareModel::setRootNode(const QString &rootNode)
 QString ShareModel::shareServer() const
 {
     return d->shareManager() ? d->shareServer : QString();
+}
+
+QUrl ShareModel::shareUrl() const
+{
+    return QUrl::fromLocalFile(database()->directory());
 }
 
 void ShareModel::clear()

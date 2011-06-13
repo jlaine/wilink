@@ -20,6 +20,8 @@
 #ifndef __WILINK_SHARES_MODEL_H__
 #define __WILINK_SHARES_MODEL_H__
 
+#include <QUrl>
+
 #include "QXmppShareIq.h"
 
 #include "model.h"
@@ -44,6 +46,7 @@ class ShareModel : public QAbstractItemModel
     Q_PROPERTY(QString rootJid READ rootJid WRITE setRootJid NOTIFY rootJidChanged)
     Q_PROPERTY(QString rootNode READ rootNode WRITE setRootNode NOTIFY rootNodeChanged)
     Q_PROPERTY(QString shareServer READ shareServer NOTIFY shareServerChanged)
+    Q_PROPERTY(QUrl shareUrl READ shareUrl NOTIFY shareUrlChanged)
 
 public:
     enum Role {
@@ -74,6 +77,7 @@ public:
     void setRootNode(const QString &rootNode);
 
     QString shareServer() const;
+    QUrl shareUrl() const;
 
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
@@ -89,6 +93,7 @@ signals:
     void rootJidChanged(const QString &rootJid);
     void rootNodeChanged(const QString &rootNode);
     void shareServerChanged(const QString &shareServer);
+    void shareUrlChanged();
 
 public slots:
     void download(int row);

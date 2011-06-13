@@ -179,7 +179,7 @@ Panel {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: queueView.top
-        text: qsTr('Received files are stored in your <a href="%1">downloads folder</a>. Once a file is received, you can double click to open it.')
+        text: qsTr('Received files are stored in your <a href="%1">downloads folder</a>.').replace('%1', view.model.shareUrl)
         z: 1
     }
 
