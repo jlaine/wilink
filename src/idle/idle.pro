@@ -10,7 +10,7 @@ HEADERS = idle.h
 SOURCES = idle.cpp
 LIBS += $$IDLE_INTERNAL_LIBS
 
-symbian {
+android|symbian {
     SOURCES += idle_stub.cpp
 } else:mac {
     SOURCES += idle_mac.cpp
@@ -19,4 +19,7 @@ symbian {
     DEFINES += HAVE_XSS
 } else:win32 {
     SOURCES += idle_win.cpp
+} else {
+    SOURCES += idle_stub.cpp
 }
+
