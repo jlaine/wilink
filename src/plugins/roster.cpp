@@ -677,6 +677,10 @@ void VCardCache::addClient(ChatClient *client)
     if (!client || d->clients.contains(client))
         return;
 
+    check = connect(client, SIGNAL(destroyed(QObject*)),
+                    this, SLOT(clientDestroyed(QObject*)));
+    Q_ASSERT(check);
+
     check = connect(client, SIGNAL(presenceReceived(QXmppPresence)),
                     this, SLOT(presenceReceived(QXmppPresence)));
     Q_ASSERT(check);
@@ -698,6 +702,11 @@ void VCardCache::addClient(ChatClient *client)
     Q_ASSERT(check);
 
     d->clients << client;
+}
+
+void VCardCache::clientDestroyed(QObject *object)
+{
+    d->clients.removeAll(static_cast<ChatClient*>(object));
 }
 
 void VCardCache::discoveryInfoReceived(const QXmppDiscoveryIq &disco)

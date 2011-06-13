@@ -162,6 +162,7 @@ public slots:
     QUrl profileUrl(const QString &jid);
 
 private slots:
+    void clientDestroyed(QObject *object);
     void discoveryInfoReceived(const QXmppDiscoveryIq &disco);
     void presenceReceived(const QXmppPresence &presence);
     void vCardReceived(const QXmppVCardIq&);
