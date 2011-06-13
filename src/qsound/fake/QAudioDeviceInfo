@@ -1,0 +1,35 @@
+#ifndef QAUDIODEVICEINFO_H
+#define QAUDIODEVICEINFO_H
+
+#include <QList>
+#include <QMetaType>
+
+#include "QAudioFormat"
+
+class QAudioDeviceInfo
+{
+public:
+    QString deviceName() const
+    {
+        return QLatin1String("default");
+    }
+
+    static QList<QAudioDeviceInfo> availableDevices(QAudio::Mode)
+    {
+        return QList<QAudioDeviceInfo>();    
+    }
+
+    static QAudioDeviceInfo defaultInputDevice()
+    {
+        return QAudioDeviceInfo();
+    }
+
+    static QAudioDeviceInfo defaultOutputDevice()
+    {
+        return QAudioDeviceInfo();
+    }
+};
+
+Q_DECLARE_METATYPE(QAudioDeviceInfo);
+
+#endif

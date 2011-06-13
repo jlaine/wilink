@@ -1,0 +1,63 @@
+#ifndef QAUDIOFORMAT_H
+#define QAUDIOFORMAT_H
+
+#include <QString>
+#include <QSysInfo>
+
+class QAudio
+{
+public:
+    enum Error
+    {
+        NoError = 0,
+        UnderrunError = 3,
+    };
+
+    enum Mode
+    {
+        AudioInput = 0,
+        AudioOutput = 1,
+    };
+
+    enum State
+    {
+        ActiveState = 0,
+        SuspendedState = 1,
+        StoppedState = 2,
+        IdleState = 3,
+    };
+};
+
+class QAudioFormat
+{
+public:
+    enum Endian
+    {
+        LittleEndian = QSysInfo::LittleEndian,
+    };
+
+    enum SampleType
+    {
+        SignedInt = 1,
+    };
+
+    Endian byteOrder() const { return LittleEndian; }
+    void setByteOrder(Endian) {}
+
+    int channels() const { return 1; }
+    void setChannels(int) {}
+
+    QString codec() const { return "audio/pcm"; }
+    void setCodec(const QString&) {}
+
+    int frequency() const { return 8000; }
+    void setFrequency(int) {};
+
+    int sampleSize() const { return 16; }
+    void setSampleSize(int) {}
+
+    SampleType sampleType() const { return SignedInt; }
+    void setSampleType(SampleType) {}
+};
+
+#endif

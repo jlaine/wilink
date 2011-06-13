@@ -1,0 +1,30 @@
+#ifndef QAUDIOOUTPUT_H
+#define QAUDIOOUTPUT_H
+
+#include <QIODevice>
+#include <QObject>
+
+#include "QAudioDeviceInfo"
+#include "QAudioFormat"
+
+class QAudioOutput : public QObject
+{
+    Q_OBJECT
+
+public:
+    QAudioOutput(const QAudioDeviceInfo&, const QAudioFormat&, QObject *parent = 0)
+        : QObject(parent)
+    {
+    }
+
+    int bufferSize() const { return 16384; }
+    void setBufferSize(int) {}
+    QAudio::Error error() const { return QAudio::NoError; }
+    QAudioFormat format() const { return QAudioFormat(); }
+    QAudio::State state() const { return QAudio::IdleState; }
+
+    void start(QIODevice*) {}
+    void stop() {}
+};
+
+#endif
