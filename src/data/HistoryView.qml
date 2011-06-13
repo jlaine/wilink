@@ -109,7 +109,6 @@ Item {
                             id: bodyText
 
                             anchors.centerIn: parent
-                            font.pixelSize: 12
                             width: rect.width - 20
                             text: model.html
                             textFormat: Qt.RichText

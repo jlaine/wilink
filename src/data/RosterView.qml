@@ -140,7 +140,6 @@ Item {
                     anchors.leftMargin: 3
                     anchors.verticalCenter: parent.verticalCenter
                     elide: Text.ElideRight
-                    font.pixelSize: 12
                     text: model.name
                 }
 

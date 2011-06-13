@@ -65,7 +65,6 @@ Rectangle {
         anchors.left: image.right
         anchors.top: parent.top
         verticalAlignment: Text.AlignVCenter
-        font.pixelSize: 12
     }
 
     MouseArea {
