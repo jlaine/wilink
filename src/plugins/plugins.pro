@@ -9,7 +9,14 @@ QT += declarative network xml
 TARGET = wiLink
 VERSION = $$WILINK_VERSION
 
-DEFINES += QT_STATICPLUGIN WILINK_EMBEDDED WILINK_VERSION=\\\"$${WILINK_VERSION}\\\"
+DEFINES += QT_STATICPLUGIN WILINK_EMBEDDED
+
+# workaround for QTBUG-19232
+symbian {
+    DEFINES += WILINK_VERSION=\"$${WILINK_VERSION}\"
+} else {
+    DEFINES += WILINK_VERSION=\\\"$${WILINK_VERSION}\\\"
+}
 
 SOURCES += \
     application.cpp \
