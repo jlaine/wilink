@@ -8,7 +8,7 @@ SOURCES = idle.cpp
 LIBS += $$IDLE_INTERNAL_LIBS
 
 symbian {
-    SOURCES += idle_symbian.cpp
+    SOURCES += idle_stub.cpp
 } else:mac {
     SOURCES += idle_mac.cpp
 } else:unix {
