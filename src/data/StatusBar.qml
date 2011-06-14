@@ -121,6 +121,11 @@ Rectangle {
                     }
                 }
             }
+
+            states: State {
+                name: 'hovered'
+                PropertyChanges { target: background; color: '#90acd8' }
+            }
         }
 
         model: ListModel {}
