@@ -48,6 +48,7 @@ class Application : public QApplication
     Q_PROPERTY(QString downloadsLocation READ downloadsLocation CONSTANT)
     Q_PROPERTY(QString incomingMessageSound READ incomingMessageSound WRITE setIncomingMessageSound)
     Q_PROPERTY(QString outgoingMessageSound READ outgoingMessageSound WRITE setOutgoingMessageSound)
+    Q_PROPERTY(bool sharesConfigured READ sharesConfigured WRITE setSharesConfigured NOTIFY sharesConfiguredChanged)
     Q_PROPERTY(bool showOfflineContacts READ showOfflineContacts WRITE setShowOfflineContacts NOTIFY showOfflineContactsChanged)
     Q_PROPERTY(bool sortContactsByStatus READ sortContactsByStatus WRITE setSortContactsByStatus NOTIFY sortContactsByStatusChanged)
     Q_PROPERTY(QSoundPlayer* soundPlayer READ soundPlayer CONSTANT)
@@ -71,27 +72,38 @@ public:
     bool isInstalled();
 
     // preferences
-    QString downloadsLocation() const;
-    bool openAtLogin() const;
-    void setOpenAtLogin(bool run);
-    QString incomingMessageSound() const;
-    void setIncomingMessageSound(const QString &soundFile);
-    QString outgoingMessageSound() const;
-    void setOutgoingMessageSound(const QString &soundFile);
-    bool showOfflineContacts() const;
-    void setShowOfflineContacts(bool show);
-    bool sortContactsByStatus() const;
-    void setSortContactsByStatus(bool sort);
     QAudioDeviceInfo audioInputDevice() const;
     void setAudioInputDevice(const QAudioDeviceInfo &device);
+
     QAudioDeviceInfo audioOutputDevice() const;
     void setAudioOutputDevice(const QAudioDeviceInfo &device);
+
+    QString downloadsLocation() const;
+
+    bool openAtLogin() const;
+    void setOpenAtLogin(bool run);
+
+    QString incomingMessageSound() const;
+    void setIncomingMessageSound(const QString &soundFile);
+
+    QString outgoingMessageSound() const;
+    void setOutgoingMessageSound(const QString &soundFile);
+
+    bool sharesConfigured() const;
+    void setSharesConfigured(bool configured);
+
+    bool showOfflineContacts() const;
+    void setShowOfflineContacts(bool show);
+
+    bool sortContactsByStatus() const;
+    void setSortContactsByStatus(bool sort);
 
 signals:
     void audioInputDeviceChanged(const QAudioDeviceInfo &device);
     void audioOutputDeviceChanged(const QAudioDeviceInfo &device);
     void messageClicked(QObject *context);
     void openAtLoginChanged(bool run);
+    void sharesConfiguredChanged(bool configured);
     void showOfflineContactsChanged(bool show);
     void sortContactsByStatusChanged(bool sort);
 

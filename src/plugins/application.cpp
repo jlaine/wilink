@@ -603,6 +603,23 @@ void Application::showMessage(QObject *context, const QString &title, const QStr
 #endif
 }
 
+/** Returns true if shares have been configured.
+ */
+bool Application::sharesConfigured() const
+{
+    return d->settings->value("SharesConfigured", false).toBool();
+}
+
+/** Sets whether shares have been configured.
+ */
+void Application::setSharesConfigured(bool configured)
+{
+    if (configured != sharesConfigured()) {
+        d->settings->setValue("SharesConfigured", configured);
+        emit sharesConfiguredChanged(configured);
+    }
+}
+
 /** Returns true if offline contacts should be displayed.
  */
 bool Application::showOfflineContacts() const
@@ -616,8 +633,7 @@ bool Application::showOfflineContacts() const
  */
 void Application::setShowOfflineContacts(bool show)
 {
-    if (show != showOfflineContacts())
-    {
+    if (show != showOfflineContacts()) {
         d->settings->setValue("ShowOfflineContacts", show);
         emit showOfflineContactsChanged(show);
     }
