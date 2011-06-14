@@ -102,6 +102,7 @@ Rectangle {
             focus: true
             x: 8
             y: 8
+            selectByMouse: true
             smooth: true
             textFormat: TextEdit.PlainText
             width: parent.width - 16
@@ -167,6 +168,19 @@ Rectangle {
                 }
             }
         }
+
+        MouseArea {
+            anchors.fill: input
+            acceptedButtons: Qt.RightButton
+            onPressed: {
+                var pos = mapToItem(chatEdit, mouse.x, mouse.y);
+                menu.model.clear();
+                menu.model.append({'action': 'cut', 'text': qsTranslate('ChatEdit', 'Cut')})
+                menu.model.append({'action': 'copy', 'text': qsTranslate('ChatEdit', 'Copy')})
+                menu.model.append({'action': 'paste', 'text': qsTranslate('ChatEdit', 'Paste')})
+                menu.show(pos.x, pos.y - menu.height);
+            }
+        }
     }
 
     Button {
@@ -177,5 +191,21 @@ Rectangle {
         anchors.rightMargin: 4
         iconSource: 'upload.png'
         onClicked: chatEdit.returnPressed()
+    }
+
+    Menu {
+        id: menu
+        opacity: 0
+
+        onItemClicked: {
+            var item = menu.model.get(index);
+            if (item.action == 'cut') {
+                input.cut();
+            } else if (item.action == 'copy') {
+                input.copy();
+            } else if (item.action == 'paste') {
+                input.paste();
+            }
+        }
     }
 }
