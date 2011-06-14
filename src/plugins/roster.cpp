@@ -393,9 +393,6 @@ void ChatRosterModel::rosterReceived()
         if (item)
             removeItem(item);
     }
-
-    // trigger resize
-    emit rosterReady();
 }
 
 void ChatRosterModel::addPendingMessage(const QString &bareJid)

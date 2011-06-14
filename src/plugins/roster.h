@@ -65,7 +65,6 @@ public:
 
 signals:
     void pendingMessages(int messages);
-    void rosterReady();
 
 public slots:
     void addPendingMessage(const QString &bareJid);
