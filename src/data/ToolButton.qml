@@ -19,15 +19,14 @@
 
 import QtQuick 1.0
 
-Rectangle {
-    id: listViewItem
+Item {
+    id: button
 
     property alias iconSource: image.source
     property alias text: label.text
     property bool enabled: true
     signal clicked
 
-    color: 'transparent'
     height: 40
     state: mouseArea.pressed ? 'pressed' : (mouseArea.hovered ? 'hovered' : '')
     width: visible ? (label.paintedWidth + 24) : 0
@@ -69,7 +68,7 @@ Rectangle {
 
         anchors.top: parent.top
         anchors.horizontalCenter: parent.horizontalCenter
-        opacity: listViewItem.enabled ? 1 : 0.5
+        opacity: button.enabled ? 1 : 0.5
         smooth: true
         width: 24
         height: 24
@@ -80,7 +79,7 @@ Rectangle {
 
         anchors.top: image.bottom
         anchors.horizontalCenter: parent.horizontalCenter
-        opacity: listViewItem.enabled ? 1 : 0.5
+        opacity: button.enabled ? 1 : 0.5
         color: 'white'
         font.pixelSize: appStyle.font.smallSize
     }
@@ -107,18 +106,18 @@ Rectangle {
         property bool hovered: false
 
         onClicked: {
-            if (listViewItem.enabled) {
-                listViewItem.clicked();
+            if (button.enabled) {
+                button.clicked();
             }
         }
         onPressed: {
-            if (listViewItem.enabled) {
+            if (button.enabled) {
                 pressed = true;
             }
         }
         onReleased: pressed = false
         onEntered: {
-            if (listViewItem.enabled) {
+            if (button.enabled) {
                 hovered = true;
             }
         }
