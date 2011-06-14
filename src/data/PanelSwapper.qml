@@ -19,7 +19,7 @@
 
 import QtQuick 1.0
 
-Item {
+FocusScope {
     id: swapper
 
     property Item currentItem

@@ -323,6 +323,7 @@ Panel {
         anchors.bottom: parent.bottom
         anchors.left: left.right
         anchors.right: parent.right
+        focus: true
 
         Connections {
             target: application

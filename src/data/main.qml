@@ -21,7 +21,7 @@ import QtQuick 1.0
 import wiLink 1.2
 import 'utils.js' as Utils
 
-Item {
+FocusScope {
     id: root
     focus: true
 
@@ -60,12 +60,12 @@ Item {
         anchors.bottom: parent.bottom
         anchors.left: dock.right
         anchors.right: parent.right
+        focus: true
     }
 
     Loader {
         id: dialog
 
-        focus: dialog.item ? dialog.item.visible : false
         x: 100
         y: 100
         z: 10
