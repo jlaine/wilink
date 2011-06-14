@@ -91,7 +91,7 @@ Panel {
                         if (name.length > 0) {
                             photoModel.createAlbum(name);
                         }
-                        dialog.item.hide();
+                        dialog.hide();
                     });
                 }
             }

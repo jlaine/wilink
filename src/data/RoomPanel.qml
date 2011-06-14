@@ -73,7 +73,7 @@ Panel {
                 onClicked: {
                     dialog.source = 'RoomInviteDialog.qml';
                     dialog.item.room = room;
-                    dialog.item.show()
+                    dialog.show()
                 }
             }
 
@@ -89,9 +89,9 @@ Panel {
                     dialog.item.textValue = room.subject
                     dialog.item.accepted.connect(function() {
                         room.subject = dialog.item.textValue;
-                        dialog.item.hide();
+                        dialog.hide();
                     });
-                    dialog.item.show()
+                    dialog.show()
                 }
             }
 

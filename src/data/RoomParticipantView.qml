@@ -144,7 +144,7 @@ Item {
                 dialog.item.labelText = qsTr('Enter the reason for kicking the user from the room.');
                 dialog.item.accepted.connect(function() {
                     room.kick(item.jid, dialog.item.textValue);
-                    dialog.item.hide();
+                    dialog.hide();
                 });
             }
         }

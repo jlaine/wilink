@@ -127,7 +127,7 @@ Rectangle {
             visible: false
             onClicked: {
                 dialog.source = 'PreferenceDialog.qml';
-                dialog.item.show();
+                dialog.show();
             }
         }
 

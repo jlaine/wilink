@@ -35,21 +35,13 @@ Rectangle {
         GradientStop { id: backgroundStop1; position: 1.0; color: '#e7effd' }
         GradientStop { id: backgroundStop2; position: 0.0; color: '#cbdaf1' }
     }
+    opacity: 0
     radius: 10
     smooth: true
     width: 320
     height: 240
     x: 0
     y: 0
-    z: 10
-
-    function show() {
-        visible = true;
-    }
-
-    function hide() {
-        visible = false;
-    }
 
     // FIXME: this is a hack waiting 'blur' or 'shadow' attribute in qml
     BorderImage {

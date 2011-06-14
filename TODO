@@ -1,7 +1,6 @@
 HIGH PRIORITY
 
 - restore copy & paste in chat history
-- fix focus handling after using a QML dialog
 - restore shares initial config dialog
 - auto-join bookmarked rooms
 - fix faulty contact ordering

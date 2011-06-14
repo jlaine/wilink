@@ -65,7 +65,7 @@ Panel {
                 onAddClicked: {
                     dialog.source = 'RoomJoinDialog.qml';
                     dialog.item.panel = chatPanel;
-                    dialog.item.show();
+                    dialog.show();
                 }
 
                 onCurrentJidChanged: {
@@ -155,10 +155,10 @@ Panel {
                         if (jid.match(/^[^@/]+@[^@/]+$/)) {
                             console.log("Add contact " + jid);
                             window.client.rosterManager.subscribe(jid);
-                            dialog.item.hide();
+                            dialog.hide();
                         }
                     });
-                    dialog.item.show();
+                    dialog.show();
                 }
 
                 onCurrentJidChanged: {
@@ -229,9 +229,9 @@ Panel {
                         dialog.item.accepted.connect(function() {
                             console.log("Rename contact " + item.jid + ": " + dialog.item.textValue);
                             window.client.rosterManager.renameItem(item.jid, dialog.item.textValue);
-                            dialog.item.hide();
+                            dialog.hide();
                         });
-                        dialog.item.show();
+                        dialog.show();
                     } else if (item.action == 'remove') {
                         var box = window.messageBox();
                         box.windowTitle = qsTr("Remove contact");

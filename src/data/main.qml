@@ -69,6 +69,21 @@ FocusScope {
         x: 100
         y: 100
         z: 10
+
+        function hide() {
+            dialog.item.opacity = 0;
+            swapper.focus = true;
+        }
+
+        function show() {
+            dialog.item.opacity = 1;
+            dialog.focus = true;
+        }
+
+        Connections {
+            target: dialog.item
+            onRejected: dialog.hide()
+        }
     }
 
     Component.onCompleted: swapper.showPanel('ChatPanel.qml')
