@@ -34,8 +34,11 @@ Dialog {
 
     onAccepted: {
         if (roomEdit.text.length) {
-            dialog.hide();
-            panel.showRoom(roomEdit.text + '@' + view.model.rootJid);
+            var jid = roomEdit.text;
+            if (jid.indexOf('@') < 0)
+                jid += '@' + view.model.rootJid;
+            parent.hide();
+            panel.showRoom(jid);
         }
     }
 
@@ -120,8 +123,8 @@ Dialog {
             MouseArea {
                 anchors.fill: parent
                 onClicked: {
-                    dialog.hide();
-                    panel.showRoom(model.jid);
+                    roomEdit.text = model.jid;
+                    dialog.accepted();
                 }
             }
         }

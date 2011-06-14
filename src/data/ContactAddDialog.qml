@@ -33,7 +33,7 @@ InputDialog {
         if (jid.match(/^[^@/]+@[^@/]+$/)) {
             console.log("Add contact " + jid);
             window.client.rosterManager.subscribe(jid);
-            dialog.hide();
+            parent.hide();
         }
     }
 }

@@ -25,16 +25,8 @@ Dialog {
 
     onAccepted: {
         generalOptions.save();
-        dialog.hide();
+        parent.hide();
     }
-/*
-    QtObject {
-        id: application
-
-        property string applicationName: 'wiLink'
-        property string applicationVersion: '1.1.7'
-    }
-*/
 
     Item {
         anchors.fill: contents
