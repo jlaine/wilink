@@ -74,13 +74,12 @@ Item {
                 height: row.height
                 width: crumb.width + row.spacing + separator.width
 
-                Rectangle {
+                Item {
                     id: crumb
 
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
                     anchors.left: parent.left
-                    color: 'transparent'
                     width: name.width
 
                     Text {
