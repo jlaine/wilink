@@ -19,8 +19,8 @@
 
 import QtQuick 1.0
 
-Rectangle {
-    id: listViewItem
+Item {
+    id: button
 
     property alias iconSource: image.source
     property string text
@@ -35,7 +35,6 @@ Rectangle {
         blinkingEffect.loops = 0
     }
 
-    color: 'transparent'
     height: 28
     width: 28
     state: mouseArea.pressed ? 'pressed' : (mouseArea.hovered ? 'hovered' : '')
@@ -67,7 +66,7 @@ Rectangle {
 
         anchors.top: parent.top
         anchors.horizontalCenter: parent.horizontalCenter
-        opacity: listViewItem.enabled ? 1 : 0.5
+        opacity: button.enabled ? 1 : 0.5
         smooth: true
         width: parent.width
         height: parent.height
@@ -117,7 +116,7 @@ Rectangle {
         opacity: 0
         color: 'white'
         font.pixelSize: appStyle.font.smallSize
-        text: '<b>' + listViewItem.text + '</b>' + shortcutText(listViewItem.shortcut)
+        text: '<b>' + button.text + '</b>' + shortcutText(button.shortcut)
     }
 
     states: [
@@ -126,14 +125,14 @@ Rectangle {
             PropertyChanges { target: label; opacity: 1 }
             PropertyChanges { target: labelBackground; opacity: 1 }
             PropertyChanges { target: image; height: 32; width: 32 }
-            PropertyChanges { target: listViewItem; height: 32 + label.paintedHeight; width: 32 + label.paintedWidth }
+            PropertyChanges { target: button; height: 32 + label.paintedHeight; width: 32 + label.paintedWidth }
         },
         State {
             name: 'pressed'
             PropertyChanges { target: label; opacity: 0.5 }
             PropertyChanges { target: labelBackground; opacity: 1 }
             PropertyChanges { target: image; height: 32; width: 32 }
-            PropertyChanges { target: listViewItem; height: 32 + label.paintedHeight; width: 32 + label.paintedWidth }
+            PropertyChanges { target: button; height: 32 + label.paintedHeight; width: 32 + label.paintedWidth }
         }
     ]
 
@@ -143,7 +142,7 @@ Rectangle {
             reversible: true
             PropertyAnimation { target: label; properties: 'opacity'; duration: 150 }
             PropertyAnimation { target: image; properties: 'height,width'; duration: 150 }
-            PropertyAnimation { target: listViewItem; properties: 'height,width'; duration: 150 }
+            PropertyAnimation { target: button; properties: 'height,width'; duration: 150 }
         }
 
     MouseArea {
@@ -155,18 +154,18 @@ Rectangle {
         property bool hovered: false
 
         onClicked: {
-            if (listViewItem.enabled) {
-                listViewItem.clicked();
+            if (button.enabled) {
+                button.clicked();
             }
         }
         onPressed: {
-            if (listViewItem.enabled) {
+            if (button.enabled) {
                 pressed = true;
             }
         }
         onReleased: pressed = false
         onEntered: {
-            if (listViewItem.enabled) {
+            if (button.enabled) {
                 hovered = true;
             }
         }

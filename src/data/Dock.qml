@@ -44,7 +44,7 @@ Rectangle {
         transform: Rotation {
             angle: 90
             origin.x: 0
-            origin.y: dock.width
+            origin.y: dockBackground.height
         }
     }
 
