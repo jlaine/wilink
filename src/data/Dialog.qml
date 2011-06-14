@@ -177,5 +177,7 @@ Rectangle {
             }
         }
     }
+
+    Keys.onEscapePressed: dialog.rejected()
 }
 
