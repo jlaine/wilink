@@ -141,23 +141,7 @@ Panel {
 
             Connections {
                 onAddClicked: {
-                    var domain = Utils.jidToDomain(window.client.jid);
-
-                    dialog.source = 'InputDialog.qml';
-                    dialog.item.title = qsTr('Add a contact');
-                    if (domain == 'wifirst.net') {
-                        dialog.item.helpText = qsTr('<b>Tip</b>: your wAmis are automatically added to your chat contacts, so the easiest way to add Wifirst contacts is to <a href=\"%1\">add them as wAmis</a>').replace('%1', 'https://www.wifirst.net/w/friends?from=wiLink');
-                    }
-                    dialog.item.labelText = qsTr('Enter the address of the contact you want to add.');
-                    dialog.item.textValue = (domain != '') ? '@' + domain : '';
-                    dialog.item.accepted.connect(function() {
-                        var jid = dialog.item.textValue;
-                        if (jid.match(/^[^@/]+@[^@/]+$/)) {
-                            console.log("Add contact " + jid);
-                            window.client.rosterManager.subscribe(jid);
-                            dialog.hide();
-                        }
-                    });
+                    dialog.source = 'ContactAddDialog.qml';
                     dialog.show();
                 }
 

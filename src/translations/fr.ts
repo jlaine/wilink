@@ -244,18 +244,6 @@ Do you accept?</source>
 
 Acceptez-vous?</translation>
     </message>
-    <message>
-        <source>Add a contact</source>
-        <translation>Ajouter un contact</translation>
-    </message>
-    <message>
-        <source>&lt;b&gt;Tip&lt;/b&gt;: your wAmis are automatically added to your chat contacts, so the easiest way to add Wifirst contacts is to &lt;a href=&quot;%1&quot;&gt;add them as wAmis&lt;/a&gt;</source>
-        <translation>&lt;b&gt;Astuce&lt;/b&gt; : vos wAmis sont automatiquement ajoutés à vos contacts de chat, donc le plus simple pour ajouter des contacts Wifirst est de &lt;a href=&quot;%1&quot;&gt;les ajouter comme wAmis&lt;/a&gt; !</translation>
-    </message>
-    <message>
-        <source>Enter the address of the contact you want to add.</source>
-        <translation>Saisissez l&apos;adresse du contact que vous souhaitez ajouter.</translation>
-    </message>
 </context>
 <context>
     <name>ChatPasswordPrompt</name>
@@ -296,6 +284,21 @@ Acceptez-vous?</translation>
     <message>
         <source>Do you accept?</source>
         <translation type="obsolete">Acceptez-vous ?</translation>
+    </message>
+</context>
+<context>
+    <name>ContactAddDialog</name>
+    <message>
+        <source>&lt;b&gt;Tip&lt;/b&gt;: your wAmis are automatically added to your chat contacts, so the easiest way to add Wifirst contacts is to &lt;a href=&quot;%1&quot;&gt;add them as wAmis&lt;/a&gt;</source>
+        <translation>&lt;b&gt;Astuce&lt;/b&gt; : vos wAmis sont automatiquement ajoutés à vos contacts de chat, donc le plus simple pour ajouter des contacts Wifirst est de &lt;a href=&quot;%1&quot;&gt;les ajouter comme wAmis&lt;/a&gt; !</translation>
+    </message>
+    <message>
+        <source>Enter the address of the contact you want to add.</source>
+        <translation>Saisissez l&apos;adresse du contact que vous souhaitez ajouter.</translation>
+    </message>
+    <message>
+        <source>Add a contact</source>
+        <translation>Ajouter un contact</translation>
     </message>
 </context>
 <context>
