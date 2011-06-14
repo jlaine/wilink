@@ -1,5 +1,6 @@
 HIGH PRIORITY
 
+- make contextual menus disappear when user clicks outside menu
 - restore copy & paste in chat history
 - restore shares initial config dialog
 - auto-join bookmarked rooms
