@@ -26,10 +26,6 @@ generate_png(png
     camera.svg
     chat.svg
     close.svg
-    contact-available.svg
-    contact-away.svg
-    contact-busy.svg
-    contact-offline.svg
     diagnostics.svg
     download.svg
     favorite-active.svg
