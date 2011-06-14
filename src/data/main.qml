@@ -66,8 +66,7 @@ FocusScope {
     Loader {
         id: dialog
 
-        x: 100
-        y: 100
+        anchors.centerIn: parent
         z: 10
 
         function hide() {

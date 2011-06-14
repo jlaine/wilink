@@ -40,8 +40,6 @@ Rectangle {
     smooth: true
     width: 320
     height: 240
-    x: 0
-    y: 0
 
     // FIXME: this is a hack waiting 'blur' or 'shadow' attribute in qml
     BorderImage {
