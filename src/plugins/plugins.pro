@@ -1,4 +1,4 @@
-include(../src.pri)
+include(../../wilink.pri)
 include(../idle/idle.pri)
 include(../qnetio/qnetio.pri)
 include(../qsound/qsound.pri)
