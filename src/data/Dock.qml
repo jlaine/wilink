@@ -27,11 +27,11 @@ Rectangle {
     Rectangle {
         id: dockBackground
 
-        height: 32
+        height: parent.width
         width: parent.height
         anchors.top: parent.top
         anchors.left: parent.left
-        anchors.topMargin: -32
+        anchors.topMargin: -parent.width
         border.color: '#597fbe'
         border.width: 1
 
@@ -44,7 +44,7 @@ Rectangle {
         transform: Rotation {
             angle: 90
             origin.x: 0
-            origin.y: 32
+            origin.y: dock.width
         }
     }
 
