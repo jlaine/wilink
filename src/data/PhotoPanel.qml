@@ -116,6 +116,20 @@ Panel {
                 panel.state = 'details';
             }
         }
+
+        Connections {
+            target: displayView
+            onCurrentIndexChanged: {
+                if (panel.state == 'details') {
+                    view.currentIndex = displayView.currentIndex;
+                    var crumb = crumbBar.model.count - 1;
+                    var model = view.currentItem.data();
+                    crumbBar.model.setProperty(crumb, 'name', model.name);
+                    crumbBar.model.setProperty(crumb, 'isDir', model.isDir);
+                    crumbBar.model.setProperty(crumb, 'url', model.url);
+                }
+            }
+        }
     }
 
     PanelHelp {
@@ -152,7 +166,11 @@ Panel {
             height: view.cellHeight
 
             function clicked() {
-                crumbBar.push(model);
+                crumbBar.push({'name': model.name, 'isDir': model.isDir, 'url': model.url});
+            }
+
+            function data() {
+                return model;
             }
 
             Column {
