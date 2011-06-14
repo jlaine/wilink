@@ -177,7 +177,5 @@ Rectangle {
             }
         }
     }
-
-    onRejected: hide()
 }
 
