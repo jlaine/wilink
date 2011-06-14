@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QCoreApplication>
 #include <QDesktopServices>
 #include <QSettings>
 #include <QTimer>
@@ -36,6 +37,11 @@
 
 static QXmppShareDatabase *globalDatabase = 0;
 static const int parallelDownloadLimit = 2;
+
+static void closeDatabase()
+{
+    delete globalDatabase;
+}
 
 static void copy(QXmppShareItem *oldChild, const QXmppShareItem *newChild)
 {
@@ -324,6 +330,7 @@ QXmppShareDatabase *ShareModel::database()
         globalDatabase = new QXmppShareDatabase;
         globalDatabase->setDirectory(sharesDirectory);
         globalDatabase->setMappedDirectories(mappedDirectories);
+        qAddPostRoutine(closeDatabase);
     }
     return globalDatabase;
 }
