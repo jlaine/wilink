@@ -68,7 +68,7 @@ Rectangle {
                 anchors.leftMargin: 4
                 anchors.verticalCenter: parent.verticalCenter
                 smooth: true
-                source: model.icon
+                source: model.icon ? model.icon : ''
                 width: 16
                 height: 16
             }
