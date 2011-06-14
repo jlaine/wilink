@@ -180,6 +180,7 @@ void RoomListModel::addRoom(const QString &jid)
     item->jid = jid;
     item->messages = 0;
     addItem(item, rootItem, row);
+    emit roomAdded(item->jid);
 }
 
 void RoomListModel::removeRoom(const QString &jid)
