@@ -167,11 +167,11 @@ Item {
         target: call
         onStateChanged: {
             if (call.state == QXmppCall.ActiveState) {
-                status.text = qsTr('Call connected.');
+                status.text = qsTranslate('CallWidget', 'Call connected.');
             } else if (call.state == QXmppCall.DisconnectingState) {
-                status.text = qsTr('Disconnecting..');
+                status.text = qsTranslate('CallWidget', 'Disconnecting..');
             } else if (call.state == QXmppCall.FinishedState) {
-                status.text = qsTr('Call finished.');
+                status.text = qsTranslate('CallWidget', 'Call finished.');
             }
         }
     }

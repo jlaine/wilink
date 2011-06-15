@@ -59,9 +59,9 @@ Panel {
 
         function stateText() {
             if (conversation.remoteState == QXmppMessage.Composing)
-                return qsTr('is composing a message');
+                return qsTranslate('ConversationPanel', 'is composing a message');
             else if (conversation.remoteState == QXmppMessage.Gone)
-                return qsTr('has closed the conversation');
+                return qsTranslate('ConversationPanel', 'has closed the conversation');
             else
                 return '';
         }
@@ -101,7 +101,7 @@ Panel {
 
                 onClicked: {
                     var dialog = window.fileDialog();
-                    dialog.windowTitle = qsTr('Send a file');
+                    dialog.windowTitle = qsTranslate('ConversationPanel', 'Send a file');
                     dialog.fileMode = QFileDialog.ExistingFile;
                     if (dialog.exec()) {
                         for (var i in dialog.selectedFiles) {
