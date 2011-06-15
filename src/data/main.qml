@@ -99,6 +99,11 @@ FocusScope {
             menuLoader.y = y;
             menuLoader.item.state = 'visible';
         }
+
+        Connections {
+            target: menuLoader.item
+            onItemClicked: menuLoader.hide()
+        }
     }
 
     Component.onCompleted: swapper.showPanel('ChatPanel.qml')

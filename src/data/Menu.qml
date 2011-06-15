@@ -34,16 +34,6 @@ Rectangle {
     width: 150
     z: 10
 
-    function hide() {
-        menu.state = '';
-    }
-
-    function show(x, y) {
-        menu.x = x;
-        menu.y = y;
-        menu.state = 'visible';
-    }
-
     ListView {
         id: menuList
 
@@ -95,11 +85,7 @@ Rectangle {
                 anchors.fill: listViewItem
                 hoverEnabled: true
 
-                onClicked: {
-                    menu.hide();
-                    itemClicked(index);
-                }
-
+                onClicked: itemClicked(index)
                 onEntered: listViewItem.state = 'hovered'
                 onExited: listViewItem.state = ''
             }
