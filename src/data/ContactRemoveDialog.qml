@@ -20,21 +20,41 @@
 import QtQuick 1.0
 import wiLink 1.2
 
-InputDialog {
+Dialog {
     property alias jid: vcard.jid
 
-    labelText: qsTr('Enter the name for this contact.')
-    textValue: vcard.name
-    title: qsTr('Rename contact')
+    minHeight: 150
+    height: minHeight
+    title: qsTr('Remove contact');
 
     VCard {
         id: vcard
     }
 
+    Item {
+        anchors.fill: contents
+
+        Image {
+            id: image
+
+            anchors.top: parent.top
+            anchors.left: parent.left
+            source: vcard.avatar
+        }
+
+        Text {
+            anchors.top: parent.top
+            anchors.left: image.right
+            anchors.leftMargin: 8
+            anchors.right: parent.right
+            text: qsTr('Do you want to remove %1 from your contact list?').replace('%1', vcard.name)
+            wrapMode: Text.WordWrap
+        }
+    }
+
     onAccepted: {
-        var name = textValue;
-        console.log("Rename contact " + jid + ": " + name);
-        window.client.rosterManager.renameItem(jid, name);
+        console.log("Remove contact " + vcard.jid);
+        window.client.rosterManager.removeItem(vcard.jid);
         dialog.hide();
     }
 }

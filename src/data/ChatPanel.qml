@@ -163,7 +163,6 @@ Panel {
                     } else if (item.action == 'rename') {
                         dialog.source = 'ContactRenameDialog.qml';
                         dialog.item.jid = item.jid;
-                        dialog.item.textValue = item.name;
                         dialog.show();
                     } else if (item.action == 'remove') {
                         dialog.source = 'ContactRemoveDialog.qml';
