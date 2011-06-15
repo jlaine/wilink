@@ -20,19 +20,52 @@
 import QtQuick 1.0
 import wiLink 1.2
 
-InputDialog {
+Dialog {
     property alias jid: vcard.jid
 
-    labelText: qsTr('Enter the name for this contact.')
-    textValue: vcard.name
     title: qsTr('Rename contact')
 
     VCard {
         id: vcard
     }
 
+    Item {
+        anchors.fill: contents
+
+        Image {
+            id: image
+
+            anchors.top: parent.top
+            anchors.left: parent.left
+            source: vcard.avatar
+        }
+
+        Text {
+            id: label
+            anchors.top: parent.top
+            anchors.left: image.right
+            anchors.leftMargin: 8
+            anchors.right: parent.right
+            text: qsTr('Enter the name for this contact.')
+            wrapMode: Text.WordWrap
+        }
+
+        InputBar {
+            id: bar
+
+            anchors.top: label.bottom
+            anchors.topMargin: 8
+            anchors.left: image.right
+            anchors.leftMargin: 8
+            anchors.right: parent.right
+            text: vcard.name
+
+            onReturnPressed: dialog.accepted()
+        }
+    }
+
     onAccepted: {
-        var name = textValue;
+        var name = bar.text;
         console.log("Rename contact " + jid + ": " + name);
         window.client.rosterManager.renameItem(jid, name);
         dialog.hide();
