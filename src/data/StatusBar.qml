@@ -129,24 +129,16 @@ Rectangle {
         }
 
         model: ListModel {}
+
+        onCurrentIndexChanged: {
+            var statusType = combo.statusType();
+            if (statusType != window.client.statusType)
+                window.client.statusType = statusType;
+        }
     }
 
     Idle {
         id: idle
-
-        Component.onCompleted: idle.start()
-    }
-
-    Component.onCompleted: {
-        combo.model.append({'name': qsTr('Available'), 'status': QXmppPresence.Online});
-        combo.model.append({'name': qsTr('Away'), 'status': QXmppPresence.Away});
-        combo.model.append({'name': qsTr('Busy'), 'status': QXmppPresence.DND});
-        combo.model.append({'name': qsTr('Offline'), 'status': QXmppPresence.Offline});
-        combo.setStatusType(QXmppPresence.Online);
-    }
-
-    Connections {
-        target: idle
 
         onIdleTimeChanged: {
             if (idle.idleTime >= 300) {
@@ -159,15 +151,15 @@ Rectangle {
                 combo.setStatusType(QXmppPresence.Online);
             }
         }
+
+        Component.onCompleted: idle.start()
     }
 
-    Connections {
-        target: combo
-
-        onCurrentIndexChanged: {
-            var statusType = combo.statusType();
-            if (statusType != window.client.statusType)
-                window.client.statusType = statusType;
-        }
+    Component.onCompleted: {
+        combo.model.append({'name': qsTr('Available'), 'status': QXmppPresence.Online});
+        combo.model.append({'name': qsTr('Away'), 'status': QXmppPresence.Away});
+        combo.model.append({'name': qsTr('Busy'), 'status': QXmppPresence.DND});
+        combo.model.append({'name': qsTr('Offline'), 'status': QXmppPresence.Offline});
+        combo.setStatusType(QXmppPresence.Online);
     }
 }
