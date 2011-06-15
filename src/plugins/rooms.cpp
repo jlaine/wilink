@@ -79,7 +79,6 @@ void RoomListModel::bookmarksReceived()
     Q_ASSERT(bookmarkManager);
 
     // join rooms marked as "autojoin"
-    qDebug("got bookmarks");
     const QXmppBookmarkSet &bookmarks = bookmarkManager->bookmarks();
     foreach (const QXmppBookmarkConference &conference, bookmarks.conferences()) {
         if (conference.autoJoin())

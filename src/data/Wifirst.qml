@@ -45,10 +45,7 @@ Item {
                         // check for "home" chat room
                         var roomCap = link.match(/xmpp:([^?]+)\?join/);
                         if (roomCap) {
-                            var jid = roomCap[1];
-                            if (!chatSwapper.findPanel('RoomPanel.qml', {'jid': jid})) {
-                                chatPanel.showRoom(jid);
-                            }
+                            roomListModel.addRoom(roomCap[1]);
                         }
                     }
 

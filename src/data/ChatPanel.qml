@@ -56,6 +56,16 @@ Panel {
             model: RoomListModel {
                 id: roomListModel
                 client: window.client
+
+                onRoomAdded: {
+                    if (!chatSwapper.findPanel('RoomPanel.qml', {'jid': jid})) {
+                        if (chatSwapper.currentItem) {
+                            chatSwapper.addPanel('RoomPanel.qml', {'jid': jid});
+                        } else {
+                            chatPanel.showRoom(jid);
+                        }
+                    }
+                }
             }
             title: qsTr('My rooms')
             height: 150
