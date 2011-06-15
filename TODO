@@ -8,12 +8,11 @@ HIGH PRIORITY
 
 LOW PRIORITY
 
-- add a "do not disturb" option for SIP
 - restore "find" feature
 - save / restore window size and position
 - add contact status in chat conversation
-- fix translation in confim dialog
 
 ENHANCEMENTS
 
 - display users list in share panel
+- add a "do not disturb" option for SIP
