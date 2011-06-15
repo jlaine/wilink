@@ -91,9 +91,4 @@ Rectangle {
             }
         }
     }
-
-    states: State {
-        name: 'visible'
-        PropertyChanges { target: menu; opacity: 1 }
-    }
 }

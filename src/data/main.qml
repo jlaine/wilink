@@ -91,13 +91,13 @@ FocusScope {
         z: 11
 
         function hide() {
-            menuLoader.item.state = '';
+            menuLoader.item.opacity = 0;
         }
 
         function show(x, y) {
             menuLoader.x = x;
             menuLoader.y = y;
-            menuLoader.item.state = 'visible';
+            menuLoader.item.opacity = 1;
         }
 
         Connections {
