@@ -90,26 +90,13 @@ Item {
                 hoverEnabled: true
                 onClicked: {
                     if (mouse.button == Qt.LeftButton) {
-                        // hide context menu
-                        menu.hide();
                         block.participantClicked(model.name);
                     } else if (mouse.button == Qt.RightButton) {
-                        // show context menu
-                        menu.model.clear()
-                        if (model.url != undefined && model.url != '')
-                            menu.model.append({
-                                'action': 'profile',
-                                'icon': 'diagnostics.png',
-                                'text': qsTr('Show profile'),
-                                'url': model.url})
-                        if (room.allowedActions & QXmppMucRoom.KickAction)
-                            menu.model.append({
-                                'action': 'kick',
-                                'icon': 'remove.png',
-                                'text': qsTr('Kick user'),
-                                'jid': model.jid})
-                        var mousePress = mapToItem(view, mouse.x - menu.width + 16, mouse.y - 16)
-                        menu.show(mousePress.x, mousePress.y);
+                        var pos = mapToItem(menuLoader.parent, mouse.x, mouse.y);
+                        menuLoader.sourceComponent = participantMenu;
+                        menuLoader.item.jid = model.jid;
+                        menuLoader.item.url = model.url;
+                        menuLoader.show(pos.x - menuLoader.item.width, pos.y);
                     }
                 }
                 onEntered: highlight.state = ''
@@ -127,23 +114,41 @@ Item {
         flickableItem: view
     }
 
-    Menu {
-        id: menu
-        opacity: 0
+    Component {
+        id: participantMenu
 
-        onItemClicked: {
-            var item = menu.model.get(index);
-            if (item.action == 'profile') {
-                Qt.openUrlExternally(item.url)
-            } else if (item.action == 'kick') {
-                dialogLoader.source = 'InputDialog.qml';
-                dialogLoader.item.title = qsTr('Kick user');
-                dialogLoader.item.labelText = qsTr('Enter the reason for kicking the user from the room.');
-                dialogLoader.item.accepted.connect(function() {
-                    room.kick(item.jid, dialogLoader.item.textValue);
-                    dialogLoader.hide();
-                });
-                dialogLoader.show();
+        Menu {
+            id: menu
+
+            property string jid
+            property string url
+
+            onItemClicked: {
+                var item = menu.model.get(index);
+                if (item.action == 'profile') {
+                    Qt.openUrlExternally(url)
+                } else if (item.action == 'kick') {
+                    dialogLoader.source = 'InputDialog.qml';
+                    dialogLoader.item.title = qsTr('Kick user');
+                    dialogLoader.item.labelText = qsTr('Enter the reason for kicking the user from the room.');
+                    dialogLoader.item.accepted.connect(function() {
+                        room.kick(jid, dialogLoader.item.textValue);
+                        dialogLoader.hide();
+                    });
+                    dialogLoader.show();
+                }
+            }
+
+            Component.onCompleted: {
+                menu.model.append({
+                    'action': 'profile',
+                    'icon': 'diagnostics.png',
+                    'text': qsTr('Show profile')});
+                //if (room.allowedActions & QXmppMucRoom.KickAction)
+                menu.model.append({
+                    'action': 'kick',
+                    'icon': 'remove.png',
+                    'text': qsTr('Kick user')});
             }
         }
     }
