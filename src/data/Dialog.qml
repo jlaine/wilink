@@ -111,6 +111,7 @@ Rectangle {
         anchors.right: parent.right
         anchors.top: header.bottom
         anchors.bottom: footer.top
+        anchors.margins: 8
     }
 
     Row {

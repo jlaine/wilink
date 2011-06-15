@@ -31,53 +31,56 @@ Dialog {
     height: (help.opacity == 1) ? 250 : 150
     width: 280
 
-    PanelHelp {
-        id: help
+    Item {
+        anchors.fill: contents
 
-        anchors.top: contents.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.margins: 8
-        opacity: text.length > 0 ? 1 : 0
-    }
+        PanelHelp {
+            id: help
 
-    Text {
-        id: label
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            opacity: text.length > 0 ? 1 : 0
+        }
 
-        anchors.top: (help.opacity == 1) ? help.bottom : contents.top
-        anchors.left:  parent.left
-        anchors.right: parent.right
-        anchors.margins: 8
-        wrapMode: Text.WordWrap
+        Text {
+            id: label
 
-        onLinkActivated: Qt.openUrlExternally(link)
-    }
+            anchors.top: (help.opacity == 1) ? help.bottom : parent.top
+            anchors.topMargin: (help.opacity == 1) ? 8 : 0
+            anchors.left:  parent.left
+            anchors.right: parent.right
+            wrapMode: Text.WordWrap
 
-    Rectangle {
-        id: bar
+            onLinkActivated: Qt.openUrlExternally(link)
+        }
 
-        anchors.margins: 8
-        anchors.top: label.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        border.color: '#c3c3c3'
-        border.width: 1
-        color: 'white'
-        width: 100
-        height: textEdit.paintedHeight + 8
+        Rectangle {
+            id: bar
 
-        TextEdit {
-            id: textEdit
+            anchors.top: label.bottom
+            anchors.topMargin: 8
+            anchors.left: parent.left
+            anchors.right: parent.right
+            border.color: '#c3c3c3'
+            border.width: 1
+            color: 'white'
+            width: 100
+            height: textEdit.paintedHeight + 8
 
-            anchors.fill: parent
-            anchors.margins: 4
-            focus: true
-            smooth: true
-            textFormat: TextEdit.PlainText
+            TextEdit {
+                id: textEdit
 
-            Keys.onReturnPressed: {
-                dialog.accepted();
-                return false;
+                anchors.fill: parent
+                anchors.margins: 4
+                focus: true
+                smooth: true
+                textFormat: TextEdit.PlainText
+
+                Keys.onReturnPressed: {
+                    dialog.accepted();
+                    return false;
+                }
             }
         }
     }
