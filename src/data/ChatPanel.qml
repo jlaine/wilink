@@ -60,19 +60,17 @@ Panel {
             title: qsTr('My rooms')
             height: 150
 
-            Connections {
-                onAddClicked: {
-                    dialog.source = 'RoomJoinDialog.qml';
-                    dialog.item.panel = chatPanel;
-                    dialog.show();
-                }
-
-                onCurrentJidChanged: {
-                    rooms.model.clearPendingMessages(rooms.currentJid);
-                }
-
-                onItemClicked: showRoom(model.jid)
+            onAddClicked: {
+                dialog.source = 'RoomJoinDialog.qml';
+                dialog.item.panel = chatPanel;
+                dialog.show();
             }
+
+            onCurrentJidChanged: {
+                rooms.model.clearPendingMessages(rooms.currentJid);
+            }
+
+            onItemClicked: showRoom(model.jid)
         }
 
         Rectangle {
@@ -147,6 +145,27 @@ Panel {
             Menu {
                 id: menu
                 opacity: 0
+
+                onItemClicked: {
+                    var item = menu.model.get(index);
+                    if (item.action == 'profile') {
+                        Qt.openUrlExternally(item.url);
+                    } else if (item.action == 'rename') {
+                        dialog.source = 'ContactRenameDialog.qml';
+                        dialog.item.jid = item.jid;
+                        dialog.item.textValue = item.name;
+                        dialog.show();
+                    } else if (item.action == 'remove') {
+                        var box = window.messageBox();
+                        box.windowTitle = qsTr('Remove contact');
+                        box.text = qsTr('Do you want to remove %1 from your contact list?').replace('%1', item.name);
+                        box.standardButtons = QMessageBox.Yes | QMessageBox.No;
+                        if (box.exec() == QMessageBox.Yes) {
+                            console.log("Remove contact " + item.jid);
+                            window.client.rosterManager.removeItem(item.jid);
+                        }
+                    }
+                }
             }
 
             onAddClicked: {
@@ -203,30 +222,6 @@ Panel {
                     } else {
                         // refuse subscription
                         window.client.rosterManager.refuseSubscription(bareJid);
-                    }
-                }
-            }
-
-            Connections {
-                target: menu
-                onItemClicked: {
-                    var item = menu.model.get(index);
-                    if (item.action == 'profile') {
-                        Qt.openUrlExternally(item.url);
-                    } else if (item.action == 'rename') {
-                        dialog.source = 'ContactRenameDialog.qml';
-                        dialog.item.jid = item.jid;
-                        dialog.item.textValue = item.name;
-                        dialog.show();
-                    } else if (item.action == 'remove') {
-                        var box = window.messageBox();
-                        box.windowTitle = qsTranslate('ChatPanel', 'Remove contact');
-                        box.text = qsTranslate('ChatPanel', 'Do you want to remove %1 from your contact list?').replace('%1', item.name);
-                        box.standardButtons = QMessageBox.Yes | QMessageBox.No;
-                        if (box.exec() == QMessageBox.Yes) {
-                            console.log("Remove contact " + item.jid);
-                            window.client.rosterManager.removeItem(item.jid);
-                        }
                     }
                 }
             }
