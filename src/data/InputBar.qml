@@ -47,12 +47,29 @@ Rectangle {
         anchors.margins: 4
         focus: true
         smooth: true
+        selectByMouse: true
         textFormat: TextEdit.PlainText
 
         Keys.onReturnPressed: {
             bar.returnPressed();
             return false;
         }
+    }
+
+    MouseArea {
+        anchors.fill: edit
+        acceptedButtons: Qt.RightButton
+
+        onPressed: {
+            var pos = mapToItem(menu.parent, mouse.x, mouse.y);
+            menu.show(pos.x, pos.y - menu.height);
+        }
+    }
+
+    InputMenu {
+        id: menu
+
+        target: edit
     }
 }
 
