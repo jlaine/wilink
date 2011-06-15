@@ -136,14 +136,14 @@ Item {
             if (item.action == 'profile') {
                 Qt.openUrlExternally(item.url)
             } else if (item.action == 'kick') {
-                dialog.source = 'InputDialog.qml';
-                dialog.item.title = qsTr('Kick user');
-                dialog.item.labelText = qsTr('Enter the reason for kicking the user from the room.');
-                dialog.item.accepted.connect(function() {
-                    room.kick(item.jid, dialog.item.textValue);
-                    dialog.hide();
+                dialogLoader.source = 'InputDialog.qml';
+                dialogLoader.item.title = qsTr('Kick user');
+                dialogLoader.item.labelText = qsTr('Enter the reason for kicking the user from the room.');
+                dialogLoader.item.accepted.connect(function() {
+                    room.kick(item.jid, dialogLoader.item.textValue);
+                    dialogLoader.hide();
                 });
-                dialog.show();
+                dialogLoader.show();
             }
         }
     }

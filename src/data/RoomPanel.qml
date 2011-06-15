@@ -71,10 +71,10 @@ Panel {
                 text: qsTr('Invite')
 
                 onClicked: {
-                    dialog.source = 'RoomInviteDialog.qml';
-                    dialog.item.contacts = onlineContacts;
-                    dialog.item.room = room;
-                    dialog.show()
+                    dialogLoader.source = 'RoomInviteDialog.qml';
+                    dialogLoader.item.contacts = onlineContacts;
+                    dialogLoader.item.room = room;
+                    dialogLoader.show()
                 }
             }
 
@@ -84,15 +84,15 @@ Panel {
                 visible: Qt.isQtObject(room) && (room.allowedActions & QXmppMucRoom.SubjectAction)
 
                 onClicked: {
-                    dialog.source = 'InputDialog.qml';
-                    dialog.item.title = qsTr('Change subject');
-                    dialog.item.labelText = qsTr('Enter the new room subject.');
-                    dialog.item.textValue = room.subject
-                    dialog.item.accepted.connect(function() {
-                        room.subject = dialog.item.textValue;
-                        dialog.hide();
+                    dialogLoader.source = 'InputDialog.qml';
+                    dialogLoader.item.title = qsTr('Change subject');
+                    dialogLoader.item.labelText = qsTr('Enter the new room subject.');
+                    dialogLoader.item.textValue = room.subject
+                    dialogLoader.item.accepted.connect(function() {
+                        room.subject = dialogLoader.item.textValue;
+                        dialogLoader.hide();
                     });
-                    dialog.show()
+                    dialogLoader.show()
                 }
             }
 

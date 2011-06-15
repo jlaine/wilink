@@ -71,9 +71,9 @@ Panel {
             height: 150
 
             onAddClicked: {
-                dialog.source = 'RoomJoinDialog.qml';
-                dialog.item.panel = chatPanel;
-                dialog.show();
+                dialogLoader.source = 'RoomJoinDialog.qml';
+                dialogLoader.item.panel = chatPanel;
+                dialogLoader.show();
             }
 
             onCurrentJidChanged: {
@@ -161,20 +161,20 @@ Panel {
                     if (item.action == 'profile') {
                         Qt.openUrlExternally(item.url);
                     } else if (item.action == 'rename') {
-                        dialog.source = 'ContactRenameDialog.qml';
-                        dialog.item.jid = item.jid;
-                        dialog.show();
+                        dialogLoader.source = 'ContactRenameDialog.qml';
+                        dialogLoader.item.jid = item.jid;
+                        dialogLoader.show();
                     } else if (item.action == 'remove') {
-                        dialog.source = 'ContactRemoveDialog.qml';
-                        dialog.item.jid = item.jid;
-                        dialog.show();
+                        dialogLoader.source = 'ContactRemoveDialog.qml';
+                        dialogLoader.item.jid = item.jid;
+                        dialogLoader.show();
                     }
                 }
             }
 
             onAddClicked: {
-                dialog.source = 'ContactAddDialog.qml';
-                dialog.show();
+                dialogLoader.source = 'ContactAddDialog.qml';
+                dialogLoader.show();
             }
 
             onCurrentJidChanged: {

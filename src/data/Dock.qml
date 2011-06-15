@@ -126,8 +126,8 @@ Rectangle {
             text: qsTr('Preferences')
             visible: false
             onClicked: {
-                dialog.source = 'PreferenceDialog.qml';
-                dialog.show();
+                dialogLoader.source = 'PreferenceDialog.qml';
+                dialogLoader.show();
             }
         }
 

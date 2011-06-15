@@ -64,24 +64,24 @@ FocusScope {
     }
 
     Loader {
-        id: dialog
+        id: dialogLoader
 
         anchors.centerIn: parent
         z: 10
 
         function hide() {
-            dialog.item.opacity = 0;
+            dialogLoader.item.opacity = 0;
             swapper.focus = true;
         }
 
         function show() {
-            dialog.item.opacity = 1;
-            dialog.focus = true;
+            dialogLoader.item.opacity = 1;
+            dialogLoader.focus = true;
         }
 
         Connections {
-            target: dialog.item
-            onRejected: dialog.hide()
+            target: dialogLoader.item
+            onRejected: dialogLoader.hide()
         }
     }
 

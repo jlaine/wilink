@@ -55,7 +55,7 @@ Dialog {
     onAccepted: {
         console.log("Remove contact " + vcard.jid);
         window.client.rosterManager.removeItem(vcard.jid);
-        dialog.hide();
+        dialogLoader.hide();
     }
 }
 
