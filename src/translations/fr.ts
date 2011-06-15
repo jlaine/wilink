@@ -216,10 +216,6 @@
         <translation>Retirer contact</translation>
     </message>
     <message>
-        <source>Do you want to remove %1 from your contact list?</source>
-        <translation>Voulez vous retirer %1 de votre liste de contacts ?</translation>
-    </message>
-    <message>
         <source>Invitation from %1</source>
         <translation>Invitation de %1</translation>
     </message>
@@ -310,6 +306,17 @@ Acceptez-vous?</translation>
     <message>
         <source>Add a contact</source>
         <translation>Ajouter un contact</translation>
+    </message>
+</context>
+<context>
+    <name>ContactRemoveDialog</name>
+    <message>
+        <source>Remove contact</source>
+        <translation>Retirer contact</translation>
+    </message>
+    <message>
+        <source>Do you want to remove %1 from your contact list?</source>
+        <translation>Voulez vous retirer %1 de votre liste de contacts ?</translation>
     </message>
 </context>
 <context>

@@ -42,103 +42,106 @@ Dialog {
         }
     }
 
-    PanelHelp {
-        id: help
+    Item {
+        anchors.fill: contents
 
-        anchors.top: contents.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.margins: 8
-        text: qsTr('Enter the name of the chat room you want to join. If the chat room does not exist yet, it will be created for you.')
-    }
+        PanelHelp {
+            id: help
 
-    Rectangle {
-        id: bar
-
-        anchors.margins: 8
-        anchors.top: help.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        border.color: '#c3c3c3'
-        border.width: 1
-        color: 'white'
-        width: 100
-        height: roomEdit.paintedHeight + 8
-
-        TextEdit {
-            id: roomEdit
-
-            anchors.fill: parent
-            anchors.margins: 4
-            focus: true
-            smooth: true
-            textFormat: TextEdit.PlainText
-
-            Keys.onReturnPressed: {
-                dialog.accepted();
-                return false;
-            }
-        }
-    }
-
-    ListView {
-        id: view
-
-        anchors.margins: 8
-        anchors.left: parent.left
-        anchors.right: scrollBar.left
-        anchors.top: bar.bottom
-        anchors.bottom: contents.bottom
-        clip: true
-        model: DiscoveryModel {
-            details: false
-            manager: window.client.discoveryManager
-            rootJid: window.client.mucServer
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            text: qsTr('Enter the name of the chat room you want to join. If the chat room does not exist yet, it will be created for you.')
         }
 
-        delegate: Rectangle {
-            width: parent.width - 1
-            height: 24
+        Rectangle {
+            id: bar
 
-            Image {
-                id: image
+            anchors.top: help.bottom
+            anchors.topMargin: 8
+            anchors.left: parent.left
+            anchors.right: parent.right
+            border.color: '#c3c3c3'
+            border.width: 1
+            color: 'white'
+            width: 100
+            height: roomEdit.paintedHeight + 8
 
-                anchors.left: parent.left
-                anchors.leftMargin: 4
-                anchors.verticalCenter: parent.verticalCenter
-                width: 16
-                height: 16
-                smooth: true
-                source: model.avatar
-            }
+            TextEdit {
+                id: roomEdit
 
-            Text {
-                anchors.left: image.right
-                anchors.leftMargin: 4
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-                text: model.name
-            }
-
-            MouseArea {
                 anchors.fill: parent
-                onClicked: {
-                    roomEdit.text = model.jid;
+                anchors.margins: 4
+                focus: true
+                smooth: true
+                textFormat: TextEdit.PlainText
+
+                Keys.onReturnPressed: {
                     dialog.accepted();
+                    return false;
                 }
             }
         }
-    }
 
-    ScrollBar {
-        id: scrollBar
+        ListView {
+            id: view
 
-        anchors.top: bar.bottom
-        anchors.bottom: contents.bottom
-        anchors.right: parent.right
-        anchors.margins: 8
-        clip: true
-        flickableItem: view
+            anchors.top: bar.bottom
+            anchors.topMargin: 8
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.right: scrollBar.left
+            clip: true
+            model: DiscoveryModel {
+                details: false
+                manager: window.client.discoveryManager
+                rootJid: window.client.mucServer
+            }
+
+            delegate: Rectangle {
+                width: parent.width - 1
+                height: 24
+
+                Image {
+                    id: image
+
+                    anchors.left: parent.left
+                    anchors.leftMargin: 4
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: 16
+                    height: 16
+                    smooth: true
+                    source: model.avatar
+                }
+
+                Text {
+                    anchors.left: image.right
+                    anchors.leftMargin: 4
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: model.name
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: {
+                        roomEdit.text = model.jid;
+                        dialog.accepted();
+                    }
+                }
+            }
+        }
+
+        ScrollBar {
+            id: scrollBar
+
+            anchors.top: bar.bottom
+            anchors.topMargin: 8
+            anchors.bottom: parent.bottom
+            anchors.right: parent.right
+            clip: true
+            flickableItem: view
+        }
     }
 }
 

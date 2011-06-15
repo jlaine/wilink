@@ -166,14 +166,9 @@ Panel {
                         dialog.item.textValue = item.name;
                         dialog.show();
                     } else if (item.action == 'remove') {
-                        var box = window.messageBox();
-                        box.windowTitle = qsTr('Remove contact');
-                        box.text = qsTr('Do you want to remove %1 from your contact list?').replace('%1', item.name);
-                        box.standardButtons = QMessageBox.Yes | QMessageBox.No;
-                        if (box.exec() == QMessageBox.Yes) {
-                            console.log("Remove contact " + item.jid);
-                            window.client.rosterManager.removeItem(item.jid);
-                        }
+                        dialog.source = 'ContactRemoveDialog.qml';
+                        dialog.item.jid = item.jid;
+                        dialog.show();
                     }
                 }
             }

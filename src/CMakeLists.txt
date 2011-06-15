@@ -114,6 +114,7 @@ if(RELOAD_TRANSLATIONS)
         data/ChatPanel.qml
         data/ContactAddDialog.qml
         data/ContactRenameDialog.qml
+        data/ContactRemoveDialog.qml
         data/ConversationPanel.qml
         data/DiagnosticPanel.qml
         data/Dialog.qml
