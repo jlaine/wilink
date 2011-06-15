@@ -34,7 +34,6 @@ Panel {
     /** Convenience method to show a chat room panel.
      */
     function showRoom(jid) {
-        swapper.showPanel('ChatPanel.qml');
         chatSwapper.showPanel('RoomPanel.qml', {'jid': jid})
     }
 

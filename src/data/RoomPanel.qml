@@ -114,7 +114,6 @@ Panel {
                 onClicked: {
                     room.leave();
                     roomListModel.removeRoom(room.jid);
-                    participantModel.unbookmark();
                     panel.close();
                 }
             }
@@ -191,7 +190,7 @@ Panel {
         }
 
         onJoined: {
-            participantModel.bookmark();
+            roomListModel.addRoom(room.jid);
         }
 
         onKicked: {
