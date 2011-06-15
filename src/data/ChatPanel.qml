@@ -149,44 +149,42 @@ Panel {
                 opacity: 0
             }
 
-            Connections {
-                onAddClicked: {
-                    dialog.source = 'ContactAddDialog.qml';
-                    dialog.show();
-                }
+            onAddClicked: {
+                dialog.source = 'ContactAddDialog.qml';
+                dialog.show();
+            }
 
-                onCurrentJidChanged: {
-                    window.rosterModel.clearPendingMessages(contacts.currentJid);
-                }
+            onCurrentJidChanged: {
+                window.rosterModel.clearPendingMessages(contacts.currentJid);
+            }
 
-                onItemClicked: {
-                    menu.hide();
-                    showConversation(model.jid);
-                }
+            onItemClicked: {
+                menu.hide();
+                showConversation(model.jid);
+            }
 
-                onItemContextMenu: {
-                    menu.model.clear()
-                    if (model.url != undefined && model.url != '') {
-                        menu.model.append({
-                            'action': 'profile',
-                            'icon': 'diagnostics.png',
-                            'text': qsTranslate('ChatPanel', 'Show profile'),
-                            'url': model.url});
-                    }
+            onItemContextMenu: {
+                menu.model.clear()
+                if (model.url != undefined && model.url != '') {
                     menu.model.append({
-                        'action': 'rename',
-                        'icon': 'options.png',
-                        'name': model.name,
-                        'text': qsTranslate('ChatPanel', 'Rename contact'),
-                        'jid': model.jid});
-                    menu.model.append({
-                        'action': 'remove',
-                        'icon': 'remove.png',
-                        'name': model.name,
-                        'text': qsTranslate('ChatPanel', 'Remove contact'),
-                        'jid': model.jid});
-                    menu.show(16, point.y - 16);
+                        'action': 'profile',
+                        'icon': 'diagnostics.png',
+                        'text': qsTr('Show profile'),
+                        'url': model.url});
                 }
+                menu.model.append({
+                    'action': 'rename',
+                    'icon': 'options.png',
+                    'name': model.name,
+                    'text': qsTr('Rename contact'),
+                    'jid': model.jid});
+                menu.model.append({
+                    'action': 'remove',
+                    'icon': 'remove.png',
+                    'name': model.name,
+                    'text': qsTr('Remove contact'),
+                    'jid': model.jid});
+                menu.show(16, point.y - 16);
             }
 
             Connections {

@@ -87,9 +87,9 @@ Rectangle {
                     if (combo.state == '' && model.status != QXmppPresence.Offline) {
                         switch (window.client.state) {
                         case QXmppClient.ConnectingState:
-                            return qsTranslate('StatusBar', 'Connecting..');
+                            return qsTr('Connecting..');
                         case QXmppClient.DisconnectedState:
-                            return qsTranslate('StatusBar', 'Offline');
+                            return qsTr('Offline');
                         }
                     }
                     return model.name;

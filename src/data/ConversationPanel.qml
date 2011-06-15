@@ -59,9 +59,9 @@ Panel {
 
         function stateText() {
             if (conversation.remoteState == QXmppMessage.Composing)
-                return qsTranslate('ConversationPanel', 'is composing a message');
+                return qsTr('is composing a message');
             else if (conversation.remoteState == QXmppMessage.Gone)
-                return qsTranslate('ConversationPanel', 'has closed the conversation');
+                return qsTr('has closed the conversation');
             else
                 return '';
         }
