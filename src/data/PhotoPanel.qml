@@ -209,7 +209,7 @@ Panel {
     ScrollBar {
         id: scrollBar
 
-        anchors.top: crumbBar.bottom
+        anchors.top: help.bottom
         anchors.bottom: footer.top
         anchors.right: parent.right
         flickableItem: view
