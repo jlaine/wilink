@@ -213,6 +213,17 @@ Panel {
             Connections {
                 target: window.client.rosterManager
                 onSubscriptionReceived: {
+                    // If we have a subscription to the requester, accept
+                    // reciprocal subscription.
+                    //
+                    // FIXME: use QXmppRosterIq::Item::To and QXmppRosterIq::Item::Both
+                    var subscription = window.client.rosterManager.subscriptionType(bareJid);
+                    if (subscription == 2 || subscription == 3) {
+                        // accept subscription
+                        window.client.rosterManager.acceptSubscription(bareJid);
+                        return;
+                    }
+
                     var box = window.messageBox();
                     box.windowTitle = qsTranslate('ChatPanel', 'Invitation from %1').replace('%1', bareJid);
                     box.text = qsTranslate('ChatPanel', '%1 has asked to add you to his or her contact list.\n\nDo you accept?').replace('%1', bareJid);
