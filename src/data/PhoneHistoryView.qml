@@ -116,30 +116,19 @@ Item {
                 hoverEnabled: true
                 onClicked: {
                     if (mouse.button == Qt.LeftButton) {
-                        menu.hide();
                         block.addressClicked(model.address);
                     } else if (mouse.button == Qt.RightButton) {
                         if (model.active) {
-                            menu.hide();
+                            menuLoader.item.hide();
                             return;
                         }
 
                         // show context menu
-                        menu.model.clear();
-                        if (!view.model.currentCalls)
-                            menu.model.append({
-                                'action': 'call',
-                                'icon': 'call.png',
-                                'text': qsTr('Call'),
-                                'address': model.address});
-                        menu.model.append({
-                            'action': 'remove',
-                            'icon': 'remove.png',
-                            'text': qsTr('Remove'),
-                            'id': model.id});
-
-                        var point = mapToItem(block, mouse.x, mouse.y);
-                        menu.show(point.x, point.y);
+                        var pos = mapToItem(menuLoader.parent, mouse.x, mouse.y);
+                        menuLoader.sourceComponent = phoneMenu;
+                        menuLoader.item.callAddress = model.address;
+                        menuLoader.item.callId = model.id;
+                        menuLoader.show(pos.x, pos.y);
                     }
                 }
                 onDoubleClicked: {
@@ -152,19 +141,35 @@ Item {
         }
     }
 
-    Menu {
-        id: menu
-        opacity: 0
+    Component {
+        id: phoneMenu
 
-        onItemClicked: {
-            var item = menu.model.get(index);
-            if (item.action == 'call') {
-                view.model.call(item.address)
-            } else if (item.action == 'remove') {
-                console.log("remove " + item.id);
+        Menu {
+            id: menu
+
+            property string callAddress
+            property int callId
+
+            onItemClicked: {
+                var item = menu.model.get(index);
+                if (item.action == 'call') {
+                    view.model.call(callAddress)
+                } else if (item.action == 'remove') {
+                    console.log("remove " + callId);
+                }
+            }
+
+            Component.onCompleted: {
+                menu.model.append({
+                    'action': 'call',
+                    'icon': 'call.png',
+                    'text': qsTr('Call')});
+                menu.model.append({
+                    'action': 'remove',
+                    'icon': 'remove.png',
+                    'text': qsTr('Remove')});
             }
         }
-
     }
 
     ScrollBar {
