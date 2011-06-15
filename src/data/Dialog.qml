@@ -23,6 +23,7 @@ Rectangle {
     id: dialog
 
     property alias contents: item
+    property alias helpText: help.text
     property alias title: label.text
     property int minWidth: 32
     property int minHeight: 32
@@ -104,13 +105,23 @@ Rectangle {
         }
     }
 
+    PanelHelp {
+        id: help
+
+        anchors.top: header.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.margins: 8
+        opacity: text.length > 0 ? 1 : 0
+    }
+
     Item {
         id: item
 
+        anchors.top: (help.opacity == 1) ? help.bottom : header.bottom
+        anchors.bottom: footer.top
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.top: header.bottom
-        anchors.bottom: footer.top
         anchors.margins: 8
     }
 

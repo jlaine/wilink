@@ -22,32 +22,21 @@ import QtQuick 1.0
 Dialog {
     id: dialog
 
-    property alias helpText: help.text
     property alias labelText: label.text
     property alias textValue: textEdit.text
 
     minWidth: 280
-    minHeight: (help.opacity == 1) ? 250 : 150
-    height: (help.opacity == 1) ? 250 : 150
-    width: 280
+    minHeight: (helpText.length > 0) ? 250 : 150
+    height: minHeight
+    width: minWidth
 
     Item {
         anchors.fill: contents
 
-        PanelHelp {
-            id: help
-
-            anchors.top: parent.top
-            anchors.left: parent.left
-            anchors.right: parent.right
-            opacity: text.length > 0 ? 1 : 0
-        }
-
         Text {
             id: label
 
-            anchors.top: (help.opacity == 1) ? help.bottom : parent.top
-            anchors.topMargin: (help.opacity == 1) ? 8 : 0
+            anchors.top: parent.top
             anchors.left:  parent.left
             anchors.right: parent.right
             wrapMode: Text.WordWrap
