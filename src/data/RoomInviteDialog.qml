@@ -24,7 +24,6 @@ Dialog {
     id: dialog
 
     property alias contacts: sortedContacts.sourceModel
-    property alias reason: reasonEdit.text
     property QtObject room
     property variant selection: []
 
@@ -44,38 +43,19 @@ Dialog {
     Item {
         anchors.fill: contents
 
-        Rectangle {
-            id: bar
+        InputBar {
+            id: reasonEdit
 
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
-            border.color: '#c3c3c3'
-            border.width: 1
-            color: 'white'
-            width: 100
-            height: reasonEdit.paintedHeight + 8
-
-            TextEdit {
-                id: reasonEdit
-
-                anchors.fill: parent
-                anchors.margins: 4
-                focus: true
-                smooth: true
-                text: "Let's talk"
-                textFormat: TextEdit.PlainText
-
-                Keys.onReturnPressed: {
-                    return false;
-                }
-            }
+            text: "Let's talk"
         }
 
         ListView {
             id: view
 
-            anchors.top: bar.bottom
+            anchors.top: reasonEdit.bottom
             anchors.topMargin: 8
             anchors.bottom: parent.bottom
             anchors.left: parent.left
@@ -173,7 +153,7 @@ Dialog {
         ScrollBar {
             id: scrollBar
 
-            anchors.top: bar.bottom
+            anchors.top: reasonEdit.bottom
             anchors.topMargin: 8
             anchors.bottom: parent.bottom
             anchors.right: parent.right
@@ -183,6 +163,7 @@ Dialog {
     }
 
     onAccepted: {
+        var reason = reasonEdit.text;
         for (var i in selection) {
             console.log("inviting " + selection[i]);
             room.sendInvitation(selection[i], reason);
