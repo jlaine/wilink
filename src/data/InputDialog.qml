@@ -26,7 +26,7 @@ Dialog {
     property alias textValue: bar.text
 
     minWidth: 280
-    minHeight: (helpText.length > 0) ? 250 : 150
+    minHeight: (helpText.length > 0) ? 270 : 150
     height: minHeight
     width: minWidth
 

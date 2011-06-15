@@ -30,10 +30,20 @@ Rectangle {
     }
     height: visible ? label.height + 2 * label.anchors.margins : 0
  
+    Image {
+        id: icon
+        anchors.left: parent.left
+        anchors.top: parent.top
+        anchors.margins: 8
+        height: Math.min(32, parent.height - 16)
+        width: Math.min(32, parent.height - 16)
+        source: 'tip.png'
+    }
+
     Text {
         id: label
 
-        anchors.left: parent.left
+        anchors.left: icon.right
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.margins: 8
