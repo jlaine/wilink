@@ -110,6 +110,7 @@ if(RELOAD_TRANSLATIONS)
         ${wiLink_SOURCES}
         data/main.qml
         data/CallWidget.qml
+        data/ChatEdit.qml
         data/ChatPanel.qml
         data/ContactAddDialog.qml
         data/ContactRenameDialog.qml

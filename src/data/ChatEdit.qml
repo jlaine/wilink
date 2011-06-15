@@ -175,9 +175,9 @@ Rectangle {
             onPressed: {
                 var pos = mapToItem(chatEdit, mouse.x, mouse.y);
                 menu.model.clear();
-                menu.model.append({'action': 'cut', 'text': qsTranslate('ChatEdit', 'Cut')})
-                menu.model.append({'action': 'copy', 'text': qsTranslate('ChatEdit', 'Copy')})
-                menu.model.append({'action': 'paste', 'text': qsTranslate('ChatEdit', 'Paste')})
+                menu.model.append({'action': 'cut', 'text': qsTr('Cut')});
+                menu.model.append({'action': 'copy', 'text': qsTr('Copy')});
+                menu.model.append({'action': 'paste', 'text': qsTr('Paste')});
                 menu.show(pos.x, pos.y - menu.height);
             }
         }

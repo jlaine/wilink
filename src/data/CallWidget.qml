@@ -63,7 +63,17 @@ Item {
             anchors.leftMargin: 4
             anchors.top: parent.top
             anchors.topMargin: 12
-            text: qsTr('Connecting..')
+            text: {
+                if (!call || call.state == QXmppCall.ConnectingState) {
+                    return qsTr('Connecting..');
+                } else if (call.state == QXmppCall.ActiveState) {
+                    return qsTr('Call connected.');
+                } else if (call.state == QXmppCall.DisconnectingState) {
+                    return qsTr('Disconnecting..');
+                } else if (call.state == QXmppCall.FinishedState) {
+                    return qsTr('Call finished.');
+                }
+            }
         }
 
         CallVideoItem {
@@ -162,18 +172,4 @@ Item {
         target: cameraButton
         onClicked: call.startVideo()
     }
-
-    Connections {
-        target: call
-        onStateChanged: {
-            if (call.state == QXmppCall.ActiveState) {
-                status.text = qsTranslate('CallWidget', 'Call connected.');
-            } else if (call.state == QXmppCall.DisconnectingState) {
-                status.text = qsTranslate('CallWidget', 'Disconnecting..');
-            } else if (call.state == QXmppCall.FinishedState) {
-                status.text = qsTranslate('CallWidget', 'Call finished.');
-            }
-        }
-    }
-
 }

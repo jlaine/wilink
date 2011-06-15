@@ -101,7 +101,7 @@ Panel {
 
                 onClicked: {
                     var dialog = window.fileDialog();
-                    dialog.windowTitle = qsTranslate('ConversationPanel', 'Send a file');
+                    dialog.windowTitle = qsTr('Send a file');
                     dialog.fileMode = QFileDialog.ExistingFile;
                     if (dialog.exec()) {
                         for (var i in dialog.selectedFiles) {

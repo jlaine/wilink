@@ -152,6 +152,21 @@
     </message>
 </context>
 <context>
+    <name>ChatEdit</name>
+    <message>
+        <source>Cut</source>
+        <translation>Couper</translation>
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation>Copier</translation>
+    </message>
+    <message>
+        <source>Paste</source>
+        <translation>Coller</translation>
+    </message>
+</context>
+<context>
     <name>ChatOptions</name>
     <message>
         <source>Open at login</source>
