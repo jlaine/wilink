@@ -48,6 +48,7 @@ generate_png(png
     share.svg
     start.svg
     stop.svg
+    tip.svg
     transfers.svg
     upload.svg
     wiLink.svg
