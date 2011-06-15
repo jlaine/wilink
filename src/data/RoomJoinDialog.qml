@@ -26,6 +26,7 @@ Dialog {
     property alias model: view.model
     property QtObject panel: null
 
+    helpText: qsTr('Enter the name of the chat room you want to join. If the chat room does not exist yet, it will be created for you.')
     title: qsTr('Join or create a chat room')
     minWidth: 320
     minHeight: 240
@@ -45,20 +46,10 @@ Dialog {
     Item {
         anchors.fill: contents
 
-        PanelHelp {
-            id: help
-
-            anchors.top: parent.top
-            anchors.left: parent.left
-            anchors.right: parent.right
-            text: qsTr('Enter the name of the chat room you want to join. If the chat room does not exist yet, it will be created for you.')
-        }
-
         Rectangle {
             id: bar
 
-            anchors.top: help.bottom
-            anchors.topMargin: 8
+            anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
             border.color: '#c3c3c3'
