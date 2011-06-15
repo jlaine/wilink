@@ -21,6 +21,7 @@ import QtQuick 1.0
 
 Rectangle {
     property alias text: label.text
+    property int iconSize: 16
 
     border.color: '#93b9f2'
     border.width: 1
@@ -35,8 +36,8 @@ Rectangle {
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.margins: 8
-        height: Math.min(32, parent.height - 16)
-        width: Math.min(32, parent.height - 16)
+        height: iconSize
+        width: iconSize
         source: 'tip.png'
     }
 

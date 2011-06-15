@@ -112,6 +112,7 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.margins: 8
+        iconSize: 32
         opacity: text.length > 0 ? 1 : 0
     }
 
