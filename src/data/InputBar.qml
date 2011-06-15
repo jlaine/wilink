@@ -25,6 +25,13 @@ Rectangle {
     property alias text: edit.text
     signal returnPressed
 
+    function backspacePressed() {
+        var oldPos = edit.cursorPosition;
+        var oldText = edit.text;
+        edit.text = oldText.substr(0, oldPos - 1) + oldText.substr(oldPos);
+        edit.cursorPosition = oldPos - 1;
+    }
+
     border.color: '#c3c3c3'
     border.width: 1
     color: 'white'

@@ -106,30 +106,17 @@ Panel {
         anchors.margins: 4
         height: 32
 
-        Rectangle {
+        InputBar {
+            id: numberEdit
+
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: buttonBox.left
             anchors.rightMargin: 4
-            border.color: '#c3c3c3'
-            border.width: 1
-            color: '#ffffff'
-            height: numberEdit.paintedHeight + 16
-            width: 100
 
-            TextEdit {
-                id: numberEdit
-                focus: true
-                x: 8
-                y: 8
-                smooth: true
-                text: ''
-                textFormat: TextEdit.PlainText
-                width: parent.width - 16
-
-                Keys.onReturnPressed: {
-                    if (callButton.enabled)
-                        callButton.clicked()
+            onReturnPressed: {
+                if (callButton.enabled) {
+                    callButton.clicked();
                 }
             }
 
@@ -156,12 +143,7 @@ Panel {
                 anchors.bottom: parent.bottom
                 iconSource: 'back.png'
 
-                onClicked: {
-                    var oldPos = numberEdit.cursorPosition;
-                    var oldText = numberEdit.text;
-                    numberEdit.text = oldText.substr(0, oldPos - 1) + oldText.substr(oldPos);
-                    numberEdit.cursorPosition = oldPos - 1;
-                }
+                onClicked: numberEdit.backspacePressed()
             }
 
             Button {

@@ -47,37 +47,19 @@ Dialog {
         anchors.fill: contents
 
         Rectangle {
-            id: bar
+            id: roomEdit
 
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
-            border.color: '#c3c3c3'
-            border.width: 1
-            color: 'white'
-            width: 100
-            height: roomEdit.paintedHeight + 8
 
-            TextEdit {
-                id: roomEdit
-
-                anchors.fill: parent
-                anchors.margins: 4
-                focus: true
-                smooth: true
-                textFormat: TextEdit.PlainText
-
-                Keys.onReturnPressed: {
-                    dialog.accepted();
-                    return false;
-                }
-            }
+            onReturnPressed: dialog.accepted()
         }
 
         ListView {
             id: view
 
-            anchors.top: bar.bottom
+            anchors.top: roomEdit.bottom
             anchors.topMargin: 8
             anchors.bottom: parent.bottom
             anchors.left: parent.left
@@ -126,7 +108,7 @@ Dialog {
         ScrollBar {
             id: scrollBar
 
-            anchors.top: bar.bottom
+            anchors.top: roomEdit.bottom
             anchors.topMargin: 8
             anchors.bottom: parent.bottom
             anchors.right: parent.right
