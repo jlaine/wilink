@@ -23,7 +23,7 @@ import 'utils.js' as Utils
 InputDialog {
     property string domain: Utils.jidToDomain(window.client.jid)
 
-    helpText: domain == 'wifirst.net' ? qsTr('<b>Tip</b>: your wAmis are automatically added to your chat contacts, so the easiest way to add Wifirst contacts is to <a href=\"%1\">add them as wAmis</a>').replace('%1', 'https://www.wifirst.net/w/friends?from=wiLink') : ''
+    helpText: domain == 'wifirst.net' ? qsTr('Your wAmis are automatically added to your chat contacts, so the easiest way to add Wifirst contacts is to <a href=\"%1\">add them as wAmis</a>').replace('%1', 'https://www.wifirst.net/w/friends?from=wiLink') : ''
     labelText: qsTr('Enter the address of the contact you want to add.')
     textValue: (domain != '') ? '@' + domain : ''
     title: qsTr('Add a contact')
