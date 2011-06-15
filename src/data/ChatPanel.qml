@@ -152,26 +152,6 @@ Panel {
             model: sortedContacts
             title: qsTr('My contacts')
 
-            Menu {
-                id: menu
-                opacity: 0
-
-                onItemClicked: {
-                    var item = menu.model.get(index);
-                    if (item.action == 'profile') {
-                        Qt.openUrlExternally(item.url);
-                    } else if (item.action == 'rename') {
-                        dialogLoader.source = 'ContactRenameDialog.qml';
-                        dialogLoader.item.jid = item.jid;
-                        dialogLoader.show();
-                    } else if (item.action == 'remove') {
-                        dialogLoader.source = 'ContactRemoveDialog.qml';
-                        dialogLoader.item.jid = item.jid;
-                        dialogLoader.show();
-                    }
-                }
-            }
-
             onAddClicked: {
                 dialogLoader.source = 'ContactAddDialog.qml';
                 dialogLoader.show();
@@ -186,10 +166,11 @@ Panel {
             }
 
             onItemContextMenu: {
+                var pos = mapToItem(menuLoader.parent, point.x, point.y);
                 menuLoader.source = 'ContactMenu.qml';
                 menuLoader.item.jid = model.jid;
                 menuLoader.item.url = model.url;
-                menuLoader.show(16, point.y - 16);
+                menuLoader.show(pos.x, pos.y);
             }
 
             Connections {
