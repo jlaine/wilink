@@ -189,34 +189,9 @@ Rectangle {
         onClicked: chatEdit.returnPressed()
     }
 
-    Menu {
+    InputMenu {
         id: menu
-        opacity: 0
 
-        onItemClicked: {
-            var item = menu.model.get(index);
-            if (item.action == 'cut') {
-                input.cut();
-            } else if (item.action == 'copy') {
-                input.copy();
-            } else if (item.action == 'paste') {
-                input.paste();
-            }
-        }
-
-        Component.onCompleted: {
-            menu.model.append({
-                'action': 'cut',
-                'icon': 'cut.png',
-                'text': qsTr('Cut')});
-            menu.model.append({
-                'action': 'copy',
-                'icon': 'copy.png',
-                'text': qsTr('Copy')});
-            menu.model.append({
-                'action': 'paste',
-                'icon': 'paste.png',
-                'text': qsTr('Paste')});
-        }
+        target: input
     }
 }

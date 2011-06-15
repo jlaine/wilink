@@ -110,7 +110,6 @@ if(RELOAD_TRANSLATIONS)
         ${wiLink_SOURCES}
         data/main.qml
         data/CallWidget.qml
-        data/ChatEdit.qml
         data/ChatPanel.qml
         data/ContactAddDialog.qml
         data/ContactRenameDialog.qml
@@ -120,6 +119,7 @@ if(RELOAD_TRANSLATIONS)
         data/Dialog.qml
         data/DiscoveryPanel.qml
         data/Dock.qml
+        data/InputMenu.qml
         data/LogPanel.qml
         data/RoomInviteDialog.qml
         data/RoomJoinDialog.qml
