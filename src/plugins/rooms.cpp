@@ -165,6 +165,10 @@ void RoomListModel::clearPendingMessages(const QString &jid)
 
 void RoomListModel::addRoom(const QString &jid)
 {
+    if (jid.isEmpty())
+        return;
+
+    // add room to list
     int row = rootItem->children.size();
     foreach (ChatModelItem *ptr, rootItem->children) {
         RoomListItem *item = static_cast<RoomListItem*>(ptr);
@@ -181,10 +185,35 @@ void RoomListModel::addRoom(const QString &jid)
     item->messages = 0;
     addItem(item, rootItem, row);
     emit roomAdded(item->jid);
+
+    // update bookmarks
+    if (m_client) {
+        QXmppBookmarkManager *bookmarkManager = m_client->findExtension<QXmppBookmarkManager>();
+        Q_ASSERT(bookmarkManager);
+
+        // find bookmark
+        QXmppBookmarkSet bookmarks = bookmarkManager->bookmarks();
+        QList<QXmppBookmarkConference> conferences = bookmarks.conferences();
+        foreach (const QXmppBookmarkConference &conference, conferences) {
+            if (conference.jid() == jid)
+                return;
+        }
+
+        // add bookmark
+        QXmppBookmarkConference conference;
+        conference.setAutoJoin(true);
+        conference.setJid(jid);
+        conferences << conference;
+        bookmarks.setConferences(conferences);
+        bookmarkManager->setBookmarks(bookmarks);
+    }
 }
 
 void RoomListModel::removeRoom(const QString &jid)
 {
+    if (jid.isEmpty())
+        return;
+
     // remove room from list
     foreach (ChatModelItem *ptr, rootItem->children) {
         RoomListItem *item = static_cast<RoomListItem*>(ptr);
@@ -194,19 +223,22 @@ void RoomListModel::removeRoom(const QString &jid)
         }
     }
 
-    // find bookmark
-    if (!m_client)
-        return;
-    QXmppBookmarkManager *bookmarkManager = m_client->findExtension<QXmppBookmarkManager>();
-    QXmppBookmarkSet bookmarks = bookmarkManager->bookmarks();
-    QList<QXmppBookmarkConference> conferences = bookmarks.conferences();
-    for (int i = 0; i < conferences.size(); ++i) {
-        if (conferences.at(i).jid() == jid) {
-            // remove bookmark
-            conferences.removeAt(i);
-            bookmarks.setConferences(conferences);
-            bookmarkManager->setBookmarks(bookmarks);
-            break;
+    // update bookmarks
+    if (m_client) {
+        QXmppBookmarkManager *bookmarkManager = m_client->findExtension<QXmppBookmarkManager>();
+        Q_ASSERT(bookmarkManager);
+
+        // find bookmark
+        QXmppBookmarkSet bookmarks = bookmarkManager->bookmarks();
+        QList<QXmppBookmarkConference> conferences = bookmarks.conferences();
+        for (int i = 0; i < conferences.size(); ++i) {
+            if (conferences.at(i).jid() == jid) {
+                // remove bookmark
+                conferences.removeAt(i);
+                bookmarks.setConferences(conferences);
+                bookmarkManager->setBookmarks(bookmarks);
+                break;
+            }
         }
     }
 }
@@ -226,36 +258,6 @@ RoomModel::RoomModel(QObject *parent)
 
     connect(VCardCache::instance(), SIGNAL(cardChanged(QString)),
             this, SLOT(participantChanged(QString)));
-}
-
-/** Bookmarks the room.
- */
-void RoomModel::bookmark()
-{
-    if (m_jid.isEmpty() || !m_manager)
-        return;
-
-    QXmppClient *client = qobject_cast<QXmppClient*>(m_manager->parent());
-    Q_ASSERT(client);
-
-    QXmppBookmarkManager *bookmarkManager = client->findExtension<QXmppBookmarkManager>();
-    Q_ASSERT(bookmarkManager);
-
-    // find bookmark
-    QXmppBookmarkSet bookmarks = bookmarkManager->bookmarks();
-    QList<QXmppBookmarkConference> conferences = bookmarks.conferences();
-    foreach (const QXmppBookmarkConference &conference, conferences) {
-        if (conference.jid() == m_jid)
-            return;
-    }
-
-    // add bookmark
-    QXmppBookmarkConference conference;
-    conference.setAutoJoin(true);
-    conference.setJid(m_jid);
-    conferences << conference;
-    bookmarks.setConferences(conferences);
-    bookmarkManager->setBookmarks(bookmarks);
 }
 
 QVariant RoomModel::data(const QModelIndex &index, int role) const

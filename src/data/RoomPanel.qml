@@ -189,7 +189,7 @@ Panel {
         }
 
         onJoined: {
-            participantModel.bookmark();
+            roomListModel.addRoom(room.jid);
         }
 
         onKicked: {

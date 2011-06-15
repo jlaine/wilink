@@ -95,9 +95,6 @@ signals:
     void managerChanged(QXmppMucManager *manager);
     void roomChanged(QXmppMucRoom *room);
 
-public slots:
-    void bookmark();
-
 private slots:
     void messageReceived(const QXmppMessage &msg);
     void participantAdded(const QString &jid);
