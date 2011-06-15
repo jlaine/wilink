@@ -116,20 +116,6 @@ Panel {
                 panel.state = 'details';
             }
         }
-
-        Connections {
-            target: displayView
-            onCurrentIndexChanged: {
-                if (panel.state == 'details') {
-                    view.currentIndex = displayView.currentIndex;
-                    var crumb = crumbBar.model.count - 1;
-                    var model = view.currentItem.data();
-                    crumbBar.model.setProperty(crumb, 'name', model.name);
-                    crumbBar.model.setProperty(crumb, 'isDir', model.isDir);
-                    crumbBar.model.setProperty(crumb, 'url', model.url);
-                }
-            }
-        }
     }
 
     PanelHelp {
@@ -257,6 +243,17 @@ Panel {
                     height: displayView.height
                     source: model.image
                     fillMode: Image.PreserveAspectFit
+                }
+            }
+
+            onCurrentIndexChanged: {
+                if (panel.state == 'details') {
+                    view.currentIndex = displayView.currentIndex;
+                    var crumb = crumbBar.model.count - 1;
+                    var model = view.currentItem.data();
+                    crumbBar.model.setProperty(crumb, 'name', model.name);
+                    crumbBar.model.setProperty(crumb, 'isDir', model.isDir);
+                    crumbBar.model.setProperty(crumb, 'url', model.url);
                 }
             }
 

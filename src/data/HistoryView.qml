@@ -228,6 +228,12 @@ Item {
         anchors.right: parent.right
         flickableItem: historyView
 
+        onPositionChanged: {
+            if (!historyView.bottomChanging) {
+                // store whether we are at the bottom
+                historyView.scrollBarAtBottom = historyView.atYEnd;
+            }
+        }
     }
 
     Connections {
@@ -253,16 +259,6 @@ Item {
                 historyView.positionViewAtIndex(historyView.count - 1, ListView.End);
             }
             historyView.bottomChanging = false;
-        }
-    }
-
-    Connections {
-        target: scrollBar
-        onPositionChanged: {
-            if (!historyView.bottomChanging) {
-                // store whether we are at the bottom
-                historyView.scrollBarAtBottom = historyView.atYEnd;
-            }
         }
     }
 }

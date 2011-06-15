@@ -24,8 +24,6 @@ import wiLink 1.2
 Panel {
     id: panel
 
-    property QtObject historyModel: PhoneCallsModel {}
-
     // Builds a full SIP address from a short recipient
     function buildAddress(recipient, sipDomain)
     {
@@ -55,6 +53,18 @@ Panel {
             return bits[0];
         else
             return recipient;
+    }
+
+    PhoneCallsModel {
+        id: historyModel
+
+        onError: {
+            var box = window.messageBox();
+            box.icon = QMessageBox.Warning;
+            box.text = qsTr('Sorry, but the call could not be completed.') + '\n\n' + error;
+            box.windowTitle = qsTr('Call failed');
+            box.show();
+        }
     }
 
     PanelHeader {
@@ -267,18 +277,6 @@ Panel {
             box.text = qsTr('%1 wants to talk to you.\n\nDo you accept?').replace('%1', contactName);
             box.windowTitle = qsTr('Call from %1').replace('%1', contactName);
             box.exec();
-        }
-    }
-
-    Connections {
-        target: historyModel
-
-        onError: {
-            var box = window.messageBox();
-            box.icon = QMessageBox.Warning;
-            box.text = qsTr('Sorry, but the call could not be completed.') + '\n\n' + error;
-            box.windowTitle = qsTr("Call failed");
-            box.show();
         }
     }
 }
