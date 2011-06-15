@@ -64,7 +64,7 @@ Rectangle {
             var pos = mapToItem(menuLoader.parent, mouse.x, mouse.y);
             menuLoader.source = 'InputMenu.qml';
             menuLoader.item.target = edit;
-            menuLoader.item.show(pos.x, pos.y - menuLoader.item.height);
+            menuLoader.show(pos.x, pos.y);
         }
     }
 }

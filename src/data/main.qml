@@ -88,7 +88,13 @@ FocusScope {
     Loader {
         id: menuLoader
 
-        z: 10
+        z: 11
+
+        function show(x, y) {
+            menuLoader.x = x;
+            menuLoader.y = y;
+            menuLoader.item.state = 'visible';
+        }
     }
 
     Component.onCompleted: swapper.showPanel('ChatPanel.qml')
