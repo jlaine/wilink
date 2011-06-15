@@ -88,35 +88,20 @@ Panel {
             smooth: true
         }
 
-        Rectangle {
-            id: searchRect
+        InputBar {
+            id: searchEdit
 
             anchors.left: searchIcon.right
             anchors.right: parent.right
             anchors.rightMargin: 8
             anchors.verticalCenter: parent.verticalCenter
             anchors.margins: 8
-            border.color: '#c3c3c3'
-            color: '#ffffff'
-            height: searchEdit.paintedHeight + 8
-
-            TextEdit {
-                id: searchEdit
-
-                anchors.fill: parent
-                anchors.margins: 4
-                focus: true
-                text: ''
-
-                Keys.onReturnPressed: {
-                    // prevent new line
-                }
-            }
 
             Text {
                 id: searchLabel
 
                 anchors.fill: searchEdit
+                anchors.margins: 4
                 color: '#999999'
                 opacity: searchEdit.text == '' ? 1 : 0
                 text: qsTr('Enter the name of the file you are looking for.');
@@ -124,7 +109,7 @@ Panel {
 
             states: State {
                 name: 'noresults'
-                PropertyChanges { target: searchRect; color: '#ffaaaa' }
+                PropertyChanges { target: searchEdit; color: '#ffaaaa' }
             }
         }
     }
@@ -164,9 +149,9 @@ Panel {
 
         onCountChanged: {
             if (count == 0 && searchEdit.text.length > 0)
-                searchRect.state = 'noresults';
+                searchEdit.state = 'noresults';
             else
-                searchRect.state = '';
+                searchEdit.state = '';
         }
 
     }
