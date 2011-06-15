@@ -41,146 +41,145 @@ Dialog {
         Component.onCompleted: sort(0)
     }
 
-    Rectangle {
-        id: bar
+    Item {
+        anchors.fill: contents
 
-        anchors.margins: 8
-        anchors.top: contents.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        border.color: '#c3c3c3'
-        border.width: 1
-        color: 'white'
-        width: 100
-        height: reasonEdit.paintedHeight + 8
+        Rectangle {
+            id: bar
 
-        TextEdit {
-            id: reasonEdit
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            border.color: '#c3c3c3'
+            border.width: 1
+            color: 'white'
+            width: 100
+            height: reasonEdit.paintedHeight + 8
 
-            anchors.fill: parent
-            anchors.margins: 4
-            focus: true
-            smooth: true
-            text: "Let's talk"
-            textFormat: TextEdit.PlainText
-
-            Keys.onReturnPressed: {
-                return false;
-            }
-        }
-    }
-
-    ListView {
-        id: view
-
-        anchors.topMargin: 8
-        anchors.leftMargin: 8
-        anchors.bottomMargin: 8
-        anchors.left: parent.left
-        anchors.right: scrollBar.left
-        anchors.top: bar.bottom
-        anchors.bottom: contents.bottom
-        clip: true
-        model: sortedContacts
-        delegate: Item {
-            id: rect
-
-            height: 24
-            width: parent.width - 1
-
-            function isSelected() {
-                for (var i = 0; i < selection.length; i += 1) {
-                    if (selection[i] == model.jid)
-                        return true;
-                }
-                return false;
-            }
-
-            Highlight {
-                id: highlight
+            TextEdit {
+                id: reasonEdit
 
                 anchors.fill: parent
-                state: 'inactive'
-            }
-
-            Rectangle {
-                id: check
-
-                anchors.left: parent.left
-                anchors.leftMargin: 4
-                anchors.verticalCenter: parent.verticalCenter
-                border.width: 1
-                border.color: '#ffb0c4de'
-                color: isSelected() ? '#597fbe' : 'white'
-                radius: 6
-                width: 12
-                height: 12
-            }
-
-            Image {
-                id: image
-
-                anchors.left: check.right
-                anchors.leftMargin: 4
-                anchors.verticalCenter: parent.verticalCenter
-                width: 16
-                height: 16
+                anchors.margins: 4
+                focus: true
                 smooth: true
-                source: model.avatar
-            }
+                text: "Let's talk"
+                textFormat: TextEdit.PlainText
 
-            Text {
-                anchors.left: image.right
-                anchors.leftMargin: 4
-                anchors.right: status.left
-                anchors.verticalCenter: parent.verticalCenter
-                text: model.name
-            }
-
-            StatusPill {
-                id: status
-                anchors.right: parent.right
-                anchors.rightMargin: 5
-                anchors.verticalCenter: parent.verticalCenter
-                presenceStatus: model.status
-                width: 10
-                height: 10
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                hoverEnabled: true
-                onClicked: {
-                    var newSelection = [];
-                    var wasSelected = false;
-                    for (var i = 0; i < selection.length; i += 1) {
-                        if (selection[i] == model.jid) {
-                            wasSelected = true;
-                        } else {
-                            newSelection[newSelection.length] = selection[i];
-                        }
-                    }
-                    if (!wasSelected)
-                        newSelection[newSelection.length] = model.jid;
-                    dialog.selection = newSelection;
+                Keys.onReturnPressed: {
+                    return false;
                 }
-                onEntered: highlight.state = ''
-                onExited: highlight.state = 'inactive'
             }
         }
-    }
 
-    ScrollBar {
-        id: scrollBar
+        ListView {
+            id: view
 
-        anchors.topMargin: 8
-        anchors.bottomMargin: 8
-        anchors.rightMargin: 8
-        anchors.right: parent.right
-        anchors.top: bar.bottom
-        anchors.bottom: contents.bottom
-        clip: true
-        flickableItem: view
+            anchors.top: bar.bottom
+            anchors.topMargin: 8
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.right: scrollBar.left
+            clip: true
+            model: sortedContacts
+            delegate: Item {
+                id: rect
+
+                height: 24
+                width: parent.width - 1
+
+                function isSelected() {
+                    for (var i = 0; i < selection.length; i += 1) {
+                        if (selection[i] == model.jid)
+                            return true;
+                    }
+                    return false;
+                }
+
+                Highlight {
+                    id: highlight
+
+                    anchors.fill: parent
+                    state: 'inactive'
+                }
+
+                Rectangle {
+                    id: check
+
+                    anchors.left: parent.left
+                    anchors.leftMargin: 4
+                    anchors.verticalCenter: parent.verticalCenter
+                    border.width: 1
+                    border.color: '#ffb0c4de'
+                    color: isSelected() ? '#597fbe' : 'white'
+                    radius: 6
+                    width: 12
+                    height: 12
+                }
+
+                Image {
+                    id: image
+
+                    anchors.left: check.right
+                    anchors.leftMargin: 4
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: 16
+                    height: 16
+                    smooth: true
+                    source: model.avatar
+                }
+
+                Text {
+                    anchors.left: image.right
+                    anchors.leftMargin: 4
+                    anchors.right: status.left
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: model.name
+                }
+
+                StatusPill {
+                    id: status
+                    anchors.right: parent.right
+                    anchors.rightMargin: 5
+                    anchors.verticalCenter: parent.verticalCenter
+                    presenceStatus: model.status
+                    width: 10
+                    height: 10
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onClicked: {
+                        var newSelection = [];
+                        var wasSelected = false;
+                        for (var i = 0; i < selection.length; i += 1) {
+                            if (selection[i] == model.jid) {
+                                wasSelected = true;
+                            } else {
+                                newSelection[newSelection.length] = selection[i];
+                            }
+                        }
+                        if (!wasSelected)
+                            newSelection[newSelection.length] = model.jid;
+                        dialog.selection = newSelection;
+                    }
+                    onEntered: highlight.state = ''
+                    onExited: highlight.state = 'inactive'
+                }
+            }
+        }
+
+        ScrollBar {
+            id: scrollBar
+
+            anchors.top: bar.bottom
+            anchors.topMargin: 8
+            anchors.bottom: parent.bottom
+            anchors.right: parent.right
+            clip: true
+            flickableItem: view
+        }
     }
 
     onAccepted: {
