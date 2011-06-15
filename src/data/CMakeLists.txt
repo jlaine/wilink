@@ -26,6 +26,8 @@ generate_png(png
     camera.svg
     chat.svg
     close.svg
+    copy.svg
+    cut.svg
     diagnostics.svg
     download.svg
     favorite-active.svg
@@ -36,6 +38,7 @@ generate_png(png
     home.svg
     invite.svg
     options.svg
+    paste.svg
     peer.svg
     permissions.svg
     phone.svg
