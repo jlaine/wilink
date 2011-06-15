@@ -63,6 +63,15 @@ FocusScope {
         focus: true
     }
 
+    MouseArea {
+        id: cancelArea
+
+        anchors.fill: parent
+        enabled: false
+
+        onClicked: menuLoader.hide();
+    }
+
     Loader {
         id: dialogLoader
 
@@ -91,10 +100,12 @@ FocusScope {
         z: 11
 
         function hide() {
+            cancelArea.enabled = false;
             menuLoader.item.opacity = 0;
         }
 
         function show(x, y) {
+            cancelArea.enabled = true;
             menuLoader.x = x;
             menuLoader.y = y;
             menuLoader.item.opacity = 1;
