@@ -185,10 +185,27 @@ void RoomListModel::addRoom(const QString &jid)
 
 void RoomListModel::removeRoom(const QString &jid)
 {
+    // remove room from list
     foreach (ChatModelItem *ptr, rootItem->children) {
         RoomListItem *item = static_cast<RoomListItem*>(ptr);
         if (item->jid == jid) {
             removeItem(item);
+            break;
+        }
+    }
+
+    // find bookmark
+    if (!m_client)
+        return;
+    QXmppBookmarkManager *bookmarkManager = m_client->findExtension<QXmppBookmarkManager>();
+    QXmppBookmarkSet bookmarks = bookmarkManager->bookmarks();
+    QList<QXmppBookmarkConference> conferences = bookmarks.conferences();
+    for (int i = 0; i < conferences.size(); ++i) {
+        if (conferences.at(i).jid() == jid) {
+            // remove bookmark
+            conferences.removeAt(i);
+            bookmarks.setConferences(conferences);
+            bookmarkManager->setBookmarks(bookmarks);
             break;
         }
     }
@@ -239,33 +256,6 @@ void RoomModel::bookmark()
     conferences << conference;
     bookmarks.setConferences(conferences);
     bookmarkManager->setBookmarks(bookmarks);
-}
-
-/** Unbookmarks the room.
- */
-void RoomModel::unbookmark()
-{
-    if (m_jid.isEmpty() || !m_manager)
-        return;
-
-    QXmppClient *client = qobject_cast<QXmppClient*>(m_manager->parent());
-    Q_ASSERT(client);
-
-    QXmppBookmarkManager *bookmarkManager = client->findExtension<QXmppBookmarkManager>();
-    Q_ASSERT(bookmarkManager);
-
-    // find bookmark
-    QXmppBookmarkSet bookmarks = bookmarkManager->bookmarks();
-    QList<QXmppBookmarkConference> conferences = bookmarks.conferences();
-    for (int i = 0; i < conferences.size(); ++i) {
-        if (conferences.at(i).jid() == m_jid) {
-            // remove bookmark
-            conferences.removeAt(i);
-            bookmarks.setConferences(conferences);
-            bookmarkManager->setBookmarks(bookmarks);
-            return;
-        }
-    }
 }
 
 QVariant RoomModel::data(const QModelIndex &index, int role) const

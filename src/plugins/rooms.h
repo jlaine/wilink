@@ -97,7 +97,6 @@ signals:
 
 public slots:
     void bookmark();
-    void unbookmark();
 
 private slots:
     void messageReceived(const QXmppMessage &msg);

@@ -113,7 +113,6 @@ Panel {
                 onClicked: {
                     room.leave();
                     roomListModel.removeRoom(room.jid);
-                    participantModel.unbookmark();
                     panel.close();
                 }
             }
