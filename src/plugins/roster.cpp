@@ -214,16 +214,16 @@ ChatRosterModel::ChatRosterModel(ChatClient *xmppClient, QObject *parent)
                     this, SLOT(itemAdded(QString)));
     Q_ASSERT(check);
 
-    check = connect(d->client->rosterManager(), SIGNAL(itemChanged(QString)),
-                    this, SLOT(itemChanged(QString)));
-    Q_ASSERT(check);
-
     check = connect(d->client->rosterManager(), SIGNAL(itemRemoved(QString)),
                     this, SLOT(itemRemoved(QString)));
     Q_ASSERT(check);
 
-    check = connect(d->client->rosterManager(), SIGNAL(presenceChanged(QString, QString)),
-                    this, SLOT(presenceChanged(QString, QString)));
+    check = connect(d->client->rosterManager(), SIGNAL(presenceChanged(QString,QString)),
+                    this, SLOT(itemChanged(QString)));
+    Q_ASSERT(check);
+
+    check = connect(VCardCache::instance(), SIGNAL(cardChanged(QString)),
+                    this, SLOT(itemChanged(QString)));
     Q_ASSERT(check);
 
     check = connect(d->client->rosterManager(), SIGNAL(rosterReceived()),
@@ -350,10 +350,8 @@ void ChatRosterModel::itemAdded(const QString &jid)
 void ChatRosterModel::itemChanged(const QString &jid)
 {
     ChatRosterItem *item = d->find(jid);
-    if (!item)
-        return;
-
-    emit dataChanged(createIndex(item), createIndex(item));
+    if (item)
+        emit dataChanged(createIndex(item), createIndex(item));
 }
 
 /** Handles an item being removed from the roster.
@@ -363,14 +361,6 @@ void ChatRosterModel::itemRemoved(const QString &jid)
     ChatRosterItem *item = d->find(jid);
     if (item)
         removeItem(item);
-}
-
-void ChatRosterModel::presenceChanged(const QString& bareJid, const QString& resource)
-{
-    Q_UNUSED(resource);
-    ChatRosterItem *item = d->find(bareJid);
-    if (item)
-        emit dataChanged(createIndex(item), createIndex(item));
 }
 
 void ChatRosterModel::rosterReceived()

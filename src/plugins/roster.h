@@ -77,7 +77,6 @@ private slots:
     void itemAdded(const QString &jid);
     void itemChanged(const QString &jid);
     void itemRemoved(const QString &jid);
-    void presenceChanged(const QString& bareJid, const QString& resource);
     void rosterReceived();
 
 private:
