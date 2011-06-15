@@ -31,7 +31,7 @@ Menu {
         } else if (item.action == 'copy') {
             target.copy();
         } else if (item.action == 'paste') {
-            targett.paste();
+            target.paste();
         }
     }
 
