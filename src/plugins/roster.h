@@ -53,7 +53,8 @@ public:
     enum Role {
         NameRole = ChatModel::NameRole,
         StatusRole = ChatModel::UserRole,
-        SortingRole,
+        StatusFilterRole,
+        StatusSortRole,
     };
 
     ChatRosterModel(ChatClient *client, QObject *parent = 0);

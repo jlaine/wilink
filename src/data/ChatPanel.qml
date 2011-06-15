@@ -121,8 +121,8 @@ Panel {
                 id: onlineContacts
 
                 dynamicSortFilter: true
-                filterRole: RosterModel.SortingRole
-                filterRegExp: /^(?!offline).+/
+                filterRole: RosterModel.StatusFilterRole
+                filterRegExp: /^(?!offline)/
                 sourceModel: window.rosterModel
             }
 
@@ -131,7 +131,7 @@ Panel {
 
                 dynamicSortFilter: true
                 sortCaseSensitivity: Qt.CaseInsensitive
-                sortRole: application.sortContactsByStatus ? RosterModel.SortingRole : RosterModel.NameRole
+                sortRole: application.sortContactsByStatus ? RosterModel.StatusSortRole : RosterModel.NameRole
                 sourceModel: application.showOfflineContacts ? window.rosterModel : onlineContacts
                 Component.onCompleted: sort(0)
             }

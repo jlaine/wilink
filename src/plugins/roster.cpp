@@ -193,7 +193,6 @@ ChatRosterModel::ChatRosterModel(ChatClient *xmppClient, QObject *parent)
 
     // set additionals role names
     QHash<int, QByteArray> names = roleNames();
-    names.insert(ChatRosterModel::SortingRole, "sorting");
     names.insert(ChatRosterModel::StatusRole, "status");
     setRoleNames(names);
 
@@ -269,10 +268,6 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
         return card.name();
     } else if (role == UrlRole) {
         return VCardCache::instance()->profileUrl(item->jid);
-    } else if (role == SortingRole) {
-        VCard card;
-        card.setJid(item->jid);
-        return contactStatus(index) + sortSeparator + card.name().toLower() + sortSeparator + item->jid.toLower();
     } else if (role == StatusRole) {
         QXmppPresence::Status::Type statusType = QXmppPresence::Status::Offline;
         // NOTE : we test the connection status, otherwise we encounter a race
@@ -292,6 +287,12 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
                 statusType = type;
         }
         return statusType;
+    } else if (role == StatusFilterRole) {
+        return contactStatus(index);
+    } else if (role == StatusSortRole) {
+        VCard card;
+        card.setJid(item->jid);
+        return contactStatus(index) + sortSeparator + card.name().toLower() + sortSeparator + item->jid.toLower();
     }
 
     return QVariant();
