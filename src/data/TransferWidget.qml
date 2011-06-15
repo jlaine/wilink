@@ -75,6 +75,8 @@ Item {
             iconSource: 'file.png'
             //visible: job && job.state == QXmppTransferJob.FinishedState && job.error == QXmppTransferJob.NoError
             visible: Qt.isQtObject(job) && job.state == QXmppTransferJob.FinishedState
+
+            onClicked: Qt.openUrlExternally(job.localFileUrl)
         }
 
         Button {
@@ -84,17 +86,9 @@ Item {
             anchors.rightMargin: 4
             anchors.verticalCenter: parent.verticalCenter
             iconSource: 'close.png'
+
+            onClicked: job.abort()
         }
-    }
-
-    Connections {
-        target: closeButton
-        onClicked: job.abort()
-    }
-
-    Connections {
-        target: openButton
-        onClicked: Qt.openUrlExternally(job.localFileUrl)
     }
 
     Connections {
