@@ -130,10 +130,7 @@ Item {
     Menu {
         id: menu
         opacity: 0
-    }
 
-    Connections {
-        target: menu
         onItemClicked: {
             var item = menu.model.get(index);
             if (item.action == 'profile') {
@@ -146,6 +143,7 @@ Item {
                     room.kick(item.jid, dialog.item.textValue);
                     dialog.hide();
                 });
+                dialog.show();
             }
         }
     }
