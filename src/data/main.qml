@@ -85,6 +85,12 @@ FocusScope {
         }
     }
 
+    Loader {
+        id: menuLoader
+
+        z: 10
+    }
+
     Component.onCompleted: swapper.showPanel('ChatPanel.qml')
     Keys.forwardTo: dock
 }

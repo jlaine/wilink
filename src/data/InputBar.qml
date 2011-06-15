@@ -61,15 +61,11 @@ Rectangle {
         acceptedButtons: Qt.RightButton
 
         onPressed: {
-            var pos = mapToItem(menu.parent, mouse.x, mouse.y);
-            menu.show(pos.x, pos.y - menu.height);
+            var pos = mapToItem(menuLoader.parent, mouse.x, mouse.y);
+            menuLoader.source = 'InputMenu.qml';
+            menuLoader.item.target = edit;
+            menuLoader.item.show(pos.x, pos.y - menuLoader.item.height);
         }
-    }
-
-    InputMenu {
-        id: menu
-
-        target: edit
     }
 }
 
