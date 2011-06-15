@@ -174,10 +174,6 @@ Rectangle {
             acceptedButtons: Qt.RightButton
             onPressed: {
                 var pos = mapToItem(chatEdit, mouse.x, mouse.y);
-                menu.model.clear();
-                menu.model.append({'action': 'cut', 'text': qsTr('Cut')});
-                menu.model.append({'action': 'copy', 'text': qsTr('Copy')});
-                menu.model.append({'action': 'paste', 'text': qsTr('Paste')});
                 menu.show(pos.x, pos.y - menu.height);
             }
         }
@@ -206,6 +202,21 @@ Rectangle {
             } else if (item.action == 'paste') {
                 input.paste();
             }
+        }
+
+        Component.onCompleted: {
+            menu.model.append({
+                'action': 'cut',
+                'icon': 'cut.png',
+                'text': qsTr('Cut')});
+            menu.model.append({
+                'action': 'copy',
+                'icon': 'copy.png',
+                'text': qsTr('Copy')});
+            menu.model.append({
+                'action': 'paste',
+                'icon': 'paste.png',
+                'text': qsTr('Paste')});
         }
     }
 }
