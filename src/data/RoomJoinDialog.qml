@@ -46,7 +46,7 @@ Dialog {
     Item {
         anchors.fill: contents
 
-        Rectangle {
+        InputBar {
             id: roomEdit
 
             anchors.top: parent.top
