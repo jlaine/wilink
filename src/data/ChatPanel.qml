@@ -118,20 +118,31 @@ Panel {
         RosterView {
             id: contacts
 
+            SortFilterProxyModel {
+                id: onlineContacts
+
+                dynamicSortFilter: true
+                filterRole: RosterModel.SortingRole
+                filterRegExp: /^(?!offline).+/
+                sourceModel: window.rosterModel
+            }
+
+            SortFilterProxyModel {
+                id: sortedContacts
+
+                dynamicSortFilter: true
+                sortCaseSensitivity: Qt.CaseInsensitive
+                sortRole: application.sortContactsByStatus ? RosterModel.SortingRole : RosterModel.NameRole
+                sourceModel: application.showOfflineContacts ? window.rosterModel : onlineContacts
+                Component.onCompleted: sort(0)
+            }
+
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: splitter.bottom
             anchors.bottom: statusBar.top
             currentJid: (Qt.isQtObject(chatSwapper.currentItem) && chatSwapper.currentItem.jid != undefined) ? chatSwapper.currentItem.jid : ''
-            model: SortFilterProxyModel {
-                dynamicSortFilter: true
-                filterRole: RosterModel.SortingRole
-                filterRegExp: application.showOfflineContacts ? /.*/ : /^(?!offline).+/
-                sortCaseSensitivity: Qt.CaseInsensitive
-                sortRole: application.sortContactsByStatus ? RosterModel.SortingRole : RosterModel.NameRole
-                sourceModel: window.rosterModel
-                Component.onCompleted: sort(0)
-            }
+            model: sortedContacts
             title: qsTr('My contacts')
 
             Menu {

@@ -72,6 +72,7 @@ Panel {
 
                 onClicked: {
                     dialog.source = 'RoomInviteDialog.qml';
+                    dialog.item.contacts = onlineContacts;
                     dialog.item.room = room;
                     dialog.show()
                 }

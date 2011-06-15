@@ -23,6 +23,7 @@ import wiLink 1.2
 Dialog {
     id: dialog
 
+    property alias contacts: sortedContacts.sourceModel
     property alias reason: reasonEdit.text
     property QtObject room
     property variant selection: []
@@ -30,6 +31,15 @@ Dialog {
     minWidth: 200
     minHeight: 150
     title: qsTr('Invite your contacts')
+
+    SortFilterProxyModel {
+        id: sortedContacts
+
+        dynamicSortFilter: true
+        sortCaseSensitivity: Qt.CaseInsensitive
+        sortRole: application.sortContactsByStatus ? RosterModel.SortingRole : RosterModel.NameRole
+        Component.onCompleted: sort(0)
+    }
 
     Rectangle {
         id: bar
@@ -71,14 +81,7 @@ Dialog {
         anchors.top: bar.bottom
         anchors.bottom: contents.bottom
         clip: true
-        model: SortFilterProxyModel {
-            dynamicSortFilter: true
-            filterRegExp: /^(?!offline).+/
-            filterRole: RosterModel.SortingRole
-            sortCaseSensitivity: Qt.CaseInsensitive
-            sourceModel: window.rosterModel
-            Component.onCompleted: sort(0)
-        }
+        model: sortedContacts
         delegate: Item {
             id: rect
 
