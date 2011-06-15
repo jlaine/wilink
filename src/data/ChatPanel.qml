@@ -170,20 +170,20 @@ Panel {
                         menu.model.append({
                             'action': 'profile',
                             'icon': 'diagnostics.png',
-                            'text': qsTr('Show profile'),
+                            'text': qsTranslate('ChatPanel', 'Show profile'),
                             'url': model.url});
                     }
                     menu.model.append({
                         'action': 'rename',
                         'icon': 'options.png',
                         'name': model.name,
-                        'text': qsTr('Rename contact'),
+                        'text': qsTranslate('ChatPanel', 'Rename contact'),
                         'jid': model.jid});
                     menu.model.append({
                         'action': 'remove',
                         'icon': 'remove.png',
                         'name': model.name,
-                        'text': qsTr('Remove contact'),
+                        'text': qsTranslate('ChatPanel', 'Remove contact'),
                         'jid': model.jid});
                     menu.show(16, point.y - 16);
                 }
@@ -193,8 +193,8 @@ Panel {
                 target: window.client.rosterManager
                 onSubscriptionReceived: {
                     var box = window.messageBox();
-                    box.windowTitle = qsTr('Invitation from %1').replace('%1', bareJid);
-                    box.text = qsTr('%1 has asked to add you to his or her contact list.\n\nDo you accept?').replace('%1', bareJid);
+                    box.windowTitle = qsTranslate('ChatPanel', 'Invitation from %1').replace('%1', bareJid);
+                    box.text = qsTranslate('ChatPanel', '%1 has asked to add you to his or her contact list.\n\nDo you accept?').replace('%1', bareJid);
                     box.standardButtons = QMessageBox.Yes | QMessageBox.No;
                     if (box.exec() == QMessageBox.Yes) {
                         // accept subscription
@@ -216,20 +216,14 @@ Panel {
                     if (item.action == 'profile') {
                         Qt.openUrlExternally(item.url);
                     } else if (item.action == 'rename') {
-                        dialog.source = 'InputDialog.qml';
-                        dialog.item.title = qsTr('Rename contact');
-                        dialog.item.labelText = qsTr("Enter the name for this contact.");
+                        dialog.source = 'ContactRenameDialog.qml';
+                        dialog.item.jid = item.jid;
                         dialog.item.textValue = item.name;
-                        dialog.item.accepted.connect(function() {
-                            console.log("Rename contact " + item.jid + ": " + dialog.item.textValue);
-                            window.client.rosterManager.renameItem(item.jid, dialog.item.textValue);
-                            dialog.hide();
-                        });
                         dialog.show();
                     } else if (item.action == 'remove') {
                         var box = window.messageBox();
-                        box.windowTitle = qsTr("Remove contact");
-                        box.text = qsTr('Do you want to remove %1 from your contact list?').replace('%1', item.name);
+                        box.windowTitle = qsTranslate('ChatPanel', 'Remove contact');
+                        box.text = qsTranslate('ChatPanel', 'Do you want to remove %1 from your contact list?').replace('%1', item.name);
                         box.standardButtons = QMessageBox.Yes | QMessageBox.No;
                         if (box.exec() == QMessageBox.Yes) {
                             console.log("Remove contact " + item.jid);
@@ -274,8 +268,8 @@ Panel {
 
                 // prompt user
                 var box = window.messageBox();
-                box.windowTitle = qsTr('Call from %1').replace('%1', contactName);
-                box.text = qsTr('%1 wants to talk to you.\n\nDo you accept?').replace('%1', contactName);
+                box.windowTitle = qsTranslate('ChatPanel', 'Call from %1').replace('%1', contactName);
+                box.text = qsTranslate('ChatPanel', '%1 wants to talk to you.\n\nDo you accept?').replace('%1', contactName);
                 box.standardButtons = QMessageBox.Yes | QMessageBox.No;
                 if (box.exec()) {
                     showConversation(call.jid);
@@ -294,8 +288,8 @@ Panel {
 
                 // prompt user
                 var box = window.messageBox();
-                box.windowTitle = qsTr('File from %1').replace('%1', contactName);
-                box.text = qsTr("%1 wants to send you a file called '%2' (%3).\n\nDo you accept?").replace('%1', contactName).replace('%2', job.fileName).replace('%3', job.fileSize);
+                box.windowTitle = qsTranslate('ChatPanel', 'File from %1').replace('%1', contactName);
+                box.text = qsTranslate('ChatPanel', "%1 wants to send you a file called '%2' (%3).\n\nDo you accept?").replace('%1', contactName).replace('%2', job.fileName).replace('%3', job.fileSize);
                 box.standardButtons = QMessageBox.Yes | QMessageBox.No;
                 if (box.exec()) {
                     // FIXME: this silently overwrite existing files!

@@ -60,6 +60,7 @@
     <file>CheckBox.qml</file>
     <file>ComboBox.qml</file>
     <file>ContactAddDialog.qml</file>
+    <file>ContactRenameDialog.qml</file>
     <file>CrumbBar.qml</file>
     <file>ConversationPanel.qml</file>
     <file>DiagnosticPanel.qml</file>
