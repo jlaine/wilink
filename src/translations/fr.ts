@@ -189,18 +189,6 @@
         <translation>Mes contacts</translation>
     </message>
     <message>
-        <source>Show profile</source>
-        <translation>Accéder au profil</translation>
-    </message>
-    <message>
-        <source>Rename contact</source>
-        <translation>Renommer contact</translation>
-    </message>
-    <message>
-        <source>Remove contact</source>
-        <translation>Retirer contact</translation>
-    </message>
-    <message>
         <source>Invitation from %1</source>
         <translation>Invitation de %1</translation>
     </message>
@@ -291,6 +279,21 @@ Acceptez-vous?</translation>
     <message>
         <source>Add a contact</source>
         <translation>Ajouter un contact</translation>
+    </message>
+</context>
+<context>
+    <name>ContactMenu</name>
+    <message>
+        <source>Show profile</source>
+        <translation>Accéder au profil</translation>
+    </message>
+    <message>
+        <source>Rename contact</source>
+        <translation>Renommer contact</translation>
+    </message>
+    <message>
+        <source>Remove contact</source>
+        <translation>Retirer contact</translation>
     </message>
 </context>
 <context>

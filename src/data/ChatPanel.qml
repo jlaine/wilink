@@ -182,32 +182,14 @@ Panel {
             }
 
             onItemClicked: {
-                menu.hide();
                 showConversation(model.jid);
             }
 
             onItemContextMenu: {
-                menu.model.clear()
-                if (model.url != undefined && model.url != '') {
-                    menu.model.append({
-                        'action': 'profile',
-                        'icon': 'diagnostics.png',
-                        'text': qsTr('Show profile'),
-                        'url': model.url});
-                }
-                menu.model.append({
-                    'action': 'rename',
-                    'icon': 'options.png',
-                    'name': model.name,
-                    'text': qsTr('Rename contact'),
-                    'jid': model.jid});
-                menu.model.append({
-                    'action': 'remove',
-                    'icon': 'remove.png',
-                    'name': model.name,
-                    'text': qsTr('Remove contact'),
-                    'jid': model.jid});
-                menu.show(16, point.y - 16);
+                menuLoader.source = 'ContactMenu.qml';
+                menuLoader.item.jid = model.jid;
+                menuLoader.item.url = model.url;
+                menuLoader.show(16, point.y - 16);
             }
 
             Connections {

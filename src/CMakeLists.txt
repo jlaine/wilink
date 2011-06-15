@@ -112,6 +112,7 @@ if(RELOAD_TRANSLATIONS)
         data/CallWidget.qml
         data/ChatPanel.qml
         data/ContactAddDialog.qml
+        data/ContactMenu.qml
         data/ContactRenameDialog.qml
         data/ContactRemoveDialog.qml
         data/ConversationPanel.qml
