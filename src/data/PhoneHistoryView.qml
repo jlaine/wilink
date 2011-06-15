@@ -119,7 +119,7 @@ Item {
                         block.addressClicked(model.address);
                     } else if (mouse.button == Qt.RightButton) {
                         if (model.active) {
-                            menuLoader.item.hide();
+                            menuLoader.hide();
                             return;
                         }
 

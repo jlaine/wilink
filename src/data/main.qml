@@ -90,6 +90,10 @@ FocusScope {
 
         z: 11
 
+        function hide() {
+            menuLoader.item.state = '';
+        }
+
         function show(x, y) {
             menuLoader.x = x;
             menuLoader.y = y;
