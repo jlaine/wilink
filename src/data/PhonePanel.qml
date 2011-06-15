@@ -58,6 +58,16 @@ Panel {
     PhoneCallsModel {
         id: historyModel
 
+        onCurrentCallsChanged: {
+            if (historyModel.currentCalls) {
+                callButton.visible = false;
+                hangupButton.visible = true;
+            } else {
+                hangupButton.visible = false;
+                callButton.visible = true;
+            }
+        }
+
         onError: {
             var box = window.messageBox();
             box.icon = QMessageBox.Warning;
@@ -99,7 +109,7 @@ Panel {
         Rectangle {
             anchors.top: parent.top
             anchors.left: parent.left
-            anchors.right: backButton.left
+            anchors.right: buttonBox.left
             anchors.rightMargin: 4
             border.color: '#c3c3c3'
             border.width: 1
@@ -131,53 +141,60 @@ Panel {
             }
         }
 
-        Button {
-            id: backButton
+        Row {
+            id: buttonBox
 
             anchors.top: parent.top
-            anchors.right: callButton.left
-            anchors.rightMargin: 4
-            iconSource: 'back.png'
-
-            onClicked: {
-                var oldPos = numberEdit.cursorPosition;
-                var oldText = numberEdit.text;
-                numberEdit.text = oldText.substr(0, oldPos - 1) + oldText.substr(oldPos);
-                numberEdit.cursorPosition = oldPos - 1;
-            }
-        }
-
-        Button {
-            id: callButton
-
-            anchors.top: parent.top
+            anchors.bottom: parent.bottom
             anchors.right: parent.right
-            enabled: historyModel.client.state == SipClient.ConnectedState
-            iconSource: 'call.png'
-            text: qsTr('Call')
-            visible: historyModel.currentCalls == 0
+            spacing: 4
 
-            onClicked: {
-                var recipient = numberEdit.text.replace(/\s+/, '');
-                if (!recipient.length)
-                    return;
+            Button {
+                id: backButton
 
-                var address = buildAddress(recipient, historyModel.client.domain);
-                if (historyModel.call(address))
-                    numberEdit.text = '';
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                iconSource: 'back.png'
+
+                onClicked: {
+                    var oldPos = numberEdit.cursorPosition;
+                    var oldText = numberEdit.text;
+                    numberEdit.text = oldText.substr(0, oldPos - 1) + oldText.substr(oldPos);
+                    numberEdit.cursorPosition = oldPos - 1;
+                }
             }
-        }
 
-        Button {
-            id: hangupButton
+            Button {
+                id: callButton
 
-            anchors.top: parent.top
-            anchors.right: parent.right
-            iconSource: 'hangup.png'
-            text: qsTr('Hangup')
-            visible: historyModel.currentCalls != 0
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                enabled: historyModel.client.state == SipClient.ConnectedState
+                iconSource: 'call.png'
+                text: qsTr('Call')
 
-            onClicked: historyModel.hangup()
+                onClicked: {
+                    var recipient = numberEdit.text.replace(/\s+/, '');
+                    if (!recipient.length)
+                        return;
+
+                    var address = buildAddress(recipient, historyModel.client.domain);
+                    if (historyModel.call(address))
+                        numberEdit.text = '';
+                }
+            }
+
+            Button {
+                id: hangupButton
+
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                iconSource: 'hangup.png'
+                text: qsTr('Hangup')
+                visible: false
+
+                onClicked: historyModel.hangup()
+            }
         }
     }
     
