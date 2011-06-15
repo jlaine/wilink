@@ -173,8 +173,10 @@ Rectangle {
             anchors.fill: input
             acceptedButtons: Qt.RightButton
             onPressed: {
-                var pos = mapToItem(chatEdit, mouse.x, mouse.y);
-                menu.show(pos.x, pos.y - menu.height);
+                var pos = mapToItem(menuLoader.parent, mouse.x, mouse.y);
+                menuLoader.source = 'InputMenu.qml';
+                menuLoader.item.target = chatEdit;
+                menuLoader.show(pos.x, pos.y - menuLoader.item.height);
             }
         }
     }
@@ -187,11 +189,5 @@ Rectangle {
         anchors.rightMargin: 4
         iconSource: 'upload.png'
         onClicked: chatEdit.returnPressed()
-    }
-
-    InputMenu {
-        id: menu
-
-        target: input
     }
 }
