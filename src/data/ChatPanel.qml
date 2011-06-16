@@ -127,7 +127,7 @@ Panel {
                     if (mouse.buttons & Qt.LeftButton) {
                         var position =  roomsPressHeight + mapToItem(left, mouse.x, mouse.y).y - mousePressY
                         position = Math.max(position, 0)
-                        position = Math.min(position, left.height - splitter.height)
+                        position = Math.min(position, left.height - splitter.height - statusBar.height)
                         rooms.height = position
                     }
                 }
