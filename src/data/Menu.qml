@@ -34,6 +34,19 @@ Rectangle {
     width: 150
     z: 10
 
+    Component {
+        id: imageDelegate
+
+        Image {
+            property variant model
+
+            smooth: true
+            source: model.icon ? model.icon : ''
+            width: 16
+            height: 16
+        }
+    }
+
     ListView {
         id: menuList
 
@@ -53,17 +66,18 @@ Rectangle {
             width: menuList.width
             radius: menu.radius
 
-            Image {
+            Loader {
                 id: icon
 
                 anchors.left: parent.left
                 anchors.leftMargin: 4
                 anchors.verticalCenter: parent.verticalCenter
                 opacity: menuItem.enabled ? 1 : 0.5
-                smooth: true
-                source: model.icon ? model.icon : ''
+                sourceComponent: imageDelegate
                 width: 16
                 height: 16
+
+                onLoaded: icon.item.model = model
             }
 
             Text {
