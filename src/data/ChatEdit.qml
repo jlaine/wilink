@@ -170,7 +170,7 @@ Rectangle {
         }
 
         MouseArea {
-            anchors.fill: input
+            anchors.fill: parent
             acceptedButtons: Qt.RightButton
             onPressed: {
                 var pos = mapToItem(menuLoader.parent, mouse.x, mouse.y);
