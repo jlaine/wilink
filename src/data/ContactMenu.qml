@@ -24,23 +24,21 @@ Menu {
     id: menu
 
     property alias jid: vcard.jid
-    property bool profileShown: false
 
     VCard {
         id: vcard
 
         onUrlChanged: {
+            var wasVisible = menu.model.get(0).action == 'profile';
             var visible = (url != undefined && url != '');
-            if (visible && !profileShown) {
+            if (visible && !wasVisible) {
                 menu.model.insert(0, {
                     'action': 'profile',
                     'icon': 'diagnostics.png',
                     'text': qsTr('Show profile'),
                     'visible': false});
-                profileShown = true;
-            } else if (!visible && profileShown) {
+            } else if (!visible && wasVisible) {
                 menu.model.remove(0);
-                profileShown = false;
             }
         }
     }
