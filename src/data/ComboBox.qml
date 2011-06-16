@@ -33,13 +33,11 @@ Rectangle {
     radius: 3
     smooth: true
 
-    Text {
+    Image {
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
-        anchors.margins: 5
-        color: 'white'
+        source: 'eject.png'
         opacity: block.state == 'expanded' ? 0 : 1
-        text: '<html>&#9167;</html>'
         z: 1
     }
 
