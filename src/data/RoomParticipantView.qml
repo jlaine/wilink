@@ -31,17 +31,6 @@ Item {
     // width: view.cellWidth + scrollBar.width
     width: 91
 
-    Rectangle {
-        id: border
-
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.top: parent.top
-        color: '#597fbe'
-        width: 1
-        z: 1
-    }
-
     GridView {
         id: view
 
@@ -114,7 +103,6 @@ Item {
         anchors.bottom: parent.bottom
         anchors.right: parent.right
         flickableItem: view
-        z: 2
     }
 
     Component {
