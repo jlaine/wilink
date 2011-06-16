@@ -106,6 +106,10 @@ Rectangle {
             name: 'hovered'
             PropertyChanges { target: highlight; opacity: 1 }
         }
+
+        transitions: Transition {
+            PropertyAnimation { target: highlight; properties: 'opacity'; duration: 150 }
+        }
     }
 
     Text {
@@ -133,24 +137,16 @@ Rectangle {
 
         onIdleTimeChanged: {
             if (idle.idleTime >= 300) {
-                if (combo.statusType() == QXmppPresence.Online) {
+                if (window.client.statusType == QXmppPresence.Online) {
                     autoAway = true;
-                    combo.setStatusType(QXmppPresence.Away);
+                    window.client.statusType = QXmppPresence.Away;
                 }
             } else if (autoAway) {
                 autoAway = false;
-                combo.setStatusType(QXmppPresence.Online);
+                window.client.statusType = QXmppPresence.Online;
             }
         }
 
         Component.onCompleted: idle.start()
-    }
-
-    Component.onCompleted: {
-        combo.model.append({'name': qsTr('Available'), 'status': QXmppPresence.Online});
-        combo.model.append({'name': qsTr('Away'), 'status': QXmppPresence.Away});
-        combo.model.append({'name': qsTr('Busy'), 'status': QXmppPresence.DND});
-        combo.model.append({'name': qsTr('Offline'), 'status': QXmppPresence.Offline});
-        combo.setStatusType(QXmppPresence.Online);
     }
 }
