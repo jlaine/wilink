@@ -140,9 +140,11 @@ Panel {
             Connections {
                 target: historyView.model
                 onMessageReceived: {
-                    if (true || !window.isActiveWindow || panel.opacity == 0) {
-                        roomListModel.addPendingMessage(participantModel.jid);
+                    var re = new RegExp('@' + Utils.escapeRegExp(room.nickName) + '[,:]');
+                    if (text.match(re) && (!window.isActiveWindow || panel.opacity == 0)) {
                         panel.notify(Utils.jidToResource(jid), text);
+                        if (panel.opacity == 0)
+                            roomListModel.addPendingMessage(participantModel.jid);
                     }
                 }
             }
