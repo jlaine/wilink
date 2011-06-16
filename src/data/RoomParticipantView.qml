@@ -124,6 +124,11 @@ Item {
 
             VCard {
                 id: vcard
+
+                onUrlChanged: {
+                    var enabled = (url != undefined && url != '');
+                    menu.model.setProperty(0, 'enabled', enabled);
+                }
             }
 
             onItemClicked: {
@@ -145,6 +150,7 @@ Item {
             Component.onCompleted: {
                 menu.model.append({
                     'action': 'profile',
+                    'enabled': false,
                     'icon': 'diagnostics.png',
                     'text': qsTr('Show profile')});
                 //if (room.allowedActions & QXmppMucRoom.KickAction)
