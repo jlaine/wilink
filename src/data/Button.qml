@@ -69,22 +69,11 @@ Rectangle {
 
     MouseArea {
         anchors.fill: parent
+        enabled: button.enabled
 
-        onClicked: {
-            if (button.enabled) {
-                button.clicked();
-            }
-        }
-        onPressed: {
-            if (button.enabled) {
-                button.state = 'pressed';
-            }
-        }
-        onReleased: {
-            if (button.enabled) {
-                button.state = '';
-            }
-        }
+        onClicked: button.clicked()
+        onPressed: button.state = 'pressed'
+        onReleased: button.state = ''
     }
 
     states: State {
