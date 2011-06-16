@@ -24,23 +24,12 @@ Menu {
     id: menu
 
     property alias jid: vcard.jid
+    property bool profileEnabled: (vcard.url != undefined && vcard.url != '')
+
+    onProfileEnabledChanged: menu.model.setProperty(0, 'enabled', profileEnabled)
 
     VCard {
         id: vcard
-
-        onUrlChanged: {
-            var wasVisible = menu.model.get(0).action == 'profile';
-            var visible = (url != undefined && url != '');
-            if (visible && !wasVisible) {
-                menu.model.insert(0, {
-                    'action': 'profile',
-                    'icon': 'diagnostics.png',
-                    'text': qsTr('Show profile'),
-                    'visible': false});
-            } else if (!visible && wasVisible) {
-                menu.model.remove(0);
-            }
-        }
     }
 
     onItemClicked: {
@@ -59,6 +48,11 @@ Menu {
     }
 
     Component.onCompleted: {
+        menu.model.append({
+            'action': 'profile',
+            'enabled': profileEnabled,
+            'icon': 'diagnostics.png',
+            'text': qsTr('Show profile')});
         menu.model.append({
             'action': 'rename',
             'icon': 'options.png',

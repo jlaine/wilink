@@ -59,6 +59,7 @@ Rectangle {
                 anchors.left: parent.left
                 anchors.leftMargin: 4
                 anchors.verticalCenter: parent.verticalCenter
+                opacity: menuItem.enabled ? 1 : 0.5
                 smooth: true
                 source: model.icon ? model.icon : ''
                 width: 16
