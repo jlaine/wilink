@@ -6,6 +6,7 @@ generate_xpm(xpm wiLink.svg)
 # 10x10 images
 generate_png(png SIZE 11
     down-arrow.svg
+    eject.svg
     up-arrow.svg)
 
 # 16x16 icons
