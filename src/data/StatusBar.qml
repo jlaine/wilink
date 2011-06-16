@@ -45,7 +45,7 @@ Rectangle {
         }
 
         anchors.bottom: parent.bottom
-        anchors.right: parent.right
+        anchors.right: statusText.left
         anchors.left: parent.left
         anchors.margins: 4
         delegate: Item {
@@ -83,17 +83,7 @@ Rectangle {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.margins: 5
                 color: 'white'
-                text: {
-                    if (combo.state == '' && model.status != QXmppPresence.Offline) {
-                        switch (window.client.state) {
-                        case QXmppClient.ConnectingState:
-                            return qsTr('Connecting..');
-                        case QXmppClient.DisconnectedState:
-                            return qsTr('Offline');
-                        }
-                    }
-                    return model.name;
-                }
+                text: model.name
             }
 
             MouseArea {
@@ -134,6 +124,25 @@ Rectangle {
             var statusType = combo.statusType();
             if (statusType != window.client.statusType)
                 window.client.statusType = statusType;
+        }
+    }
+
+    Text {
+        id: statusText
+
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.margins: 5
+        color: 'white'
+        text: {
+            switch (window.client.state) {
+            case QXmppClient.ConnectedState:
+                return qsTr('Connected');
+            case QXmppClient.ConnectingState:
+                return qsTr('Connecting..');
+            case QXmppClient.DisconnectedState:
+                return qsTr('Offline');
+            }
         }
     }
 
