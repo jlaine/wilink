@@ -200,20 +200,6 @@ Item {
 
         highlight: Highlight {}
         highlightMoveDuration: 500
-
-        Connections {
-            target: block
-
-            onCurrentJidChanged: {
-                for (var i = 0; i < listHelper.count; i++) {
-                    if (listHelper.get(i).jid == currentJid) {
-                        view.currentIndex = i;
-                        return;
-                    }
-                }
-                view.currentIndex = -1;
-            }
-        }
     }
 
     Rectangle {
@@ -233,5 +219,34 @@ Item {
         anchors.bottom: parent.bottom
         anchors.right: parent.right
         flickableItem: view
+    }
+
+    Timer {
+        id: timer
+
+        interval: 100
+
+        onTriggered: {
+            // Update the currently selected item after delay.
+            for (var i = 0; i < listHelper.count; i++) {
+                if (listHelper.get(i).jid == currentJid) {
+                    view.currentIndex = i;
+                    return;
+                }
+            }
+            view.currentIndex = -1;
+        }
+    }
+
+    Connections {
+        target: block
+        onCurrentJidChanged: timer.restart()
+    }
+
+    Connections {
+        target: view.model
+        onDataChanged: timer.restart()
+        onRowsInserted: timer.restart()
+        onRowsRemoved: timer.restart()
     }
 }
