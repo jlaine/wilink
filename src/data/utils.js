@@ -19,6 +19,10 @@
 
 .pragma library
 
+function escapeRegExp(text) {
+    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+}
+
 function formatNumber(size) {
     var KILO = 1000;
     var MEGA = KILO * 1000;
