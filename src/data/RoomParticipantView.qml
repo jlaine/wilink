@@ -32,12 +32,14 @@ Item {
     width: 91
 
     Rectangle {
-        id: background
+        id: border
 
-        anchors.fill:  parent
-        color: 'transparent'
-        border.color: '#597fbe'
-        border.width: 1
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.top: parent.top
+        color: '#597fbe'
+        width: 1
+        z: 1
     }
 
     GridView {
@@ -112,6 +114,7 @@ Item {
         anchors.bottom: parent.bottom
         anchors.right: parent.right
         flickableItem: view
+        z: 2
     }
 
     Component {
