@@ -19,6 +19,7 @@
 
 import QtQuick 1.0
 import QXmpp 0.4
+import wiLink 1.2
 
 Item {
     id: block
@@ -95,7 +96,6 @@ Item {
                         var pos = mapToItem(menuLoader.parent, mouse.x, mouse.y);
                         menuLoader.sourceComponent = participantMenu;
                         menuLoader.item.jid = model.jid;
-                        menuLoader.item.url = model.url;
                         menuLoader.show(pos.x - menuLoader.item.width, pos.y);
                     }
                 }
@@ -120,13 +120,16 @@ Item {
         Menu {
             id: menu
 
-            property string jid
-            property string url
+            property alias jid: vcard.jid
+
+            VCard {
+                id: vcard
+            }
 
             onItemClicked: {
                 var item = menu.model.get(index);
                 if (item.action == 'profile') {
-                    Qt.openUrlExternally(url)
+                    Qt.openUrlExternally(vcard.url)
                 } else if (item.action == 'kick') {
                     dialogLoader.source = 'InputDialog.qml';
                     dialogLoader.item.title = qsTr('Kick user');
