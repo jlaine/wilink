@@ -28,108 +28,89 @@ Rectangle {
 
     color: '#567dbc'
 
-    ComboBox {
-        id: combo
+    Component {
+        id: statusMenu
 
-        function statusType() {
-            return combo.model.get(combo.currentIndex).status;
-        }
+        Menu {
+            id: menu
 
-        function setStatusType(statusType) {
-            for (var i = 0; i < combo.model.count; i++) {
-                if (combo.model.get(i).status == statusType) {
-                    combo.currentIndex = i;
-                    break;
-                }
+            onItemClicked: {
+                var statusType = menu.model.get(index).status;
+                console.log("status req: " + statusType);
+                if (statusType != window.client.statusType)
+                    window.client.statusType = statusType;
+            }
+
+            Component.onCompleted: {
+                menu.model.append({'text': qsTr('Available'), 'status': QXmppPresence.Online});
+                menu.model.append({'text': qsTr('Away'), 'status': QXmppPresence.Away});
+                menu.model.append({'text': qsTr('Busy'), 'status': QXmppPresence.DND});
+                menu.model.append({'text': qsTr('Offline'), 'status': QXmppPresence.Offline});
             }
         }
+    }
 
+    Item {
+        id: statusArea
+        
+        anchors.top: parent.top
         anchors.bottom: parent.bottom
-        anchors.right: statusText.left
         anchors.left: parent.left
-        anchors.margins: 4
-        delegate: Item {
-            id: item
+        width: 48
 
-            height: 25
-            width: parent.width
+        Rectangle {
+            id: highlight
 
-            Rectangle {
-                id: background
+            anchors.fill: parent
+            border.width: 1
+            border.color: 'white'
+            color: '#90acd8'
+            opacity: 0
+            radius: 3
+        }
 
-                anchors.fill: parent
-                border.width: 1
-                border.color: 'transparent'
-                color: 'transparent'
-                radius: block.radius
-                smooth: block.smooth
-            }
+        StatusPill {
+            id: statusPill
 
-            StatusPill {
-                id: statusPill
+            anchors.left:  parent.left
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.margins: 5
+            height: 16
+            width: 16
+            presenceStatus: window.client.statusType
+        }
 
-                anchors.left:  parent.left
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.margins: 5
-                height: 16
-                width: 16
-                presenceStatus: model.status
-            }
+        Text {
+            anchors.left: statusPill.right
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.margins: 5
+            color: 'white'
+            text: '<html>&#9167;</html>'
+        }
 
-            Text {
-                id: text
+        MouseArea {
+            anchors.fill: parent
+            hoverEnabled: true
 
-                anchors.left: statusPill.right
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.margins: 5
-                color: 'white'
-                text: model.name
-            }
-
-            MouseArea {
-                property variant positionPressed
-                property int pressedIndex
-
-                anchors.fill: parent
-                hoverEnabled: true
-
-                onEntered: {
-                    item.state = 'hovered'
-                }
-
-                onExited: {
-                    item.state = ''
-                }
-
-                onPressed: {
-                    if (block.state != 'expanded') {
-                        block.state = 'expanded'
-                    } else {
-                        var pos = mapToItem(view, mouse.x, mouse.y)
-                        currentIndex = view.indexAt(pos.x, pos.y)
-                        block.state = ''
-                    }
-                }
-            }
-
-            states: State {
-                name: 'hovered'
-                PropertyChanges { target: background; color: '#90acd8' }
+            onEntered: statusArea.state = 'hovered'
+            onExited: statusArea.state = ''
+            onClicked: {
+                var pos = mapToItem(menuLoader.parent, mouse.x, mouse.y);
+                menuLoader.sourceComponent = statusMenu;
+                menuLoader.show(pos.x, pos.y - menuLoader.item.height);
             }
         }
 
-        model: ListModel {}
-
-        onCurrentIndexChanged: {
-            var statusType = combo.statusType();
-            if (statusType != window.client.statusType)
-                window.client.statusType = statusType;
+        states: State {
+            name: 'hovered'
+            PropertyChanges { target: highlight; opacity: 1 }
         }
     }
 
     Text {
-        id: statusText
+        id: connectionText
 
+        anchors.left: statusArea.right
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
         anchors.margins: 5
