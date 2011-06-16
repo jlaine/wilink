@@ -38,6 +38,17 @@ Item {
     }
 
     Rectangle {
+        id: border
+
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        anchors.top: parent.top
+        color: '#597fbe'
+        width: 1
+        z: 1
+    }
+
+    Rectangle {
         id: background
 
         width: parent.height
@@ -45,8 +56,6 @@ Item {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.topMargin: -parent.width
-        border.color: '#597fbe'
-        border.width: 1
 
         gradient: Gradient {
             GradientStop { id: backgroundStop1; position: 0.0; color: '#e7effd' }
@@ -224,5 +233,6 @@ Item {
         anchors.bottom: parent.bottom
         anchors.right: parent.right
         flickableItem: view
+        z: 2
     }
 }
