@@ -22,6 +22,7 @@ import QtQuick 1.0
 Rectangle {
     id: menu
 
+    property Component iconDelegate: imageDelegate
     property ListModel model: ListModel {}
     signal itemClicked(int index)
 
@@ -84,7 +85,7 @@ Rectangle {
                 anchors.leftMargin: 4
                 anchors.verticalCenter: parent.verticalCenter
                 opacity: menuItem.enabled ? 1 : 0.5
-                sourceComponent: imageDelegate
+                sourceComponent: menu.iconDelegate
                 width: 16
                 height: 16
 

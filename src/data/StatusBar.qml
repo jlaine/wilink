@@ -29,10 +29,22 @@ Rectangle {
     color: '#567dbc'
 
     Component {
+        id: pillDelegate
+
+        StatusPill {
+            property variant model
+
+            presenceStatus: model.status
+        }
+    }
+
+    Component {
         id: statusMenu
 
         Menu {
             id: menu
+
+            iconDelegate: pillDelegate
 
             onItemClicked: {
                 var statusType = menu.model.get(index).status;
