@@ -76,16 +76,27 @@ Rectangle {
             shortcut: Qt.ControlModifier + Qt.Key_M
             text: qsTr('Media')
             visible: false
-            onClicked: swapper.showPanel('PlayerPanel.qml')
+
+            onClicked: {
+                visible = true;
+                swapper.showPanel('PlayerPanel.qml');
+            }
         }
 
         DockButton {
             id: phoneButton
 
             iconSource: 'phone.png'
+            shortcut: Qt.ControlModifier + Qt.Key_T
             text: qsTr('Phone')
             visible: Utils.jidToDomain(window.client.jid) == 'wifirst.net'
-            onClicked: swapper.showPanel('PhonePanel.qml')
+
+            onClicked: {
+                if (visible) {
+                    swapper.showPanel('PhonePanel.qml');
+                }
+            }
+
             Component.onCompleted: {
                 if (visible) {
                     swapper.addPanel('PhonePanel.qml');
@@ -97,11 +108,18 @@ Rectangle {
             id: shareButton
 
             iconSource: 'share.png'
+            shortcut: Qt.ControlModifier + Qt.Key_S
             text: qsTr('Shares')
             visible: window.client.shareServer != ''
-            onClicked: swapper.showPanel('SharePanel.qml')
+
+            onClicked: {
+                if (visible) {
+                    swapper.showPanel('SharePanel.qml');
+                }
+            }
+
             onVisibleChanged: {
-                if (shareButton.visible) {
+                if (visible) {
                     swapper.addPanel('SharePanel.qml');
                 }
             }
@@ -111,8 +129,10 @@ Rectangle {
             property string domain: Utils.jidToDomain(window.client.jid)
 
             iconSource: 'photos.png'
+            shortcut: Qt.ControlModifier + Qt.Key_P
             text: qsTr('Photos')
             visible: domain == 'wifirst.net' || domain == 'gmail.com'
+
             onClicked: {
                 if (domain == 'wifirst.net')
                     swapper.showPanel('PhotoPanel.qml', {'url': 'wifirst://www.wifirst.net/w'});
@@ -143,7 +163,11 @@ Rectangle {
             shortcut: Qt.ControlModifier + Qt.Key_L
             text: qsTr('Debugging')
             visible: false
-            onClicked: swapper.showPanel('LogPanel.qml')
+
+            onClicked: {
+                visible = true;
+                swapper.showPanel('LogPanel.qml');
+            }
         }
 
         DockButton {
@@ -151,7 +175,11 @@ Rectangle {
             shortcut: Qt.ControlModifier + Qt.Key_B
             text: qsTr('Discovery')
             visible: false
-            onClicked: swapper.showPanel('DiscoveryPanel.qml')
+
+            onClicked: {
+                visible = true;
+                swapper.showPanel('DiscoveryPanel.qml');
+            }
         }
     }
 
@@ -160,7 +188,6 @@ Rectangle {
         for (var i = 0; i < control.children.length; i++) {
             var button = control.children[i];
             if (val == button.shortcut) {
-                button.visible = true;
                 button.clicked();
                 break;
             }
