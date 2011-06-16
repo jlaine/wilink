@@ -29,17 +29,23 @@ Item {
     Rectangle {
         id: background
         anchors.fill: parent
-        gradient: Gradient {
-            GradientStop { id: backgroundStop1; position: 0.0; color: '#cbdaf1' }
-            GradientStop { id: backgroundStop2; position: 1.0; color: '#e7effd' }
-        }
+        border.color: '#aa567dbc'
+        border.width: 1
+        color: '#ffffff'
+        smooth: true
     }
 
     Rectangle {
         id: header
         anchors.left: parent.left
         anchors.right: parent.right
-        color: '#7091c8'
+        border.color: '#aa567dbc'
+        border.width: 1
+        gradient: Gradient {
+            GradientStop { position:0.0; color: '#9fb7dd' }
+            GradientStop { position:0.5; color: '#597fbe' }
+            GradientStop { position:1.0; color: '#9fb7dd' }
+        }
         height: textHeader.height
         z: 1
 
