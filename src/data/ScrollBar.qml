@@ -88,7 +88,7 @@ Item {
 
             states: State {
                 name: 'pressed'
-//                PropertyChanges { target: handleStop2; color: '#57c7e7' }
+                PropertyChanges { target: handle; border.color: '#4e9de6' }
             }
         }
     }

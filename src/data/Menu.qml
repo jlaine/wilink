@@ -47,6 +47,17 @@ Rectangle {
         }
     }
 
+    // FIXME: this is a hack waiting 'blur' or 'shadow' attribute in qml
+    BorderImage {
+        id: shadow
+        anchors.fill: menu
+        anchors { leftMargin: -5; topMargin: -5; rightMargin: -8; bottomMargin: -9 }
+        border { left: 10; top: 10; right: 10; bottom: 10 }
+        source: 'shadow.png'
+        smooth: true
+        z: -1
+    }
+
     ListView {
         id: menuList
 
