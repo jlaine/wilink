@@ -21,6 +21,8 @@ import QtQuick 1.0
 import wiLink 1.2
 
 Dialog {
+    id: dialog
+
     property alias jid: vcard.jid
 
     minHeight: 150
