@@ -44,7 +44,9 @@ Rectangle {
         model: menu.model
 
         delegate: Rectangle {
-            id: listViewItem
+            id: menuItem
+
+            property bool enabled: model.enabled != false
 
             color: 'transparent'
             height: 20
@@ -57,6 +59,7 @@ Rectangle {
                 anchors.left: parent.left
                 anchors.leftMargin: 4
                 anchors.verticalCenter: parent.verticalCenter
+                opacity: menuItem.enabled ? 1 : 0.5
                 smooth: true
                 source: model.icon ? model.icon : ''
                 width: 16
@@ -69,25 +72,25 @@ Rectangle {
                 anchors.left: icon.right
                 anchors.leftMargin: 8
                 anchors.verticalCenter: parent.verticalCenter
-                color: '#000000'
+                color: menuItem.enabled ? 'black' : '#888'
                 elide: Text.ElideRight
-                //font.pointSize: itemFontSize
                 text: model.text
                 width: parent.width
             }
 
             states: State {
                 name: 'hovered'
-                PropertyChanges { target: listViewItem; color: '#eae7f4fe' }
+                PropertyChanges { target: menuItem; color: '#eae7f4fe' }
             }
 
             MouseArea {
-                anchors.fill: listViewItem
+                anchors.fill: parent
+                enabled: menuItem.enabled
                 hoverEnabled: true
 
                 onClicked: itemClicked(index)
-                onEntered: listViewItem.state = 'hovered'
-                onExited: listViewItem.state = ''
+                onEntered: menuItem.state = 'hovered'
+                onExited: menuItem.state = ''
             }
         }
     }

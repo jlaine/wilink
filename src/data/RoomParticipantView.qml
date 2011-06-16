@@ -121,10 +121,15 @@ Item {
             id: menu
 
             property alias jid: vcard.jid
+            property bool kickEnabled: (room.allowedActions & QXmppMucRoom.KickAction)
+            property bool profileEnabled: (vcard.url != undefined && vcard.url != '')
 
             VCard {
                 id: vcard
             }
+
+            onProfileEnabledChanged: menu.model.setProperty(0, 'enabled', profileEnabled)
+            onKickEnabledChanged: menu.model.setProperty(1, 'enabled', kickEnabled)
 
             onItemClicked: {
                 var item = menu.model.get(index);
@@ -145,11 +150,12 @@ Item {
             Component.onCompleted: {
                 menu.model.append({
                     'action': 'profile',
+                    'enabled': profileEnabled,
                     'icon': 'diagnostics.png',
                     'text': qsTr('Show profile')});
-                //if (room.allowedActions & QXmppMucRoom.KickAction)
                 menu.model.append({
                     'action': 'kick',
+                    'enabled': kickEnabled,
                     'icon': 'remove.png',
                     'text': qsTr('Kick user')});
             }
