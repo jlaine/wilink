@@ -851,6 +851,10 @@ Acceptez-vous?</translation>
         <source>Connecting..</source>
         <translation>Connexion..</translation>
     </message>
+    <message>
+        <source>Connected</source>
+        <translation>Connecté</translation>
+    </message>
 </context>
 <context>
     <name>UpdatesDialog</name>
