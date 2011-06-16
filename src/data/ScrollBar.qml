@@ -93,89 +93,47 @@ Item {
         }
     }
 
-    Rectangle {
+    Image {
         id: buttonUp
 
         anchors.top: parent.top
-        border.color: track.border.color
-        color: '#ffffff'
-        height: parent.width - 1
-        width: parent.width - 1
-
-        Text {
-            id: textButtonUp
-            anchors.fill: parent
-            color: '#555555'
-            font.pixelSize: scrollBar.width - 4
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            text: '<html>&#9650;</html>'
-        }
+        source: 'up-arrow.png'
 
         MouseArea {
             anchors.fill: parent
 
             onPressed: {
-                buttonUp.state = 'pressed';
                 moveAction = 'up';
                 moveQuantity = -30;
                 scrollBar.moveBy(moveQuantity);
             }
 
             onReleased: {
-                buttonUp.state = '';
                 moveAction = '';
                 moveRepeat = false;
             }
         }
-
-        states: State {
-            name: 'pressed'
-            PropertyChanges { target: buttonUp; color: '#ffffff' }
-            PropertyChanges { target: textButtonUp; color: '#5fb0c3' }
-        }
     }
 
-    Rectangle {
+    Image {
         id: buttonDown
 
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: 1
-        border.color: track.border.color
-        color: '#ffffff'
-        height: parent.width - 1
-        width: parent.width - 1
-
-        Text {
-            id: textButtonDown
-            anchors.fill: parent
-            color: '#555555'
-            font.pixelSize: scrollBar.width - 4
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            text: '<html>&#9660;</html>'
-        }
+        source: 'down-arrow.png'
 
         MouseArea {
             anchors.fill: parent
 
             onPressed: {
-                buttonDown.state = 'pressed';
                 moveAction = 'down';
                 moveQuantity = 30;
                 scrollBar.moveBy(moveQuantity);
             }
 
             onReleased: {
-                buttonDown.state = '';
                 moveAction = '';
                 moveRepeat = false;
             }
-        }
-        states: State {
-            name: 'pressed'
-            PropertyChanges { target: buttonDown; color: '#ffffff' }
-            PropertyChanges { target: textButtonDown; color: '#5fb0c3' }
         }
     }
 

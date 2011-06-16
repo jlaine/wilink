@@ -16,6 +16,7 @@
     <file>copy.png</file>
     <file>cut.png</file>
     <file>diagnostics.png</file>
+    <file>down-arrow.png</file>
     <file>download.png</file>
     <file>favorite-active.png</file>
     <file>favorite-inactive.png</file>
@@ -50,6 +51,7 @@
     <file>stop.png</file>
     <file>tip.png</file>
     <file>transfers.png</file>
+    <file>up-arrow.png</file>
     <file>upload.png</file>
     <file>wiLink.png</file>
     <file>wiLink-black.png</file>

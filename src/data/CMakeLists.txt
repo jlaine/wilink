@@ -3,6 +3,11 @@ generate_icns(icns wiLink.svg)
 generate_ico(ico wiLink.svg)
 generate_xpm(xpm wiLink.svg)
 
+# 10x10 images
+generate_png(png SIZE 11
+    down-arrow.svg
+    up-arrow.svg)
+
 # 16x16 icons
 generate_png(png SIZE 16
     smiley-angry.svg
