@@ -23,6 +23,8 @@ import wiLink 1.2
 Dialog {
     property alias jid: vcard.jid
 
+    minHeight: 150
+    height: minHeight
     title: qsTr('Rename contact')
 
     VCard {
