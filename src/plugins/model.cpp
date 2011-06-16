@@ -46,7 +46,6 @@ ChatModel::ChatModel(QObject *parent)
     roleNames.insert(ChatModel::JidRole, "jid");
     roleNames.insert(ChatModel::MessagesRole, "messages");
     roleNames.insert(ChatModel::NameRole, "name");
-    roleNames.insert(ChatModel::UrlRole, "url");
     setRoleNames(roleNames);
 
     // create rool

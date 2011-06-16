@@ -47,6 +47,7 @@ enum PlayerRole {
     ImageUrlRole,
     PlayingRole,
     TitleRole,
+    UrlRole,
 };
 
 static bool isLocal(const QUrl &url)
@@ -135,7 +136,7 @@ QList<Item*> PlayerModelPrivate::find(ChatModelItem *parent, int role, const QUr
     foreach (ChatModelItem *it, parent->children) {
         Item *item = static_cast<Item*>(it);
         if (url.isEmpty() ||
-            (role == ChatModel::UrlRole && item->url == url) ||
+            (role == UrlRole && item->url == url) ||
             (role == ImageUrlRole && item->imageUrl == url))
             items << item;
         if (!item->children.isEmpty())
@@ -149,7 +150,7 @@ void PlayerModelPrivate::processQueue()
     if (dataReply)
         return;
 
-    QList<Item*> items = find(q->rootItem, ChatModel::UrlRole, QUrl());
+    QList<Item*> items = find(q->rootItem, UrlRole, QUrl());
     foreach (Item *item, items) {
         // check data
         if (item->url.isValid() &&

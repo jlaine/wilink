@@ -51,6 +51,7 @@ enum PhotoRole
     IsDirRole,
     ProgressRole,
     SizeRole,
+    UrlRole,
 };
 
 static bool isImage(const QString &fileName)
@@ -197,6 +198,7 @@ PhotoModel::PhotoModel(QObject *parent)
     names.insert(ImageRole, "image");
     names.insert(IsDirRole, "isDir");
     names.insert(SizeRole, "size");
+    names.insert(UrlRole, "url");
     setRoleNames(names);
 
     m_uploads = new PhotoUploadModel(this);
