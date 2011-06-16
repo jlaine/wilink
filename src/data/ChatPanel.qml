@@ -169,7 +169,6 @@ Panel {
                 var pos = mapToItem(menuLoader.parent, point.x, point.y);
                 menuLoader.source = 'ContactMenu.qml';
                 menuLoader.item.jid = model.jid;
-                menuLoader.item.url = model.url;
                 menuLoader.show(pos.x, pos.y);
             }
 

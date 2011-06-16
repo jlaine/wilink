@@ -18,18 +18,37 @@
  */
 
 import QtQuick 1.0
+import wiLink 1.2
 
 Menu {
     id: menu
 
-    property string jid
-    property string url
+    property alias jid: vcard.jid
     property bool profileShown: false
+
+    VCard {
+        id: vcard
+
+        onUrlChanged: {
+            var visible = (url != undefined && url != '');
+            if (visible && !profileShown) {
+                menu.model.insert(0, {
+                    'action': 'profile',
+                    'icon': 'diagnostics.png',
+                    'text': qsTr('Show profile'),
+                    'visible': false});
+                profileShown = true;
+            } else if (!visible && profileShown) {
+                menu.model.remove(0);
+                profileShown = false;
+            }
+        }
+    }
 
     onItemClicked: {
         var item = menu.model.get(index);
         if (item.action == 'profile') {
-            Qt.openUrlExternally(url);
+            Qt.openUrlExternally(vcard.url);
         } else if (item.action == 'rename') {
             dialogLoader.source = 'ContactRenameDialog.qml';
             dialogLoader.item.jid = jid;
@@ -38,21 +57,6 @@ Menu {
             dialogLoader.source = 'ContactRemoveDialog.qml';
             dialogLoader.item.jid = jid;
             dialogLoader.show();
-        }
-    }
-
-    onUrlChanged: {
-        var visible = (url != undefined && url != '');
-        if (visible && !profileShown) {
-            menu.model.insert(0, {
-                'action': 'profile',
-                'icon': 'diagnostics.png',
-                'text': qsTr('Show profile'),
-                'visible': false});
-            profileShown = true;
-        } else if (!visible && profileShown) {
-            menu.model.remove(0);
-            profileShown = false;
         }
     }
 

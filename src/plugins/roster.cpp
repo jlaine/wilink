@@ -266,8 +266,6 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
         VCard card;
         card.setJid(item->jid);
         return card.name();
-    } else if (role == UrlRole) {
-        return VCardCache::instance()->profileUrl(item->jid);
     } else if (role == StatusRole) {
         QXmppPresence::Status::Type statusType = QXmppPresence::Status::Offline;
         // NOTE : we test the connection status, otherwise we encounter a race
