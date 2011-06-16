@@ -2,14 +2,15 @@ HIGH PRIORITY
 
 - restore copy & paste in chat history
 - restore shares initial config dialog
+- fix "unread message" counter
 
 LOW PRIORITY
 
 - restore "find" feature
-- save / restore window size and position
 - add contact status in chat conversation
 
 ENHANCEMENTS
 
 - display users list in share panel
 - add a "do not disturb" option for SIP
+- save / restore window size and position
