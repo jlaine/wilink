@@ -158,7 +158,6 @@ public slots:
     void addClient(ChatClient *client);
     bool get(const QString &jid, QXmppVCardIq *iq = 0);
     QUrl imageUrl(const QString &jid);
-    QUrl profileUrl(const QString &jid);
 
 private slots:
     void clientDestroyed(QObject *object);

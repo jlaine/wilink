@@ -640,15 +640,6 @@ QUrl VCardCache::imageUrl(const QString &jid)
         return QUrl("qrc:/peer.png");
 }
 
-QUrl VCardCache::profileUrl(const QString &jid)
-{
-    QXmppVCardIq vcard;
-    if (get(jid, &vcard))
-        return QUrl(vcard.url());
-    else
-        return QUrl();
-}
-
 VCardCache *VCardCache::instance()
 {
     if (!vcardCache)
