@@ -75,7 +75,6 @@ FocusScope {
     Loader {
         id: dialogLoader
 
-        anchors.centerIn: parent
         z: 10
 
         function hide() {
@@ -86,6 +85,11 @@ FocusScope {
         function show() {
             dialogLoader.item.opacity = 1;
             dialogLoader.focus = true;
+        }
+
+        onLoaded: {
+            x = Math.floor((parent.width - width) / 2);
+            y = Math.floor((parent.height - height) / 2);
         }
 
         Connections {
