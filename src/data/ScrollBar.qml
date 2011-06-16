@@ -38,12 +38,11 @@ Item {
         anchors.top: scrollBar.top
         anchors.left: scrollBar.left
         anchors.topMargin: -1
-        border.color: '#84bde8'
+        border.color: '#c5c5c5'
         border.width: 1
         gradient: Gradient {
-            GradientStop {id: trackStop1; position: 0.0; color: '#bedfe7'}
-            GradientStop {id: trackStop2; position: 0.5; color: '#ffffff'}
-            GradientStop {id: trackStop3; position: 1.0; color: '#dfeff3'}
+            GradientStop {position: 0.0; color: '#ffffff'}
+            GradientStop {position: 1.0; color: '#d0d0d0'}
         }
         height: parent.width
         width: parent.height - 2 * ( scrollBar.width - 1 )
@@ -58,12 +57,26 @@ Item {
 
             property int desiredHeight: Math.ceil(scrollBar.pageSize * (track.width - 2))
 
-            border.color: track.border.color
+            Rectangle {
+                id: handleReflect
+
+                anchors.left: parent.left
+                anchors.leftMargin: 3
+                anchors.right: parent.right
+                anchors.rightMargin: 3
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 1
+                color: '#9cc6ec'
+                height: Math.round(parent.height / 2 - 2)
+                radius: parent.radius
+                smooth: parent.smooth
+            }
+
+            border.color: '#1750c0'
             border.width: 1
             gradient: Gradient {
-                GradientStop {id: handleStop1; position: 0.0; color: '#ffffff'}
-                GradientStop {id: handleStop2; position: 0.5; color: '#7ac6d8'}
-                GradientStop {id: handleStop3; position: 1.0; color: '#ffffff'}
+                GradientStop { position: 1.0; color: '#2061c0' }
+                GradientStop { position: 0.2; color: '#afebff' }
             }
             radius: 10
             smooth: true
@@ -75,7 +88,7 @@ Item {
 
             states: State {
                 name: 'pressed'
-                PropertyChanges { target: handleStop2; color: '#57c7e7' }
+//                PropertyChanges { target: handleStop2; color: '#57c7e7' }
             }
         }
     }
@@ -85,14 +98,14 @@ Item {
 
         anchors.top: parent.top
         border.color: track.border.color
-        color: '#bedfe7'
+        color: '#ffffff'
         height: parent.width - 1
         width: parent.width - 1
 
         Text {
             id: textButtonUp
             anchors.fill: parent
-            color: '#0d88a4'
+            color: '#555555'
             font.pixelSize: scrollBar.width - 4
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
@@ -129,14 +142,14 @@ Item {
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 1
         border.color: track.border.color
-        color: '#bedfe7'
+        color: '#ffffff'
         height: parent.width - 1
         width: parent.width - 1
 
         Text {
             id: textButtonDown
             anchors.fill: parent
-            color: '#0d88a4'
+            color: '#555555'
             font.pixelSize: scrollBar.width - 4
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
