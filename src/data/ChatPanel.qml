@@ -81,6 +81,22 @@ Panel {
             }
 
             onItemClicked: showRoom(model.jid)
+
+            Connections {
+                target: window.client.mucManager
+
+                onInvitationReceived: {
+                    var jid = Utils.jidToBareJid(inviter);
+                    var box = window.messageBox();
+                    box.windowTitle = qsTranslate('ChatPanel', 'Invitation from %1').replace('%1', jid);
+                    box.text = qsTranslate('ChatPanel', "%1 has invited you to join the '%2' chat room.\n\nDo you accept?").replace('%1', jid).replace('%2', roomJid);
+                    box.standardButtons = QMessageBox.Yes | QMessageBox.No;
+                    if (box.exec() == QMessageBox.Yes) {
+                        swapper.showPanel('ChatPanel.qml');
+                        showRoom(roomJid);
+                    }
+                }
+            }
         }
 
         Rectangle {

@@ -224,6 +224,14 @@ Do you accept?</source>
 
 Acceptez-vous?</translation>
     </message>
+    <message>
+        <source>%1 has invited you to join the &apos;%2&apos; chat room.
+
+Do you accept?</source>
+        <translation>%1 vous as invité à rejoindre le salon &apos;%2&apos;.
+
+Acceptez-vous?</translation>
+    </message>
 </context>
 <context>
     <name>ChatPasswordPrompt</name>
@@ -253,17 +261,6 @@ Acceptez-vous?</translation>
     <message>
         <source>Preferences</source>
         <translation>Préférences</translation>
-    </message>
-</context>
-<context>
-    <name>ChatRoomWatcher</name>
-    <message>
-        <source>%1 has asked to add you to join the &apos;%2&apos; chat room</source>
-        <translation type="obsolete">%1 vous as invité à rejoindre le salon &apos;%2&apos;</translation>
-    </message>
-    <message>
-        <source>Do you accept?</source>
-        <translation type="obsolete">Acceptez-vous ?</translation>
     </message>
 </context>
 <context>
