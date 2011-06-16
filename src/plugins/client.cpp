@@ -76,13 +76,18 @@ int ChatClient::statusType() const
 
 void ChatClient::setStatusType(int statusType)
 {
+    const QXmppPresence::Status::Type newType = static_cast<QXmppPresence::Status::Type>(statusType);
     QXmppPresence presence = clientPresence();
-    if (statusType == QXmppPresence::Status::Offline)
-        presence.setType(QXmppPresence::Unavailable);
-    else
-        presence.setType(QXmppPresence::Available);
-    presence.status().setType(static_cast<QXmppPresence::Status::Type>(statusType));
-    setClientPresence(presence);
+    if (newType != presence.status().type()) {
+        if (newType == QXmppPresence::Status::Offline)
+            presence.setType(QXmppPresence::Unavailable);
+        else
+            presence.setType(QXmppPresence::Available);
+        presence.status().setType(newType);
+        setClientPresence(presence);
+
+        emit statusTypeChanged(newType);
+    }
 }
 
 QXmppArchiveManager *ChatClient::archiveManager()

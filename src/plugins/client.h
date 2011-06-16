@@ -40,7 +40,7 @@ class ChatClient : public QXmppClient
 {
     Q_OBJECT
     Q_PROPERTY(QString jid READ jid NOTIFY jidChanged)
-    Q_PROPERTY(int statusType READ statusType WRITE setStatusType)
+    Q_PROPERTY(int statusType READ statusType WRITE setStatusType NOTIFY statusTypeChanged)
     Q_PROPERTY(QXmppArchiveManager* archiveManager READ archiveManager CONSTANT)
     Q_PROPERTY(QXmppCallManager* callManager READ callManager CONSTANT)
     Q_PROPERTY(DiagnosticManager* diagnosticManager READ diagnosticManager CONSTANT)
@@ -77,6 +77,7 @@ signals:
     void messageReceived(const QString &from);
     void mucServerChanged(const QString &mucServer);
     void shareServerChanged(const QString &shareServer);
+    void statusTypeChanged(int statusType);
 
 public slots:
     void replayMessage();

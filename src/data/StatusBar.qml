@@ -36,9 +36,7 @@ Rectangle {
 
             onItemClicked: {
                 var statusType = menu.model.get(index).status;
-                console.log("status req: " + statusType);
-                if (statusType != window.client.statusType)
-                    window.client.statusType = statusType;
+                window.client.statusType = statusType;
             }
 
             Component.onCompleted: {
