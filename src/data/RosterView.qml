@@ -38,17 +38,6 @@ Item {
     }
 
     Rectangle {
-        id: border
-
-        anchors.bottom: parent.bottom
-        anchors.right: parent.right
-        anchors.top: parent.top
-        color: '#597fbe'
-        width: 1
-        z: 1
-    }
-
-    Rectangle {
         id: background
 
         width: parent.height
@@ -226,6 +215,16 @@ Item {
         }
     }
 
+    Rectangle {
+        id: border
+
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        anchors.top: parent.top
+        color: '#597fbe'
+        width: 1
+    }
+
     ScrollBar {
         id: scrollBar
 
@@ -233,6 +232,5 @@ Item {
         anchors.bottom: parent.bottom
         anchors.right: parent.right
         flickableItem: view
-        z: 2
     }
 }

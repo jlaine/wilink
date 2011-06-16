@@ -23,7 +23,9 @@ Rectangle {
     id: bar
 
     property alias text: edit.text
+
     signal returnPressed
+    signal tabPressed
 
     function backspacePressed() {
         var oldPos = edit.cursorPosition;
@@ -54,10 +56,15 @@ Rectangle {
             bar.returnPressed();
             return false;
         }
+
+        Keys.onTabPressed: {
+            bar.tabPressed();
+            return false;
+        }
     }
 
     MouseArea {
-        anchors.fill: edit
+        anchors.fill: parent
         acceptedButtons: Qt.RightButton
 
         onPressed: {

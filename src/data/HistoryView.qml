@@ -220,6 +220,16 @@ Item {
 */
     }
 
+    Rectangle {
+        id: border
+
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        anchors.top: parent.top
+        color: '#597fbe'
+        width: 1
+    }
+
     ScrollBar {
         id: scrollBar
 
