@@ -210,7 +210,7 @@ Panel {
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.right: parent.right
-            height: 32
+            height: 28
         }
 
         // FIXME : this is a hack to replay received messages after
