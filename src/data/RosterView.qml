@@ -199,6 +199,7 @@ Item {
         }
 
         highlight: Highlight {}
+        highlightMoveDuration: 500
 
         Connections {
             target: block
