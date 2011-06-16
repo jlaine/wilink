@@ -72,7 +72,7 @@ Item {
                 smooth: parent.smooth
             }
 
-            border.color: '#1750c0'
+            border.color: '#2A85d9'
             border.width: 1
             gradient: Gradient {
                 GradientStop { position: 1.0; color: '#2061c0' }
