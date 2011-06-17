@@ -76,7 +76,6 @@ Item {
                 text += qsTr('%1 of %2').replace('%1', progress).replace('%2', Utils.formatSize(job.fileSize));
                 return text;
             }
-            wrapMode: Text.Wrap
         }
     }
 
