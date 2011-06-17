@@ -25,7 +25,7 @@ Item {
     property alias model: view.model
     property alias currentIndex: view.currentIndex
 
-    height: 25
+    height: 21
 
     Component {
         id: comboMenu
