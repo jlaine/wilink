@@ -23,9 +23,6 @@ import wiLink 1.2
 Panel {
     id: panel
 
-    property bool recording: false
-    property int testSeconds: 5
-
     function save() {
         // devices
         if (input.currentIndex >= 0) {
@@ -163,7 +160,7 @@ Panel {
                     id: label
 
                     property string playingText: qsTr('You should now hear the sound you recorded.')
-                    property string recordingText: qsTr('Speak into the microphone for %1 seconds and check the sound level.').replace('%1', testSeconds)
+                    property string recordingText: qsTr('Speak into the microphone for %1 seconds and check the sound level.').replace('%1', tester.duration)
 
                     anchors.top: parent.top
                     anchors.left: parent.left
@@ -178,7 +175,11 @@ Panel {
                     anchors.right: parent.right
                     text: qsTr('Test')
 
-                    onClicked: tester.start(input.text, output.text);
+                    onClicked: {
+                        var inputDevice = input.model.get(input.currentIndex).text;
+                        var outputDevice = output.model.get(output.currentIndex).text;
+                        tester.start(inputDevice, outputDevice);
+                    }
                 }
             }
         }

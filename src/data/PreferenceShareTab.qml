@@ -83,6 +83,7 @@ Panel {
                     anchors.bottom: parent.bottom
                     anchors.left: parent.left
                     anchors.right: placeBar.left
+                    clip: true
                     model: placeModel
 
                     delegate: CheckBox {
@@ -115,6 +116,7 @@ Panel {
                     anchors.bottom: parent.bottom
                     anchors.left: parent.left
                     anchors.right: folderBar.left
+                    clip: true
                     model: folderModel
                     visible: false
 
