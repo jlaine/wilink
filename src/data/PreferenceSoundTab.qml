@@ -27,6 +27,17 @@ Panel {
     property int testSeconds: 5
 
     function save() {
+        // devices
+        if (input.currentIndex >= 0) {
+            var device = input.model.get(input.currentIndex).text;
+            application.audioInputDeviceName = device;
+        }
+        if (output.currentIndex >= 0) {
+            var device = output.model.get(output.currentIndex).text;
+            application.audioOutputDeviceName = device;
+        }
+
+        // notifications
         application.incomingMessageSound = incomingMessageSound.checked ? ':/message-incoming.ogg' : '';
         application.outgoingMessageSound = outgoingMessageSound.checked ? ':/message-outgoing.ogg' : '';
     }
