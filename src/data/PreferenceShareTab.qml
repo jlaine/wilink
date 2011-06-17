@@ -36,6 +36,7 @@ Panel {
 
         Column {
             anchors.fill: places.contents
+            spacing: appStyle.spacing.vertical
 
             PanelHelp {
                 anchors.left: parent.left
@@ -51,16 +52,40 @@ Panel {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        height: 100
+        height: 130
         title: qsTr('Downloads folder')
 
         Column {
             anchors.fill: downloads.contents
+            spacing: appStyle.spacing.vertical
 
             PanelHelp {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 text: qsTr('Select the folder in which received files will be stored.')
+            }
+
+            Item {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                height: input.height
+
+                InputBar {
+                    id: input
+
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.right: button.left
+                    anchors.rightMargin: appStyle.spacing.horizontal
+                }
+
+                Button {
+                    id: button
+
+                    anchors.top: parent.top
+                    anchors.right: parent.right
+                    iconSource: 'album.png'
+                }
             }
         }
     }
