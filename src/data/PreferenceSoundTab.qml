@@ -47,28 +47,6 @@ Panel {
         }
     }
 
-    ListModel {
-        id: inputDevices
-
-        Component.onCompleted: {
-            var names = tester.inputDeviceNames;
-            for (var i in names) {
-                append({'text': names[i]});
-            }
-        }
-    }
-
-    ListModel {
-        id: outputDevices
-
-        Component.onCompleted: {
-            var names = tester.outputDeviceNames;
-            for (var i in names) {
-                append({'text': names[i]});
-            }
-        }
-    }
-
     GroupBox {
         id: devices
 
@@ -103,7 +81,19 @@ Panel {
 
                 anchors.left: parent.left
                 anchors.right: parent.right
-                model: outputDevices
+                model: ListModel {}
+
+                Component.onCompleted: {
+                    var names = tester.outputDeviceNames;
+                    for (var i in names) {
+                        var device = names[i];
+                        model.append({'text': device});
+                        if (device == application.audioOutputDeviceName) {
+                            console.log("found output " + device + " at " + i);
+                            output.currentIndex = i;
+                        }
+                    }
+                }
             }
 
             Row {
@@ -127,7 +117,19 @@ Panel {
 
                 anchors.left: parent.left
                 anchors.right: parent.right
-                model: inputDevices
+                model: ListModel {}
+
+                Component.onCompleted: {
+                    var names = tester.inputDeviceNames;
+                    for (var i in names) {
+                        var device = names[i];
+                        model.append({'text': device});
+                        if (device == application.audioInputDeviceName) {
+                            console.log("found input " + device + " at " + i);
+                            input.currentIndex = i;
+                        }
+                    }
+                }
             }
 
             ProgressBar {
