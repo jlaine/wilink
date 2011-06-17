@@ -105,20 +105,8 @@ Application::Application(int &argc, char **argv)
     d->settings = new QSettings(this);
     if (isInstalled() && openAtLogin())
         setOpenAtLogin(true);
-    d->audioInputDevice = QAudioDeviceInfo::defaultInputDevice();
-    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioInput)) {
-        if (info.deviceName() == d->settings->value("AudioInputDevice").toString()) {
-            d->audioInputDevice = info;
-            break;
-        }
-    }
-    d->audioOutputDevice = QAudioDeviceInfo::defaultOutputDevice();
-    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioOutput)) {
-        if (info.deviceName() == d->settings->value("AudioOutputDevice").toString()) {
-            d->audioOutputDevice = info;
-            break;
-        }
-    }
+    setAudioInputDeviceName(d->settings->value("AudioInputDevice").toString());
+    setAudioOutputDeviceName(d->settings->value("AudioOutputDevice").toString());
 
     /* initialise cache and wallet */
     const QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
@@ -517,6 +505,22 @@ void Application::setAudioInputDevice(const QAudioDeviceInfo &device)
     emit audioInputDeviceChanged(device);
 }
 
+QString Application::audioInputDeviceName() const
+{
+    return d->audioInputDevice.deviceName();
+}
+
+void Application::setAudioInputDeviceName(const QString &name)
+{
+    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioInput)) {
+        if (info.deviceName() == name) {
+            setAudioInputDevice(info);
+            return;
+        }
+    }
+    setAudioInputDevice(QAudioDeviceInfo::defaultInputDevice());
+}
+
 QAudioDeviceInfo Application::audioOutputDevice() const
 {
     return d->audioOutputDevice;
@@ -527,6 +531,22 @@ void Application::setAudioOutputDevice(const QAudioDeviceInfo &device)
     d->settings->setValue("AudioOutputDevice", device.deviceName());
     d->audioOutputDevice = device;
     emit audioOutputDeviceChanged(device);
+}
+
+QString Application::audioOutputDeviceName() const
+{
+    return d->audioOutputDevice.deviceName();
+}
+
+void Application::setAudioOutputDeviceName(const QString &name)
+{
+    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioOutput)) {
+        if (info.deviceName() == name) {
+            setAudioOutputDevice(info);
+            return;
+        }
+    }
+    setAudioOutputDevice(QAudioDeviceInfo::defaultOutputDevice());
 }
 
 QString Application::downloadsLocation() const

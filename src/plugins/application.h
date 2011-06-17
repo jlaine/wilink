@@ -45,6 +45,8 @@ class Application : public QApplication
     Q_OBJECT
     Q_PROPERTY(QString applicationName READ applicationName CONSTANT)
     Q_PROPERTY(QString applicationVersion READ applicationVersion CONSTANT)
+    Q_PROPERTY(QString audioInputDeviceName READ audioInputDeviceName WRITE setAudioInputDeviceName NOTIFY audioInputDeviceChanged)
+    Q_PROPERTY(QString audioOutputDeviceName READ audioOutputDeviceName WRITE setAudioOutputDeviceName NOTIFY audioOutputDeviceChanged)
     Q_PROPERTY(QString downloadsLocation READ downloadsLocation CONSTANT)
     Q_PROPERTY(QString incomingMessageSound READ incomingMessageSound WRITE setIncomingMessageSound NOTIFY incomingMessageSoundChanged)
     Q_PROPERTY(QString outgoingMessageSound READ outgoingMessageSound WRITE setOutgoingMessageSound NOTIFY outgoingMessageSoundChanged)
@@ -73,12 +75,19 @@ public:
 
     bool isInstalled();
 
-    // preferences
+    // sound
     QAudioDeviceInfo audioInputDevice() const;
     void setAudioInputDevice(const QAudioDeviceInfo &device);
 
     QAudioDeviceInfo audioOutputDevice() const;
     void setAudioOutputDevice(const QAudioDeviceInfo &device);
+
+    // preferences
+    QString audioInputDeviceName() const;
+    void setAudioInputDeviceName(const QString &name);
+
+    QString audioOutputDeviceName() const;
+    void setAudioOutputDeviceName(const QString &name);
 
     QString downloadsLocation() const;
 
