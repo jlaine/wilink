@@ -27,8 +27,8 @@ Rectangle {
     property alias text: label.text
     signal clicked
 
-    height: image.sourceSize.height ? 32 : 24
-    width: label.width + image.width + 2 * image.anchors.margins
+    height: button.visible ? (image.sourceSize.height ? 32 : 24) : 0
+    width: button.visible ? label.width + image.width + 2 * image.anchors.margins : 0
     border.color: '#84bde8'
     gradient: Gradient {
         GradientStop { id: stop1; position: 0.0; color: '#ffffff' }
