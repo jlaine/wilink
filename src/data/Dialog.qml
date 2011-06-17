@@ -51,6 +51,12 @@ Rectangle {
         z: -1
     }
 
+    // This MouseArea prevents clicks on items behind dialog
+    MouseArea {
+        anchors.fill: parent
+        hoverEnabled: true
+    }
+
     Rectangle {
         id: header
 
