@@ -223,6 +223,7 @@ Panel {
                 anchors.right:  parent.right
                 checked: application.incomingMessageSound.length > 0
                 text: qsTr('Incoming message')
+                onClicked: checked = !checked
             }
 
             CheckBox {
@@ -232,6 +233,7 @@ Panel {
                 anchors.right:  parent.right
                 checked: application.outgoingMessageSound.length > 0
                 text: qsTr('Outgoing message')
+                onClicked: checked = !checked
             }
         }
     }

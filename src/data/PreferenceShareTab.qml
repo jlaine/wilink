@@ -24,6 +24,8 @@ Panel {
     id: panel
 
     function save() {
+        application.sharesLocation = sharesLocation.text;
+        application.sharesDirectories = folderModel.selectedFolders;
     }
 
     color: 'transparent'
@@ -41,6 +43,7 @@ Panel {
             id: folderModel
 
             forcedFolder: application.sharesLocation
+            selectedFolders: application.sharesDirectories
         }
 
         SharePlaceModel {
@@ -74,9 +77,12 @@ Panel {
                 delegate: CheckBox {
                     height: appStyle.icon.smallSize
                     width: view.width - 1
-
+                    checked: model.checkState == 2
                     iconSource: 'album.png'
                     text: model.name
+                    onClicked: {
+                        folderModel.setCheckState(model.path, checked ? 0 : 2);
+                    }
                 }
 
                 highlight: Highlight{}
@@ -116,15 +122,16 @@ Panel {
             Item {
                 anchors.left: parent.left
                 anchors.right: parent.right
-                height: input.height
+                height: sharesLocation.height
 
                 InputBar {
-                    id: input
+                    id: sharesLocation
 
                     anchors.top: parent.top
                     anchors.left: parent.left
                     anchors.right: button.left
                     anchors.rightMargin: appStyle.spacing.horizontal
+                    text: application.sharesLocation
                 }
 
                 Button {

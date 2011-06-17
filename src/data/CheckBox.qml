@@ -72,6 +72,4 @@ Item {
         enabled: checkBox.enabled
         onClicked: checkBox.clicked()
     }
-
-    onClicked: checked = !checked
 }

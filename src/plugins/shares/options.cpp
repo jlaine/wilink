@@ -37,6 +37,7 @@ FolderModel::FolderModel(QObject *parent)
 {
     // set role names
     QHash<int, QByteArray> names;
+    names.insert(Qt::CheckStateRole, "checkState");
     names.insert(QFileSystemModel::FileNameRole, "name");
     names.insert(QFileSystemModel::FilePathRole, "path");
     setRoleNames(names);
@@ -70,6 +71,11 @@ QVariant FolderModel::data(const QModelIndex &index, int role) const
         return state;
     } else
         return QFileSystemModel::data(index, role);
+}
+
+void FolderModel::setCheckState(const QString &path, int state)
+{
+    setData(index(path), state, Qt::CheckStateRole);
 }
 
 bool FolderModel::setData(const QModelIndex &changedIndex, const QVariant &value, int role)

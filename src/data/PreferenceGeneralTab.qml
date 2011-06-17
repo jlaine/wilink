@@ -52,6 +52,7 @@ Panel {
                 checked: application.openAtLogin
                 enabled: application.isInstalled
                 text: qsTr('Open at login')
+                onClicked: checked = !checked
             }
 
             CheckBox {
@@ -61,6 +62,7 @@ Panel {
                 anchors.right:  parent.right
                 checked: application.showOfflineContacts
                 text: qsTr('Show offline contacts')
+                onClicked: checked = !checked
             }
 
             CheckBox {
@@ -70,6 +72,7 @@ Panel {
                 anchors.right:  parent.right
                 checked: application.sortContactsByStatus
                 text: qsTr('Sort contacts by status')
+                onClicked: checked = !checked
             }
         }
     }

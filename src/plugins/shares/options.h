@@ -51,6 +51,9 @@ signals:
     void forcedFolderChanged(const QString &forced);
     void selectedFoldersChanged(const QStringList &selected);
 
+public slots:
+    void setCheckState(const QString &path, int state);
+
 private:
     QString m_forced;
     QStringList m_selected;
