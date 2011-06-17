@@ -24,11 +24,13 @@ FocusScope {
 
     signal close
     signal notify(string title, string text)
+    property alias color: background.color
 
     anchors.fill: parent
     opacity: 0
 
     Rectangle {
+        id: background
         anchors.fill: parent
         z: -1
     }

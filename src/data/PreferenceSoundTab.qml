@@ -30,6 +30,8 @@ Panel {
         application.outgoingMessageSound = outgoingMessageSound.checked ? ':/message-outgoing.ogg' : '';
     }
 
+    color: 'transparent'
+
     GroupBox {
         id: devices
 
@@ -63,6 +65,7 @@ Panel {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 text: application.audioOutputDeviceName
+                elide: Text.ElideRight
             }
 
             Row {
@@ -85,6 +88,7 @@ Panel {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 text: application.audioInputDeviceName
+                elide: Text.ElideRight
             }
 
             ProgressBar {
