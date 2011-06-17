@@ -27,7 +27,13 @@ Dialog {
     title: qsTr("Preferences")
 
     onAccepted: {
-        generalOptions.save();
+        for (var i = 0; i < tabList.count; ++i) {
+            var panel = prefSwapper.findPanel(tabList.model.get(i).source);
+            if (panel) {
+                console.log("Saving " + panel);
+                panel.save()
+            }
+        }
         parent.hide();
     }
 

@@ -22,6 +22,9 @@ import QtQuick 1.0
 Panel {
     id: panel
 
+    property bool recording: false
+    property int testSeconds: 5
+
     function save() {
         application.incomingMessageSound = incomingMessageSound.checked ? ':/message-incoming.ogg' : '';
         application.outgoingMessageSound = outgoingMessageSound.checked ? ':/message-outgoing.ogg' : '';
@@ -33,7 +36,7 @@ Panel {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        height: parent.height / 2
+        height: Math.floor(parent.height * 0.6)
         title: qsTr('Sound devices')
 
         Column {
@@ -72,9 +75,50 @@ Panel {
                 }
             }
 
-            Button {
-                text: qsTr('Test')
+            ProgressBar {
+                anchors.left: parent.left
+                anchors.right: parent.right
             }
+
+            Item {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                height: 24
+
+                Text {
+                    id: label
+
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.right: button.left
+                    text: {
+                        if (state == 'recording')
+                            qsTr('Speak into the microphone for %1 seconds and check the sound level.').replace('%1', testSeconds);
+                        else if (state == 'playing')
+                            qsTr('You should now hear the sound you recorded.')
+                        else
+                            return '';
+                    }
+                    wrapMode: Text.WordWrap
+                }
+
+                Button {
+                    id: button
+
+                    anchors.top: parent.top
+                    anchors.right: parent.right
+                    text: qsTr('Test')
+                }
+            }
+
+            states: [
+                State {
+                    name: 'playing'
+                },
+                State {
+                    name: 'recording'
+                }
+            ]
         }
     }
 
