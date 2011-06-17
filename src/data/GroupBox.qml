@@ -57,7 +57,6 @@ FocusScope {
         anchors.left: parent.left
         anchors.right: parent.right
         font.bold: true
-        height: 24
         horizontalAlignment: Text.AlignHCenter
         text: box.title    
     }

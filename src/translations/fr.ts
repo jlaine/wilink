@@ -596,6 +596,25 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>PreferenceShareTab</name>
+    <message>
+        <source>Shared folders</source>
+        <translation>Dossier partagés</translation>
+    </message>
+    <message>
+        <source>Downloads folder</source>
+        <translation>Dossier de téléchargement</translation>
+    </message>
+    <message>
+        <source>Select the folders you want to share. The files you share will only be visible in your residence, they can never be accessed outside your residence.</source>
+        <translation>Sélectionnez les dossiers que vous voulez partager. Les fichiers que vous partagez ne seront visibles que dans votre résidence, il ne sont en aucun cas accessibles hors de la résidence.</translation>
+    </message>
+    <message>
+        <source>Select the folder in which received files will be stored.</source>
+        <translation>Sélectionnez le dossier qui contiendra les fichiers reçus.</translation>
+    </message>
+</context>
+<context>
     <name>PreferenceSoundTab</name>
     <message>
         <source>Incoming message</source>

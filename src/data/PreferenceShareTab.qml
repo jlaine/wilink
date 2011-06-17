@@ -25,11 +25,44 @@ Panel {
     function save() {
     }
 
-    Column {
-        id: prefs
+    GroupBox {
+        id: places
 
-        anchors.fill: parent
-        spacing: appStyle.spacing.horizontal
+        anchors.top: parent.top
+        anchors.bottom: downloads.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        title: qsTr('Shared folders')
+
+        Column {
+            anchors.fill: places.contents
+
+            PanelHelp {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                text: qsTr('Select the folders you want to share. The files you share will only be visible in your residence, they can never be accessed outside your residence.')
+            }
+        }
+    }
+
+    GroupBox {
+        id: downloads
+
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 100
+        title: qsTr('Downloads folder')
+
+        Column {
+            anchors.fill: downloads.contents
+
+            PanelHelp {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                text: qsTr('Select the folder in which received files will be stored.')
+            }
+        }
     }
 }
 
