@@ -185,10 +185,14 @@ Chat::Chat(QWidget *parent)
 
     QAction *action = fileMenu->addAction(QIcon(":/options.png"), tr("&Preferences"));
     action->setMenuRole(QAction::PreferencesRole);
-    connect(action, SIGNAL(triggered()), this, SIGNAL(showPreferences()));
+    check = connect(action, SIGNAL(triggered()),
+                    this, SIGNAL(showPreferences()));
+    Q_ASSERT(check);
 
     action = fileMenu->addAction(QIcon(":/chat.png"), tr("Chat accounts"));
-    connect(action, SIGNAL(triggered(bool)), qApp, SLOT(showAccounts()));
+    check = connect(action, SIGNAL(triggered(bool)),
+                    wApp, SLOT(showAccounts()));
+    Q_ASSERT(check);
 
     if (wApp->updatesDialog())
     {
@@ -199,7 +203,9 @@ Chat::Chat(QWidget *parent)
     action = fileMenu->addAction(QIcon(":/close.png"), tr("&Quit"));
     action->setMenuRole(QAction::QuitRole);
     action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_Q));
-    connect(action, SIGNAL(triggered(bool)), qApp, SLOT(quit()));
+    check = connect(action, SIGNAL(triggered(bool)),
+                    qApp, SLOT(quit()));
+    Q_ASSERT(check);
 
 #if 0
     /* "Edit" menu */
@@ -213,6 +219,25 @@ Chat::Chat(QWidget *parent)
     d->findAgainAction->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_G));
     d->findAgainAction->setEnabled(false);
 #endif
+
+    /* "Help" menu */
+    QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
+
+    action = helpMenu->addAction(tr("%1 FAQ").arg(qApp->applicationName()));
+#ifdef Q_OS_MAC
+    action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_Question));
+#else
+    action->setShortcut(QKeySequence(Qt::Key_F1));
+#endif
+    check = connect(action, SIGNAL(triggered(bool)),
+                    this, SLOT(showHelp()));
+    Q_ASSERT(check);
+
+    action = helpMenu->addAction(tr("About %1").arg(qApp->applicationName()));
+    action->setMenuRole(QAction::AboutRole);
+    check = connect(action, SIGNAL(triggered(bool)),
+                    this, SIGNAL(showAbout()));
+    Q_ASSERT(check);
 
     /* set up client */
     connect(d->client, SIGNAL(error(QXmppClient::Error)), this, SLOT(error(QXmppClient::Error)));
@@ -376,21 +401,6 @@ bool Chat::open(const QString &jid)
     /* connect to server */
     d->client->connectToServer(config);
 
-    /* Create "Help" menu here, so that it remains last */
-    QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
-
-    QAction *action = helpMenu->addAction(tr("%1 FAQ").arg(qApp->applicationName()));
-#ifdef Q_OS_MAC
-    action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_Question));
-#else
-    action->setShortcut(QKeySequence(Qt::Key_F1));
-#endif
-    connect(action, SIGNAL(triggered(bool)), this, SLOT(showHelp()));
-
-    action = helpMenu->addAction(tr("About %1").arg(qApp->applicationName()));
-    action->setMenuRole(QAction::AboutRole);
-    connect(action, SIGNAL(triggered(bool)), this, SLOT(showAbout()));
-
     /* load QML */
     d->rosterView->setSource(QUrl("qrc:/main.qml"));
 
@@ -401,36 +411,6 @@ void Chat::setWindowTitle(const QString &title)
 {
     d->windowTitle = title;
     QWidget::setWindowTitle(title);
-}
-
-static QLayout *aboutBox()
-{
-    QHBoxLayout *hbox = new QHBoxLayout;
-    QLabel *icon = new QLabel;
-    icon->setPixmap(QPixmap(":/wiLink-64.png"));
-    hbox->addWidget(icon);
-    hbox->addSpacing(20);
-    hbox->addWidget(new QLabel(QString("<p style=\"font-size: xx-large;\">%1</p>"
-        "<p style=\"font-size: large;\">%2</p>")
-        .arg(qApp->applicationName(),
-            QString("version %1").arg(qApp->applicationVersion()))));
-    return hbox;
-}
-
-/** Display an "about" dialog.
- */
-void Chat::showAbout()
-{
-    QDialog dlg;
-    dlg.setWindowTitle(tr("About %1").arg(qApp->applicationName()));
-
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->addLayout(aboutBox());
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok);
-    connect(buttonBox, SIGNAL(accepted()), &dlg, SLOT(accept()));
-    layout->addWidget(buttonBox);
-    dlg.setLayout(layout);
-    dlg.exec();
 }
 
 /** Display the help web page.

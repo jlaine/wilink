@@ -105,6 +105,7 @@ if(RELOAD_TRANSLATIONS)
     qt4_create_translation(QM_FILES
         ${wiLink_SOURCES}
         data/main.qml
+        data/AboutDialog.qml
         data/CallWidget.qml
         data/ChatPanel.qml
         data/ContactAddDialog.qml

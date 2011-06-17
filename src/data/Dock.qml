@@ -150,10 +150,6 @@ Rectangle {
                 dialogLoader.show();
             }
 
-            Connections {
-                target: window
-                onShowPreferences: preferenceButton.clicked()
-            }
         }
 
         DockButton {
@@ -186,6 +182,17 @@ Rectangle {
                 swapper.showPanel('DiscoveryPanel.qml');
             }
         }
+    }
+
+    Connections {
+        target: window
+
+        onShowAbout: {
+            dialogLoader.source = 'AboutDialog.qml';
+            dialogLoader.show();
+        }
+
+        onShowPreferences: preferenceButton.clicked()
     }
 
     Keys.onPressed: {

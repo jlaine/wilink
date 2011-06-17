@@ -2,6 +2,17 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="fr_FR">
 <context>
+    <name>AboutDialog</name>
+    <message>
+        <source>About %1</source>
+        <translation>À propos de %1</translation>
+    </message>
+    <message>
+        <source>version %1</source>
+        <translation>version %1</translation>
+    </message>
+</context>
+<context>
     <name>Application</name>
     <message>
         <source>&amp;Quit</source>

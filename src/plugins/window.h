@@ -52,6 +52,7 @@ public:
 
 signals:
     void isActiveWindowChanged();
+    void showAbout();
     void showPreferences();
 
 public slots:
@@ -63,7 +64,6 @@ private slots:
     void error(QXmppClient::Error error);
     void pendingMessages(int messages);
     void promptCredentials();
-    void showAbout();
     void showHelp();
 
 protected:
