@@ -26,6 +26,10 @@ Dialog {
     minimumWidth: 360
     title: qsTr("Preferences")
 
+    function showPanel(source) {
+        prefSwapper.showPanel(source);
+    }
+
     onAccepted: {
         for (var i = 0; i < tabList.count; ++i) {
             var panel = prefSwapper.findPanel(tabList.model.get(i).source);

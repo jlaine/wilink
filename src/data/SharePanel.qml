@@ -51,7 +51,11 @@ Panel {
                 iconSource: 'options.png'
                 text: qsTr('Options')
 
-                onClicked: window.showPreferences('shares')
+                onClicked: {
+                    dialogLoader.source = 'PreferenceDialog.qml';
+                    dialogLoader.item.showPanel('PreferenceShareTab.qml');
+                    dialogLoader.show();
+                }
             }
         }
     }
