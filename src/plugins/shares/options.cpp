@@ -36,6 +36,15 @@
 FolderModel::FolderModel(QObject *parent)
     : QFileSystemModel(parent)
 {
+    // set role names
+    QHash<int, QByteArray> names;
+    names.insert(QFileSystemModel::FileNameRole, "name");
+    names.insert(QFileSystemModel::FilePathRole, "path");
+    setRoleNames(names);
+
+    setFilter(QDir::Dirs | QDir::Drives | QDir::NoDotAndDotDot);
+    setRootPath(QDir::rootPath());
+    setReadOnly(true);
 }
 
 QVariant FolderModel::data(const QModelIndex &index, int role) const
@@ -106,6 +115,8 @@ bool FolderModel::setData(const QModelIndex &changedIndex, const QVariant &value
         emit dataChanged(
             index(0, 0, changedIndex),
             index(rowCount(changedIndex), columnCount(changedIndex), changedIndex));
+
+        emit selectedFoldersChanged(m_selected);
         return true;
     } else
         return false;
@@ -116,6 +127,11 @@ Qt::ItemFlags FolderModel::flags(const QModelIndex &index) const
     Qt::ItemFlags flags = QFileSystemModel::flags(index);
     flags |= Qt::ItemIsUserCheckable;
     return flags;
+}
+
+QString FolderModel::forcedFolder() const
+{
+    return m_forced;
 }
 
 void FolderModel::setForcedFolder(const QString &forced)
@@ -136,6 +152,7 @@ void FolderModel::setForcedFolder(const QString &forced)
         {
             changed << currentPath;
             m_selected.removeAt(i);
+            emit selectedFoldersChanged(m_selected);
         }
     }
 
@@ -147,6 +164,7 @@ void FolderModel::setForcedFolder(const QString &forced)
         QModelIndex idx = index(changedPath);
         emit dataChanged(idx, idx);
     }
+    emit forcedFolderChanged(m_forced);
 }
 
 QStringList FolderModel::selectedFolders() const
@@ -236,12 +254,23 @@ void PlaceModel::sourceDataChanged(const QModelIndex &topLeft, const QModelIndex
         emit dataChanged(proxyTopLeft, proxyBottomRight);
 }
 
-void PlaceModel::setSourceModel(QFileSystemModel *sourceModel)
+FolderModel *PlaceModel::sourceModel() const
 {
-    m_fsModel = sourceModel;
-    connect(m_fsModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
-            this, SLOT(sourceDataChanged(QModelIndex,QModelIndex)));
-    QAbstractProxyModel::setSourceModel(sourceModel);
+    return m_fsModel;
+}
+
+void PlaceModel::setSourceModel(FolderModel *sourceModel)
+{
+    if (sourceModel != m_fsModel) {
+        m_fsModel = sourceModel;
+
+        if (m_fsModel) {
+            connect(m_fsModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
+                    this, SLOT(sourceDataChanged(QModelIndex,QModelIndex)));
+            QAbstractProxyModel::setSourceModel(m_fsModel);
+        }
+        emit sourceModelChanged(m_fsModel);
+    }
 }
 
 ShareOptions::ShareOptions(QXmppShareDatabase *database)
@@ -257,11 +286,8 @@ ShareOptions::ShareOptions(QXmppShareDatabase *database)
 
     // full view
     m_fsModel = new FolderModel(this);
-    m_fsModel->setFilter(QDir::Dirs | QDir::Drives | QDir::NoDotAndDotDot);
     m_fsModel->setForcedFolder(m_database->directory());
     m_fsModel->setSelectedFolders(m_database->mappedDirectories());
-    m_fsModel->setRootPath(QDir::rootPath());
-    m_fsModel->setReadOnly(true);
     m_fsView = new QTreeView;
     m_fsView->setModel(m_fsModel);
     m_fsView->setColumnHidden(1, true);

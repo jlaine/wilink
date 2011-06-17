@@ -18,6 +18,7 @@
  */
 
 import QtQuick 1.0
+import wiLink 1.2
 
 Panel {
     id: panel
@@ -33,6 +34,16 @@ Panel {
         anchors.left: parent.left
         anchors.right: parent.right
         title: qsTr('Shared folders')
+
+        ShareFolderModel {
+            id: folderModel
+        }
+
+        SharePlaceModel {
+            id: placeModel
+
+            sourceModel: folderModel
+        }
 
         Item {
             anchors.fill: places.contents
@@ -54,15 +65,29 @@ Panel {
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 anchors.right: scrollBar.left
+                model: placeModel
 
-                model: ListModel {
-                    ListElement { name: 'Foo' }
-                    ListElement { name: 'Bar' }
-                    ListElement { name: 'Wiz' }
-                }
+                delegate: Item {
+                    height: appStyle.icon.smallSize
+                    width: view.width - 1
 
-                delegate: Text {
-                    text: model.name
+                    Image {
+                        id: image
+
+                        anchors.left: parent.left
+                        anchors.top: parent.top
+                        height: appStyle.icon.smallSize
+                        width: appStyle.icon.smallSize
+                        source: 'album.png'
+                    }
+
+                    Text {
+                        anchors.left: image.right
+                        anchors.leftMargin: appStyle.spacing.horizontal
+                        anchors.right: parent.right
+                        anchors.verticalCenter: parent.verticalCenter
+                        text: model.name
+                    }
                 }
             }
 
