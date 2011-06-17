@@ -64,39 +64,107 @@ Panel {
                 text: qsTr('Select the folders you want to share. The files you share will only be visible in your residence, they can never be accessed outside your residence.')
             }
 
-            ListView {
-                id: view
+            Item {
+                id: toggle
 
                 anchors.top: help.bottom
                 anchors.topMargin: appStyle.spacing.vertical
-                anchors.bottom: parent.bottom
+                anchors.bottom: placeButton.top
+                anchors.bottomMargin: appStyle.spacing.vertical
                 anchors.left: parent.left
-                anchors.right: scrollBar.left
-                model: placeModel
+                anchors.leftMargin: appStyle.spacing.horizontal
+                anchors.right: parent.right
+                anchors.rightMargin: appStyle.spacing.horizontal
 
-                delegate: CheckBox {
-                    height: appStyle.icon.smallSize
-                    width: view.width - 1
-                    checked: model.checkState == 2
-                    iconSource: 'album.png'
-                    text: model.name
-                    onClicked: {
-                        folderModel.setCheckState(model.path, checked ? 0 : 2);
+                ListView {
+                    id: placeView
+
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+                    anchors.left: parent.left
+                    anchors.right: placeBar.left
+                    model: placeModel
+
+                    delegate: CheckBox {
+                        height: appStyle.icon.smallSize
+                        width: placeView.width - 1
+                        checked: model.checkState == 2
+                        iconSource: 'album.png'
+                        text: model.name
+                        onClicked: {
+                            folderModel.setCheckState(model.path, checked ? 0 : 2);
+                        }
                     }
+
+                    highlight: Highlight{}
                 }
 
-                highlight: Highlight{}
+                ScrollBar {
+                    id: placeBar
+
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+                    anchors.right: parent.right
+                    flickableItem: placeView
+                }
+
+                ListView {
+                    id: folderView
+
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+                    anchors.left: parent.left
+                    anchors.right: folderBar.left
+                    model: folderModel
+                    visible: false
+
+                    delegate: CheckBox {
+                        height: appStyle.icon.smallSize
+                        width: folderView.width - 1
+                        checked: model.checkState == 2
+                        iconSource: 'album.png'
+                        text: model.name
+                        onClicked: {
+                            folderModel.setCheckState(model.path, checked ? 0 : 2);
+                        }
+                    }
+
+                }
+
+                ScrollBar {
+                    id: folderBar
+
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+                    anchors.right: parent.right
+                    flickableItem: folderView
+                    visible: false
+                }
             }
 
-            ScrollBar {
-                id: scrollBar
+            Button {
+                id: placeButton
 
-                anchors.top: help.bottom
-                anchors.topMargin: appStyle.spacing.vertical
+                property string moreString: qsTr('More folders..')
+                property string lessString: qsTr('Fewer folders..')
+
                 anchors.bottom: parent.bottom
                 anchors.right: parent.right
-                flickableItem: view
+                text: moreString
+
+                onClicked: {
+                    places.state = (places.state == '') ? 'folders': ''
+                }
             }
+        }
+
+        states: State {
+            name: 'folders'
+            PropertyChanges { target: folderView; visible: true }
+            PropertyChanges { target: folderBar; visible: true }
+            PropertyChanges { target: placeView; visible: false }
+            PropertyChanges { target: placeBar; visible: false }
+            PropertyChanges { target: placeButton; text: placeButton.lessString }
         }
     }
 
