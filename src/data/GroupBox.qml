@@ -38,12 +38,25 @@ FocusScope {
         radius: 8
     }
 
+    Rectangle {
+        id: header
+
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.margins: 1
+        color: '#9fb7dd'
+        height: textItem.paintedHeight
+        radius: 8
+    }
+
     Text {
         id: textItem
 
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
+        font.bold: true
         height: 24
         horizontalAlignment: Text.AlignHCenter
         text: box.title    
