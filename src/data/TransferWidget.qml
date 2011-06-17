@@ -86,7 +86,7 @@ Item {
             iconSource: 'file.png'
             text: qsTr('Open')
             //visible: job && job.state == QXmppTransferJob.FinishedState && job.error == QXmppTransferJob.NoError
-            visible: Qt.isQtObject(job) && job.state == QXmppTransferJob.FinishedState
+            visible: Qt.isQtObject(job) && job.state == QXmppTransferJob.FinishedState && job.direction == QXmppTransferJob.IncomingDirection
 
             onClicked: Qt.openUrlExternally(job.localFileUrl)
         }
