@@ -30,6 +30,8 @@ Panel {
         application.outgoingMessageSound = outgoingMessageSound.checked ? ':/message-outgoing.ogg' : '';
     }
 
+    color: 'transparent'
+
     GroupBox {
         id: devices
 
