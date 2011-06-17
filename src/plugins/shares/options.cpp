@@ -42,7 +42,7 @@ ShareOptions::ShareOptions()
     vbox->addWidget(sharesLabel);
 
     // full view
-    m_fsModel = new FolderModel(this);
+    m_fsModel = new ShareFolderModel(this);
     m_fsModel->setForcedFolder(wApp->sharesLocation());
     m_fsModel->setSelectedFolders(wApp->sharesDirectories());
     m_fsView = new QTreeView;
@@ -54,7 +54,7 @@ ShareOptions::ShareOptions()
     vbox->addWidget(m_fsView);
 
     // simple view
-    m_placesModel = new PlaceModel(this);
+    m_placesModel = new SharePlaceModel(this);
     m_placesModel->setSourceModel(m_fsModel);
     m_placesView = new QTreeView;
     m_placesView->setModel(m_placesModel);

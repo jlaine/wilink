@@ -22,8 +22,8 @@
 
 #include "plugins/preferences.h"
 
-class FolderModel;
-class PlaceModel;
+class ShareFolderModel;
+class SharePlaceModel;
 class QLineEdit;
 class QTreeView;
 
@@ -51,9 +51,9 @@ private:
     QPushButton *m_moreButton;
     QPushButton *m_fewerButton;
     QLineEdit *m_directoryEdit;
-    PlaceModel *m_placesModel;
+    SharePlaceModel *m_placesModel;
     QTreeView *m_placesView;
-    FolderModel *m_fsModel;
+    ShareFolderModel *m_fsModel;
     QTreeView *m_fsView;
 };
 

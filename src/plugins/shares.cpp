@@ -882,7 +882,7 @@ void ShareQueueModel::_q_transferFinished()
     d->process();
 }
 
-FolderModel::FolderModel(QObject *parent)
+ShareFolderModel::ShareFolderModel(QObject *parent)
     : QFileSystemModel(parent)
 {
     // set role names
@@ -897,7 +897,7 @@ FolderModel::FolderModel(QObject *parent)
     setReadOnly(true);
 }
 
-QVariant FolderModel::data(const QModelIndex &index, int role) const
+QVariant ShareFolderModel::data(const QModelIndex &index, int role) const
 {
     if (role == Qt::CheckStateRole && index.isValid() && !index.column())
     {
@@ -923,12 +923,12 @@ QVariant FolderModel::data(const QModelIndex &index, int role) const
         return QFileSystemModel::data(index, role);
 }
 
-void FolderModel::setCheckState(const QString &path, int state)
+void ShareFolderModel::setCheckState(const QString &path, int state)
 {
     setData(index(path), state, Qt::CheckStateRole);
 }
 
-bool FolderModel::setData(const QModelIndex &changedIndex, const QVariant &value, int role)
+bool ShareFolderModel::setData(const QModelIndex &changedIndex, const QVariant &value, int role)
 {
     if (role == Qt::CheckStateRole && changedIndex.isValid() && !changedIndex.column())
     {
@@ -977,19 +977,19 @@ bool FolderModel::setData(const QModelIndex &changedIndex, const QVariant &value
         return false;
 }
 
-Qt::ItemFlags FolderModel::flags(const QModelIndex &index) const
+Qt::ItemFlags ShareFolderModel::flags(const QModelIndex &index) const
 {
     Qt::ItemFlags flags = QFileSystemModel::flags(index);
     flags |= Qt::ItemIsUserCheckable;
     return flags;
 }
 
-QString FolderModel::forcedFolder() const
+QString ShareFolderModel::forcedFolder() const
 {
     return m_forced;
 }
 
-void FolderModel::setForcedFolder(const QString &forced)
+void ShareFolderModel::setForcedFolder(const QString &forced)
 {
     if (forced == m_forced)
         return;
@@ -1022,17 +1022,17 @@ void FolderModel::setForcedFolder(const QString &forced)
     emit forcedFolderChanged(m_forced);
 }
 
-QStringList FolderModel::selectedFolders() const
+QStringList ShareFolderModel::selectedFolders() const
 {
     return m_selected;
 }
 
-void FolderModel::setSelectedFolders(const QStringList &selected)
+void ShareFolderModel::setSelectedFolders(const QStringList &selected)
 {
     m_selected = selected;
 }
 
-PlaceModel::PlaceModel(QObject *parent)
+SharePlaceModel::SharePlaceModel(QObject *parent)
     : QAbstractProxyModel(parent)
 {
     QList<QDesktopServices::StandardLocation> locations;
@@ -1050,7 +1050,7 @@ PlaceModel::PlaceModel(QObject *parent)
     }
 }
 
-QModelIndex PlaceModel::index(int row, int column, const QModelIndex& parent) const
+QModelIndex SharePlaceModel::index(int row, int column, const QModelIndex& parent) const
 {
     if (parent.isValid() || row < 0 || row >= m_paths.size())
         return QModelIndex();
@@ -1058,17 +1058,17 @@ QModelIndex PlaceModel::index(int row, int column, const QModelIndex& parent) co
     return createIndex(row, column, 0);
 }
 
-QModelIndex PlaceModel::parent(const QModelIndex &index) const
+QModelIndex SharePlaceModel::parent(const QModelIndex &index) const
 {
     return QModelIndex();
 }
 
-int PlaceModel::columnCount(const QModelIndex &parent) const
+int SharePlaceModel::columnCount(const QModelIndex &parent) const
 {
     return 1;
 }
 
-int PlaceModel::rowCount(const QModelIndex &parent) const
+int SharePlaceModel::rowCount(const QModelIndex &parent) const
 {
     if (parent.isValid())
         return 0;
@@ -1076,7 +1076,7 @@ int PlaceModel::rowCount(const QModelIndex &parent) const
         return m_paths.size();
 }
 
-QModelIndex PlaceModel::mapFromSource(const QModelIndex &sourceIndex) const
+QModelIndex SharePlaceModel::mapFromSource(const QModelIndex &sourceIndex) const
 {
     if (!sourceIndex.isValid())
         return QModelIndex();
@@ -1089,7 +1089,7 @@ QModelIndex PlaceModel::mapFromSource(const QModelIndex &sourceIndex) const
         return createIndex(row, sourceIndex.column(), 0);
 }
 
-QModelIndex PlaceModel::mapToSource(const QModelIndex &proxyIndex) const
+QModelIndex SharePlaceModel::mapToSource(const QModelIndex &proxyIndex) const
 {
     if (!proxyIndex.isValid())
         return QModelIndex();
@@ -1101,7 +1101,7 @@ QModelIndex PlaceModel::mapToSource(const QModelIndex &proxyIndex) const
         return m_fsModel->index(m_paths.at(row));
 }
 
-void PlaceModel::sourceDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
+void SharePlaceModel::sourceDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
 {
     QModelIndex proxyTopLeft = mapFromSource(topLeft);
     QModelIndex proxyBottomRight = mapFromSource(bottomRight);
@@ -1109,12 +1109,12 @@ void PlaceModel::sourceDataChanged(const QModelIndex &topLeft, const QModelIndex
         emit dataChanged(proxyTopLeft, proxyBottomRight);
 }
 
-FolderModel *PlaceModel::sourceModel() const
+ShareFolderModel *SharePlaceModel::sourceModel() const
 {
     return m_fsModel;
 }
 
-void PlaceModel::setSourceModel(FolderModel *sourceModel)
+void SharePlaceModel::setSourceModel(ShareFolderModel *sourceModel)
 {
     if (sourceModel != m_fsModel) {
         m_fsModel = sourceModel;

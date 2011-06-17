@@ -152,7 +152,7 @@ private:
     friend class ShareQueueModelPrivate;
 };
 
-class FolderModel : public QFileSystemModel
+class ShareFolderModel : public QFileSystemModel
 {
     Q_OBJECT
     Q_PROPERTY(QString forcedFolder READ forcedFolder WRITE setForcedFolder NOTIFY forcedFolderChanged)
@@ -160,7 +160,7 @@ class FolderModel : public QFileSystemModel
     Q_PROPERTY(QStringList selectedFolders READ selectedFolders WRITE setSelectedFolders NOTIFY selectedFoldersChanged)
 
 public:
-    FolderModel(QObject *parent = 0);
+    ShareFolderModel(QObject *parent = 0);
     QVariant data(const QModelIndex &index, int role) const;
     bool setData(const QModelIndex & index, const QVariant &value, int role = Qt::EditRole);
     Qt::ItemFlags flags(const QModelIndex &index) const;
@@ -183,13 +183,13 @@ private:
     QStringList m_selected;
 };
 
-class PlaceModel : public QAbstractProxyModel
+class SharePlaceModel : public QAbstractProxyModel
 {
     Q_OBJECT
-    Q_PROPERTY(FolderModel* sourceModel READ sourceModel WRITE setSourceModel NOTIFY sourceModelChanged)
+    Q_PROPERTY(ShareFolderModel* sourceModel READ sourceModel WRITE setSourceModel NOTIFY sourceModelChanged)
 
 public:
-    PlaceModel(QObject *parent = 0);
+    SharePlaceModel(QObject *parent = 0);
     QModelIndex index(int row, int column, const QModelIndex& parent) const;
     QModelIndex parent(const QModelIndex &index) const;
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
@@ -198,17 +198,17 @@ public:
     QModelIndex mapFromSource(const QModelIndex &sourceIndex) const;
     QModelIndex mapToSource(const QModelIndex &proxyIndex) const;
 
-    FolderModel *sourceModel() const;
-    void setSourceModel(FolderModel *sourceModel);
+    ShareFolderModel *sourceModel() const;
+    void setSourceModel(ShareFolderModel *sourceModel);
 
 signals:
-    void sourceModelChanged(FolderModel *sourceModel);
+    void sourceModelChanged(ShareFolderModel *sourceModel);
 
 private slots:
     void sourceDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);
 
 private:
-    FolderModel *m_fsModel;
+    ShareFolderModel *m_fsModel;
     QList<QString> m_paths;
 };
 

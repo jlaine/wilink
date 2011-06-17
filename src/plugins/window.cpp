@@ -139,8 +139,8 @@ Chat::Chat(QWidget *parent)
     qmlRegisterType<RoomListModel>("wiLink", 1, 2, "RoomListModel");
     qmlRegisterUncreatableType<ChatRosterModel>("wiLink", 1, 2, "RosterModel", "");
     qmlRegisterType<ShareModel>("wiLink", 1, 2, "ShareModel");
-    qmlRegisterType<FolderModel>("wiLink", 1, 2, "ShareFolderModel");
-    qmlRegisterType<PlaceModel>("wiLink", 1, 2, "SharePlaceModel");
+    qmlRegisterType<ShareFolderModel>("wiLink", 1, 2, "ShareShareFolderModel");
+    qmlRegisterType<SharePlaceModel>("wiLink", 1, 2, "ShareSharePlaceModel");
     qmlRegisterType<ShareQueueModel>("wiLink", 1, 2, "ShareQueueModel");
     qmlRegisterUncreatableType<QSoundPlayer>("wiLink", 1, 2, "SoundPlayer", "");
     qmlRegisterType<QSoundTester>("wiLink", 1, 2, "SoundTester");
