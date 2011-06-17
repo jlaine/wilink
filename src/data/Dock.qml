@@ -144,7 +144,7 @@ Rectangle {
         DockButton {
             iconSource: 'options.png'
             text: qsTr('Preferences')
-            visible: false
+            visible: true
             onClicked: {
                 dialogLoader.source = 'PreferenceDialog.qml';
                 dialogLoader.show();

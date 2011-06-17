@@ -55,7 +55,7 @@ Dialog {
                 }
             }
             delegate: Row {
-                spacing: 4
+                spacing: appStyle.verticalSpacing
 
                 Image {
                     anchors.verticalCenter: parent.verticalCenter
@@ -78,28 +78,46 @@ Dialog {
             anchors.right: parent.right
 
             function save() {
-                application.showOfflineContacts = check.checked
+                if (openAtLogin.enabled)
+                    application.openAtLogin = openAtLogin.checked;
+                application.showOfflineContacts = showOfflineContacts.checked;
+                application.sortContactsByStatus = sortContactsByStatus.checked;
             }
 
-            Row {
+            Column {
                 id: prefs
 
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.right: parent.right
-                spacing: 4
+                spacing: appStyle.horizontalSpacing
 
                 CheckBox {
-                    id: check
+                    id: openAtLogin
 
-                    anchors.verticalCenter: parent.verticalCenter
-                    checked: application.showOfflineContacts
-                    onClicked: check.checked = !check.checked
+                    anchors.left: parent.left
+                    anchors.right:  parent.right
+                    checked: application.openAtLogin
+                    enabled: application.isInstalled
+                    text: qsTr('Open at login')
                 }
 
-                Text {
-                    anchors.verticalCenter: parent.verticalCenter
+                CheckBox {
+                    id: showOfflineContacts
+
+                    anchors.left: parent.left
+                    anchors.right:  parent.right
+                    checked: application.showOfflineContacts
                     text: qsTr('Show offline contacts')
+                }
+
+                CheckBox {
+                    id: sortContactsByStatus
+
+                    anchors.left: parent.left
+                    anchors.right:  parent.right
+                    checked: application.sortContactsByStatus
+                    text: qsTr('Sort contacts by status')
                 }
             }
 

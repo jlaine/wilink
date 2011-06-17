@@ -19,22 +19,45 @@
 
 import QtQuick 1.0
 
-Rectangle {
+Item {
     id: checkBox
 
     signal clicked
-    property bool checked
+    property bool checked: false
+    property bool enabled: true
+    property string text
 
-    border.width: 1
-    border.color: '#ffb0c4de'
-    color: checked ? '#597fbe' : 'white'
-    radius: 6
-    width: 12
-    height: 12
+    height: textItem.paintedHeight
+
+    Rectangle {
+        id: rect
+
+        anchors.left:  parent.left
+        anchors.verticalCenter: parent.verticalCenter
+        border.width: 1
+        border.color: '#ffb0c4de'
+        color: checked ? '#597fbe' : 'white'
+        radius: 6
+        width: 12
+        height: 12
+    }
+
+    Text {
+        id: textItem
+
+        anchors.left: rect.right
+        anchors.leftMargin: appStyle.horizontalSpacing
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        elide: Text.ElideRight
+        text: checkBox.text
+    }
 
     MouseArea {
         anchors.fill: parent
+        enabled: checkBox.enabled
         onClicked: checkBox.clicked()
     }
-}
 
+    onClicked: checked = !checked
+}

@@ -575,6 +575,14 @@ Acceptez-vous?</translation>
         <source>Show offline contacts</source>
         <translation>Afficher les contacts déconnectés</translation>
     </message>
+    <message>
+        <source>Sort contacts by status</source>
+        <translation>Trier les contacts par état</translation>
+    </message>
+    <message>
+        <source>Open at login</source>
+        <translation>Ouvrir au démarrage</translation>
+    </message>
 </context>
 <context>
     <name>RoomInviteDialog</name>
