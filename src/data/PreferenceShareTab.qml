@@ -34,14 +34,46 @@ Panel {
         anchors.right: parent.right
         title: qsTr('Shared folders')
 
-        Column {
+        Item {
             anchors.fill: places.contents
-            spacing: appStyle.spacing.vertical
 
             PanelHelp {
+                id: help
+
+                anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.right: parent.right
                 text: qsTr('Select the folders you want to share. The files you share will only be visible in your residence, they can never be accessed outside your residence.')
+            }
+
+            ListView {
+                id: view
+
+                anchors.top: help.bottom
+                anchors.topMargin: appStyle.spacing.vertical
+                anchors.bottom: parent.bottom
+                anchors.left: parent.left
+                anchors.right: scrollBar.left
+
+                model: ListModel {
+                    ListElement { name: 'Foo' }
+                    ListElement { name: 'Bar' }
+                    ListElement { name: 'Wiz' }
+                }
+
+                delegate: Text {
+                    text: model.name
+                }
+            }
+
+            ScrollBar {
+                id: scrollBar
+
+                anchors.top: help.bottom
+                anchors.topMargin: appStyle.spacing.vertical
+                anchors.bottom: parent.bottom
+                anchors.right: parent.right
+                flickableItem: view
             }
         }
     }
