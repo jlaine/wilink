@@ -37,6 +37,8 @@ Panel {
 
         ShareFolderModel {
             id: folderModel
+
+            forcedFolder: application.sharesLocation
         }
 
         SharePlaceModel {

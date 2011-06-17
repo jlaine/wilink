@@ -19,7 +19,6 @@
 
 #include <QCoreApplication>
 #include <QDesktopServices>
-#include <QSettings>
 #include <QTimer>
 
 #include "QDjango.h"
@@ -30,6 +29,7 @@
 #include "QXmppTransferManager.h"
 #include "QXmppUtils.h"
 
+#include "application.h"
 #include "client.h"
 #include "utils.h"
 #include "roster.h"
@@ -319,17 +319,14 @@ QXmppShareDatabase *ShareModel::database()
         // drop wiLink <= 0.9.4 table
         sharesDb.exec("DROP TABLE files");
 
-        // sanitize settings
-        QSettings settings;
-        QString sharesDirectory = settings.value("SharesLocation",  QDir::home().filePath("Public")).toString();
-        if (sharesDirectory.endsWith("/"))
-            sharesDirectory.chop(1);
-        QStringList mappedDirectories = settings.value("SharesDirectories").toStringList();
-
         // create shares database
         globalDatabase = new QXmppShareDatabase;
-        globalDatabase->setDirectory(sharesDirectory);
-        globalDatabase->setMappedDirectories(mappedDirectories);
+        globalDatabase->setDirectory(wApp->sharesLocation());
+        globalDatabase->setMappedDirectories(wApp->sharesDirectories());
+        connect(wApp, SIGNAL(sharesDirectoriesChanged(QStringList)),
+                globalDatabase, SLOT(setMappedDirectories(QStringList)));
+        connect(wApp, SIGNAL(sharesLocationChanged(QString)),
+                globalDatabase, SLOT(setDirectory(QString)));
         qAddPostRoutine(closeDatabase);
     }
     return globalDatabase;

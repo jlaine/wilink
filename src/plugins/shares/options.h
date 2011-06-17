@@ -27,7 +27,6 @@
 
 class QLineEdit;
 class QTreeView;
-class QXmppShareDatabase;
 
 class FolderModel : public QFileSystemModel
 {
@@ -93,7 +92,7 @@ class ShareOptions : public ChatPreferencesTab
     Q_OBJECT
 
 public:
-    ShareOptions(QXmppShareDatabase *database);
+    ShareOptions();
     bool save();
 
 protected:
@@ -109,7 +108,6 @@ private slots:
 private:
     QPushButton *m_moreButton;
     QPushButton *m_fewerButton;
-    QXmppShareDatabase *m_database;
     QLineEdit *m_directoryEdit;
     PlaceModel *m_placesModel;
     QTreeView *m_placesView;

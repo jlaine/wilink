@@ -564,6 +564,35 @@ QString Application::downloadsLocation() const
     return QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation);
 }
 
+QStringList Application::sharesDirectories() const
+{
+    return d->settings->value("SharesDirectories").toStringList();
+}
+
+void Application::setSharesDirectories(const QStringList &directories)
+{
+    if (directories != sharesDirectories()) {
+        d->settings->setValue("SharesDirectories", directories);
+        emit sharesDirectoriesChanged(sharesDirectories());
+    }
+}
+
+QString Application::sharesLocation() const
+{
+    QString sharesDirectory = d->settings->value("SharesLocation",  QDir::home().filePath("Public")).toString();
+    if (sharesDirectory.endsWith("/"))
+        sharesDirectory.chop(1);
+    return sharesDirectory;
+}
+
+void Application::setSharesLocation(const QString &location)
+{
+    if (location != sharesLocation()) {
+        d->settings->setValue("SharesLocation", location);
+        emit sharesLocationChanged(sharesLocation());
+    }
+}
+
 #ifdef USE_LIBNOTIFY
 static void notificationClicked(NotifyNotification *notification, char *action, gpointer data)
 {

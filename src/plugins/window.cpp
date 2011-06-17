@@ -454,7 +454,7 @@ void Chat::showPreferences(const QString &focusTab)
 
     dialog->addTab(new ChatOptions);
     dialog->addTab(new SoundOptions);
-    dialog->addTab(new ShareOptions(ShareModel::database()));
+    dialog->addTab(new ShareOptions);
 
     dialog->setCurrentTab(focusTab);
 #ifdef WILINK_EMBEDDED

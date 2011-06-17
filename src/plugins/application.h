@@ -53,6 +53,8 @@ class Application : public QApplication
     Q_PROPERTY(bool isInstalled READ isInstalled CONSTANT)
     Q_PROPERTY(bool openAtLogin READ openAtLogin WRITE setOpenAtLogin NOTIFY openAtLoginChanged)
     Q_PROPERTY(bool sharesConfigured READ sharesConfigured WRITE setSharesConfigured NOTIFY sharesConfiguredChanged)
+    Q_PROPERTY(QStringList sharesDirectories READ sharesDirectories WRITE setSharesDirectories NOTIFY sharesDirectoriesChanged)
+    Q_PROPERTY(QString sharesLocation READ sharesLocation WRITE setSharesLocation NOTIFY sharesLocationChanged)
     Q_PROPERTY(bool showOfflineContacts READ showOfflineContacts WRITE setShowOfflineContacts NOTIFY showOfflineContactsChanged)
     Q_PROPERTY(bool sortContactsByStatus READ sortContactsByStatus WRITE setSortContactsByStatus NOTIFY sortContactsByStatusChanged)
     Q_PROPERTY(QSoundPlayer* soundPlayer READ soundPlayer CONSTANT)
@@ -103,6 +105,12 @@ public:
     bool sharesConfigured() const;
     void setSharesConfigured(bool configured);
 
+    QStringList sharesDirectories() const;
+    void setSharesDirectories(const QStringList &directories);
+
+    QString sharesLocation() const;
+    void setSharesLocation(const QString &location);
+
     bool showOfflineContacts() const;
     void setShowOfflineContacts(bool show);
 
@@ -117,6 +125,8 @@ signals:
     void messageClicked(QObject *context);
     void openAtLoginChanged(bool run);
     void sharesConfiguredChanged(bool configured);
+    void sharesDirectoriesChanged(const QStringList &directories);
+    void sharesLocationChanged(const QString &location);
     void showOfflineContactsChanged(bool show);
     void sortContactsByStatusChanged(bool sort);
 

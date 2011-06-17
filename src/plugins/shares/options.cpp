@@ -25,12 +25,11 @@
 #include <QLineEdit>
 #include <QListWidget>
 #include <QPushButton>
-#include <QSettings>
 #include <QTimer>
 #include <QTreeView>
 
-#include "QXmppShareDatabase.h"
 
+#include "plugins/application.h"
 #include "options.h"
 
 FolderModel::FolderModel(QObject *parent)
@@ -273,8 +272,7 @@ void PlaceModel::setSourceModel(FolderModel *sourceModel)
     }
 }
 
-ShareOptions::ShareOptions(QXmppShareDatabase *database)
-    : m_database(database)
+ShareOptions::ShareOptions()
 {
     QVBoxLayout *layout = new QVBoxLayout;
     QGroupBox *sharesGroup = new QGroupBox(tr("Shared folders"));
@@ -286,8 +284,8 @@ ShareOptions::ShareOptions(QXmppShareDatabase *database)
 
     // full view
     m_fsModel = new FolderModel(this);
-    m_fsModel->setForcedFolder(m_database->directory());
-    m_fsModel->setSelectedFolders(m_database->mappedDirectories());
+    m_fsModel->setForcedFolder(wApp->sharesLocation());
+    m_fsModel->setSelectedFolders(wApp->sharesDirectories());
     m_fsView = new QTreeView;
     m_fsView->setModel(m_fsModel);
     m_fsView->setColumnHidden(1, true);
@@ -329,7 +327,7 @@ ShareOptions::ShareOptions(QXmppShareDatabase *database)
     QHBoxLayout *hbox = new QHBoxLayout;
     hbox->setMargin(0);
     m_directoryEdit = new QLineEdit;
-    m_directoryEdit->setText(m_database->directory());
+    m_directoryEdit->setText(wApp->sharesLocation());
     m_directoryEdit->setEnabled(false);
     hbox->addWidget(m_directoryEdit);
     QPushButton *directoryButton = new QPushButton;
@@ -393,12 +391,8 @@ bool ShareOptions::save()
     const QStringList mapped = m_fsModel->selectedFolders();
 
     // remember directory
-    QSettings settings;
-    settings.setValue("SharesLocation", path);
-    settings.setValue("SharesDirectories", mapped);
-
-    m_database->setDirectory(path);
-    m_database->setMappedDirectories(mapped);
+    wApp->setSharesLocation(path);
+    wApp->setSharesDirectories(mapped);
     return true;
 }
 
