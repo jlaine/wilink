@@ -125,8 +125,8 @@ Item {
                     anchors.left: parent.left
                     anchors.leftMargin: 6
                     anchors.verticalCenter: parent.verticalCenter
-                    width: 22
-                    height: 22
+                    width: appStyle.icon.smallSize
+                    height: appStyle.icon.smallSize
                     smooth: true
                     source: model.avatar
 
