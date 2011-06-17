@@ -22,11 +22,23 @@ import QtQuick 1.0
 Item {
     id: block
 
-    property alias delegate: view.delegate
     property alias model: view.model
     property alias currentIndex: view.currentIndex
 
     height: 25
+
+    Component {
+        id: comboMenu
+
+        Menu {
+            model: view.model
+            width: view.width
+
+            onItemClicked: {
+
+            }
+        }
+    }
 
     Rectangle {
         anchors.fill: parent
@@ -58,7 +70,20 @@ Item {
         anchors.leftMargin: 8
         anchors.right: eject.right
         anchors.rightMargin: 16
-        interactive: false
         clip: true
+        interactive: false
+
+        delegate: MenuDelegate {
+           width: view.width - 1
+        }
+    }
+
+    MouseArea {
+        anchors.fill: parent
+        onClicked: {
+            var pos = view.mapToItem(menuLoader.parent, 0, 0);
+            menuLoader.sourceComponent = comboMenu;
+            menuLoader.show(pos.x, pos.y);
+        }
     }
 }

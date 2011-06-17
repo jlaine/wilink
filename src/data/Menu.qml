@@ -68,56 +68,11 @@ Rectangle {
         clip: true
         model: menu.model
 
-        delegate: Rectangle {
+        delegate: MenuDelegate {
             id: menuItem
 
-            property bool enabled: model.enabled != false
-
-            color: 'transparent'
-            height: 20
-            width: menuList.width
-            radius: menu.radius
-
-            Loader {
-                id: icon
-
-                anchors.left: parent.left
-                anchors.leftMargin: 4
-                anchors.verticalCenter: parent.verticalCenter
-                opacity: menuItem.enabled ? 1 : 0.5
-                sourceComponent: menu.iconDelegate
-                width: 16
-                height: 16
-
-                onLoaded: icon.item.model = model
-            }
-
-            Text {
-                id: itemText
-
-                anchors.left: icon.right
-                anchors.leftMargin: 8
-                anchors.verticalCenter: parent.verticalCenter
-                color: menuItem.enabled ? 'black' : '#888'
-                elide: Text.ElideRight
-                text: model.text
-                width: parent.width
-            }
-
-            states: State {
-                name: 'hovered'
-                PropertyChanges { target: menuItem; color: '#eae7f4fe' }
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                enabled: menuItem.enabled
-                hoverEnabled: true
-
-                onClicked: itemClicked(index)
-                onEntered: menuItem.state = 'hovered'
-                onExited: menuItem.state = ''
-            }
+            iconDelegate: menu.iconDelegate
+            onClicked: itemClicked(index)
         }
     }
 }

@@ -104,13 +104,6 @@ Panel {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 model: outputDevices
-                delegate: Text {
-                    width: devices.width - 1
-                    height: 24
-                    elide: Text.ElideRight
-                    text: model.text
-                    verticalAlignment: Text.AlignVCenter
-                }
             }
 
             Row {
@@ -135,13 +128,6 @@ Panel {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 model: inputDevices
-                delegate: Text {
-                    width: devices.width - 1
-                    height: 24
-                    elide: Text.ElideRight
-                    text: model.text
-                    verticalAlignment: Text.AlignVCenter
-                }
             }
 
             ProgressBar {
