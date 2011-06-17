@@ -19,8 +19,8 @@
 
 import QtQuick 1.0
 
-Item {
-    id: tab
+Panel {
+    id: panel
 
     function save() {
     }

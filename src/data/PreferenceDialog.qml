@@ -44,38 +44,61 @@ Dialog {
                 ListElement {
                     avatar: 'options.png'
                     name: 'General'
+                    source: 'PreferenceGeneralTab.qml'
                 }
                 ListElement {
                     avatar: 'audio-output.png'
                     name: 'Sound'
+                    source: 'PreferenceSoundTab.qml'
                 }
                 ListElement {
                     avatar: 'share.png'
                     name: 'Shares'
+                    source: 'PreferenceShareTab.qml'
                 }
             }
-            delegate: Row {
-                spacing: appStyle.verticalSpacing
+
+            delegate: Item {
+                height: 32
+                width: tabList.width - 1
 
                 Image {
+                    id: image
+                    anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
                     source: model.avatar
                 }
 
                 Text {
+                    anchors.left: image.right
+                    anchors.leftMargin: appStyle.horizontalSpacing
                     anchors.verticalCenter: parent.verticalCenter
                     text: model.name
                 }
+
+                MouseArea {
+                    anchors.fill: parent
+                    acceptedButtons: Qt.LeftButton
+
+                    onClicked: {
+                        tabList.currentIndex = model.index;
+                        prefSwapper.showPanel(model.source);
+                    }
+                }
             }
+
+            highlight: Highlight {}
+
+            Component.onCompleted: prefSwapper.showPanel(model.get(0).source)
         }
 
-        PreferenceGeneralTab {
-            id: generalOptions
+        PanelSwapper {
+            id: prefSwapper
 
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             anchors.left: tabList.right
-            anchors.right: parent.right
+            anchors.right: parent.right 
         }
     }
 }
