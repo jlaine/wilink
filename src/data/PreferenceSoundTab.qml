@@ -23,15 +23,34 @@ Panel {
     id: panel
 
     function save() {
+        application.incomingMessageSound = incomingMessageSound.checked ? ':/message-incoming.ogg' : '';
+        application.outgoingMessageSound = outgoingMessageSound.checked ? ':/message-outgoing.ogg' : '';
     }
 
     Column {
         id: prefs
 
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
+        anchors.fill: parent
         spacing: appStyle.horizontalSpacing
+
+        CheckBox {
+            id: incomingMessageSound
+            
+            anchors.left: parent.left
+            anchors.right:  parent.right
+            checked: application.incomingMessageSound.length > 0
+            text: qsTr('Incoming message')
+        }
+
+        CheckBox {
+            id: outgoingMessageSound
+
+            anchors.left: parent.left
+            anchors.right:  parent.right
+            checked: application.outgoingMessageSound.length > 0
+            text: qsTr('Outgoing message')
+        }
+
     }
 }
 

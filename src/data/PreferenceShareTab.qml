@@ -28,9 +28,7 @@ Panel {
     Column {
         id: prefs
 
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
+        anchors.fill: parent
         spacing: appStyle.horizontalSpacing
     }
 }

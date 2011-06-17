@@ -588,6 +588,17 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>PreferenceSoundTab</name>
+    <message>
+        <source>Incoming message</source>
+        <translation>Message reçu</translation>
+    </message>
+    <message>
+        <source>Outgoing message</source>
+        <translation>Message envoyé</translation>
+    </message>
+</context>
+<context>
     <name>RoomInviteDialog</name>
     <message>
         <source>Invite your contacts</source>

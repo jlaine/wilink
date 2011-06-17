@@ -30,7 +30,6 @@ Dialog {
 
     Item {
         anchors.fill: contents
-        anchors.margins: 6
 
         ListView {
             id: tabList
@@ -98,6 +97,7 @@ Dialog {
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             anchors.left: tabList.right
+            anchors.leftMargin: 8
             anchors.right: parent.right 
         }
     }
