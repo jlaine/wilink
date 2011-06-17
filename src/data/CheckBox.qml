@@ -25,6 +25,7 @@ Item {
     signal clicked
     property bool checked: false
     property bool enabled: true
+    property string iconSource
     property string text
 
     height: textItem.paintedHeight
@@ -42,10 +43,23 @@ Item {
         height: 12
     }
 
+    Image {
+        id: image
+
+        property bool collapsed: source == ''
+
+        anchors.left: rect.right
+        anchors.leftMargin: collapsed ? 0 : appStyle.spacing.horizontal
+        anchors.top: parent.top
+        height: collapsed ? 0 : appStyle.icon.smallSize
+        width: collapsed ? 0 : appStyle.icon.smallSize
+        source: checkBox.iconSource
+    }
+
     Text {
         id: textItem
 
-        anchors.left: rect.right
+        anchors.left: image.right
         anchors.leftMargin: appStyle.spacing.horizontal
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter

@@ -67,28 +67,15 @@ Panel {
                 anchors.right: scrollBar.left
                 model: placeModel
 
-                delegate: Item {
+                delegate: CheckBox {
                     height: appStyle.icon.smallSize
                     width: view.width - 1
 
-                    Image {
-                        id: image
-
-                        anchors.left: parent.left
-                        anchors.top: parent.top
-                        height: appStyle.icon.smallSize
-                        width: appStyle.icon.smallSize
-                        source: 'album.png'
-                    }
-
-                    Text {
-                        anchors.left: image.right
-                        anchors.leftMargin: appStyle.spacing.horizontal
-                        anchors.right: parent.right
-                        anchors.verticalCenter: parent.verticalCenter
-                        text: model.name
-                    }
+                    iconSource: 'album.png'
+                    text: model.name
                 }
+
+                highlight: Highlight{}
             }
 
             ScrollBar {
