@@ -37,7 +37,6 @@ Rectangle {
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
         source: 'eject.png'
-        opacity: block.state == 'expanded' ? 0 : 1
         z: 1
     }
 
@@ -47,13 +46,5 @@ Rectangle {
         anchors.fill: parent
         interactive: false
         clip: true
-    }
-
-    states: State {
-        name: 'expanded'
-        PropertyChanges {
-            target: block
-            height: 25 * view.count
-        }
     }
 }
