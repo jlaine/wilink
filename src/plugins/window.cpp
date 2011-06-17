@@ -67,11 +67,9 @@
 #include "phone/sip.h"
 #include "photos.h"
 #include "player.h"
-#include "preferences.h"
 #include "rooms.h"
 #include "roster.h"
 #include "shares.h"
-#include "shares/options.h"
 #include "updatesdialog.h"
 #include "window.h"
 
@@ -187,7 +185,7 @@ Chat::Chat(QWidget *parent)
 
     QAction *action = fileMenu->addAction(QIcon(":/options.png"), tr("&Preferences"));
     action->setMenuRole(QAction::PreferencesRole);
-    connect(action, SIGNAL(triggered()), this, SLOT(showPreferences()));
+    connect(action, SIGNAL(triggered()), this, SIGNAL(showPreferences()));
 
     action = fileMenu->addAction(QIcon(":/chat.png"), tr("Chat accounts"));
     connect(action, SIGNAL(triggered(bool)), qApp, SLOT(showAccounts()));
@@ -441,26 +439,4 @@ void Chat::showHelp()
 {
     QDesktopServices::openUrl(QUrl(HELP_URL));
 }
-
-/** Display the preferenes dialog.
- */
-void Chat::showPreferences(const QString &focusTab)
-{
-    ChatPreferences *dialog = new ChatPreferences(this);
-    dialog->setWindowModality(Qt::WindowModal);
-
-    connect(dialog, SIGNAL(finished(int)),
-            dialog, SLOT(deleteLater()));
-
-    dialog->addTab(new ChatOptions);
-    dialog->addTab(new ShareOptions);
-
-    dialog->setCurrentTab(focusTab);
-#ifdef WILINK_EMBEDDED
-    dialog->showMaximized();
-#else
-    dialog->show();
-#endif
-}
-
 

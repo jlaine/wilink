@@ -140,12 +140,19 @@ Rectangle {
         }
 
         DockButton {
+            id: preferenceButton
+
             iconSource: 'options.png'
             text: qsTr('Preferences')
             visible: true
             onClicked: {
                 dialogLoader.source = 'PreferenceDialog.qml';
                 dialogLoader.show();
+            }
+
+            Connections {
+                target: window
+                onShowPreferences: preferenceButton.clicked()
             }
         }
 

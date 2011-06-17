@@ -63,11 +63,9 @@ set(wiLink_SOURCES
     plugins/phone/sip.cpp
     plugins/phone/stun.cpp
     plugins/player.cpp
-    plugins/preferences.cpp
     plugins/rooms.cpp
     plugins/roster.cpp
     plugins/shares.cpp
-    plugins/shares/options.cpp
     plugins/systeminfo.cpp
     plugins/utils.cpp
     plugins/updates.cpp
@@ -95,11 +93,9 @@ set(wiLink_MOC_HEADERS
     plugins/phone/sip.h
     plugins/phone/stun.h
     plugins/player.h
-    plugins/preferences.h
     plugins/rooms.h
     plugins/roster.h
     plugins/shares.h
-    plugins/shares/options.h
     plugins/updates.h
     plugins/updatesdialog.h
     plugins/window.h)

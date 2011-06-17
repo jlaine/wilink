@@ -152,33 +152,6 @@
     </message>
 </context>
 <context>
-    <name>ChatOptions</name>
-    <message>
-        <source>Open at login</source>
-        <translation>Ouvrir au démarrage</translation>
-    </message>
-    <message>
-        <source>Show offline contacts</source>
-        <translation>Afficher les contacts déconnectés</translation>
-    </message>
-    <message>
-        <source>General</source>
-        <translation>Général</translation>
-    </message>
-    <message>
-        <source>General options</source>
-        <translation>Options générales</translation>
-    </message>
-    <message>
-        <source>About %1</source>
-        <translation>À propos de %1</translation>
-    </message>
-    <message>
-        <source>Sort contacts by status</source>
-        <translation>Trier les contacts par état</translation>
-    </message>
-</context>
-<context>
     <name>ChatPanel</name>
     <message>
         <source>My rooms</source>
@@ -254,13 +227,6 @@ Acceptez-vous?</translation>
     <message>
         <source>Password required</source>
         <translation>Mot de passe requis</translation>
-    </message>
-</context>
-<context>
-    <name>ChatPreferences</name>
-    <message>
-        <source>Preferences</source>
-        <translation>Préférences</translation>
     </message>
 </context>
 <context>
@@ -782,41 +748,6 @@ Acceptez-vous?</translation>
     <message>
         <source>Chat room permissions</source>
         <translation>Permissions du salon de discussion</translation>
-    </message>
-</context>
-<context>
-    <name>ShareOptions</name>
-    <message>
-        <source>Shared folders</source>
-        <translation>Dossier partagés</translation>
-    </message>
-    <message>
-        <source>Select the folders you want to share. The files you share will only be visible in your residence, they can never be accessed outside your residence.</source>
-        <translation>Sélectionnez les dossiers que vous voulez partager. Les fichiers que vous partagez ne seront visibles que dans votre résidence, il ne sont en aucun cas accessibles hors de la résidence.</translation>
-    </message>
-    <message>
-        <source>More folders..</source>
-        <translation>Plus de dossiers..</translation>
-    </message>
-    <message>
-        <source>Fewer folders..</source>
-        <translation>Moins de dossiers..</translation>
-    </message>
-    <message>
-        <source>Downloads folder</source>
-        <translation>Dossier de téléchargement</translation>
-    </message>
-    <message>
-        <source>Select the folder in which received files will be stored.</source>
-        <translation>Sélectionnez le dossier qui contiendra les fichiers reçus.</translation>
-    </message>
-    <message>
-        <source>Shares</source>
-        <translation>Partages</translation>
-    </message>
-    <message>
-        <source>Shares folder</source>
-        <translation>Dossier de partages</translation>
     </message>
 </context>
 <context>

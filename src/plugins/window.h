@@ -52,12 +52,12 @@ public:
 
 signals:
     void isActiveWindowChanged();
+    void showPreferences();
 
 public slots:
     void alert();
     QFileDialog *fileDialog();
     QMessageBox *messageBox();
-    void showPreferences(const QString &focusTab = QString());
 
 private slots:
     void error(QXmppClient::Error error);

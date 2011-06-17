@@ -35,11 +35,9 @@ SOURCES += \
     phone/sip.cpp \
     photos.cpp \
     player.cpp \
-    preferences.cpp \
     rooms.cpp \
     roster.cpp \
     shares.cpp \
-    shares/options.cpp \
     systeminfo.cpp \
     updates.cpp \
     updatesdialog.cpp \
@@ -63,11 +61,9 @@ HEADERS += \
     player.h \
     phone/sip.h \
     phone/sip_p.h \
-    preferences.h \
     rooms.h \
     roster.h \
     shares.h \
-    shares/options.h \
     systeminfo.h \
     updates.h \
     updatesdialog.h \
