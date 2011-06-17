@@ -31,94 +31,93 @@ Item {
     height: 40
 
     Rectangle {
+        id: background
         anchors.fill: parent
-        border.color: '#2689d6'
+        border.color: '#93b9f2'
+        border.width: 1
         gradient: Gradient {
-            GradientStop { position: 0.0; color: '#e7f4fe' }
-            GradientStop { position: 0.2; color: '#bfddf4' }
-            GradientStop { position: 0.8; color: '#bfddf4' }
-            GradientStop { position: 1.0; color: '#e7f4fe' }
+            GradientStop { position: 0; color: '#e7effd' }
+            GradientStop { position: 1; color: '#cbdaf1' }
         }
-        radius: 8
-        smooth: true
+    }
 
-        Image {
-            id: icon
+    Image {
+        id: icon
 
-            width: 32; height: 32
-            anchors.left: parent.left
-            anchors.leftMargin: 4
-            anchors.verticalCenter: parent.verticalCenter
-            source: (Qt.isQtObject(job) && job.direction == QXmppTransferJob.OutgoingDirection) ? 'upload.png' : 'download.png'
-        }
+        width: 24
+        height: 24
+        anchors.left: parent.left
+        anchors.leftMargin: 4
+        anchors.verticalCenter: parent.verticalCenter
+        source: (Qt.isQtObject(job) && job.direction == QXmppTransferJob.OutgoingDirection) ? 'upload.png' : 'download.png'
+    }
 
-        ProgressBar {
-            id: progressBar
+    ProgressBar {
+        id: progressBar
 
-            anchors.left: icon.right
-            anchors.leftMargin: 4
-            anchors.right: openButton.left
-            anchors.rightMargin: 4
-            anchors.verticalCenter: parent.verticalCenter
+        anchors.left: icon.right
+        anchors.leftMargin: 4
+        anchors.right: openButton.left
+        anchors.rightMargin: 4
+        anchors.verticalCenter: parent.verticalCenter
 
-            Text {
-                anchors.fill: parent
-                elide: Text.ElideRight
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                text: {
-                    if (!job)
-                        return '';
+        Text {
+            anchors.fill: parent
+            elide: Text.ElideRight
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            text: {
+                if (!job)
+                    return '';
 
-                    var progress = Math.round(progressBar.value / progressBar.maximumValue * 100) + '%';
-                    var text = '<b>' + job.fileName + '</b>';
-                    text += ' - ';
-                    text += qsTr('%1 of %2').replace('%1', progress).replace('%2', Utils.formatSize(job.fileSize));
-                    return text;
-                }
+                var progress = Math.round(progressBar.value / progressBar.maximumValue * 100) + '%';
+                var text = '<b>' + job.fileName + '</b>';
+                text += ' - ';
+                text += qsTr('%1 of %2').replace('%1', progress).replace('%2', Utils.formatSize(job.fileSize));
+                return text;
             }
         }
+    }
 
-        Button {
-            id: openButton
+    Button {
+        id: openButton
 
-            anchors.right: cancelButton.left
-            anchors.verticalCenter: parent.verticalCenter
-            iconSource: 'file.png'
-            text: qsTr('Open')
-            //visible: job && job.state == QXmppTransferJob.FinishedState && job.error == QXmppTransferJob.NoError
-            visible: Qt.isQtObject(job) && job.state == QXmppTransferJob.FinishedState && job.direction == QXmppTransferJob.IncomingDirection
+        anchors.right: cancelButton.left
+        anchors.verticalCenter: parent.verticalCenter
+        iconSource: 'file.png'
+        text: qsTr('Open')
+        //visible: job && job.state == QXmppTransferJob.FinishedState && job.error == QXmppTransferJob.NoError
+        visible: Qt.isQtObject(job) && job.state == QXmppTransferJob.FinishedState && job.direction == QXmppTransferJob.IncomingDirection
 
-            onClicked: Qt.openUrlExternally(job.localFileUrl)
-        }
+        onClicked: Qt.openUrlExternally(job.localFileUrl)
+    }
 
-        Button {
-            id: cancelButton
+    Button {
+        id: cancelButton
 
-            anchors.right: closeButton.left
-            anchors.rightMargin: 4
-            anchors.verticalCenter: parent.verticalCenter
-            iconSource: 'remove.png'
-            text: qsTr('Cancel')
-            visible: Qt.isQtObject(job) && job.state != QXmppTransferJob.FinishedState
+        anchors.right: closeButton.left
+        anchors.rightMargin: 4
+        anchors.verticalCenter: parent.verticalCenter
+        iconSource: 'remove.png'
+        text: qsTr('Cancel')
+        visible: Qt.isQtObject(job) && job.state != QXmppTransferJob.FinishedState
 
-            onClicked: job.abort()
-        }
+        onClicked: job.abort()
+    }
 
-        Button {
-            id: closeButton
+    Button {
+        id: closeButton
 
-            anchors.right: parent.right
-            anchors.rightMargin: 4
-            anchors.verticalCenter: parent.verticalCenter
-            iconSource: 'close.png'
-            text: qsTr('Close')
-            visible: Qt.isQtObject(job) && job.state == QXmppTransferJob.FinishedState
+        anchors.right: parent.right
+        anchors.rightMargin: 4
+        anchors.verticalCenter: parent.verticalCenter
+        iconSource: 'close.png'
+        text: qsTr('Close')
+        visible: Qt.isQtObject(job) && job.state == QXmppTransferJob.FinishedState
 
-            onClicked: {
-                item.height = 0
-                item.visible = false
-            }
+        onClicked: {
+            item.height = 0
+            item.visible = false
         }
     }
 
