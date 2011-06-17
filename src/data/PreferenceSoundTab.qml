@@ -47,6 +47,28 @@ Panel {
         }
     }
 
+    ListModel {
+        id: inputDevices
+
+        Component.onCompleted: {
+            var names = tester.inputDeviceNames;
+            for (var i in names) {
+                append({'text': names[i]});
+            }
+        }
+    }
+
+    ListModel {
+        id: outputDevices
+
+        Component.onCompleted: {
+            var names = tester.outputDeviceNames;
+            for (var i in names) {
+                append({'text': names[i]});
+            }
+        }
+    }
+
     GroupBox {
         id: devices
 
@@ -76,13 +98,19 @@ Panel {
                 }
             }
 
-            Text {
+            ComboBox {
                 id: output
 
                 anchors.left: parent.left
                 anchors.right: parent.right
-                text: application.audioOutputDeviceName
-                elide: Text.ElideRight
+                model: outputDevices
+                delegate: Text {
+                    width: devices.width - 1
+                    height: 24
+                    elide: Text.ElideRight
+                    text: model.text
+                    verticalAlignment: Text.AlignVCenter
+                }
             }
 
             Row {
@@ -101,13 +129,19 @@ Panel {
                 }
             }
 
-            Text {
+            ComboBox {
                 id: input
 
                 anchors.left: parent.left
                 anchors.right: parent.right
-                text: application.audioInputDeviceName
-                elide: Text.ElideRight
+                model: inputDevices
+                delegate: Text {
+                    width: devices.width - 1
+                    height: 24
+                    elide: Text.ElideRight
+                    text: model.text
+                    verticalAlignment: Text.AlignVCenter
+                }
             }
 
             ProgressBar {

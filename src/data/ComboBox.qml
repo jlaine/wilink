@@ -19,22 +19,31 @@
 
 import QtQuick 1.0
 
-Rectangle {
+Item {
     id: block
 
     property alias delegate: view.delegate
     property alias model: view.model
     property alias currentIndex: view.currentIndex
 
-    border.width: 1
-    border.color: '#ffffff'
-    color: '#567dbc'
     height: 25
-    radius: 3
-    smooth: true
+
+    Rectangle {
+        anchors.fill: parent
+        anchors.rightMargin: 1
+        anchors.bottomMargin: 1
+        border.width: 1
+        border.color: '#ffffff'
+        color: '#567dbc'
+        radius: 3
+        smooth: true
+    }
 
     Image {
+        id: eject
+
         anchors.right: parent.right
+        anchors.rightMargin: 8
         anchors.verticalCenter: parent.verticalCenter
         source: 'eject.png'
         z: 1
@@ -43,7 +52,12 @@ Rectangle {
     ListView {
         id: view
 
-        anchors.fill: parent
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.leftMargin: 8
+        anchors.right: eject.right
+        anchors.rightMargin: 16
         interactive: false
         clip: true
     }

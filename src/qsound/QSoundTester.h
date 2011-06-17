@@ -33,10 +33,11 @@ class QSoundTester : public QObject
     Q_OBJECT
     Q_ENUMS(State)
     Q_PROPERTY(int duration READ duration CONSTANT)
+    Q_PROPERTY(QStringList inputDeviceNames READ inputDeviceNames CONSTANT)
+    Q_PROPERTY(QStringList outputDeviceNames READ outputDeviceNames CONSTANT)
     Q_PROPERTY(State state READ state NOTIFY stateChanged)
     Q_PROPERTY(int volume READ volume NOTIFY volumeChanged)
     Q_PROPERTY(int maximumVolume READ maximumVolume CONSTANT)
-
 
 public:
     enum State {
@@ -47,6 +48,8 @@ public:
 
     QSoundTester(QObject *parent = 0);
     int duration() const;
+    QStringList inputDeviceNames() const;
+    QStringList outputDeviceNames() const;
     State state() const;
     int volume() const;
     int maximumVolume() const;
