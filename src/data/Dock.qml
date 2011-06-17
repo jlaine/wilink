@@ -22,7 +22,7 @@ import 'utils.js' as Utils
 
 Rectangle {
     id: dock
-    width: 32
+    width: 40
 
     Rectangle {
         id: dockBackground
@@ -32,13 +32,10 @@ Rectangle {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.topMargin: -parent.width
-        border.color: '#597fbe'
-        border.width: 1
-
         gradient: Gradient {
-            GradientStop { position:0.0; color: '#9fb7dd' }
-            GradientStop { position:0.5; color: '#7495ca' }
-            GradientStop { position:1.0; color: '#9fb7dd' }
+            GradientStop {position: 0.1; color: '#597fbe' }
+            GradientStop {position: 0.11; color: '#7495ca'}
+            GradientStop {position: 1.0; color: '#9fb7dd'}
         }
 
         transform: Rotation {
@@ -50,7 +47,8 @@ Rectangle {
 
     Column {
         id: control
-        anchors.margins:  2
+        anchors.leftMargin: 4
+        anchors.topMargin: 4
         anchors.top: parent.top
         anchors.left: parent.left
         spacing: 5
