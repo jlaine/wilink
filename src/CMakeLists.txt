@@ -129,6 +129,9 @@ if(RELOAD_TRANSLATIONS)
         data/PhonePanel.qml
         data/PhotoPanel.qml
         data/PreferenceDialog.qml
+        data/PreferenceGeneralTab.qml
+        data/PreferenceShareTab.qml
+        data/PreferenceSoundTab.qml
         data/RoomPanel.qml
         data/SharePanel.qml
         data/ShareQueueView.qml

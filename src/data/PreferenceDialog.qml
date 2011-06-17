@@ -69,91 +69,14 @@ Dialog {
             }
         }
 
-        Item {
+        PreferenceGeneralTab {
             id: generalOptions
 
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             anchors.left: tabList.right
             anchors.right: parent.right
-
-            function save() {
-                if (openAtLogin.enabled)
-                    application.openAtLogin = openAtLogin.checked;
-                application.showOfflineContacts = showOfflineContacts.checked;
-                application.sortContactsByStatus = sortContactsByStatus.checked;
-            }
-
-            Column {
-                id: prefs
-
-                anchors.top: parent.top
-                anchors.left: parent.left
-                anchors.right: parent.right
-                spacing: appStyle.horizontalSpacing
-
-                CheckBox {
-                    id: openAtLogin
-
-                    anchors.left: parent.left
-                    anchors.right:  parent.right
-                    checked: application.openAtLogin
-                    enabled: application.isInstalled
-                    text: qsTr('Open at login')
-                }
-
-                CheckBox {
-                    id: showOfflineContacts
-
-                    anchors.left: parent.left
-                    anchors.right:  parent.right
-                    checked: application.showOfflineContacts
-                    text: qsTr('Show offline contacts')
-                }
-
-                CheckBox {
-                    id: sortContactsByStatus
-
-                    anchors.left: parent.left
-                    anchors.right:  parent.right
-                    checked: application.sortContactsByStatus
-                    text: qsTr('Sort contacts by status')
-                }
-            }
-
-            Item {
-                anchors.top: prefs.bottom
-                anchors.bottom: parent.bottom
-                anchors.left: parent.left
-                anchors.right: parent.right
-
-                Image {
-                    id: appIcon
-                    anchors.left: parent.left
-                    source: 'wiLink-64.png'
-                }
-
-                Text {
-                    id: appName
-
-                    anchors.left: appIcon.right
-                    anchors.top: appIcon.top
-                    anchors.margins: 6
-                    font.bold: true
-                    font.pixelSize: 20
-                    text: application.applicationName
-                }
-
-                Text {
-                    anchors.left: appIcon.right
-                    anchors.top: appName.bottom
-                    anchors.margins: 6
-                    font.pixelSize: 16
-                    text: qsTr('version %1').replace('%1', application.applicationVersion)
-                }
-            }
         }
-        
     }
 }
 

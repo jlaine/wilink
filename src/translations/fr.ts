@@ -567,9 +567,12 @@ Acceptez-vous?</translation>
         <source>Preferences</source>
         <translation>Préférences</translation>
     </message>
+</context>
+<context>
+    <name>PreferenceGeneralTab</name>
     <message>
-        <source>version %1</source>
-        <translation>version %1</translation>
+        <source>Open at login</source>
+        <translation>Ouvrir au démarrage</translation>
     </message>
     <message>
         <source>Show offline contacts</source>
@@ -580,8 +583,8 @@ Acceptez-vous?</translation>
         <translation>Trier les contacts par état</translation>
     </message>
     <message>
-        <source>Open at login</source>
-        <translation>Ouvrir au démarrage</translation>
+        <source>version %1</source>
+        <translation>version %1</translation>
     </message>
 </context>
 <context>
