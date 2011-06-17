@@ -76,8 +76,12 @@ Panel {
             }
 
             ProgressBar {
+                id: progressBar
+
                 anchors.left: parent.left
                 anchors.right: parent.right
+                opacity: 0
+                height: 0
             }
 
             Item {
@@ -88,17 +92,12 @@ Panel {
                 Text {
                     id: label
 
+                    property string playingText: qsTr('You should now hear the sound you recorded.')
+                    property string recordingText: qsTr('Speak into the microphone for %1 seconds and check the sound level.').replace('%1', testSeconds)
+
                     anchors.top: parent.top
                     anchors.left: parent.left
                     anchors.right: button.left
-                    text: {
-                        if (state == 'recording')
-                            qsTr('Speak into the microphone for %1 seconds and check the sound level.').replace('%1', testSeconds);
-                        else if (state == 'playing')
-                            qsTr('You should now hear the sound you recorded.')
-                        else
-                            return '';
-                    }
                     wrapMode: Text.WordWrap
                 }
 
@@ -108,17 +107,29 @@ Panel {
                     anchors.top: parent.top
                     anchors.right: parent.right
                     text: qsTr('Test')
+
+                    onClicked: devices.state = 'recording'
                 }
             }
+        }
 
-            states: [
-                State {
-                    name: 'playing'
-                },
-                State {
-                    name: 'recording'
-                }
-            ]
+        states: [
+            State {
+                name: 'playing'
+                PropertyChanges { target: progressBar; height: 16; opacity: 1 }
+                PropertyChanges { target: button; enabled: false }
+                PropertyChanges { target: label; text: label.playingText }
+            },
+            State {
+                name: 'recording'
+                PropertyChanges { target: progressBar; height: 16; opacity: 1 }
+                PropertyChanges { target: button; enabled: false }
+                PropertyChanges { target: label; text: label.recordingText }
+            }
+        ]
+
+        transitions: Transition {
+            PropertyAnimation { target: progressBar; properties: 'height'; duration: 150 }
         }
     }
 
