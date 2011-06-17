@@ -63,8 +63,8 @@ Item {
                 anchors.left: parent.left
                 anchors.top: parent.top
                 anchors.margins: 4
-                width: 24
-                height: 24
+                width: appStyle.icon.smallSize
+                height: appStyle.icon.smallSize
                 smooth: true
                 source: model.isDir ? (model.node.length ? 'album.png' : 'peer.png') : 'file.png'
 

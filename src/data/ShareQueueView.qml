@@ -45,7 +45,7 @@ Item {
         delegate: Item {
             id: item
             width: view.width - 1
-            height: 24
+            height: appStyle.icon.smallSize
 
             Image {
                 id: thumbnail
@@ -53,8 +53,8 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
                 anchors.margins: 4
-                width: 24
-                height: 24
+                width: appStyle.icon.smallSize
+                height: appStyle.icon.smallSize
                 smooth: true
                 source: model.isDir ? (model.node.length ? 'album.png' : 'peer.png') : 'file.png'
             }

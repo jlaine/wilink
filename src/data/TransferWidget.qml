@@ -44,8 +44,8 @@ Item {
     Image {
         id: icon
 
-        width: 24
-        height: 24
+        width: appStyle.icon.smallSize
+        height: appStyle.icon.smallSize
         anchors.left: parent.left
         anchors.leftMargin: 4
         anchors.verticalCenter: parent.verticalCenter

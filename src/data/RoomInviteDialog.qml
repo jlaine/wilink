@@ -63,7 +63,7 @@ Dialog {
             delegate: Item {
                 id: rect
 
-                height: 24
+                height: appStyle.icon.smallSize
                 width: parent.width - 1
 
                 function isSelected() {
@@ -85,7 +85,7 @@ Dialog {
                     id: check
 
                     anchors.left: parent.left
-                    anchors.leftMargin: 4
+                    anchors.leftMargin: appStyle.spacing.horizontal
                     anchors.verticalCenter: parent.verticalCenter
                     border.width: 1
                     border.color: '#ffb0c4de'
@@ -99,17 +99,17 @@ Dialog {
                     id: image
 
                     anchors.left: check.right
-                    anchors.leftMargin: 4
+                    anchors.leftMargin: appStyle.spacing.horizontal
                     anchors.verticalCenter: parent.verticalCenter
-                    width: 16
-                    height: 16
+                    width: appStyle.icon.smallSize
+                    height: appStyle.icon.smallSize
                     smooth: true
                     source: model.avatar
                 }
 
                 Text {
                     anchors.left: image.right
-                    anchors.leftMargin: 4
+                    anchors.leftMargin: appStyle.spacing.horizontal
                     anchors.right: status.left
                     anchors.verticalCenter: parent.verticalCenter
                     text: model.name
@@ -118,7 +118,7 @@ Dialog {
                 StatusPill {
                     id: status
                     anchors.right: parent.right
-                    anchors.rightMargin: 5
+                    anchors.rightMargin: appStyle.spacing.horizontal
                     anchors.verticalCenter: parent.verticalCenter
                     presenceStatus: model.status
                     width: 10

@@ -29,7 +29,7 @@ Item {
 
     height: 40
     state: mouseArea.pressed ? 'pressed' : (mouseArea.hovered ? 'hovered' : '')
-    width: visible ? (label.paintedWidth + 24) : 0
+    width: visible ? (label.paintedWidth + appStyle.icon.smallSize) : 0
 
     Gradient {
         id: hoverGradient
@@ -70,8 +70,8 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         opacity: button.enabled ? 1 : 0.5
         smooth: true
-        width: 24
-        height: 24
+        width: appStyle.icon.smallSize
+        height: appStyle.icon.smallSize
     }
 
     Text {

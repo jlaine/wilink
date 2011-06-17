@@ -71,7 +71,7 @@ Dialog {
 
             delegate: Rectangle {
                 width: parent.width - 1
-                height: 24
+                height: appStyle.icon.smallSize
 
                 Image {
                     id: image
@@ -79,8 +79,8 @@ Dialog {
                     anchors.left: parent.left
                     anchors.leftMargin: 4
                     anchors.verticalCenter: parent.verticalCenter
-                    width: 16
-                    height: 16
+                    width: appStyle.icon.smallSize
+                    height: appStyle.icon.smallSize
                     smooth: true
                     source: model.avatar
                 }
