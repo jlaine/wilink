@@ -865,6 +865,25 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>TransferWidget</name>
+    <message>
+        <source>%1 of %2</source>
+        <translation>%1 sur %2</translation>
+    </message>
+    <message>
+        <source>Open</source>
+        <translation>Ouvrir</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Fermer</translation>
+    </message>
+</context>
+<context>
     <name>UpdatesDialog</name>
     <message>
         <source>Changes:</source>

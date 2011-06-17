@@ -70,9 +70,10 @@ Item {
                     if (!job)
                         return '';
 
-                    var text = '<b>' + job.fileName + '</b>'
-                    text += ' - ' + Math.round(progressBar.value / progressBar.maximumValue * 100) + '%'
-                    text += qsTr(' of ') + Utils.formatSize(job.fileSize);
+                    var progress = Math.round(progressBar.value / progressBar.maximumValue * 100) + '%';
+                    var text = '<b>' + job.fileName + '</b>';
+                    text += ' - ';
+                    text += qsTr('%1 of %2').replace('%1', progress).replace('%2', Utils.formatSize(job.fileSize));
                     return text;
                 }
             }
