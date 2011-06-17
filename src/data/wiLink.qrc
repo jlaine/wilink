@@ -111,6 +111,7 @@
     <file>ShareView.qml</file>
     <file>StatusBar.qml</file>
     <file>StatusPill.qml</file>
+    <file>Style.qml</file>
     <file>ToolButton.qml</file>
     <file>TransferWidget.qml</file>
     <file>Wifirst.qml</file>

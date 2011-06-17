@@ -40,7 +40,7 @@ Panel {
 
         Column {
             anchors.fill: general.contents
-            spacing: appStyle.verticalSpacing
+            spacing: appStyle.spacing.vertical
 
             CheckBox {
                 id: openAtLogin

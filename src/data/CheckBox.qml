@@ -46,7 +46,7 @@ Item {
         id: textItem
 
         anchors.left: rect.right
-        anchors.leftMargin: appStyle.horizontalSpacing
+        anchors.leftMargin: appStyle.spacing.horizontal
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
         elide: Text.ElideRight

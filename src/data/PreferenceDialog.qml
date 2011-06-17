@@ -23,6 +23,7 @@ Dialog {
     id: dialog
 
     minimumHeight: 360
+    minimumWidth: 360
     title: qsTr("Preferences")
 
     onAccepted: {
@@ -72,7 +73,7 @@ Dialog {
 
                 Text {
                     anchors.left: image.right
-                    anchors.leftMargin: appStyle.horizontalSpacing
+                    anchors.leftMargin: appStyle.spacing.horizontal
                     anchors.verticalCenter: parent.verticalCenter
                     text: model.name
                 }

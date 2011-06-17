@@ -38,12 +38,12 @@ Panel {
 
         Column {
             anchors.fill: devices.contents
-            spacing: appStyle.verticalSpacing
+            spacing: appStyle.spacing.vertical
 
             Row {
                 anchors.left: parent.left
                 anchors.right: parent.right
-                spacing: appStyle.horizontalSpacing
+                spacing: appStyle.spacing.horizontal
 
                 Image {
                     anchors.verticalCenter: parent.verticalCenter
@@ -59,7 +59,7 @@ Panel {
             Row {
                 anchors.left: parent.left
                 anchors.right: parent.right
-                spacing: appStyle.horizontalSpacing
+                spacing: appStyle.spacing.horizontal
 
                 Image {
                     anchors.verticalCenter: parent.verticalCenter
@@ -89,7 +89,7 @@ Panel {
 
         Column {
             anchors.fill: notifications.contents
-            spacing: appStyle.verticalSpacing
+            spacing: appStyle.spacing.vertical
 
             CheckBox {
                 id: incomingMessageSound

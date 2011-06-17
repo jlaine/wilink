@@ -25,26 +25,8 @@ FocusScope {
     id: root
     focus: true
 
-    Item {
+    Style {
         id: appStyle
-
-        property alias font: fontItem
-        property int horizontalSpacing: 6
-        property int verticalSpacing: 4
-
-        opacity: 0
-
-        Item {
-            id: fontItem
-
-            property int largeSize: Math.ceil(normalSize * 1.5)
-            property int normalSize: textItem.font.pixelSize
-            property int smallSize: Math.ceil(normalSize * 0.9)
-        }
-
-        Text {
-            id: textItem
-        }
     }
 
     Dock {
