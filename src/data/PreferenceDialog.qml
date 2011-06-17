@@ -21,6 +21,8 @@ import QtQuick 1.0
 
 Dialog {
     id: dialog
+
+    minimumHeight: 360
     title: qsTr("Preferences")
 
     onAccepted: {

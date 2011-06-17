@@ -97,7 +97,7 @@ Panel {
                 anchors.top: appIcon.top
                 anchors.margins: 6
                 font.bold: true
-                font.pixelSize: 20
+                font.pixelSize: appStyle.font.largeSize
                 text: application.applicationName
             }
 
@@ -105,7 +105,6 @@ Panel {
                 anchors.left: appIcon.right
                 anchors.top: appName.bottom
                 anchors.margins: 6
-                font.pixelSize: 16
                 text: qsTr('version %1').replace('%1', application.applicationVersion)
             }
         }

@@ -37,8 +37,9 @@ FocusScope {
         Item {
             id: fontItem
 
+            property int largeSize: Math.ceil(normalSize * 1.5)
             property int normalSize: textItem.font.pixelSize
-            property int smallSize: Math.ceil((normalSize * 11) / 13)
+            property int smallSize: Math.ceil(normalSize * 0.9)
         }
 
         Text {
