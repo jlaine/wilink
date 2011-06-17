@@ -26,6 +26,8 @@ Panel {
     function save() {
     }
 
+    color: 'transparent'
+
     GroupBox {
         id: places
 
