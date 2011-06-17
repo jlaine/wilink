@@ -19,8 +19,8 @@
 
 import QtQuick 1.0
 
-Item {
-    id: tab
+Panel {
+    id: panel
 
     function save() {
     }
@@ -32,7 +32,6 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         spacing: appStyle.horizontalSpacing
-
     }
 }
 
