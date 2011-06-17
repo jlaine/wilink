@@ -19,6 +19,7 @@
 
 import QtQuick 1.0
 import QXmpp 0.4
+import 'utils.js' as Utils
 
 Item {
     property QtObject job: null
@@ -49,22 +50,30 @@ Item {
             source: (Qt.isQtObject(job) && job.direction == QXmppTransferJob.OutgoingDirection) ? 'upload.png' : 'download.png'
         }
 
-        Text {
-            id: text
-
-            anchors.left: icon.right
-            anchors.verticalCenter: parent.verticalCenter
-            text: job ? job.fileName : ''
-        }
-
         ProgressBar {
             id: progressBar
 
-            anchors.left: text.right
+            anchors.left: icon.right
             anchors.leftMargin: 4
             anchors.right: openButton.left
             anchors.rightMargin: 4
             anchors.verticalCenter: parent.verticalCenter
+
+            Text {
+                anchors.fill: parent
+                elide: Text.ElideRight
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                text: {
+                    if (!job)
+                        return '';
+
+                    var text = '<b>' + job.fileName + '</b>'
+                    text += ' - ' + Math.round(progressBar.value / progressBar.maximumValue * 100) + '%'
+                    text += qsTr(' of ') + Utils.formatSize(job.fileSize);
+                    return text;
+                }
+            }
         }
 
         Button {
