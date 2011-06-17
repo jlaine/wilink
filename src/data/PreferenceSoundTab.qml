@@ -117,6 +117,8 @@ Panel {
                 anchors.right: parent.right
                 opacity: 0
                 height: 0
+                maximumValue: tester.maximumVolume
+                value: tester.volume
             }
 
             Item {
