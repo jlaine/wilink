@@ -881,3 +881,250 @@ void ShareQueueModel::_q_transferFinished()
 
     d->process();
 }
+
+FolderModel::FolderModel(QObject *parent)
+    : QFileSystemModel(parent)
+{
+    // set role names
+    QHash<int, QByteArray> names;
+    names.insert(Qt::CheckStateRole, "checkState");
+    names.insert(QFileSystemModel::FileNameRole, "name");
+    names.insert(QFileSystemModel::FilePathRole, "path");
+    setRoleNames(names);
+
+    setFilter(QDir::Dirs | QDir::Drives | QDir::NoDotAndDotDot);
+    setRootPath(QDir::rootPath());
+    setReadOnly(true);
+}
+
+QVariant FolderModel::data(const QModelIndex &index, int role) const
+{
+    if (role == Qt::CheckStateRole && index.isValid() && !index.column())
+    {
+        const QString path = filePath(index);
+        if (path == QDir::rootPath() || !QFileInfo(path).isDir())
+            return QVariant();
+
+        Qt::CheckState state = Qt::Unchecked;
+        QStringList allSelected = m_selected;
+        allSelected << m_forced;
+        for (int i = 0; i < allSelected.size(); ++i)
+        {
+            const QString currentPath = allSelected[i];
+            if (currentPath == path)
+                return Qt::Checked;
+            else if (currentPath.startsWith(path + "/"))
+                state = Qt::PartiallyChecked;
+            else if (path.startsWith(currentPath + "/"))
+                return QVariant();
+        }
+        return state;
+    } else
+        return QFileSystemModel::data(index, role);
+}
+
+void FolderModel::setCheckState(const QString &path, int state)
+{
+    setData(index(path), state, Qt::CheckStateRole);
+}
+
+bool FolderModel::setData(const QModelIndex &changedIndex, const QVariant &value, int role)
+{
+    if (role == Qt::CheckStateRole && changedIndex.isValid() && !changedIndex.column())
+    {
+        const QString changedPath = filePath(changedIndex);
+        if (changedPath == QDir::rootPath() || !QFileInfo(changedPath).isDir())
+            return false;
+
+        if (changedPath == m_forced ||
+            changedPath.startsWith(m_forced + "/"))
+            return false;
+
+        if (value.toInt() == Qt::Checked)
+        {
+            // unselect any children or parents
+            for (int i = m_selected.size() - 1; i >= 0; --i)
+            {
+                const QString currentPath = m_selected[i];
+                if (currentPath.startsWith(changedPath + "/") ||
+                    changedPath.startsWith(currentPath + "/"))
+                    m_selected.removeAt(i);
+            }
+            if (!m_selected.contains(changedPath))
+                m_selected << changedPath;
+        }
+        else
+        {
+            m_selected.removeAll(changedPath);
+        }
+
+        // refresh items which have changed
+        QModelIndex idx = changedIndex;
+        while (idx.isValid())
+        {
+            emit dataChanged(idx, idx);
+            idx = idx.parent();
+        }
+
+        // refresh children of the changed index
+        emit dataChanged(
+            index(0, 0, changedIndex),
+            index(rowCount(changedIndex), columnCount(changedIndex), changedIndex));
+
+        emit selectedFoldersChanged(m_selected);
+        return true;
+    } else
+        return false;
+}
+
+Qt::ItemFlags FolderModel::flags(const QModelIndex &index) const
+{
+    Qt::ItemFlags flags = QFileSystemModel::flags(index);
+    flags |= Qt::ItemIsUserCheckable;
+    return flags;
+}
+
+QString FolderModel::forcedFolder() const
+{
+    return m_forced;
+}
+
+void FolderModel::setForcedFolder(const QString &forced)
+{
+    if (forced == m_forced)
+        return;
+
+    // make a note of changed directories
+    QStringList changed;
+    if (!m_forced.isEmpty())
+        changed << m_forced;
+    changed << forced;
+    for (int i = m_selected.size() - 1; i >= 0; --i)
+    {
+        const QString currentPath = m_selected[i];
+        if (currentPath == forced ||
+            currentPath.startsWith(forced + "/"))
+        {
+            changed << currentPath;
+            m_selected.removeAt(i);
+            emit selectedFoldersChanged(m_selected);
+        }
+    }
+
+    m_forced = forced;
+
+    // emit changes
+    foreach (const QString changedPath, changed)
+    {
+        QModelIndex idx = index(changedPath);
+        emit dataChanged(idx, idx);
+    }
+    emit forcedFolderChanged(m_forced);
+}
+
+QStringList FolderModel::selectedFolders() const
+{
+    return m_selected;
+}
+
+void FolderModel::setSelectedFolders(const QStringList &selected)
+{
+    m_selected = selected;
+}
+
+PlaceModel::PlaceModel(QObject *parent)
+    : QAbstractProxyModel(parent)
+{
+    QList<QDesktopServices::StandardLocation> locations;
+    locations << QDesktopServices::DocumentsLocation;
+    locations << QDesktopServices::MusicLocation;
+    locations << QDesktopServices::MoviesLocation;
+    locations << QDesktopServices::PicturesLocation;
+    foreach (QDesktopServices::StandardLocation location, locations)
+    {
+        const QString path = QDesktopServices::storageLocation(location);
+        QDir dir(path);
+        if (path.isEmpty() || dir == QDir::home())
+            continue;
+        m_paths << path;
+    }
+}
+
+QModelIndex PlaceModel::index(int row, int column, const QModelIndex& parent) const
+{
+    if (parent.isValid() || row < 0 || row >= m_paths.size())
+        return QModelIndex();
+
+    return createIndex(row, column, 0);
+}
+
+QModelIndex PlaceModel::parent(const QModelIndex &index) const
+{
+    return QModelIndex();
+}
+
+int PlaceModel::columnCount(const QModelIndex &parent) const
+{
+    return 1;
+}
+
+int PlaceModel::rowCount(const QModelIndex &parent) const
+{
+    if (parent.isValid())
+        return 0;
+    else
+        return m_paths.size();
+}
+
+QModelIndex PlaceModel::mapFromSource(const QModelIndex &sourceIndex) const
+{
+    if (!sourceIndex.isValid())
+        return QModelIndex();
+
+    const QString path = sourceIndex.data(QFileSystemModel::FilePathRole).toString();
+    const int row = m_paths.indexOf(path);
+    if (row < 0)
+        return QModelIndex();
+    else
+        return createIndex(row, sourceIndex.column(), 0);
+}
+
+QModelIndex PlaceModel::mapToSource(const QModelIndex &proxyIndex) const
+{
+    if (!proxyIndex.isValid())
+        return QModelIndex();
+
+    const int row = proxyIndex.row();
+    if (row < 0 || row >= m_paths.size())
+        return QModelIndex();
+    else
+        return m_fsModel->index(m_paths.at(row));
+}
+
+void PlaceModel::sourceDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight)
+{
+    QModelIndex proxyTopLeft = mapFromSource(topLeft);
+    QModelIndex proxyBottomRight = mapFromSource(bottomRight);
+    if (proxyTopLeft.isValid() && proxyBottomRight.isValid())
+        emit dataChanged(proxyTopLeft, proxyBottomRight);
+}
+
+FolderModel *PlaceModel::sourceModel() const
+{
+    return m_fsModel;
+}
+
+void PlaceModel::setSourceModel(FolderModel *sourceModel)
+{
+    if (sourceModel != m_fsModel) {
+        m_fsModel = sourceModel;
+
+        if (m_fsModel) {
+            connect(m_fsModel, SIGNAL(dataChanged(QModelIndex,QModelIndex)),
+                    this, SLOT(sourceDataChanged(QModelIndex,QModelIndex)));
+            QAbstractProxyModel::setSourceModel(m_fsModel);
+        }
+        emit sourceModelChanged(m_fsModel);
+    }
+}
+
