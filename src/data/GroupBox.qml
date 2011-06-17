@@ -33,6 +33,8 @@ FocusScope {
         anchors.rightMargin: 1
         anchors.bottomMargin: 1
         border.width: 1
+        border.color: '#7091c8'
+        color: '#cbd9f0'
         radius: 8
     }
 
