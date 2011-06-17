@@ -120,11 +120,6 @@ Application::Application(int &argc, char **argv)
     d->settings->setValue("LastRunVersion", WILINK_VERSION);
     QNetIO::Wallet::setDataPath(QDir(dataPath).filePath("wallet"));
 
-    /* initialise style */
-    QFile css(":/wiLink.css");
-    if (css.open(QIODevice::ReadOnly))
-       setStyleSheet(QString::fromUtf8(css.readAll()));
-
     // FIXME: register URL handler
     //QDesktopServices::setUrlHandler("xmpp", this, "openUrl");
 

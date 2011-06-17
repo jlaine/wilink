@@ -21,7 +21,6 @@
 #define __WILINK_SOUND_METER_H__
 
 #include <QIODevice>
-#include <QProgressBar>
 
 class QAudioFormat;
 
@@ -54,14 +53,6 @@ private:
     qint64 m_pos;
     int m_sampleSize;
     int m_value;
-};
-
-class QSoundMeterBar : public QProgressBar
-{
-    Q_OBJECT
-
-public:
-    QSoundMeterBar(QWidget *parent = 0);
 };
 
 #endif

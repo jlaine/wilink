@@ -117,8 +117,6 @@
     <file>ToolButton.qml</file>
     <file>TransferWidget.qml</file>
     <file>Wifirst.qml</file>
-    <!-- Stylesheets -->
-    <file>wiLink.css</file>
     <!-- Sounds -->
     <file>call-incoming.ogg</file>
     <file>call-outgoing.ogg</file>
