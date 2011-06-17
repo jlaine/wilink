@@ -59,6 +59,12 @@ Panel {
                 }
             }
 
+            Text {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                text: application.audioInputDeviceName
+            }
+
             Row {
                 anchors.left: parent.left
                 anchors.right: parent.right
@@ -73,6 +79,12 @@ Panel {
                     anchors.verticalCenter: parent.verticalCenter
                     text: qsTr('Audio playback device')
                 }
+            }
+
+            Text {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                text: application.audioOutputDeviceName
             }
 
             ProgressBar {
