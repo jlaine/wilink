@@ -34,20 +34,26 @@ class QSoundTester : public QObject
     Q_ENUMS(State)
     Q_PROPERTY(int duration READ duration CONSTANT)
     Q_PROPERTY(State state READ state NOTIFY stateChanged)
+    Q_PROPERTY(int volume READ volume NOTIFY volumeChanged)
+    Q_PROPERTY(int maximumVolume READ maximumVolume CONSTANT)
+
 
 public:
     enum State {
-        Idle = 0,
-        Recording,
-        Playing,
+        IdleState = 0,
+        RecordingState,
+        PlayingState,
     };
 
     QSoundTester(QObject *parent = 0);
     int duration() const;
     State state() const;
+    int volume() const;
+    int maximumVolume() const;
 
 signals:
     void stateChanged(State state);
+    void volumeChanged(int volume);
 
 public slots:
     void start(const QString &inputDevice, const QString &outputDevice);
@@ -55,12 +61,14 @@ public slots:
 private slots:
     void _q_playback();
     void _q_stop();
+    void _q_volumeChanged(int volume);
 
 private:
     QBuffer *m_buffer;
     QAudioInput *m_input;
     QAudioOutput *m_output;
     State m_state;
+    int m_volume;
 };
 
 #endif

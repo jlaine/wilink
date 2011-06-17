@@ -29,7 +29,8 @@ QSoundTester::QSoundTester(QObject *parent)
     : QObject(parent),
     m_input(0),
     m_output(0),
-    m_state(Idle)
+    m_state(IdleState),
+    m_volume(0)
 {
     m_buffer = new QBuffer(this);
 }
@@ -37,6 +38,11 @@ QSoundTester::QSoundTester(QObject *parent)
 int QSoundTester::duration() const
 {
     return 5;
+}
+
+int QSoundTester::maximumVolume() const
+{
+    return QSoundMeter::maximum();
 }
 
 void QSoundTester::start(const QString &inputDeviceName, const QString &outputDeviceName)
@@ -97,12 +103,12 @@ void QSoundTester::start(const QString &inputDeviceName, const QString &outputDe
     m_buffer->open(QIODevice::WriteOnly);
     m_buffer->reset();
     QSoundMeter *inputMeter = new QSoundMeter(m_input->format(), m_buffer, m_input);
-//    connect(inputMeter, SIGNAL(valueChanged(int)), testBar, SLOT(setValue(int)));
+    connect(inputMeter, SIGNAL(valueChanged(int)), this, SLOT(_q_volumeChanged(int)));
     m_input->start(inputMeter);
     QTimer::singleShot(duration() * 1000, this, SLOT(_q_playback()));
 
     // update state
-    m_state = Recording;
+    m_state = RecordingState;
     emit stateChanged(m_state);
 }
 
@@ -111,17 +117,50 @@ QSoundTester::State QSoundTester::state() const
     return m_state;
 }
 
+int QSoundTester::volume() const
+{
+    return m_volume;
+}
+
 void QSoundTester::_q_playback()
 {
+    m_input->stop();
+    _q_volumeChanged(0);
+
+    // start output
+    m_buffer->open(QIODevice::ReadOnly);
+    m_buffer->reset();
+    QSoundMeter *outputMeter = new QSoundMeter(m_output->format(), m_buffer, m_output);
+    connect(outputMeter, SIGNAL(valueChanged(int)), this, SLOT(_q_volumeChanged(int)));
+    m_output->start(outputMeter);
+    QTimer::singleShot(duration() * 1000, this, SLOT(_q_stop()));
+
     // update state
-    m_state = Playing;
+    m_state = PlayingState;
     emit stateChanged(m_state);
 }
 
 void QSoundTester::_q_stop()
 {
+    m_output->stop();
+    _q_volumeChanged(0);
+
+    // cleanup
+    delete m_input;
+    m_input = 0;
+    delete m_output;
+    m_output = 0;
+
     // update state
-    m_state = Idle;
+    m_state = IdleState;
     emit stateChanged(m_state);
+}
+
+void QSoundTester::_q_volumeChanged(int volume)
+{
+    if (volume != m_volume) {
+        m_volume = volume;
+        emit volumeChanged(m_volume);
+    }
 }
 

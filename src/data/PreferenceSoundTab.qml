@@ -18,6 +18,7 @@
  */
 
 import QtQuick 1.0
+import wiLink 1.2
 
 Panel {
     id: panel
@@ -31,6 +32,20 @@ Panel {
     }
 
     color: 'transparent'
+
+    SoundTester {
+        id: tester
+
+        onStateChanged: {
+            if (tester.state == SoundTester.RecordingState) {
+                devices.state = 'recording';
+            } else if (tester.state == SoundTester.PlayingState) {
+                devices.state = 'playing';
+            } else {
+                devices.state = '';
+            }
+        }
+    }
 
     GroupBox {
         id: devices
@@ -62,6 +77,8 @@ Panel {
             }
 
             Text {
+                id: output
+
                 anchors.left: parent.left
                 anchors.right: parent.right
                 text: application.audioOutputDeviceName
@@ -85,6 +102,8 @@ Panel {
             }
 
             Text {
+                id: input
+
                 anchors.left: parent.left
                 anchors.right: parent.right
                 text: application.audioInputDeviceName
@@ -124,7 +143,7 @@ Panel {
                     anchors.right: parent.right
                     text: qsTr('Test')
 
-                    onClicked: devices.state = 'recording'
+                    onClicked: tester.start(input.text, output.text);
                 }
             }
         }

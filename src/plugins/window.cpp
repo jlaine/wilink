@@ -38,6 +38,7 @@
 #include <QTimer>
 
 #include "QSoundPlayer.h"
+#include "QSoundTester.h"
 
 #include "QXmppCallManager.h"
 #include "QXmppConfiguration.h"
@@ -140,6 +141,7 @@ Chat::Chat(QWidget *parent)
     qmlRegisterType<ShareModel>("wiLink", 1, 2, "ShareModel");
     qmlRegisterType<ShareQueueModel>("wiLink", 1, 2, "ShareQueueModel");
     qmlRegisterUncreatableType<QSoundPlayer>("wiLink", 1, 2, "SoundPlayer", "");
+    qmlRegisterType<QSoundTester>("wiLink", 1, 2, "SoundTester");
     qmlRegisterType<VCard>("wiLink", 1, 2, "VCard");
     qmlRegisterUncreatableType<Chat>("wiLink", 1, 2, "Window", "");
 
