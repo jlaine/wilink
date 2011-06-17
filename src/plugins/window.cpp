@@ -453,7 +453,6 @@ void Chat::showPreferences(const QString &focusTab)
             dialog, SLOT(deleteLater()));
 
     dialog->addTab(new ChatOptions);
-    dialog->addTab(new SoundOptions);
     dialog->addTab(new ShareOptions);
 
     dialog->setCurrentTab(focusTab);
