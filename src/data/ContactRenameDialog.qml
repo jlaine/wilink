@@ -25,8 +25,7 @@ Dialog {
 
     property alias jid: vcard.jid
 
-    minHeight: 150
-    height: minHeight
+    minimumHeight: 150
     title: qsTr('Rename contact')
 
     VCard {

@@ -25,10 +25,8 @@ Dialog {
     property alias labelText: label.text
     property alias textValue: bar.text
 
-    minWidth: 280
-    minHeight: (helpText.length > 0) ? 270 : 150
-    height: minHeight
-    width: minWidth
+    minimumWidth: 280
+    minimumHeight: (helpText.length > 0) ? 270 : 150
 
     Item {
         anchors.fill: contents

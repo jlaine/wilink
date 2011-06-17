@@ -23,8 +23,7 @@ import wiLink 1.2
 Dialog {
     property alias jid: vcard.jid
 
-    minHeight: 150
-    height: minHeight
+    minimumHeight: 150
     title: qsTr('Remove contact');
 
     VCard {

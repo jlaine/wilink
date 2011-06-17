@@ -40,12 +40,36 @@ Panel {
             anchors.fill: devices.contents
             spacing: appStyle.verticalSpacing
 
-            Text {
-                text: qsTr('Audio capture device')
+            Row {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                spacing: appStyle.horizontalSpacing
+
+                Image {
+                    anchors.verticalCenter: parent.verticalCenter
+                    source: 'audio-input.png'
+                }
+
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: qsTr('Audio capture device')
+                }
             }
 
-            Text {
-                text: qsTr('Audio playback device')
+            Row {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                spacing: appStyle.horizontalSpacing
+
+                Image {
+                    anchors.verticalCenter: parent.verticalCenter
+                    source: 'audio-output.png'
+                }
+
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: qsTr('Audio playback device')
+                }
             }
 
             Button {

@@ -25,8 +25,8 @@ Rectangle {
     property alias contents: item
     property alias helpText: help.text
     property alias title: label.text
-    property int minWidth: 32
-    property int minHeight: 32
+    property int minimumWidth: 320
+    property int minimumHeight: 240
     signal accepted
     signal rejected
 
@@ -39,8 +39,6 @@ Rectangle {
     opacity: 0
     radius: 10
     smooth: true
-    width: 320
-    height: 240
 
     // FIXME: this is a hack waiting 'blur' or 'shadow' attribute in qml
     BorderImage {
@@ -184,11 +182,16 @@ Rectangle {
                     var newWidth = sizePress.width + (mouseCurrent.x - mousePress.x);
                     var newHeight = sizePress.height + (mouseCurrent.y - mousePress.y);
 
-                    dialog.width = Math.max(dialog.minWidth, Math.min(newWidth, maxSize.x));
-                    dialog.height = Math.max(dialog.minHeight, Math.min(newHeight, maxSize.y));
+                    dialog.width = Math.max(dialog.minimumWidth, Math.min(newWidth, maxSize.x));
+                    dialog.height = Math.max(dialog.minimumHeight, Math.min(newHeight, maxSize.y));
                 }
             }
         }
+    }
+
+    Component.onCompleted: {
+        height = minimumHeight;
+        width = minimumWidth;
     }
 
     Keys.onEscapePressed: dialog.rejected()

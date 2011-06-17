@@ -27,8 +27,6 @@ Dialog {
     property QtObject room
     property variant selection: []
 
-    minWidth: 200
-    minHeight: 150
     title: qsTr('Invite your contacts')
 
     SortFilterProxyModel {
