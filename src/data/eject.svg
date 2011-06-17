@@ -27,20 +27,7 @@
      gridtolerance="10000"
      guidetolerance="10"
      objecttolerance="10"
-     inkscape:pageopacity="0.0"
-     inkscape:pageshadow="2"
-     inkscape:zoom="32"
-     inkscape:cx="0.80349624"
-     inkscape:cy="4.8823581"
-     inkscape:document-units="px"
-     inkscape:current-layer="layer1"
-     showgrid="true"
-     inkscape:window-width="1366"
-     inkscape:window-height="692"
-     inkscape:window-x="0"
-     inkscape:window-y="25"
-     inkscape:window-maximized="1"
-     inkscape:snap-global="true">
+     showgrid="true">
     <inkscape:grid
        type="xygrid"
        id="grid2402"
@@ -57,7 +44,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -68,15 +55,16 @@
      transform="translate(0,-10)">
     <path
        style="fill:#ffffff;fill-opacity:1;fill-rule:evenodd;stroke:none"
-       d="M 0,17 10,17 4.4444442,10 0,17 z"
+       d="M 0,15 10,15 5,10 z"
        id="path2404"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccc" />
     <rect
        style="fill:#ffffff;fill-opacity:1;stroke:none"
        id="rect3878"
        width="10"
-       height="2.000001"
+       height="3.0000017"
        x="9.9920072e-16"
-       y="18" />
+       y="17" />
   </g>
 </svg>

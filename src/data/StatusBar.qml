@@ -91,12 +91,14 @@ Rectangle {
             presenceStatus: window.client.statusType
         }
 
-        Text {
-            anchors.left: statusPill.right
+        Image {
+            id: eject
+
+            anchors.right: parent.right
+            anchors.rightMargin: 8
             anchors.verticalCenter: parent.verticalCenter
-            anchors.margins: 5
-            color: 'white'
-            text: '<html>&#9167;</html>'
+            source: 'eject.png'
+            z: 1
         }
 
         MouseArea {
