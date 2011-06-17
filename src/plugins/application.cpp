@@ -415,7 +415,10 @@ QString Application::incomingMessageSound() const
 
 void Application::setIncomingMessageSound(const QString &soundFile)
 {
-    d->settings->setValue("IncomingMessageSound", soundFile);
+    if (soundFile != incomingMessageSound()) {
+        d->settings->setValue("IncomingMessageSound", soundFile);
+        emit incomingMessageSoundChanged(soundFile);
+    }
 }
 
 QString Application::outgoingMessageSound() const
@@ -425,7 +428,10 @@ QString Application::outgoingMessageSound() const
 
 void Application::setOutgoingMessageSound(const QString &soundFile)
 {
-    d->settings->setValue("OutgoingMessageSound", soundFile);
+    if (soundFile != outgoingMessageSound()) {
+        d->settings->setValue("OutgoingMessageSound", soundFile);
+        emit outgoingMessageSoundChanged(soundFile);
+    }
 }
 
 void Application::showAccounts()
