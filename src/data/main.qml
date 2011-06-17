@@ -29,6 +29,8 @@ FocusScope {
         id: appStyle
 
         property alias font: fontItem
+        property int horizontalSpacing: 6
+        property int verticalSpacing: 4
 
         opacity: 0
 
