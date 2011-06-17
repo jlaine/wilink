@@ -65,6 +65,8 @@ Panel {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 text: application.audioOutputDeviceName
+                elide: Text.ElideRight
+                wrapMode: Text.Wrap
             }
 
             Row {
@@ -87,6 +89,8 @@ Panel {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 text: application.audioInputDeviceName
+                elide: Text.ElideRight
+                wrapMode: Text.Wrap
             }
 
             ProgressBar {
