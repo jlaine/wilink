@@ -613,6 +613,14 @@ Acceptez-vous?</translation>
         <source>Select the folder in which received files will be stored.</source>
         <translation>Sélectionnez le dossier qui contiendra les fichiers reçus.</translation>
     </message>
+    <message>
+        <source>More folders..</source>
+        <translation>Plus de dossiers..</translation>
+    </message>
+    <message>
+        <source>Fewer folders..</source>
+        <translation>Moins de dossiers..</translation>
+    </message>
 </context>
 <context>
     <name>PreferenceSoundTab</name>
