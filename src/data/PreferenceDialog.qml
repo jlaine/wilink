@@ -46,6 +46,7 @@ Dialog {
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             anchors.left: parent.left
+            interactive: false
             width: 100
 
             model: ListModel {
