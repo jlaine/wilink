@@ -22,6 +22,8 @@ import QXmpp 0.4
 import 'utils.js' as Utils
 
 Item {
+    id: item
+
     property QtObject job: null
 
     anchors.left: parent ? parent.left : undefined
@@ -79,13 +81,27 @@ Item {
         Button {
             id: openButton
 
-            anchors.right: closeButton.left
+            anchors.right: cancelButton.left
             anchors.verticalCenter: parent.verticalCenter
             iconSource: 'file.png'
+            text: qsTr('Open')
             //visible: job && job.state == QXmppTransferJob.FinishedState && job.error == QXmppTransferJob.NoError
             visible: Qt.isQtObject(job) && job.state == QXmppTransferJob.FinishedState
 
             onClicked: Qt.openUrlExternally(job.localFileUrl)
+        }
+
+        Button {
+            id: cancelButton
+
+            anchors.right: closeButton.left
+            anchors.rightMargin: 4
+            anchors.verticalCenter: parent.verticalCenter
+            iconSource: 'remove.png'
+            text: qsTr('Cancel')
+            visible: Qt.isQtObject(job) && job.state != QXmppTransferJob.FinishedState
+
+            onClicked: job.abort()
         }
 
         Button {
@@ -95,8 +111,13 @@ Item {
             anchors.rightMargin: 4
             anchors.verticalCenter: parent.verticalCenter
             iconSource: 'close.png'
+            text: qsTr('Close')
+            visible: Qt.isQtObject(job) && job.state == QXmppTransferJob.FinishedState
 
-            onClicked: job.abort()
+            onClicked: {
+                item.height = 0
+                item.visible = false
+            }
         }
     }
 
