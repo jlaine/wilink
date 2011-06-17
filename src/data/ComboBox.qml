@@ -35,7 +35,7 @@ Item {
             width: view.width
 
             onItemClicked: {
-
+                block.currentIndex = index;
             }
         }
     }
