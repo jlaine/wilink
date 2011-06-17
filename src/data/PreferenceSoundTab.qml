@@ -50,28 +50,6 @@ Panel {
 
                 Image {
                     anchors.verticalCenter: parent.verticalCenter
-                    source: 'audio-input.png'
-                }
-
-                Text {
-                    anchors.verticalCenter: parent.verticalCenter
-                    text: qsTr('Audio capture device')
-                }
-            }
-
-            Text {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                text: application.audioInputDeviceName
-            }
-
-            Row {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                spacing: appStyle.spacing.horizontal
-
-                Image {
-                    anchors.verticalCenter: parent.verticalCenter
                     source: 'audio-output.png'
                 }
 
@@ -85,6 +63,28 @@ Panel {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 text: application.audioOutputDeviceName
+            }
+
+            Row {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                spacing: appStyle.spacing.horizontal
+
+                Image {
+                    anchors.verticalCenter: parent.verticalCenter
+                    source: 'audio-input.png'
+                }
+
+                Text {
+                    anchors.verticalCenter: parent.verticalCenter
+                    text: qsTr('Audio capture device')
+                }
+            }
+
+            Text {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                text: application.audioInputDeviceName
             }
 
             ProgressBar {
