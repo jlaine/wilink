@@ -586,6 +586,14 @@ Acceptez-vous?</translation>
         <source>version %1</source>
         <translation>version %1</translation>
     </message>
+    <message>
+        <source>General options</source>
+        <translation>Options générales</translation>
+    </message>
+    <message>
+        <source>About %1</source>
+        <translation>À propos de %1</translation>
+    </message>
 </context>
 <context>
     <name>PreferenceSoundTab</name>
@@ -596,6 +604,26 @@ Acceptez-vous?</translation>
     <message>
         <source>Outgoing message</source>
         <translation>Message envoyé</translation>
+    </message>
+    <message>
+        <source>Sound notifications</source>
+        <translation>Notifications sonores</translation>
+    </message>
+    <message>
+        <source>Audio capture device</source>
+        <translation>Périphérique d&apos;entrée son</translation>
+    </message>
+    <message>
+        <source>Audio playback device</source>
+        <translation>Périphérique de sortie son</translation>
+    </message>
+    <message>
+        <source>Test</source>
+        <translation>Tester</translation>
+    </message>
+    <message>
+        <source>Sound devices</source>
+        <translation>Périphériques audio</translation>
     </message>
 </context>
 <context>

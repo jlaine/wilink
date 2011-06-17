@@ -29,72 +29,85 @@ Panel {
         application.sortContactsByStatus = sortContactsByStatus.checked;
     }
 
-    Column {
-        id: prefs
+    GroupBox {
+        id: general
 
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        spacing: appStyle.horizontalSpacing
+        height: parent.height / 2
+        title: qsTr('General options')
 
-        CheckBox {
-            id: openAtLogin
+        Column {
+            anchors.fill: general.contents
+            spacing: appStyle.verticalSpacing
 
-            anchors.left: parent.left
-            anchors.right:  parent.right
-            checked: application.openAtLogin
-            enabled: application.isInstalled
-            text: qsTr('Open at login')
-        }
+            CheckBox {
+                id: openAtLogin
 
-        CheckBox {
-            id: showOfflineContacts
+                anchors.left: parent.left
+                anchors.right:  parent.right
+                checked: application.openAtLogin
+                enabled: application.isInstalled
+                text: qsTr('Open at login')
+            }
 
-            anchors.left: parent.left
-            anchors.right:  parent.right
-            checked: application.showOfflineContacts
-            text: qsTr('Show offline contacts')
-        }
+            CheckBox {
+                id: showOfflineContacts
 
-        CheckBox {
-            id: sortContactsByStatus
+                anchors.left: parent.left
+                anchors.right:  parent.right
+                checked: application.showOfflineContacts
+                text: qsTr('Show offline contacts')
+            }
 
-            anchors.left: parent.left
-            anchors.right:  parent.right
-            checked: application.sortContactsByStatus
-            text: qsTr('Sort contacts by status')
+            CheckBox {
+                id: sortContactsByStatus
+
+                anchors.left: parent.left
+                anchors.right:  parent.right
+                checked: application.sortContactsByStatus
+                text: qsTr('Sort contacts by status')
+            }
         }
     }
 
-    Item {
-        anchors.top: prefs.bottom
+    GroupBox {
+        id: about
+
+        anchors.top: general.bottom
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
+        title: qsTr('About %1').replace('%1', application.applicationName)
 
-        Image {
-            id: appIcon
-            anchors.left: parent.left
-            source: 'wiLink-64.png'
-        }
+        Item {
+            anchors.fill: about.contents
 
-        Text {
-            id: appName
+            Image {
+                id: appIcon
+                anchors.left: parent.left
+                source: 'wiLink-64.png'
+            }
 
-            anchors.left: appIcon.right
-            anchors.top: appIcon.top
-            anchors.margins: 6
-            font.bold: true
-            font.pixelSize: 20
-            text: application.applicationName
-        }
+            Text {
+                id: appName
 
-        Text {
-            anchors.left: appIcon.right
-            anchors.top: appName.bottom
-            anchors.margins: 6
-            font.pixelSize: 16
-            text: qsTr('version %1').replace('%1', application.applicationVersion)
+                anchors.left: appIcon.right
+                anchors.top: appIcon.top
+                anchors.margins: 6
+                font.bold: true
+                font.pixelSize: 20
+                text: application.applicationName
+            }
+
+            Text {
+                anchors.left: appIcon.right
+                anchors.top: appName.bottom
+                anchors.margins: 6
+                font.pixelSize: 16
+                text: qsTr('version %1').replace('%1', application.applicationVersion)
+            }
         }
     }
 }

@@ -27,30 +27,64 @@ Panel {
         application.outgoingMessageSound = outgoingMessageSound.checked ? ':/message-outgoing.ogg' : '';
     }
 
-    Column {
-        id: prefs
+    GroupBox {
+        id: devices
 
-        anchors.fill: parent
-        spacing: appStyle.horizontalSpacing
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: parent.height / 2
+        title: qsTr('Sound devices')
 
-        CheckBox {
-            id: incomingMessageSound
-            
-            anchors.left: parent.left
-            anchors.right:  parent.right
-            checked: application.incomingMessageSound.length > 0
-            text: qsTr('Incoming message')
+        Column {
+            anchors.fill: devices.contents
+            spacing: appStyle.verticalSpacing
+
+            Text {
+                text: qsTr('Audio capture device')
+            }
+
+            Text {
+                text: qsTr('Audio playback device')
+            }
+
+            Button {
+                text: qsTr('Test')
+            }
         }
+    }
 
-        CheckBox {
-            id: outgoingMessageSound
+    GroupBox {
+        id: notifications
 
-            anchors.left: parent.left
-            anchors.right:  parent.right
-            checked: application.outgoingMessageSound.length > 0
-            text: qsTr('Outgoing message')
+        anchors.top: devices.bottom
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        title: qsTr('Sound notifications')
+
+        Column {
+            anchors.fill: notifications.contents
+            spacing: appStyle.verticalSpacing
+
+            CheckBox {
+                id: incomingMessageSound
+
+                anchors.left: parent.left
+                anchors.right:  parent.right
+                checked: application.incomingMessageSound.length > 0
+                text: qsTr('Incoming message')
+            }
+
+            CheckBox {
+                id: outgoingMessageSound
+
+                anchors.left: parent.left
+                anchors.right:  parent.right
+                checked: application.outgoingMessageSound.length > 0
+                text: qsTr('Outgoing message')
+            }
         }
-
     }
 }
 
