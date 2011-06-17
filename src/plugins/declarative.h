@@ -97,6 +97,7 @@ public:
 
     int count() const;
     Q_INVOKABLE QVariant get(int row) const;
+    Q_INVOKABLE QVariant getProperty(int row, const QString &name) const;
 
     QAbstractItemModel *model() const;
     void setModel(QAbstractItemModel *model);

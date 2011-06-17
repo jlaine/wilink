@@ -229,7 +229,7 @@ Item {
         onTriggered: {
             // Update the currently selected item after delay.
             for (var i = 0; i < listHelper.count; i++) {
-                if (listHelper.get(i).jid == currentJid) {
+                if (listHelper.getProperty(i, 'jid') == currentJid) {
                     view.currentIndex = i;
                     return;
                 }

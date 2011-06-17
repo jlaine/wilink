@@ -71,6 +71,16 @@ QVariant ListHelper::get(int row) const
     return result;
 }
 
+QVariant ListHelper::getProperty(int row, const QString &name) const
+{
+    if (m_model) {
+        QModelIndex index = m_model->index(row, 0);
+        const int role = m_model->roleNames().key(name.toAscii());
+        return index.data(role);
+    }
+    return QVariant();
+}
+
 QAbstractItemModel *ListHelper::model() const
 {
     return m_model;

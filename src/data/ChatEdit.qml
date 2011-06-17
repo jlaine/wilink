@@ -156,7 +156,7 @@ Rectangle {
                 var needle = input.text.slice(start, end).toLowerCase();
                 var matches = [];
                 for (var i = 0; i < listHelper.count; i += 1) {
-                    var name = listHelper.get(i).name;
+                    var name = listHelper.getProperty(i, 'name');
                     if (name.slice(0, needle.length).toLowerCase() == needle) {
                         matches[matches.length] = name;
                     }
