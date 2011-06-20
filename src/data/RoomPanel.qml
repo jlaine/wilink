@@ -40,11 +40,8 @@ Panel {
 
         onNameChanged: {
             room.nickName = name;
-            if (!room.isJoined) {
-                // clear history
-                participantModel.historyModel.clear();
-
-                // send join request
+            // send join request
+            if (room.nickName.length > 0 && !room.isJoined) {
                 room.join();
             }
         }
