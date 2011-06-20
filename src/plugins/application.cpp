@@ -205,6 +205,19 @@ QString Application::cacheDirectory() const
     return QDir(dataPath).filePath("cache");
 }
 
+QStringList Application::chatAccounts() const
+{
+    return d->settings->value("ChatAccounts").toStringList();
+}
+
+void Application::setChatAccounts(const QStringList &accounts)
+{
+    if (accounts != chatAccounts()) {
+        d->settings->setValue("ChatAccounts", accounts);
+        emit chatAccountsChanged(accounts);
+    }
+}
+
 /** Create the system tray icon.
  */
 void Application::createSystemTrayIcon()
@@ -441,7 +454,7 @@ void Application::resetWindows()
     /* connect to chat accounts */
     int xpos = 30;
     int ypos = 20;
-    const QStringList chatJids = dlg.accounts();
+    const QStringList chatJids = chatAccounts();
     foreach (const QString &jid, chatJids) {
         Window *chat = new Window;
         if (chatJids.size() == 1)

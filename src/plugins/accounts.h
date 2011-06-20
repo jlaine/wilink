@@ -80,7 +80,6 @@ class ChatAccounts : public QDialog
 
 public:
     ChatAccounts(QWidget *parent = 0);
-    QStringList accounts() const;
     bool changed() const;
 
     void check();

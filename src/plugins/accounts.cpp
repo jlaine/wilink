@@ -36,8 +36,6 @@
 #include "accounts.h"
 #include "utils.h"
 
-static const char *accountsKey = "ChatAccounts";
-
 /** Returns the authentication realm for the given JID.
  */
 static QString authRealm(const QString &jid)
@@ -272,28 +270,24 @@ ChatAccounts::ChatAccounts(QWidget *parent)
 
     /* load accounts */
     m_settings = new QSettings(this);
-    const QStringList accountJids = accounts();
+    const QStringList accountJids = wApp->chatAccounts();
     foreach (const QString &jid, accountJids)
         m_listWidget->addItem(new QListWidgetItem(QIcon(":/chat.png"), jid));
     updateButtons();
 }
 
-QStringList ChatAccounts::accounts() const
-{
-    return m_settings->value(accountsKey).toStringList();
-}
-
 bool ChatAccounts::addAccount(const QString &domain)
 {
+    QStringList accounts = wApp->chatAccounts();
     ChatAccountPrompt dlg(this);
-    dlg.setAccounts(accounts());
+    dlg.setAccounts(accounts);
     dlg.setDomain(domain);
-    if (dlg.exec())
+    if (dlg.exec() && !accounts.contains(dlg.jid()))
     {
         m_changed = true;
         const QString jid = dlg.jid();
         QNetIO::Wallet::instance()->setCredentials(authRealm(jid), jid, dlg.password());
-        m_settings->setValue(accountsKey, accounts() << jid);
+        wApp->setChatAccounts(accounts << jid);
         m_listWidget->addItem(new QListWidgetItem(QIcon(":/chat.png"), jid));
         return true;
     }
@@ -307,7 +301,7 @@ void ChatAccounts::check()
     const QString requiredDomain("wifirst.net");
 
     bool foundAccount = false;
-    const QStringList accountJids = accounts();
+    const QStringList accountJids = wApp->chatAccounts();
     foreach (const QString &jid, accountJids)
     {
         if (!isBareJid(jid))
@@ -380,9 +374,9 @@ void ChatAccounts::removeAccount(const QString &jid)
     QNetIO::Wallet::instance()->deleteCredentials(realm);
 
     // remove account
-    QStringList accounts = m_settings->value(accountsKey).toStringList();
+    QStringList accounts = wApp->chatAccounts();
     accounts.removeAll(jid);
-    m_settings->setValue(accountsKey, accounts);
+    wApp->setChatAccounts(accounts);
 
     // update buttons
     QList<QListWidgetItem*> goners = m_listWidget->findItems(jid, Qt::MatchExactly);
