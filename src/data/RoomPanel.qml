@@ -204,5 +204,15 @@ Panel {
         }
     }
 
+    Connections {
+        target: window.client
+        onConnected: {
+            // re-join after disconnect
+            if (room.nickName.length > 0 && !room.isJoined) {
+                room.join();
+            }
+        }
+    }
+
     Keys.forwardTo: historyView
 }
