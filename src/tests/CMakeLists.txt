@@ -7,11 +7,13 @@ add_definitions(-DWILINK_VERSION="${WILINK_VERSION}")
 
 # tests
 set(tests_MOC_HEADERS
+    ../plugins/declarative.h
     ../plugins/updates.h
     tests.h)
 qt4_wrap_cpp(tests_MOC_SOURCES ${tests_MOC_HEADERS})
 qt4_add_resources(tests_RCC_SOURCES tones.qrc)
 add_executable(tests
+    ../plugins/declarative.cpp
     ../plugins/systeminfo.cpp
     ../plugins/updates.cpp
     ../plugins/utils.cpp

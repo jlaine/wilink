@@ -26,7 +26,6 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QLocale>
-#include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QStringList>
@@ -37,6 +36,7 @@
 #include <windows.h>
 #endif
 
+#include "declarative.h"
 #include "systeminfo.h"
 #include "updates.h"
 
@@ -113,7 +113,7 @@ Updates::Updates(QObject *parent)
     d(new UpdatesPrivate)
 {
     d->updatesUrl = QUrl("https://download.wifirst.net/wiLink/");
-    d->network = new QNetworkAccessManager(this);
+    d->network = new NetworkAccessManager(this);
 
     /* schedule updates */
     d->timer = new QTimer(this);
@@ -174,7 +174,6 @@ void Updates::check()
 
     QNetworkRequest req(statusUrl);
     req.setRawHeader("Accept", "application/xml");
-    req.setRawHeader("Accept-Language", QLocale::system().name().toAscii());
     QNetworkReply *reply = d->network->get(req);
     connect(reply, SIGNAL(finished()), this, SLOT(processStatus()));
 }
