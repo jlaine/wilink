@@ -23,8 +23,9 @@ Item {
     id: scrollBar
 
     property Flickable flickableItem
+    property int defaultQuantity: 30
     property string moveAction: ''
-    property int moveQuantity: 30
+    property int moveQuantity: defaultQuantity
     property bool moveRepeat: false
     property real position: flickableItem.visibleArea.yPosition
     property real pageSize: flickableItem.visibleArea.heightRatio
@@ -104,7 +105,7 @@ Item {
 
             onPressed: {
                 moveAction = 'up';
-                moveQuantity = -30;
+                moveQuantity = -defaultQuantity;
                 scrollBar.moveBy(moveQuantity);
             }
 
@@ -126,7 +127,7 @@ Item {
 
             onPressed: {
                 moveAction = 'down';
-                moveQuantity = 30;
+                moveQuantity = defaultQuantity;
                 scrollBar.moveBy(moveQuantity);
             }
 
@@ -215,5 +216,21 @@ Item {
     states: State {
         name: 'collapsed'
         PropertyChanges { target: scrollBar; width: 0; opacity: 0 }
+    }
+
+    Keys.onPressed: {
+        if (event.key == Qt.Key_Up) {
+            scrollBar.moveBy(-defaultQuantity);
+            event.accepted = true;
+        } else if (event.key == Qt.Key_Down) {
+            scrollBar.moveBy(defaultQuantity);
+            event.accepted = true;
+        } else if (event.key == Qt.Key_PageUp) {
+            scrollBar.moveBy(-flickableItem.height);
+            event.accepted = true;
+        } else if (event.key == Qt.Key_PageDown) {
+            scrollBar.moveBy(flickableItem.height);
+            event.accepted = true;
+        }
     }
 }

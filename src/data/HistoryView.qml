@@ -271,4 +271,6 @@ Item {
             historyView.bottomChanging = false;
         }
     }
+
+    Keys.forwardTo: scrollBar
 }

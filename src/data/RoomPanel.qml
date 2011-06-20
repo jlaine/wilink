@@ -203,4 +203,6 @@ Panel {
             box.show();
         }
     }
+
+    Keys.forwardTo: historyView
 }

@@ -194,4 +194,6 @@ Panel {
             }
         }
     }
+
+    Keys.forwardTo: historyView
 }
