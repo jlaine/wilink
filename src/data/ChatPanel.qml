@@ -68,7 +68,7 @@ Panel {
                 }
             }
             title: qsTr('My rooms')
-            height: 150
+            height: 28 + 30 * Math.max(1, Math.min(count, 8));
 
             onAddClicked: {
                 dialogLoader.source = 'RoomJoinDialog.qml';

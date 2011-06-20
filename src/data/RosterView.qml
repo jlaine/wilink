@@ -25,6 +25,7 @@ Item {
     clip: true
 
     property string currentJid
+    property alias count: view.count
     property alias model: view.model
     property alias title: titleText.text
 
