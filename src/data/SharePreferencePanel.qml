@@ -120,27 +120,60 @@ Panel {
                     anchors.fill: parent
                     opacity: 0
 
+                    CrumbBar {
+                        id: crumbs
+
+                        anchors.top: parent.top
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                    }
+
                     ListView {
                         id: folderView
 
-                        anchors.top: parent.top
+                        anchors.top: crumbs.bottom
                         anchors.bottom: parent.bottom
                         anchors.left: parent.left
                         anchors.right: folderBar.left
                         clip: true
-                        model: folderModel
+                        model: VisualDataModel {
+                            id: visualModel
 
-                        delegate: CheckBox {
-                            height: appStyle.icon.smallSize
-                            width: folderView.width - 1
-                            checked: model.checkState == 2
-                            iconSource: 'album.png'
-                            text: model.name
-                            onClicked: {
-                                folderModel.setCheckState(model.path, checked ? 0 : 2);
+                            model: folderModel
+                            delegate: Item {
+                                height: appStyle.icon.smallSize
+                                width: folderView.width - 1
+
+                                CheckBox {
+                                    id: check
+
+                                    anchors.left: parent.left
+                                    anchors.top: parent.top
+                                    anchors.bottom: parent.bottom
+                                    checked: model.checkState == 2
+                                    iconSource: 'album.png'
+                                    width: 12 + appStyle.icon.smallSize + appStyle.spacing.horizontal
+                                    onClicked: {
+                                        folderModel.setCheckState(model.path, checked ? 0 : 2);
+                                    }
+                                }
+
+                                Text {
+                                    anchors.left: check.right
+                                    anchors.right: parent.right
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: model.name
+
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        onClicked: {
+                                            crumbs.push({'name': model.name, 'path': model.path});
+                                            visualModel.rootIndex = visualModel.modelIndex(model.index);
+                                        }
+                                    }
+                                }
                             }
                         }
-
                     }
 
                     ScrollBar {
