@@ -76,71 +76,81 @@ Panel {
                 anchors.right: parent.right
                 anchors.rightMargin: appStyle.spacing.horizontal
 
-                ListView {
-                    id: placeView
+                Item {
+                    id: placePanel
 
-                    anchors.top: parent.top
-                    anchors.bottom: parent.bottom
-                    anchors.left: parent.left
-                    anchors.right: placeBar.left
-                    clip: true
-                    model: placeModel
+                    anchors.fill: parent
 
-                    delegate: CheckBox {
-                        height: appStyle.icon.smallSize
-                        width: placeView.width - 1
-                        checked: model.checkState == 2
-                        iconSource: 'album.png'
-                        text: model.name
-                        onClicked: {
-                            folderModel.setCheckState(model.path, checked ? 0 : 2);
+                    ListView {
+                        id: placeView
+
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.left
+                        anchors.right: placeBar.left
+                        model: placeModel
+
+                        delegate: CheckBox {
+                            height: appStyle.icon.smallSize
+                            width: placeView.width - 1
+                            checked: model.checkState == 2
+                            iconSource: 'album.png'
+                            text: model.name
+                            onClicked: {
+                                folderModel.setCheckState(model.path, checked ? 0 : 2);
+                            }
                         }
+
+                        highlight: Highlight{}
                     }
 
-                    highlight: Highlight{}
+                    ScrollBar {
+                        id: placeBar
+
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
+                        anchors.right: parent.right
+                        flickableItem: placeView
+                    }
                 }
 
-                ScrollBar {
-                    id: placeBar
+                Item {
+                    id: folderPanel
 
-                    anchors.top: parent.top
-                    anchors.bottom: parent.bottom
-                    anchors.right: parent.right
-                    flickableItem: placeView
-                }
+                    anchors.fill: parent
+                    opacity: 0
 
-                ListView {
-                    id: folderView
+                    ListView {
+                        id: folderView
 
-                    anchors.top: parent.top
-                    anchors.bottom: parent.bottom
-                    anchors.left: parent.left
-                    anchors.right: folderBar.left
-                    clip: true
-                    model: folderModel
-                    visible: false
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
+                        anchors.left: parent.left
+                        anchors.right: folderBar.left
+                        clip: true
+                        model: folderModel
 
-                    delegate: CheckBox {
-                        height: appStyle.icon.smallSize
-                        width: folderView.width - 1
-                        checked: model.checkState == 2
-                        iconSource: 'album.png'
-                        text: model.name
-                        onClicked: {
-                            folderModel.setCheckState(model.path, checked ? 0 : 2);
+                        delegate: CheckBox {
+                            height: appStyle.icon.smallSize
+                            width: folderView.width - 1
+                            checked: model.checkState == 2
+                            iconSource: 'album.png'
+                            text: model.name
+                            onClicked: {
+                                folderModel.setCheckState(model.path, checked ? 0 : 2);
+                            }
                         }
+
                     }
 
-                }
+                    ScrollBar {
+                        id: folderBar
 
-                ScrollBar {
-                    id: folderBar
-
-                    anchors.top: parent.top
-                    anchors.bottom: parent.bottom
-                    anchors.right: parent.right
-                    flickableItem: folderView
-                    visible: false
+                        anchors.top: parent.top
+                        anchors.bottom: parent.bottom
+                        anchors.right: parent.right
+                        flickableItem: folderView
+                    }
                 }
             }
 
@@ -162,10 +172,8 @@ Panel {
 
         states: State {
             name: 'folders'
-            PropertyChanges { target: folderView; visible: true }
-            PropertyChanges { target: folderBar; visible: true }
-            PropertyChanges { target: placeView; visible: false }
-            PropertyChanges { target: placeBar; visible: false }
+            PropertyChanges { target: folderPanel; opacity: 1 }
+            PropertyChanges { target: placePanel; opacity: 0 }
             PropertyChanges { target: placeButton; text: placeButton.lessString }
         }
     }
