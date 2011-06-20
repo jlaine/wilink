@@ -59,6 +59,11 @@ Dialog {
 
             model: ListModel {
                 ListElement {
+                    avatar: 'peer.png'
+                    name: 'Accounts'
+                    source: 'AccountPreferencePanel.qml'
+                }
+                ListElement {
                     avatar: 'options.png'
                     name: 'General'
                     source: 'GeneralPreferencePanel.qml'
@@ -75,9 +80,10 @@ Dialog {
                 }
 
                 Component.onCompleted: {
-                    setProperty(0, 'name', qsTr('General'));
-                    setProperty(1, 'name', qsTr('Sound'));
-                    setProperty(2, 'name', qsTr('Shares'));
+                    setProperty(0, 'name', qsTr('Accounts'));
+                    setProperty(1, 'name', qsTr('General'));
+                    setProperty(2, 'name', qsTr('Sound'));
+                    setProperty(3, 'name', qsTr('Shares'));
                 }
             }
 

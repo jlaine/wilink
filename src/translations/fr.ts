@@ -13,6 +13,13 @@
     </message>
 </context>
 <context>
+    <name>AccountPreferencePanel</name>
+    <message>
+        <source>Chat accounts</source>
+        <translation>Comptes de chat</translation>
+    </message>
+</context>
+<context>
     <name>Application</name>
     <message>
         <source>&amp;Quit</source>
@@ -528,6 +535,10 @@ Acceptez-vous?</translation>
     <message>
         <source>Shares</source>
         <translation>Partages</translation>
+    </message>
+    <message>
+        <source>Accounts</source>
+        <translation>Comptes</translation>
     </message>
 </context>
 <context>
