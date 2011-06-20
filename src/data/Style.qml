@@ -37,6 +37,7 @@ Item {
     Item {
         id: iconItem
 
+        property int tinySize: 16
         property int smallSize: 24
         property int normalSize: 32
     }

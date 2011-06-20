@@ -21,7 +21,7 @@ import QtQuick 1.0
 
 Rectangle {
     property alias text: label.text
-    property int iconSize: 16
+    property int iconSize: appStyle.icon.tinySize
 
     border.color: '#93b9f2'
     border.width: 1

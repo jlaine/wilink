@@ -43,8 +43,8 @@ Rectangle {
 
             smooth: true
             source: model.icon ? model.icon : ''
-            width: 16
-            height: 16
+            width: appStyle.icon.tinySize
+            height: appStyle.icon.tinySize
         }
     }
 

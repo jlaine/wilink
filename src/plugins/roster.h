@@ -95,6 +95,7 @@ class VCard : public QObject
     Q_PROPERTY(QString jid READ jid WRITE setJid NOTIFY jidChanged)
     Q_PROPERTY(QString name READ name NOTIFY nameChanged)
     Q_PROPERTY(QString nickName READ nickName NOTIFY nickNameChanged)
+    Q_PROPERTY(int status READ status NOTIFY statusChanged)
     Q_PROPERTY(QUrl url READ url NOTIFY urlChanged)
 
 public:
@@ -124,14 +125,16 @@ signals:
     void jidChanged(const QString &jid);
     void nameChanged(const QString &name);
     void nickNameChanged(const QString &nickName);
+    void statusChanged();
     void urlChanged(const QUrl &url);
 
 public slots:
     QString jidForFeature(Feature feature) const;
 
 private slots:
-    void cardChanged(const QString &jid);
-    void discoChanged(const QString &jid);
+    void _q_cardChanged(const QString &jid);
+    void _q_discoChanged(const QString &jid);
+    void _q_presenceChanged(const QString &jid);
 
 private:
     void update();
@@ -159,6 +162,7 @@ public:
 signals:
     void cardChanged(const QString &jid);
     void discoChanged(const QString &jid);
+    void presenceChanged(const QString &jid);
 
 public slots:
     void addClient(ChatClient *client);

@@ -394,7 +394,6 @@ public:
     QList<ChatClient*> clients;
     QSet<QString> discoQueue;
     QMap<QString, VCard::Features> features;
-    QMap<QString, QXmppPresence::Status::Type> presences;
     QSet<QString> vcardFailed;
     QSet<QString> vcardQueue;
 };
@@ -409,23 +408,6 @@ VCard::VCard(QObject *parent)
 QUrl VCard::avatar() const
 {
     return m_avatar;
-}
-
-void VCard::cardChanged(const QString &jid)
-{
-    if (jid == m_jid)
-        update();
-}
-
-void VCard::discoChanged(const QString &jid)
-{
-    if (jid == m_jid) {
-        Features newFeatures = m_cache->features(m_jid);
-        if (newFeatures != m_features) {
-            m_features = newFeatures;
-            emit featuresChanged(m_features);
-        }
-    }
 }
 
 VCard::Features VCard::features() const
@@ -469,6 +451,7 @@ void VCard::setJid(const QString &jid)
         // reset features
         m_features = 0;
         emit featuresChanged(m_features);
+        emit statusChanged();
     }
 }
 
@@ -484,10 +467,10 @@ QString VCard::nickName() const
 
 int VCard::status() const
 {
-    QXmppPresence::Status::Type statusType = QXmppPresence::Status::Offline;
-    foreach (ChatClient *client, m_cache->d->clients) {
-
-    }
+    if (!m_jid.isEmpty())
+        return VCardCache::instance()->presenceStatus(m_jid);
+    else
+        return QXmppPresence::Status::Offline;
 }
 
 QUrl VCard::url() const
@@ -507,9 +490,11 @@ void VCard::update()
         if (!m_cache) {
             m_cache = VCardCache::instance();
             connect(m_cache, SIGNAL(cardChanged(QString)),
-                    this, SLOT(cardChanged(QString)));
+                    this, SLOT(_q_cardChanged(QString)));
             connect(m_cache, SIGNAL(discoChanged(QString)),
-                    this, SLOT(discoChanged(QString)));
+                    this, SLOT(_q_discoChanged(QString)));
+            connect(m_cache, SIGNAL(presenceChanged(QString)),
+                    this, SLOT(_q_presenceChanged(QString)));
         }
 
         QXmppVCardIq vcard;
@@ -550,6 +535,31 @@ void VCard::update()
     if (newUrl != m_url) {
         m_url = newUrl;
         emit urlChanged(m_url);
+    }
+}
+
+void VCard::_q_cardChanged(const QString &jid)
+{
+    if (jid == m_jid)
+        update();
+}
+
+void VCard::_q_discoChanged(const QString &jid)
+{
+    if (jid == m_jid && m_cache) {
+        Features newFeatures = m_cache->features(m_jid);
+        if (newFeatures != m_features) {
+            m_features = newFeatures;
+            emit featuresChanged(m_features);
+        }
+    }
+}
+
+void VCard::_q_presenceChanged(const QString &jid)
+{
+    if (jid == m_jid && m_cache) {
+        qDebug("presence changed");
+        emit statusChanged();
     }
 }
 
@@ -716,6 +726,8 @@ void VCardCache::presenceReceived(const QXmppPresence &presence)
     if ((presence.type() == QXmppPresence::Available && !d->features.contains(jid)) ||
         (presence.type() == QXmppPresence::Unavailable && d->features.remove(jid)))
         emit discoChanged(jidToBareJid(jid));
+
+    emit presenceChanged(jidToBareJid(jid));
 }
 
 QXmppPresence::Status::Type VCardCache::presenceStatus(const QString &jid) const

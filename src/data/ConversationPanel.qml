@@ -72,6 +72,13 @@ Panel {
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.right
 
+            StatusPill {
+                anchors.verticalCenter: parent.verticalCenter
+                presenceStatus: vcard.status
+                height: appStyle.icon.tinySize
+                width: appStyle.icon.tinySize
+            }
+
             ToolButton {
                 iconSource: 'call.png'
                 text: qsTr('Call')

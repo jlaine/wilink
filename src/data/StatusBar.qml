@@ -86,8 +86,8 @@ Rectangle {
             anchors.left:  parent.left
             anchors.verticalCenter: parent.verticalCenter
             anchors.margins: 5
-            height: 16
-            width: 16
+            height: appStyle.icon.tinySize
+            width: appStyle.icon.tinySize
             presenceStatus: window.client.statusType
         }
 
