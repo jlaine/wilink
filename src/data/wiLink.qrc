@@ -98,7 +98,7 @@
     <file>PhotoUploadView.qml</file>
     <file>PlayerPanel.qml</file>
     <file>PreferenceDialog.qml</file>
-    <file>PreferenceGeneralTab.qml</file>
+    <file>GeneralPreferencePanel.qml</file>
     <file>SharePreferencePanel.qml</file>
     <file>SoundPreferencePanel.qml</file>
     <file>ProgressBar.qml</file>

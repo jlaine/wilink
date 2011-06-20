@@ -400,6 +400,33 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>GeneralPreferencePanel</name>
+    <message>
+        <source>Open at login</source>
+        <translation>Ouvrir au démarrage</translation>
+    </message>
+    <message>
+        <source>Show offline contacts</source>
+        <translation>Afficher les contacts déconnectés</translation>
+    </message>
+    <message>
+        <source>Sort contacts by status</source>
+        <translation>Trier les contacts par état</translation>
+    </message>
+    <message>
+        <source>version %1</source>
+        <translation>version %1</translation>
+    </message>
+    <message>
+        <source>General options</source>
+        <translation>Options générales</translation>
+    </message>
+    <message>
+        <source>About %1</source>
+        <translation>À propos de %1</translation>
+    </message>
+</context>
+<context>
     <name>InputMenu</name>
     <message>
         <source>Cut</source>
@@ -543,33 +570,6 @@ Acceptez-vous?</translation>
     <message>
         <source>Preferences</source>
         <translation>Préférences</translation>
-    </message>
-</context>
-<context>
-    <name>PreferenceGeneralTab</name>
-    <message>
-        <source>Open at login</source>
-        <translation>Ouvrir au démarrage</translation>
-    </message>
-    <message>
-        <source>Show offline contacts</source>
-        <translation>Afficher les contacts déconnectés</translation>
-    </message>
-    <message>
-        <source>Sort contacts by status</source>
-        <translation>Trier les contacts par état</translation>
-    </message>
-    <message>
-        <source>version %1</source>
-        <translation>version %1</translation>
-    </message>
-    <message>
-        <source>General options</source>
-        <translation>Options générales</translation>
-    </message>
-    <message>
-        <source>About %1</source>
-        <translation>À propos de %1</translation>
     </message>
 </context>
 <context>

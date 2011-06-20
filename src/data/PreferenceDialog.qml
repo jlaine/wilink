@@ -57,7 +57,7 @@ Dialog {
                 ListElement {
                     avatar: 'options.png'
                     name: 'General'
-                    source: 'PreferenceGeneralTab.qml'
+                    source: 'GeneralPreferencePanel.qml'
                 }
                 ListElement {
                     avatar: 'audio-output.png'
