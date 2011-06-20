@@ -33,7 +33,7 @@ class QMessageBox;
 
 /** Chat represents the user interface's main window.
  */
-class Chat : public QMainWindow
+class Window : public QMainWindow
 {
     Q_OBJECT
     Q_PROPERTY(ChatClient* client READ client CONSTANT)
@@ -41,8 +41,8 @@ class Chat : public QMainWindow
     Q_PROPERTY(bool isActiveWindow READ isActiveWindow NOTIFY isActiveWindowChanged)
 
 public:
-    Chat(QWidget *parent = 0);
-    ~Chat();
+    Window(QWidget *parent = 0);
+    ~Window();
 
     ChatClient *client();
     ChatRosterModel *rosterModel();
