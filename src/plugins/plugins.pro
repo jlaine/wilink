@@ -18,6 +18,11 @@ symbian {
     DEFINES += WILINK_VERSION=\\\"$${WILINK_VERSION}\\\"
 }
 
+# FIXME: this is a hack so that Q_OS_ANDROID is defined
+android {
+    DEFINES += ANDROID
+}
+
 SOURCES += \
     application.cpp \
     accounts.cpp \

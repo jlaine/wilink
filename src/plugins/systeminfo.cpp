@@ -24,7 +24,9 @@
 
 QString SystemInfo::osName()
 {
-#if defined(Q_OS_LINUX)
+#if defined(Q_OS_ANDROID)
+    return QString::fromLatin1("Android");
+#elif defined(Q_OS_LINUX)
     return QString::fromLatin1("Linux");
 #elif defined(Q_OS_MAC)
     return QString::fromLatin1("Mac OS");
@@ -39,7 +41,9 @@ QString SystemInfo::osName()
 
 QString SystemInfo::osType()
 {
-#if defined(Q_OS_LINUX)
+#if defined(Q_OS_ANDROID)
+    return QString::fromLatin1("android");
+#elif defined(Q_OS_LINUX)
     return QString::fromLatin1("linux");
 #elif defined(Q_OS_MAC)
     return QString::fromLatin1("mac");
