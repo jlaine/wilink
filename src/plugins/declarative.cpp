@@ -25,7 +25,6 @@
 
 #include "qnetio/wallet.h"
 
-#include "window.h"
 #include "declarative.h"
 
 QDeclarativeSortFilterProxyModel::QDeclarativeSortFilterProxyModel(QObject *parent)

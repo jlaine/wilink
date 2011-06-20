@@ -35,7 +35,6 @@
 #include "QSoundPlayer.h"
 
 #include "application.h"
-#include "window.h"
 #include "declarative.h"
 #include "player.h"
 

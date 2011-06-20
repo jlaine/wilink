@@ -24,7 +24,6 @@
 
 #include "model.h"
 
-class Chat;
 class QSoundPlayer;
 
 class PlayerModelPrivate;

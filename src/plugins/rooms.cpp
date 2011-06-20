@@ -47,11 +47,11 @@
 #include "QXmppUtils.h"
 
 #include "application.h"
+#include "client.h"
 #include "history.h"
 #include "rooms.h"
 #include "roster.h"
 #include "utils.h"
-#include "window.h"
 
 enum MembersColumns {
     JidColumn = 0,

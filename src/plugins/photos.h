@@ -29,7 +29,6 @@
 
 using namespace QNetIO;
 
-class Chat;
 class PhotoCachePrivate;
 class PhotoDownloadItem;
 class PhotoUploadItem;

@@ -34,9 +34,9 @@
 #include <QTimer>
 #include <QThread>
 
+#include "QXmppClient.h"
 #include "QXmppUtils.h"
 
-#include "window.h"
 #include "diagnostics.h"
 #include "systeminfo.h"
 

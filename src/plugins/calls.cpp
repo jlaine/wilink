@@ -42,7 +42,6 @@
 
 #include "application.h"
 #include "calls.h"
-#include "window.h"
 
 static QAudioFormat formatFor(const QXmppJinglePayloadType &type)
 {

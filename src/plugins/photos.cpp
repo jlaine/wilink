@@ -29,7 +29,6 @@
 
 #include "QXmppClient.h"
 
-#include "window.h"
 #include "photos.h"
 
 static const QSize UPLOAD_SIZE(2048, 2048);

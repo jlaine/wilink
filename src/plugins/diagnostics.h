@@ -24,7 +24,6 @@
 
 #include "diagnostics/iq.h"
 
-class Chat;
 class DiagnosticManager;
 class QTimer;
 
