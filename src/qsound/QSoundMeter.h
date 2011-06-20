@@ -46,12 +46,14 @@ protected:
     qint64 writeData(const char *data, qint64 maxSize);
 
 private slots:
-    void deviceDestroyed(QObject *obj);
+    void _q_deviceDestroyed(QObject *obj);
+    void _q_emitSignals();
 
 private:
     QIODevice *m_device;
     qint64 m_pos;
     int m_sampleSize;
+    bool m_signalsQueued;
     int m_value;
 };
 

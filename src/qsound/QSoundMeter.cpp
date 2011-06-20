@@ -52,6 +52,7 @@ QSoundMeter::QSoundMeter(const QAudioFormat &format, QIODevice *device, QObject 
     m_device(0),
     m_pos(0),
     m_sampleSize(0),
+    m_signalsQueued(false),
     m_value(0)
 {
     if (format.byteOrder() != int(QSysInfo::ByteOrder) ||
@@ -63,15 +64,10 @@ QSoundMeter::QSoundMeter(const QAudioFormat &format, QIODevice *device, QObject 
     }
     m_device = device;
     connect(m_device, SIGNAL(destroyed(QObject*)),
-            this, SLOT(deviceDestroyed(QObject*)));
+            this, SLOT(_q_deviceDestroyed(QObject*)));
     m_sampleSize = format.sampleSize() / 8;
     if (m_device)
         open(device->openMode() | QIODevice::Unbuffered);
-}
-
-void QSoundMeter::deviceDestroyed(QObject *obj)
-{
-    m_device = 0;
 }
 
 int QSoundMeter::maximum()
@@ -96,7 +92,10 @@ qint64 QSoundMeter::readData(char *data, qint64 maxSize)
         const int newValue = loudness(data, length, m_pos, m_sampleSize);
         if (newValue != m_value) {
             m_value = newValue;
-            emit valueChanged(m_value);
+            if (!m_signalsQueued && !signalsBlocked()) {
+                m_signalsQueued = true;
+                QMetaObject::invokeMethod(this, "_q_emitSignals", Qt::QueuedConnection);
+            }
         }
         m_pos += length;
     }
@@ -125,10 +124,23 @@ qint64 QSoundMeter::writeData(const char *data, qint64 maxSize)
         const int newValue = loudness(data, length, m_pos, m_sampleSize);
         if (newValue != m_value) {
             m_value = newValue;
-            emit valueChanged(m_value);
+            if (!m_signalsQueued && !signalsBlocked()) {
+                m_signalsQueued = true;
+                QMetaObject::invokeMethod(this, "_q_emitSignals", Qt::QueuedConnection);
+            }
         }
         m_pos += length;
     }
     return length;
 }
 
+void QSoundMeter::_q_deviceDestroyed(QObject *obj)
+{
+    m_device = 0;
+}
+
+void QSoundMeter::_q_emitSignals()
+{
+    emit valueChanged(m_value);
+    m_signalsQueued = false;
+}
