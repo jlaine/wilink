@@ -41,6 +41,10 @@ Dialog {
         parent.hide();
     }
 
+    onRejected: {
+        dialogLoader.source = ''
+    }
+
     Item {
         anchors.fill: contents
 
