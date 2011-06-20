@@ -155,26 +155,41 @@ Panel {
                                     anchors.top: parent.top
                                     anchors.bottom: parent.bottom
                                     checked: model.checkState == 2
-                                    iconSource: 'album.png'
-                                    width: 12 + appStyle.icon.smallSize + appStyle.spacing.horizontal
+                                    width: 12
                                     onClicked: {
                                         folderModel.setCheckState(model.path, checked ? 0 : 2);
                                     }
                                 }
 
-                                Text {
+                                Image {
+                                    id: icon
+
                                     anchors.left: check.right
+                                    anchors.leftMargin: appStyle.spacing.horizontal
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    source: 'album.png'
+                                }
+
+                                Text {
+                                    anchors.left: icon.right
+                                    anchors.leftMargin: appStyle.spacing.horizontal
                                     anchors.right: parent.right
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: model.name
 
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        onClicked: {
-                                            crumbs.push({'name': model.name, 'path': model.path});
-                                        }
+                                }
+
+                                MouseArea {
+                                    anchors.top: parent.top
+                                    anchors.bottom: parent.bottom
+                                    anchors.left: check.right
+                                    anchors.right: parent.right
+
+                                    onClicked: {
+                                        crumbs.push({'name': model.name, 'path': model.path});
                                     }
                                 }
+
                             }
                         }
                     }
