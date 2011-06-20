@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
     app.setUpdatesDialog(&updates);
 
     /* Show chat windows */
-    QTimer::singleShot(0, &app, SLOT(resetChats()));
+    QTimer::singleShot(0, &app, SLOT(resetWindows()));
 
     /* Run application */
     return app.exec();

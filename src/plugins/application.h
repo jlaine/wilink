@@ -134,9 +134,9 @@ public slots:
     void showMessage(QObject *context, const QString &title, const QString &message);
 
 private slots:
-    void resetChats();
+    void resetWindows();
     void showAccounts();
-    void showChats();
+    void showWindows();
 #ifdef USE_SYSTRAY
     void trayActivated(QSystemTrayIcon::ActivationReason reason);
     void trayClicked();

@@ -52,7 +52,7 @@ class ApplicationPrivate
 public:
     ApplicationPrivate();
 
-    QList<Chat*> chats;
+    QList<Window*> chats;
     QSettings *settings;
     QSoundPlayer *soundPlayer;
     QThread *soundThread;
@@ -177,7 +177,7 @@ Application::~Application()
 #endif
 
     // destroy chat windows
-    foreach (Chat *chat, d->chats)
+    foreach (Window *chat, d->chats)
         delete chat;
 
     // stop sound player
@@ -380,7 +380,7 @@ void Application::setOpenAtLogin(bool run)
  */
 void Application::openUrl(const QUrl &url)
 {
-    foreach (Chat *chat, d->chats)
+    foreach (Window *chat, d->chats)
     {
         if (chat->client()->configuration().jidBare() == url.authority()) {
             QUrl simpleUrl = url;
@@ -424,13 +424,13 @@ void Application::showAccounts()
 
     // reset chats later as we may delete the calling window
     if (dlg.changed())
-        QTimer::singleShot(0, this, SLOT(resetChats()));
+        QTimer::singleShot(0, this, SLOT(resetWindows()));
 }
 
-void Application::resetChats()
+void Application::resetWindows()
 {
-    /* close any existing chats */
-    foreach (Chat *chat, d->chats)
+    /* close any existing windows */
+    foreach (Window *chat, d->chats)
         delete chat;
     d->chats.clear();
 
@@ -442,9 +442,8 @@ void Application::resetChats()
     int xpos = 30;
     int ypos = 20;
     const QStringList chatJids = dlg.accounts();
-    foreach (const QString &jid, chatJids)
-    {
-        Chat *chat = new Chat;
+    foreach (const QString &jid, chatJids) {
+        Window *chat = new Window;
         if (chatJids.size() == 1)
             chat->setWindowTitle(qApp->applicationName());
         else
@@ -464,13 +463,12 @@ void Application::resetChats()
     }
 
     /* show chats */
-    showChats();
+    showWindows();
 }
 
-void Application::showChats()
+void Application::showWindows()
 {
-    foreach (Chat *chat, d->chats)
-    {
+    foreach (Window *chat, d->chats) {
         chat->setWindowState(chat->windowState() & ~Qt::WindowMinimized);
         chat->show();
         chat->raise();
@@ -713,7 +711,7 @@ void Application::setSortContactsByStatus(bool sort)
 void Application::trayActivated(QSystemTrayIcon::ActivationReason reason)
 {
     if (reason != QSystemTrayIcon::Context)
-        showChats();
+        showWindows();
 }
 
 void Application::trayClicked()

@@ -94,7 +94,7 @@ public:
     QString windowTitle;
 };
 
-Chat::Chat(QWidget *parent)
+Window::Window(QWidget *parent)
     : QMainWindow(parent),
     d(new ChatPrivate)
 {
@@ -143,7 +143,7 @@ Chat::Chat(QWidget *parent)
     qmlRegisterUncreatableType<QSoundPlayer>("wiLink", 1, 2, "SoundPlayer", "");
     qmlRegisterType<QSoundTester>("wiLink", 1, 2, "SoundTester");
     qmlRegisterType<VCard>("wiLink", 1, 2, "VCard");
-    qmlRegisterUncreatableType<Chat>("wiLink", 1, 2, "Window", "");
+    qmlRegisterUncreatableType<Window>("wiLink", 1, 2, "Window", "");
 
     // crutches for Qt..
     qRegisterMetaType<QIODevice::OpenMode>("QIODevice::OpenMode");
@@ -255,14 +255,14 @@ Chat::Chat(QWidget *parent)
     resize(size);
 }
 
-Chat::~Chat()
+Window::~Window()
 {
     // disconnect
     d->client->disconnectFromServer();
     delete d;
 }
 
-void Chat::alert()
+void Window::alert()
 {
     // show the chat window
     if (!isVisible()) {
@@ -281,7 +281,7 @@ void Chat::alert()
     wApp->alert(this);
 }
 
-void Chat::changeEvent(QEvent *event)
+void Window::changeEvent(QEvent *event)
 {
     QWidget::changeEvent(event);
     if (event->type() == QEvent::ActivationChange)
@@ -292,7 +292,7 @@ void Chat::changeEvent(QEvent *event)
  *
  * @param error
  */
-void Chat::error(QXmppClient::Error error)
+void Window::error(QXmppClient::Error error)
 {
     if(error == QXmppClient::XmppStreamError)
     {
@@ -312,7 +312,7 @@ void Chat::error(QXmppClient::Error error)
 
 /** The number of pending messages changed.
  */
-void Chat::pendingMessages(int messages)
+void Window::pendingMessages(int messages)
 {
     QString title = d->windowTitle;
     if (messages)
@@ -322,7 +322,7 @@ void Chat::pendingMessages(int messages)
 
 /** Prompt for credentials then connect.
  */
-void Chat::promptCredentials()
+void Window::promptCredentials()
 {
     QXmppConfiguration config = d->client->configuration();
     QString password = config.password();
@@ -334,13 +334,13 @@ void Chat::promptCredentials()
     }
 }
 
-QFileDialog *Chat::fileDialog()
+QFileDialog *Window::fileDialog()
 {
     QFileDialog *dialog = new QDeclarativeFileDialog(this);
     return dialog;
 }
 
-QMessageBox *Chat::messageBox()
+QMessageBox *Window::messageBox()
 {
     QMessageBox *box = new QMessageBox(this);
     box->setIcon(QMessageBox::Question);
@@ -349,14 +349,14 @@ QMessageBox *Chat::messageBox()
 
 /** Return this window's chat client.
  */
-ChatClient *Chat::client()
+ChatClient *Window::client()
 {
     return d->client;
 }
 
 /** Return this window's chat roster model.
  */
-ChatRosterModel *Chat::rosterModel()
+ChatRosterModel *Window::rosterModel()
 {
     return d->rosterModel;
 }
@@ -365,7 +365,7 @@ ChatRosterModel *Chat::rosterModel()
  *
  * @param jid
  */
-bool Chat::open(const QString &jid)
+bool Window::open(const QString &jid)
 {
     QXmppConfiguration config;
     config.setResource(qApp->applicationName());
@@ -407,7 +407,7 @@ bool Chat::open(const QString &jid)
     return true;
 }
 
-void Chat::setWindowTitle(const QString &title)
+void Window::setWindowTitle(const QString &title)
 {
     d->windowTitle = title;
     QWidget::setWindowTitle(title);
@@ -415,7 +415,7 @@ void Chat::setWindowTitle(const QString &title)
 
 /** Display the help web page.
  */
-void Chat::showHelp()
+void Window::showHelp()
 {
     QDesktopServices::openUrl(QUrl(HELP_URL));
 }
