@@ -77,7 +77,7 @@ void writeIq(QAbstractNetworkCache *cache, const QUrl &url, const T &iq, int cac
     cache->insert(ioDevice);
 }
 
-static QString getStatusName(ChatClient *client, const QString &jid)
+static QString getStatusName(const QString &jid)
 {
     const QXmppPresence::Status::Type type = VCardCache::instance()->presenceStatus(jid);
     if (type == QXmppPresence::Status::Offline)
@@ -268,11 +268,11 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
     } else if (role == StatusRole) {
         return VCardCache::instance()->presenceStatus(item->jid);
     } else if (role == StatusFilterRole) {
-        return getStatusName(d->client, item->jid);
+        return getStatusName(item->jid);
     } else if (role == StatusSortRole) {
         VCard card;
         card.setJid(item->jid);
-        return getStatusName(d->client, item->jid) + sortSeparator + card.name().toLower() + sortSeparator + item->jid.toLower();
+        return getStatusName(item->jid) + sortSeparator + card.name().toLower() + sortSeparator + item->jid.toLower();
     }
 
     return QVariant();
