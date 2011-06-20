@@ -66,18 +66,21 @@ Panel {
                 return '';
         }
 
+        StatusPill {
+            anchors.left: parent.left
+            anchors.leftMargin: appStyle.icon.normalSize - 3
+            anchors.top: parent.top
+            anchors.topMargin: appStyle.icon.normalSize - 3
+            height: appStyle.icon.tinySize
+            width: appStyle.icon.tinySize
+            presenceStatus: vcard.status
+        }
+
         Row {
             id: toolBar
 
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.right
-
-            StatusPill {
-                anchors.verticalCenter: parent.verticalCenter
-                presenceStatus: vcard.status
-                height: appStyle.icon.tinySize
-                width: appStyle.icon.tinySize
-            }
 
             ToolButton {
                 iconSource: 'call.png'

@@ -41,8 +41,8 @@ Rectangle {
         anchors.leftMargin: 8
         anchors.verticalCenter: parent.verticalCenter
         smooth: true
-        height: 32
-        width: 32
+        height: appStyle.icon.normalSize
+        width: appStyle.icon.normalSize
     }
 
     Text {
