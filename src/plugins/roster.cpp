@@ -77,31 +77,9 @@ void writeIq(QAbstractNetworkCache *cache, const QUrl &url, const T &iq, int cac
     cache->insert(ioDevice);
 }
 
-static QXmppPresence::Status::Type getStatus(ChatClient *client, const QString &jid) {
-    QXmppPresence::Status::Type statusType = QXmppPresence::Status::Offline;
-    // NOTE : we test the connection status, otherwise we encounter a race
-    // condition upon disconnection, because the roster has not yet been cleared
-    if (!client->isConnected())
-        return statusType;
-
-    foreach (const QXmppPresence &presence, client->rosterManager()->getAllPresencesForBareJid(jid)) {
-        QXmppPresence::Status::Type type = presence.status().type();
-        if (type == QXmppPresence::Status::Offline)
-            continue;
-        // FIXME : we should probably be using the priority rather than
-        // stop at the first available contact
-        else if (type == QXmppPresence::Status::Online ||
-                 type == QXmppPresence::Status::Chat)
-            return type;
-        else
-            statusType = type;
-    }
-    return statusType;
-}
-
 static QString getStatusName(ChatClient *client, const QString &jid)
 {
-    const QXmppPresence::Status::Type type = getStatus(client, jid);
+    const QXmppPresence::Status::Type type = VCardCache::instance()->presenceStatus(jid);
     if (type == QXmppPresence::Status::Offline)
         return "offline";
     else if (type == QXmppPresence::Status::Online || type == QXmppPresence::Status::Chat)
@@ -288,7 +266,7 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
         card.setJid(item->jid);
         return card.name();
     } else if (role == StatusRole) {
-        return getStatus(d->client, item->jid);
+        return VCardCache::instance()->presenceStatus(item->jid);
     } else if (role == StatusFilterRole) {
         return getStatusName(d->client, item->jid);
     } else if (role == StatusSortRole) {
@@ -416,6 +394,7 @@ public:
     QList<ChatClient*> clients;
     QSet<QString> discoQueue;
     QMap<QString, VCard::Features> features;
+    QMap<QString, QXmppPresence::Status::Type> presences;
     QSet<QString> vcardFailed;
     QSet<QString> vcardQueue;
 };
@@ -501,6 +480,14 @@ QString VCard::name() const
 QString VCard::nickName() const
 {
     return m_nickName;
+}
+
+int VCard::status() const
+{
+    QXmppPresence::Status::Type statusType = QXmppPresence::Status::Offline;
+    foreach (ChatClient *client, m_cache->d->clients) {
+
+    }
 }
 
 QUrl VCard::url() const
@@ -730,6 +717,33 @@ void VCardCache::presenceReceived(const QXmppPresence &presence)
         (presence.type() == QXmppPresence::Unavailable && d->features.remove(jid)))
         emit discoChanged(jidToBareJid(jid));
 }
+
+QXmppPresence::Status::Type VCardCache::presenceStatus(const QString &jid) const
+{
+    QXmppPresence::Status::Type statusType = QXmppPresence::Status::Offline;
+
+    foreach (ChatClient *client, d->clients) {
+        // NOTE : we test the connection status, otherwise we encounter a race
+        // condition upon disconnection, because the roster has not yet been cleared
+        if (!client->isConnected())
+            continue;
+
+        foreach (const QXmppPresence &presence, client->rosterManager()->getAllPresencesForBareJid(jid)) {
+            QXmppPresence::Status::Type type = presence.status().type();
+            if (type == QXmppPresence::Status::Offline)
+                continue;
+            // FIXME : we should probably be using the priority rather than
+            // stop at the first available contact
+            else if (type == QXmppPresence::Status::Online ||
+                     type == QXmppPresence::Status::Chat)
+                return type;
+            else
+                statusType = type;
+        }
+    }
+    return statusType;
+}
+
 
 void VCardCache::vCardReceived(const QXmppVCardIq& vCard)
 {

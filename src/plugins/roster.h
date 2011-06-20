@@ -24,6 +24,8 @@
 #include <QSet>
 #include <QUrl>
 
+#include <QXmppPresence.h>
+
 #include "model.h"
 
 class QXmppDiscoveryIq;
@@ -113,6 +115,7 @@ public:
     void setJid(const QString &jid);
     QString name() const;
     QString nickName() const;
+    int status() const;
     QUrl url() const;
 
 signals:
@@ -149,6 +152,9 @@ class VCardCache : public QObject
 public:
     static VCardCache *instance();
     ~VCardCache();
+    
+    QUrl imageUrl(const QString &jid);
+    QXmppPresence::Status::Type presenceStatus(const QString &jid) const;
 
 signals:
     void cardChanged(const QString &jid);
@@ -157,7 +163,6 @@ signals:
 public slots:
     void addClient(ChatClient *client);
     bool get(const QString &jid, QXmppVCardIq *iq = 0);
-    QUrl imageUrl(const QString &jid);
 
 private slots:
     void clientDestroyed(QObject *object);
