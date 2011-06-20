@@ -42,6 +42,8 @@ static int loudness(const char *data, qint64 length, qint64 offset, int sampleSi
         sum += (sample * sample);
         count++;
     }
+    if (!count || sum < count)
+        return 0;
     return 5.0 * log((float)sum/(float)count);
 }
 
