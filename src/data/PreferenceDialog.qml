@@ -73,6 +73,12 @@ Dialog {
                     name: 'Shares'
                     source: 'SharePreferencePanel.qml'
                 }
+
+                Component.onCompleted: {
+                    setProperty(0, 'name', qsTr('General'));
+                    setProperty(1, 'name', qsTr('Sound'));
+                    setProperty(2, 'name', qsTr('Shares'));
+                }
             }
 
             delegate: Item {
