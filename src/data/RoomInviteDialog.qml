@@ -81,42 +81,28 @@ Dialog {
                     state: 'inactive'
                 }
 
-                Rectangle {
+                CheckBox {
                     id: check
 
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
                     anchors.left: parent.left
                     anchors.leftMargin: appStyle.spacing.horizontal
-                    anchors.verticalCenter: parent.verticalCenter
-                    border.width: 1
-                    border.color: '#ffb0c4de'
-                    color: isSelected() ? '#597fbe' : 'white'
-                    radius: 6
-                    width: 12
-                    height: 12
-                }
-
-                Image {
-                    id: image
-
-                    anchors.left: check.right
-                    anchors.leftMargin: appStyle.spacing.horizontal
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: appStyle.icon.smallSize
-                    height: appStyle.icon.smallSize
-                    smooth: true
-                    source: model.avatar
-                }
-
-                Text {
-                    anchors.left: image.right
-                    anchors.leftMargin: appStyle.spacing.horizontal
                     anchors.right: status.left
-                    anchors.verticalCenter: parent.verticalCenter
+                    checked: {
+                        for (var i = 0; i < selection.length; i += 1) {
+                            if (selection[i] == model.jid)
+                                return true;
+                        }
+                        return false;
+                    }
+                    iconSource: model.avatar
                     text: model.name
                 }
 
                 StatusPill {
                     id: status
+
                     anchors.right: parent.right
                     anchors.rightMargin: appStyle.spacing.horizontal
                     anchors.verticalCenter: parent.verticalCenter
