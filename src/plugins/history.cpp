@@ -83,7 +83,7 @@ QString ChatMessage::html(const QString &meName) const
 
 #ifdef USE_SMILEYS
     bodyHtml.replace(":@", "<img alt=\":@\" src=\":/smiley-angry.png\" />");
-    bodyHtml.replace(":s", "<img alt=\":s\" rc=\":/smiley-confused.png\" />");
+    bodyHtml.replace(":s", "<img alt=\":s\" src=\":/smiley-confused.png\" />");
     bodyHtml.replace(":)", "<img alt=\":)\" src=\":/smiley-happy.png\" />");
     bodyHtml.replace(":|", "<img alt=\":|\" src=\":/smiley-neutral.png\" />");
     bodyHtml.replace(":p", "<img alt=\":p\" src=\":/smiley-raspberry.png\" />");
