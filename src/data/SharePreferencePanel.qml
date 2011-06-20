@@ -198,7 +198,7 @@ Panel {
                     ScrollBar {
                         id: folderBar
 
-                        anchors.top: parent.top
+                        anchors.top: crumbs.bottom
                         anchors.bottom: parent.bottom
                         anchors.right: parent.right
                         flickableItem: folderView
