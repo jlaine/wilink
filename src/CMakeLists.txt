@@ -127,7 +127,7 @@ if(RELOAD_TRANSLATIONS)
         data/PhotoPanel.qml
         data/PreferenceDialog.qml
         data/PreferenceGeneralTab.qml
-        data/PreferenceShareTab.qml
+        data/SharePreferencePanel.qml
         data/PreferenceSoundTab.qml
         data/RoomPanel.qml
         data/SharePanel.qml

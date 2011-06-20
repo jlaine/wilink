@@ -53,7 +53,7 @@ Panel {
 
                 onClicked: {
                     dialogLoader.source = 'PreferenceDialog.qml';
-                    dialogLoader.item.showPanel('PreferenceShareTab.qml');
+                    dialogLoader.item.showPanel('SharePreferencePanel.qml');
                     dialogLoader.show();
                 }
             }

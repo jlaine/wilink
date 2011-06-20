@@ -67,7 +67,7 @@ Dialog {
                 ListElement {
                     avatar: 'share.png'
                     name: 'Shares'
-                    source: 'PreferenceShareTab.qml'
+                    source: 'SharePreferencePanel.qml'
                 }
             }
 
