@@ -106,6 +106,7 @@
     <file>ProgressBar.qml</file>
     <file>RoomPanel.qml</file>
     <file>RoomParticipantView.qml</file>
+    <file>RoomPermissionDialog.qml</file>
     <file>RoomInviteDialog.qml</file>
     <file>RoomJoinDialog.qml</file>
     <file>RosterView.qml</file>
