@@ -81,6 +81,7 @@ Panel {
         id: about
 
         anchors.top: general.bottom
+        anchors.topMargin: appStyle.spacing.vertical
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right

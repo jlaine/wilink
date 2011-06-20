@@ -35,6 +35,7 @@ Panel {
 
         anchors.top: parent.top
         anchors.bottom: downloads.top
+        anchors.bottomMargin: appStyle.spacing.vertical
         anchors.left: parent.left
         anchors.right: parent.right
         title: qsTr('Shared folders')
