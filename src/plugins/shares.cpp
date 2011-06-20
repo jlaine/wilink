@@ -310,11 +310,15 @@ QVariant ShareModel::data(const QModelIndex &index, int role) const
 QXmppShareDatabase *ShareModel::database()
 {
     if (!globalDatabase) {
+        bool check;
+
         // initialise database
         const QString databaseName = QDir(QDesktopServices::storageLocation(QDesktopServices::DataLocation)).filePath("database.sqlite");
         QSqlDatabase sharesDb = QSqlDatabase::addDatabase("QSQLITE");
         sharesDb.setDatabaseName(databaseName);
-        Q_ASSERT(sharesDb.open());
+        check = sharesDb.open();
+        Q_ASSERT(check);
+
         QDjango::setDatabase(sharesDb);
         // drop wiLink <= 0.9.4 table
         sharesDb.exec("DROP TABLE files");
@@ -323,10 +327,12 @@ QXmppShareDatabase *ShareModel::database()
         globalDatabase = new QXmppShareDatabase;
         globalDatabase->setDirectory(wApp->sharesLocation());
         globalDatabase->setMappedDirectories(wApp->sharesDirectories());
-        connect(wApp, SIGNAL(sharesDirectoriesChanged(QStringList)),
-                globalDatabase, SLOT(setMappedDirectories(QStringList)));
-        connect(wApp, SIGNAL(sharesLocationChanged(QString)),
-                globalDatabase, SLOT(setDirectory(QString)));
+        check = connect(wApp, SIGNAL(sharesDirectoriesChanged(QStringList)),
+                        globalDatabase, SLOT(setMappedDirectories(QStringList)));
+        Q_ASSERT(check);
+        check = connect(wApp, SIGNAL(sharesLocationChanged(QString)),
+                        globalDatabase, SLOT(setDirectory(QString)));
+        Q_ASSERT(check);
         qAddPostRoutine(closeDatabase);
     }
     return globalDatabase;
