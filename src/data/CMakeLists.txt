@@ -11,6 +11,8 @@ generate_png(png SIZE 11
 
 # 16x16 icons
 generate_png(png SIZE 16
+    checkbox.svg
+    checkbox-checked.svg
     smiley-angry.svg
     smiley-confused.svg
     smiley-happy.svg

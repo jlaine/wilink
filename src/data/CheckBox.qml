@@ -30,15 +30,12 @@ Item {
 
     height: textItem.paintedHeight
 
-    Rectangle {
+    Image {
         id: rect
 
         anchors.left:  parent.left
         anchors.verticalCenter: parent.verticalCenter
-        border.width: 1
-        border.color: '#ffb0c4de'
-        color: checked ? '#597fbe' : 'white'
-        radius: 6
+        source: checked ? 'checkbox-checked.png' : 'checkbox.png'
         width: 12
         height: 12
     }
