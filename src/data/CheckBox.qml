@@ -28,7 +28,7 @@ Item {
     property string iconSource
     property string text
 
-    height: textItem.paintedHeight
+    height: Math.max(16, textItem.paintedHeight)
 
     Image {
         id: rect
@@ -36,8 +36,8 @@ Item {
         anchors.left:  parent.left
         anchors.verticalCenter: parent.verticalCenter
         source: checked ? 'checkbox-checked.png' : 'checkbox.png'
-        width: 12
-        height: 12
+        width: 16
+        height: 16
     }
 
     Image {
