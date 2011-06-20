@@ -162,7 +162,7 @@ public:
 signals:
     void cardChanged(const QString &jid);
     void discoChanged(const QString &jid);
-    void presenceChanged(const QString &jid);
+    void presenceChanged(const QString &jid = QString());
 
 public slots:
     void addClient(ChatClient *client);

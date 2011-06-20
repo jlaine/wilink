@@ -557,10 +557,8 @@ void VCard::_q_discoChanged(const QString &jid)
 
 void VCard::_q_presenceChanged(const QString &jid)
 {
-    if (jid == m_jid && m_cache) {
-        qDebug("presence changed");
+    if (jid.isEmpty() || jid == m_jid)
         emit statusChanged();
-    }
 }
 
 VCardCache::VCardCache(QObject *parent)
@@ -657,6 +655,10 @@ void VCardCache::addClient(ChatClient *client)
 
     check = connect(client, SIGNAL(destroyed(QObject*)),
                     this, SLOT(clientDestroyed(QObject*)));
+    Q_ASSERT(check);
+
+    check = connect(client, SIGNAL(disconnected()),
+                    this, SIGNAL(presenceChanged()));
     Q_ASSERT(check);
 
     check = connect(client, SIGNAL(presenceReceived(QXmppPresence)),
