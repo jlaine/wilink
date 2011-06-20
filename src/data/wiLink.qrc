@@ -100,7 +100,7 @@
     <file>PreferenceDialog.qml</file>
     <file>PreferenceGeneralTab.qml</file>
     <file>SharePreferencePanel.qml</file>
-    <file>PreferenceSoundTab.qml</file>
+    <file>SoundPreferencePanel.qml</file>
     <file>ProgressBar.qml</file>
     <file>RoomPanel.qml</file>
     <file>RoomParticipantView.qml</file>

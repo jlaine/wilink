@@ -573,45 +573,6 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>PreferenceSoundTab</name>
-    <message>
-        <source>Incoming message</source>
-        <translation>Message reçu</translation>
-    </message>
-    <message>
-        <source>Outgoing message</source>
-        <translation>Message envoyé</translation>
-    </message>
-    <message>
-        <source>Sound notifications</source>
-        <translation>Notifications sonores</translation>
-    </message>
-    <message>
-        <source>Audio capture device</source>
-        <translation>Périphérique d&apos;entrée son</translation>
-    </message>
-    <message>
-        <source>Audio playback device</source>
-        <translation>Périphérique de sortie son</translation>
-    </message>
-    <message>
-        <source>Test</source>
-        <translation>Tester</translation>
-    </message>
-    <message>
-        <source>Sound devices</source>
-        <translation>Périphériques audio</translation>
-    </message>
-    <message>
-        <source>Speak into the microphone for %1 seconds and check the sound level.</source>
-        <translation>Parlez dans le microphone pendant %1 secondes et vérifiez le niveau sonore.</translation>
-    </message>
-    <message>
-        <source>You should now hear the sound you recorded.</source>
-        <translation>Vous devriez maintenant entendre le son que vous avez enregistré.</translation>
-    </message>
-</context>
-<context>
     <name>RoomInviteDialog</name>
     <message>
         <source>Invite your contacts</source>
@@ -808,6 +769,45 @@ Acceptez-vous?</translation>
     <message>
         <source>Download</source>
         <translation>Télécharger</translation>
+    </message>
+</context>
+<context>
+    <name>SoundPreferencePanel</name>
+    <message>
+        <source>Incoming message</source>
+        <translation>Message reçu</translation>
+    </message>
+    <message>
+        <source>Outgoing message</source>
+        <translation>Message envoyé</translation>
+    </message>
+    <message>
+        <source>Sound notifications</source>
+        <translation>Notifications sonores</translation>
+    </message>
+    <message>
+        <source>Audio capture device</source>
+        <translation>Périphérique d&apos;entrée son</translation>
+    </message>
+    <message>
+        <source>Audio playback device</source>
+        <translation>Périphérique de sortie son</translation>
+    </message>
+    <message>
+        <source>Test</source>
+        <translation>Tester</translation>
+    </message>
+    <message>
+        <source>Sound devices</source>
+        <translation>Périphériques audio</translation>
+    </message>
+    <message>
+        <source>Speak into the microphone for %1 seconds and check the sound level.</source>
+        <translation>Parlez dans le microphone pendant %1 secondes et vérifiez le niveau sonore.</translation>
+    </message>
+    <message>
+        <source>You should now hear the sound you recorded.</source>
+        <translation>Vous devriez maintenant entendre le son que vous avez enregistré.</translation>
     </message>
 </context>
 <context>

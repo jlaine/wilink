@@ -62,7 +62,7 @@ Dialog {
                 ListElement {
                     avatar: 'audio-output.png'
                     name: 'Sound'
-                    source: 'PreferenceSoundTab.qml'
+                    source: 'SoundPreferencePanel.qml'
                 }
                 ListElement {
                     avatar: 'share.png'

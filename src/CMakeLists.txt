@@ -128,7 +128,7 @@ if(RELOAD_TRANSLATIONS)
         data/PreferenceDialog.qml
         data/PreferenceGeneralTab.qml
         data/SharePreferencePanel.qml
-        data/PreferenceSoundTab.qml
+        data/SoundPreferencePanel.qml
         data/RoomPanel.qml
         data/SharePanel.qml
         data/ShareQueueView.qml
