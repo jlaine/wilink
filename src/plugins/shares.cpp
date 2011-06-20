@@ -968,8 +968,8 @@ bool ShareFolderModel::setData(const QModelIndex &changedIndex, const QVariant &
 
         // refresh children of the changed index
         emit dataChanged(
-            index(0, 0, changedIndex),
-            index(rowCount(changedIndex), columnCount(changedIndex), changedIndex));
+            QFileSystemModel::index(0, 0, changedIndex),
+            QFileSystemModel::index(rowCount(changedIndex), columnCount(changedIndex), changedIndex));
 
         emit selectedFoldersChanged(m_selected);
         return true;

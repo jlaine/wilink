@@ -126,6 +126,10 @@ Panel {
                         anchors.top: parent.top
                         anchors.left: parent.left
                         anchors.right: parent.right
+
+                        onLocationChanged: {
+                            visualModel.rootIndex = folderModel.index(location.path);
+                        }
                     }
 
                     ListView {
@@ -168,7 +172,6 @@ Panel {
                                         anchors.fill: parent
                                         onClicked: {
                                             crumbs.push({'name': model.name, 'path': model.path});
-                                            visualModel.rootIndex = visualModel.modelIndex(model.index);
                                         }
                                     }
                                 }
