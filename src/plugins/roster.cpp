@@ -77,6 +77,41 @@ void writeIq(QAbstractNetworkCache *cache, const QUrl &url, const T &iq, int cac
     cache->insert(ioDevice);
 }
 
+static QXmppPresence::Status::Type getStatus(ChatClient *client, const QString &jid) {
+    QXmppPresence::Status::Type statusType = QXmppPresence::Status::Offline;
+    // NOTE : we test the connection status, otherwise we encounter a race
+    // condition upon disconnection, because the roster has not yet been cleared
+    if (!client->isConnected())
+        return statusType;
+
+    foreach (const QXmppPresence &presence, client->rosterManager()->getAllPresencesForBareJid(jid)) {
+        QXmppPresence::Status::Type type = presence.status().type();
+        if (type == QXmppPresence::Status::Offline)
+            continue;
+        // FIXME : we should probably be using the priority rather than
+        // stop at the first available contact
+        else if (type == QXmppPresence::Status::Online ||
+                 type == QXmppPresence::Status::Chat)
+            return type;
+        else
+            statusType = type;
+    }
+    return statusType;
+}
+
+static QString getStatusName(ChatClient *client, const QString &jid)
+{
+    const QXmppPresence::Status::Type type = getStatus(client, jid);
+    if (type == QXmppPresence::Status::Offline)
+        return "offline";
+    else if (type == QXmppPresence::Status::Online || type == QXmppPresence::Status::Chat)
+        return "available";
+    else if (type == QXmppPresence::Status::Away || type == QXmppPresence::Status::XA)
+        return "away";
+    else
+        return "busy";
+}
+
 class ChatRosterItem : public ChatModelItem
 {
 public:
@@ -236,20 +271,6 @@ ChatRosterModel::~ChatRosterModel()
     delete d;
 }
 
-static QString contactStatus(const QModelIndex &index)
-{
-    const int typeVal = index.data(ChatRosterModel::StatusRole).toInt();
-    QXmppPresence::Status::Type type = static_cast<QXmppPresence::Status::Type>(typeVal);
-    if (type == QXmppPresence::Status::Offline)
-        return "offline";
-    else if (type == QXmppPresence::Status::Online || type == QXmppPresence::Status::Chat)
-        return "available";
-    else if (type == QXmppPresence::Status::Away || type == QXmppPresence::Status::XA)
-        return "away";
-    else
-        return "busy";
-}
-
 QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
 {
     ChatRosterItem *item = static_cast<ChatRosterItem*>(index.internalPointer());
@@ -267,30 +288,13 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
         card.setJid(item->jid);
         return card.name();
     } else if (role == StatusRole) {
-        QXmppPresence::Status::Type statusType = QXmppPresence::Status::Offline;
-        // NOTE : we test the connection status, otherwise we encounter a race
-        // condition upon disconnection, because the roster has not yet been cleared
-        if (!d->client->isConnected())
-            return statusType;
-        foreach (const QXmppPresence &presence, d->client->rosterManager()->getAllPresencesForBareJid(item->jid)) {
-            QXmppPresence::Status::Type type = presence.status().type();
-            if (type == QXmppPresence::Status::Offline)
-                continue;
-            // FIXME : we should probably be using the priority rather than
-            // stop at the first available contact
-            else if (type == QXmppPresence::Status::Online ||
-                     type == QXmppPresence::Status::Chat)
-                return type;
-            else
-                statusType = type;
-        }
-        return statusType;
+        return getStatus(d->client, item->jid);
     } else if (role == StatusFilterRole) {
-        return contactStatus(index);
+        return getStatusName(d->client, item->jid);
     } else if (role == StatusSortRole) {
         VCard card;
         card.setJid(item->jid);
-        return contactStatus(index) + sortSeparator + card.name().toLower() + sortSeparator + item->jid.toLower();
+        return getStatusName(d->client, item->jid) + sortSeparator + card.name().toLower() + sortSeparator + item->jid.toLower();
     }
 
     return QVariant();
