@@ -85,9 +85,6 @@ public:
 class ChatPrivate
 {
 public:
-    QAction *findAction;
-    QAction *findAgainAction;
-
     ChatClient *client;
     ChatRosterModel *rosterModel;
     QDeclarativeView *rosterView;
@@ -206,19 +203,6 @@ Window::Window(QWidget *parent)
     check = connect(action, SIGNAL(triggered(bool)),
                     qApp, SLOT(quit()));
     Q_ASSERT(check);
-
-#if 0
-    /* "Edit" menu */
-    QMenu *editMenu = menuBar()->addMenu(tr("&Edit"));
-
-    d->findAction = editMenu->addAction(QIcon(":/search.png"), tr("&Find"));
-    d->findAction->setEnabled(false);
-    d->findAction->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_F));
-
-    d->findAgainAction = editMenu->addAction(tr("Find a&gain"));
-    d->findAgainAction->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_G));
-    d->findAgainAction->setEnabled(false);
-#endif
 
     /* "Help" menu */
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
