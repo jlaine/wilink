@@ -123,15 +123,7 @@ Panel {
             anchors.left: parent.left
             anchors.right: buttonBox.left
             anchors.rightMargin: 4
-
-            Text {
-                anchors.fill: numberEdit
-                anchors.margins: 4
-                color: '#999'
-                elide: Text.ElideRight
-                opacity: numberEdit.text == '' ? 1 : 0
-                text: qsTr('Enter the number you want to call')
-            }
+            hintText: qsTr('Enter the number you want to call')
 
             Keys.onReturnPressed: {
                 if (callButton.enabled) {

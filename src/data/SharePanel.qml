@@ -100,17 +100,7 @@ Panel {
             anchors.rightMargin: 8
             anchors.verticalCenter: parent.verticalCenter
             anchors.margins: 8
-
-            Text {
-                id: searchLabel
-
-                anchors.fill: searchEdit
-                anchors.margins: 4
-                color: '#999'
-                elide: Text.ElideRight
-                opacity: searchEdit.text == '' ? 1 : 0
-                text: qsTr('Enter the name of the file you are looking for.');
-            }
+            hintText: qsTr('Enter the name of the file you are looking for.')
 
             states: State {
                 name: 'noresults'

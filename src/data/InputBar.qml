@@ -23,6 +23,7 @@ Rectangle {
     id: bar
 
     property alias echoMode: edit.echoMode
+    property alias hintText: label.text
     property alias text: edit.text
 
     function backspacePressed() {
@@ -48,6 +49,15 @@ Rectangle {
         focus: true
         smooth: true
         selectByMouse: true
+    }
+
+    Text {
+        id: label
+
+        anchors.fill: edit
+        elide: Text.ElideRight
+        color: '#999'
+        opacity: edit.text == '' ? 1 : 0
     }
 
     MouseArea {
