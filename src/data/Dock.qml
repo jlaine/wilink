@@ -64,6 +64,7 @@ Rectangle {
 */
         DockButton {
             iconSource: 'dock-chat.png'
+            iconPress: 'chat.png'
             text: qsTr('Chat')
             onClicked: {
                 var panel = swapper.findPanel('ChatPanel.qml');
