@@ -52,16 +52,7 @@ Rectangle {
         anchors.top: parent.top
         anchors.left: parent.left
         spacing: 5
-/*
-        DockButton {
-            iconSource: 'wiLink-white.png'
-            iconPress: 'wiLink.png'
-            text: qsTr('My account')
-            onClicked: {
-                Qt.openUrlExternally('https://www.wifirst.net/w/profile')
-            }
-        }
-*/
+
         DockButton {
             iconSource: 'dock-chat.png'
             iconPress: 'chat.png'
