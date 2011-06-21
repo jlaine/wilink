@@ -39,8 +39,7 @@ class QXmppTransferManager;
 class ChatClient : public QXmppClient
 {
     Q_OBJECT
-    Q_PROPERTY(QString jid READ jid WRITE setJid NOTIFY jidChanged)
-    Q_PROPERTY(QString password READ password WRITE setPassword NOTIFY passwordChanged)
+    Q_PROPERTY(QString jid READ jid NOTIFY jidChanged)
     Q_PROPERTY(int statusType READ statusType WRITE setStatusType NOTIFY statusTypeChanged)
     Q_PROPERTY(QXmppArchiveManager* archiveManager READ archiveManager CONSTANT)
     Q_PROPERTY(QXmppCallManager* callManager READ callManager CONSTANT)
@@ -54,14 +53,8 @@ class ChatClient : public QXmppClient
     Q_PROPERTY(QXmppTransferManager* transferManager READ transferManager CONSTANT)
 
 public:
-    ChatClient(QObject *parent = 0);
-
+    ChatClient(QObject *parent);
     QString jid() const;
-    void setJid(const QString &jid);
-
-    QString password() const;
-    void setPassword(const QString &password);
-
     QDateTime serverTime() const;
 
     int statusType() const;
@@ -83,7 +76,6 @@ signals:
     void diagnosticServerChanged(const QString &diagnosticServer);
     void messageReceived(const QString &from);
     void mucServerChanged(const QString &mucServer);
-    void passwordChanged(const QString &password);
     void shareServerChanged(const QString &shareServer);
     void statusTypeChanged(int statusType);
 

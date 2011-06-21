@@ -64,28 +64,6 @@ QString ChatClient::jid() const
     return client->configuration().jid();
 }
 
-void ChatClient::setJid(const QString &jid)
-{
-    if (jid != configuration().jid()) {
-        configuration().setJid(jid);
-        emit jidChanged(jid);
-    }
-}
-
-QString ChatClient::password() const
-{
-    QXmppClient *client = (QXmppClient*)this;
-    return client->configuration().password();
-}
-
-void ChatClient::setPassword(const QString &password)
-{
-    if (password != configuration().password()) {
-        configuration().setPassword(password);
-        emit passwordChanged(password);
-    }
-}
-
 QDateTime ChatClient::serverTime() const
 {
     return QDateTime::currentDateTime().addSecs(timeOffset);
