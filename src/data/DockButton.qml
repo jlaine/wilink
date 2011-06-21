@@ -23,6 +23,7 @@ Item {
     id: button
 
     property alias iconSource: image.source
+    property string iconPress: ''
     property string text
     property bool enabled: true
     property int shortcut: 0
@@ -35,8 +36,8 @@ Item {
         blinkingEffect.loops = 0
     }
 
-    height: 28
-    width: 28
+    height: 32
+    width: 32
     state: mouseArea.pressed ? 'pressed' : (mouseArea.hovered ? 'hovered' : '')
 
     Rectangle {
