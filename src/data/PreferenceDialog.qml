@@ -95,13 +95,18 @@ Dialog {
                     id: image
                     anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
+                    smooth: true
                     source: model.avatar
+                    height: appStyle.icon.smallSize
+                    width: appStyle.icon.smallSize
                 }
 
                 Text {
                     anchors.left: image.right
                     anchors.leftMargin: appStyle.spacing.horizontal
+                    anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
+                    elide: Text.ElideRight
                     text: model.name
                 }
 
