@@ -53,7 +53,7 @@ class ChatClient : public QXmppClient
     Q_PROPERTY(QXmppTransferManager* transferManager READ transferManager CONSTANT)
 
 public:
-    ChatClient(QObject *parent);
+    ChatClient(QObject *parent = 0);
     QString jid() const;
     QDateTime serverTime() const;
 
