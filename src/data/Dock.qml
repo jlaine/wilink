@@ -33,8 +33,8 @@ Rectangle {
         anchors.left: parent.left
         anchors.topMargin: -parent.width
         gradient: Gradient {
-            GradientStop {position: 0.1; color: '#597fbe' }
-            GradientStop {position: 0.11; color: '#7495ca'}
+            GradientStop {position: 0.05; color: '#597fbe' }
+            GradientStop {position: 0.06; color: '#7495ca'}
             GradientStop {position: 1.0; color: '#9fb7dd'}
         }
 
