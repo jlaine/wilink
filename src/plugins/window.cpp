@@ -117,7 +117,7 @@ Window::Window(QWidget *parent)
     qmlRegisterType<CallVideoHelper>("wiLink", 1, 2, "CallVideoHelper");
     qmlRegisterType<CallVideoItem>("wiLink", 1, 2, "CallVideoItem");
     qmlRegisterUncreatableType<DeclarativePen>("wiLink", 1, 2, "Pen", "");
-    qmlRegisterUncreatableType<ChatClient>("wiLink", 1, 2, "Client", "");
+    qmlRegisterType<ChatClient>("wiLink", 1, 2, "Client");
     qmlRegisterType<Conversation>("wiLink", 1, 2, "Conversation");
     qmlRegisterType<DiscoveryModel>("wiLink", 1, 2, "DiscoveryModel");
     qmlRegisterUncreatableType<ChatHistoryModel>("wiLink", 1, 2, "HistoryModel", "");
