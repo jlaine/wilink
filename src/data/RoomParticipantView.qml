@@ -142,7 +142,7 @@ Item {
                 menu.model.append({
                     'action': 'profile',
                     'enabled': profileEnabled,
-                    'icon': 'diagnostics.png',
+                    'icon': 'information.png',
                     'text': qsTr('Show profile')});
                 menu.model.append({
                     'action': 'kick',

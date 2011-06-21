@@ -50,6 +50,7 @@ generate_png(png
     forward.svg
     hangup.svg
     home.svg
+    information.svg
     invite.svg
     options.svg
     paste.svg
