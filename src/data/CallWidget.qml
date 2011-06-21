@@ -149,8 +149,8 @@ Item {
             anchors.right: inputVolume.left
             anchors.rightMargin: 5
             source: 'audio-input.png'
-            height: 16
-            width: 16
+            height: appStyle.icon.tinySize
+            width: appStyle.icon.tinySize
         }
 
         Image {
@@ -158,8 +158,8 @@ Item {
             anchors.right: outputVolume.left
             anchors.rightMargin: 5
             source: 'audio-output.png'
-            height: 16
-            width: 16
+            height: appStyle.icon.tinySize
+            width: appStyle.icon.tinySize
         }
     }
 
