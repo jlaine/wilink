@@ -23,6 +23,7 @@
 #include <QApplication>
 #include <QAudioDeviceInfo>
 #include <QString>
+#include <QStringList>
 #include <QUrl>
 
 #ifdef USE_SYSTRAY
