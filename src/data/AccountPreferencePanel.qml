@@ -40,10 +40,20 @@ Panel {
         Item {
             anchors.fill: accounts.contents
 
+            PanelHelp {
+                id: help
+
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.right: parent.right
+                text: qsTr('In addition to your %1 account, %2 can connect to additional chat accounts such as Google Talk and Facebook.').replace('%1', application.organizationName).replace('%2', application.applicationName)
+            }
+
             ListView {
                 id: view
 
-                anchors.top: parent.top
+                anchors.top: help.bottom
+                anchors.topMargin: appStyle.spacing.vertical
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
                 anchors.right: scrollBar.left
@@ -77,7 +87,8 @@ Panel {
             ScrollBar {
                 id: scrollBar
 
-                anchors.top: parent.top
+                anchors.top: help.bottom
+                anchors.topMargin: appStyle.spacing.vertical
                 anchors.bottom: parent.bottom
                 anchors.right: parent.right
                 flickableItem: view

@@ -45,6 +45,7 @@ class Application : public QApplication
     Q_OBJECT
     Q_PROPERTY(QString applicationName READ applicationName CONSTANT)
     Q_PROPERTY(QString applicationVersion READ applicationVersion CONSTANT)
+    Q_PROPERTY(QString organizationName READ organizationName CONSTANT)
     Q_PROPERTY(QString audioInputDeviceName READ audioInputDeviceName WRITE setAudioInputDeviceName NOTIFY audioInputDeviceChanged)
     Q_PROPERTY(QString audioOutputDeviceName READ audioOutputDeviceName WRITE setAudioOutputDeviceName NOTIFY audioOutputDeviceChanged)
     Q_PROPERTY(QStringList chatAccounts READ chatAccounts WRITE setChatAccounts NOTIFY chatAccountsChanged)
