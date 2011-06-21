@@ -121,6 +121,7 @@ Item {
             PropertyChanges { target: labelBackground; opacity: 1 }
             PropertyChanges { target: image; height: 32; width: 32 }
             PropertyChanges { target: button; height: 32 + label.paintedHeight; width: 32 + label.paintedWidth }
+            PropertyChanges { target: image; source: iconPress != '' ? iconPress : iconSource }
         }
     ]
 
