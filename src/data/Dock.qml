@@ -168,6 +168,7 @@ Rectangle {
 
         DockButton {
             iconSource: 'dock-diagnostics.png'
+            iconPress: 'diagnostics.png'
             shortcut: Qt.ControlModifier + Qt.Key_I
             text: qsTr('Diagnostics')
             onClicked: swapper.showPanel('DiagnosticPanel.qml')
