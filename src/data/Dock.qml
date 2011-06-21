@@ -95,6 +95,7 @@ Rectangle {
             id: phoneButton
 
             iconSource: 'dock-phone.png'
+            iconPress: 'phone.png'
             shortcut: Qt.ControlModifier + Qt.Key_T
             text: qsTr('Phone')
             visible: Utils.jidToDomain(window.client.jid) == 'wifirst.net'
