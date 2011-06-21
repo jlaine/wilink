@@ -6,6 +6,8 @@ QSOUND_LIBRARY_NAME = qsound
 
 android {
     QSOUND_INCLUDE_DIR += $$PWD/fake
+} else:win32 {
+    QT += multimedia
 } else {
     CONFIG += mobility
     MOBILITY += multimedia
