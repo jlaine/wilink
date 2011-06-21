@@ -86,8 +86,8 @@ Panel {
             anchors.left: parent.left
             anchors.leftMargin: 8
             anchors.verticalCenter: parent.verticalCenter
-            height: 16
-            width: 16
+            height: appStyle.icon.tinySize
+            width: appStyle.icon.tinySize
             source: 'search.png'
             smooth: true
         }

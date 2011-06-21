@@ -39,8 +39,8 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         opacity: menuItem.enabled ? 1 : 0.5
         sourceComponent: menuItem.iconDelegate
-        width: 16
-        height: 16
+        width: appStyle.icon.tinySize
+        height: appStyle.icon.tinySize
 
         onLoaded: icon.item.model = model
     }
