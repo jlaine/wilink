@@ -139,6 +139,7 @@ Rectangle {
             property string domain: Utils.jidToDomain(window.client.jid)
 
             iconSource: 'dock-photo.png'
+            iconPress: 'photos.png'
             shortcut: Qt.ControlModifier + Qt.Key_P
             text: qsTr('Photos')
             visible: domain == 'wifirst.net' || domain == 'gmail.com'
@@ -155,6 +156,7 @@ Rectangle {
             id: preferenceButton
 
             iconSource: 'dock-options.png'
+            iconPress: 'options.png'
             text: qsTr('Preferences')
             visible: true
             onClicked: {
