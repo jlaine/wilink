@@ -70,8 +70,7 @@ generate_png(png
     transfers.svg
     upload.svg
     wiLink.svg
-    wiLink-black.svg
-    wiLink-white.svg)
+    wiLink-black.svg)
 
 # 64x64 icons
 generate_png(png SIZE 64 SUFFIX -64
