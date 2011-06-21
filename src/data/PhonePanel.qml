@@ -124,12 +124,6 @@ Panel {
             anchors.right: buttonBox.left
             anchors.rightMargin: 4
 
-            onReturnPressed: {
-                if (callButton.enabled) {
-                    callButton.clicked();
-                }
-            }
-
             Text {
                 anchors.fill: numberEdit
                 anchors.margins: 4
@@ -137,6 +131,12 @@ Panel {
                 elide: Text.ElideRight
                 opacity: numberEdit.text == '' ? 1 : 0
                 text: qsTr('Enter the number you want to call')
+            }
+
+            Keys.onReturnPressed: {
+                if (callButton.enabled) {
+                    callButton.clicked();
+                }
             }
         }
 

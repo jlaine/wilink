@@ -63,7 +63,7 @@ Dialog {
             anchors.right: parent.right
             text: vcard.name
 
-            onReturnPressed: dialog.accepted()
+            Keys.onReturnPressed: dialog.accepted()
         }
     }
 

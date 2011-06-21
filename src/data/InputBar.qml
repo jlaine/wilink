@@ -22,9 +22,9 @@ import QtQuick 1.0
 Rectangle {
     id: bar
 
+    property alias echoMode: edit.echoMode
     property alias text: edit.text
 
-    signal returnPressed
     signal tabPressed
 
     function backspacePressed() {
@@ -38,9 +38,9 @@ Rectangle {
     border.width: 1
     color: 'white'
     width: 100
-    height: edit.paintedHeight + 8
+    height: edit.height + 8
 
-    TextEdit {
+    TextInput {
         id: edit
 
         anchors.top: parent.top
@@ -50,12 +50,6 @@ Rectangle {
         focus: true
         smooth: true
         selectByMouse: true
-        textFormat: TextEdit.PlainText
-
-        Keys.onReturnPressed: {
-            bar.returnPressed();
-            return false;
-        }
 
         Keys.onTabPressed: {
             bar.tabPressed();
