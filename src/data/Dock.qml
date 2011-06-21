@@ -117,6 +117,7 @@ Rectangle {
             id: shareButton
 
             iconSource: 'dock-share.png'
+            iconPress: 'share.png'
             shortcut: Qt.ControlModifier + Qt.Key_S
             text: qsTr('Shares')
             visible: window.client.shareServer != ''
