@@ -23,6 +23,7 @@
 #include <QAudioDeviceInfo>
 #include <QMap>
 #include <QObject>
+#include <QStringList>
 
 class QAudioInput;
 class QAudioOutput;

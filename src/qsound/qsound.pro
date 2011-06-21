@@ -9,10 +9,14 @@ TARGET = $$QSOUND_LIBRARY_NAME
 VERSION = $$QSOUND_VERSION
 DESTDIR = $$QSOUND_LIBRARY_DIR
 
-INCLUDEPATH += $$QXMPP_INCLUDE_DIR
+INCLUDEPATH += $$QSOUND_INCLUDE_DIR $$QXMPP_INCLUDE_DIR
 
 android {
-    HEADERS += fake/QAudioOutput
+    HEADERS += \
+        fake/QAudioDeviceInfo \
+        fake/QAudioFormat \
+        fake/QAudioInput \
+        fake/QAudioOutput
 }
 
 HEADERS += \
