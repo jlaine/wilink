@@ -129,31 +129,6 @@ QPixmap ChatRosterImageProvider::requestPixmap(const QString &id, QSize *size, c
     return pixmap;
 }
 
-static void paintMessages(QPixmap &icon, int messages)
-{
-    QString pending = QString::number(messages);
-    QPainter painter(&icon);
-    QFont font = painter.font();
-    font.setWeight(QFont::Bold);
-    painter.setFont(font);
-
-    // text rectangle
-    QRect rect = painter.fontMetrics().boundingRect(pending);
-    rect.setWidth(rect.width() + 4);
-    if (rect.width() < rect.height())
-        rect.setWidth(rect.height());
-    else
-        rect.setHeight(rect.width());
-    rect.moveTop(2);
-    rect.moveRight(icon.width() - 2);
-
-    painter.setRenderHint(QPainter::Antialiasing, true);
-    painter.setBrush(Qt::red);
-    painter.setPen(Qt::white);
-    painter.drawEllipse(rect);
-    painter.drawText(rect, Qt::AlignCenter, pending);
-}
-
 class ChatRosterModelPrivate
 {
 public:
@@ -433,7 +408,7 @@ QString VCard::jidForFeature(Feature feature) const
 
     if (jidToResource(m_jid).isEmpty()) {
         foreach (const QString &key, m_cache->d->features.keys()) {
-            if (jidToBareJid(key) == m_jid)
+            if (jidToBareJid(key) == m_jid && (m_cache->d->features.value(key) & feature))
                 return key;
         }
     }
