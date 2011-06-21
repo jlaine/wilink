@@ -18,6 +18,10 @@
         <source>Chat accounts</source>
         <translation>Comptes de chat</translation>
     </message>
+    <message>
+        <source>In addition to your %1 account, %2 can connect to additional chat accounts such as Google Talk and Facebook.</source>
+        <translation>Outre votre compte %1, %2 peut se connecter à des comptes de chat supplémentaires tels que Google Talk ou Facebook.</translation>
+    </message>
 </context>
 <context>
     <name>Application</name>
