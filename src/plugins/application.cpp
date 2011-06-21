@@ -41,6 +41,7 @@
 
 #include "accounts.h"
 #include "application.h"
+#include "systeminfo.h"
 #include "updates.h"
 #include "utils.h"
 #include "window.h"
@@ -261,6 +262,11 @@ bool Application::isInstalled()
 {
     QDir dir = QFileInfo(executablePath()).dir();
     return !dir.exists("CMakeFiles");
+}
+
+QString Application::osType() const
+{
+    return SystemInfo::osType();
 }
 
 void Application::migrateFromWdesktop()
