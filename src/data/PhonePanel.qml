@@ -132,11 +132,11 @@ Panel {
 
             Text {
                 anchors.fill: numberEdit
-                anchors.leftMargin: 5
+                anchors.margins: 4
                 color: '#999'
+                elide: Text.ElideRight
+                opacity: numberEdit.text == '' ? 1 : 0
                 text: qsTr('Enter the number you want to call')
-                verticalAlignment: Text.AlignVCenter
-                visible: numberEdit.text == ''
             }
         }
 

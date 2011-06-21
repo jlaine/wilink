@@ -106,7 +106,8 @@ Panel {
 
                 anchors.fill: searchEdit
                 anchors.margins: 4
-                color: '#999999'
+                color: '#999'
+                elide: Text.ElideRight
                 opacity: searchEdit.text == '' ? 1 : 0
                 text: qsTr('Enter the name of the file you are looking for.');
             }
