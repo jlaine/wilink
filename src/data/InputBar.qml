@@ -25,8 +25,6 @@ Rectangle {
     property alias echoMode: edit.echoMode
     property alias text: edit.text
 
-    signal tabPressed
-
     function backspacePressed() {
         var oldPos = edit.cursorPosition;
         var oldText = edit.text;
@@ -50,11 +48,6 @@ Rectangle {
         focus: true
         smooth: true
         selectByMouse: true
-
-        Keys.onTabPressed: {
-            bar.tabPressed();
-            return false;
-        }
     }
 
     MouseArea {
