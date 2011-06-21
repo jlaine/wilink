@@ -23,6 +23,7 @@ FocusScope {
     id: swapper
 
     property Item currentItem
+    property string currentSource
 
     ListModel {
         id: panels
@@ -145,6 +146,13 @@ FocusScope {
             background.opacity = 0;
 
         currentItem = panel;
+        for (var i = 0; i < panels.count; i += 1) {
+            if (panels.get(i).panel == panel) {
+                currentSource = panels.get(i).source;
+                return;
+            }
+        }
+        currentSource = '';
     }
 
     Rectangle {

@@ -65,9 +65,10 @@ Rectangle {
         DockButton {
             iconSource: 'dock-chat.png'
             iconPress: 'chat.png'
+            panelSource: 'ChatPanel.qml'
             text: qsTr('Chat')
             onClicked: {
-                var panel = swapper.findPanel('ChatPanel.qml');
+                var panel = swapper.findPanel(panelSource);
                 if (panel == swapper.currentItem) {
                     if (panel.state == 'noroster')
                         panel.state = '';
@@ -81,13 +82,14 @@ Rectangle {
 
         DockButton {
             iconSource: 'start.png'
+            panelSource: 'PlayerPanel.qml'
             shortcut: Qt.ControlModifier + Qt.Key_M
             text: qsTr('Media')
             visible: false
 
             onClicked: {
                 visible = true;
-                swapper.showPanel('PlayerPanel.qml');
+                swapper.showPanel(panelSource);
             }
         }
 
@@ -96,19 +98,20 @@ Rectangle {
 
             iconSource: 'dock-phone.png'
             iconPress: 'phone.png'
+            panelSource: 'PhonePanel.qml'
             shortcut: Qt.ControlModifier + Qt.Key_T
             text: qsTr('Phone')
             visible: Utils.jidToDomain(window.client.jid) == 'wifirst.net'
 
             onClicked: {
                 if (visible) {
-                    swapper.showPanel('PhonePanel.qml');
+                    swapper.showPanel(panelSource);
                 }
             }
 
             Component.onCompleted: {
                 if (visible) {
-                    swapper.addPanel('PhonePanel.qml');
+                    swapper.addPanel(panelSource);
                 }
             }
         }
@@ -118,19 +121,20 @@ Rectangle {
 
             iconSource: 'dock-share.png'
             iconPress: 'share.png'
+            panelSource: 'SharePanel.qml'
             shortcut: Qt.ControlModifier + Qt.Key_S
             text: qsTr('Shares')
             visible: window.client.shareServer != ''
 
             onClicked: {
                 if (visible) {
-                    swapper.showPanel('SharePanel.qml');
+                    swapper.showPanel(panelSource);
                 }
             }
 
             onVisibleChanged: {
                 if (visible) {
-                    swapper.addPanel('SharePanel.qml');
+                    swapper.addPanel(panelSource);
                 }
             }
         }
@@ -140,15 +144,16 @@ Rectangle {
 
             iconSource: 'dock-photo.png'
             iconPress: 'photos.png'
+            panelSource: 'PhotoPanel.qml'
             shortcut: Qt.ControlModifier + Qt.Key_P
             text: qsTr('Photos')
             visible: domain == 'wifirst.net' || domain == 'gmail.com'
 
             onClicked: {
                 if (domain == 'wifirst.net')
-                    swapper.showPanel('PhotoPanel.qml', {'url': 'wifirst://www.wifirst.net/w'});
+                    swapper.showPanel(panelSource, {'url': 'wifirst://www.wifirst.net/w'});
                 else if (domain == 'gmail.com')
-                    swapper.showPanel('PhotoPanel.qml', {'url': 'picasa://default'});
+                    swapper.showPanel(panelSource, {'url': 'picasa://default'});
             }
         }
 
@@ -169,32 +174,35 @@ Rectangle {
         DockButton {
             iconSource: 'dock-diagnostics.png'
             iconPress: 'diagnostics.png'
+            panelSource: 'DiagnosticPanel.qml'
             shortcut: Qt.ControlModifier + Qt.Key_I
             text: qsTr('Diagnostics')
-            onClicked: swapper.showPanel('DiagnosticPanel.qml')
+            onClicked: swapper.showPanel(panelSource)
         }
 
         DockButton {
             iconSource: 'options.png'
+            panelSource: 'LogPanel.qml'
             shortcut: Qt.ControlModifier + Qt.Key_L
             text: qsTr('Debugging')
             visible: false
 
             onClicked: {
                 visible = true;
-                swapper.showPanel('LogPanel.qml');
+                swapper.showPanel(panelSource);
             }
         }
 
         DockButton {
             iconSource: 'peer.png'
+            panelSource: 'DiscoveryPanel.qml'
             shortcut: Qt.ControlModifier + Qt.Key_B
             text: qsTr('Discovery')
             visible: false
 
             onClicked: {
                 visible = true;
-                swapper.showPanel('DiscoveryPanel.qml');
+                swapper.showPanel(panelSource);
             }
         }
     }

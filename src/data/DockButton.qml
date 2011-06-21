@@ -22,10 +22,12 @@ import QtQuick 1.0
 Item {
     id: button
 
-    property alias iconSource: image.source
-    property string iconPress: ''
-    property string text
+    property bool active: swapper.currentSource == panelSource
     property bool enabled: true
+    property string iconSource: ''
+    property string iconPress: ''
+    property string panelSource: ''
+    property string text
     property int shortcut: 0
     signal clicked
 
@@ -56,6 +58,7 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         opacity: button.enabled ? 1 : 0.5
         smooth: true
+        source: (button.iconPress != '' && button.active) ? button.iconPress : button.iconSource
         width: parent.width
         height: parent.height
 
@@ -121,7 +124,6 @@ Item {
             PropertyChanges { target: labelBackground; opacity: 1 }
             PropertyChanges { target: image; height: 32; width: 32 }
             PropertyChanges { target: button; height: 32 + label.paintedHeight; width: 32 + label.paintedWidth }
-            PropertyChanges { target: image; source: iconPress != '' ? iconPress : iconSource }
         }
     ]
 
