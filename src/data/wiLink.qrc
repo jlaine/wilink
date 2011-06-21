@@ -18,6 +18,12 @@
     <file>copy.png</file>
     <file>cut.png</file>
     <file>diagnostics.png</file>
+    <file>dock-chat.png</file>
+    <file>dock-diagnostics.png</file>
+    <file>dock-options.png</file>
+    <file>dock-phone.png</file>
+    <file>dock-photo.png</file>
+    <file>dock-share.png</file>
     <file>down-arrow.png</file>
     <file>download.png</file>
     <file>eject.png</file>
@@ -58,6 +64,7 @@
     <file>upload.png</file>
     <file>wiLink.png</file>
     <file>wiLink-black.png</file>
+    <file>wiLink-white.png</file>
     <file>wiLink-64.png</file>
     <!-- QML -->
     <file>utils.js</file>

@@ -22,7 +22,7 @@ import 'utils.js' as Utils
 
 Rectangle {
     id: dock
-    width: 40
+    width: 44
 
     Rectangle {
         id: dockBackground
@@ -54,7 +54,15 @@ Rectangle {
         spacing: 5
 
         DockButton {
-            iconSource: 'chat.png'
+            iconSource: 'wiLink-white.png'
+            text: qsTr('My account')
+            onClicked: {
+                Qt.openUrlExternally('https://www.wifirst.net/w/profile')
+            }
+        }
+
+        DockButton {
+            iconSource: 'dock-chat.png'
             text: qsTr('Chat')
             onClicked: {
                 var panel = swapper.findPanel('ChatPanel.qml');
@@ -84,7 +92,7 @@ Rectangle {
         DockButton {
             id: phoneButton
 
-            iconSource: 'phone.png'
+            iconSource: 'dock-phone.png'
             shortcut: Qt.ControlModifier + Qt.Key_T
             text: qsTr('Phone')
             visible: Utils.jidToDomain(window.client.jid) == 'wifirst.net'
@@ -105,7 +113,7 @@ Rectangle {
         DockButton {
             id: shareButton
 
-            iconSource: 'share.png'
+            iconSource: 'dock-share.png'
             shortcut: Qt.ControlModifier + Qt.Key_S
             text: qsTr('Shares')
             visible: window.client.shareServer != ''
@@ -126,7 +134,7 @@ Rectangle {
         DockButton {
             property string domain: Utils.jidToDomain(window.client.jid)
 
-            iconSource: 'photos.png'
+            iconSource: 'dock-photo.png'
             shortcut: Qt.ControlModifier + Qt.Key_P
             text: qsTr('Photos')
             visible: domain == 'wifirst.net' || domain == 'gmail.com'
@@ -142,7 +150,7 @@ Rectangle {
         DockButton {
             id: preferenceButton
 
-            iconSource: 'options.png'
+            iconSource: 'dock-options.png'
             text: qsTr('Preferences')
             visible: true
             onClicked: {
@@ -153,7 +161,7 @@ Rectangle {
         }
 
         DockButton {
-            iconSource: 'diagnostics.png'
+            iconSource: 'dock-diagnostics.png'
             shortcut: Qt.ControlModifier + Qt.Key_I
             text: qsTr('Diagnostics')
             onClicked: swapper.showPanel('DiagnosticPanel.qml')

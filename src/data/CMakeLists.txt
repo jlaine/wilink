@@ -37,6 +37,12 @@ generate_png(png
     copy.svg
     cut.svg
     diagnostics.svg
+    dock-chat.svg
+    dock-diagnostics.svg
+    dock-options.svg
+    dock-phone.svg
+    dock-photo.svg
+    dock-share.svg
     download.svg
     favorite-active.svg
     favorite-inactive.svg
@@ -63,7 +69,8 @@ generate_png(png
     transfers.svg
     upload.svg
     wiLink.svg
-    wiLink-black.svg)
+    wiLink-black.svg
+    wiLink-white.svg)
 
 # 64x64 icons
 generate_png(png SIZE 64 SUFFIX -64
