@@ -58,7 +58,7 @@ Panel {
                         anchors.top: parent.top
                         anchors.left: parent.left
                         smooth: true
-                        source: 'peer.png'
+                        source: Utils.jidToDomain(modelData) == 'wifirst.net' ? 'wiLink.png' : 'peer.png'
                         height: appStyle.icon.smallSize
                         width: appStyle.icon.smallSize
                     }
