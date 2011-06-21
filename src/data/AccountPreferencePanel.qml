@@ -18,6 +18,7 @@
  */
 
 import QtQuick 1.0
+import 'utils.js' as Utils
 
 Panel {
     id: panel
@@ -36,9 +37,51 @@ Panel {
         anchors.right: parent.right
         title: qsTr('Chat accounts')
 
-        Column {
+        Item {
             anchors.fill: accounts.contents
-            spacing: appStyle.spacing.vertical
+
+            ListView {
+                id: view
+
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                anchors.left: parent.left
+                anchors.right: scrollBar.left
+                model: application.chatAccounts
+                delegate: Item {
+                    height: appStyle.icon.smallSize
+                    width: view.width - 1
+
+                    Image {
+                        id: image
+
+                        anchors.top: parent.top
+                        anchors.left: parent.left
+                        smooth: true
+                        source: 'peer.png'
+                        height: appStyle.icon.smallSize
+                        width: appStyle.icon.smallSize
+                    }
+
+                    Text {
+                        anchors.left: image.right
+                        anchors.leftMargin: appStyle.spacing.horizontal
+                        anchors.right: parent.right
+                        anchors.verticalCenter: parent.verticalCenter
+                        elide: Text.ElideRight
+                        text: modelData
+                    }
+                }
+            }
+
+            ScrollBar {
+                id: scrollBar
+
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                anchors.right: parent.right
+                flickableItem: view
+            }
         }
     }
 }
