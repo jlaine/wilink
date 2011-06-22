@@ -109,6 +109,16 @@ Application::Application(int &argc, char **argv)
     setAudioInputDeviceName(d->settings->value("AudioInputDevice").toString());
     setAudioOutputDeviceName(d->settings->value("AudioOutputDevice").toString());
 
+    // clean acounts
+    QStringList cleanAccounts = wApp->chatAccounts();
+    foreach (const QString &jid, cleanAccounts) {
+        if (!isBareJid(jid)) {
+            qWarning("Removing bad account %s", qPrintable(jid));
+            cleanAccounts.removeAll(jid);
+        }
+    }
+    setChatAccounts(cleanAccounts);
+
     /* initialise cache and wallet */
     const QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
     QDir().mkpath(dataPath);

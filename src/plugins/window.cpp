@@ -18,16 +18,13 @@
  */
 
 #include <QApplication>
-#include <QAuthenticator>
 #include <QDeclarativeContext>
 #include <QDeclarativeEngine>
 #include <QDeclarativeItem>
 #include <QDeclarativeView>
 #include <QDesktopServices>
 #include <QDesktopWidget>
-#include <QDialogButtonBox>
 #include <QFileDialog>
-#include <QLabel>
 #include <QList>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -63,10 +60,6 @@ Window::Window(QWidget *parent)
     d(new ChatPrivate)
 {
     bool check;
-
-    // register QML extensions
-    Plugin plugin;
-    plugin.registerTypes("wiLink");
 
     // create client
     d->client = new ChatClient(this);

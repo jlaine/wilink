@@ -30,6 +30,7 @@
 #endif
 
 #include "application.h"
+#include "declarative.h"
 #include "updatesdialog.h"
 
 static int aborted = 0;
@@ -47,6 +48,10 @@ int main(int argc, char *argv[])
     /* Create application */
     Application::platformInit();
     Application app(argc, argv);
+
+    /* Register QML extensions */
+    Plugin plugin;
+    plugin.registerTypes("wiLink");
 
     /* Adjust palette to make text selection more visible */
 #ifdef Q_OS_WIN
