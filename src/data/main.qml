@@ -103,10 +103,7 @@ FocusScope {
 
         Connections {
             target: menuLoader.item
-            onItemClicked: {
-                console.log("clicked");
-                menuLoader.hide()
-            }
+            onItemClicked: menuLoader.hide()
         }
     }
 
