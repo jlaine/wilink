@@ -37,8 +37,6 @@
 #include "QXmppRosterManager.h"
 #include "QXmppUtils.h"
 
-#include "qnetio/wallet.h"
-
 #include "accounts.h"
 #include "application.h"
 #include "declarative.h"
@@ -215,18 +213,11 @@ void Window::pendingMessages(int messages)
 
 bool Window::getPassword(const QString &jid, QString &password)
 {
-    const QString realm = DeclarativeWallet::realm(jid);
-    if (!QNetIO::Wallet::instance())
-    {
-        qWarning("No wallet!");
-        return false;
-    }
+    DeclarativeWallet wallet;
 
     /* check if we have a stored password that differs from the given one */
-    QString tmpJid(jid), tmpPassword(password);
-    if (QNetIO::Wallet::instance()->getCredentials(realm, tmpJid, tmpPassword) &&
-        tmpJid == jid && tmpPassword != password)
-    {
+    QString tmpPassword = wallet.get(jid);
+    if (!tmpPassword.isEmpty() && tmpPassword != password) {
         password = tmpPassword;
         return true;
     }
@@ -241,7 +232,7 @@ bool Window::getPassword(const QString &jid, QString &password)
 
     /* store new password */
     password = dialog.password();
-    QNetIO::Wallet::instance()->setCredentials(realm, jid, password);
+    wallet.set(jid, password);
     return true;
 }
 

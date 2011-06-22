@@ -145,6 +145,20 @@ DeclarativeWallet::DeclarativeWallet(QObject *parent)
 {
 }
 
+QString DeclarativeWallet::get(const QString &jid) const
+{
+    const QString key = realm(jid);
+
+    if (!key.isEmpty()) {
+        QString tmpJid(jid);
+        QString tmpPassword;
+
+        if (QNetIO::Wallet::instance()->getCredentials(key, tmpJid, tmpPassword))
+            return tmpPassword;
+    }
+    return QString();
+}
+
 /** Returns the authentication realm for the given JID.
  */
 QString DeclarativeWallet::realm(const QString &jid)

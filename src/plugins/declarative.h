@@ -139,6 +139,7 @@ public:
     static QString realm(const QString &jid);
 
 public slots:
+    QString get(const QString &jid) const;
     void remove(const QString &jid);
     void set(const QString &jid, const QString &password);
 };
