@@ -196,4 +196,4 @@ endif(WIN32)
 install(TARGETS wiLink DESTINATION bin)
 
 # tests
-add_subdirectory(tests)
+#add_subdirectory(tests)
