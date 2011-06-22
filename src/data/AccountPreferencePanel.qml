@@ -49,89 +49,12 @@ Panel {
                 text: qsTr('In addition to your %1 account, %2 can connect to additional chat accounts such as Google Talk and Facebook.').replace('%1', application.organizationName).replace('%2', application.applicationName)
             }
 
-            ListView {
-                id: accountView
-
+            AccountListPanel {
                 anchors.top: help.bottom
                 anchors.topMargin: appStyle.spacing.vertical
-                anchors.bottom: footer.top
-                anchors.left: parent.left
-                anchors.right: scrollBar.left
-                model: ListModel {
-                    Component.onCompleted: {
-                        for (var i in application.chatAccounts) {
-                            append({'jid': application.chatAccounts[i]});
-                        }
-                    }
-                }
-                highlight: Highlight { height: 28; width: accountView.width - 1 }
-                delegate: Item {
-                    height: 28
-                    width: accountView.width - 1
-
-                    Item {
-                        anchors.fill: parent
-                        anchors.margins: 2
-
-                        Image {
-                            id: image
-
-                            anchors.top: parent.top
-                            anchors.left: parent.left
-                            smooth: true
-                            source: Utils.jidToDomain(model.jid) == 'wifirst.net' ? 'wiLink.png' : 'peer.png'
-                            height: appStyle.icon.smallSize
-                            width: appStyle.icon.smallSize
-                        }
-
-                        Text {
-                            anchors.left: image.right
-                            anchors.leftMargin: appStyle.spacing.horizontal
-                            anchors.right: parent.right
-                            anchors.verticalCenter: parent.verticalCenter
-                            elide: Text.ElideRight
-                            text: model.jid
-                        }
-
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: {
-                                accountView.currentIndex = model.index;
-                            }
-                        }
-                    }
-                }
-            }
-
-            ScrollBar {
-                id: scrollBar
-
-                anchors.top: help.bottom
-                anchors.topMargin: appStyle.spacing.vertical
-                anchors.bottom: footer.top
-                anchors.right: parent.right
-                flickableItem: accountView
-            }
-
-            Row {
-                id: footer
-                anchors.left: parent.left
-                anchors.right: parent.right
                 anchors.bottom: parent.bottom
-                height: 32
-
-                Button {
-                    iconSource: 'add.png'
-                }
-
-                Button {
-                    iconSource: 'remove.png'
-                    onClicked: {
-                        if (accountView.currentIndex >= 0) {
-                            accountView.model.remove(accountView.currentIndex);
-                        }
-                    }
-                }
+                anchors.left: parent.left
+                anchors.right: parent.right
             }
         }
     }

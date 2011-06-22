@@ -106,6 +106,8 @@ if(RELOAD_TRANSLATIONS)
         ${wiLink_SOURCES}
         data/main.qml
         data/AboutDialog.qml
+        data/AccountAddPanel.qml
+        data/AccountListPanel.qml
         data/AccountPreferencePanel.qml
         data/CallWidget.qml
         data/ChatPanel.qml

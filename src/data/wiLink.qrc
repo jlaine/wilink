@@ -70,6 +70,8 @@
     <file>utils.js</file>
     <file>main.qml</file>
     <file>AboutDialog.qml</file>
+    <file>AccountAddPanel.qml</file>
+    <file>AccountListPanel.qml</file>
     <file>AccountPreferencePanel.qml</file>
     <file>Button.qml</file>
     <file>ChatEdit.qml</file>
