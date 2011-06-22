@@ -26,7 +26,10 @@ FocusScope {
     id: panel
 
     property bool acceptableInput: (jidInput.acceptableInput && passwordInput.acceptableInput)
+    property string domain: ''
     property ListModel model
+    property string testJid
+    property string testPassword
 
     signal accepted(string jid, string password)
     signal rejected
@@ -37,39 +40,81 @@ FocusScope {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        text: qsTr('Enter the address and password for the account you want to add.')
+        text: panel.domain != '' ? qsTr("Enter the username and password for your '%1' account.").replace('%1', panel.domain) : qsTr('Enter the address and password for the account you want to add.')
     }
 
-    InputBar {
-        id: jidInput
+    Item {
+        id: jidRow
 
         anchors.top: help.bottom
         anchors.topMargin: appStyle.spacing.vertical
         anchors.left: parent.left
         anchors.right: parent.right
-        hintText: qsTr('Address')
-        validator: RegExpValidator {
-            regExp: /^[^@/]+@[^@/]+$/
+        height: jidInput.height
+
+        Text {
+            id: jidLabel
+
+            anchors.left: parent.left
+            anchors.verticalCenter: parent.verticalCenter
+            elide: Text.ElideRight
+            font.bold: true
+            text: panel.domain != '' ? qsTr('Username') : qsTr('Address')
+            width: 100
         }
 
-        onTextChanged: {
-            if (panel.state == 'dupe') {
-                panel.state = '';
+        InputBar {
+            id: jidInput
+
+            anchors.top: parent.top
+            anchors.left: jidLabel.right
+            anchors.leftMargin: appStyle.spacing.horizontal
+            anchors.right: parent.right
+            focus: false
+            validator: RegExpValidator {
+                regExp: panel.domain != '' ? /^[^@/ ]+$/ : /^[^@/ ]+@[^@/ ]+$/
+            }
+
+            onTextChanged: {
+                if (panel.state == 'dupe') {
+                    panel.state = '';
+                }
             }
         }
     }
 
-    InputBar {
-        id: passwordInput
+    Item {
+        id: passwordRow
 
-        anchors.top: jidInput.bottom
+        anchors.top: jidRow.bottom
         anchors.topMargin: appStyle.spacing.vertical
         anchors.left: parent.left
         anchors.right: parent.right
-        echoMode: TextInput.Password
-        hintText: qsTr('Password')
-        validator: RegExpValidator {
-            regExp: /.+/
+        height: passwordInput.height
+
+        Text {
+            id: passwordLabel
+
+            anchors.left: parent.left
+            anchors.verticalCenter: parent.verticalCenter
+            elide: Text.ElideRight
+            font.bold: true
+            text: qsTr('Password')
+            width: 100
+        }
+
+
+        InputBar {
+            id: passwordInput
+
+            anchors.top: parent.top
+            anchors.left: passwordLabel.right
+            anchors.leftMargin: appStyle.spacing.horizontal
+            anchors.right: parent.right
+            echoMode: TextInput.Password
+            validator: RegExpValidator {
+                regExp: /.+/
+            }
         }
     }
 
@@ -80,7 +125,7 @@ FocusScope {
         property string failedText: qsTr('Could not connect, please check your username and password.')
         property string testingText: qsTr('Checking your username and password..')
 
-        anchors.top: passwordInput.bottom
+        anchors.top: passwordRow.bottom
         anchors.topMargin: appStyle.spacing.vertical
         anchors.left: parent.left
         anchors.right: parent.right
@@ -111,11 +156,15 @@ FocusScope {
             id: addButton
 
             iconSource: 'add.png'
-            enabled: panel.acceptableInput && panel.state != 'testing'
             text: qsTr('Add')
 
             onClicked: {
+                if (!jidInput.acceptableInput || !passwordInput.acceptableInput)
+                    return;
+
                 var jid = jidInput.text;
+                if (panel.domain != '')
+                    jid += '@' + panel.domain;
 
                 // check for duplicate account
                 for (var i = 0; i < model.count; i++) {
@@ -125,7 +174,9 @@ FocusScope {
                     }
                 }
                 panel.state = 'testing';
-                testClient.connectToServer(jid + '/AccountCheck', passwordInput.text);
+                panel.testJid = jid;
+                panel.testPassword = passwordInput.text;
+                testClient.connectToServer(panel.testJid + '/AccountCheck', panel.testPassword);
             }
         }
     }
@@ -136,7 +187,7 @@ FocusScope {
         onConnected: {
             if (panel.state == 'testing') {
                 panel.state = '';
-                panel.accepted(jidInput.text, passwordInput.text);
+                panel.accepted(panel.testJid, panel.testPassword);
             }
         }
 
@@ -158,11 +209,22 @@ FocusScope {
         },
         State {
             name: 'testing'
+            PropertyChanges { target: addButton; enabled: false }
             PropertyChanges { target: statusLabel; text: statusLabel.testingText }
             PropertyChanges { target: jidInput; enabled: false }
             PropertyChanges { target: passwordInput; enabled: false }
         }
     ]
+
+    Component.onCompleted: {
+        jidInput.focus = true;
+    }
+
+    Keys.onReturnPressed: {
+        if (addButton.enabled) {
+            addButton.clicked();
+        }
+    }
 
     Keys.onTabPressed: {
         if (jidInput.activeFocus)

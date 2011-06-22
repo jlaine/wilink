@@ -22,9 +22,13 @@
 #endif
 
 #include <QAuthenticator>
+#include <QDeclarativeContext>
+#include <QDeclarativeEngine>
+#include <QDeclarativeView>
 #include <QDesktopServices>
 #include <QDir>
 #include <QFileInfo>
+#include <QGraphicsObject>
 #include <QMenu>
 #include <QNetworkDiskCache>
 #include <QProcess>
@@ -453,6 +457,16 @@ void Application::resetWindows()
 
     /* check we have a valid account */
     if (chatAccounts().isEmpty()) {
+
+        QDeclarativeView *view = new QDeclarativeView;
+        view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
+        view->engine()->setNetworkAccessManagerFactory(new NetworkAccessManagerFactory);
+        view->rootContext()->setContextProperty("application", this);
+        view->setSource(QUrl("qrc:/setup.qml"));
+        view->show();
+        return;
+
+#if 0
         ChatAccountPrompt dlg(0);
         dlg.setDomain("wifirst.net");
         if (!dlg.exec() || dlg.jid().isEmpty()) {
@@ -463,6 +477,7 @@ void Application::resetWindows()
         DeclarativeWallet wallet;
         wallet.set(dlg.jid(), dlg.password());
         setChatAccounts(QStringList() << dlg.jid());
+#endif
     }
 
     /* connect to chat accounts */

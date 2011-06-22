@@ -46,6 +46,14 @@
         <source>You already have an account for &apos;%1&apos;.</source>
         <translation>Vous avez déjà un compte pour &apos;%1&apos;.</translation>
     </message>
+    <message>
+        <source>Username</source>
+        <translation>Identifiant</translation>
+    </message>
+    <message>
+        <source>Enter the username and password for your &apos;%1&apos; account.</source>
+        <translation>Saisissez l&apos;identifiant et le mot de passe de votre compte &apos;%1&apos;.</translation>
+    </message>
 </context>
 <context>
     <name>AccountListPanel</name>
@@ -927,6 +935,13 @@ Acceptez-vous?</translation>
     <message>
         <source>&amp;Preferences</source>
         <translation>&amp;Préférences</translation>
+    </message>
+</context>
+<context>
+    <name>setup</name>
+    <message>
+        <source>If you need help, please refer to the &lt;a href=&quot;%1&quot;&gt;%2 FAQ&lt;/a&gt;.</source>
+        <translation>Si vous avez besoin d&apos;aide, merci de consulter la &lt;a href=&quot;%1&quot;&gt;FAQ %2&lt;/a&gt;.</translation>
     </message>
 </context>
 </TS>

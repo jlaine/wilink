@@ -105,6 +105,7 @@ if(RELOAD_TRANSLATIONS)
     qt4_create_translation(QM_FILES
         ${wiLink_SOURCES}
         data/main.qml
+        data/setup.qml
         data/AboutDialog.qml
         data/AccountAddPanel.qml
         data/AccountListPanel.qml

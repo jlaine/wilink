@@ -144,7 +144,6 @@ public slots:
     void showMessage(QObject *context, const QString &title, const QString &message);
 
 private slots:
-    void showWindows();
 #ifdef USE_SYSTRAY
     void trayActivated(QSystemTrayIcon::ActivationReason reason);
     void trayClicked();
@@ -153,6 +152,7 @@ private slots:
 private:
     static QString executablePath();
     void migrateFromWdesktop();
+    void showWindows();
 
     ApplicationPrivate * const d;
 };

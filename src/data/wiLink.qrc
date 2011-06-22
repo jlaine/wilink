@@ -69,6 +69,7 @@
     <!-- QML -->
     <file>utils.js</file>
     <file>main.qml</file>
+    <file>setup.qml</file>
     <file>AboutDialog.qml</file>
     <file>AccountAddPanel.qml</file>
     <file>AccountListPanel.qml</file>
