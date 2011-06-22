@@ -19,7 +19,7 @@
 
 import QtQuick 1.0
 
-Rectangle {
+FocusScope {
     id: bar
 
     property alias acceptableInput: edit.acceptableInput
@@ -28,6 +28,8 @@ Rectangle {
     property alias text: edit.text
     property alias validator: edit.validator
 
+    focus: true
+
     function backspacePressed() {
         var oldPos = edit.cursorPosition;
         var oldText = edit.text;
@@ -35,11 +37,15 @@ Rectangle {
         edit.cursorPosition = oldPos - 1;
     }
 
-    border.color: '#c3c3c3'
-    border.width: 1
-    color: 'white'
     width: 100
     height: edit.height + 8
+
+    Rectangle {
+        anchors.fill: parent
+        border.color: '#c3c3c3'
+        border.width: 1
+        color: 'white'
+    }
 
     TextInput {
         id: edit
