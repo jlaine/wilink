@@ -17,23 +17,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QApplication>
-#include <QAuthenticator>
 #include <QDialogButtonBox>
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
-#include <QListWidget>
 #include <QPushButton>
-#include <QSettings>
 
 #include "QXmppClient.h"
 #include "QXmppUtils.h"
 
-#include "qnetio/wallet.h"
-
 #include "application.h"
-#include "declarative.h"
 #include "accounts.h"
 #include "utils.h"
 

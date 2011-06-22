@@ -25,8 +25,6 @@
 class QDialogButtonBox;
 class QLabel;
 class QLineEdit;
-class QListWidget;
-class QSettings;
 class QXmppClient;
 
 class ChatAccountPrompt : public QDialog
