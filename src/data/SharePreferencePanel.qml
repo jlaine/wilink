@@ -263,7 +263,7 @@ Panel {
                     anchors.left: parent.left
                     anchors.right: button.left
                     anchors.rightMargin: appStyle.spacing.horizontal
-                    text: application.sharesLocation
+                    text: application.downloadsLocation
                 }
 
                 Button {
@@ -272,6 +272,15 @@ Panel {
                     anchors.top: parent.top
                     anchors.right: parent.right
                     iconSource: 'album.png'
+
+                    onClicked: {
+                        var dialog = window.fileDialog();
+                        dialog.windowTitle = qsTr('Downloads folder');
+                        dialog.fileMode = QFileDialog.Directory;
+                        if (dialog.exec() && dialog.selectedFiles.length > 0) {
+                            application.downloadsLocation = dialog.selectedFiles[0];
+                        }
+                    }
                 }
             }
         }
