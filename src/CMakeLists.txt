@@ -106,6 +106,7 @@ if(RELOAD_TRANSLATIONS)
         data/AboutDialog.qml
         data/AccountAddPanel.qml
         data/AccountListPanel.qml
+        data/AccountPasswordDialog.qml
         data/AccountPreferencePanel.qml
         data/CallWidget.qml
         data/ChatPanel.qml
