@@ -142,6 +142,7 @@ signals:
 public slots:
     void resetWindows();
     void showMessage(QObject *context, const QString &title, const QString &message);
+    void showWindows();
 
 private slots:
 #ifdef USE_SYSTRAY
@@ -152,7 +153,6 @@ private slots:
 private:
     static QString executablePath();
     void migrateFromWdesktop();
-    void showWindows();
 
     ApplicationPrivate * const d;
 };

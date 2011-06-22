@@ -20,8 +20,6 @@
 #include <AppKit/AppKit.h>
 #include <Foundation/NSAutoreleasePool.h>
 
-#include <QTimer>
-
 #include "application.h"
 
 @interface AppController : NSObject <NSApplicationDelegate>
@@ -35,8 +33,7 @@
  */
 - (BOOL)applicationShouldHandleReopen: (NSApplication *)app hasVisibleWindows: (BOOL) flag
 {
-    if (qApp)
-        QTimer::singleShot(0, qApp, SLOT(showChats()));
+    wApp->showWindows();
     return NO;
 }
 
