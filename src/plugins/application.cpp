@@ -26,6 +26,7 @@
 #include <QDeclarativeEngine>
 #include <QDeclarativeView>
 #include <QDesktopServices>
+#include <QDesktopWidget>
 #include <QDir>
 #include <QFileInfo>
 #include <QGraphicsObject>
@@ -462,7 +463,11 @@ void Application::resetWindows()
         view->engine()->setNetworkAccessManagerFactory(new NetworkAccessManagerFactory);
         view->rootContext()->setContextProperty("application", this);
         view->setSource(QUrl("qrc:/setup.qml"));
+
+        const QSize size = QApplication::desktop()->availableGeometry(view).size();
+        view->move((size.width() - view->width()) / 2, (size.height() - view->height()) / 2);
         view->show();
+        view->raise();
         d->chats << view;
         return;
     }
