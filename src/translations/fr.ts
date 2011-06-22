@@ -23,10 +23,6 @@
         <translation>Ajouter</translation>
     </message>
     <message>
-        <source>Go back</source>
-        <translation>Retour</translation>
-    </message>
-    <message>
         <source>Address</source>
         <translation>Adresse</translation>
     </message>
@@ -53,6 +49,10 @@
     <message>
         <source>Enter the username and password for your &apos;%1&apos; account.</source>
         <translation>Saisissez l&apos;identifiant et le mot de passe de votre compte &apos;%1&apos;.</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
     </message>
 </context>
 <context>
