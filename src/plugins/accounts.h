@@ -74,29 +74,10 @@ private:
     QLineEdit *m_passwordEdit;
 };
 
-class ChatAccounts : public QDialog
+class ChatAccounts
 {
-    Q_OBJECT
-
 public:
-    ChatAccounts(QWidget *parent = 0);
-    bool changed() const;
-
-    void check();
     static bool getPassword(const QString &jid, QString &password, QWidget *parent);
-
-private slots:
-    bool addAccount(const QString &domain = QString());
-    void removeAccount();
-    void updateButtons();
-
-private:
-    void removeAccount(const QString &jid);
-
-    bool m_changed;
-    QListWidget *m_listWidget;
-    QPushButton *m_removeButton;
-    QSettings *m_settings;
 };
 
 #endif

@@ -139,21 +139,6 @@
     </message>
 </context>
 <context>
-    <name>ChatAccounts</name>
-    <message>
-        <source>In addition to your %1 account, %2 can connect to additional chat accounts such as Google Talk and Facebook.</source>
-        <translation>Outre votre compte %1, %2 peut se connecter à des comptes de chat supplémentaires tels que Google Talk ou Facebook.</translation>
-    </message>
-    <message>
-        <source>Add</source>
-        <translation>Ajouter</translation>
-    </message>
-    <message>
-        <source>Remove</source>
-        <translation>Retirer</translation>
-    </message>
-</context>
-<context>
     <name>ChatPanel</name>
     <message>
         <source>My rooms</source>

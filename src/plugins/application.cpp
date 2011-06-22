@@ -41,6 +41,7 @@
 
 #include "accounts.h"
 #include "application.h"
+#include "declarative.h"
 #include "systeminfo.h"
 #include "updates.h"
 #include "utils.h"
@@ -450,9 +451,19 @@ void Application::resetWindows()
         chat->deleteLater();
     d->chats.clear();
 
-    /* clean any bad accounts */
-    ChatAccounts dlg;
-    dlg.check();
+    /* check we have a valid account */
+    if (chatAccounts().isEmpty()) {
+        ChatAccountPrompt dlg(0);
+        dlg.setDomain("wifirst.net");
+        if (!dlg.exec() || dlg.jid().isEmpty()) {
+            quit();
+            return;
+        }
+
+        DeclarativeWallet wallet;
+        wallet.set(dlg.jid(), dlg.password());
+        setChatAccounts(QStringList() << dlg.jid());
+    }
 
     /* connect to chat accounts */
     int xpos = 30;
