@@ -177,7 +177,7 @@ Panel {
                 if (!window.isActiveWindow || panel.opacity == 0) {
                     panel.notify(vcard.name, text);
                     if (panel.opacity == 0)
-                        window.rosterModel.addPendingMessage(jid);
+                        rosterModel.addPendingMessage(jid);
                 }
             }
         }

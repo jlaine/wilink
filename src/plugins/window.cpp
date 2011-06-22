@@ -91,7 +91,6 @@ class ChatPrivate
 {
 public:
     ChatClient *client;
-    RosterModel *rosterModel;
     QDeclarativeView *rosterView;
     QString windowTitle;
 };
@@ -104,9 +103,6 @@ Window::Window(QWidget *parent)
 
     // create client
     d->client = new ChatClient(this);
-    d->rosterModel =  new RosterModel(this);
-    d->rosterModel->setClient(d->client);
-    connect(d->rosterModel, SIGNAL(pendingMessages(int)), this, SLOT(pendingMessages(int)));
 
     QXmppLogger *logger = new QXmppLogger(this);
     logger->setLoggingType(QXmppLogger::SignalLogging);
@@ -310,13 +306,6 @@ QMessageBox *Window::messageBox()
 ChatClient *Window::client()
 {
     return d->client;
-}
-
-/** Return this window's chat roster model.
- */
-RosterModel *Window::rosterModel()
-{
-    return d->rosterModel;
 }
 
 /** Open the connection to the chat server.

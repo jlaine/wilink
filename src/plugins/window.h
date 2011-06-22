@@ -51,7 +51,6 @@ class Window : public QMainWindow
 {
     Q_OBJECT
     Q_PROPERTY(ChatClient* client READ client CONSTANT)
-    Q_PROPERTY(RosterModel* rosterModel READ rosterModel CONSTANT)
     Q_PROPERTY(bool isActiveWindow READ isActiveWindow NOTIFY isActiveWindowChanged)
 
 public:
@@ -59,7 +58,6 @@ public:
     ~Window();
 
     ChatClient *client();
-    RosterModel *rosterModel();
 
     bool open(const QString &jid);
     void setWindowTitle(const QString &title);

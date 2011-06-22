@@ -147,7 +147,10 @@ Panel {
                 dynamicSortFilter: true
                 filterRole: RosterModel.StatusFilterRole
                 filterRegExp: /^(?!offline)/
-                sourceModel: window.rosterModel
+                sourceModel: RosterModel {
+                    id: rosterModel
+                    client: window.client
+                }
             }
 
             SortFilterProxyModel {
@@ -156,7 +159,7 @@ Panel {
                 dynamicSortFilter: true
                 sortCaseSensitivity: Qt.CaseInsensitive
                 sortRole: application.sortContactsByStatus ? RosterModel.StatusSortRole : RosterModel.NameRole
-                sourceModel: application.showOfflineContacts ? window.rosterModel : onlineContacts
+                sourceModel: application.showOfflineContacts ? rosterModel : onlineContacts
                 Component.onCompleted: sort(0)
             }
 
@@ -174,7 +177,7 @@ Panel {
             }
 
             onCurrentJidChanged: {
-                window.rosterModel.clearPendingMessages(contacts.currentJid);
+                rosterModel.clearPendingMessages(contacts.currentJid);
             }
 
             onItemClicked: {
