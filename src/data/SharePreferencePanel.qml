@@ -272,6 +272,16 @@ Panel {
                     anchors.top: parent.top
                     anchors.right: parent.right
                     iconSource: 'album.png'
+
+                    onClicked: {
+                        var dialog = window.fileDialog();
+                        dialog.windowTitle = qsTr('Downloads folder');
+                        dialog.fileMode = QFileDialog.Directory;
+                        if (dialog.exec() && dialog.selectedFiles.length > 0) {
+                            var path = dialog.selectedFiles[0];
+                            application.sharesLocation = dialog.selectedFiles[0];
+                        }
+                    }
                 }
             }
         }
