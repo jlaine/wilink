@@ -54,7 +54,7 @@ FocusScope {
         anchors.fill: parent
         enabled: false
 
-        onClicked: menuLoader.hide();
+        onClicked: menuLoader.hide()
     }
 
     Loader {
@@ -89,10 +89,8 @@ FocusScope {
         z: 11
 
         function hide() {
-            if(menuLoader.item) {
-                cancelArea.enabled = false;
-                menuLoader.item.opacity = 0;
-            }
+            cancelArea.enabled = false;
+            menuLoader.item.opacity = 0;
         }
 
         function show(x, y) {
@@ -104,7 +102,10 @@ FocusScope {
 
         Connections {
             target: menuLoader.item
-            onItemClicked: menuLoader.hide()
+            onItemClicked: {
+                console.log("clicked");
+                menuLoader.hide()
+            }
         }
     }
 
