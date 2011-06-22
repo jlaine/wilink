@@ -24,7 +24,11 @@
 #include <QDeclarativeView>
 #include <QDesktopServices>
 #include <QDesktopWidget>
+#include <QDialogButtonBox>
 #include <QFileDialog>
+#include <QLabel>
+#include <QLayout>
+#include <QLineEdit>
 #include <QList>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -37,7 +41,6 @@
 #include "QXmppRosterManager.h"
 #include "QXmppUtils.h"
 
-#include "accounts.h"
 #include "application.h"
 #include "declarative.h"
 #include "photos.h"
@@ -45,6 +48,49 @@
 #include "window.h"
 #include "updatesdialog.h"
 #include "utils.h"
+
+ChatPasswordPrompt::ChatPasswordPrompt(const QString &jid, QWidget *parent)
+    : QDialog(parent)
+{
+    QGridLayout *layout = new QGridLayout;
+
+    QLabel *promptLabel = new QLabel;
+    promptLabel->setText(tr("Enter the password for your '%1' account.").arg(jidToDomain(jid)));
+    promptLabel->setWordWrap(true);
+    layout->addWidget(promptLabel, 0, 0, 1, 2);
+
+    layout->addWidget(new QLabel("<b>" + tr("Address") + "</b>"), 1, 0);
+    QLineEdit *usernameEdit = new QLineEdit;
+    usernameEdit->setText(jid);
+    usernameEdit->setEnabled(false);
+    layout->addWidget(usernameEdit, 1, 1);
+
+    layout->addWidget(new QLabel("<b>" + tr("Password") + "</b>"), 2, 0);
+    m_passwordEdit = new QLineEdit;
+    m_passwordEdit->setEchoMode(QLineEdit::Password);
+    layout->addWidget(m_passwordEdit, 2, 1);
+
+    QLabel *helpLabel = new QLabel("<i>" + tr("If you need help, please refer to the <a href=\"%1\">%2 FAQ</a>.")
+        .arg(QLatin1String(HELP_URL), qApp->applicationName()) + "</i>");
+    helpLabel->setOpenExternalLinks(true);
+    layout->addWidget(helpLabel, 3, 0, 1, 2);
+
+    QDialogButtonBox *buttonBox = new QDialogButtonBox;
+    buttonBox->addButton(QDialogButtonBox::Ok);
+    buttonBox->addButton(QDialogButtonBox::Cancel);
+    connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
+    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
+    layout->addWidget(buttonBox, 4, 0, 1, 2);
+
+    setLayout(layout);
+    setWindowTitle(tr("Password required"));
+}
+
+QString ChatPasswordPrompt::password() const
+{
+    return m_passwordEdit->text();
+}
+
 
 class ChatPrivate
 {

@@ -25,7 +25,6 @@ android {
 
 SOURCES += \
     application.cpp \
-    accounts.cpp \
     calls.cpp \
     client.cpp \
     console.cpp \
@@ -50,7 +49,6 @@ SOURCES += \
     window.cpp
 
 HEADERS += \
-    accounts.h \
     application.h \
     calls.h \
     client.h \

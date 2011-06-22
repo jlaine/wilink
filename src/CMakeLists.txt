@@ -46,7 +46,6 @@ if(NOT APPLE)
 endif(NOT APPLE)
 
 set(wiLink_SOURCES
-    plugins/accounts.cpp
     plugins/application.cpp
     plugins/calls.cpp
     plugins/client.cpp
@@ -77,7 +76,6 @@ if(APPLE)
 endif(APPLE)
 
 set(wiLink_MOC_HEADERS
-    plugins/accounts.h
     plugins/application.h
     plugins/calls.h
     plugins/client.h

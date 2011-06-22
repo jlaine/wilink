@@ -43,7 +43,6 @@
 #include "QSoundPlayer.h"
 #include "QXmppUtils.h"
 
-#include "accounts.h"
 #include "application.h"
 #include "declarative.h"
 #include "systeminfo.h"

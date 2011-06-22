@@ -20,6 +20,7 @@
 #ifndef __WILINK_WINDOW_H__
 #define __WILINK_WINDOW_H__
 
+#include <QDialog>
 #include <QMainWindow>
 
 #include "client.h"
@@ -29,7 +30,20 @@ class ChatPrivate;
 class ChatRosterModel;
 class ChatRosterView;
 class QFileDialog;
+class QLineEdit;
 class QMessageBox;
+
+class ChatPasswordPrompt : public QDialog
+{
+    Q_OBJECT
+
+public:
+    ChatPasswordPrompt(const QString &jid, QWidget *parent = 0);
+    QString password() const;
+
+private:
+    QLineEdit *m_passwordEdit;
+};
 
 /** Chat represents the user interface's main window.
  */
