@@ -21,6 +21,7 @@
 #define __WILINK_DECLARATIVE_H__
 
 #include <QAbstractItemModel>
+#include <QDeclarativeExtensionPlugin>
 #include <QFileDialog>
 #include <QNetworkAccessManager>
 #include <QSortFilterProxyModel>
@@ -130,6 +131,14 @@ public:
 public slots:
     void remove(const QString &jid);
     void set(const QString &jid, const QString &password);
+};
+
+class Plugin : public QDeclarativeExtensionPlugin
+{
+    Q_OBJECT
+
+public:
+     void registerTypes(const char *uri);
 };
 
 #endif
