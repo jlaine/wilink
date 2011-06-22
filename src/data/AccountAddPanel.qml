@@ -18,40 +18,103 @@
  */
 
 import QtQuick 1.0
+import QXmpp 0.4
 import wiLink 1.2
 
 Item {
+    id: panel
+
+    property bool acceptableInput: (jidInput.acceptableInput && passwordInput.acceptableInput)
     property variant model
 
-    InputBar {
-        id: jidInput
+    signal accepted
+    signal rejected
+
+    PanelHelp {
+        id: help
 
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        hintText: 'Username'
+        text: qsTr('Enter the address and password for the account you want to add.')
+    }
+
+    InputBar {
+        id: jidInput
+
+        anchors.top: help.bottom
+        anchors.topMargin: appStyle.spacing.vertical
+        anchors.left: parent.left
+        anchors.right: parent.right
+        hintText: qsTr('Address')
+        validator: RegExpValidator {
+            regExp: /^[^@/]+@[^@/]+$/
+        }
     }
 
     InputBar {
         id: passwordInput
 
         anchors.top: jidInput.bottom
+        anchors.topMargin: appStyle.spacing.vertical
         anchors.left: parent.left
         anchors.right: parent.right
         echoMode: TextInput.Password
-        hintText: 'Password'
+        hintText: qsTr('Password')
+        validator: RegExpValidator {
+            regExp: /.+/
+        }
     }
 
     Text {
         id: statusLabel
 
-        anchors.top: passwordInput.top
+        anchors.top: passwordInput.bottom
+        anchors.topMargin: appStyle.spacing.vertical
         anchors.left: parent.left
         anchors.right: parent.right
+        wrapMode: Text.WordWrap
+    }
+
+    Row {
+        anchors.top: statusLabel.bottom
+        anchors.topMargin: appStyle.spacing.vertical
+        anchors.horizontalCenter: parent.horizontalCenter
+        height: 32
+        spacing: appStyle.spacing.horizontal
+
+        Button {
+            iconSource: 'back.png'
+            text: qsTr('Go back')
+
+            onClicked: panel.rejected()
+        }
+
+        Button {
+            id: addButton
+
+            iconSource: 'add.png'
+            enabled: panel.acceptableInput && testClient.state == QXmppClient.DisconnectedState
+            text: qsTr('Add')
+
+            onClicked: {
+                statusLabel.text = qsTr('Checking your username and password..');
+                testClient.disconnectFromServer();
+                testClient.connectToServer(jidInput.text + '/AccountCheck', passwordInput.text);
+            }
+        }
     }
 
     Client {
         id: testClient
+
+        onConnected: {
+            panel.accepted();
+        }
+
+        onDisconnected: {
+            statusLabel.text = qsTr('Could not connect, please check your username and password.');
+        }
     }
 }
 

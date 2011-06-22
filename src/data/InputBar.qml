@@ -22,9 +22,11 @@ import QtQuick 1.0
 Rectangle {
     id: bar
 
+    property alias acceptableInput: edit.acceptableInput
     property alias echoMode: edit.echoMode
     property alias hintText: label.text
     property alias text: edit.text
+    property alias validator: edit.validator
 
     function backspacePressed() {
         var oldPos = edit.cursorPosition;

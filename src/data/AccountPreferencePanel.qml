@@ -37,26 +37,29 @@ Panel {
         anchors.right: parent.right
         title: qsTr('Chat accounts')
 
-        Item {
+        AccountListPanel {
+            id: listPanel
+
             anchors.fill: accounts.contents
 
-            PanelHelp {
-                id: help
-
-                anchors.top: parent.top
-                anchors.left: parent.left
-                anchors.right: parent.right
-                text: qsTr('In addition to your %1 account, %2 can connect to additional chat accounts such as Google Talk and Facebook.').replace('%1', application.organizationName).replace('%2', application.applicationName)
-            }
-
-            AccountListPanel {
-                anchors.top: help.bottom
-                anchors.topMargin: appStyle.spacing.vertical
-                anchors.bottom: parent.bottom
-                anchors.left: parent.left
-                anchors.right: parent.right
-            }
+            onAddClicked: panel.state = 'edit'
         }
+
+        AccountAddPanel {
+            id: addPanel
+
+            anchors.fill: accounts.contents
+            opacity: 0
+
+            onAccepted: panel.state = ''
+            onRejected: panel.state = ''
+        }
+    }
+
+    states: State {
+        name: 'edit'
+        PropertyChanges { target: listPanel; opacity: 0 }
+        PropertyChanges { target: addPanel; opacity: 1 }
     }
 }
 
