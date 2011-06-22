@@ -43,6 +43,7 @@ generate_png(png
     dock-phone.svg
     dock-photo.svg
     dock-share.svg
+    dock-start.svg
     download.svg
     favorite-active.svg
     favorite-inactive.svg

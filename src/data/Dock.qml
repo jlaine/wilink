@@ -72,7 +72,8 @@ Rectangle {
         }
 
         DockButton {
-            iconSource: 'start.png'
+            iconSource: 'dock-start.png'
+            iconPress: 'start.png'
             panelSource: 'PlayerPanel.qml'
             shortcut: Qt.ControlModifier + Qt.Key_M
             text: qsTr('Media')
