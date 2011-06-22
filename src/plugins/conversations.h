@@ -24,7 +24,7 @@
 
 class ChatClient;
 class ChatHistoryModel;
-class ChatRosterModel;
+class RosterModel;
 class QXmppArchiveChat;
 
 class Conversation : public QObject
@@ -52,15 +52,15 @@ public:
 
     int remoteState() const;
 
-    ChatRosterModel *rosterModel() const;
-    void setRosterModel(ChatRosterModel *rosterModel);
+    RosterModel *rosterModel() const;
+    void setRosterModel(RosterModel *rosterModel);
 
 signals:
     void clientChanged(ChatClient *client);
     void localStateChanged(int localState);
     void jidChanged(const QString &jid);
     void remoteStateChanged(int remoteState);
-    void rosterModelChanged(ChatRosterModel *rosterModel);
+    void rosterModelChanged(RosterModel *rosterModel);
 
 public slots:
     bool sendMessage(const QString &text);

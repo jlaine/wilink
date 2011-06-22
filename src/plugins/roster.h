@@ -34,8 +34,8 @@ class QXmppVCardIq;
 class QXmppVCardManager;
 
 class ChatClient;
-class ChatRosterModel;
-class ChatRosterModelPrivate;
+class RosterModel;
+class RosterModelPrivate;
 class VCardCache;
 class VCardCachePrivate;
 
@@ -46,7 +46,7 @@ public:
     QPixmap requestPixmap(const QString &id, QSize *size, const QSize &requestedSize);
 };
 
-class ChatRosterModel : public ChatModel
+class RosterModel : public ChatModel
 {
     Q_OBJECT
     Q_ENUMS(Role)
@@ -60,8 +60,8 @@ public:
         StatusSortRole,
     };
 
-    ChatRosterModel(QObject *parent = 0);
-    ~ChatRosterModel();
+    RosterModel(QObject *parent = 0);
+    ~RosterModel();
 
     ChatClient *client() const;
     void setClient(ChatClient *client);
@@ -87,8 +87,8 @@ private slots:
     void rosterReceived();
 
 private:
-    friend class ChatRosterModelPrivate;
-    ChatRosterModelPrivate * const d;
+    friend class RosterModelPrivate;
+    RosterModelPrivate * const d;
 };
 
 class VCard : public QObject

@@ -27,7 +27,7 @@
 
 class Application;
 class ChatPrivate;
-class ChatRosterModel;
+class RosterModel;
 class ChatRosterView;
 class QFileDialog;
 class QLineEdit;
@@ -51,7 +51,7 @@ class Window : public QMainWindow
 {
     Q_OBJECT
     Q_PROPERTY(ChatClient* client READ client CONSTANT)
-    Q_PROPERTY(ChatRosterModel* rosterModel READ rosterModel CONSTANT)
+    Q_PROPERTY(RosterModel* rosterModel READ rosterModel CONSTANT)
     Q_PROPERTY(bool isActiveWindow READ isActiveWindow NOTIFY isActiveWindowChanged)
 
 public:
@@ -59,7 +59,7 @@ public:
     ~Window();
 
     ChatClient *client();
-    ChatRosterModel *rosterModel();
+    RosterModel *rosterModel();
 
     bool open(const QString &jid);
     void setWindowTitle(const QString &title);

@@ -30,7 +30,6 @@ class QUrl;
 
 class ChatHistoryModel;
 class ChatHistoryModelPrivate;
-class ChatRosterModel;
 
 /** The ChatMessage class represents the data for a single chat history message.
  */

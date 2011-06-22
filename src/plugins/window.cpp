@@ -91,7 +91,7 @@ class ChatPrivate
 {
 public:
     ChatClient *client;
-    ChatRosterModel *rosterModel;
+    RosterModel *rosterModel;
     QDeclarativeView *rosterView;
     QString windowTitle;
 };
@@ -104,7 +104,7 @@ Window::Window(QWidget *parent)
 
     // create client
     d->client = new ChatClient(this);
-    d->rosterModel =  new ChatRosterModel(this);
+    d->rosterModel =  new RosterModel(this);
     d->rosterModel->setClient(d->client);
     connect(d->rosterModel, SIGNAL(pendingMessages(int)), this, SLOT(pendingMessages(int)));
 
@@ -314,7 +314,7 @@ ChatClient *Window::client()
 
 /** Return this window's chat roster model.
  */
-ChatRosterModel *Window::rosterModel()
+RosterModel *Window::rosterModel()
 {
     return d->rosterModel;
 }

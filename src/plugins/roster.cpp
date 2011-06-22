@@ -129,19 +129,19 @@ QPixmap ChatRosterImageProvider::requestPixmap(const QString &id, QSize *size, c
     return pixmap;
 }
 
-class ChatRosterModelPrivate
+class RosterModelPrivate
 {
 public:
     int countPendingMessages();
     ChatRosterItem* find(const QString &id, ChatModelItem *parent = 0);
 
-    ChatRosterModel *q;
+    RosterModel *q;
     ChatClient *client;
 };
 
 /** Count the current number of pending messages.
  */
-int ChatRosterModelPrivate::countPendingMessages()
+int RosterModelPrivate::countPendingMessages()
 {
     int pending = 0;
     foreach (ChatModelItem *item, q->rootItem->children) {
@@ -151,7 +151,7 @@ int ChatRosterModelPrivate::countPendingMessages()
     return pending;
 }
 
-ChatRosterItem *ChatRosterModelPrivate::find(const QString &id, ChatModelItem *parent)
+ChatRosterItem *RosterModelPrivate::find(const QString &id, ChatModelItem *parent)
 {
     if (!parent)
         parent = q->rootItem;
@@ -173,30 +173,30 @@ ChatRosterItem *ChatRosterModelPrivate::find(const QString &id, ChatModelItem *p
     return 0;
 }
 
-ChatRosterModel::ChatRosterModel(QObject *parent)
+RosterModel::RosterModel(QObject *parent)
     : ChatModel(parent),
-    d(new ChatRosterModelPrivate)
+    d(new RosterModelPrivate)
 {
     d->client = 0;
     d->q = this;
 
     // set additionals role names
     QHash<int, QByteArray> names = roleNames();
-    names.insert(ChatRosterModel::StatusRole, "status");
+    names.insert(RosterModel::StatusRole, "status");
     setRoleNames(names);
 }
 
-ChatRosterModel::~ChatRosterModel()
+RosterModel::~RosterModel()
 {
     delete d;
 }
 
-ChatClient *ChatRosterModel::client() const
+ChatClient *RosterModel::client() const
 {
     return d->client;
 }
 
-void ChatRosterModel::setClient(ChatClient *client)
+void RosterModel::setClient(ChatClient *client)
 {
     if (client != d->client) {
         bool check;
@@ -237,7 +237,7 @@ void ChatRosterModel::setClient(ChatClient *client)
     }
 }
 
-QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
+QVariant RosterModel::data(const QModelIndex &index, int role) const
 {
     ChatRosterItem *item = static_cast<ChatRosterItem*>(index.internalPointer());
     if (!index.isValid() || !item)
@@ -266,7 +266,7 @@ QVariant ChatRosterModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-bool ChatRosterModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool RosterModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     ChatRosterItem *item = static_cast<ChatRosterItem*>(index.internalPointer());
     if (!index.isValid() || !item)
@@ -281,13 +281,13 @@ bool ChatRosterModel::setData(const QModelIndex &index, const QVariant &value, i
     return false;
 }
 
-void ChatRosterModel::_q_connected()
+void RosterModel::_q_connected()
 {
     // request own vCard
     VCardCache::instance()->get(d->client->configuration().jidBare());
 }
 
-void ChatRosterModel::_q_disconnected()
+void RosterModel::_q_disconnected()
 {
     if (rootItem->children.size() > 0)
     {
@@ -299,7 +299,7 @@ void ChatRosterModel::_q_disconnected()
 
 /** Handles an item being added to the roster.
  */
-void ChatRosterModel::itemAdded(const QString &jid)
+void RosterModel::itemAdded(const QString &jid)
 {
     ChatRosterItem *item = d->find(jid);
     if (item)
@@ -315,7 +315,7 @@ void ChatRosterModel::itemAdded(const QString &jid)
 
 /** Handles an item being changed in the roster.
  */
-void ChatRosterModel::itemChanged(const QString &jid)
+void RosterModel::itemChanged(const QString &jid)
 {
     ChatRosterItem *item = d->find(jid);
     if (item)
@@ -324,14 +324,14 @@ void ChatRosterModel::itemChanged(const QString &jid)
 
 /** Handles an item being removed from the roster.
  */
-void ChatRosterModel::itemRemoved(const QString &jid)
+void RosterModel::itemRemoved(const QString &jid)
 {
     ChatRosterItem *item = d->find(jid);
     if (item)
         removeItem(item);
 }
 
-void ChatRosterModel::rosterReceived()
+void RosterModel::rosterReceived()
 {
     // make a note of existing contacts
     QStringList oldJids;
@@ -354,7 +354,7 @@ void ChatRosterModel::rosterReceived()
     }
 }
 
-void ChatRosterModel::addPendingMessage(const QString &bareJid)
+void RosterModel::addPendingMessage(const QString &bareJid)
 {
     ChatRosterItem *item = d->find(bareJid);
     if (item)
@@ -365,7 +365,7 @@ void ChatRosterModel::addPendingMessage(const QString &bareJid)
     }
 }
 
-void ChatRosterModel::clearPendingMessages(const QString &bareJid)
+void RosterModel::clearPendingMessages(const QString &bareJid)
 {
     ChatRosterItem *item = d->find(bareJid);
     if (item && item->messages) {

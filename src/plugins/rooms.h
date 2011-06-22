@@ -29,7 +29,6 @@
 class ChatClient;
 class ChatHistoryModel;
 class ChatMessage;
-class ChatRosterModel;
 class QModelIndex;
 class QTableWidget;
 class QXmppMessage;

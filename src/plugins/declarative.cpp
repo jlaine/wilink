@@ -236,7 +236,7 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterType<PlayerModel>(uri, 1, 2, "PlayerModel");
     qmlRegisterType<RoomModel>(uri, 1, 2, "RoomModel");
     qmlRegisterType<RoomListModel>(uri, 1, 2, "RoomListModel");
-    qmlRegisterUncreatableType<ChatRosterModel>(uri, 1, 2, "RosterModel", "");
+    qmlRegisterType<RosterModel>(uri, 1, 2, "RosterModel");
     qmlRegisterType<ShareModel>(uri, 1, 2, "ShareModel");
     qmlRegisterType<ShareFolderModel>(uri, 1, 2, "ShareFolderModel");
     qmlRegisterType<SharePlaceModel>(uri, 1, 2, "SharePlaceModel");
