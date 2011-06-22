@@ -58,7 +58,7 @@ class ApplicationPrivate
 public:
     ApplicationPrivate();
 
-    QList<Window*> chats;
+    QList<QWidget*> chats;
     QSettings *settings;
     QSoundPlayer *soundPlayer;
     QThread *soundThread;
@@ -193,7 +193,7 @@ Application::~Application()
 #endif
 
     // destroy chat windows
-    foreach (Window *chat, d->chats)
+    foreach (QWidget *chat, d->chats)
         delete chat;
 
     // stop sound player
@@ -451,7 +451,7 @@ void Application::setOutgoingMessageSound(const QString &soundFile)
 void Application::resetWindows()
 {
     /* close any existing windows */
-    foreach (Window *chat, d->chats)
+    foreach (QWidget *chat, d->chats)
         chat->deleteLater();
     d->chats.clear();
 
@@ -464,20 +464,8 @@ void Application::resetWindows()
         view->rootContext()->setContextProperty("application", this);
         view->setSource(QUrl("qrc:/setup.qml"));
         view->show();
+        d->chats << view;
         return;
-
-#if 0
-        ChatAccountPrompt dlg(0);
-        dlg.setDomain("wifirst.net");
-        if (!dlg.exec() || dlg.jid().isEmpty()) {
-            quit();
-            return;
-        }
-
-        DeclarativeWallet wallet;
-        wallet.set(dlg.jid(), dlg.password());
-        setChatAccounts(QStringList() << dlg.jid());
-#endif
     }
 
     /* connect to chat accounts */
@@ -510,7 +498,7 @@ void Application::resetWindows()
 
 void Application::showWindows()
 {
-    foreach (Window *chat, d->chats) {
+    foreach (QWidget *chat, d->chats) {
         chat->setWindowState(chat->windowState() & ~Qt::WindowMinimized);
         chat->show();
         chat->raise();

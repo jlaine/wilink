@@ -22,43 +22,7 @@
 
 #include <QDialog>
 
-class QDialogButtonBox;
-class QLabel;
 class QLineEdit;
-class QXmppClient;
-
-class ChatAccountPrompt : public QDialog
-{
-    Q_OBJECT
-
-public:
-    ChatAccountPrompt(QWidget *parent = 0);
-
-    QString jid() const;
-    QString password() const;
-
-    void setAccounts(const QStringList &accounts);
-    void setDomain(const QString &domain);
-
-private slots:
-    void testAccount();
-    void testFailed();
-
-private:
-    void showMessage(const QString &message, bool isError);
-
-    QString m_domain;
-    QStringList m_accounts;
-    QString m_errorStyle;
-
-    QDialogButtonBox *m_buttonBox;
-    QLineEdit *m_jidEdit;
-    QLabel *m_jidLabel;
-    QLineEdit *m_passwordEdit;
-    QLabel *m_promptLabel;
-    QLabel *m_statusLabel;
-    QXmppClient *m_testClient;
-};
 
 class ChatPasswordPrompt : public QDialog
 {

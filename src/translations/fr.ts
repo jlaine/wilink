@@ -100,53 +100,6 @@
     </message>
 </context>
 <context>
-    <name>ChatAccountPrompt</name>
-    <message>
-        <source>Password</source>
-        <translation>Mot de passe</translation>
-    </message>
-    <message>
-        <source>Add an account</source>
-        <translation>Ajouter un compte</translation>
-    </message>
-    <message>
-        <source>The address you entered is invalid.</source>
-        <translation>L&apos;adresse que vous avez saisie n&apos;est pas valide.</translation>
-    </message>
-    <message>
-        <source>Checking your username and password..</source>
-        <translation>Vérification de votre identifiant et mot de passe..</translation>
-    </message>
-    <message>
-        <source>Enter the address and password for the account you want to add.</source>
-        <translation>Saisissez l&apos;adresse et le mot de passe du compte que vous souhaitez ajouter.</translation>
-    </message>
-    <message>
-        <source>You already have an account for &apos;%1&apos;.</source>
-        <translation>Vous avez déjà un compte pour &apos;%1&apos;.</translation>
-    </message>
-    <message>
-        <source>Could not connect, please check your username and password.</source>
-        <translation>La connexion a échoué, merci de vérifier votre identifiant et mot de passe.</translation>
-    </message>
-    <message>
-        <source>Username</source>
-        <translation>Identifiant</translation>
-    </message>
-    <message>
-        <source>Enter the username and password for your &apos;%1&apos; account.</source>
-        <translation>Saisissez l&apos;identifiant et le mot de passe de votre compte &apos;%1&apos;.</translation>
-    </message>
-    <message>
-        <source>Address</source>
-        <translation>Adresse</translation>
-    </message>
-    <message>
-        <source>If you need help, please refer to the &lt;a href=&quot;%1&quot;&gt;%2 FAQ&lt;/a&gt;.</source>
-        <translation>Si vous avez besoin d&apos;aide, merci de consulter la &lt;a href=&quot;%1&quot;&gt;FAQ %2&lt;/a&gt;.</translation>
-    </message>
-</context>
-<context>
     <name>ChatPanel</name>
     <message>
         <source>My rooms</source>
