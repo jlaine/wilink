@@ -69,6 +69,9 @@ Item {
     Text {
         id: statusLabel
 
+        property string failedText: qsTr('Could not connect, please check your username and password.')
+        property string testingText: qsTr('Checking your username and password..')
+
         anchors.top: passwordInput.bottom
         anchors.topMargin: appStyle.spacing.vertical
         anchors.left: parent.left
@@ -94,12 +97,11 @@ Item {
             id: addButton
 
             iconSource: 'add.png'
-            enabled: panel.acceptableInput && testClient.state == QXmppClient.DisconnectedState
+            enabled: panel.acceptableInput && panel.state != 'testing'
             text: qsTr('Add')
 
             onClicked: {
-                statusLabel.text = qsTr('Checking your username and password..');
-                testClient.disconnectFromServer();
+                panel.state = 'testing';
                 testClient.connectToServer(jidInput.text + '/AccountCheck', passwordInput.text);
             }
         }
@@ -109,12 +111,28 @@ Item {
         id: testClient
 
         onConnected: {
+            panel.state = '';
             panel.accepted();
         }
 
         onDisconnected: {
-            statusLabel.text = qsTr('Could not connect, please check your username and password.');
+            if (panel.state == 'testing') {
+                panel.state = 'failed';
+            }
         }
     }
+
+    states: [
+        State {
+            name: 'failed'
+            PropertyChanges { target: statusLabel; color: 'red'; text: statusLabel.failedText }
+        },
+        State {
+            name: 'testing'
+            PropertyChanges { target: statusLabel; text: statusLabel.testingText }
+            PropertyChanges { target: jidInput; enabled: false }
+            PropertyChanges { target: passwordInput; enabled: false }
+        }
+    ]
 }
 
