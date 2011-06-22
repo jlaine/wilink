@@ -55,7 +55,10 @@ Rectangle {
     MouseArea {
         anchors.fill: parent
         hoverEnabled: true
-        onClicked: menuLoader.hide();
+        onClicked: {
+            if (cancelArea.enabled)
+                cancelArea.clicked();
+        }
     }
 
     Rectangle {
