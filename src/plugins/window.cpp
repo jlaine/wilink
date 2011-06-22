@@ -104,7 +104,8 @@ Window::Window(QWidget *parent)
 
     // create client
     d->client = new ChatClient(this);
-    d->rosterModel =  new ChatRosterModel(d->client, this);
+    d->rosterModel =  new ChatRosterModel(this);
+    d->rosterModel->setClient(d->client);
     connect(d->rosterModel, SIGNAL(pendingMessages(int)), this, SLOT(pendingMessages(int)));
 
     QXmppLogger *logger = new QXmppLogger(this);

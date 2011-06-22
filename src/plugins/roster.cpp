@@ -173,55 +173,68 @@ ChatRosterItem *ChatRosterModelPrivate::find(const QString &id, ChatModelItem *p
     return 0;
 }
 
-ChatRosterModel::ChatRosterModel(ChatClient *xmppClient, QObject *parent)
+ChatRosterModel::ChatRosterModel(QObject *parent)
     : ChatModel(parent),
     d(new ChatRosterModelPrivate)
 {
+    d->client = 0;
     d->q = this;
 
     // set additionals role names
     QHash<int, QByteArray> names = roleNames();
     names.insert(ChatRosterModel::StatusRole, "status");
     setRoleNames(names);
-
-    // get cache
-    VCardCache::instance()->addClient(xmppClient);
-
-    d->client = xmppClient;
-
-    bool check;
-    check = connect(d->client, SIGNAL(connected()),
-                    this, SLOT(_q_connected()));
-    Q_ASSERT(check);
-
-    check = connect(d->client, SIGNAL(disconnected()),
-                    this, SLOT(_q_disconnected()));
-    Q_ASSERT(check);
-
-    check = connect(d->client->rosterManager(), SIGNAL(itemAdded(QString)),
-                    this, SLOT(itemAdded(QString)));
-    Q_ASSERT(check);
-
-    check = connect(d->client->rosterManager(), SIGNAL(itemRemoved(QString)),
-                    this, SLOT(itemRemoved(QString)));
-    Q_ASSERT(check);
-
-    check = connect(d->client->rosterManager(), SIGNAL(presenceChanged(QString,QString)),
-                    this, SLOT(itemChanged(QString)));
-    Q_ASSERT(check);
-
-    check = connect(VCardCache::instance(), SIGNAL(cardChanged(QString)),
-                    this, SLOT(itemChanged(QString)));
-    Q_ASSERT(check);
-
-    check = connect(d->client->rosterManager(), SIGNAL(rosterReceived()),
-                    this, SLOT(rosterReceived()));
-    Q_ASSERT(check);
 }
 
 ChatRosterModel::~ChatRosterModel()
 {
     delete d;
+}
+
+ChatClient *ChatRosterModel::client() const
+{
+    return d->client;
+}
+
+void ChatRosterModel::setClient(ChatClient *client)
+{
+    if (client != d->client) {
+        bool check;
+
+        d->client = client;
+
+        VCardCache::instance()->addClient(d->client);
+
+        check = connect(d->client, SIGNAL(connected()),
+                        this, SLOT(_q_connected()));
+        Q_ASSERT(check);
+
+        check = connect(d->client, SIGNAL(disconnected()),
+                        this, SLOT(_q_disconnected()));
+        Q_ASSERT(check);
+
+        check = connect(d->client->rosterManager(), SIGNAL(itemAdded(QString)),
+                        this, SLOT(itemAdded(QString)));
+        Q_ASSERT(check);
+
+        check = connect(d->client->rosterManager(), SIGNAL(itemRemoved(QString)),
+                        this, SLOT(itemRemoved(QString)));
+        Q_ASSERT(check);
+
+        check = connect(d->client->rosterManager(), SIGNAL(presenceChanged(QString,QString)),
+                        this, SLOT(itemChanged(QString)));
+        Q_ASSERT(check);
+
+        check = connect(VCardCache::instance(), SIGNAL(cardChanged(QString)),
+                        this, SLOT(itemChanged(QString)));
+        Q_ASSERT(check);
+
+        check = connect(d->client->rosterManager(), SIGNAL(rosterReceived()),
+                        this, SLOT(rosterReceived()));
+        Q_ASSERT(check);
+
+        emit clientChanged(d->client);
+    }
 }
 
 QVariant ChatRosterModel::data(const QModelIndex &index, int role) const

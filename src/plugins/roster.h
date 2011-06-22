@@ -50,6 +50,7 @@ class ChatRosterModel : public ChatModel
 {
     Q_OBJECT
     Q_ENUMS(Role)
+    Q_PROPERTY(ChatClient* client READ client WRITE setClient NOTIFY clientChanged)
 
 public:
     enum Role {
@@ -59,14 +60,18 @@ public:
         StatusSortRole,
     };
 
-    ChatRosterModel(ChatClient *client, QObject *parent = 0);
+    ChatRosterModel(QObject *parent = 0);
     ~ChatRosterModel();
+
+    ChatClient *client() const;
+    void setClient(ChatClient *client);
 
     // QAbstractItemModel interface
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
 
 signals:
+    void clientChanged(ChatClient *client);
     void pendingMessages(int messages);
 
 public slots:
