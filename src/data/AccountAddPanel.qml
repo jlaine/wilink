@@ -140,19 +140,6 @@ FocusScope {
         spacing: appStyle.spacing.horizontal
 
         Button {
-            iconSource: 'back.png'
-            text: qsTr('Go back')
-
-            onClicked: {
-                panel.state = '';
-                jidInput.text = '';
-                passwordInput.Text = '';
-                testClient.disconnectFromServer();
-                panel.rejected();
-            }
-        }
-
-        Button {
             id: addButton
 
             iconSource: 'add.png'
@@ -177,6 +164,19 @@ FocusScope {
                 panel.testJid = jid;
                 panel.testPassword = passwordInput.text;
                 testClient.connectToServer(panel.testJid + '/AccountCheck', panel.testPassword);
+            }
+        }
+
+        Button {
+            iconSource: 'back.png'
+            text: qsTr('Cancel')
+
+            onClicked: {
+                panel.state = '';
+                jidInput.text = '';
+                passwordInput.Text = '';
+                testClient.disconnectFromServer();
+                panel.rejected();
             }
         }
     }
