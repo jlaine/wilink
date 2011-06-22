@@ -31,7 +31,7 @@ Dialog {
     }
 
     onAccepted: {
-        for (var i = 0; i < tabList.count; ++i) {
+        for (var i = tabList.count - 1; i >= 0; i--) {
             var panel = prefSwapper.findPanel(tabList.model.get(i).source);
             if (panel) {
                 console.log("Saving " + panel);

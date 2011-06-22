@@ -47,6 +47,7 @@ Panel {
 
         // save accounts
         application.chatAccounts = newJids;
+        application.resetWindows();
     }
 
     color: 'transparent'

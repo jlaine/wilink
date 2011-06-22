@@ -140,11 +140,10 @@ signals:
     void sortContactsByStatusChanged(bool sort);
 
 public slots:
+    void resetWindows();
     void showMessage(QObject *context, const QString &title, const QString &message);
 
 private slots:
-    void resetWindows();
-    void showAccounts();
     void showWindows();
 #ifdef USE_SYSTRAY
     void trayActivated(QSystemTrayIcon::ActivationReason reason);

@@ -433,21 +433,11 @@ void Application::setOutgoingMessageSound(const QString &soundFile)
     }
 }
 
-void Application::showAccounts()
-{
-    ChatAccounts dlg;
-    dlg.exec();
-
-    // reset chats later as we may delete the calling window
-    if (dlg.changed())
-        QTimer::singleShot(0, this, SLOT(resetWindows()));
-}
-
 void Application::resetWindows()
 {
     /* close any existing windows */
     foreach (Window *chat, d->chats)
-        delete chat;
+        chat->deleteLater();
     d->chats.clear();
 
     /* clean any bad accounts */
