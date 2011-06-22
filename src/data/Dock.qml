@@ -72,7 +72,8 @@ Rectangle {
         }
 
         DockButton {
-            iconSource: 'start.png'
+            iconSource: 'dock-start.png'
+            iconPress: 'start.png'
             panelSource: 'PlayerPanel.qml'
             shortcut: Qt.ControlModifier + Qt.Key_M
             text: qsTr('Media')
@@ -172,7 +173,8 @@ Rectangle {
         }
 
         DockButton {
-            iconSource: 'options.png'
+            iconSource: 'dock-options.png'
+            iconPress: 'options.png'
             panelSource: 'LogPanel.qml'
             shortcut: Qt.ControlModifier + Qt.Key_L
             text: qsTr('Debugging')
@@ -185,7 +187,8 @@ Rectangle {
         }
 
         DockButton {
-            iconSource: 'peer.png'
+            iconSource: 'dock-peer.png'
+            iconPress: 'peer.png'
             panelSource: 'DiscoveryPanel.qml'
             shortcut: Qt.ControlModifier + Qt.Key_B
             text: qsTr('Discovery')
