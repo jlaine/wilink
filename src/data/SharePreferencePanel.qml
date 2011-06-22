@@ -76,6 +76,7 @@ Panel {
                 anchors.leftMargin: appStyle.spacing.horizontal
                 anchors.right: parent.right
                 anchors.rightMargin: appStyle.spacing.horizontal
+                clip: true
 
                 Item {
                     id: placePanel
@@ -127,6 +128,7 @@ Panel {
                         anchors.top: parent.top
                         anchors.left: parent.left
                         anchors.right: parent.right
+                        z: 1
 
                         onLocationChanged: {
                             visualModel.rootIndex = folderModel.index(location.path);
@@ -140,7 +142,7 @@ Panel {
                         anchors.bottom: parent.bottom
                         anchors.left: parent.left
                         anchors.right: folderBar.left
-                        clip: true
+
                         model: VisualDataModel {
                             id: visualModel
 
