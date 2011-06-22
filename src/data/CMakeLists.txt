@@ -40,6 +40,7 @@ generate_png(png
     dock-chat.svg
     dock-diagnostics.svg
     dock-options.svg
+    dock-peer.svg
     dock-phone.svg
     dock-photo.svg
     dock-share.svg
