@@ -39,22 +39,40 @@ ChatClient::ChatClient(QObject *parent)
     : QXmppClient(parent),
     timeOffset(0)
 {
-    connect(this, SIGNAL(connected()), this, SLOT(slotConnected()));
-    connect(this, SIGNAL(messageReceived(QXmppMessage)), this, SLOT(slotMessageReceived(QXmppMessage)));
+    bool check;
+
+    check = connect(this, SIGNAL(connected()),
+                    this, SLOT(slotConnected()));
+    Q_ASSERT(check);
+
+    check = connect(this, SIGNAL(error(QXmppClient::Error)),
+            this, SLOT(slotError(QXmppClient::Error)));
+    Q_ASSERT(check);
+
+    check = connect(this, SIGNAL(messageReceived(QXmppMessage)),
+            this, SLOT(slotMessageReceived(QXmppMessage)));
+    Q_ASSERT(check);
+
+    // service discovery
     discoManager = findExtension<QXmppDiscoveryManager>();
-    connect(discoManager, SIGNAL(infoReceived(QXmppDiscoveryIq)),
-        this, SLOT(slotDiscoveryInfoReceived(QXmppDiscoveryIq)));
-    connect(discoManager, SIGNAL(itemsReceived(QXmppDiscoveryIq)),
-        this, SLOT(slotDiscoveryItemsReceived(QXmppDiscoveryIq)));
+    check = connect(discoManager, SIGNAL(infoReceived(QXmppDiscoveryIq)),
+                    this, SLOT(slotDiscoveryInfoReceived(QXmppDiscoveryIq)));
+    Q_ASSERT(check);
 
+    check = connect(discoManager, SIGNAL(itemsReceived(QXmppDiscoveryIq)),
+                    this, SLOT(slotDiscoveryItemsReceived(QXmppDiscoveryIq)));
+    Q_ASSERT(check);
+
+    // server time
     timeManager = findExtension<QXmppEntityTimeManager>();
-    connect(timeManager, SIGNAL(timeReceived(QXmppEntityTimeIq)),
-        this, SLOT(slotTimeReceived(QXmppEntityTimeIq)));
+    check = connect(timeManager, SIGNAL(timeReceived(QXmppEntityTimeIq)),
+                    this, SLOT(slotTimeReceived(QXmppEntityTimeIq)));
+    Q_ASSERT(check);
 
-    // create transfer manager
+    // file transfers
     transferManager()->setSupportedMethods(QXmppTransferJob::SocksMethod);
 
-    // create call manager
+    // multimedia calls
     callManager();
 }
 
@@ -275,6 +293,17 @@ void ChatClient::slotDiscoveryItemsReceived(const QXmppDiscoveryIq &disco)
                 if (!id.isEmpty())
                     discoQueue.append(id);
             }
+        }
+    }
+}
+
+void ChatClient::slotError(QXmppClient::Error error)
+{
+    if (error == QXmppClient::XmppStreamError) {
+        if (xmppStreamError() == QXmppStanza::Error::Conflict) {
+            emit conflictReceived();
+        } else if (xmppStreamError() == QXmppStanza::Error::NotAuthorized) {
+            emit authenticationFailed();
         }
     }
 }

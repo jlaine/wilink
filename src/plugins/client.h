@@ -72,6 +72,8 @@ public:
     QXmppTransferManager* transferManager();
 
 signals:
+    void authenticationFailed();
+    void conflictReceived();
     void jidChanged(const QString &jid);
     void diagnosticServerChanged(const QString &diagnosticServer);
     void messageReceived(const QString &from);
@@ -86,6 +88,7 @@ private slots:
     void slotConnected();
     void slotDiscoveryInfoReceived(const QXmppDiscoveryIq &disco);
     void slotDiscoveryItemsReceived(const QXmppDiscoveryIq &disco);
+    void slotError(QXmppClient::Error error);
     void slotMessageReceived(const QXmppMessage &message);
     void slotTimeReceived(const QXmppEntityTimeIq &time);
     void setTurnServer(const QXmppSrvInfo &serviceInfo);
