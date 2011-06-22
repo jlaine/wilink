@@ -39,10 +39,12 @@ Dialog {
             }
         }
         parent.hide();
+        parent.source = '';
     }
 
     onRejected: {
-        dialogLoader.source = ''
+        parent.hide();
+        parent.source = '';
     }
 
     Item {
