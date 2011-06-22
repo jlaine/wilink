@@ -219,9 +219,9 @@ Panel {
                 id: inputVolume
 
                 anchors.horizontalCenter: parent.horizontalCenter
-                orientation: Qt.VerticalOrientation
-                maximumValue: historyModel.maximumVolume
-                value: historyModel.inputVolume
+                orientation: Qt.Vertical
+                maximumValue: Qt.isQtObject(historyModel) ? historyModel.maximumVolume : 100
+                value: Qt.isQtObject(historyModel) ? historyModel.inputVolume : 0
             }
 
             Image {
@@ -239,9 +239,9 @@ Panel {
                 id: outputVolume
 
                 anchors.horizontalCenter: parent.horizontalCenter
-                orientation: Qt.VerticalOrientation
-                maximumValue: historyModel.maximumVolume
-                value: historyModel.outputVolume
+                orientation: Qt.Vertical
+                maximumValue: Qt.isQtObject(historyModel) ? historyModel.maximumVolume : 100
+                value: Qt.isQtObject(historyModel) ? historyModel.inputVolume : 0
             }
 
             Image {
