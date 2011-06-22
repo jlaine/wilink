@@ -47,7 +47,7 @@ Item {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.leftMargin: 36
+        anchors.leftMargin: 40
         color: '#aa597fbe'
     }
 

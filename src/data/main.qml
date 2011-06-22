@@ -89,8 +89,10 @@ FocusScope {
         z: 11
 
         function hide() {
-            cancelArea.enabled = false;
-            menuLoader.item.opacity = 0;
+            if(menuLoader.item) {
+                cancelArea.enabled = false;
+                menuLoader.item.opacity = 0;
+            }
         }
 
         function show(x, y) {
