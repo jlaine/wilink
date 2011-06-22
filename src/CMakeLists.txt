@@ -66,7 +66,6 @@ set(wiLink_SOURCES
     plugins/roster.cpp
     plugins/shares.cpp
     plugins/systeminfo.cpp
-    plugins/utils.cpp
     plugins/updates.cpp
     plugins/updatesdialog.cpp
     plugins/window.cpp)

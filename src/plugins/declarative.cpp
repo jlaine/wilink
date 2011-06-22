@@ -36,7 +36,6 @@
 #include "qnetio/wallet.h"
 
 #include "application.h"
-#include "utils.h"
 #include "idle/idle.h"
 #include "calls.h"
 #include "console.h"

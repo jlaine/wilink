@@ -47,7 +47,6 @@
 #include "roster.h"
 #include "window.h"
 #include "updatesdialog.h"
-#include "utils.h"
 
 ChatPasswordPrompt::ChatPasswordPrompt(const QString &jid, QWidget *parent)
     : QDialog(parent)
@@ -328,16 +327,8 @@ bool Window::open(const QString &jid)
     QXmppConfiguration config;
     config.setResource(qApp->applicationName());
 
-    /* get user and domain */
-    if (!isBareJid(jid))
-    {
-        qWarning("Cannot connect to chat server using invalid JID");
-        return false;
-    }
+    // set jid and password
     config.setJid(jid);
-    setObjectName(config.jidBare());
-
-    /* get password */
     QString password;
     if (!getPassword(config.jidBare(), password))
     {
@@ -357,6 +348,7 @@ bool Window::open(const QString &jid)
     config.setKeepAliveTimeout(15);
 
     /* connect to server */
+    setObjectName(config.jidBare());
     d->client->connectToServer(config);
 
     /* load QML */

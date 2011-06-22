@@ -48,7 +48,6 @@
 #include "declarative.h"
 #include "systeminfo.h"
 #include "updates.h"
-#include "utils.h"
 #include "window.h"
 
 Application *wApp = 0;
@@ -117,7 +116,7 @@ Application::Application(int &argc, char **argv)
     // clean acounts
     QStringList cleanAccounts = wApp->chatAccounts();
     foreach (const QString &jid, cleanAccounts) {
-        if (!isBareJid(jid)) {
+        if (!QRegExp("^[^@/ ]+@[^@/ ]+$").exactMatch(jid)) {
             qWarning("Removing bad account %s", qPrintable(jid));
             cleanAccounts.removeAll(jid);
         }

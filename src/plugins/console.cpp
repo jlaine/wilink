@@ -18,9 +18,50 @@
  */
 
 #include <QDateTime>
+#include <QRegExp>
 
 #include "console.h"
-#include "utils.h"
+
+static QString indentXml(const QString &xml)
+{
+    if (!xml.startsWith("<"))
+        return xml;
+    QRegExp expression("<([^>]+)>");
+    int level = 0;
+    int index = expression.indexIn(xml);
+    QString output;
+    while (index >= 0) {
+        int length = expression.matchedLength();
+        QString tagContents = expression.cap(1);
+
+        if (tagContents.startsWith("/"))
+            level--;
+
+        if (output.endsWith("\n"))
+            output += QString(level * 4, ' ');
+
+        if (!tagContents.startsWith("?") &&
+            !tagContents.endsWith("?") &&
+            !tagContents.startsWith("/") &&
+            !tagContents.endsWith("/"))
+            level++;
+
+        output += expression.cap(0);
+
+        // look for next match
+        int cursor = index + length;
+        index = expression.indexIn(xml, cursor);
+        if (index >= cursor)
+        {
+            QString data = xml.mid(cursor, index - cursor).trimmed();
+            if (data.isEmpty())
+                output += "\n";
+            else
+                output += data;
+        }
+    }
+    return output;
+}
 
 enum LogRole {
     ContentRole = ChatModel::UserRole,

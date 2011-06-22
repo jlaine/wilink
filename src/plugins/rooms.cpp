@@ -51,7 +51,6 @@
 #include "history.h"
 #include "rooms.h"
 #include "roster.h"
-#include "utils.h"
 
 enum MembersColumns {
     JidColumn = 0,

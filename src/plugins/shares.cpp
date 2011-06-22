@@ -31,7 +31,6 @@
 
 #include "application.h"
 #include "client.h"
-#include "utils.h"
 #include "roster.h"
 #include "shares.h"
 
