@@ -212,35 +212,4 @@ QString ChatPasswordPrompt::password() const
     return m_passwordEdit->text();
 }
 
-bool ChatAccounts::getPassword(const QString &jid, QString &password, QWidget *parent)
-{
-    const QString realm = DeclarativeWallet::realm(jid);
-    if (!QNetIO::Wallet::instance())
-    {
-        qWarning("No wallet!");
-        return false;
-    }
-
-    /* check if we have a stored password that differs from the given one */
-    QString tmpJid(jid), tmpPassword(password);
-    if (QNetIO::Wallet::instance()->getCredentials(realm, tmpJid, tmpPassword) &&
-        tmpJid == jid && tmpPassword != password)
-    {
-        password = tmpPassword;
-        return true;
-    }
-
-    /* prompt user */
-    ChatPasswordPrompt dialog(jid, parent);
-    while (dialog.password().isEmpty())
-    {
-        if (dialog.exec() != QDialog::Accepted)
-            return false;
-    }
-
-    /* store new password */
-    password = dialog.password();
-    QNetIO::Wallet::instance()->setCredentials(realm, jid, password);
-    return true;
-}
 

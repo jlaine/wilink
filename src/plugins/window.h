@@ -70,6 +70,7 @@ protected:
     void changeEvent(QEvent *event);
 
 private:
+    bool getPassword(const QString &jid, QString &password);
     ChatPrivate * const d;
 };
 

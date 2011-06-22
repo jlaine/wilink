@@ -74,10 +74,4 @@ private:
     QLineEdit *m_passwordEdit;
 };
 
-class ChatAccounts
-{
-public:
-    static bool getPassword(const QString &jid, QString &password, QWidget *parent);
-};
-
 #endif

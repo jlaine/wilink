@@ -37,6 +37,8 @@
 #include "QXmppRosterManager.h"
 #include "QXmppUtils.h"
 
+#include "qnetio/wallet.h"
+
 #include "accounts.h"
 #include "application.h"
 #include "declarative.h"
@@ -211,13 +213,45 @@ void Window::pendingMessages(int messages)
     QWidget::setWindowTitle(title);
 }
 
+bool Window::getPassword(const QString &jid, QString &password)
+{
+    const QString realm = DeclarativeWallet::realm(jid);
+    if (!QNetIO::Wallet::instance())
+    {
+        qWarning("No wallet!");
+        return false;
+    }
+
+    /* check if we have a stored password that differs from the given one */
+    QString tmpJid(jid), tmpPassword(password);
+    if (QNetIO::Wallet::instance()->getCredentials(realm, tmpJid, tmpPassword) &&
+        tmpJid == jid && tmpPassword != password)
+    {
+        password = tmpPassword;
+        return true;
+    }
+
+    /* prompt user */
+    ChatPasswordPrompt dialog(jid, this);
+    while (dialog.password().isEmpty())
+    {
+        if (dialog.exec() != QDialog::Accepted)
+            return false;
+    }
+
+    /* store new password */
+    password = dialog.password();
+    QNetIO::Wallet::instance()->setCredentials(realm, jid, password);
+    return true;
+}
+
 /** Prompt for credentials then connect.
  */
 void Window::promptCredentials()
 {
     QXmppConfiguration config = d->client->configuration();
     QString password = config.password();
-    if (ChatAccounts::getPassword(config.jidBare(), password, this) &&
+    if (getPassword(config.jidBare(), password) &&
         password != config.password())
     {
         config.setPassword(password);
@@ -272,7 +306,7 @@ bool Window::open(const QString &jid)
 
     /* get password */
     QString password;
-    if (!ChatAccounts::getPassword(config.jidBare(), password, this))
+    if (!getPassword(config.jidBare(), password))
     {
         qWarning("Cannot connect to chat server without a password");
         return false;
