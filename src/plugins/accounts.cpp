@@ -33,20 +33,9 @@
 #include "qnetio/wallet.h"
 
 #include "application.h"
+#include "declarative.h"
 #include "accounts.h"
 #include "utils.h"
-
-/** Returns the authentication realm for the given JID.
- */
-static QString authRealm(const QString &jid)
-{
-    const QString domain = jidToDomain(jid);
-    if (domain == "wifirst.net")
-        return QLatin1String("www.wifirst.net");
-    else if (domain == "gmail.com")
-        return QLatin1String("www.google.com");
-    return domain;
-}
 
 ChatAccountPrompt::ChatAccountPrompt(QWidget *parent)
     : QDialog(parent),
@@ -286,7 +275,7 @@ bool ChatAccounts::addAccount(const QString &domain)
     {
         m_changed = true;
         const QString jid = dlg.jid();
-        QNetIO::Wallet::instance()->setCredentials(authRealm(jid), jid, dlg.password());
+        QNetIO::Wallet::instance()->setCredentials(DeclarativeWallet::realm(jid), jid, dlg.password());
         wApp->setChatAccounts(accounts << jid);
         m_listWidget->addItem(new QListWidgetItem(QIcon(":/chat.png"), jid));
         return true;
@@ -327,7 +316,7 @@ bool ChatAccounts::changed() const
 
 bool ChatAccounts::getPassword(const QString &jid, QString &password, QWidget *parent)
 {
-    const QString realm = authRealm(jid);
+    const QString realm = DeclarativeWallet::realm(jid);
     if (!QNetIO::Wallet::instance())
     {
         qWarning("No wallet!");
@@ -369,7 +358,7 @@ void ChatAccounts::removeAccount(const QString &jid)
     m_changed = true;
 
     // remove credentials
-    const QString realm = authRealm(jid);
+    const QString realm = DeclarativeWallet::realm(jid);
     qDebug() << "Removing credentials for" << realm;
     QNetIO::Wallet::instance()->deleteCredentials(realm);
 

@@ -23,6 +23,8 @@
 #include <QMessageBox>
 #include <QNetworkRequest>
 
+#include "QXmppUtils.h"
+
 #include "qnetio/wallet.h"
 
 #include "declarative.h"
@@ -110,5 +112,40 @@ QNetworkReply *NetworkAccessManager::createRequest(Operation op, const QNetworkR
     request.setRawHeader("Accept-Language", QLocale::system().name().toAscii());
     request.setRawHeader("User-Agent", QString(qApp->applicationName() + "/" + qApp->applicationVersion()).toAscii());
     return QNetworkAccessManager::createRequest(op, request, outgoingData);
+}
+
+DeclarativeWallet::DeclarativeWallet(QObject *parent)
+    : QObject(parent)
+{
+}
+
+/** Returns the authentication realm for the given JID.
+ */
+QString DeclarativeWallet::realm(const QString &jid)
+{
+    const QString domain = jidToDomain(jid);
+    if (domain == QLatin1String("wifirst.net"))
+        return QLatin1String("www.wifirst.net");
+    else if (domain == QLatin1String("gmail.com"))
+        return QLatin1String("www.google.com");
+    return domain;
+}
+
+void DeclarativeWallet::remove(const QString &jid)
+{
+    const QString key = realm(jid);
+    if (!key.isEmpty()) {
+        qDebug("Removing password for %s (%s)", qPrintable(jid), qPrintable(key));
+        QNetIO::Wallet::instance()->deleteCredentials(key);
+    }
+}
+
+void DeclarativeWallet::set(const QString &jid, const QString &password)
+{
+    const QString key = realm(jid);
+    if (!key.isEmpty()) {
+        qDebug("Setting password for %s (%s)", qPrintable(jid), qPrintable(key));
+        QNetIO::Wallet::instance()->setCredentials(key, jid, password);
+    }
 }
 

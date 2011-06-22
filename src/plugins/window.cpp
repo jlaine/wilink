@@ -140,6 +140,7 @@ Window::Window(QWidget *parent)
     qmlRegisterUncreatableType<QSoundPlayer>("wiLink", 1, 2, "SoundPlayer", "");
     qmlRegisterType<QSoundTester>("wiLink", 1, 2, "SoundTester");
     qmlRegisterType<VCard>("wiLink", 1, 2, "VCard");
+    qmlRegisterType<DeclarativeWallet>("wiLink", 1, 2, "Wallet");
     qmlRegisterUncreatableType<Window>("wiLink", 1, 2, "Window", "");
 
     // crutches for Qt..

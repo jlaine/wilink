@@ -18,12 +18,35 @@
  */
 
 import QtQuick 1.0
+import wiLink 1.2
 import 'utils.js' as Utils
 
 Panel {
     id: panel
 
     function save() {
+        var newJids = [];
+
+        // save passwords for new accounts
+        for (var i = 0; i < listPanel.model.count; i++) {
+            var entry = listPanel.model.get(i);
+            if (entry.password != undefined) {
+                wallet.set(entry.jid, entry.password);
+            }
+            newJids.push(entry.jid);
+        }
+
+        // remove password for removed accounts
+        var oldJids = application.chatAccounts;
+        for (var i = 0; i < oldJids.length; i++) {
+            var jid = oldJids[i];
+            if (newJids.indexOf(jid) < 0) {
+                wallet.remove(jid);
+            }
+        }
+
+        // save accounts
+        application.chatAccounts = newJids;
     }
 
     color: 'transparent'
@@ -60,6 +83,10 @@ Panel {
         }
     }
 
+    Wallet {
+        id: wallet
+    }
+ 
     states: State {
         name: 'edit'
         PropertyChanges { target: listPanel; opacity: 0 }

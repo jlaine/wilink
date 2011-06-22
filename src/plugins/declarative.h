@@ -119,4 +119,17 @@ protected:
     virtual QNetworkReply *createRequest(Operation op, const QNetworkRequest &req, QIODevice *outgoingData = 0);
 };
 
+class DeclarativeWallet : public QObject
+{
+    Q_OBJECT
+
+public:
+    DeclarativeWallet(QObject *parent = 0);
+    static QString realm(const QString &jid);
+
+public slots:
+    void remove(const QString &jid);
+    void set(const QString &jid, const QString &password);
+};
+
 #endif
