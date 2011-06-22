@@ -22,7 +22,7 @@ import QXmpp 0.4
 import wiLink 1.2
 import 'utils.js' as Utils
 
-Item {
+FocusScope {
     id: panel
 
     property bool acceptableInput: (jidInput.acceptableInput && passwordInput.acceptableInput)
@@ -163,5 +163,12 @@ Item {
             PropertyChanges { target: passwordInput; enabled: false }
         }
     ]
+
+    Keys.onTabPressed: {
+        if (jidInput.activeFocus)
+            passwordInput.focus = true;
+        else
+            jidInput.focus = true;
+    }
 }
 
