@@ -37,6 +37,7 @@ class QDeclarativeFileDialog : public QFileDialog
 
 public:
     QDeclarativeFileDialog(QWidget *parent = 0) : QFileDialog(parent) {}
+    Q_INVOKABLE void setDirectory(const QString &directory);
 };
 
 class QDeclarativeSortFilterProxyModel : public QSortFilterProxyModel

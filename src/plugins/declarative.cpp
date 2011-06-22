@@ -53,6 +53,11 @@
 #include "shares.h"
 #include "window.h"
 
+void QDeclarativeFileDialog::setDirectory(const QString &directory)
+{
+    QFileDialog::setDirectory(directory);
+}
+
 QDeclarativeSortFilterProxyModel::QDeclarativeSortFilterProxyModel(QObject *parent)
     : QSortFilterProxyModel(parent)
 {
