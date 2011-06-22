@@ -42,6 +42,10 @@
         <source>Could not connect, please check your username and password.</source>
         <translation>La connexion a échoué, merci de vérifier votre identifiant et mot de passe.</translation>
     </message>
+    <message>
+        <source>You already have an account for &apos;%1&apos;.</source>
+        <translation>Vous avez déjà un compte pour &apos;%1&apos;.</translation>
+    </message>
 </context>
 <context>
     <name>AccountListPanel</name>

@@ -23,6 +23,8 @@ import 'utils.js' as Utils
 Item {
     id: panel
 
+    property alias model: accountView.model
+
     signal addClicked
 
     PanelHelp {

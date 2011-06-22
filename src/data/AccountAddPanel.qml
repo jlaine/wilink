@@ -20,14 +20,15 @@
 import QtQuick 1.0
 import QXmpp 0.4
 import wiLink 1.2
+import 'utils.js' as Utils
 
 Item {
     id: panel
 
     property bool acceptableInput: (jidInput.acceptableInput && passwordInput.acceptableInput)
-    property variant model
+    property ListModel model
 
-    signal accepted
+    signal accepted(string jid, string password)
     signal rejected
 
     PanelHelp {
@@ -50,6 +51,12 @@ Item {
         validator: RegExpValidator {
             regExp: /^[^@/]+@[^@/]+$/
         }
+
+        onTextChanged: {
+            if (panel.state == 'dupe') {
+                panel.state = '';
+            }
+        }
     }
 
     InputBar {
@@ -69,6 +76,7 @@ Item {
     Text {
         id: statusLabel
 
+        property string dupeText: qsTr("You already have an account for '%1'.").replace('%1', Utils.jidToDomain(jidInput.text));
         property string failedText: qsTr('Could not connect, please check your username and password.')
         property string testingText: qsTr('Checking your username and password..')
 
@@ -90,7 +98,13 @@ Item {
             iconSource: 'back.png'
             text: qsTr('Go back')
 
-            onClicked: panel.rejected()
+            onClicked: {
+                panel.state = '';
+                jidInput.text = '';
+                passwordInput.Text = '';
+                testClient.disconnectFromServer();
+                panel.rejected();
+            }
         }
 
         Button {
@@ -101,8 +115,17 @@ Item {
             text: qsTr('Add')
 
             onClicked: {
+                var jid = jidInput.text;
+
+                // check for duplicate account
+                for (var i = 0; i < model.count; i++) {
+                    if (Utils.jidToDomain(model.get(i).jid) == Utils.jidToDomain(jid)) {
+                        panel.state = 'dupe';
+                        return;
+                    }
+                }
                 panel.state = 'testing';
-                testClient.connectToServer(jidInput.text + '/AccountCheck', passwordInput.text);
+                testClient.connectToServer(jid + '/AccountCheck', passwordInput.text);
             }
         }
     }
@@ -111,8 +134,10 @@ Item {
         id: testClient
 
         onConnected: {
-            panel.state = '';
-            panel.accepted();
+            if (panel.state == 'testing') {
+                panel.state = '';
+                panel.accepted(jidInput.text, passwordInput.text);
+            }
         }
 
         onDisconnected: {
@@ -123,6 +148,10 @@ Item {
     }
 
     states: [
+        State {
+            name: 'dupe'
+            PropertyChanges { target: statusLabel; color: 'red'; text: statusLabel.dupeText }
+        },
         State {
             name: 'failed'
             PropertyChanges { target: statusLabel; color: 'red'; text: statusLabel.failedText }

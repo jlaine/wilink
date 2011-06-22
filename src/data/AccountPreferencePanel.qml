@@ -49,9 +49,13 @@ Panel {
             id: addPanel
 
             anchors.fill: accounts.contents
+            model: listPanel.model
             opacity: 0
 
-            onAccepted: panel.state = ''
+            onAccepted: {
+                panel.state = '';
+                listPanel.model.append({'jid': jid, 'password': password});
+            }
             onRejected: panel.state = ''
         }
     }
