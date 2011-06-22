@@ -275,10 +275,10 @@ Panel {
 
                     onClicked: {
                         var dialog = window.fileDialog();
-                        dialog.windowTitle = qsTr('Downloads folder');
+                        dialog.directory = application.sharesLocation;
                         dialog.fileMode = QFileDialog.Directory;
                         dialog.options = QFileDialog.ShowDirsOnly;
-                        dialog.setDirectory(application.sharesLocation);
+                        dialog.windowTitle = qsTr('Downloads folder');
                         if (dialog.exec() && dialog.selectedFiles.length > 0) {
                             application.sharesLocation = dialog.selectedFiles[0];
                         }
