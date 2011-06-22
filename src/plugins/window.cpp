@@ -187,11 +187,6 @@ Window::Window(QWidget *parent)
                     this, SIGNAL(showPreferences()));
     Q_ASSERT(check);
 
-    action = fileMenu->addAction(QIcon(":/chat.png"), tr("Chat accounts"));
-    check = connect(action, SIGNAL(triggered(bool)),
-                    wApp, SLOT(showAccounts()));
-    Q_ASSERT(check);
-
     if (wApp->updatesDialog())
     {
         action = fileMenu->addAction(QIcon(":/refresh.png"), tr("Check for &updates"));

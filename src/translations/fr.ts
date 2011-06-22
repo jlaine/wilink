@@ -68,10 +68,6 @@
         <translation>&amp;Quitter</translation>
     </message>
     <message>
-        <source>Chat accounts</source>
-        <translation>Comptes de chat</translation>
-    </message>
-    <message>
         <source>Show this conversation</source>
         <translation>Afficher la conversation</translation>
     </message>
@@ -912,10 +908,6 @@ Acceptez-vous?</translation>
 </context>
 <context>
     <name>Window</name>
-    <message>
-        <source>Chat accounts</source>
-        <translation>Comptes de chat</translation>
-    </message>
     <message>
         <source>&amp;Quit</source>
         <translation>&amp;Quitter</translation>

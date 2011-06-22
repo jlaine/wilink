@@ -228,10 +228,7 @@ void Application::createSystemTrayIcon()
     d->trayIcon->setIcon(QIcon(":/wiLink.png"));
 
     d->trayMenu = new QMenu;
-    QAction *action = d->trayMenu->addAction(QIcon(":/options.png"), tr("Chat accounts"));
-    connect(action, SIGNAL(triggered()),
-            this, SLOT(showAccounts()));
-    action = d->trayMenu->addAction(QIcon(":/close.png"), tr("&Quit"));
+    QAction *action = d->trayMenu->addAction(QIcon(":/close.png"), tr("&Quit"));
     connect(action, SIGNAL(triggered()),
             this, SLOT(quit()));
     d->trayIcon->setContextMenu(d->trayMenu);
