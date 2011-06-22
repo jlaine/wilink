@@ -55,10 +55,6 @@ Rectangle {
     MouseArea {
         anchors.fill: parent
         hoverEnabled: true
-        onClicked: {
-            if (cancelArea.enabled)
-                cancelArea.clicked();
-        }
     }
 
     Rectangle {

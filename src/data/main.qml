@@ -53,6 +53,7 @@ FocusScope {
 
         anchors.fill: parent
         enabled: false
+        z: 11
 
         onClicked: menuLoader.hide()
     }
@@ -86,7 +87,7 @@ FocusScope {
     Loader {
         id: menuLoader
 
-        z: 11
+        z: 12
 
         function hide() {
             cancelArea.enabled = false;
