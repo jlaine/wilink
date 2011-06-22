@@ -21,6 +21,7 @@
 #define __WILINK_DECLARATIVE_H__
 
 #include <QAbstractItemModel>
+#include <QDeclarativeNetworkAccessManagerFactory>
 #include <QDeclarativeExtensionPlugin>
 #include <QFileDialog>
 #include <QNetworkAccessManager>
@@ -118,6 +119,15 @@ public:
 
 protected:
     virtual QNetworkReply *createRequest(Operation op, const QNetworkRequest &req, QIODevice *outgoingData = 0);
+};
+
+class NetworkAccessManagerFactory : public QDeclarativeNetworkAccessManagerFactory
+{
+public:
+    QNetworkAccessManager *create(QObject * parent)
+    {
+        return new NetworkAccessManager(parent);
+    }
 };
 
 class DeclarativeWallet : public QObject
