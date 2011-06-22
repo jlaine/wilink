@@ -41,6 +41,7 @@
 
 #include "accounts.h"
 #include "application.h"
+#include "declarative.h"
 #include "systeminfo.h"
 #include "updates.h"
 #include "utils.h"
@@ -108,6 +109,16 @@ Application::Application(int &argc, char **argv)
         setOpenAtLogin(true);
     setAudioInputDeviceName(d->settings->value("AudioInputDevice").toString());
     setAudioOutputDeviceName(d->settings->value("AudioOutputDevice").toString());
+
+    // clean acounts
+    QStringList cleanAccounts = wApp->chatAccounts();
+    foreach (const QString &jid, cleanAccounts) {
+        if (!isBareJid(jid)) {
+            qWarning("Removing bad account %s", qPrintable(jid));
+            cleanAccounts.removeAll(jid);
+        }
+    }
+    setChatAccounts(cleanAccounts);
 
     /* initialise cache and wallet */
     const QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
@@ -228,10 +239,7 @@ void Application::createSystemTrayIcon()
     d->trayIcon->setIcon(QIcon(":/wiLink.png"));
 
     d->trayMenu = new QMenu;
-    QAction *action = d->trayMenu->addAction(QIcon(":/options.png"), tr("Chat accounts"));
-    connect(action, SIGNAL(triggered()),
-            this, SLOT(showAccounts()));
-    action = d->trayMenu->addAction(QIcon(":/close.png"), tr("&Quit"));
+    QAction *action = d->trayMenu->addAction(QIcon(":/close.png"), tr("&Quit"));
     connect(action, SIGNAL(triggered()),
             this, SLOT(quit()));
     d->trayIcon->setContextMenu(d->trayMenu);
@@ -436,26 +444,26 @@ void Application::setOutgoingMessageSound(const QString &soundFile)
     }
 }
 
-void Application::showAccounts()
-{
-    ChatAccounts dlg;
-    dlg.exec();
-
-    // reset chats later as we may delete the calling window
-    if (dlg.changed())
-        QTimer::singleShot(0, this, SLOT(resetWindows()));
-}
-
 void Application::resetWindows()
 {
     /* close any existing windows */
     foreach (Window *chat, d->chats)
-        delete chat;
+        chat->deleteLater();
     d->chats.clear();
 
-    /* clean any bad accounts */
-    ChatAccounts dlg;
-    dlg.check();
+    /* check we have a valid account */
+    if (chatAccounts().isEmpty()) {
+        ChatAccountPrompt dlg(0);
+        dlg.setDomain("wifirst.net");
+        if (!dlg.exec() || dlg.jid().isEmpty()) {
+            quit();
+            return;
+        }
+
+        DeclarativeWallet wallet;
+        wallet.set(dlg.jid(), dlg.password());
+        setChatAccounts(QStringList() << dlg.jid());
+    }
 
     /* connect to chat accounts */
     int xpos = 30;

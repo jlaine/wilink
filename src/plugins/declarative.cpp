@@ -23,9 +23,37 @@
 #include <QMessageBox>
 #include <QNetworkRequest>
 
+#include "QXmppCallManager.h"
+#include "QXmppDiscoveryManager.h"
+#include "QXmppMucManager.h"
+#include "QXmppRosterManager.h"
+#include "QXmppTransferManager.h"
+#include "QXmppUtils.h"
+
+#include "QSoundPlayer.h"
+#include "QSoundTester.h"
+
 #include "qnetio/wallet.h"
 
+#include "accounts.h"
+#include "application.h"
+#include "utils.h"
+#include "idle/idle.h"
+#include "calls.h"
+#include "console.h"
+#include "conversations.h"
 #include "declarative.h"
+#include "diagnostics.h"
+#include "discovery.h"
+#include "history.h"
+#include "phone.h"
+#include "phone/sip.h"
+#include "photos.h"
+#include "player.h"
+#include "rooms.h"
+#include "roster.h"
+#include "shares.h"
+#include "window.h"
 
 QDeclarativeSortFilterProxyModel::QDeclarativeSortFilterProxyModel(QObject *parent)
     : QSortFilterProxyModel(parent)
@@ -112,3 +140,109 @@ QNetworkReply *NetworkAccessManager::createRequest(Operation op, const QNetworkR
     return QNetworkAccessManager::createRequest(op, request, outgoingData);
 }
 
+DeclarativeWallet::DeclarativeWallet(QObject *parent)
+    : QObject(parent)
+{
+}
+
+QString DeclarativeWallet::get(const QString &jid) const
+{
+    const QString key = realm(jid);
+
+    if (!key.isEmpty()) {
+        QString tmpJid(jid);
+        QString tmpPassword;
+
+        if (QNetIO::Wallet::instance()->getCredentials(key, tmpJid, tmpPassword))
+            return tmpPassword;
+    }
+    return QString();
+}
+
+/** Returns the authentication realm for the given JID.
+ */
+QString DeclarativeWallet::realm(const QString &jid)
+{
+    const QString domain = jidToDomain(jid);
+    if (domain == QLatin1String("wifirst.net"))
+        return QLatin1String("www.wifirst.net");
+    else if (domain == QLatin1String("gmail.com"))
+        return QLatin1String("www.google.com");
+    return domain;
+}
+
+void DeclarativeWallet::remove(const QString &jid)
+{
+    const QString key = realm(jid);
+    if (!key.isEmpty()) {
+        qDebug("Removing password for %s (%s)", qPrintable(jid), qPrintable(key));
+        QNetIO::Wallet::instance()->deleteCredentials(key);
+    }
+}
+
+void DeclarativeWallet::set(const QString &jid, const QString &password)
+{
+    const QString key = realm(jid);
+    if (!key.isEmpty()) {
+        qDebug("Setting password for %s (%s)", qPrintable(jid), qPrintable(key));
+        QNetIO::Wallet::instance()->setCredentials(key, jid, password);
+    }
+}
+
+void Plugin::registerTypes(const char *uri)
+{
+    // QXmpp
+    qmlRegisterUncreatableType<QXmppClient>("QXmpp", 0, 4, "QXmppClient", "");
+    qmlRegisterUncreatableType<QXmppCall>("QXmpp", 0, 4, "QXmppCall", "");
+    qmlRegisterUncreatableType<QXmppCallManager>("QXmpp", 0, 4, "QXmppCallManager", "");
+    qmlRegisterUncreatableType<DiagnosticManager>("QXmpp", 0, 4, "DiagnosticManager", "");
+    qmlRegisterUncreatableType<QXmppDiscoveryManager>("QXmpp", 0, 4, "QXmppDiscoveryManager", "");
+    qmlRegisterUncreatableType<QXmppLogger>("QXmpp", 0, 4, "QXmppLogger", "");
+    qmlRegisterType<QXmppDeclarativeMessage>("QXmpp", 0, 4, "QXmppMessage");
+    qmlRegisterUncreatableType<QXmppMucManager>("QXmpp", 0, 4, "QXmppMucManager", "");
+    qmlRegisterUncreatableType<QXmppMucRoom>("QXmpp", 0, 4, "QXmppMucRoom", "");
+    qmlRegisterType<QXmppDeclarativePresence>("QXmpp", 0, 4, "QXmppPresence");
+    qmlRegisterUncreatableType<QXmppRosterManager>("QXmpp", 0, 4, "QXmppRosterManager", "");
+    qmlRegisterUncreatableType<QXmppRtpAudioChannel>("QXmpp", 0, 4, "QXmppRtpAudioChannel", "");
+    qmlRegisterUncreatableType<QXmppTransferJob>("QXmpp", 0, 4, "QXmppTransferJob", "");
+    qmlRegisterUncreatableType<QXmppTransferManager>("QXmpp", 0, 4, "QXmppTransferManager", "");
+    qRegisterMetaType<QXmppVideoFrame>("QXmppVideoFrame");
+
+    // wiLink
+    qmlRegisterType<CallAudioHelper>(uri, 1, 2, "CallAudioHelper");
+    qmlRegisterType<CallVideoHelper>(uri, 1, 2, "CallVideoHelper");
+    qmlRegisterType<CallVideoItem>(uri, 1, 2, "CallVideoItem");
+    qmlRegisterUncreatableType<DeclarativePen>(uri, 1, 2, "Pen", "");
+    qmlRegisterType<ChatClient>(uri, 1, 2, "Client");
+    qmlRegisterType<Conversation>(uri, 1, 2, "Conversation");
+    qmlRegisterType<DiscoveryModel>(uri, 1, 2, "DiscoveryModel");
+    qmlRegisterUncreatableType<ChatHistoryModel>(uri, 1, 2, "HistoryModel", "");
+    qmlRegisterType<Idle>(uri, 1, 2, "Idle");
+    qmlRegisterType<ListHelper>(uri, 1, 2, "ListHelper");
+    qmlRegisterType<LogModel>(uri, 1, 2, "LogModel");
+    qmlRegisterType<PhoneCallsModel>(uri, 1, 2, "PhoneCallsModel");
+    qmlRegisterUncreatableType<SipClient>(uri, 1, 2, "SipClient", "");
+    qmlRegisterUncreatableType<SipCall>(uri, 1, 2, "SipCall", "");
+    qmlRegisterUncreatableType<PhotoUploadModel>(uri, 1, 2, "PhotoUploadModel", "");
+    qmlRegisterType<PhotoModel>(uri, 1, 2, "PhotoModel");
+    qmlRegisterType<PlayerModel>(uri, 1, 2, "PlayerModel");
+    qmlRegisterType<RoomModel>(uri, 1, 2, "RoomModel");
+    qmlRegisterType<RoomListModel>(uri, 1, 2, "RoomListModel");
+    qmlRegisterUncreatableType<ChatRosterModel>(uri, 1, 2, "RosterModel", "");
+    qmlRegisterType<ShareModel>(uri, 1, 2, "ShareModel");
+    qmlRegisterType<ShareFolderModel>(uri, 1, 2, "ShareFolderModel");
+    qmlRegisterType<SharePlaceModel>(uri, 1, 2, "SharePlaceModel");
+    qmlRegisterType<ShareQueueModel>(uri, 1, 2, "ShareQueueModel");
+    qmlRegisterUncreatableType<QSoundPlayer>(uri, 1, 2, "SoundPlayer", "");
+    qmlRegisterType<QSoundTester>(uri, 1, 2, "SoundTester");
+    qmlRegisterType<VCard>(uri, 1, 2, "VCard");
+    qmlRegisterType<DeclarativeWallet>(uri, 1, 2, "Wallet");
+    qmlRegisterUncreatableType<Window>(uri, 1, 2, "Window", "");
+
+    // crutches for Qt..
+    qRegisterMetaType<QIODevice::OpenMode>("QIODevice::OpenMode");
+    qmlRegisterUncreatableType<QAbstractItemModel>(uri, 1, 2, "QAbstractItemModel", "");
+    qmlRegisterUncreatableType<QFileDialog>(uri, 1, 2, "QFileDialog", "");
+    qmlRegisterUncreatableType<QMessageBox>(uri, 1, 2, "QMessageBox", "");
+    qmlRegisterType<QDeclarativeSortFilterProxyModel>(uri, 1, 2, "SortFilterProxyModel");
+}

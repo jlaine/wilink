@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __WILINK_CHAT_H__
-#define __WILINK_CHAT_H__
+#ifndef __WILINK_WINDOW_H__
+#define __WILINK_WINDOW_H__
 
 #include <QMainWindow>
 
@@ -70,6 +70,7 @@ protected:
     void changeEvent(QEvent *event);
 
 private:
+    bool getPassword(const QString &jid, QString &password);
     ChatPrivate * const d;
 };
 

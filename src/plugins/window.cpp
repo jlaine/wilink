@@ -18,18 +18,13 @@
  */
 
 #include <QApplication>
-#include <QAuthenticator>
 #include <QDeclarativeContext>
 #include <QDeclarativeEngine>
 #include <QDeclarativeItem>
-#include <QDeclarativeNetworkAccessManagerFactory>
 #include <QDeclarativeView>
 #include <QDesktopServices>
 #include <QDesktopWidget>
-#include <QDialogButtonBox>
 #include <QFileDialog>
-#include <QLabel>
-#include <QLayout>
 #include <QList>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -37,50 +32,19 @@
 #include <QStringList>
 #include <QTimer>
 
-#include "QSoundPlayer.h"
-#include "QSoundTester.h"
-
-#include "QXmppCallManager.h"
 #include "QXmppConfiguration.h"
-#include "QXmppDiscoveryManager.h"
 #include "QXmppLogger.h"
-#include "QXmppMessage.h"
-#include "QXmppMucManager.h"
-#include "QXmppRosterIq.h"
 #include "QXmppRosterManager.h"
-#include "QXmppRtpChannel.h"
-#include "QXmppTransferManager.h"
 #include "QXmppUtils.h"
 
 #include "accounts.h"
 #include "application.h"
-#include "utils.h"
-#include "idle/idle.h"
-#include "calls.h"
-#include "console.h"
-#include "conversations.h"
 #include "declarative.h"
-#include "diagnostics.h"
-#include "discovery.h"
-#include "history.h"
-#include "phone.h"
-#include "phone/sip.h"
 #include "photos.h"
-#include "player.h"
-#include "rooms.h"
 #include "roster.h"
-#include "shares.h"
-#include "updatesdialog.h"
 #include "window.h"
-
-class NetworkAccessManagerFactory : public QDeclarativeNetworkAccessManagerFactory
-{
-public:
-    QNetworkAccessManager *create(QObject * parent)
-    {
-        return new NetworkAccessManager(parent);
-    }
-};
+#include "updatesdialog.h"
+#include "utils.h"
 
 class ChatPrivate
 {
@@ -96,58 +60,6 @@ Window::Window(QWidget *parent)
     d(new ChatPrivate)
 {
     bool check;
-
-    qmlRegisterUncreatableType<QXmppClient>("QXmpp", 0, 4, "QXmppClient", "");
-    qmlRegisterUncreatableType<QXmppCall>("QXmpp", 0, 4, "QXmppCall", "");
-    qmlRegisterUncreatableType<QXmppCallManager>("QXmpp", 0, 4, "QXmppCallManager", "");
-    qmlRegisterUncreatableType<DiagnosticManager>("QXmpp", 0, 4, "DiagnosticManager", "");
-    qmlRegisterUncreatableType<QXmppDiscoveryManager>("QXmpp", 0, 4, "QXmppDiscoveryManager", "");
-    qmlRegisterUncreatableType<QXmppLogger>("QXmpp", 0, 4, "QXmppLogger", "");
-    qmlRegisterType<QXmppDeclarativeMessage>("QXmpp", 0, 4, "QXmppMessage");
-    qmlRegisterUncreatableType<QXmppMucManager>("QXmpp", 0, 4, "QXmppMucManager", "");
-    qmlRegisterUncreatableType<QXmppMucRoom>("QXmpp", 0, 4, "QXmppMucRoom", "");
-    qmlRegisterType<QXmppDeclarativePresence>("QXmpp", 0, 4, "QXmppPresence");
-    qmlRegisterUncreatableType<QXmppRosterManager>("QXmpp", 0, 4, "QXmppRosterManager", "");
-    qmlRegisterUncreatableType<QXmppRtpAudioChannel>("QXmpp", 0, 4, "QXmppRtpAudioChannel", "");
-    qmlRegisterUncreatableType<QXmppTransferJob>("QXmpp", 0, 4, "QXmppTransferJob", "");
-    qmlRegisterUncreatableType<QXmppTransferManager>("QXmpp", 0, 4, "QXmppTransferManager", "");
-    qRegisterMetaType<QXmppVideoFrame>("QXmppVideoFrame");
-
-    qmlRegisterType<CallAudioHelper>("wiLink", 1, 2, "CallAudioHelper");
-    qmlRegisterType<CallVideoHelper>("wiLink", 1, 2, "CallVideoHelper");
-    qmlRegisterType<CallVideoItem>("wiLink", 1, 2, "CallVideoItem");
-    qmlRegisterUncreatableType<DeclarativePen>("wiLink", 1, 2, "Pen", "");
-    qmlRegisterType<ChatClient>("wiLink", 1, 2, "Client");
-    qmlRegisterType<Conversation>("wiLink", 1, 2, "Conversation");
-    qmlRegisterType<DiscoveryModel>("wiLink", 1, 2, "DiscoveryModel");
-    qmlRegisterUncreatableType<ChatHistoryModel>("wiLink", 1, 2, "HistoryModel", "");
-    qmlRegisterType<Idle>("wiLink", 1, 2, "Idle");
-    qmlRegisterType<ListHelper>("wiLink", 1, 2, "ListHelper");
-    qmlRegisterType<LogModel>("wiLink", 1, 2, "LogModel");
-    qmlRegisterType<PhoneCallsModel>("wiLink", 1, 2, "PhoneCallsModel");
-    qmlRegisterUncreatableType<SipClient>("wiLink", 1, 2, "SipClient", "");
-    qmlRegisterUncreatableType<SipCall>("wiLink", 1, 2, "SipCall", "");
-    qmlRegisterUncreatableType<PhotoUploadModel>("wiLink", 1, 2, "PhotoUploadModel", "");
-    qmlRegisterType<PhotoModel>("wiLink", 1, 2, "PhotoModel");
-    qmlRegisterType<PlayerModel>("wiLink", 1, 2, "PlayerModel");
-    qmlRegisterType<RoomModel>("wiLink", 1, 2, "RoomModel");
-    qmlRegisterType<RoomListModel>("wiLink", 1, 2, "RoomListModel");
-    qmlRegisterUncreatableType<ChatRosterModel>("wiLink", 1, 2, "RosterModel", "");
-    qmlRegisterType<ShareModel>("wiLink", 1, 2, "ShareModel");
-    qmlRegisterType<ShareFolderModel>("wiLink", 1, 2, "ShareFolderModel");
-    qmlRegisterType<SharePlaceModel>("wiLink", 1, 2, "SharePlaceModel");
-    qmlRegisterType<ShareQueueModel>("wiLink", 1, 2, "ShareQueueModel");
-    qmlRegisterUncreatableType<QSoundPlayer>("wiLink", 1, 2, "SoundPlayer", "");
-    qmlRegisterType<QSoundTester>("wiLink", 1, 2, "SoundTester");
-    qmlRegisterType<VCard>("wiLink", 1, 2, "VCard");
-    qmlRegisterUncreatableType<Window>("wiLink", 1, 2, "Window", "");
-
-    // crutches for Qt..
-    qRegisterMetaType<QIODevice::OpenMode>("QIODevice::OpenMode");
-    qmlRegisterUncreatableType<QAbstractItemModel>("wiLink", 1, 2, "QAbstractItemModel", "");
-    qmlRegisterUncreatableType<QFileDialog>("wiLink", 1, 2, "QFileDialog", "");
-    qmlRegisterUncreatableType<QMessageBox>("wiLink", 1, 2, "QMessageBox", "");
-    qmlRegisterType<QDeclarativeSortFilterProxyModel>("wiLink", 1, 2, "SortFilterProxyModel");
 
     // create client
     d->client = new ChatClient(this);
@@ -184,11 +96,6 @@ Window::Window(QWidget *parent)
     action->setMenuRole(QAction::PreferencesRole);
     check = connect(action, SIGNAL(triggered()),
                     this, SIGNAL(showPreferences()));
-    Q_ASSERT(check);
-
-    action = fileMenu->addAction(QIcon(":/chat.png"), tr("Chat accounts"));
-    check = connect(action, SIGNAL(triggered(bool)),
-                    wApp, SLOT(showAccounts()));
     Q_ASSERT(check);
 
     if (wApp->updatesDialog())
@@ -304,13 +211,38 @@ void Window::pendingMessages(int messages)
     QWidget::setWindowTitle(title);
 }
 
+bool Window::getPassword(const QString &jid, QString &password)
+{
+    DeclarativeWallet wallet;
+
+    /* check if we have a stored password that differs from the given one */
+    QString tmpPassword = wallet.get(jid);
+    if (!tmpPassword.isEmpty() && tmpPassword != password) {
+        password = tmpPassword;
+        return true;
+    }
+
+    /* prompt user */
+    ChatPasswordPrompt dialog(jid, this);
+    while (dialog.password().isEmpty())
+    {
+        if (dialog.exec() != QDialog::Accepted)
+            return false;
+    }
+
+    /* store new password */
+    password = dialog.password();
+    wallet.set(jid, password);
+    return true;
+}
+
 /** Prompt for credentials then connect.
  */
 void Window::promptCredentials()
 {
     QXmppConfiguration config = d->client->configuration();
     QString password = config.password();
-    if (ChatAccounts::getPassword(config.jidBare(), password, this) &&
+    if (getPassword(config.jidBare(), password) &&
         password != config.password())
     {
         config.setPassword(password);
@@ -365,7 +297,7 @@ bool Window::open(const QString &jid)
 
     /* get password */
     QString password;
-    if (!ChatAccounts::getPassword(config.jidBare(), password, this))
+    if (!getPassword(config.jidBare(), password))
     {
         qWarning("Cannot connect to chat server without a password");
         return false;

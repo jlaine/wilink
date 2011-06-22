@@ -21,11 +21,28 @@ import QtQuick 1.0
 import 'utils.js' as Utils
 
 Item {
+    id: panel
+
+    property alias model: accountView.model
+
+    signal addClicked
+
+    PanelHelp {
+        id: help
+
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        text: qsTr('In addition to your %1 account, %2 can connect to additional chat accounts such as Google Talk and Facebook.').replace('%1', application.organizationName).replace('%2', application.applicationName)
+    }
+
     ListView {
         id: accountView
 
-        anchors.top: parent.top
+        anchors.top: help.bottom
+        anchors.topMargin: appStyle.spacing.vertical
         anchors.bottom: footer.top
+        anchors.bottomMargin: appStyle.spacing.vertical
         anchors.left: parent.left
         anchors.right: scrollBar.left
         model: ListModel {
@@ -77,9 +94,10 @@ Item {
     ScrollBar {
         id: scrollBar
 
-        anchors.top: parent.top
+        anchors.top: help.bottom
         anchors.topMargin: appStyle.spacing.vertical
         anchors.bottom: footer.top
+        anchors.bottomMargin: appStyle.spacing.vertical
         anchors.right: parent.right
         flickableItem: accountView
     }
@@ -93,6 +111,7 @@ Item {
 
         Button {
             iconSource: 'add.png'
+            onClicked: panel.addClicked()
         }
 
         Button {

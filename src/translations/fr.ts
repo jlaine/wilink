@@ -13,14 +13,52 @@
     </message>
 </context>
 <context>
+    <name>AccountAddPanel</name>
+    <message>
+        <source>Enter the address and password for the account you want to add.</source>
+        <translation>Saisissez l&apos;adresse et le mot de passe du compte que vous souhaitez ajouter.</translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation>Ajouter</translation>
+    </message>
+    <message>
+        <source>Go back</source>
+        <translation>Retour</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>Adresse</translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation>Mot de passe</translation>
+    </message>
+    <message>
+        <source>Checking your username and password..</source>
+        <translation>Vérification de votre identifiant et mot de passe..</translation>
+    </message>
+    <message>
+        <source>Could not connect, please check your username and password.</source>
+        <translation>La connexion a échoué, merci de vérifier votre identifiant et mot de passe.</translation>
+    </message>
+    <message>
+        <source>You already have an account for &apos;%1&apos;.</source>
+        <translation>Vous avez déjà un compte pour &apos;%1&apos;.</translation>
+    </message>
+</context>
+<context>
+    <name>AccountListPanel</name>
+    <message>
+        <source>In addition to your %1 account, %2 can connect to additional chat accounts such as Google Talk and Facebook.</source>
+        <translation>Outre votre compte %1, %2 peut se connecter à des comptes de chat supplémentaires tels que Google Talk ou Facebook.</translation>
+    </message>
+</context>
+<context>
     <name>AccountPreferencePanel</name>
     <message>
         <source>Chat accounts</source>
         <translation>Comptes de chat</translation>
-    </message>
-    <message>
-        <source>In addition to your %1 account, %2 can connect to additional chat accounts such as Google Talk and Facebook.</source>
-        <translation>Outre votre compte %1, %2 peut se connecter à des comptes de chat supplémentaires tels que Google Talk ou Facebook.</translation>
     </message>
 </context>
 <context>
@@ -28,10 +66,6 @@
     <message>
         <source>&amp;Quit</source>
         <translation>&amp;Quitter</translation>
-    </message>
-    <message>
-        <source>Chat accounts</source>
-        <translation>Comptes de chat</translation>
     </message>
     <message>
         <source>Show this conversation</source>
@@ -102,21 +136,6 @@
     <message>
         <source>If you need help, please refer to the &lt;a href=&quot;%1&quot;&gt;%2 FAQ&lt;/a&gt;.</source>
         <translation>Si vous avez besoin d&apos;aide, merci de consulter la &lt;a href=&quot;%1&quot;&gt;FAQ %2&lt;/a&gt;.</translation>
-    </message>
-</context>
-<context>
-    <name>ChatAccounts</name>
-    <message>
-        <source>In addition to your %1 account, %2 can connect to additional chat accounts such as Google Talk and Facebook.</source>
-        <translation>Outre votre compte %1, %2 peut se connecter à des comptes de chat supplémentaires tels que Google Talk ou Facebook.</translation>
-    </message>
-    <message>
-        <source>Add</source>
-        <translation>Ajouter</translation>
-    </message>
-    <message>
-        <source>Remove</source>
-        <translation>Retirer</translation>
     </message>
 </context>
 <context>
@@ -874,10 +893,6 @@ Acceptez-vous?</translation>
 </context>
 <context>
     <name>Window</name>
-    <message>
-        <source>Chat accounts</source>
-        <translation>Comptes de chat</translation>
-    </message>
     <message>
         <source>&amp;Quit</source>
         <translation>&amp;Quitter</translation>
