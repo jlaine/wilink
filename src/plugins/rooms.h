@@ -30,7 +30,6 @@ class ChatClient;
 class ChatHistoryModel;
 class ChatMessage;
 class QModelIndex;
-class QTableWidget;
 class QXmppMessage;
 class QXmppMucManager;
 class QXmppMucRoom;
@@ -122,27 +121,6 @@ protected slots:
 
 private:
     QXmppDataForm chatForm;
-};
-
-class RoomPermissionDialog : public QDialog
-{
-    Q_OBJECT
-
-public:
-    RoomPermissionDialog(QXmppMucRoom *mucRoom, const QString &defaultJid, QWidget *parent);
-
-protected slots:
-    void addMember();
-    void removeMember();
-    void permissionsReceived(const QList<QXmppMucItem> &permissions);
-    void submit();
-
-private:
-    void addEntry(const QString &jid, QXmppMucItem::Affiliation affiliation);
-
-    QString m_defaultJid;
-    QXmppMucRoom *m_room;
-    QTableWidget *m_tableWidget;
 };
 
 class RoomPermissionModel : public ChatModel

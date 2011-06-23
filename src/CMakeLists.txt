@@ -101,7 +101,6 @@ configure_file(translations/translations.qrc.cmake ${CMAKE_CURRENT_BINARY_DIR}/t
 if(RELOAD_TRANSLATIONS)
     qt4_create_translation(QM_FILES
         plugins/application.cpp
-        plugins/rooms.cpp
         plugins/updatesdialog.cpp
         plugins/window.cpp
         data/main.qml

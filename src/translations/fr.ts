@@ -612,22 +612,6 @@ Acceptez-vous?</translation>
 <context>
     <name>RoomPermissionDialog</name>
     <message>
-        <source>User</source>
-        <translation>Utilisateur</translation>
-    </message>
-    <message>
-        <source>Role</source>
-        <translation>Role</translation>
-    </message>
-    <message>
-        <source>Add a user</source>
-        <translation>Ajouter un utilisateur</translation>
-    </message>
-    <message>
-        <source>Enter the address of the user you want to add.</source>
-        <translation>Saisissez l&apos;adresse de l&apos;utilisateur que vous souhaitez ajouter.</translation>
-    </message>
-    <message>
         <source>member</source>
         <translation>membre</translation>
     </message>

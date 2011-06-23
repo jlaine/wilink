@@ -24,17 +24,10 @@
 #include <QDeclarativeItem>
 #include <QDeclarativeView>
 #include <QDialogButtonBox>
-#include <QHeaderView>
-#include <QInputDialog>
 #include <QLabel>
 #include <QLayout>
 #include <QLineEdit>
 #include <QMenu>
-#include <QMessageBox>
-#include <QPushButton>
-#include <QSortFilterProxyModel>
-#include <QTableWidget>
-#include <QTimer>
 #include <QUrl>
 
 #include "QXmppBookmarkManager.h"
@@ -51,11 +44,6 @@
 #include "history.h"
 #include "rooms.h"
 #include "roster.h"
-
-enum MembersColumns {
-    JidColumn = 0,
-    AffiliationColumn,
-};
 
 class RoomListItem : public ChatModelItem
 {
@@ -518,103 +506,6 @@ void ChatForm::submit()
 QXmppDataForm ChatForm::form() const
 {
     return chatForm;
-}
-
-RoomPermissionDialog::RoomPermissionDialog(QXmppMucRoom *mucRoom, const QString &defaultJid, QWidget *parent)
-    : QDialog(parent),
-    m_defaultJid(defaultJid),
-    m_room(mucRoom)
-{
-    QVBoxLayout *layout = new QVBoxLayout;
-    setLayout(layout);
-    setWindowTitle(tr("Chat room permissions"));
-
-    m_tableWidget = new QTableWidget(this);
-    m_tableWidget->setColumnCount(2);
-    m_tableWidget->setHorizontalHeaderItem(JidColumn, new QTableWidgetItem(tr("User")));
-    m_tableWidget->setHorizontalHeaderItem(AffiliationColumn, new QTableWidgetItem(tr("Role")));
-    m_tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
-    m_tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
-    m_tableWidget->verticalHeader()->setVisible(false);
-    m_tableWidget->horizontalHeader()->setResizeMode(JidColumn, QHeaderView::Stretch);
-
-    layout->addWidget(m_tableWidget);
-
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    connect(buttonBox, SIGNAL(accepted()), this, SLOT(submit()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-
-    QPushButton *addButton = new QPushButton;
-    addButton->setIcon(QIcon(":/add.png"));
-    connect(addButton, SIGNAL(clicked()), this, SLOT(addMember()));
-    buttonBox->addButton(addButton, QDialogButtonBox::ActionRole);
-
-    QPushButton *removeButton = new QPushButton;
-    removeButton->setIcon(QIcon(":/remove.png"));
-    connect(removeButton, SIGNAL(clicked()), this, SLOT(removeMember()));
-    buttonBox->addButton(removeButton, QDialogButtonBox::ActionRole);
-
-    layout->addWidget(buttonBox);
-
-    // request current permissions
-    connect(m_room, SIGNAL(permissionsReceived(QList<QXmppMucItem>)),
-            this, SLOT(permissionsReceived(QList<QXmppMucItem>)));
-    m_room->requestPermissions();
-}
-
-void RoomPermissionDialog::permissionsReceived(const QList<QXmppMucItem> &permissions)
-{
-    foreach (const QXmppMucItem &item, permissions)
-        addEntry(item.jid(), item.affiliation());
-    m_tableWidget->sortItems(JidColumn, Qt::AscendingOrder);
-}
-
-void RoomPermissionDialog::submit()
-{
-    QList<QXmppMucItem> items;
-    for (int i = 0; i < m_tableWidget->rowCount(); i++) {
-        const QComboBox *combo = qobject_cast<QComboBox *>(m_tableWidget->cellWidget(i, AffiliationColumn));
-        Q_ASSERT(m_tableWidget->item(i, JidColumn) && combo);
-
-        QXmppMucItem item;
-        item.setAffiliation(static_cast<QXmppMucItem::Affiliation>(combo->itemData(combo->currentIndex()).toInt()));
-        item.setJid(m_tableWidget->item(i, JidColumn)->text());
-        items << item;
-    }
-
-    m_room->setPermissions(items);
-    accept();
-}
-
-void RoomPermissionDialog::addMember()
-{
-    bool ok = false;
-    QString jid = QInputDialog::getText(this, tr("Add a user"),
-                  tr("Enter the address of the user you want to add."),
-                  QLineEdit::Normal, m_defaultJid, &ok).toLower();
-    if (ok)
-        addEntry(jid, QXmppMucItem::MemberAffiliation);
-}
-
-void RoomPermissionDialog::addEntry(const QString &jid, QXmppMucItem::Affiliation affiliation)
-{
-    QComboBox *combo = new QComboBox;
-    combo->addItem(tr("member"), QXmppMucItem::MemberAffiliation);
-    combo->addItem(tr("administrator"), QXmppMucItem::AdminAffiliation);
-    combo->addItem(tr("owner"), QXmppMucItem::OwnerAffiliation);
-    combo->addItem(tr("banned"), QXmppMucItem::OutcastAffiliation);
-    combo->setEditable(false);
-    combo->setCurrentIndex(combo->findData(affiliation));
-    QTableWidgetItem *jidItem = new QTableWidgetItem(jid);
-    jidItem->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
-    m_tableWidget->insertRow(0);
-    m_tableWidget->setCellWidget(0, AffiliationColumn, combo);
-    m_tableWidget->setItem(0, JidColumn, jidItem);
-}
-
-void RoomPermissionDialog::removeMember()
-{
-    m_tableWidget->removeRow(m_tableWidget->currentRow());
 }
 
 class RoomPermissionItem : public ChatModelItem
