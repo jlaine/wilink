@@ -146,9 +146,8 @@ Panel {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 opacity: 0
-                height: 0
-                maximumValue: tester.maximumVolume
-                value: tester.volume
+                maximumValue: Qt.isQtObject(tester) ? tester.maximumVolume : 100
+                value: Qt.isQtObject(tester) ? tester.volume : 0
             }
 
             Item {
