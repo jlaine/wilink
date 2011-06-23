@@ -224,13 +224,7 @@ void Window::error(QXmppClient::Error error)
 {
     if(error == QXmppClient::XmppStreamError)
     {
-        if (d->client->xmppStreamError() == QXmppStanza::Error::Conflict)
-        {
-            // if we received a resource conflict, exit
-            qWarning("Received a resource conflict from chat server");
-            qApp->quit();
-        }
-        else if (d->client->xmppStreamError() == QXmppStanza::Error::NotAuthorized)
+        if (d->client->xmppStreamError() == QXmppStanza::Error::NotAuthorized)
         {
             // prompt user for credentials at the next main loop execution
             QTimer::singleShot(0, this, SLOT(promptCredentials()));

@@ -107,6 +107,15 @@ FocusScope {
         }
     }
 
+    Connections {
+        target: window.client
+
+        onConflictReceived: {
+            console.log("Received a resource conflict from chat server");
+            application.quit();
+        }
+    }
+
     Component.onCompleted: swapper.showPanel('ChatPanel.qml')
     Keys.forwardTo: dock
 }
