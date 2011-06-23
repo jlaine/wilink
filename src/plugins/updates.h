@@ -46,21 +46,30 @@ class UpdatesPrivate;
 class Updates : public QObject
 {
     Q_OBJECT
+    Q_ENUMS(Error State)
+    Q_PROPERTY(State state READ state NOTIFY stateChanged)
 
 public:
-    typedef enum {
+    enum Error {
+        NoError = 0,
         IntegrityError,
         FileError,
         NetworkError,
         SecurityError,
-    } UpdatesError;
+    };
+
+    enum State {
+        IdleState = 0,
+        CheckState,
+        DownloadState,
+    };
 
     Updates(QObject *parent);
     ~Updates();
 
     void download(const Release &release);
     void install(const Release &release);
-    bool isDownloading() const;
+    State state() const;
 
     QString cacheDirectory() const;
     void setCacheDirectory(const QString &cacheDir);
@@ -75,11 +84,12 @@ signals:
     void checkFinished(const Release &release);
     void downloadProgress(qint64 done, qint64 total);
     void downloadFinished(const Release &release);
-    void error(Updates::UpdatesError error, const QString &errorString);
+    void error(Updates::Error error, const QString &errorString);
+    void stateChanged(State state);
 
 private slots:
-    void saveUpdate();
-    void processStatus();
+    void _q_saveUpdate();
+    void _q_processStatus();
 
 private:
     UpdatesPrivate * const d;

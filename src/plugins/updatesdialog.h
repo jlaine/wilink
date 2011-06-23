@@ -46,7 +46,7 @@ private slots:
     void checkFinished(const Release &release);
     void downloadProgress(qint64 done, qint64 total);
     void downloadFinished(const Release &release);
-    void error(Updates::UpdatesError error, const QString &errorString);
+    void error(Updates::Error error, const QString &errorString);
 
 private:
     QDialogButtonBox *buttonBox;

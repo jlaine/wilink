@@ -83,8 +83,8 @@ UpdateDialog::UpdateDialog(QWidget *parent)
                     this, SLOT(downloadFinished(Release)));
     Q_ASSERT(check);
 
-    check = connect(updates, SIGNAL(error(Updates::UpdatesError, const QString&)),
-                    this, SLOT(error(Updates::UpdatesError, const QString&)));
+    check = connect(updates, SIGNAL(error(Updates::Error, const QString&)),
+                    this, SLOT(error(Updates::Error, const QString&)));
     Q_ASSERT(check);
 
     check = connect(updates, SIGNAL(downloadProgress(qint64, qint64)),
@@ -162,7 +162,7 @@ void UpdateDialog::downloadFinished(const Release &release)
     buttonBox->button(QDialogButtonBox::Yes)->setFocus();
 }
 
-void UpdateDialog::error(Updates::UpdatesError error, const QString &errorString)
+void UpdateDialog::error(Updates::Error error, const QString &errorString)
 {
     Q_UNUSED(error);
 
