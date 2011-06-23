@@ -80,8 +80,8 @@ ChatClient::ChatClient(QObject *parent)
 void ChatClient::connectToServer(const QString &jid, const QString &password)
 {
     QXmppConfiguration config;
-    config.setJid(jid);
     config.setResource(qApp->applicationName());
+    config.setJid(jid);
     config.setPassword(password);
     if (config.domain() == QLatin1String("wifirst.net"))
     {
