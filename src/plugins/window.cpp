@@ -24,14 +24,10 @@
 #include <QDeclarativeView>
 #include <QDesktopWidget>
 #include <QFileDialog>
-#include <QList>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QShortcut>
 #include <QStringList>
-#include <QTimer>
-
-#include "QXmppLogger.h"
 
 #include "application.h"
 #include "declarative.h"
