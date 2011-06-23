@@ -263,19 +263,8 @@ ChatClient *Window::client()
  */
 bool Window::open(const QString &jid)
 {
-    const QString bareJid = jidToBareJid(jid);
-
-    // get password
-    QString password;
-    if (!getPassword(bareJid, password))
-    {
-        qWarning("Cannot connect to chat server without a password");
-        return false;
-    }
-
-    // connect to server
-    setObjectName(bareJid);
-    d->client->connectToServer(bareJid, password);
+    d->client->configuration().setJid(jid);
+    setObjectName(jid);
 
     // load QML
     d->rosterView->setSource(QUrl("qrc:/main.qml"));
