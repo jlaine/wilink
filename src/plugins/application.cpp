@@ -48,6 +48,7 @@
 #include "declarative.h"
 #include "systeminfo.h"
 #include "updates.h"
+#include "updatesdialog.h"
 #include "window.h"
 
 Application *wApp = 0;
@@ -757,7 +758,7 @@ QSystemTrayIcon *Application::trayIcon()
 }
 #endif
 
-UpdateDialog *Application::updateDialog()
+UpdateDialog *Application::updateDialog() const
 {
     return d->updates;
 }
@@ -765,5 +766,10 @@ UpdateDialog *Application::updateDialog()
 void Application::setUpdateDialog(UpdateDialog *updateDialog)
 {
     d->updates = updateDialog;
+}
+
+Updates *Application::updater() const
+{
+    return d->updates->updater();
 }
 

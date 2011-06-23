@@ -37,6 +37,8 @@ class UpdateDialog : public QDialog
 public:
     UpdateDialog(QWidget *parent = NULL);
 
+    Updates *updater() const;
+
 public slots:
     void check();
 
@@ -50,8 +52,7 @@ private:
     QDialogButtonBox *buttonBox;
     QProgressBar *progressBar;
     QLabel *statusLabel;
-    Updates *updates;
-    Release promptRelease;
+    Updates *m_updates;
 };
 
 #endif
