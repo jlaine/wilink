@@ -55,6 +55,7 @@ Dialog {
 
             anchors.top: parent.top
             anchors.bottom: addRow.top
+            anchors.bottomMargin: appStyle.spacing.vertical
             anchors.left: parent.left
             anchors.right: scrollBar.left
             clip: true
@@ -117,6 +118,7 @@ Dialog {
 
             anchors.top: parent.top
             anchors.bottom: addRow.top
+            anchors.bottomMargin: appStyle.spacing.vertical
             anchors.right: parent.right
             flickableItem: view
         }
