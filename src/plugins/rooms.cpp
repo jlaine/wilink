@@ -23,11 +23,6 @@
 #include <QDeclarativeEngine>
 #include <QDeclarativeItem>
 #include <QDeclarativeView>
-#include <QDialogButtonBox>
-#include <QLabel>
-#include <QLayout>
-#include <QLineEdit>
-#include <QMenu>
 #include <QUrl>
 
 #include "QXmppBookmarkManager.h"
@@ -524,96 +519,6 @@ void RoomModel::setRoom(QXmppMucRoom *room)
     }
 
     emit roomChanged(m_room);
-}
-
-ChatForm::ChatForm(const QXmppDataForm &form, QWidget *parent)
-    : QDialog(parent), chatForm(form)
-{
-    QVBoxLayout *vbox = new QVBoxLayout;
-    foreach (const QXmppDataForm::Field &field, chatForm.fields())
-    {
-        const QString key = field.key();
-        if (key.isEmpty())
-            continue;
-
-        if (field.type() == QXmppDataForm::Field::BooleanField)
-        {
-            QCheckBox *checkbox = new QCheckBox(field.label());
-            checkbox->setChecked(field.value().toBool());
-            checkbox->setObjectName(key);
-            vbox->addWidget(checkbox);
-        }
-        else if (field.type() == QXmppDataForm::Field::TextSingleField)
-        {
-            QHBoxLayout *hbox = new QHBoxLayout;
-            hbox->addWidget(new QLabel(field.label()));
-            QLineEdit *edit = new QLineEdit(field.value().toString());
-            edit->setObjectName(key);
-            hbox->addWidget(edit);
-            vbox->addLayout(hbox);
-        }
-        else if (field.type() == QXmppDataForm::Field::ListSingleField)
-        {
-            QHBoxLayout *hbox = new QHBoxLayout;
-            hbox->addWidget(new QLabel(field.label()));
-            QComboBox *combo = new QComboBox;
-            combo->setObjectName(key);
-            int currentIndex = 0;
-            QList<QPair<QString,QString> > options = field.options();
-            for (int i = 0; i < options.size(); i++)
-            {
-                combo->addItem(options[i].first, options[i].second);
-                if (options[i].first == field.value().toString())
-                    currentIndex = i;
-            }
-            combo->setCurrentIndex(currentIndex);
-            hbox->addWidget(combo);
-            vbox->addLayout(hbox);
-        }
-    }
-
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    vbox->addWidget(buttonBox);
-
-    setLayout(vbox);
-    setWindowTitle(chatForm.title());
-
-    connect(buttonBox, SIGNAL(accepted()), this, SLOT(submit()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-}
-
-void ChatForm::submit()
-{
-    chatForm.setType(QXmppDataForm::Submit);
-    for (int i = 0; i < chatForm.fields().size(); i++)
-    {
-        QXmppDataForm::Field &field = chatForm.fields()[i];
-        const QString key = field.key();
-        if (key.isEmpty())
-            continue;
-
-        if (field.type() == QXmppDataForm::Field::BooleanField)
-        {
-            QCheckBox *checkbox = findChild<QCheckBox*>(key);
-            field.setValue(checkbox->checkState() == Qt::Checked);
-        }
-        else if (field.type() == QXmppDataForm::Field::TextSingleField)
-        {
-            QLineEdit *edit = findChild<QLineEdit*>(key);
-            field.setValue(edit->text());
-        }
-        else if (field.type() == QXmppDataForm::Field::ListSingleField)
-        {
-            QComboBox *combo = findChild<QComboBox*>(key);
-            field.setValue(combo->itemData(combo->currentIndex()).toString());
-        }
-    }
-    accept();
-}
-
-QXmppDataForm ChatForm::form() const
-{
-    return chatForm;
 }
 
 class RoomPermissionItem : public ChatModelItem

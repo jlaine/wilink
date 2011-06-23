@@ -20,8 +20,6 @@
 #ifndef __WILINK_ROOMS_H__
 #define __WILINK_ROOMS_H__
 
-#include <QDialog>
-
 #include "QXmppDataForm.h"
 #include "QXmppMucIq.h"
 #include "model.h"
@@ -142,21 +140,6 @@ private:
     QString m_jid;
     QXmppMucManager *m_manager;
     QXmppMucRoom *m_room;
-};
-
-class ChatForm : public QDialog
-{
-    Q_OBJECT
-
-public:
-    ChatForm(const QXmppDataForm &form, QWidget *parent);
-    QXmppDataForm form() const;
-
-protected slots:
-    void submit();
-
-private:
-    QXmppDataForm chatForm;
 };
 
 class RoomPermissionModel : public ChatModel
