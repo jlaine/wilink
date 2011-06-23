@@ -39,10 +39,10 @@ class RosterModelPrivate;
 class VCardCache;
 class VCardCachePrivate;
 
-class ChatRosterImageProvider : public QDeclarativeImageProvider
+class RosterImageProvider : public QDeclarativeImageProvider
 {
 public:
-    ChatRosterImageProvider();
+    RosterImageProvider();
     QPixmap requestPixmap(const QString &id, QSize *size, const QSize &requestedSize);
 };
 

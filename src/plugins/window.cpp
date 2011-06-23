@@ -50,7 +50,7 @@ Window::Window(const QString &jid, QWidget *parent)
     rosterView->setMinimumWidth(240);
     rosterView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     rosterView->engine()->addImageProvider("photo", new PhotoImageProvider);
-    rosterView->engine()->addImageProvider("roster", new ChatRosterImageProvider);
+    rosterView->engine()->addImageProvider("roster", new RosterImageProvider);
     rosterView->engine()->setNetworkAccessManagerFactory(new NetworkAccessManagerFactory);
 
     rosterView->setAttribute(Qt::WA_OpaquePaintEvent);
