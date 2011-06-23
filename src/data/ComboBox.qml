@@ -22,8 +22,8 @@ import QtQuick 1.0
 Item {
     id: block
 
-    property alias model: view.model
-    property alias currentIndex: view.currentIndex
+    property variant model
+    property int currentIndex: -1
 
     height: 21
 
@@ -31,7 +31,7 @@ Item {
         id: comboMenu
 
         Menu {
-            model: view.model
+            model: block.model
             width: view.width
 
             onItemClicked: {
@@ -61,8 +61,10 @@ Item {
         z: 1
     }
 
-    ListView {
+    MenuDelegate {
         id: view
+
+        property variant model
 
         anchors.top: parent.top
         anchors.bottom: parent.bottom
@@ -70,12 +72,6 @@ Item {
         anchors.leftMargin: 8
         anchors.right: eject.right
         anchors.rightMargin: 16
-        clip: true
-        interactive: false
-
-        delegate: MenuDelegate {
-           width: view.width - 1
-        }
     }
 
     MouseArea {
@@ -85,5 +81,9 @@ Item {
             menuLoader.sourceComponent = comboMenu;
             menuLoader.show(pos.x, pos.y);
         }
+    }
+
+    onCurrentIndexChanged: {
+        view.model = block.model.get(currentIndex);
     }
 }
