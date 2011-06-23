@@ -42,11 +42,9 @@ public slots:
 
 private slots:
     void buttonClicked(QAbstractButton *button);
-    void checkStarted();
-    void checkFinished(const Release &release);
     void downloadProgress(qint64 done, qint64 total);
-    void downloadFinished(const Release &release);
     void error(Updates::Error error, const QString &errorString);
+    void _q_stateChanged(Updates::State state);
 
 private:
     QDialogButtonBox *buttonBox;

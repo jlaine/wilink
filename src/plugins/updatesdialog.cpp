@@ -71,24 +71,16 @@ UpdateDialog::UpdateDialog(QWidget *parent)
                     this, SLOT(buttonClicked(QAbstractButton*)));
     Q_ASSERT(check);
 
-    check = connect(updates, SIGNAL(checkStarted()),
-                    this, SLOT(checkStarted()));
-    Q_ASSERT(check);
-
-    check = connect(updates, SIGNAL(checkFinished(Release)),
-                    this, SLOT(checkFinished(Release)));
-    Q_ASSERT(check);
-
-    check = connect(updates, SIGNAL(downloadFinished(Release)),
-                    this, SLOT(downloadFinished(Release)));
-    Q_ASSERT(check);
-
     check = connect(updates, SIGNAL(error(Updates::Error, const QString&)),
                     this, SLOT(error(Updates::Error, const QString&)));
     Q_ASSERT(check);
 
     check = connect(updates, SIGNAL(downloadProgress(qint64, qint64)),
                     this, SLOT(downloadProgress(qint64, qint64)));
+    Q_ASSERT(check);
+
+    check = connect(updates, SIGNAL(stateChanged(Updates::State)),
+                    this, SLOT(_q_stateChanged(Updates::State)));
     Q_ASSERT(check);
 }
 
@@ -97,7 +89,6 @@ void UpdateDialog::buttonClicked(QAbstractButton *button)
     if (buttonBox->standardButton(button) == QDialogButtonBox::Yes)
     {
         buttonBox->setStandardButtons(QDialogButtonBox::Ok);
-        statusLabel->setText(tr("Installing update.."));
         updates->install(promptRelease);
     }
     else if (buttonBox->standardButton(button) == QDialogButtonBox::No)
@@ -118,48 +109,10 @@ void UpdateDialog::check()
     updates->check();
 }
 
-void UpdateDialog::checkStarted()
-{
-    statusLabel->setText(tr("Checking for updates.."));
-}
-
-void UpdateDialog::checkFinished(const Release &release)
-{
-    if (release.isValid())
-    {
-        statusLabel->setText(tr("Downloading update.."));
-        progressBar->show();
-        updates->download(release);
-    } else {
-        statusLabel->setText(tr("Your version of %1 is up to date.").arg(qApp->applicationName()));
-    }
-    if (isVisible())
-        resize(size().expandedTo(sizeHint()));
-}
-
 void UpdateDialog::downloadProgress(qint64 done, qint64 total)
 {
     progressBar->setMaximum(total);
     progressBar->setValue(done);
-}
-
-void UpdateDialog::downloadFinished(const Release &release)
-{
-    progressBar->hide();
-    promptRelease = release;
-    statusLabel->setText(QString("<p>%1</p><p><b>%2</b></p><pre>%3</pre><p>%4</p>")
-            .arg(tr("Version %1 of %2 is available. Do you want to install it?")
-                .arg(release.version)
-                .arg(release.package))
-            .arg(tr("Changes:"))
-            .arg(release.changes)
-            .arg(tr("%1 will automatically exit to allow you to install the new version.")
-                .arg(release.package)));
-    buttonBox->setStandardButtons(QDialogButtonBox::Yes | QDialogButtonBox::No);
-    if (isVisible())
-        resize(size().expandedTo(sizeHint()));
-    show();
-    buttonBox->button(QDialogButtonBox::Yes)->setFocus();
 }
 
 void UpdateDialog::error(Updates::Error error, const QString &errorString)
@@ -167,5 +120,37 @@ void UpdateDialog::error(Updates::Error error, const QString &errorString)
     Q_UNUSED(error);
 
     statusLabel->setText(tr("Could not run software update, please try again later.") + "\n\n" + errorString);
+}
+
+void UpdateDialog::_q_stateChanged(Updates::State state)
+{
+    if (state == Updates::CheckState) {
+        statusLabel->setText(tr("Checking for updates.."));
+        progressBar->hide();
+    } else if (state == Updates::CheckState) {
+        statusLabel->setText(tr("Downloading update.."));
+        progressBar->show();
+    } else if (state == Updates::InstallState) {
+        statusLabel->setText(tr("Installing update.."));
+        progressBar->hide();
+    } else if (state == Updates::PromptState) {
+        statusLabel->setText(QString("<p>%1</p><p><b>%2</b></p><pre>%3</pre><p>%4</p>")
+                .arg(tr("Version %1 of %2 is available. Do you want to install it?")
+                    .arg(updates->updateVersion())
+                    .arg(qApp->applicationName()))
+                .arg(tr("Changes:"))
+                .arg(updates->updateChanges())
+                .arg(tr("%1 will automatically exit to allow you to install the new version.")
+                    .arg(qApp->applicationName())));
+        progressBar->hide();
+        buttonBox->setStandardButtons(QDialogButtonBox::Yes | QDialogButtonBox::No);
+        show();
+        buttonBox->button(QDialogButtonBox::Yes)->setFocus();
+    } else {
+        statusLabel->setText(tr("Your version of %1 is up to date.").arg(qApp->applicationName()));
+        progressBar->hide();
+    }
+    if (isVisible())
+        resize(size().expandedTo(sizeHint()));
 }
 

@@ -62,12 +62,16 @@ public:
         IdleState = 0,
         CheckState,
         DownloadState,
+        PromptState,
+        InstallState,
     };
 
     Updates(QObject *parent);
     ~Updates();
 
-    void download(const Release &release);
+    QString updateChanges() const;
+    QString updateVersion() const;
+
     void install(const Release &release);
     State state() const;
 
@@ -80,18 +84,16 @@ public slots:
     void check();
 
 signals:
-    void checkStarted();
-    void checkFinished(const Release &release);
     void downloadProgress(qint64 done, qint64 total);
-    void downloadFinished(const Release &release);
     void error(Updates::Error error, const QString &errorString);
-    void stateChanged(State state);
+    void stateChanged(Updates::State state);
 
 private slots:
     void _q_saveUpdate();
     void _q_processStatus();
 
 private:
+    void download(const Release &release);
     UpdatesPrivate * const d;
 };
 

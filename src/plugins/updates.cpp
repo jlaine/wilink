@@ -153,7 +153,7 @@ void Updates::setCacheDirectory(const QString &cacheDir)
 void Updates::check()
 {
     if (d->state != IdleState) {
-        qWarning("Not checking for updates, download in progress");
+        qWarning("Not starting check, operation in progress");
         return;
     }
 
@@ -162,8 +162,6 @@ void Updates::check()
         emit error(SecurityError, "Refusing to check for updates from non-HTTPS site");
         return;
     }
-
-    emit checkStarted();
 
     QUrl statusUrl = d->updatesUrl;
     QList< QPair<QString, QString> > query = statusUrl.queryItems();
@@ -203,24 +201,14 @@ int Updates::compareVersions(const QString &v1, const QString v2)
  */
 void Updates::download(const Release &release)
 {
-    if (d->state != IdleState) {
-        qWarning("Not starting download, download already in progress");
-        return;
-    }
-
-    /* only download files over HTTPS with an SHA1 hash */
-    if (!release.isValid()) {
-        emit error(SecurityError, "Refusing to download update from non-HTTPS site or without checksum");
-        return;
-    }
-
-    /* check cached file */
+    // check cached file
     if (d->checkCachedFile(release)) {
-        emit downloadFinished(release);
+        d->state = PromptState;
+        emit stateChanged(d->state);
         return;
     }
 
-    /* download release */
+    // download release
     d->downloadRelease = release;
     QNetworkRequest req(release.url);
     QNetworkReply *reply = d->network->get(req);
@@ -245,12 +233,20 @@ Updates::State Updates::state() const
 
 void Updates::install(const Release &release)
 {
-    /* check file integrity */
-    if (!d->checkCachedFile(release))
-    {
+    if (d->state != IdleState) {
+        qWarning("Not starting install, operation in progress");
+        return;
+    }
+
+    // check file integrity
+    if (!d->checkCachedFile(release)) {
         emit error(IntegrityError, "The checksum of the downloaded file is incorrect");
         return;
     }
+
+    // update state
+    d->state = InstallState;
+    emit stateChanged(d->state);
 
 #if defined(Q_OS_SYMBIAN)
     // open the download directory in file browser
@@ -297,6 +293,16 @@ void Updates::install(const Release &release)
 #endif
 }
 
+QString Updates::updateChanges() const
+{
+    return d->downloadRelease.changes;
+}
+
+QString Updates::updateVersion() const
+{
+    return d->downloadRelease.version;
+}
+
 /** Once a release has been downloaded, verify its checksum and write it
  *  to disk.
  */
@@ -320,7 +326,9 @@ void Updates::_q_saveUpdate()
 
             // check integrity
             if (d->checkCachedFile(release)) {
-                emit downloadFinished(release);
+                d->state = PromptState;
+                emit stateChanged(d->state);
+                return;
             } else {
                 downloadFile.remove();
                 emit error(IntegrityError, "The checksum of the downloaded file is incorrect");
@@ -368,17 +376,16 @@ void Updates::_q_processStatus()
         if (!urlString.isEmpty())
             release.url = d->updatesUrl.resolved(QUrl(urlString));
 
-        // emit information about available release
-        if (release.isValid())
-            emit checkFinished(release);
-        else
-            emit checkFinished(Release());
-        d->state = IdleState;
-        emit stateChanged(d->state);
-
-        // check again in two days
-        d->timer->setInterval(2 * 24 * 3600 * 1000);
-        d->timer->start();
+        if (release.isValid()) {
+            // emit information about available release
+            d->state = IdleState;
+            download(release);
+            return;
+        } else {
+            // check again in two days
+            d->timer->setInterval(2 * 24 * 3600 * 1000);
+            d->timer->start();
+        }
 
     } else {
         // network error, retry in 5mn */
