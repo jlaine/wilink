@@ -65,7 +65,7 @@ class Application : public QApplication
     Q_PROPERTY(bool sortContactsByStatus READ sortContactsByStatus WRITE setSortContactsByStatus NOTIFY sortContactsByStatusChanged)
     Q_PROPERTY(QSoundPlayer* soundPlayer READ soundPlayer CONSTANT)
     Q_PROPERTY(UpdateDialog* updateDialog READ updateDialog WRITE setUpdateDialog)
-    Q_PROPERTY(Updates* updater READ updater)
+    Q_PROPERTY(Updates* updater READ updater CONSTANT)
 
 public:
     Application(int &argc, char **argv);

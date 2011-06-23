@@ -45,6 +45,8 @@ class Updates : public QObject
     Q_OBJECT
     Q_ENUMS(Error State)
     Q_PROPERTY(State state READ state NOTIFY stateChanged)
+    Q_PROPERTY(QString updateChanges READ updateChanges NOTIFY updateChanged)
+    Q_PROPERTY(QString updateVersion READ updateVersion NOTIFY updateChanged)
 
 public:
     enum Error {
@@ -83,6 +85,7 @@ signals:
     void downloadProgress(qint64 done, qint64 total);
     void error(Updates::Error error, const QString &errorString);
     void stateChanged(Updates::State state);
+    void updateChanged();
 
 private slots:
     void _q_saveUpdate();

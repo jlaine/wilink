@@ -11,6 +11,34 @@
         <source>version %1</source>
         <translation>version %1</translation>
     </message>
+    <message>
+        <source>Your version of %1 is up to date.</source>
+        <translation>Votre version de %1 est à jour.</translation>
+    </message>
+    <message>
+        <source>Checking for updates..</source>
+        <translation>Recherche de mise à jour..</translation>
+    </message>
+    <message>
+        <source>Downloading update..</source>
+        <translation>Téléchargement de la mise à jour..</translation>
+    </message>
+    <message>
+        <source>Installing update..</source>
+        <translation>Installation de la mise à jour..</translation>
+    </message>
+    <message>
+        <source>Version %1 of %2 is available. Do you want to install it?</source>
+        <translation>La version %1 de %2 est disponible. Voulez-vous l&apos;installer ?</translation>
+    </message>
+    <message>
+        <source>Changes:</source>
+        <translation>Changements :</translation>
+    </message>
+    <message>
+        <source>%1 will automatically exit to allow you to install the new version.</source>
+        <translation>%1 quittera automatiquement afin de vous laisser installer la nouvelle version.</translation>
+    </message>
 </context>
 <context>
     <name>AccountAddPanel</name>

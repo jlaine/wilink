@@ -317,6 +317,7 @@ void Updates::_q_saveUpdate()
 
     // update state
     d->release = Release();
+    emit updateChanged();
     d->state = IdleState;
     emit stateChanged(d->state);
 }
@@ -359,6 +360,7 @@ void Updates::_q_processStatus()
         {
             // download the file
             d->release = release;
+            emit updateChanged();
             d->state = IdleState;
             download();
             return;
