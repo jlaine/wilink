@@ -93,7 +93,7 @@ Rectangle {
             panelSource: 'PhonePanel.qml'
             shortcut: Qt.ControlModifier + Qt.Key_T
             text: qsTr('Phone')
-            visible: Utils.jidToDomain(window.client.jid) == 'wifirst.net'
+            visible: Utils.jidToDomain(appClient.jid) == 'wifirst.net'
 
             onClicked: {
                 if (visible) {
@@ -116,7 +116,7 @@ Rectangle {
             panelSource: 'SharePanel.qml'
             shortcut: Qt.ControlModifier + Qt.Key_S
             text: qsTr('Shares')
-            visible: window.client.shareServer != ''
+            visible: appClient.shareServer != ''
 
             onClicked: {
                 if (visible) {
@@ -132,7 +132,7 @@ Rectangle {
         }
 
         DockButton {
-            property string domain: Utils.jidToDomain(window.client.jid)
+            property string domain: Utils.jidToDomain(appClient.jid)
 
             iconSource: 'dock-photo.png'
             iconPress: 'photos.png'

@@ -40,44 +40,33 @@
 #include "updatesdialog.h"
 #include "window.h"
 
-class ChatPrivate
-{
-public:
-    ChatClient *client;
-    QDeclarativeView *rosterView;
-};
-
-Window::Window(QWidget *parent)
-    : QMainWindow(parent),
-    d(new ChatPrivate)
+Window::Window(const QString &jid, QWidget *parent)
+    : QMainWindow(parent)
 {
     bool check;
+    setObjectName(jid);
 
-    // create client
-    d->client = new ChatClient(this);
-
-    QXmppLogger *logger = new QXmppLogger(this);
-    logger->setLoggingType(QXmppLogger::SignalLogging);
-    d->client->setLogger(logger);
+    // FIXME: set logger
+    //logger->setLoggingType(QXmppLogger::SignalLogging);
 
     // create declarative view
-    d->rosterView = new QDeclarativeView;
-    d->rosterView->setMinimumWidth(240);
-    d->rosterView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
-    d->rosterView->engine()->addImageProvider("photo", new PhotoImageProvider);
-    d->rosterView->engine()->addImageProvider("roster", new ChatRosterImageProvider);
-    d->rosterView->engine()->setNetworkAccessManagerFactory(new NetworkAccessManagerFactory);
+    QDeclarativeView *rosterView = new QDeclarativeView;
+    rosterView->setMinimumWidth(240);
+    rosterView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
+    rosterView->engine()->addImageProvider("photo", new PhotoImageProvider);
+    rosterView->engine()->addImageProvider("roster", new ChatRosterImageProvider);
+    rosterView->engine()->setNetworkAccessManagerFactory(new NetworkAccessManagerFactory);
 
-    d->rosterView->setAttribute(Qt::WA_OpaquePaintEvent);
-    d->rosterView->setAttribute(Qt::WA_NoSystemBackground);
-    d->rosterView->viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
-    d->rosterView->viewport()->setAttribute(Qt::WA_NoSystemBackground);
+    rosterView->setAttribute(Qt::WA_OpaquePaintEvent);
+    rosterView->setAttribute(Qt::WA_NoSystemBackground);
+    rosterView->viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
+    rosterView->viewport()->setAttribute(Qt::WA_NoSystemBackground);
 
-    QDeclarativeContext *context = d->rosterView->rootContext();
+    QDeclarativeContext *context = rosterView->rootContext();
     context->setContextProperty("application", wApp);
     context->setContextProperty("window", this);
 
-    setCentralWidget(d->rosterView);
+    setCentralWidget(rosterView);
 
     /* "File" menu */
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
@@ -131,13 +120,9 @@ Window::Window(QWidget *parent)
     size.setHeight(size.height() - 100);
     size.setWidth((size.height() * 4.0) / 3.0);
     resize(size);
-}
 
-Window::~Window()
-{
-    // disconnect
-    d->client->disconnectFromServer();
-    delete d;
+    // load QML
+    rosterView->setSource(QUrl("qrc:/main.qml"));
 }
 
 void Window::alert()
@@ -177,27 +162,5 @@ QMessageBox *Window::messageBox()
     QMessageBox *box = new QMessageBox(this);
     box->setIcon(QMessageBox::Question);
     return box;
-}
-
-/** Return this window's chat client.
- */
-ChatClient *Window::client()
-{
-    return d->client;
-}
-
-/** Open the connection to the chat server.
- *
- * @param jid
- */
-bool Window::open(const QString &jid)
-{
-    d->client->configuration().setJid(jid);
-    setObjectName(jid);
-
-    // load QML
-    d->rosterView->setSource(QUrl("qrc:/main.qml"));
-
-    return true;
 }
 

@@ -52,10 +52,10 @@ Panel {
             anchors.right: parent.right
             anchors.top: parent.top
             currentJid: (Qt.isQtObject(chatSwapper.currentItem) && chatSwapper.currentItem.jid != undefined) ? chatSwapper.currentItem.jid : ''
-            enabled: window.client.mucServer != ''
+            enabled: appClient.mucServer != ''
             model: RoomListModel {
                 id: roomListModel
-                client: window.client
+                client: appClient
 
                 onRoomAdded: {
                     if (!chatSwapper.findPanel('RoomPanel.qml', {'jid': jid})) {
@@ -83,7 +83,7 @@ Panel {
             onItemClicked: showRoom(model.jid)
 
             Connections {
-                target: window.client.mucManager
+                target: appClient.mucManager
 
                 onInvitationReceived: {
                     var jid = Utils.jidToBareJid(inviter);
@@ -149,7 +149,7 @@ Panel {
                 filterRegExp: /^(?!offline)/
                 sourceModel: RosterModel {
                     id: rosterModel
-                    client: window.client
+                    client: appClient
                 }
             }
 
@@ -192,16 +192,16 @@ Panel {
             }
 
             Connections {
-                target: window.client.rosterManager
+                target: appClient.rosterManager
                 onSubscriptionReceived: {
                     // If we have a subscription to the requester, accept
                     // reciprocal subscription.
                     //
                     // FIXME: use QXmppRosterIq::Item::To and QXmppRosterIq::Item::Both
-                    var subscription = window.client.rosterManager.subscriptionType(bareJid);
+                    var subscription = appClient.rosterManager.subscriptionType(bareJid);
                     if (subscription == 2 || subscription == 3) {
                         // accept subscription
-                        window.client.rosterManager.acceptSubscription(bareJid);
+                        appClient.rosterManager.acceptSubscription(bareJid);
                         return;
                     }
 
@@ -211,13 +211,13 @@ Panel {
                     box.standardButtons = QMessageBox.Yes | QMessageBox.No;
                     if (box.exec() == QMessageBox.Yes) {
                         // accept subscription
-                        window.client.rosterManager.acceptSubscription(bareJid);
+                        appClient.rosterManager.acceptSubscription(bareJid);
 
                         // request reciprocal subscription
-                        window.client.rosterManager.subscribe(bareJid);
+                        appClient.rosterManager.subscribe(bareJid);
                     } else {
                         // refuse subscription
-                        window.client.rosterManager.refuseSubscription(bareJid);
+                        appClient.rosterManager.refuseSubscription(bareJid);
                     }
                 }
             }
@@ -235,18 +235,18 @@ Panel {
         // FIXME : this is a hack to replay received messages after
         // adding the appropriate conversation
         Connections {
-            target: window.client
+            target: appClient
             onMessageReceived: {
                 var jid = Utils.jidToBareJid(from);
                 if (!chatSwapper.findPanel('ConversationPanel.qml', {'jid': jid})) {
                     chatSwapper.addPanel('ConversationPanel.qml', {'jid': jid});
-                    window.client.replayMessage();
+                    appClient.replayMessage();
                 }
             }
         }
 
         Connections {
-            target: window.client.callManager
+            target: appClient.callManager
             onCallReceived: {
                 var contactName = call.jid;
                 console.log("Call received: " + contactName);
@@ -270,7 +270,7 @@ Panel {
         }
 
         Connections {
-            target: window.client.transferManager
+            target: appClient.transferManager
             onFileReceived: {
                 var contactName = job.jid;
                 console.log("File received: " + contactName);
@@ -312,9 +312,9 @@ Panel {
         id: wifirst
 
         Connections {
-            target: window.client
+            target: appClient
             onConnected: {
-                wifirst.source = (Utils.jidToDomain(window.client.jid) == 'wifirst.net') ? 'Wifirst.qml' : '';
+                wifirst.source = (Utils.jidToDomain(appClient.jid) == 'wifirst.net') ? 'Wifirst.qml' : '';
             }
         }
     }

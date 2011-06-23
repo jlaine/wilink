@@ -48,7 +48,7 @@ Rectangle {
 
             onItemClicked: {
                 var statusType = menu.model.get(index).status;
-                window.client.statusType = statusType;
+                appClient.statusType = statusType;
             }
 
             Component.onCompleted: {
@@ -88,7 +88,7 @@ Rectangle {
             anchors.margins: 5
             height: appStyle.icon.tinySize
             width: appStyle.icon.tinySize
-            presenceStatus: window.client.statusType
+            presenceStatus: appClient.statusType
         }
 
         Image {
@@ -133,7 +133,7 @@ Rectangle {
         anchors.margins: 5
         color: 'white'
         text: {
-            switch (window.client.state) {
+            switch (appClient.state) {
             case QXmppClient.ConnectedState:
                 return qsTr('Connected');
             case QXmppClient.ConnectingState:
@@ -149,13 +149,13 @@ Rectangle {
 
         onIdleTimeChanged: {
             if (idle.idleTime >= 300) {
-                if (window.client.statusType == QXmppPresence.Online) {
+                if (appClient.statusType == QXmppPresence.Online) {
                     autoAway = true;
-                    window.client.statusType = QXmppPresence.Away;
+                    appClient.statusType = QXmppPresence.Away;
                 }
             } else if (autoAway) {
                 autoAway = false;
-                window.client.statusType = QXmppPresence.Online;
+                appClient.statusType = QXmppPresence.Online;
             }
         }
 

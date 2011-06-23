@@ -70,7 +70,7 @@ Dialog {
     onAccepted: {
         var name = bar.text;
         console.log("Rename contact " + jid + ": " + name);
-        window.client.rosterManager.renameItem(jid, name);
+        appClient.rosterManager.renameItem(jid, name);
         dialogLoader.hide();
     }
 }

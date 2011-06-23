@@ -132,7 +132,7 @@ Panel {
         anchors.bottom: queueHelp.top
 
         model: ShareModel {
-            client: window.client
+            client: appClient
             filter: searchEdit.text
 
             onShareServerChanged: {

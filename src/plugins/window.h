@@ -22,11 +22,7 @@
 
 #include <QMainWindow>
 
-#include "client.h"
-
 class Application;
-class ChatPrivate;
-class ChatRosterView;
 class QFileDialog;
 class QMessageBox;
 
@@ -35,16 +31,10 @@ class QMessageBox;
 class Window : public QMainWindow
 {
     Q_OBJECT
-    Q_PROPERTY(ChatClient* client READ client CONSTANT)
     Q_PROPERTY(bool isActiveWindow READ isActiveWindow NOTIFY isActiveWindowChanged)
 
 public:
-    Window(QWidget *parent = 0);
-    ~Window();
-
-    ChatClient *client();
-
-    bool open(const QString &jid);
+    Window(const QString &jid, QWidget *parent = 0);
 
 signals:
     void isActiveWindowChanged();
@@ -59,9 +49,6 @@ public slots:
 
 protected:
     void changeEvent(QEvent *event);
-
-private:
-    ChatPrivate * const d;
 };
 
 #endif

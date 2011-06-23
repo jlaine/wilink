@@ -38,6 +38,7 @@
 #include "application.h"
 #include "idle/idle.h"
 #include "calls.h"
+#include "client.h"
 #include "console.h"
 #include "conversations.h"
 #include "declarative.h"
@@ -205,7 +206,7 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterUncreatableType<QXmppCallManager>("QXmpp", 0, 4, "QXmppCallManager", "");
     qmlRegisterUncreatableType<DiagnosticManager>("QXmpp", 0, 4, "DiagnosticManager", "");
     qmlRegisterUncreatableType<QXmppDiscoveryManager>("QXmpp", 0, 4, "QXmppDiscoveryManager", "");
-    qmlRegisterUncreatableType<QXmppLogger>("QXmpp", 0, 4, "QXmppLogger", "");
+    qmlRegisterType<QXmppLogger>("QXmpp", 0, 4, "QXmppLogger");
     qmlRegisterType<QXmppDeclarativeMessage>("QXmpp", 0, 4, "QXmppMessage");
     qmlRegisterUncreatableType<QXmppMucManager>("QXmpp", 0, 4, "QXmppMucManager", "");
     qmlRegisterUncreatableType<QXmppMucRoom>("QXmpp", 0, 4, "QXmppMucRoom", "");

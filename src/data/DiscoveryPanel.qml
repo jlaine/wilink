@@ -92,7 +92,7 @@ Panel {
         anchors.bottom: parent.bottom
 
         model: DiscoveryModel {
-            manager: window.client.discoveryManager
+            manager: appClient.discoveryManager
         }
 
         delegate: Rectangle {

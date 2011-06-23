@@ -25,6 +25,10 @@ FocusScope {
     id: root
     focus: true
 
+    Client {
+        id: appClient
+    }
+
     Style {
         id: appStyle
     }
@@ -112,11 +116,11 @@ FocusScope {
     }
 
     Connections {
-        target: window.client
+        target: appClient
 
         onAuthenticationFailed: {
             console.log("Failed to authenticate with chat server");
-            var jid = Utils.jidToBareJid(window.client.jid);
+            var jid = Utils.jidToBareJid(appClient.jid);
             dialogLoader.source = 'AccountPasswordDialog.qml';
             dialogLoader.item.jid = jid;
             dialogLoader.item.accepted.connect(function() {
@@ -124,7 +128,7 @@ FocusScope {
                 dialogLoader.hide();
                 dialogLoader.source = '';
                 appWallet.set(jid, password);
-                window.client.connectToServer(jid, password);
+                appClient.connectToServer(jid, password);
             });
             dialogLoader.show();
         }
@@ -136,7 +140,12 @@ FocusScope {
     }
 
     Component.onCompleted: {
-        var jid = Utils.jidToBareJid(window.client.jid);
+        var jid = window.objectName;
+        if (jid == '') {
+            console.log("Failed to get window JID");
+            application.quit();
+        }
+
         var password = appWallet.get(jid);
         if (password == '') {
             console.log("no password");
@@ -147,10 +156,10 @@ FocusScope {
                 dialogLoader.hide();
                 dialogLoader.source = '';
                 appWallet.set(jid, password);
-                window.client.connectToServer(jid, password);
+                appClient.connectToServer(jid, password);
             });
         }
-        window.client.connectToServer(jid, password);
+        appClient.connectToServer(jid, password);
         swapper.showPanel('ChatPanel.qml');
     }
 

@@ -65,8 +65,8 @@ Dialog {
             clip: true
             model: DiscoveryModel {
                 details: false
-                manager: window.client.discoveryManager
-                rootJid: window.client.mucServer
+                manager: appClient.discoveryManager
+                rootJid: appClient.mucServer
             }
 
             delegate: Rectangle {

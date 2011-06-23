@@ -476,7 +476,7 @@ void Application::resetWindows()
     int ypos = 20;
     const QStringList chatJids = chatAccounts();
     foreach (const QString &jid, chatJids) {
-        Window *chat = new Window;
+        Window *chat = new Window(jid);
         if (chatJids.size() == 1)
             chat->setWindowTitle(qApp->applicationName());
         else
@@ -490,7 +490,6 @@ void Application::resetWindows()
         chat->show();
 #endif
 
-        chat->open(jid);
         d->chats << chat;
         xpos += 300;
     }

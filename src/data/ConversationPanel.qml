@@ -30,7 +30,7 @@ Panel {
     Conversation {
         id: conversation
 
-        client: window.client
+        client: appClient
     }
 
     PanelHeader {
@@ -89,11 +89,11 @@ Panel {
 
                 onClicked: {
                     var fullJid = vcard.jidForFeature(VCard.AudioFeature);
-                    window.client.callManager.call(fullJid);
+                    appClient.callManager.call(fullJid);
                 }
 
                 Connections {
-                    target: window.client.callManager
+                    target: appClient.callManager
                     onCallStarted: {
                         if (Utils.jidToBareJid(call.jid) == conversation.jid) {
                             var component = Qt.createComponent('CallWidget.qml');
@@ -117,13 +117,13 @@ Panel {
                         for (var i in dialog.selectedFiles) {
                             var filePath = dialog.selectedFiles[i];
                             var fullJid = vcard.jidForFeature(VCard.FileTransferFeature);
-                            window.client.transferManager.sendFile(fullJid, filePath);
+                            appClient.transferManager.sendFile(fullJid, filePath);
                         }
                     }
                 }
 
                 Connections {
-                    target: window.client.transferManager
+                    target: appClient.transferManager
                     onJobStarted: {
                         if (Utils.jidToBareJid(job.jid) == conversation.jid) {
                             var component = Qt.createComponent('TransferWidget.qml');
