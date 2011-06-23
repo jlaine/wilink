@@ -18,6 +18,7 @@
  */
 
 import QtQuick 1.0
+import QXmpp 0.4
 import wiLink 1.2
 
 Dialog {
@@ -33,40 +34,62 @@ Dialog {
         id: permissionModel
     }
 
-    ListView {
-        id: view
-
+    Item {
         anchors.fill: contents
-        clip: true
 
-        model: permissionModel
-        delegate: Item {
-            id: item
+        ListView {
+            id: view
 
-            width: parent.width
-            height: text.paintedHeight
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.right: scrollBar.left
+            clip: true
 
-            Text {
-                id: text
+            model: permissionModel
+            delegate: Item {
+                id: item
 
-                anchors.left: parent.left
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                text: model.jid
-                verticalAlignment: Text.AlignVCenter
-            }
+                width: parent.width
+                height: combo.height
 
-            ComboBox {
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-                currentIndex: 1
-                model: ListModel {
-                    ListElement { text: 'Owner' }
-                    ListElement { text: 'Administrator' }
-                    ListElement { text: 'Member' }
-                    ListElement { text: 'None' }
+                Text {
+                    id: label
+
+                    anchors.left: parent.left
+                    anchors.right: combo.left
+                    anchors.rightMargin: appStyle.spacing.horizontal
+                    anchors.verticalCenter: parent.verticalCenter
+                    elide: Text.ElideRight
+                    text: model.jid
+                    verticalAlignment: Text.AlignVCenter
+                }
+
+                ComboBox {
+                    id: combo
+
+                    anchors.top: parent.top
+                    anchors.right: parent.right
+                    currentIndex: 1
+                    model: ListModel {}
+                    width: 150
+                    Component.onCompleted: {
+                        model.append({'text': qsTr('member'), 'value': QXmppMucItem.MemberAffiliation});
+                        model.append({'text': qsTr('administrator'), 'value': QXmppMucItem.AdminAffiliation});
+                        model.append({'text': qsTr('owner'), 'value': QXmppMucItem.OwnerAffiliation});
+                        model.append({'text': qsTr('banner'), 'value': QXmppMucItem.OutcastAffiliation});
+                    }
                 }
             }
+        }
+
+        ScrollBar {
+            id: scrollBar
+
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.right: parent.right
+            flickableItem: view
         }
     }
 }
