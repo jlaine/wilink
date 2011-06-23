@@ -53,6 +53,8 @@ RoomConfigurationModel::RoomConfigurationModel(QObject *parent)
     names.insert(DescriptionRole, "description");
     names.insert(KeyRole, "key");
     names.insert(LabelRole, "label");
+    names.insert(TypeRole, "type");
+    names.insert(ValueRole, "value");
     setRoleNames(names);
 }
 
@@ -68,6 +70,10 @@ QVariant RoomConfigurationModel::data(const QModelIndex &index, int role) const
         return field.key();
     else if (role == LabelRole)
         return field.label();
+    else if (role == TypeRole)
+        return field.type();
+    else if (role == ValueRole)
+        return field.value();
 
     return QVariant();
 }
@@ -93,7 +99,13 @@ void RoomConfigurationModel::setRoom(QXmppMucRoom *room)
         if (m_room)
             m_room->disconnect(this);
 
-        m_form = QXmppDataForm();
+        if (m_form.fields().size() > 0) {
+            beginRemoveRows(QModelIndex(), 0, m_form.fields().size() - 1);
+            m_form = QXmppDataForm();
+            endRemoveRows();
+        } else {
+            m_form = QXmppDataForm();
+        }
         m_room = room;
 
         if (m_room) {
@@ -117,13 +129,27 @@ int RoomConfigurationModel::rowCount(const QModelIndex &parent) const
 
 void RoomConfigurationModel::save()
 {
+    if (m_room) {
+        m_room->setConfiguration(m_form);
+    }
+}
+
+void RoomConfigurationModel::setValue(int row, const QVariant &value)
+{
+    if (row > 0 && row <  m_form.fields().size()) {
+        m_form.fields()[row].setValue(value);
+        emit dataChanged(index(row), index(row));
+    }
 }
 
 void RoomConfigurationModel::_q_configurationReceived(const QXmppDataForm &configuration)
 {
-    beginInsertRows(QModelIndex(), 0, configuration.fields().size() - 1);
-    m_form = configuration;
-    endInsertRows();
+    if (!m_form.fields().size()) {
+        beginInsertRows(QModelIndex(), 0, configuration.fields().size() - 1);
+        m_form = configuration;
+        m_form.setType(QXmppDataForm::Submit);
+        endInsertRows();
+    }
 }
 
 class RoomListItem : public ChatModelItem

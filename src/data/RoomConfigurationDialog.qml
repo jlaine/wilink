@@ -52,13 +52,36 @@ Dialog {
                 width: parent.width - 1
                 height: 24
 
-                CheckBox {
-                    id: label
+                Item {
+                    anchors.fill: parent
+                    visible: model.type == QXmppDataForm.TextSingleField
 
+                    Text {
+                        id: label
+
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.left: parent.left
+                        text: model.label
+                    }
+
+                    InputBar {
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.left: label.right
+                        anchors.leftMargin: appStyle.spacing.horizontal
+                        anchors.right: parent.right
+                        text: model.value
+                    }
+                }
+
+                CheckBox {
                     anchors.top: parent.top
                     anchors.left: parent.left
                     anchors.right: parent.right
+                    checked: model.value == true
                     text: model.label
+                    visible: model.type == QXmppDataForm.BooleanField
+
+                    onClicked: configurationModel.setValue(model.index, !checked)
                 }
             }
         }
@@ -74,7 +97,7 @@ Dialog {
     }
 
     onAccepted: {
-        permissionModel.save();
+        configurationModel.save();
         dialogLoader.hide();
     }
 }

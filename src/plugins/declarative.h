@@ -59,6 +59,27 @@ signals:
     void sourceModelChanged(QAbstractItemModel *sourceModel);
 };
 
+class QXmppDeclarativeDataForm : public QObject
+{
+    Q_OBJECT
+    Q_ENUMS(Field)
+
+public:
+    enum Field
+    {
+        BooleanField = QXmppDataForm::Field::BooleanField,
+        FixedField = QXmppDataForm::Field::FixedField,
+        HiddenField = QXmppDataForm::Field::HiddenField,
+        JidMultiField = QXmppDataForm::Field::JidMultiField,
+        JidSingleField = QXmppDataForm::Field::JidSingleField,
+        ListMultiField = QXmppDataForm::Field::ListMultiField,
+        ListSingleField = QXmppDataForm::Field::ListSingleField,
+        TextMultiField = QXmppDataForm::Field::TextMultiField,
+        TextPrivateField = QXmppDataForm::Field::TextPrivateField,
+        TextSingleField = QXmppDataForm::Field::TextSingleField,
+    };
+};
+
 class QXmppDeclarativeMessage : public QObject
 {
     Q_OBJECT

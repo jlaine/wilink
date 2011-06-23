@@ -53,6 +53,7 @@ signals:
 
 public slots:
     void save();
+    void setValue(int row, const QVariant &value);
 
 private slots:
     void _q_configurationReceived(const QXmppDataForm &configuration);
@@ -62,6 +63,8 @@ private:
         DescriptionRole,
         KeyRole,
         LabelRole,
+        TypeRole,
+        ValueRole,
     };
     QXmppDataForm m_form;
     QXmppMucRoom *m_room;
