@@ -174,25 +174,6 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>ChatPasswordPrompt</name>
-    <message>
-        <source>Password</source>
-        <translation>Mot de passe</translation>
-    </message>
-    <message>
-        <source>Enter the password for your &apos;%1&apos; account.</source>
-        <translation>Saisissez le mot de passe de votre compte &apos;%1&apos;.</translation>
-    </message>
-    <message>
-        <source>If you need help, please refer to the &lt;a href=&quot;%1&quot;&gt;%2 FAQ&lt;/a&gt;.</source>
-        <translation>Si vous avez besoin d&apos;aide, merci de consulter la &lt;a href=&quot;%1&quot;&gt;FAQ %2&lt;/a&gt;.</translation>
-    </message>
-    <message>
-        <source>Password required</source>
-        <translation>Mot de passe requis</translation>
-    </message>
-</context>
-<context>
     <name>ContactAddDialog</name>
     <message>
         <source>Your wAmis are automatically added to your chat contacts, so the easiest way to add Wifirst contacts is to &lt;a href=&quot;%1&quot;&gt;add them as wAmis&lt;/a&gt;</source>

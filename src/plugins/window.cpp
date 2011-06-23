@@ -22,13 +22,8 @@
 #include <QDeclarativeEngine>
 #include <QDeclarativeItem>
 #include <QDeclarativeView>
-#include <QDesktopServices>
 #include <QDesktopWidget>
-#include <QDialogButtonBox>
 #include <QFileDialog>
-#include <QLabel>
-#include <QLayout>
-#include <QLineEdit>
 #include <QList>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -36,9 +31,7 @@
 #include <QStringList>
 #include <QTimer>
 
-#include "QXmppConfiguration.h"
 #include "QXmppLogger.h"
-#include "QXmppUtils.h"
 
 #include "application.h"
 #include "declarative.h"
@@ -46,45 +39,6 @@
 #include "roster.h"
 #include "updatesdialog.h"
 #include "window.h"
-
-ChatPasswordPrompt::ChatPasswordPrompt(const QString &jid, QWidget *parent)
-    : QDialog(parent)
-{
-    QVBoxLayout *layout = new QVBoxLayout;
-
-    QLabel *promptLabel = new QLabel;
-    promptLabel->setText(tr("Enter the password for your '%1' account.").arg(jid));
-    promptLabel->setWordWrap(true);
-    layout->addWidget(promptLabel);
-
-    QHBoxLayout *row = new QHBoxLayout;
-    row->addWidget(new QLabel("<b>" + tr("Password") + "</b>"));
-    m_passwordEdit = new QLineEdit;
-    m_passwordEdit->setEchoMode(QLineEdit::Password);
-    row->addWidget(m_passwordEdit);
-    layout->addLayout(row);
-
-    QLabel *helpLabel = new QLabel("<i>" + tr("If you need help, please refer to the <a href=\"%1\">%2 FAQ</a>.")
-        .arg(QLatin1String(HELP_URL), qApp->applicationName()) + "</i>");
-    helpLabel->setOpenExternalLinks(true);
-    layout->addWidget(helpLabel);
-
-    QDialogButtonBox *buttonBox = new QDialogButtonBox;
-    buttonBox->addButton(QDialogButtonBox::Ok);
-    buttonBox->addButton(QDialogButtonBox::Cancel);
-    connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
-    connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-    layout->addWidget(buttonBox);
-
-    setLayout(layout);
-    setWindowTitle(tr("Password required"));
-}
-
-QString ChatPasswordPrompt::password() const
-{
-    return m_passwordEdit->text();
-}
-
 
 class ChatPrivate
 {
@@ -210,31 +164,6 @@ void Window::changeEvent(QEvent *event)
     QWidget::changeEvent(event);
     if (event->type() == QEvent::ActivationChange)
         emit isActiveWindowChanged();
-}
-
-bool Window::getPassword(const QString &jid, QString &password)
-{
-    DeclarativeWallet wallet;
-
-    /* check if we have a stored password that differs from the given one */
-    QString tmpPassword = wallet.get(jid);
-    if (!tmpPassword.isEmpty() && tmpPassword != password) {
-        password = tmpPassword;
-        return true;
-    }
-
-    /* prompt user */
-    ChatPasswordPrompt dialog(jid, this);
-    while (dialog.password().isEmpty())
-    {
-        if (dialog.exec() != QDialog::Accepted)
-            return false;
-    }
-
-    /* store new password */
-    password = dialog.password();
-    wallet.set(jid, password);
-    return true;
 }
 
 QFileDialog *Window::fileDialog()
