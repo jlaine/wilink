@@ -167,9 +167,6 @@ Window::Window(QWidget *parent)
                     this, SIGNAL(showAbout()));
     Q_ASSERT(check);
 
-    /* set up client */
-    connect(d->client, SIGNAL(error(QXmppClient::Error)), this, SLOT(error(QXmppClient::Error)));
-
     /* set up keyboard shortcuts */
 #ifdef Q_OS_MAC
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_W), this);
@@ -214,22 +211,6 @@ void Window::changeEvent(QEvent *event)
     QWidget::changeEvent(event);
     if (event->type() == QEvent::ActivationChange)
         emit isActiveWindowChanged();
-}
-
-/** Handle an error talking to the chat server.
- *
- * @param error
- */
-void Window::error(QXmppClient::Error error)
-{
-    if(error == QXmppClient::XmppStreamError)
-    {
-        if (d->client->xmppStreamError() == QXmppStanza::Error::NotAuthorized)
-        {
-            // prompt user for credentials at the next main loop execution
-            QTimer::singleShot(0, this, SLOT(promptCredentials()));
-        }
-    }
 }
 
 /** The number of pending messages changed.

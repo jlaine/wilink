@@ -23,8 +23,9 @@ Dialog {
     id: dialog
 
     property string jid
+    property alias password: passwordInput.text
 
-    minimumHeight: 150
+    minimumHeight: 250
     title: qsTr('Password required')
 
     Column {

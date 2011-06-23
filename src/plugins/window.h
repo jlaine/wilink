@@ -72,7 +72,6 @@ public slots:
     QMessageBox *messageBox();
 
 private slots:
-    void error(QXmppClient::Error error);
     void pendingMessages(int messages);
     void promptCredentials();
     void showHelp();

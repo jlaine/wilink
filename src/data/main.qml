@@ -29,6 +29,10 @@ FocusScope {
         id: appStyle
     }
 
+    Wallet {
+        id: appWallet
+    }
+
     Dock {
         id: dock
 
@@ -110,12 +114,29 @@ FocusScope {
     Connections {
         target: window.client
 
+        onAuthenticationFailed: {
+            console.log("Failed to authenticate with chat server");
+            dialogLoader.source = 'AccountPasswordDialog.qml';
+            dialogLoader.item.jid = window.client.jid;
+            dialogLoader.item.accepted.connect(function() {
+                var password = dialogLoader.item.password;
+                dialogLoader.hide();
+                dialogLoader.source = '';
+                appWallet.set(window.client.jid, password);
+                window.client.connectToServer(window.client.jid, password);
+            });
+            dialogLoader.show();
+        }
+
         onConflictReceived: {
             console.log("Received a resource conflict from chat server");
             application.quit();
         }
     }
 
-    Component.onCompleted: swapper.showPanel('ChatPanel.qml')
+    Component.onCompleted: {
+        swapper.showPanel('ChatPanel.qml');
+    }
+
     Keys.forwardTo: dock
 }
