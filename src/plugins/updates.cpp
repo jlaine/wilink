@@ -36,6 +36,7 @@
 #include <windows.h>
 #endif
 
+#include "application.h"
 #include "declarative.h"
 #include "systeminfo.h"
 #include "updates.h"
@@ -58,7 +59,6 @@ public:
     QString cacheFile() const;
     bool checkCachedFile() const;
 
-    QString cacheDirectory;
     Release release;
     QUrl updatesUrl;
 
@@ -69,7 +69,7 @@ public:
 
 QString UpdatesPrivate::cacheFile() const
 {
-    return QDir(cacheDirectory).filePath(QFileInfo(release.url.path()).fileName());
+    return QDir(wApp->downloadsLocation()).filePath(QFileInfo(release.url.path()).fileName());
 }
 
 bool UpdatesPrivate::checkCachedFile() const
@@ -119,22 +119,6 @@ Updates::Updates(QObject *parent)
 Updates::~Updates()
 {
     delete d;
-}
-
-/** Returns the location where downloaded updates will be stored.
- */
-QString Updates::cacheDirectory() const
-{
-    return d->cacheDirectory;
-}
-
-/** Sets the location where downloaded updates will be stored.
- *
- * @param cacheDir
- */
-void Updates::setCacheDirectory(const QString &cacheDir)
-{
-    d->cacheDirectory = cacheDir;
 }
 
 /** Requests the current release information from the updates server.

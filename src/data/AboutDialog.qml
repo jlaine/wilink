@@ -53,6 +53,7 @@ Dialog {
         }
 
         Text {
+            id: prompt
             anchors.top: appIcon.bottom
             anchors.left: parent.left
             anchors.right: parent.right
@@ -82,6 +83,13 @@ Dialog {
                 }
             }
             wrapMode: Text.WordWrap
+        }
+
+        ProgressBar {
+            anchors.top: prompt.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            visible: Qt.isQtObject(application.updater) && application.updater.state == Updater.DownloadState
         }
     }
 }

@@ -29,7 +29,6 @@
 #include <QPushButton>
 #include <QTimer>
 
-#include "application.h"
 #include "systeminfo.h"
 #include "updatesdialog.h"
 
@@ -64,7 +63,6 @@ UpdateDialog::UpdateDialog(QWidget *parent)
 
     /* updates */
     m_updates = new Updates(this);
-    m_updates->setCacheDirectory(wApp->downloadsLocation());
 
     bool check;
     check = connect(buttonBox, SIGNAL(clicked(QAbstractButton*)),

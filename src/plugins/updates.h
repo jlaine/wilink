@@ -62,9 +62,6 @@ public:
     QString updateChanges() const;
     QString updateVersion() const;
 
-    QString cacheDirectory() const;
-    void setCacheDirectory(const QString &cacheDir);
-
     static int compareVersions(const QString &v1, const QString v2);
 
 public slots:
