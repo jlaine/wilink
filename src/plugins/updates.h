@@ -25,16 +25,6 @@
 
 class QNetworkReply;
 
-class Release
-{
-public:
-    QString changes;
-    QString package;
-    QUrl url;
-    QString version;
-    QMap<QString, QByteArray> hashes;
-};
-
 class UpdatesPrivate;
 
 /** The Updates class handling checking for software updates

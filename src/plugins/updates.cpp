@@ -42,6 +42,16 @@
 
 #define CHUNK_SIZE 16384
 
+class Release
+{
+public:
+    QString changes;
+    QString package;
+    QUrl url;
+    QString version;
+    QMap<QString, QByteArray> hashes;
+};
+
 class UpdatesPrivate
 {
 public:
@@ -228,7 +238,7 @@ void Updates::install()
 
 #if defined(Q_OS_SYMBIAN)
     // open the download directory in file browser
-    QFileInfo fileInfo(d->cacheFile(d->release));
+    QFileInfo fileInfo(d->cacheFile());
     QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.dir().path()));
 #elif defined(Q_OS_WIN)
     // invoke the downloaded installer on the same path as the current install
@@ -257,7 +267,7 @@ void Updates::install()
         CloseHandle(pinfo.hThread);
         CloseHandle(pinfo.hProcess);
     } else {
-        QDesktopServices::openUrl(QUrl::fromLocalFile(d->cacheFile(d->release)));
+        QDesktopServices::openUrl(QUrl::fromLocalFile(d->cacheFile()));
     }
 
     // quit application to allow installation
