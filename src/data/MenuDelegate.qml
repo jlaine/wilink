@@ -35,11 +35,11 @@ Rectangle {
         id: icon
 
         anchors.left: parent.left
-        anchors.leftMargin: 4
+        anchors.leftMargin: sourceComponent ? 4 : 0
         anchors.verticalCenter: parent.verticalCenter
         opacity: menuItem.enabled ? 1 : 0.5
         sourceComponent: menuItem.iconDelegate
-        width: appStyle.icon.tinySize
+        width: sourceComponent ? appStyle.icon.tinySize : 0
         height: appStyle.icon.tinySize
 
         onLoaded: icon.item.model = model

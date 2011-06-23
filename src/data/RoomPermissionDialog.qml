@@ -87,7 +87,7 @@ Dialog {
                     anchors.right: button.left
                     anchors.rightMargin: appStyle.spacing.horizontal
                     model: affiliationModel
-                    width: 150
+                    width: 120
                     Component.onCompleted: {
                         for (var i = 0; i < model.count; i++) {
                             if (label.affiliation == model.get(i).value) {
@@ -148,7 +148,7 @@ Dialog {
                 anchors.right: button.left
                 anchors.rightMargin: appStyle.spacing.horizontal
                 model: affiliationModel
-                width: 150
+                width: 120
             }
 
             Button {

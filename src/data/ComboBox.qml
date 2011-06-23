@@ -33,6 +33,7 @@ Item {
         Menu {
             model: block.model
             width: view.width
+            iconDelegate: view.iconDelegate
 
             onItemClicked: {
                 block.currentIndex = index;
@@ -57,16 +58,6 @@ Item {
         smooth: true
     }
 
-    Image {
-        id: eject
-
-        anchors.right: parent.right
-        anchors.rightMargin: 8
-        anchors.verticalCenter: parent.verticalCenter
-        source: 'eject.png'
-        z: 1
-    }
-
     MenuDelegate {
         id: view
 
@@ -75,9 +66,18 @@ Item {
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.left: parent.left
-        anchors.leftMargin: 8
-        anchors.right: eject.right
-        anchors.rightMargin: 16
+        anchors.right: eject.left
+        anchors.rightMargin: 8
+    }
+
+    Image {
+        id: eject
+
+        anchors.right: parent.right
+        anchors.rightMargin: 8
+        anchors.verticalCenter: parent.verticalCenter
+        source: 'eject.png'
+        z: 1
     }
 
     MouseArea {
