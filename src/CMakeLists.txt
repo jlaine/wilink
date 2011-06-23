@@ -100,7 +100,10 @@ set(wiLink_MOC_HEADERS
 configure_file(translations/translations.qrc.cmake ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc)
 if(RELOAD_TRANSLATIONS)
     qt4_create_translation(QM_FILES
-        ${wiLink_SOURCES}
+        plugins/application.cpp
+        plugins/rooms.cpp
+        plugins/updatesdialog.cpp
+        plugins/window.cpp
         data/main.qml
         data/setup.qml
         data/AboutDialog.qml
@@ -124,6 +127,7 @@ if(RELOAD_TRANSLATIONS)
         data/RoomInviteDialog.qml
         data/RoomJoinDialog.qml
         data/RoomParticipantView.qml
+        data/RoomPermissionDialog.qml
         data/PhoneHistoryView.qml
         data/PhonePanel.qml
         data/PhotoPanel.qml

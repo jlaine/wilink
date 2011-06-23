@@ -102,7 +102,12 @@ Panel {
             ToolButton {
                 iconSource: 'permissions.png'
                 text: qsTr('Permissions')
-                visible: false //room.allowedActions & QXmppMucRoom.PermissionsAction
+                visible: room.allowedActions & QXmppMucRoom.PermissionsAction
+
+                onClicked: {
+                    dialogLoader.source = 'RoomPermissionDialog.qml';
+                    dialogLoader.show();
+                }
             }
 
             ToolButton {

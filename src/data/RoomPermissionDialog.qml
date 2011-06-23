@@ -24,6 +24,7 @@ Dialog {
 
     minimumWidth: 280
     minimumHeight: 150
+    title: qsTr('Chat room permissions')
 
     ListView {
         id: view
