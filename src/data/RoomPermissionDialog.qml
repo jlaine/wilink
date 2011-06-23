@@ -56,6 +56,8 @@ Dialog {
                 Text {
                     id: label
 
+                    property int affiliation: model.affiliation
+
                     anchors.left: parent.left
                     anchors.right: combo.left
                     anchors.rightMargin: appStyle.spacing.horizontal
@@ -70,14 +72,21 @@ Dialog {
 
                     anchors.top: parent.top
                     anchors.right: parent.right
-                    currentIndex: 1
                     model: ListModel {}
                     width: 150
                     Component.onCompleted: {
                         model.append({'text': qsTr('member'), 'value': QXmppMucItem.MemberAffiliation});
                         model.append({'text': qsTr('administrator'), 'value': QXmppMucItem.AdminAffiliation});
                         model.append({'text': qsTr('owner'), 'value': QXmppMucItem.OwnerAffiliation});
-                        model.append({'text': qsTr('banner'), 'value': QXmppMucItem.OutcastAffiliation});
+                        model.append({'text': qsTr('banned'), 'value': QXmppMucItem.OutcastAffiliation});
+
+                        console.log('item aff: ' + label.affiliation);
+                        for (var i = 0; i < model.count; i++) {
+                            if (label.affiliation == model.get(i).value) {
+                                combo.currentIndex = i;
+                                break;
+                            }
+                        }
                     }
                 }
             }
