@@ -41,11 +41,6 @@
 #define FLAGS_DIRECTION 0x1
 #define FLAGS_ERROR 0x2
 
-static QString formatDuration(int secs)
-{
-    return QString::number(secs) + "s";
-}
-
 class PhoneCallsItem
 {
 public:
