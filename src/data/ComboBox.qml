@@ -40,6 +40,12 @@ Item {
         }
     }
 
+    QtObject {
+        id: emptyItem
+
+        property string text: ''
+    }
+
     Rectangle {
         anchors.fill: parent
         anchors.rightMargin: 1
@@ -64,7 +70,7 @@ Item {
     MenuDelegate {
         id: view
 
-        property variant model
+        property QtObject model: emptyItem
 
         anchors.top: parent.top
         anchors.bottom: parent.bottom
@@ -84,6 +90,10 @@ Item {
     }
 
     onCurrentIndexChanged: {
-        view.model = block.model.get(currentIndex);
+        if (currentIndex >= 0 && currentIndex < block.model.count) {
+            view.model = block.model.get(currentIndex);
+        } else {
+            view.model = emptyItem;
+        }
     }
 }

@@ -34,6 +34,17 @@ Dialog {
         id: permissionModel
     }
 
+    ListModel {
+        id: affiliationModel
+
+        Component.onCompleted: {
+            append({'text': qsTr('member'), 'value': QXmppMucItem.MemberAffiliation});
+            append({'text': qsTr('administrator'), 'value': QXmppMucItem.AdminAffiliation});
+            append({'text': qsTr('owner'), 'value': QXmppMucItem.OwnerAffiliation});
+            append({'text': qsTr('banned'), 'value': QXmppMucItem.OutcastAffiliation});
+        }
+    }
+
     Item {
         anchors.fill: contents
 
@@ -41,7 +52,7 @@ Dialog {
             id: view
 
             anchors.top: parent.top
-            anchors.bottom: parent.bottom
+            anchors.bottom: addRow.top
             anchors.left: parent.left
             anchors.right: scrollBar.left
             clip: true
@@ -71,15 +82,11 @@ Dialog {
                     id: combo
 
                     anchors.top: parent.top
-                    anchors.right: parent.right
-                    model: ListModel {}
+                    anchors.right: button.left
+                    anchors.rightMargin: appStyle.spacing.horizontal
+                    model: affiliationModel
                     width: 150
                     Component.onCompleted: {
-                        model.append({'text': qsTr('member'), 'value': QXmppMucItem.MemberAffiliation});
-                        model.append({'text': qsTr('administrator'), 'value': QXmppMucItem.AdminAffiliation});
-                        model.append({'text': qsTr('owner'), 'value': QXmppMucItem.OwnerAffiliation});
-                        model.append({'text': qsTr('banned'), 'value': QXmppMucItem.OutcastAffiliation});
-
                         for (var i = 0; i < model.count; i++) {
                             if (label.affiliation == model.get(i).value) {
                                 combo.currentIndex = i;
@@ -88,6 +95,15 @@ Dialog {
                         }
                     }
                 }
+
+                Button {
+                    id: button
+
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+                    anchors.right: parent.right
+                    iconSource: 'remove.png'
+                }
             }
         }
 
@@ -95,9 +111,46 @@ Dialog {
             id: scrollBar
 
             anchors.top: parent.top
-            anchors.bottom: parent.bottom
+            anchors.bottom: addRow.top
             anchors.right: parent.right
             flickableItem: view
+        }
+
+        Item {
+            id: addRow
+
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            height: input.height
+
+            InputBar {
+                id: input
+
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.right: combo.left
+                anchors.rightMargin: appStyle.spacing.horizontal
+            }
+
+            ComboBox {
+                id: combo
+
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.right: button.left
+                anchors.rightMargin: appStyle.spacing.horizontal
+                model: affiliationModel
+                width: 150
+            }
+
+            Button {
+                id: button
+
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                anchors.right: parent.right
+                iconSource: 'add.png'
+            }
         }
     }
 }
