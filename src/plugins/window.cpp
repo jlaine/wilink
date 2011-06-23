@@ -263,34 +263,21 @@ ChatClient *Window::client()
  */
 bool Window::open(const QString &jid)
 {
-    QXmppConfiguration config;
-    config.setResource(qApp->applicationName());
+    const QString bareJid = jidToBareJid(jid);
 
-    // set jid and password
-    config.setJid(jid);
+    // get password
     QString password;
-    if (!getPassword(config.jidBare(), password))
+    if (!getPassword(bareJid, password))
     {
         qWarning("Cannot connect to chat server without a password");
         return false;
     }
-    config.setPassword(password);
 
-    /* set security parameters */
-    if (config.domain() == QLatin1String("wifirst.net"))
-    {
-        config.setStreamSecurityMode(QXmppConfiguration::TLSRequired);
-        config.setIgnoreSslErrors(false);
-    }
+    // connect to server
+    setObjectName(bareJid);
+    d->client->connectToServer(bareJid, password);
 
-    /* set keep alive */
-    config.setKeepAliveTimeout(15);
-
-    /* connect to server */
-    setObjectName(config.jidBare());
-    d->client->connectToServer(config);
-
-    /* load QML */
+    // load QML
     d->rosterView->setSource(QUrl("qrc:/main.qml"));
 
     return true;

@@ -453,22 +453,21 @@ void ShareModel::_q_presenceReceived(const QXmppPresence &presence)
         presence.error().type() == QXmppStanza::Error::Modify &&
         presence.error().condition() == QXmppStanza::Error::Redirect)
     {
-        const QString domain = shareExtension.firstChildElement("domain").value();
-        const QString server = shareExtension.firstChildElement("server").value();
+        const QString newDomain = shareExtension.firstChildElement("domain").value();
+        const QString newJid = d->client->configuration().user() + '@' + newDomain;
 
-        qDebug("Redirecting to %s,%s", qPrintable(domain), qPrintable(server));
+        // avoid redirect loop
+        if (newDomain == d->client->configuration().domain())
+            return;
 
         // reconnect to another server
-        QXmppConfiguration config = d->client->configuration();
-        config.setDomain(domain);
-        config.setHost(server);
-
+        qDebug("Redirecting to %s", qPrintable(newDomain));
         ChatClient *newClient = new ChatClient(this);
         newClient->setLogger(d->client->logger());
+        newClient->connectToServer(newJid, d->client->configuration().password());
 
         // replace client
         d->setShareClient(newClient);
-        newClient->connectToServer(config);
     }
 }
 

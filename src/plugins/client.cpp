@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QCoreApplication>
 #include <QHostInfo>
 
 #include "QXmppArchiveManager.h"
@@ -74,6 +75,21 @@ ChatClient::ChatClient(QObject *parent)
 
     // multimedia calls
     callManager();
+}
+
+void ChatClient::connectToServer(const QString &jid, const QString &password)
+{
+    QXmppConfiguration config;
+    config.setJid(jid);
+    config.setResource(qApp->applicationName());
+    config.setPassword(password);
+    if (config.domain() == QLatin1String("wifirst.net"))
+    {
+        config.setStreamSecurityMode(QXmppConfiguration::TLSRequired);
+        config.setIgnoreSslErrors(false);
+    }
+    config.setKeepAliveTimeout(15);
+    QXmppClient::connectToServer(config);
 }
 
 QString ChatClient::jid() const

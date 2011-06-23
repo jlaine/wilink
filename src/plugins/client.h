@@ -82,6 +82,7 @@ signals:
     void statusTypeChanged(int statusType);
 
 public slots:
+    void connectToServer(const QString &jid, const QString &password);
     void replayMessage();
 
 private slots:
