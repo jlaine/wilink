@@ -209,6 +209,8 @@ Rectangle {
             dialogLoader.show();
         }
 
+        onShowHelp: Qt.openUrlExternally('https://www.wifirst.net/wilink/faq')
+
         onShowPreferences: preferenceButton.clicked()
     }
 

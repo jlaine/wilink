@@ -879,7 +879,7 @@ Acceptez-vous?</translation>
     </message>
     <message numerus="yes">
         <source>%n message(s)</source>
-        <translation>
+        <translation type="obsolete">
             <numerusform>%n message</numerusform>
             <numerusform>%n messages</numerusform>
         </translation>

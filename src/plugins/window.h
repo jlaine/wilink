@@ -59,22 +59,17 @@ public:
     ChatClient *client();
 
     bool open(const QString &jid);
-    void setWindowTitle(const QString &title);
 
 signals:
     void isActiveWindowChanged();
     void showAbout();
+    void showHelp();
     void showPreferences();
 
 public slots:
     void alert();
     QFileDialog *fileDialog();
     QMessageBox *messageBox();
-
-private slots:
-    void pendingMessages(int messages);
-    void promptCredentials();
-    void showHelp();
 
 protected:
     void changeEvent(QEvent *event);

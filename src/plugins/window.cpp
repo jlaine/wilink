@@ -91,7 +91,6 @@ class ChatPrivate
 public:
     ChatClient *client;
     QDeclarativeView *rosterView;
-    QString windowTitle;
 };
 
 Window::Window(QWidget *parent)
@@ -158,7 +157,7 @@ Window::Window(QWidget *parent)
     action->setShortcut(QKeySequence(Qt::Key_F1));
 #endif
     check = connect(action, SIGNAL(triggered(bool)),
-                    this, SLOT(showHelp()));
+                    this, SIGNAL(showHelp()));
     Q_ASSERT(check);
 
     action = helpMenu->addAction(tr("About %1").arg(qApp->applicationName()));
@@ -213,16 +212,6 @@ void Window::changeEvent(QEvent *event)
         emit isActiveWindowChanged();
 }
 
-/** The number of pending messages changed.
- */
-void Window::pendingMessages(int messages)
-{
-    QString title = d->windowTitle;
-    if (messages)
-        title += " - " + tr("%n message(s)", "", messages);
-    QWidget::setWindowTitle(title);
-}
-
 bool Window::getPassword(const QString &jid, QString &password)
 {
     DeclarativeWallet wallet;
@@ -246,20 +235,6 @@ bool Window::getPassword(const QString &jid, QString &password)
     password = dialog.password();
     wallet.set(jid, password);
     return true;
-}
-
-/** Prompt for credentials then connect.
- */
-void Window::promptCredentials()
-{
-    QXmppConfiguration config = d->client->configuration();
-    QString password = config.password();
-    if (getPassword(config.jidBare(), password) &&
-        password != config.password())
-    {
-        config.setPassword(password);
-        d->client->connectToServer(config);
-    }
 }
 
 QFileDialog *Window::fileDialog()
@@ -319,18 +294,5 @@ bool Window::open(const QString &jid)
     d->rosterView->setSource(QUrl("qrc:/main.qml"));
 
     return true;
-}
-
-void Window::setWindowTitle(const QString &title)
-{
-    d->windowTitle = title;
-    QWidget::setWindowTitle(title);
-}
-
-/** Display the help web page.
- */
-void Window::showHelp()
-{
-    QDesktopServices::openUrl(QUrl(HELP_URL));
 }
 
