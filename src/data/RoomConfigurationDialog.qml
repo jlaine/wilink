@@ -28,7 +28,7 @@ Dialog {
 
     title: qsTr('Chat room configuration')
     minimumWidth: 300
-    minimumHeight: 160
+    minimumHeight: 220
 
     RoomConfigurationModel {
         id: configurationModel
@@ -51,7 +51,7 @@ Dialog {
             delegate: Item {
                 id: item
 
-                width: parent.width - 1
+                width: view.width - 1
                 height: 24
 
                 Item {
@@ -71,6 +71,7 @@ Dialog {
                         anchors.left: label.right
                         anchors.leftMargin: appStyle.spacing.horizontal
                         anchors.right: parent.right
+                        anchors.rightMargin: appStyle.spacing.horizontal
                         text: model.value
 
                         onTextChanged: {
