@@ -347,7 +347,7 @@ void Updates::_q_processStatus()
 
         // parse release information
         Release release;
-        release.changes = item.firstChildElement("changes").text();
+        release.changes = item.firstChildElement("changes").text().trimmed();
         release.package = item.firstChildElement("package").text();
         release.version = item.firstChildElement("version").text();
         QDomElement hash = item.firstChildElement("hash");
