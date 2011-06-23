@@ -27,6 +27,8 @@ Dialog {
     property alias room: configurationModel.room
 
     title: qsTr('Chat room configuration')
+    minimumWidth: 300
+    minimumHeight: 160
 
     RoomConfigurationModel {
         id: configurationModel
