@@ -30,15 +30,15 @@ static QList<TextTransform> textTransforms;
 static const QRegExp linkRegex = QRegExp("\\b((ftp|http|https)://[^\\s]+)");
 static const QRegExp meRegex = QRegExp("^/me( .*)");
 
-class ChatHistoryItem : public ChatModelItem
+class HistoryItem : public ChatModelItem
 {
 public:
-    ~ChatHistoryItem();
+    ~HistoryItem();
 
     QList<HistoryMessage*> messages;
 };
 
-ChatHistoryItem::~ChatHistoryItem()
+HistoryItem::~HistoryItem()
 {
     foreach (HistoryMessage *message, messages)
         delete message;
@@ -150,12 +150,12 @@ void HistoryModel::addMessage(const HistoryMessage &message)
         return;
 
     // position cursor
-    ChatHistoryItem *prevBubble = 0;
-    ChatHistoryItem *nextBubble = 0;
+    HistoryItem *prevBubble = 0;
+    HistoryItem *nextBubble = 0;
     HistoryMessage *prevMsg = 0;
     HistoryMessage *nextMsg = 0;
     foreach (ChatModelItem *bubblePtr, rootItem->children) {
-        ChatHistoryItem *bubble = static_cast<ChatHistoryItem*>(bubblePtr);
+        HistoryItem *bubble = static_cast<HistoryItem*>(bubblePtr);
         foreach (HistoryMessage *curMessage, bubble->messages) {
 
             // check for collision
@@ -222,7 +222,7 @@ void HistoryModel::addMessage(const HistoryMessage &message)
             const int index = prevBubble->messages.indexOf(prevMsg);
             const int lastRow = prevBubble->messages.size() - 1;
             if (index < lastRow) {
-                ChatHistoryItem *bubble = new ChatHistoryItem;
+                HistoryItem *bubble = new HistoryItem;
                 const int firstRow = index + 1;
                 for (int i = lastRow; i >= firstRow; --i) {
                     HistoryMessage *item = prevBubble->messages.takeAt(i);
@@ -233,7 +233,7 @@ void HistoryModel::addMessage(const HistoryMessage &message)
         }
 
         // insert the new bubble
-        ChatHistoryItem *bubble = new ChatHistoryItem;
+        HistoryItem *bubble = new HistoryItem;
         bubble->messages.append(msg);
         addItem(bubble, rootItem, bubblePos);
     }
@@ -251,7 +251,7 @@ void HistoryModel::cardChanged()
         return;
     const QString jid = card->jid();
     foreach (ChatModelItem *it, rootItem->children) {
-        ChatHistoryItem *item = static_cast<ChatHistoryItem*>(it);
+        HistoryItem *item = static_cast<HistoryItem*>(it);
         if (item->messages.first()->jid == jid)
             emit dataChanged(createIndex(it), createIndex(it));
     }
@@ -284,7 +284,7 @@ int HistoryModel::columnCount(const QModelIndex &parent) const
  */
 QVariant HistoryModel::data(const QModelIndex &index, int role) const
 {
-    ChatHistoryItem *item = static_cast<ChatHistoryItem*>(index.internalPointer());
+    HistoryItem *item = static_cast<HistoryItem*>(index.internalPointer());
     if (!index.isValid() || !item)
         return QVariant();
 
