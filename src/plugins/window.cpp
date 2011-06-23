@@ -38,15 +38,14 @@
 
 #include "QXmppConfiguration.h"
 #include "QXmppLogger.h"
-#include "QXmppRosterManager.h"
 #include "QXmppUtils.h"
 
 #include "application.h"
 #include "declarative.h"
 #include "photos.h"
 #include "roster.h"
-#include "window.h"
 #include "updatesdialog.h"
+#include "window.h"
 
 ChatPasswordPrompt::ChatPasswordPrompt(const QString &jid, QWidget *parent)
     : QDialog(parent)

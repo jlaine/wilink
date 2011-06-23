@@ -27,7 +27,6 @@
 
 class Application;
 class ChatPrivate;
-class RosterModel;
 class ChatRosterView;
 class QFileDialog;
 class QLineEdit;
