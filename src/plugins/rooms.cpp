@@ -710,6 +710,24 @@ void RoomPermissionModel::setRoom(QXmppMucRoom *room)
     }
 }
 
+void RoomPermissionModel::save()
+{
+    if (!m_room)
+        return;
+
+    QList<QXmppMucItem> permissions;
+    foreach (ChatModelItem *ptr, rootItem->children) {
+        RoomPermissionItem *item = static_cast<RoomPermissionItem*>(ptr);
+
+        QXmppMucItem mucItem;
+        mucItem.setAffiliation(static_cast<QXmppMucItem::Affiliation>(item->affiliation));
+        mucItem.setJid(item->jid);
+        permissions << mucItem;
+    }
+
+    m_room->setPermissions(permissions);
+}
+
 void RoomPermissionModel::_q_permissionsReceived(const QList<QXmppMucItem> &permissions)
 {
     foreach (const QXmppMucItem &mucItem, permissions) {

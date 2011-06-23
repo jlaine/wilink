@@ -168,4 +168,9 @@ Dialog {
             }
         }
     }
+
+    onAccepted: {
+        permissionModel.save();
+        dialogLoader.hide();
+    }
 }
