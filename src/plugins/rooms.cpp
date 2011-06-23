@@ -628,9 +628,10 @@ RoomPermissionModel::RoomPermissionModel(QObject *parent)
     : ChatModel(parent),
     m_room(0)
 {
-    QMap<int, QByteArray> names;
+    QHash<int, QByteArray> names;
     names.insert(AffiliationRole, "affiliation");
     names.insert(JidRole, "jid");
+    setRoleNames(names);
 }
 
 void RoomPermissionModel::addPermission(const QString &jid, int affiliation)

@@ -80,7 +80,6 @@ Dialog {
                         model.append({'text': qsTr('owner'), 'value': QXmppMucItem.OwnerAffiliation});
                         model.append({'text': qsTr('banned'), 'value': QXmppMucItem.OutcastAffiliation});
 
-                        console.log('item aff: ' + label.affiliation);
                         for (var i = 0; i < model.count; i++) {
                             if (label.affiliation == model.get(i).value) {
                                 combo.currentIndex = i;
