@@ -61,14 +61,14 @@ Dialog {
 
             model: ListModel {
                 ListElement {
-                    avatar: 'peer.png'
-                    name: 'Accounts'
-                    source: 'AccountPreferencePanel.qml'
-                }
-                ListElement {
                     avatar: 'options.png'
                     name: 'General'
                     source: 'GeneralPreferencePanel.qml'
+                }
+                ListElement {
+                    avatar: 'peer.png'
+                    name: 'Accounts'
+                    source: 'AccountPreferencePanel.qml'
                 }
                 ListElement {
                     avatar: 'audio-output.png'

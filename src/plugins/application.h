@@ -48,6 +48,7 @@ class Application : public QApplication
     Q_PROPERTY(QString applicationVersion READ applicationVersion CONSTANT)
     Q_PROPERTY(QString organizationName READ organizationName CONSTANT)
     Q_PROPERTY(QString osType READ osType CONSTANT)
+
     Q_PROPERTY(QString audioInputDeviceName READ audioInputDeviceName WRITE setAudioInputDeviceName NOTIFY audioInputDeviceChanged)
     Q_PROPERTY(QString audioOutputDeviceName READ audioOutputDeviceName WRITE setAudioOutputDeviceName NOTIFY audioOutputDeviceChanged)
     Q_PROPERTY(QStringList chatAccounts READ chatAccounts WRITE setChatAccounts NOTIFY chatAccountsChanged)
@@ -62,6 +63,7 @@ class Application : public QApplication
     Q_PROPERTY(bool showOfflineContacts READ showOfflineContacts WRITE setShowOfflineContacts NOTIFY showOfflineContactsChanged)
     Q_PROPERTY(bool sortContactsByStatus READ sortContactsByStatus WRITE setSortContactsByStatus NOTIFY sortContactsByStatusChanged)
     Q_PROPERTY(QSoundPlayer* soundPlayer READ soundPlayer CONSTANT)
+    Q_PROPERTY(UpdatesDialog* updatesDialog READ updatesDialog WRITE setUpdatesDialog)
 
 public:
     Application(int &argc, char **argv);

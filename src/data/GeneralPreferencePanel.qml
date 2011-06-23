@@ -35,6 +35,8 @@ Panel {
         id: general
 
         anchors.top: parent.top
+        anchors.bottom: about.top
+        anchors.bottomMargin: appStyle.spacing.vertical
         anchors.left: parent.left
         anchors.right: parent.right
         height: parent.height / 2
@@ -43,17 +45,6 @@ Panel {
         Column {
             anchors.fill: general.contents
             spacing: appStyle.spacing.vertical
-
-            CheckBox {
-                id: openAtLogin
-
-                anchors.left: parent.left
-                anchors.right:  parent.right
-                checked: application.openAtLogin
-                enabled: application.isInstalled
-                text: qsTr('Open at login')
-                onClicked: checked = !checked
-            }
 
             CheckBox {
                 id: showOfflineContacts
@@ -80,38 +71,69 @@ Panel {
     GroupBox {
         id: about
 
-        anchors.top: general.bottom
-        anchors.topMargin: appStyle.spacing.vertical
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
+        height: 160
         title: qsTr('About %1').replace('%1', application.applicationName)
 
-        Item {
+        Column {
             anchors.fill: about.contents
+            spacing: appStyle.spacing.vertical
 
-            Image {
-                id: appIcon
+            Item {
                 anchors.left: parent.left
-                source: 'wiLink-64.png'
+                anchors.right: parent.right
+                height: 64
+
+                Image {
+                    id: appIcon
+
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    source: 'wiLink-64.png'
+                }
+
+                Text {
+                    id: appName
+
+                    anchors.left: appIcon.right
+                    anchors.right: parent.right
+                    anchors.top: appIcon.top
+                    anchors.margins: 6
+                    font.bold: true
+                    font.pixelSize: appStyle.font.largeSize
+                    text: application.applicationName
+                }
+
+                Text {
+                    id: appVersion
+
+                    anchors.left: appIcon.right
+                    anchors.right: parent.right
+                    anchors.top: appName.bottom
+                    anchors.margins: 6
+                    text: qsTr('version %1').replace('%1', application.applicationVersion)
+                }
             }
 
-            Text {
-                id: appName
+            CheckBox {
+                id: openAtLogin
 
-                anchors.left: appIcon.right
-                anchors.top: appIcon.top
-                anchors.margins: 6
-                font.bold: true
-                font.pixelSize: appStyle.font.largeSize
-                text: application.applicationName
+                anchors.left: parent.left
+                anchors.right:  parent.right
+                checked: application.openAtLogin
+                enabled: application.isInstalled
+                text: qsTr('Open at login')
+                onClicked: checked = !checked
             }
 
-            Text {
-                anchors.left: appIcon.right
-                anchors.top: appName.bottom
+            Button {
+                anchors.horizontalCenter: parent.horizontalCenter
                 anchors.margins: 6
-                text: qsTr('version %1').replace('%1', application.applicationVersion)
+                iconSource: 'refresh.png'
+                text: qsTr('Check for updates')
+                onClicked: application.updatesDialog.check()
             }
         }
     }

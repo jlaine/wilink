@@ -358,6 +358,10 @@ Acceptez-vous?</translation>
         <source>About %1</source>
         <translation>À propos de %1</translation>
     </message>
+    <message>
+        <source>Check for updates</source>
+        <translation>Mettre à jour</translation>
+    </message>
 </context>
 <context>
     <name>InputMenu</name>

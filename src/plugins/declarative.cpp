@@ -52,6 +52,7 @@
 #include "rooms.h"
 #include "roster.h"
 #include "shares.h"
+#include "updatesdialog.h"
 #include "window.h"
 
 QString QDeclarativeFileDialog::directory() const
@@ -244,6 +245,7 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterType<ShareQueueModel>(uri, 1, 2, "ShareQueueModel");
     qmlRegisterUncreatableType<QSoundPlayer>(uri, 1, 2, "SoundPlayer", "");
     qmlRegisterType<QSoundTester>(uri, 1, 2, "SoundTester");
+    qmlRegisterUncreatableType<UpdatesDialog>(uri, 1, 2, "UpdatesDialog", "");
     qmlRegisterType<VCard>(uri, 1, 2, "VCard");
     qmlRegisterType<DeclarativeWallet>(uri, 1, 2, "Wallet");
     qmlRegisterUncreatableType<Window>(uri, 1, 2, "Window", "");
