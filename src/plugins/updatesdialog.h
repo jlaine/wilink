@@ -30,12 +30,12 @@ class QLabel;
 class QProgressBar;
 class QUrl;
 
-class UpdatesDialog : public QDialog
+class UpdateDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    UpdatesDialog(QWidget *parent = NULL);
+    UpdateDialog(QWidget *parent = NULL);
 
 public slots:
     void check();

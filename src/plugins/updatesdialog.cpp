@@ -33,7 +33,7 @@
 #include "systeminfo.h"
 #include "updatesdialog.h"
 
-UpdatesDialog::UpdatesDialog(QWidget *parent)
+UpdateDialog::UpdateDialog(QWidget *parent)
     : QDialog(parent)
 {
     QVBoxLayout *layout = new QVBoxLayout;
@@ -92,7 +92,7 @@ UpdatesDialog::UpdatesDialog(QWidget *parent)
     Q_ASSERT(check);
 }
 
-void UpdatesDialog::buttonClicked(QAbstractButton *button)
+void UpdateDialog::buttonClicked(QAbstractButton *button)
 {
     if (buttonBox->standardButton(button) == QDialogButtonBox::Yes)
     {
@@ -112,18 +112,18 @@ void UpdatesDialog::buttonClicked(QAbstractButton *button)
     }
 }
 
-void UpdatesDialog::check()
+void UpdateDialog::check()
 {
     show();
     updates->check();
 }
 
-void UpdatesDialog::checkStarted()
+void UpdateDialog::checkStarted()
 {
     statusLabel->setText(tr("Checking for updates.."));
 }
 
-void UpdatesDialog::checkFinished(const Release &release)
+void UpdateDialog::checkFinished(const Release &release)
 {
     if (release.isValid())
     {
@@ -137,13 +137,13 @@ void UpdatesDialog::checkFinished(const Release &release)
         resize(size().expandedTo(sizeHint()));
 }
 
-void UpdatesDialog::downloadProgress(qint64 done, qint64 total)
+void UpdateDialog::downloadProgress(qint64 done, qint64 total)
 {
     progressBar->setMaximum(total);
     progressBar->setValue(done);
 }
 
-void UpdatesDialog::downloadFinished(const Release &release)
+void UpdateDialog::downloadFinished(const Release &release)
 {
     progressBar->hide();
     promptRelease = release;
@@ -162,7 +162,7 @@ void UpdatesDialog::downloadFinished(const Release &release)
     buttonBox->button(QDialogButtonBox::Yes)->setFocus();
 }
 
-void UpdatesDialog::error(Updates::UpdatesError error, const QString &errorString)
+void UpdateDialog::error(Updates::UpdatesError error, const QString &errorString)
 {
     Q_UNUSED(error);
 

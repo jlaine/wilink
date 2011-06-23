@@ -133,7 +133,7 @@ Panel {
                 anchors.margins: 6
                 iconSource: 'refresh.png'
                 text: qsTr('Check for updates')
-                onClicked: application.updatesDialog.check()
+                onClicked: application.updateDialog.check()
             }
         }
     }

@@ -810,7 +810,7 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>UpdatesDialog</name>
+    <name>UpdateDialog</name>
     <message>
         <source>Changes:</source>
         <translation>Changements :</translation>

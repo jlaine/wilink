@@ -72,8 +72,8 @@ int main(int argc, char *argv[])
     app.createSystemTrayIcon();
 
     /* Check for updates */
-    UpdatesDialog updates;
-    app.setUpdatesDialog(&updates);
+    UpdateDialog updates;
+    app.setUpdateDialog(&updates);
 
     /* Show chat windows */
     QTimer::singleShot(0, &app, SLOT(resetWindows()));

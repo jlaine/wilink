@@ -32,7 +32,7 @@
 
 #define HELP_URL "https://www.wifirst.net/wilink/faq"
 
-class UpdatesDialog;
+class UpdateDialog;
 class QAuthenticator;
 class QAbstractNetworkCache;
 class QSoundPlayer;
@@ -63,7 +63,7 @@ class Application : public QApplication
     Q_PROPERTY(bool showOfflineContacts READ showOfflineContacts WRITE setShowOfflineContacts NOTIFY showOfflineContactsChanged)
     Q_PROPERTY(bool sortContactsByStatus READ sortContactsByStatus WRITE setSortContactsByStatus NOTIFY sortContactsByStatusChanged)
     Q_PROPERTY(QSoundPlayer* soundPlayer READ soundPlayer CONSTANT)
-    Q_PROPERTY(UpdatesDialog* updatesDialog READ updatesDialog WRITE setUpdatesDialog)
+    Q_PROPERTY(UpdateDialog* updateDialog READ updateDialog WRITE setUpdateDialog)
 
 public:
     Application(int &argc, char **argv);
@@ -75,8 +75,8 @@ public:
     void createSystemTrayIcon();
     QSoundPlayer *soundPlayer();
     QThread *soundThread();
-    UpdatesDialog *updatesDialog();
-    void setUpdatesDialog(UpdatesDialog *updatesDialog);
+    UpdateDialog *updateDialog();
+    void setUpdateDialog(UpdateDialog *updateDialog);
 #ifdef USE_SYSTRAY
     QSystemTrayIcon *trayIcon();
 #endif

@@ -71,7 +71,7 @@ public:
     QSystemTrayIcon *trayIcon;
     QMenu *trayMenu;
 #endif
-    UpdatesDialog *updates;
+    UpdateDialog *updates;
 };
 
 ApplicationPrivate::ApplicationPrivate()
@@ -757,13 +757,13 @@ QSystemTrayIcon *Application::trayIcon()
 }
 #endif
 
-UpdatesDialog *Application::updatesDialog()
+UpdateDialog *Application::updateDialog()
 {
     return d->updates;
 }
 
-void Application::setUpdatesDialog(UpdatesDialog *updatesDialog)
+void Application::setUpdateDialog(UpdateDialog *updateDialog)
 {
-    d->updates = updatesDialog;
+    d->updates = updateDialog;
 }
 

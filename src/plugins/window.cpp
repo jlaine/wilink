@@ -73,10 +73,10 @@ Window::Window(const QString &jid, QWidget *parent)
                     this, SIGNAL(showPreferences()));
     Q_ASSERT(check);
 
-    if (wApp->updatesDialog())
+    if (wApp->updateDialog())
     {
         action = fileMenu->addAction(QIcon(":/refresh.png"), tr("Check for &updates"));
-        connect(action, SIGNAL(triggered(bool)), wApp->updatesDialog(), SLOT(check()));
+        connect(action, SIGNAL(triggered(bool)), wApp->updateDialog(), SLOT(check()));
     }
 
     action = fileMenu->addAction(QIcon(":/close.png"), tr("&Quit"));
