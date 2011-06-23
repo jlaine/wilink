@@ -209,6 +209,7 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterUncreatableType<QXmppDiscoveryManager>("QXmpp", 0, 4, "QXmppDiscoveryManager", "");
     qmlRegisterType<QXmppLogger>("QXmpp", 0, 4, "QXmppLogger");
     qmlRegisterType<QXmppDeclarativeMessage>("QXmpp", 0, 4, "QXmppMessage");
+    qmlRegisterType<QXmppDeclarativeMucItem>("QXmpp", 0, 4, "QXmppMucItem");
     qmlRegisterUncreatableType<QXmppMucManager>("QXmpp", 0, 4, "QXmppMucManager", "");
     qmlRegisterUncreatableType<QXmppMucRoom>("QXmpp", 0, 4, "QXmppMucRoom", "");
     qmlRegisterType<QXmppDeclarativePresence>("QXmpp", 0, 4, "QXmppPresence");
@@ -238,6 +239,7 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterType<PlayerModel>(uri, 1, 2, "PlayerModel");
     qmlRegisterType<RoomModel>(uri, 1, 2, "RoomModel");
     qmlRegisterType<RoomListModel>(uri, 1, 2, "RoomListModel");
+    qmlRegisterType<RoomPermissionModel>(uri, 1, 2, "RoomPermissionModel");
     qmlRegisterType<RosterModel>(uri, 1, 2, "RosterModel");
     qmlRegisterType<ShareModel>(uri, 1, 2, "ShareModel");
     qmlRegisterType<ShareFolderModel>(uri, 1, 2, "ShareFolderModel");

@@ -18,13 +18,20 @@
  */
 
 import QtQuick 1.0
+import wiLink 1.2
 
 Dialog {
     id: dialog
 
+    property alias room: permissionModel.room
+
     minimumWidth: 280
     minimumHeight: 150
     title: qsTr('Chat room permissions')
+
+    RoomPermissionModel {
+        id: permissionModel
+    }
 
     ListView {
         id: view
@@ -32,13 +39,7 @@ Dialog {
         anchors.fill: contents
         clip: true
 
-        model: ListModel {
-            ListElement { nickName: 'User1' }
-            ListElement { nickName: 'User2' }
-            ListElement { nickName: 'User3' }
-            ListElement { nickName: 'User4' }
-        }
-
+        model: permissionModel
         delegate: Item {
             id: item
 
@@ -51,7 +52,7 @@ Dialog {
                 anchors.left: parent.left
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
-                text: model.nickName
+                text: model.jid
                 verticalAlignment: Text.AlignVCenter
             }
 

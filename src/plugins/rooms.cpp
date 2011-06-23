@@ -617,3 +617,91 @@ void RoomPermissionDialog::removeMember()
     m_tableWidget->removeRow(m_tableWidget->currentRow());
 }
 
+class RoomPermissionItem : public ChatModelItem
+{
+public:
+    QString jid;
+    int affiliation;
+};
+
+RoomPermissionModel::RoomPermissionModel(QObject *parent)
+    : ChatModel(parent),
+    m_room(0)
+{
+    QMap<int, QByteArray> names;
+    names.insert(AffiliationRole, "affiliation");
+    names.insert(JidRole, "jid");
+}
+
+void RoomPermissionModel::addPermission(const QString &jid, int affiliation)
+{
+    // add room to list
+    int row = rootItem->children.size();
+    foreach (ChatModelItem *ptr, rootItem->children) {
+        RoomPermissionItem *item = static_cast<RoomPermissionItem*>(ptr);
+        if (item->jid == jid) {
+            return;
+        } else if (item->jid.compare(jid, Qt::CaseInsensitive) > 0) {
+            row = item->row();
+            break;
+        }
+    }
+
+    RoomPermissionItem *item = new RoomPermissionItem;
+    item->affiliation = affiliation;
+    item->jid = jid;
+    addItem(item, rootItem, row);
+}
+
+QVariant RoomPermissionModel::data(const QModelIndex &index, int role) const
+{
+    RoomPermissionItem *item = static_cast<RoomPermissionItem*>(index.internalPointer());
+    if (!index.isValid() || !item)
+        return QVariant();
+
+    if (role == AffiliationRole) {
+        return item->affiliation;
+    } else if (role == ChatModel::JidRole) {
+        return item->jid;
+    }
+
+    return QVariant();
+}
+
+QXmppMucRoom *RoomPermissionModel::room() const
+{
+    return m_room;
+}
+
+void RoomPermissionModel::setRoom(QXmppMucRoom *room)
+{
+    if (room != m_room) {
+        bool check;
+
+        if (m_room)
+            m_room->disconnect(this);
+
+        m_room = room;
+        removeRows(0, rootItem->children.size());
+
+        if (m_room) {
+            bool check;
+            check = connect(m_room, SIGNAL(permissionsReceived(QList<QXmppMucItem>)),
+                            this, SLOT(_q_permissionsReceived(QList<QXmppMucItem>)));
+            Q_ASSERT(check);
+            Q_UNUSED(check);
+
+            m_room->requestPermissions();
+        }
+
+        emit roomChanged(m_room);
+    }
+}
+
+void RoomPermissionModel::_q_permissionsReceived(const QList<QXmppMucItem> &permissions)
+{
+    foreach (const QXmppMucItem &mucItem, permissions) {
+        addPermission(mucItem.jid(), mucItem.affiliation());
+    }
+}
+

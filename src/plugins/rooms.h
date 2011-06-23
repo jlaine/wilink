@@ -145,4 +145,34 @@ private:
     QTableWidget *m_tableWidget;
 };
 
+class RoomPermissionModel : public ChatModel
+{
+    Q_OBJECT
+    Q_PROPERTY(QXmppMucRoom* room READ room WRITE setRoom NOTIFY roomChanged)
+
+public:
+    RoomPermissionModel(QObject *parent = 0);
+
+    QVariant data(const QModelIndex &index, int role) const;
+
+    QXmppMucRoom *room() const;
+    void setRoom(QXmppMucRoom *room);
+
+signals:
+    void roomChanged(QXmppMucRoom *room);
+
+public slots:
+    void addPermission(const QString &jid, int affiliation);
+
+private slots:
+    void _q_permissionsReceived(const QList<QXmppMucItem> &permissions);
+
+private:
+    enum Role {
+        AffiliationRole = ChatModel::UserRole,
+    };
+
+    QXmppMucRoom *m_room;
+};
+
 #endif

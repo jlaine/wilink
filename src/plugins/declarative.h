@@ -92,6 +92,22 @@ public:
     };
 };
 
+class QXmppDeclarativeMucItem : public QObject
+{
+    Q_OBJECT
+    Q_ENUMS(Affiliation)
+
+public:
+    enum Affiliation {
+        UnspecifiedAffiliation = QXmppMucItem::UnspecifiedAffiliation,
+        OutcastAffiliation = QXmppMucItem::OutcastAffiliation,
+        NoAffiliation = QXmppMucItem::NoAffiliation,
+        MemberAffiliation = QXmppMucItem::MemberAffiliation,
+        AdminAffiliation = QXmppMucItem::AdminAffiliation,
+        OwnerAffiliation = QXmppMucItem::OwnerAffiliation,
+    };
+};
+
 class ListHelper : public QObject
 {
     Q_OBJECT

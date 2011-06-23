@@ -106,6 +106,7 @@ Panel {
 
                 onClicked: {
                     dialogLoader.source = 'RoomPermissionDialog.qml';
+                    dialogLoader.item.room = room;
                     dialogLoader.show();
                 }
             }
