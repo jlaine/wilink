@@ -64,6 +64,8 @@ Dialog {
             delegate: Item {
                 id: item
 
+                property string jid: model.jid
+
                 width: parent.width
                 height: combo.height
 
@@ -89,6 +91,13 @@ Dialog {
                     anchors.rightMargin: appStyle.spacing.horizontal
                     model: affiliationModel
                     width: 120
+
+                    onCurrentIndexChanged: {
+                        if (currentIndex > 0) {
+                            permissionModel.setPermission(item.jid, model.get(currentIndex).value);
+                        }
+                    }
+
                     Component.onCompleted: {
                         for (var i = 0; i < model.count; i++) {
                             if (label.affiliation == model.get(i).value) {
@@ -162,7 +171,7 @@ Dialog {
                 iconSource: 'add.png'
 
                 onClicked: {
-                    permissionModel.addPermission(input.text, affiliationModel.get(combo.currentIndex).value);
+                    permissionModel.setPermission(input.text, affiliationModel.get(combo.currentIndex).value);
                     input.text = '';
                 }
             }
@@ -172,5 +181,11 @@ Dialog {
     onAccepted: {
         permissionModel.save();
         dialogLoader.hide();
+        dialogLoader.source = '';
+    }
+
+    onRejected: {
+        dialogLoader.hide();
+        dialogLoader.source = '';
     }
 }

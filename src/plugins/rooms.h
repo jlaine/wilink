@@ -159,7 +159,7 @@ signals:
     void roomChanged(QXmppMucRoom *room);
 
 public slots:
-    void addPermission(const QString &jid, int affiliation);
+    void setPermission(const QString &jid, int affiliation);
     void removePermission(const QString &jid);
     void save();
 

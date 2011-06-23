@@ -538,13 +538,17 @@ RoomPermissionModel::RoomPermissionModel(QObject *parent)
     setRoleNames(names);
 }
 
-void RoomPermissionModel::addPermission(const QString &jid, int affiliation)
+void RoomPermissionModel::setPermission(const QString &jid, int affiliation)
 {
     // add room to list
     int row = rootItem->children.size();
     foreach (ChatModelItem *ptr, rootItem->children) {
         RoomPermissionItem *item = static_cast<RoomPermissionItem*>(ptr);
         if (item->jid == jid) {
+            if (affiliation != item->affiliation) {
+                item->affiliation = affiliation;
+                emit dataChanged(createIndex(item), createIndex(item));
+            }
             return;
         } else if (item->jid.compare(jid, Qt::CaseInsensitive) > 0) {
             row = item->row();
@@ -634,8 +638,7 @@ void RoomPermissionModel::save()
 
 void RoomPermissionModel::_q_permissionsReceived(const QList<QXmppMucItem> &permissions)
 {
-    foreach (const QXmppMucItem &mucItem, permissions) {
-        addPermission(mucItem.jid(), mucItem.affiliation());
-    }
+    foreach (const QXmppMucItem &mucItem, permissions)
+        setPermission(mucItem.jid(), mucItem.affiliation());
 }
 

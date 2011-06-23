@@ -105,5 +105,11 @@ Dialog {
     onAccepted: {
         configurationModel.save();
         dialogLoader.hide();
+        dialogLoader.source = '';
+    }
+
+    onRejected: {
+        dialogLoader.hide();
+        dialogLoader.source = '';
     }
 }
