@@ -148,15 +148,15 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: status.left
                     anchors.margins: 3
-                    border.color: '#597fbe'
+                    border.color: '#de0000'
                     border.width: 1
                     gradient: Gradient {
-                        GradientStop { position: 0.0; color: '#66597fbe' }
-                        GradientStop { position: 0.6; color: '#597fbe' }
-                        GradientStop { position: 1.0; color: '#66597fbe' }
+                        GradientStop { position: 0.0; color: '#dea1a1' }
+                        GradientStop { position: 0.6; color: '#de0000' }
+                        GradientStop { position: 1.0; color: '#dea1a1' }
                     }
                     height: label.paintedHeight + 6
-                    width: label.paintedWidth + 6
+                    width: Math.max(label.paintedWidth + 6, label.paintedHeight + 6)
                     opacity: model.messages > 0 ? 1 : 0
                     radius: 10
                     smooth: true
