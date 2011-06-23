@@ -50,11 +50,12 @@ Rectangle {
 
         anchors.left: icon.right
         anchors.leftMargin: 8
+        anchors.right: parent.right
+        anchors.rightMargin: 8
         anchors.verticalCenter: parent.verticalCenter
         color: menuItem.enabled ? 'black' : '#888'
         elide: Text.ElideRight
         text: model.text
-        width: parent.width
     }
 
     states: State {
