@@ -136,7 +136,8 @@ void RoomConfigurationModel::save()
 
 void RoomConfigurationModel::setValue(int row, const QVariant &value)
 {
-    if (row > 0 && row <  m_form.fields().size()) {
+    if (row > 0 && row <  m_form.fields().size() &&
+        value != m_form.fields()[row].value()) {
         m_form.fields()[row].setValue(value);
         emit dataChanged(index(row), index(row));
     }

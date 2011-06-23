@@ -70,6 +70,12 @@ Dialog {
                         anchors.leftMargin: appStyle.spacing.horizontal
                         anchors.right: parent.right
                         text: model.value
+
+                        onTextChanged: {
+                            if (model.type == QXmppDataForm.TextSingleField) {
+                                configurationModel.setValue(model.index, text);
+                            }
+                        }
                     }
                 }
 
