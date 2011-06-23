@@ -42,33 +42,14 @@
 
 #define CHUNK_SIZE 16384
 
-/** Returns the running application's release.
- */
-Release Release::applicationRelease()
-{
-    Release release;
-    release.package = qApp->applicationName();
-    release.version = qApp->applicationVersion();
-    return release;
-}
-
-/** Returns true if the release is a valid update from the
- *  currently installed version.
- */
-bool Release::isValid() const
-{
-    return (Updates::compareVersions(version, qApp->applicationVersion()) > 0) &&
-           url.isValid() && url.scheme() == "https" && hashes.contains("sha1");
-}
-
 class UpdatesPrivate
 {
 public:
-    QString cacheFile(const Release &release) const;
-    bool checkCachedFile(const Release &release) const;
+    QString cacheFile() const;
+    bool checkCachedFile() const;
 
     QString cacheDirectory;
-    Release downloadRelease;
+    Release release;
     QUrl updatesUrl;
 
     QNetworkAccessManager *network;
@@ -76,19 +57,17 @@ public:
     QTimer *timer;
 };
 
-QString UpdatesPrivate::cacheFile(const Release &release) const
+QString UpdatesPrivate::cacheFile() const
 {
     return QDir(cacheDirectory).filePath(QFileInfo(release.url.path()).fileName());
 }
 
-bool UpdatesPrivate::checkCachedFile(const Release &release) const
+bool UpdatesPrivate::checkCachedFile() const
 {
     /* check file integrity */
-    foreach (const QString &type, release.hashes.keys())
-    {
-        if (type == "sha1")
-        {
-            QFile downloadFile(cacheFile(release));
+    foreach (const QString &type, release.hashes.keys()) {
+        if (type == "sha1") {
+            QFile downloadFile(cacheFile());
             if (!downloadFile.open(QIODevice::ReadOnly))
                 return false;
 
@@ -199,18 +178,17 @@ int Updates::compareVersions(const QString &v1, const QString v2)
 
 /** Downloads the specified release to the given file.
  */
-void Updates::download(const Release &release)
+void Updates::download()
 {
     // check cached file
-    if (d->checkCachedFile(release)) {
+    if (d->checkCachedFile()) {
         d->state = PromptState;
         emit stateChanged(d->state);
         return;
     }
 
     // download release
-    d->downloadRelease = release;
-    QNetworkRequest req(release.url);
+    QNetworkRequest req(d->release.url);
     QNetworkReply *reply = d->network->get(req);
 
     bool check;
@@ -231,15 +209,15 @@ Updates::State Updates::state() const
     return d->state;
 }
 
-void Updates::install(const Release &release)
+void Updates::install()
 {
-    if (d->state != IdleState) {
+    if (d->state != PromptState) {
         qWarning("Not starting install, operation in progress");
         return;
     }
 
     // check file integrity
-    if (!d->checkCachedFile(release)) {
+    if (!d->checkCachedFile()) {
         emit error(IntegrityError, "The checksum of the downloaded file is incorrect");
         return;
     }
@@ -250,7 +228,7 @@ void Updates::install(const Release &release)
 
 #if defined(Q_OS_SYMBIAN)
     // open the download directory in file browser
-    QFileInfo fileInfo(d->cacheFile(release));
+    QFileInfo fileInfo(d->cacheFile(d->release));
     QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.dir().path()));
 #elif defined(Q_OS_WIN)
     // invoke the downloaded installer on the same path as the current install
@@ -260,7 +238,7 @@ void Updates::install(const Release &release)
     // we cannot use QProcess::startDetached() because NSIS wants the
     // /D=.. argument to be absolutely unescaped.
     QString args = QString("\"%1\" /S /D=%2")
-        .arg(d->cacheFile(release).replace(QLatin1Char('/'), QLatin1Char('\\')))
+        .arg(d->cacheFile(d->release).replace(QLatin1Char('/'), QLatin1Char('\\')))
         .arg(installDir.absolutePath().replace(QLatin1Char('/'), QLatin1Char('\\')));
 
     STARTUPINFOW startupInfo = { sizeof( STARTUPINFO ), 0, 0, 0,
@@ -279,14 +257,14 @@ void Updates::install(const Release &release)
         CloseHandle(pinfo.hThread);
         CloseHandle(pinfo.hProcess);
     } else {
-        QDesktopServices::openUrl(QUrl::fromLocalFile(d->cacheFile(release)));
+        QDesktopServices::openUrl(QUrl::fromLocalFile(d->cacheFile(d->release)));
     }
 
     // quit application to allow installation
     qApp->quit();
 #else
     // open the downloaded archive
-    QDesktopServices::openUrl(QUrl::fromLocalFile(d->cacheFile(release)));
+    QDesktopServices::openUrl(QUrl::fromLocalFile(d->cacheFile()));
 
     // quit application to allow installation
     qApp->quit();
@@ -295,12 +273,12 @@ void Updates::install(const Release &release)
 
 QString Updates::updateChanges() const
 {
-    return d->downloadRelease.changes;
+    return d->release.changes;
 }
 
 QString Updates::updateVersion() const
 {
-    return d->downloadRelease.version;
+    return d->release.version;
 }
 
 /** Once a release has been downloaded, verify its checksum and write it
@@ -311,11 +289,8 @@ void Updates::_q_saveUpdate()
     QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
     Q_ASSERT(reply != NULL);
 
-    const Release release = d->downloadRelease;
-    d->downloadRelease = Release();
-
     if (reply->error() == QNetworkReply::NoError) {
-        QFile downloadFile(d->cacheFile(release));
+        QFile downloadFile(d->cacheFile());
         if (downloadFile.open(QIODevice::WriteOnly)) {
             // save file
             char buffer[CHUNK_SIZE];
@@ -325,7 +300,7 @@ void Updates::_q_saveUpdate()
             downloadFile.close();
 
             // check integrity
-            if (d->checkCachedFile(release)) {
+            if (d->checkCachedFile()) {
                 d->state = PromptState;
                 emit stateChanged(d->state);
                 return;
@@ -341,6 +316,7 @@ void Updates::_q_saveUpdate()
     }
 
     // update state
+    d->release = Release();
     d->state = IdleState;
     emit stateChanged(d->state);
 }
@@ -376,10 +352,15 @@ void Updates::_q_processStatus()
         if (!urlString.isEmpty())
             release.url = d->updatesUrl.resolved(QUrl(urlString));
 
-        if (release.isValid()) {
-            // emit information about available release
+        if (Updates::compareVersions(release.version, qApp->applicationVersion()) > 0 &&
+            release.url.isValid() &&
+            release.url.scheme() == "https" &&
+            release.hashes.contains("sha1"))
+        {
+            // download the file
+            d->release = release;
             d->state = IdleState;
-            download(release);
+            download();
             return;
         } else {
             // check again in two days

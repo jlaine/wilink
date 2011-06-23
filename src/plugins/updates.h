@@ -28,9 +28,6 @@ class QNetworkReply;
 class Release
 {
 public:
-    static Release applicationRelease();
-    bool isValid() const;
-
     QString changes;
     QString package;
     QUrl url;
@@ -69,11 +66,9 @@ public:
     Updates(QObject *parent);
     ~Updates();
 
+    State state() const;
     QString updateChanges() const;
     QString updateVersion() const;
-
-    void install(const Release &release);
-    State state() const;
 
     QString cacheDirectory() const;
     void setCacheDirectory(const QString &cacheDir);
@@ -82,6 +77,7 @@ public:
 
 public slots:
     void check();
+    void install();
 
 signals:
     void downloadProgress(qint64 done, qint64 total);
@@ -93,7 +89,7 @@ private slots:
     void _q_processStatus();
 
 private:
-    void download(const Release &release);
+    void download();
     UpdatesPrivate * const d;
 };
 

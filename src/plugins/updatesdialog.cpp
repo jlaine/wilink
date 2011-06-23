@@ -89,7 +89,7 @@ void UpdateDialog::buttonClicked(QAbstractButton *button)
     if (buttonBox->standardButton(button) == QDialogButtonBox::Yes)
     {
         buttonBox->setStandardButtons(QDialogButtonBox::Ok);
-        updates->install(promptRelease);
+        updates->install();
     }
     else if (buttonBox->standardButton(button) == QDialogButtonBox::No)
     {
