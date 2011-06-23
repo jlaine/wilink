@@ -109,20 +109,20 @@ bool ChatMessage::isAction() const
     return body.indexOf(meRegex) >= 0;
 }
 
-class ChatHistoryModelPrivate
+class HistoryModelPrivate
 {
 public:
     QMap<QString, VCard*> rosterCards;
 };
 
-/** Constructs a new ChatHistoryModel.
+/** Constructs a new HistoryModel.
  *
  * @param parent
  */
-ChatHistoryModel::ChatHistoryModel(QObject *parent)
+HistoryModel::HistoryModel(QObject *parent)
     : ChatModel(parent)
 {
-    d = new ChatHistoryModelPrivate;
+    d = new HistoryModelPrivate;
 
     // set role names
     QHash<int, QByteArray> roleNames;
@@ -144,7 +144,7 @@ ChatHistoryModel::ChatHistoryModel(QObject *parent)
  *
  * @param message
  */
-void ChatHistoryModel::addMessage(const ChatMessage &message)
+void HistoryModel::addMessage(const ChatMessage &message)
 {
     if (message.body.isEmpty())
         return;
@@ -244,7 +244,7 @@ void ChatHistoryModel::addMessage(const ChatMessage &message)
         emit messageReceived(msg->jid, msg->body);
 }
 
-void ChatHistoryModel::cardChanged()
+void HistoryModel::cardChanged()
 {
     VCard *card = qobject_cast<VCard*>(sender());
     if (!card)
@@ -259,7 +259,7 @@ void ChatHistoryModel::cardChanged()
 
 /** Clears all messages.
  */
-void ChatHistoryModel::clear()
+void HistoryModel::clear()
 {
     int rows = rowCount(QModelIndex());
     if (rows > 0)
@@ -270,7 +270,7 @@ void ChatHistoryModel::clear()
  *
  * @param parent
  */
-int ChatHistoryModel::columnCount(const QModelIndex &parent) const
+int HistoryModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
     return 1;
@@ -282,7 +282,7 @@ int ChatHistoryModel::columnCount(const QModelIndex &parent) const
  * @param index
  * @param role
  */
-QVariant ChatHistoryModel::data(const QModelIndex &index, int role) const
+QVariant HistoryModel::data(const QModelIndex &index, int role) const
 {
     ChatHistoryItem *item = static_cast<ChatHistoryItem*>(index.internalPointer());
     if (!index.isValid() || !item)

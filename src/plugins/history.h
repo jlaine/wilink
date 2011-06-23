@@ -28,8 +28,8 @@
 
 class QUrl;
 
-class ChatHistoryModel;
-class ChatHistoryModelPrivate;
+class HistoryModel;
+class HistoryModelPrivate;
 
 /** The ChatMessage class represents the data for a single chat history message.
  */
@@ -50,10 +50,10 @@ public:
     bool received;
 };
 
-/** The ChatHistoryModel class represents a conversation history with
+/** The HistoryModel class represents a conversation history with
  *  a given person or chat room.
  */
-class ChatHistoryModel : public ChatModel
+class HistoryModel : public ChatModel
 {
     Q_OBJECT
 
@@ -67,7 +67,7 @@ public:
         ReceivedRole,
     };
 
-    ChatHistoryModel(QObject *parent = 0);
+    HistoryModel(QObject *parent = 0);
     void addMessage(const ChatMessage &message);
 
     // QAbstracItemModel
@@ -87,8 +87,8 @@ private slots:
     void cardChanged();
 
 private:
-    friend class ChatHistoryModelPrivate;
-    ChatHistoryModelPrivate *d;
+    friend class HistoryModelPrivate;
+    HistoryModelPrivate *d;
 };
 
 #endif

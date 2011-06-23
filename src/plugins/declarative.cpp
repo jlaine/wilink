@@ -227,7 +227,7 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterType<ChatClient>(uri, 1, 2, "Client");
     qmlRegisterType<Conversation>(uri, 1, 2, "Conversation");
     qmlRegisterType<DiscoveryModel>(uri, 1, 2, "DiscoveryModel");
-    qmlRegisterUncreatableType<ChatHistoryModel>(uri, 1, 2, "HistoryModel", "");
+    qmlRegisterUncreatableType<HistoryModel>(uri, 1, 2, "HistoryModel", "");
     qmlRegisterType<Idle>(uri, 1, 2, "Idle");
     qmlRegisterType<ListHelper>(uri, 1, 2, "ListHelper");
     qmlRegisterType<LogModel>(uri, 1, 2, "LogModel");

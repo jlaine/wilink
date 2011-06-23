@@ -240,7 +240,7 @@ RoomModel::RoomModel(QObject *parent)
     : ChatModel(parent),
     m_room(0)
 {
-    m_historyModel = new ChatHistoryModel(this);
+    m_historyModel = new HistoryModel(this);
 
     connect(VCardCache::instance(), SIGNAL(cardChanged(QString)),
             this, SLOT(participantChanged(QString)));
@@ -263,7 +263,7 @@ QVariant RoomModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-ChatHistoryModel *RoomModel::historyModel() const
+HistoryModel *RoomModel::historyModel() const
 {
     return m_historyModel;
 }

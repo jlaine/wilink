@@ -46,7 +46,7 @@ Conversation::Conversation(QObject *parent)
     m_localState(QXmppMessage::None),
     m_remoteState(QXmppMessage::None)
 {
-    m_historyModel = new ChatHistoryModel(this);
+    m_historyModel = new HistoryModel(this);
 }
 
 ChatClient *Conversation::client() const
@@ -79,7 +79,7 @@ void Conversation::setClient(ChatClient *client)
     }
 }
 
-ChatHistoryModel *Conversation::historyModel() const
+HistoryModel *Conversation::historyModel() const
 {
     return m_historyModel;
 }

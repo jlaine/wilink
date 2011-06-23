@@ -23,7 +23,7 @@
 #include "QXmppMessage.h"
 
 class ChatClient;
-class ChatHistoryModel;
+class HistoryModel;
 class RosterModel;
 class QXmppArchiveChat;
 
@@ -32,7 +32,7 @@ class Conversation : public QObject
     Q_OBJECT
     Q_PROPERTY(QString jid READ jid WRITE setJid NOTIFY jidChanged)
     Q_PROPERTY(ChatClient* client READ client WRITE setClient NOTIFY clientChanged)
-    Q_PROPERTY(ChatHistoryModel* historyModel READ historyModel CONSTANT)
+    Q_PROPERTY(HistoryModel* historyModel READ historyModel CONSTANT)
     Q_PROPERTY(int localState READ localState WRITE setLocalState NOTIFY localStateChanged)
     Q_PROPERTY(int remoteState READ remoteState NOTIFY remoteStateChanged)
 
@@ -42,7 +42,7 @@ public:
     ChatClient *client() const;
     void setClient(ChatClient *client);
 
-    ChatHistoryModel *historyModel() const;
+    HistoryModel *historyModel() const;
 
     QString jid() const;
     void setJid(const QString &jid);
@@ -74,7 +74,7 @@ private slots:
 private:
     bool m_archivesFetched;
     ChatClient *m_client;
-    ChatHistoryModel *m_historyModel;
+    HistoryModel *m_historyModel;
     QXmppMessage::State m_localState;
     QString m_jid;
     QXmppMessage::State m_remoteState;

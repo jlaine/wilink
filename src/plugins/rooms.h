@@ -27,7 +27,7 @@
 #include "model.h"
 
 class ChatClient;
-class ChatHistoryModel;
+class HistoryModel;
 class ChatMessage;
 class QModelIndex;
 class QXmppMessage;
@@ -71,14 +71,14 @@ class RoomModel : public ChatModel
     Q_PROPERTY(QString jid READ jid WRITE setJid NOTIFY jidChanged)
     Q_PROPERTY(QXmppMucManager* manager READ manager WRITE setManager NOTIFY managerChanged)
     Q_PROPERTY(QXmppMucRoom* room READ room NOTIFY roomChanged)
-    Q_PROPERTY(ChatHistoryModel* historyModel READ historyModel CONSTANT)
+    Q_PROPERTY(HistoryModel* historyModel READ historyModel CONSTANT)
 
 public:
     RoomModel(QObject *parent = 0);
 
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
-    ChatHistoryModel *historyModel() const;
+    HistoryModel *historyModel() const;
 
     QString jid() const;
     void setJid(const QString &jid);
@@ -102,7 +102,7 @@ private slots:
 private:
     void setRoom(QXmppMucRoom *room);
 
-    ChatHistoryModel *m_historyModel;
+    HistoryModel *m_historyModel;
     QString m_jid;
     QXmppMucManager *m_manager;
     QXmppMucRoom *m_room;
