@@ -26,8 +26,6 @@ Dialog {
 
     property alias room: configurationModel.room
 
-    minimumWidth: 280
-    minimumHeight: 150
     title: qsTr('Chat room configuration')
 
     RoomConfigurationModel {
@@ -51,19 +49,16 @@ Dialog {
             delegate: Item {
                 id: item
 
-                width: parent.width
-                height: 30
+                width: parent.width - 1
+                height: 24
 
-                Text {
+                CheckBox {
                     id: label
 
+                    anchors.top: parent.top
                     anchors.left: parent.left
-                    anchors.right: combo.left
-                    anchors.rightMargin: appStyle.spacing.horizontal
-                    anchors.verticalCenter: parent.verticalCenter
-                    elide: Text.ElideRight
-                    text: model.jid
-                    verticalAlignment: Text.AlignVCenter
+                    anchors.right: parent.right
+                    text: model.label
                 }
             }
         }

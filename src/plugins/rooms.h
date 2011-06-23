@@ -33,7 +33,7 @@ class QXmppMessage;
 class QXmppMucManager;
 class QXmppMucRoom;
 
-class RoomConfigurationModel : public ChatModel
+class RoomConfigurationModel : public QAbstractListModel
 {
     Q_OBJECT
     Q_PROPERTY(QXmppMucRoom* room READ room WRITE setRoom NOTIFY roomChanged)
@@ -42,6 +42,8 @@ public:
     RoomConfigurationModel(QObject *parent = 0);
 
     QVariant data(const QModelIndex &index, int role) const;
+    QModelIndex index(int row, int column = 0, const QModelIndex & parent = QModelIndex()) const;
+    int rowCount(const QModelIndex &parent) const;
 
     QXmppMucRoom *room() const;
     void setRoom(QXmppMucRoom *room);
@@ -56,6 +58,12 @@ private slots:
     void _q_configurationReceived(const QXmppDataForm &configuration);
 
 private:
+    enum Role {
+        DescriptionRole,
+        KeyRole,
+        LabelRole,
+    };
+    QXmppDataForm m_form;
     QXmppMucRoom *m_room;
 };
 

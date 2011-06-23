@@ -45,23 +45,39 @@
 #include "rooms.h"
 #include "roster.h"
 
-class RoomConfigurationItem : public ChatModelItem
-{
-};
-
 RoomConfigurationModel::RoomConfigurationModel(QObject *parent)
-    : ChatModel(parent),
+    : QAbstractListModel(parent),
     m_room(0)
 {
+    QHash<int, QByteArray> names;
+    names.insert(DescriptionRole, "description");
+    names.insert(KeyRole, "key");
+    names.insert(LabelRole, "label");
+    setRoleNames(names);
 }
 
 QVariant RoomConfigurationModel::data(const QModelIndex &index, int role) const
 {
-    RoomConfigurationItem *item = static_cast<RoomConfigurationItem*>(index.internalPointer());
-    if (!index.isValid() || !item)
+    if (!index.isValid())
         return QVariant();
 
+    const QXmppDataForm::Field field = m_form.fields()[index.row()];
+    if (role == DescriptionRole)
+        return field.description();
+    else if (role == KeyRole)
+        return field.key();
+    else if (role == LabelRole)
+        return field.label();
+
     return QVariant();
+}
+
+QModelIndex RoomConfigurationModel::index(int row, int column, const QModelIndex &parent) const
+{
+    if (!hasIndex(row, column, parent))
+        return QModelIndex();
+
+    return createIndex(row, column);
 }
 
 QXmppMucRoom *RoomConfigurationModel::room() const
@@ -77,8 +93,8 @@ void RoomConfigurationModel::setRoom(QXmppMucRoom *room)
         if (m_room)
             m_room->disconnect(this);
 
+        m_form = QXmppDataForm();
         m_room = room;
-        removeRows(0, rootItem->children.size());
 
         if (m_room) {
             bool check;
@@ -94,12 +110,20 @@ void RoomConfigurationModel::setRoom(QXmppMucRoom *room)
     }
 }
 
+int RoomConfigurationModel::rowCount(const QModelIndex &parent) const
+{
+    return parent.isValid() ? 0 : m_form.fields().size();
+}
+
 void RoomConfigurationModel::save()
 {
 }
 
 void RoomConfigurationModel::_q_configurationReceived(const QXmppDataForm &configuration)
 {
+    beginInsertRows(QModelIndex(), 0, configuration.fields().size() - 1);
+    m_form = configuration;
+    endInsertRows();
 }
 
 class RoomListItem : public ChatModelItem
