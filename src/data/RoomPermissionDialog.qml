@@ -42,6 +42,8 @@ Dialog {
             append({'text': qsTr('administrator'), 'value': QXmppMucItem.AdminAffiliation});
             append({'text': qsTr('owner'), 'value': QXmppMucItem.OwnerAffiliation});
             append({'text': qsTr('banned'), 'value': QXmppMucItem.OutcastAffiliation});
+
+            combo.currentIndex = 0;
         }
     }
 
@@ -103,6 +105,9 @@ Dialog {
                     anchors.bottom: parent.bottom
                     anchors.right: parent.right
                     iconSource: 'remove.png'
+                    onClicked: {
+                        permissionModel.removePermission(model.jid);
+                    }
                 }
             }
         }
@@ -131,6 +136,9 @@ Dialog {
                 anchors.left: parent.left
                 anchors.right: combo.left
                 anchors.rightMargin: appStyle.spacing.horizontal
+                validator: RegExpValidator {
+                    regExp: /^[^@/ ]+@[^@/ ]+$/
+                }
             }
 
             ComboBox {
@@ -150,6 +158,11 @@ Dialog {
                 anchors.bottom: parent.bottom
                 anchors.right: parent.right
                 iconSource: 'add.png'
+
+                onClicked: {
+                    permissionModel.addPermission(input.text, affiliationModel.get(combo.currentIndex).value);
+                    input.text = '';
+                }
             }
         }
     }

@@ -654,6 +654,17 @@ void RoomPermissionModel::addPermission(const QString &jid, int affiliation)
     addItem(item, rootItem, row);
 }
 
+void RoomPermissionModel::removePermission(const QString &jid)
+{
+    foreach (ChatModelItem *ptr, rootItem->children) {
+        RoomPermissionItem *item = static_cast<RoomPermissionItem*>(ptr);
+        if (item->jid == jid) {
+            removeItem(item);
+            return;
+        }
+    }
+}
+
 QVariant RoomPermissionModel::data(const QModelIndex &index, int role) const
 {
     RoomPermissionItem *item = static_cast<RoomPermissionItem*>(index.internalPointer());

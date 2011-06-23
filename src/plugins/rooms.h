@@ -163,6 +163,7 @@ signals:
 
 public slots:
     void addPermission(const QString &jid, int affiliation);
+    void removePermission(const QString &jid);
 
 private slots:
     void _q_permissionsReceived(const QList<QXmppMucItem> &permissions);
