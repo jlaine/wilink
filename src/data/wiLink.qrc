@@ -118,6 +118,7 @@
     <file>SharePreferencePanel.qml</file>
     <file>SoundPreferencePanel.qml</file>
     <file>ProgressBar.qml</file>
+    <file>RoomConfigurationDialog.qml</file>
     <file>RoomPanel.qml</file>
     <file>RoomParticipantView.qml</file>
     <file>RoomPermissionDialog.qml</file>

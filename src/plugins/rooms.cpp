@@ -45,6 +45,63 @@
 #include "rooms.h"
 #include "roster.h"
 
+class RoomConfigurationItem : public ChatModelItem
+{
+};
+
+RoomConfigurationModel::RoomConfigurationModel(QObject *parent)
+    : ChatModel(parent),
+    m_room(0)
+{
+}
+
+QVariant RoomConfigurationModel::data(const QModelIndex &index, int role) const
+{
+    RoomConfigurationItem *item = static_cast<RoomConfigurationItem*>(index.internalPointer());
+    if (!index.isValid() || !item)
+        return QVariant();
+
+    return QVariant();
+}
+
+QXmppMucRoom *RoomConfigurationModel::room() const
+{
+    return m_room;
+}
+
+void RoomConfigurationModel::setRoom(QXmppMucRoom *room)
+{
+    if (room != m_room) {
+        bool check;
+
+        if (m_room)
+            m_room->disconnect(this);
+
+        m_room = room;
+        removeRows(0, rootItem->children.size());
+
+        if (m_room) {
+            bool check;
+            check = connect(m_room, SIGNAL(configurationReceived(QXmppDataForm)),
+                            this, SLOT(_q_configurationReceived(QXmppDataForm)));
+            Q_ASSERT(check);
+            Q_UNUSED(check);
+
+            m_room->requestConfiguration();
+        }
+
+        emit roomChanged(m_room);
+    }
+}
+
+void RoomConfigurationModel::save()
+{
+}
+
+void RoomConfigurationModel::_q_configurationReceived(const QXmppDataForm &configuration)
+{
+}
+
 class RoomListItem : public ChatModelItem
 {
 public:

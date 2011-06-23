@@ -33,6 +33,32 @@ class QXmppMessage;
 class QXmppMucManager;
 class QXmppMucRoom;
 
+class RoomConfigurationModel : public ChatModel
+{
+    Q_OBJECT
+    Q_PROPERTY(QXmppMucRoom* room READ room WRITE setRoom NOTIFY roomChanged)
+
+public:
+    RoomConfigurationModel(QObject *parent = 0);
+
+    QVariant data(const QModelIndex &index, int role) const;
+
+    QXmppMucRoom *room() const;
+    void setRoom(QXmppMucRoom *room);
+
+signals:
+    void roomChanged(QXmppMucRoom *room);
+
+public slots:
+    void save();
+
+private slots:
+    void _q_configurationReceived(const QXmppDataForm &configuration);
+
+private:
+    QXmppMucRoom *m_room;
+};
+
 class RoomListModel : public ChatModel
 {
     Q_OBJECT

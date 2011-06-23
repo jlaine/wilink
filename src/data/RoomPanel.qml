@@ -96,7 +96,13 @@ Panel {
             ToolButton {
                 iconSource: 'options.png'
                 text: qsTr('Options')
-                visible: false //room.allowedActions & QXmppMucRoom.ConfigurationAction
+                visible: Qt.isQtObject(room) && (room.allowedActions & QXmppMucRoom.ConfigurationAction)
+
+                onClicked: {
+                    dialogLoader.source = 'RoomConfigurationDialog.qml';
+                    dialogLoader.item.room = room;
+                    dialogLoader.show();
+                }
             }
 
             ToolButton {

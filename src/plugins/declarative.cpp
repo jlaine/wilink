@@ -237,8 +237,9 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterUncreatableType<PhotoUploadModel>(uri, 1, 2, "PhotoUploadModel", "");
     qmlRegisterType<PhotoModel>(uri, 1, 2, "PhotoModel");
     qmlRegisterType<PlayerModel>(uri, 1, 2, "PlayerModel");
-    qmlRegisterType<RoomModel>(uri, 1, 2, "RoomModel");
+    qmlRegisterType<RoomConfigurationModel>(uri, 1, 2, "RoomConfigurationModel");
     qmlRegisterType<RoomListModel>(uri, 1, 2, "RoomListModel");
+    qmlRegisterType<RoomModel>(uri, 1, 2, "RoomModel");
     qmlRegisterType<RoomPermissionModel>(uri, 1, 2, "RoomPermissionModel");
     qmlRegisterType<RosterModel>(uri, 1, 2, "RosterModel");
     qmlRegisterType<ShareModel>(uri, 1, 2, "ShareModel");
