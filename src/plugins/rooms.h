@@ -28,7 +28,6 @@
 
 class ChatClient;
 class HistoryModel;
-class ChatMessage;
 class QModelIndex;
 class QXmppMessage;
 class QXmppMucManager;

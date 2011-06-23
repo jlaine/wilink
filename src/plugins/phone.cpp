@@ -529,7 +529,7 @@ void PhoneCallsModel::_q_handleSettings()
 
         // register URL handler
         if (!m_registeredHandler) {
-            ChatMessage::addTransform(QRegExp("^(.*\\s)?(\\+?[0-9]{4,})(\\s.*)?$"),
+            HistoryMessage::addTransform(QRegExp("^(.*\\s)?(\\+?[0-9]{4,})(\\s.*)?$"),
                 QString("\\1<a href=\"sip:\\2@%1\">\\2</a>\\3").arg(m_client->domain()));
             QDesktopServices::setUrlHandler("sip", this, "_q_openUrl");
             m_registeredHandler = true;

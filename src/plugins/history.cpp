@@ -35,18 +35,18 @@ class ChatHistoryItem : public ChatModelItem
 public:
     ~ChatHistoryItem();
 
-    QList<ChatMessage*> messages;
+    QList<HistoryMessage*> messages;
 };
 
 ChatHistoryItem::~ChatHistoryItem()
 {
-    foreach (ChatMessage *message, messages)
+    foreach (HistoryMessage *message, messages)
         delete message;
 }
 
-/** Constructs a new ChatMessage.
+/** Constructs a new HistoryMessage.
  */
-ChatMessage::ChatMessage()
+HistoryMessage::HistoryMessage()
     : archived(false), received(true)
 {
 }
@@ -56,7 +56,7 @@ ChatMessage::ChatMessage()
  * @param match
  * @param replacement
  */
-void ChatMessage::addTransform(const QRegExp &match, const QString &replacement)
+void HistoryMessage::addTransform(const QRegExp &match, const QString &replacement)
 {
     textTransforms.append(qMakePair(match, replacement));
 }
@@ -65,7 +65,7 @@ void ChatMessage::addTransform(const QRegExp &match, const QString &replacement)
  *
  * @param other
  */
-bool ChatMessage::groupWith(const ChatMessage &other) const
+bool HistoryMessage::groupWith(const HistoryMessage &other) const
 {
     return jid == other.jid &&
         !isAction() &&
@@ -77,7 +77,7 @@ bool ChatMessage::groupWith(const ChatMessage &other) const
  *
  * @param meName
  */
-QString ChatMessage::html(const QString &meName) const
+QString HistoryMessage::html(const QString &meName) const
 {
     QString bodyHtml = Qt::escape(body);
 
@@ -104,7 +104,7 @@ QString ChatMessage::html(const QString &meName) const
 /** Returns true if the message is an "action" message, such
  *  as /me.
  */
-bool ChatMessage::isAction() const
+bool HistoryMessage::isAction() const
 {
     return body.indexOf(meRegex) >= 0;
 }
@@ -144,7 +144,7 @@ HistoryModel::HistoryModel(QObject *parent)
  *
  * @param message
  */
-void HistoryModel::addMessage(const ChatMessage &message)
+void HistoryModel::addMessage(const HistoryMessage &message)
 {
     if (message.body.isEmpty())
         return;
@@ -152,11 +152,11 @@ void HistoryModel::addMessage(const ChatMessage &message)
     // position cursor
     ChatHistoryItem *prevBubble = 0;
     ChatHistoryItem *nextBubble = 0;
-    ChatMessage *prevMsg = 0;
-    ChatMessage *nextMsg = 0;
+    HistoryMessage *prevMsg = 0;
+    HistoryMessage *nextMsg = 0;
     foreach (ChatModelItem *bubblePtr, rootItem->children) {
         ChatHistoryItem *bubble = static_cast<ChatHistoryItem*>(bubblePtr);
-        foreach (ChatMessage *curMessage, bubble->messages) {
+        foreach (HistoryMessage *curMessage, bubble->messages) {
 
             // check for collision
             if (message.archived != curMessage->archived &&
@@ -178,7 +178,7 @@ void HistoryModel::addMessage(const ChatMessage &message)
     }
 
     // prepare message
-    ChatMessage *msg = new ChatMessage(message);
+    HistoryMessage *msg = new HistoryMessage(message);
 
     // notify bottom is about to change
     emit bottomAboutToChange();
@@ -191,7 +191,7 @@ void HistoryModel::addMessage(const ChatMessage &message)
         prevBubble->messages.insert(row++, msg);
         const int lastRow = nextBubble->messages.size() - 1;
         for (int i = lastRow; i >= 0; --i) {
-            ChatMessage *item = nextBubble->messages.takeAt(i);
+            HistoryMessage *item = nextBubble->messages.takeAt(i);
             prevBubble->messages.insert(row, item);
         }
         removeRow(nextBubble->row());
@@ -225,7 +225,7 @@ void HistoryModel::addMessage(const ChatMessage &message)
                 ChatHistoryItem *bubble = new ChatHistoryItem;
                 const int firstRow = index + 1;
                 for (int i = lastRow; i >= firstRow; --i) {
-                    ChatMessage *item = prevBubble->messages.takeAt(i);
+                    HistoryMessage *item = prevBubble->messages.takeAt(i);
                     bubble->messages.prepend(item);
                 }
                 addItem(bubble, rootItem, bubblePos);
@@ -288,14 +288,14 @@ QVariant HistoryModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || !item)
         return QVariant();
 
-    ChatMessage *msg = item->messages.first();
+    HistoryMessage *msg = item->messages.first();
     if (role == ActionRole) {
         return msg->isAction();
     } else if (role == AvatarRole) {
         return VCardCache::instance()->imageUrl(msg->jid);
     } else if (role == BodyRole) {
         QStringList bodies;
-        foreach (ChatMessage *ptr, item->messages)
+        foreach (HistoryMessage *ptr, item->messages)
             bodies << ptr->body;
         return bodies.join("\n");
     } else if (role == DateRole) {
@@ -320,7 +320,7 @@ QVariant HistoryModel::data(const QModelIndex &index, int role) const
     } else if (role == HtmlRole) {
         const QString meName = data(index, FromRole).toString();
         QString bodies;
-        foreach (ChatMessage *ptr, item->messages)
+        foreach (HistoryMessage *ptr, item->messages)
             bodies += "<p style=\"margin-top: 0; margin-bottom: 2\">" + ptr->html(meName) + "</p>";
         return bodies;
     } else if (role == JidRole) {

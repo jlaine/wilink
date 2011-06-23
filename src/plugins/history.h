@@ -31,14 +31,14 @@ class QUrl;
 class HistoryModel;
 class HistoryModelPrivate;
 
-/** The ChatMessage class represents the data for a single chat history message.
+/** The HistoryMessage class represents the data for a single chat history message.
  */
-class ChatMessage
+class HistoryMessage
 {
 public:
-    ChatMessage();
+    HistoryMessage();
     QString html(const QString &meName) const;
-    bool groupWith(const ChatMessage &other) const;
+    bool groupWith(const HistoryMessage &other) const;
     bool isAction() const;
 
     static void addTransform(const QRegExp &match, const QString &replacement);
@@ -68,7 +68,7 @@ public:
     };
 
     HistoryModel(QObject *parent = 0);
-    void addMessage(const ChatMessage &message);
+    void addMessage(const HistoryMessage &message);
 
     // QAbstracItemModel
     int columnCount(const QModelIndex &parent = QModelIndex()) const;

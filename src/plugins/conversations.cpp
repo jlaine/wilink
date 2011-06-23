@@ -133,7 +133,7 @@ void Conversation::archiveChatReceived(const QXmppArchiveChat &chat)
         return;
 
     foreach (const QXmppArchiveMessage &msg, chat.messages()) {
-        ChatMessage message;
+        HistoryMessage message;
         message.archived = true;
         message.body = msg.body();
         message.date = msg.date();
@@ -176,7 +176,7 @@ void Conversation::messageReceived(const QXmppMessage &msg)
     if (msg.body().isEmpty())
         return;
 
-    ChatMessage message;
+    HistoryMessage message;
     message.body = msg.body();
     message.date = msg.stamp();
     if (!message.date.isValid())
@@ -208,7 +208,7 @@ bool Conversation::sendMessage(const QString &body)
 
     // add message to history
     if (m_historyModel) {
-        ChatMessage message;
+        HistoryMessage message;
         message.body = body;
         message.date = m_client->serverTime();
         message.jid = m_client->configuration().jidBare();
