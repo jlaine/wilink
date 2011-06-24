@@ -44,6 +44,7 @@ class Updater : public QObject
 public:
     enum Error {
         NoError = 0,
+        NoUpdateError,
         IntegrityError,
         FileError,
         NetworkError,
@@ -86,9 +87,7 @@ private slots:
     void _q_processStatus();
 
 private:
-    void download();
     UpdaterPrivate *d;
-
     friend class UpdaterPrivate;
 };
 

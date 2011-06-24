@@ -203,34 +203,6 @@ int Updater::compareVersions(const QString &v1, const QString v2)
     return 0;
 }
 
-/** Downloads the specified release to the given file.
- */
-void Updater::download()
-{
-    // check cached file
-    if (d->checkCachedFile()) {
-        d->state = PromptState;
-        emit stateChanged(d->state);
-        return;
-    }
-
-    // download release
-    QNetworkRequest req(d->release.url);
-    QNetworkReply *reply = d->network->get(req);
-
-    bool check;
-    check = connect(reply, SIGNAL(downloadProgress(qint64, qint64)),
-                    this, SLOT(_q_downloadProgress(qint64, qint64)));
-    Q_ASSERT(check);
-
-    check = connect(reply, SIGNAL(finished()),
-                    this, SLOT(_q_saveUpdate()));
-    Q_ASSERT(check);
-
-    d->state = DownloadState;
-    emit stateChanged(d->state);
-}
-
 Updater::Error Updater::error() const
 {
     return d->error;
@@ -405,23 +377,42 @@ void Updater::_q_processStatus()
     if (!urlString.isEmpty())
         release.url = d->updatesUrl.resolved(QUrl(urlString));
 
-    if (Updater::compareVersions(release.version, qApp->applicationVersion()) > 0 &&
-        release.url.isValid() &&
-        release.url.scheme() == "https" &&
-        release.hashes.contains("sha1"))
+    if (Updater::compareVersions(release.version, qApp->applicationVersion()) <= 0 ||
+        !release.url.isValid() ||
+        release.url.scheme() != "https" ||
+        !release.hashes.contains("sha1"))
     {
-        // download the file
-        d->release = release;
-        emit updateChanged();
-        d->state = IdleState;
-        download();
-    } else {
-        // no update available, check again in two days
+        // no update available, retry in 2 days
         d->timer->start(2 * 24 * 3600 * 1000);
-
-        // update state
-        d->state = IdleState;
-        emit stateChanged(d->state);
+        d->fail(NoUpdateError, "No update available.");
+        return;
     }
+
+    // found an update
+    d->release = release;
+    emit updateChanged();
+
+    // check cached file
+    if (d->checkCachedFile()) {
+        d->state = PromptState;
+        emit stateChanged(d->state);
+        return;
+    }
+
+    // download release
+    QNetworkRequest req(d->release.url);
+    reply = d->network->get(req);
+
+    bool check;
+    check = connect(reply, SIGNAL(downloadProgress(qint64, qint64)),
+                    this, SLOT(_q_downloadProgress(qint64, qint64)));
+    Q_ASSERT(check);
+
+    check = connect(reply, SIGNAL(finished()),
+                    this, SLOT(_q_saveUpdate()));
+    Q_ASSERT(check);
+
+    d->state = DownloadState;
+    emit stateChanged(d->state);
 }
 
