@@ -294,6 +294,17 @@ int Updater::progressValue() const
     return d->progressValue;
 }
 
+void Updater::refuse()
+{
+    if (d->state == PromptState) {
+        d->error = NoError;
+        d->errorString = QString();
+
+        d->state = IdleState;
+        emit stateChanged(d->state);
+    }
+}
+
 QString Updater::updateChanges() const
 {
     return d->release.changes;

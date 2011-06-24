@@ -76,6 +76,7 @@ public:
 public slots:
     void check();
     void install();
+    void refuse();
 
 signals:
     void error(Updater::Error error, const QString &errorString);

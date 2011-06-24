@@ -26,7 +26,7 @@ Rectangle {
     property Component footerComponent: dialogFooter
     property alias helpText: help.text
     property alias title: label.text
-    property int minimumWidth: 320
+    property int minimumWidth: 360
     property int minimumHeight: 240
     signal accepted
     signal rejected

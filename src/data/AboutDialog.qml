@@ -24,63 +24,87 @@ Dialog {
     id: dialog
 
     property QtObject appUpdater: application.updater
+    property bool prompting: Qt.isQtObject(appUpdater) && appUpdater.state == Updater.PromptState
 
     footerComponent: Row {
         spacing: 8
 
         Button {
-            enabled: Qt.isQtObject(appUpdater) && appUpdater.state == Updater.IdleState;
+            enabled: Qt.isQtObject(appUpdater) && appUpdater.state == Updater.IdleState
             iconSource: 'refresh.png'
             text: qsTr('Check for updates')
+            visible: !prompting
             onClicked: appUpdater.check()
         }
 
         Button {
             iconSource: 'start.png'
             text: qsTr('Install')
-            visible: Qt.isQtObject(appUpdater) && appUpdater.state == Updater.PromptState;
+            visible: prompting
             onClicked: appUpdater.install()
         }
 
         Button {
             iconSource: 'close.png'
-            text: qsTr('Close')
-            onClicked: dialog.rejected()
+            text: prompting ? qsTr('Cancel') : qsTr('Close')
+            onClicked: {
+                if (prompting)
+                    appUpdater.refuse();
+                dialog.rejected();
+            }
         }
     }
 
+    minimumHeight: 280
     title: qsTr('About %1').replace('%1', application.applicationName)
 
     Item {
         anchors.fill: dialog.contents
 
-        Image {
-            id: appIcon
-            anchors.left: parent.left
-            source: 'wiLink-64.png'
-        }
+        Item {
+            id: appBanner
 
-        Text {
-            id: appName
+            anchors.top: parent.top
+            anchors.horizontalCenter: parent.horizontalCenter
+            height: 48
+            width: 48 + appVersion.width
 
-            anchors.left: appIcon.right
-            anchors.top: appIcon.top
-            anchors.margins: 6
-            font.bold: true
-            font.pixelSize: appStyle.font.largeSize
-            text: application.applicationName
-        }
+            Image {
+                id: appIcon
+                anchors.top: parent.top
+                anchors.left: parent.left
+                height: 48
+                width: 48
+                smooth: true
+                source: 'wiLink-64.png'
+            }
 
-        Text {
-            anchors.left: appIcon.right
-            anchors.top: appName.bottom
-            anchors.margins: 6
-            text: qsTr('version %1').replace('%1', application.applicationVersion)
+            Text {
+                id: appName
+
+                anchors.top: parent.top
+                anchors.left: appIcon.right
+                anchors.leftMargin: appStyle.spacing.horizontal
+                font.bold: true
+                font.pixelSize: appStyle.font.largeSize
+                text: application.applicationName
+            }
+
+            Text {
+                id: appVersion
+
+                anchors.left: appIcon.right
+                anchors.leftMargin: appStyle.spacing.horizontal
+                anchors.top: appName.bottom
+                anchors.topMargin: appStyle.spacing.vertical
+                text: qsTr('version %1').replace('%1', application.applicationVersion)
+            }
         }
 
         Text {
             id: prompt
-            anchors.top: appIcon.bottom
+            anchors.top: appBanner.bottom
+            anchors.topMargin: appStyle.spacing.vertical
             anchors.left: parent.left
             anchors.right: parent.right
             text: {
@@ -90,7 +114,12 @@ Dialog {
                 switch (appUpdater.state) {
                 case Updater.IdleState: {
                     if (appUpdater.error == Updater.NoError) {
-                        return '';
+                        return "<p>Copyright (C) 2009-2011 Bolloré telecom<br/>"
+                        + "See AUTHORS file for a full list of contributors.</p>"
+                        + "<p>This program is free software: you can redistribute it and/or modify "
+                        + "it under the terms of the GNU General Public License as published by "
+                        + "the Free Software Foundation, either version 3 of the License, or "
+                        + "(at your option) any later version.</p>";
                     } else if (appUpdater.error == Updater.NoUpdateError) {
                         return qsTr('Your version of %1 is up to date.').replace('%1', application.applicationName);
                     } else {
@@ -109,8 +138,6 @@ Dialog {
                                 .replace('%2', application.applicationName) + "</p>";
                     text += "<p><b>" + qsTr('Changes:') + "</b></p>";
                     text += "<pre>" + appUpdater.updateChanges + "</pre>";
-                    text += "<p>" + qsTr('%1 will automatically exit to allow you to install the new version.')
-                                .replace('%1', application.applicationName) + "</p>";
                     return text;
                 }
                 case Updater.InstallState:
