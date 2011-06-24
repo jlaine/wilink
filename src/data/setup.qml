@@ -70,4 +70,10 @@ FocusScope {
     Wallet {
         id: wallet
     }
+
+    Connections {
+        target: window
+
+        onShowHelp: Qt.openUrlExternally('https://www.wifirst.net/wilink/faq')
+    }
 }
