@@ -28,14 +28,6 @@
         <translation>Installation de la mise à jour..</translation>
     </message>
     <message>
-        <source>Version %1 of %2 is available. Do you want to install it?</source>
-        <translation>La version %1 de %2 est disponible. Voulez-vous l&apos;installer ?</translation>
-    </message>
-    <message>
-        <source>Changes:</source>
-        <translation>Changements :</translation>
-    </message>
-    <message>
         <source>Could not run software update, please try again later.</source>
         <translation>La mise à jour a échoué, merci de re-essayer ultérieurement.</translation>
     </message>
@@ -54,6 +46,14 @@
     <message>
         <source>Cancel</source>
         <translation>Annuler</translation>
+    </message>
+    <message>
+        <source>Changes</source>
+        <translation>Changements</translation>
+    </message>
+    <message>
+        <source>Version %1 of %2 is ready to be installed.</source>
+        <translation>La version %1 de %2 est prête à être installée.</translation>
     </message>
 </context>
 <context>

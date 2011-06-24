@@ -133,10 +133,10 @@ Dialog {
                 case Updater.DownloadState:
                     return qsTr('Downloading update..');
                 case Updater.PromptState: {
-                    var text = "<p>" + qsTr('Version %1 of %2 is available. Do you want to install it?')
+                    var text = "<p>" + qsTr('Version %1 of %2 is ready to be installed.')
                                 .replace('%1', appUpdater.updateVersion)
                                 .replace('%2', application.applicationName) + "</p>";
-                    text += "<p><b>" + qsTr('Changes:') + "</b></p>";
+                    text += "<p><b>" + qsTr('Changes') + "</b></p>";
                     text += "<pre>" + appUpdater.updateChanges + "</pre>";
                     return text;
                 }
