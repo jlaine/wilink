@@ -98,7 +98,7 @@ Application::Application(int &argc, char **argv)
 
     /* set application properties */
     setApplicationName("wiLink");
-    setApplicationVersion("1.1.903");
+    setApplicationVersion(WILINK_VERSION);
     setOrganizationDomain("wifirst.net");
     setOrganizationName("Wifirst");
     setQuitOnLastWindowClosed(false);
