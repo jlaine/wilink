@@ -18,6 +18,7 @@
  */
 
 import QtQuick 1.0
+import wiLink 1.2
 import 'utils.js' as Utils
 
 Rectangle {
@@ -197,6 +198,18 @@ Rectangle {
             onClicked: {
                 visible = true;
                 swapper.showPanel(panelSource);
+            }
+        }
+    }
+
+    Connections {
+        target: application.updater
+
+        onStateChanged: {
+            // when an update is ready to install, prompt user
+            if (application.updater.state == Updater.PromptState) {
+                dialogLoader.source = 'AboutDialog.qml';
+                dialogLoader.show();
             }
         }
     }

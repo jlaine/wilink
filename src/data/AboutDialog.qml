@@ -101,7 +101,7 @@ Dialog {
             }
         }
 
-        Text {
+        PanelHelp {
             id: prompt
             anchors.top: appBanner.bottom
             anchors.topMargin: appStyle.spacing.vertical
@@ -144,7 +144,6 @@ Dialog {
                     return qsTr('Installing update..');
                 }
             }
-            wrapMode: Text.WordWrap
         }
 
         ProgressBar {
