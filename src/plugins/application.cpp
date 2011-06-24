@@ -21,10 +21,6 @@
 #include <libnotify/notify.h>
 #endif
 
-#include <QAuthenticator>
-#include <QDeclarativeContext>
-#include <QDeclarativeEngine>
-#include <QDeclarativeView>
 #include <QDesktopServices>
 #include <QDesktopWidget>
 #include <QDir>
@@ -37,15 +33,12 @@
 #include <QSslSocket>
 #include <QSystemTrayIcon>
 #include <QThread>
-#include <QTimer>
 #include <QUrl>
 
 #include "qnetio/wallet.h"
 #include "QSoundPlayer.h"
-#include "QXmppUtils.h"
 
 #include "application.h"
-#include "declarative.h"
 #include "systeminfo.h"
 #include "updater.h"
 #include "window.h"
