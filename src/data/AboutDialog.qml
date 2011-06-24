@@ -23,6 +23,8 @@ import wiLink 1.2
 Dialog {
     id: dialog
 
+    property QtObject appUpdater: application.updater
+
     title: qsTr('About %1').replace('%1', application.applicationName)
 
     Item {
@@ -58,10 +60,10 @@ Dialog {
             anchors.left: parent.left
             anchors.right: parent.right
             text: {
-                if (!Qt.isQtObject(application.updater))
+                if (!Qt.isQtObject(appUpdater))
                     return '';
 
-                switch (application.updater.state) {
+                switch (appUpdater.state) {
                 case Updater.IdleState:
                     return qsTr('Your version of %1 is up to date.').replace('%1', application.applicationName);
                 case Updater.CheckState:
@@ -70,10 +72,10 @@ Dialog {
                     return qsTr('Downloading update..');
                 case Updater.PromptState: {
                     var text = "<p>" + qsTr('Version %1 of %2 is available. Do you want to install it?')
-                                .replace('%1', application.updater.updateVersion)
+                                .replace('%1', appUpdater.updateVersion)
                                 .replace('%2', application.applicationName) + "</p>";
                     text += "<p><b>" + qsTr('Changes:') + "</b></p>";
-                    text += "<pre>" + application.updater.updateChanges + "</pre>";
+                    text += "<pre>" + appUpdater.updateChanges + "</pre>";
                     text += "<p>" + qsTr('%1 will automatically exit to allow you to install the new version.')
                                 .replace('%1', application.applicationName) + "</p>";
                     return text;
@@ -87,9 +89,12 @@ Dialog {
 
         ProgressBar {
             anchors.top: prompt.bottom
+            anchors.topMargin: appStyle.spacing.vertical
             anchors.left: parent.left
             anchors.right: parent.right
-            visible: Qt.isQtObject(application.updater) && application.updater.state == Updater.DownloadState
+            maximumValue: Qt.isQtObject(appUpdater) ? appUpdater.progressMaximum : 100
+            value: Qt.isQtObject(appUpdater) ? appUpdater.progressValue : 0
+            visible: Qt.isQtObject(appUpdater) && appUpdater.state == Updater.DownloadState
         }
     }
 }

@@ -57,18 +57,44 @@ public:
 class UpdaterPrivate
 {
 public:
+    UpdaterPrivate(Updater *qq);
     QString cacheFile() const;
     bool checkCachedFile() const;
+    void fail(Updater::Error newError, const QString &newString);
 
-    Release release;
-    QUrl updatesUrl;
-
-    int progressValue;
-
+    Updater::Error error;
     QNetworkAccessManager *network;
+    int progressValue;
+    Release release;
     Updater::State state;
     QTimer *timer;
+    QUrl updatesUrl;
+
+private:
+    Updater *q;
 };
+
+UpdaterPrivate::UpdaterPrivate(Updater *qq)
+    : error(Updater::NoError),
+    progressValue(0),
+    state(Updater::IdleState),
+    updatesUrl("https://download.wifirst.net/wiLink/"),
+    q(qq)
+{
+    network = new NetworkAccessManager(q);
+}
+
+void UpdaterPrivate::fail(Updater::Error newError, const QString &newString)
+{
+    error = newError;
+    q->error(error, newString);
+
+    release = Release();
+    q->updateChanged();
+
+    state = Updater::IdleState;
+    q->stateChanged(state);
+}
 
 QString UpdaterPrivate::cacheFile() const
 {
@@ -102,15 +128,11 @@ bool UpdaterPrivate::checkCachedFile() const
  * @param parent
  */
 Updater::Updater(QObject *parent)
-    : QObject(parent),
-    d(new UpdaterPrivate)
+    : QObject(parent)
 {
     bool check;
 
-    d->progressValue = 0;
-    d->updatesUrl = QUrl("https://download.wifirst.net/wiLink/");
-    d->network = new NetworkAccessManager(this);
-    d->state = IdleState;
+    d = new UpdaterPrivate(this);
 
     // schedule updates
     d->timer = new QTimer(this);
@@ -139,9 +161,9 @@ void Updater::check()
         return;
     }
 
-    /* only download files over HTTPS */
+    // only download files over HTTPS
     if (d->updatesUrl.scheme() != "https") {
-        emit error(SecurityError, "Refusing to check for updates from non-HTTPS site");
+        d->fail(SecurityError, "Refusing to check for updates from non-HTTPS site");
         return;
     }
 
@@ -158,6 +180,7 @@ void Updater::check()
     connect(reply, SIGNAL(finished()),
             this, SLOT(_q_processStatus()));
 
+    // change state
     d->state = CheckState;
     emit stateChanged(d->state);
 }
@@ -207,6 +230,11 @@ void Updater::download()
     emit stateChanged(d->state);
 }
 
+Updater::Error Updater::error() const
+{
+    return d->error;
+}
+
 Updater::State Updater::state() const
 {
     return d->state;
@@ -221,7 +249,7 @@ void Updater::install()
 
     // check file integrity
     if (!d->checkCachedFile()) {
-        emit error(IntegrityError, "The checksum of the downloaded file is incorrect");
+        d->fail(IntegrityError, "The checksum of the downloaded file is incorrect");
         return;
     }
 
@@ -311,36 +339,32 @@ void Updater::_q_saveUpdate()
     QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
     Q_ASSERT(reply != NULL);
 
-    if (reply->error() == QNetworkReply::NoError) {
-        QFile downloadFile(d->cacheFile());
-        if (downloadFile.open(QIODevice::WriteOnly)) {
-            // save file
-            char buffer[CHUNK_SIZE];
-            qint64 length;
-            while ((length = reply->read(buffer, CHUNK_SIZE)) > 0)
-                downloadFile.write(buffer, length);
-            downloadFile.close();
-
-            // check integrity
-            if (d->checkCachedFile()) {
-                d->state = PromptState;
-                emit stateChanged(d->state);
-                return;
-            } else {
-                downloadFile.remove();
-                emit error(IntegrityError, "The checksum of the downloaded file is incorrect");
-            }
-        } else {
-            emit error(FileError, "Could not save downloaded file to disk");
-        }
-    } else {
-        emit error(NetworkError, reply->errorString());
+    if (reply->error() != QNetworkReply::NoError) {
+        d->fail(NetworkError, reply->errorString());
+        return;
     }
 
-    // update state
-    d->release = Release();
-    emit updateChanged();
-    d->state = IdleState;
+    QFile downloadFile(d->cacheFile());
+    if (!downloadFile.open(QIODevice::WriteOnly)) {
+        d->fail(FileError, "Could not save downloaded file to disk");
+        return;
+    }
+
+    // save file
+    char buffer[CHUNK_SIZE];
+    qint64 length;
+    while ((length = reply->read(buffer, CHUNK_SIZE)) > 0)
+        downloadFile.write(buffer, length);
+    downloadFile.close();
+
+    // check integrity
+    if (!d->checkCachedFile()) {
+        downloadFile.remove();
+        d->fail(IntegrityError, "The checksum of the downloaded file is incorrect");
+    }
+
+    // prompt user
+    d->state = PromptState;
     emit stateChanged(d->state);
 }
 
@@ -352,53 +376,51 @@ void Updater::_q_processStatus()
     QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
     Q_ASSERT(reply != NULL);
 
-    if (reply->error() == QNetworkReply::NoError) {
-        QDomDocument doc;
-        doc.setContent(reply);
-        QDomElement item = doc.documentElement();
-
-        // parse release information
-        Release release;
-        release.changes = item.firstChildElement("changes").text().trimmed();
-        release.package = item.firstChildElement("package").text();
-        release.version = item.firstChildElement("version").text();
-        QDomElement hash = item.firstChildElement("hash");
-        while (!hash.isNull())
-        {
-            const QString type = hash.attribute("type");
-            const QByteArray value = QByteArray::fromHex(hash.text().toAscii());
-            if (!type.isEmpty() && !value.isEmpty())
-                release.hashes[type] = value;
-            hash = hash.nextSiblingElement("hash");
-        }
-        const QString urlString = item.firstChildElement("url").text();
-        if (!urlString.isEmpty())
-            release.url = d->updatesUrl.resolved(QUrl(urlString));
-
-        if (Updater::compareVersions(release.version, qApp->applicationVersion()) > 0 &&
-            release.url.isValid() &&
-            release.url.scheme() == "https" &&
-            release.hashes.contains("sha1"))
-        {
-            // download the file
-            d->release = release;
-            emit updateChanged();
-            d->state = IdleState;
-            download();
-            return;
-        } else {
-            // no update available, check again in two days
-            d->timer->start(2 * 24 * 3600 * 1000);
-        }
-
-    } else {
+    if (reply->error() != QNetworkReply::NoError) {
         // network error, retry in 5mn
         d->timer->start(5 * 60 * 1000);
-        emit error(NetworkError, reply->errorString());
+        d->fail(NetworkError, reply->errorString());
+        return;
     }
 
-    // update state
-    d->state = IdleState;
-    emit stateChanged(d->state);
+    QDomDocument doc;
+    doc.setContent(reply);
+    QDomElement item = doc.documentElement();
+
+    // parse release information
+    Release release;
+    release.changes = item.firstChildElement("changes").text().trimmed();
+    release.package = item.firstChildElement("package").text();
+    release.version = item.firstChildElement("version").text();
+    QDomElement hash = item.firstChildElement("hash");
+    while (!hash.isNull()) {
+        const QString type = hash.attribute("type");
+        const QByteArray value = QByteArray::fromHex(hash.text().toAscii());
+        if (!type.isEmpty() && !value.isEmpty())
+            release.hashes[type] = value;
+        hash = hash.nextSiblingElement("hash");
+    }
+    const QString urlString = item.firstChildElement("url").text();
+    if (!urlString.isEmpty())
+        release.url = d->updatesUrl.resolved(QUrl(urlString));
+
+    if (Updater::compareVersions(release.version, qApp->applicationVersion()) > 0 &&
+        release.url.isValid() &&
+        release.url.scheme() == "https" &&
+        release.hashes.contains("sha1"))
+    {
+        // download the file
+        d->release = release;
+        emit updateChanged();
+        d->state = IdleState;
+        download();
+    } else {
+        // no update available, check again in two days
+        d->timer->start(2 * 24 * 3600 * 1000);
+
+        // update state
+        d->state = IdleState;
+        emit stateChanged(d->state);
+    }
 }
 

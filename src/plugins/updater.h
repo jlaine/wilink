@@ -34,6 +34,7 @@ class Updater : public QObject
 {
     Q_OBJECT
     Q_ENUMS(Error State)
+    Q_PROPERTY(Error error READ error NOTIFY error)
     Q_PROPERTY(int progressMaximum READ progressMaximum CONSTANT)
     Q_PROPERTY(int progressValue READ progressValue NOTIFY progressValueChanged)
     Q_PROPERTY(State state READ state NOTIFY stateChanged)
@@ -60,6 +61,7 @@ public:
     Updater(QObject *parent);
     ~Updater();
 
+    Error error() const;
     int progressMaximum() const;
     int progressValue() const;
     State state() const;
@@ -85,7 +87,9 @@ private slots:
 
 private:
     void download();
-    UpdaterPrivate * const d;
+    UpdaterPrivate *d;
+
+    friend class UpdaterPrivate;
 };
 
 #endif
