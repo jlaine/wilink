@@ -33,8 +33,10 @@
 #include "updatesdialog.h"
 
 UpdateDialog::UpdateDialog(QWidget *parent)
-    : QDialog(parent)
+    : QDialog(parent),
+    m_updater(0)
 {
+    bool check;
     QVBoxLayout *layout = new QVBoxLayout;
 
     /* status */
@@ -56,32 +58,16 @@ UpdateDialog::UpdateDialog(QWidget *parent)
     /* button box */
     buttonBox = new QDialogButtonBox;
     buttonBox->addButton(QDialogButtonBox::Ok);
+    check = connect(buttonBox, SIGNAL(clicked(QAbstractButton*)),
+                    this, SLOT(buttonClicked(QAbstractButton*)));
+    Q_ASSERT(check);
     layout->addWidget(buttonBox);
 
     setLayout(layout);
     setWindowTitle(tr("%1 software update").arg(qApp->applicationName()));
 
     /* updates */
-    m_updates = new Updater(this);
-
-    bool check;
-    check = connect(buttonBox, SIGNAL(clicked(QAbstractButton*)),
-                    this, SLOT(buttonClicked(QAbstractButton*)));
-    Q_ASSERT(check);
-
-    check = connect(m_updates, SIGNAL(error(Updater::Error, const QString&)),
-                    this, SLOT(error(Updater::Error, const QString&)));
-    Q_ASSERT(check);
-
-    progressBar->setMaximum(m_updates->progressMaximum());
-    progressBar->setValue(m_updates->progressValue());
-    check = connect(m_updates, SIGNAL(progressValueChanged(int)),
-                    progressBar, SLOT(setValue(int)));
-    Q_ASSERT(check);
-
-    check = connect(m_updates, SIGNAL(stateChanged(Updater::State)),
-                    this, SLOT(_q_stateChanged(Updater::State)));
-    Q_ASSERT(check);
+    setUpdater(new Updater(this));
 }
 
 void UpdateDialog::buttonClicked(QAbstractButton *button)
@@ -89,7 +75,7 @@ void UpdateDialog::buttonClicked(QAbstractButton *button)
     if (buttonBox->standardButton(button) == QDialogButtonBox::Yes)
     {
         buttonBox->setStandardButtons(QDialogButtonBox::Ok);
-        m_updates->install();
+        m_updater->install();
     }
     else if (buttonBox->standardButton(button) == QDialogButtonBox::No)
     {
@@ -106,7 +92,7 @@ void UpdateDialog::buttonClicked(QAbstractButton *button)
 void UpdateDialog::check()
 {
     show();
-    m_updates->check();
+    m_updater->check();
 }
 
 void UpdateDialog::downloadProgress(qint64 done, qint64 total)
@@ -124,7 +110,39 @@ void UpdateDialog::error(Updater::Error error, const QString &errorString)
 
 Updater *UpdateDialog::updater() const
 {
-    return m_updates;
+    return m_updater;
+}
+
+void UpdateDialog::setUpdater(Updater *updater)
+{
+    bool check;
+
+    if (updater == m_updater)
+        return;
+
+    // disconnect old signals
+    if (m_updater)
+        m_updater->disconnect(this);
+
+    m_updater = updater;
+
+    // connect new signals
+    check = connect(m_updater, SIGNAL(error(Updater::Error, const QString&)),
+                    this, SLOT(error(Updater::Error, const QString&)));
+    Q_ASSERT(check);
+
+    progressBar->setMaximum(m_updater->progressMaximum());
+    progressBar->setValue(m_updater->progressValue());
+    check = connect(m_updater, SIGNAL(progressValueChanged(int)),
+                    progressBar, SLOT(setValue(int)));
+    Q_ASSERT(check);
+
+    check = connect(m_updater, SIGNAL(stateChanged(Updater::State)),
+                    this, SLOT(_q_stateChanged(Updater::State)));
+    Q_ASSERT(check);
+
+    // notify
+    emit updaterChanged(m_updater);
 }
 
 void UpdateDialog::_q_stateChanged(Updater::State state)
@@ -141,10 +159,10 @@ void UpdateDialog::_q_stateChanged(Updater::State state)
     } else if (state == Updater::PromptState) {
         statusLabel->setText(QString("<p>%1</p><p><b>%2</b></p><pre>%3</pre><p>%4</p>")
                 .arg(tr("Version %1 of %2 is available. Do you want to install it?")
-                    .arg(m_updates->updateVersion())
+                    .arg(m_updater->updateVersion())
                     .arg(qApp->applicationName()))
                 .arg(tr("Changes:"))
-                .arg(m_updates->updateChanges())
+                .arg(m_updater->updateChanges())
                 .arg(tr("%1 will automatically exit to allow you to install the new version.")
                     .arg(qApp->applicationName())));
         progressBar->hide();

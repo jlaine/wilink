@@ -32,11 +32,16 @@ class QProgressBar;
 class UpdateDialog : public QDialog
 {
     Q_OBJECT
+    Q_PROPERTY(Updater* updater READ updater WRITE setUpdater)
 
 public:
     UpdateDialog(QWidget *parent = NULL);
 
     Updater *updater() const;
+    void setUpdater(Updater *updater);
+
+signals:
+    void updaterChanged(Updater *updater);
 
 public slots:
     void check();
@@ -51,7 +56,7 @@ private:
     QDialogButtonBox *buttonBox;
     QProgressBar *progressBar;
     QLabel *statusLabel;
-    Updater *m_updates;
+    Updater *m_updater;
 };
 
 #endif
