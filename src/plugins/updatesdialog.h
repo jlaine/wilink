@@ -47,9 +47,7 @@ public slots:
     void check();
 
 private slots:
-    void buttonClicked(QAbstractButton *button);
-    void downloadProgress(qint64 done, qint64 total);
-    void error(Updater::Error error, const QString &errorString);
+    void _q_buttonClicked(QAbstractButton *button);
     void _q_stateChanged(Updater::State state);
 
 private:

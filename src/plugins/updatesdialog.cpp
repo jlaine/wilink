@@ -59,7 +59,7 @@ UpdateDialog::UpdateDialog(QWidget *parent)
     buttonBox = new QDialogButtonBox;
     buttonBox->addButton(QDialogButtonBox::Ok);
     check = connect(buttonBox, SIGNAL(clicked(QAbstractButton*)),
-                    this, SLOT(buttonClicked(QAbstractButton*)));
+                    this, SLOT(_q_buttonClicked(QAbstractButton*)));
     Q_ASSERT(check);
     layout->addWidget(buttonBox);
 
@@ -70,42 +70,10 @@ UpdateDialog::UpdateDialog(QWidget *parent)
     setUpdater(new Updater(this));
 }
 
-void UpdateDialog::buttonClicked(QAbstractButton *button)
-{
-    if (buttonBox->standardButton(button) == QDialogButtonBox::Yes)
-    {
-        buttonBox->setStandardButtons(QDialogButtonBox::Ok);
-        m_updater->install();
-    }
-    else if (buttonBox->standardButton(button) == QDialogButtonBox::No)
-    {
-        buttonBox->setStandardButtons(QDialogButtonBox::Ok);
-        statusLabel->setText(tr("Not installing update."));
-        hide();
-    }
-    else
-    {
-        hide();
-    }
-}
-
 void UpdateDialog::check()
 {
     show();
     m_updater->check();
-}
-
-void UpdateDialog::downloadProgress(qint64 done, qint64 total)
-{
-    progressBar->setMaximum(total);
-    progressBar->setValue(done);
-}
-
-void UpdateDialog::error(Updater::Error error, const QString &errorString)
-{
-    Q_UNUSED(error);
-
-    statusLabel->setText(tr("Could not run software update, please try again later.") + "\n\n" + errorString);
 }
 
 Updater *UpdateDialog::updater() const
@@ -127,10 +95,6 @@ void UpdateDialog::setUpdater(Updater *updater)
     m_updater = updater;
 
     // connect new signals
-    check = connect(m_updater, SIGNAL(error(Updater::Error, const QString&)),
-                    this, SLOT(error(Updater::Error, const QString&)));
-    Q_ASSERT(check);
-
     progressBar->setMaximum(m_updater->progressMaximum());
     progressBar->setValue(m_updater->progressValue());
     check = connect(m_updater, SIGNAL(progressValueChanged(int)),
@@ -143,6 +107,25 @@ void UpdateDialog::setUpdater(Updater *updater)
 
     // notify
     emit updaterChanged(m_updater);
+}
+
+void UpdateDialog::_q_buttonClicked(QAbstractButton *button)
+{
+    if (buttonBox->standardButton(button) == QDialogButtonBox::Yes)
+    {
+        buttonBox->setStandardButtons(QDialogButtonBox::Ok);
+        m_updater->install();
+    }
+    else if (buttonBox->standardButton(button) == QDialogButtonBox::No)
+    {
+        buttonBox->setStandardButtons(QDialogButtonBox::Ok);
+        statusLabel->setText(tr("Not installing update."));
+        hide();
+    }
+    else
+    {
+        hide();
+    }
 }
 
 void UpdateDialog::_q_stateChanged(Updater::State state)
