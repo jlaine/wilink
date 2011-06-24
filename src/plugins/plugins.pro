@@ -74,7 +74,9 @@ mac {
     LIBS += -framework AppKit
 }
 
-RESOURCES += ../data/wiLink.qrc
+RESOURCES += \
+    ../data/wiLink.qrc \
+    $$OUT_PWD/../translations/translations.qrc
 
 INCLUDEPATH += \
     $$WILINK_INCLUDE_DIR \

@@ -6,6 +6,7 @@ SUBDIRS = \
     qnetio \
     qsound \
     qxmpp \
+    translations \
     plugins
 
 CONFIG += ordered
