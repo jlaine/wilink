@@ -23,6 +23,7 @@ FocusScope {
     id: bar
 
     property alias acceptableInput: edit.acceptableInput
+    property alias cursorPosition: edit.cursorPosition
     property alias echoMode: edit.echoMode
     property alias hintText: label.text
     property alias text: edit.text
