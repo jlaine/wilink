@@ -107,12 +107,8 @@ Window::Window(const QUrl &url, const QString &jid, QWidget *parent)
     connect(shortcut, SIGNAL(activated()), this, SLOT(close()));
 #endif
 
-    // resize
-    setMinimumWidth(240);
-    QSize size = QApplication::desktop()->availableGeometry(this).size();
-    size.setHeight(size.height() - 100);
-    size.setWidth((size.height() * 4.0) / 3.0);
-    resize(size);
+    setMinimumHeight(240);
+    setMinimumWidth(320);
 
     // load QML
     view->setSource(url);

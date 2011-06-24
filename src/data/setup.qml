@@ -25,8 +25,6 @@ FocusScope {
     id: root
 
     focus: true
-    width: 320
-    height: 240
 
     Style {
         id: appStyle

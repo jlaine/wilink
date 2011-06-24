@@ -454,6 +454,8 @@ void Application::resetWindows()
     if (chatAccounts().isEmpty()) {
 
         Window *window = new Window(QUrl("qrc:/setup.qml"), QString());
+        window->resize(360, 360);
+
         const QSize size = QApplication::desktop()->availableGeometry(window).size();
         window->move((size.width() - window->width()) / 2, (size.height() - window->height()) / 2);
         window->show();
@@ -467,17 +469,21 @@ void Application::resetWindows()
     int ypos = 20;
     const QStringList chatJids = chatAccounts();
     foreach (const QString &jid, chatJids) {
-        Window *chat = new Window(QUrl("qrc:/main.qml"), jid);
+        Window *window = new Window(QUrl("qrc:/main.qml"), jid);
+        QSize size = QApplication::desktop()->availableGeometry(window).size();
+        size.setHeight(size.height() - 100);
+        size.setWidth((size.height() * 4.0) / 3.0);
+        window->resize(size);
 
 #ifdef WILINK_EMBEDDED
         Q_UNUSED(ypos);
-        chat->showFullScreen();
+        window->showFullScreen();
 #else
-        chat->move(xpos, ypos);
-        chat->show();
+        window->move(xpos, ypos);
+        window->show();
 #endif
 
-        d->chats << chat;
+        d->chats << window;
         xpos += 300;
     }
 

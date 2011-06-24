@@ -23,14 +23,12 @@
 #include <QSettings>
 #include <QTimer>
 #include <QTranslator>
-#include <QtPlugin>
 
 #ifdef Q_OS_WIN
 #include <windows.h>
 #endif
 
 #include "application.h"
-#include "declarative.h"
 
 static int aborted = 0;
 static void signal_handler(int sig)
@@ -47,10 +45,6 @@ int main(int argc, char *argv[])
     /* Create application */
     Application::platformInit();
     Application app(argc, argv);
-
-    /* Register QML extensions */
-    Plugin plugin;
-    plugin.registerTypes("wiLink");
 
     /* Load translations */
     QString localeName = QLocale::system().name().split("_").first();
