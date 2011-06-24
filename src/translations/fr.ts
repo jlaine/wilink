@@ -39,6 +39,10 @@
         <source>%1 will automatically exit to allow you to install the new version.</source>
         <translation>%1 quittera automatiquement afin de vous laisser installer la nouvelle version.</translation>
     </message>
+    <message>
+        <source>Could not run software update, please try again later.</source>
+        <translation>La mise à jour a échoué, merci de re-essayer ultérieurement.</translation>
+    </message>
 </context>
 <context>
     <name>AccountAddPanel</name>

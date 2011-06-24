@@ -64,8 +64,17 @@ Dialog {
                     return '';
 
                 switch (appUpdater.state) {
-                case Updater.IdleState:
-                    return qsTr('Your version of %1 is up to date.').replace('%1', application.applicationName);
+                case Updater.IdleState: {
+                    if (appUpdater.error == Updater.NoError) {
+                        return '';
+                    } else if (appUpdater.error == Updater.NoUpdateError) {
+                        return qsTr('Your version of %1 is up to date.').replace('%1', application.applicationName);
+                    } else {
+                        var text = '<p>' + qsTr('Could not run software update, please try again later.') + '</p>'
+                        text += '<pre>' + appUpdater.errorString + '</pre>';
+                        return text;
+                    }
+                }
                 case Updater.CheckState:
                     return qsTr('Checking for updates..');
                 case Updater.DownloadState:
@@ -80,7 +89,7 @@ Dialog {
                                 .replace('%1', application.applicationName) + "</p>";
                     return text;
                 }
-                case Updates.InstallState:
+                case Updater.InstallState:
                     return qsTr('Installing update..');
                 }
             }

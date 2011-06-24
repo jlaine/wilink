@@ -63,6 +63,7 @@ public:
     void fail(Updater::Error newError, const QString &newString);
 
     Updater::Error error;
+    QString errorString;
     QNetworkAccessManager *network;
     int progressValue;
     Release release;
@@ -87,7 +88,8 @@ UpdaterPrivate::UpdaterPrivate(Updater *qq)
 void UpdaterPrivate::fail(Updater::Error newError, const QString &newString)
 {
     error = newError;
-    q->error(error, newString);
+    errorString = newString;
+    q->error(error, errorString);
 
     release = Release();
     q->updateChanged();
@@ -182,6 +184,8 @@ void Updater::check()
             this, SLOT(_q_processStatus()));
 
     // change state
+    d->error = NoError;
+    d->errorString = QString();
     d->state = CheckState;
     emit stateChanged(d->state);
 }
@@ -206,6 +210,11 @@ int Updater::compareVersions(const QString &v1, const QString v2)
 Updater::Error Updater::error() const
 {
     return d->error;
+}
+
+QString Updater::errorString() const
+{
+    return d->errorString;
 }
 
 Updater::State Updater::state() const

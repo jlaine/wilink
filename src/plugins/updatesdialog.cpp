@@ -147,15 +147,26 @@ void UpdateDialog::setUpdater(Updater *updater)
 
 void UpdateDialog::_q_stateChanged(Updater::State state)
 {
-    if (state == Updater::CheckState) {
-        statusLabel->setText(tr("Checking for updates.."));
+    Q_ASSERT(m_updater);
+
+    if (state != Updater::DownloadState)
         progressBar->hide();
+
+    if (state == Updater::IdleState) {
+        if (m_updater->error() == Updater::NoError) {
+            statusLabel->setText(QString());
+        } else if (m_updater->error() == Updater::NoUpdateError) {
+            statusLabel->setText(tr("Your version of %1 is up to date.").arg(qApp->applicationName()));
+        } else {
+            statusLabel->setText(tr("Could not run software update, please try again later.") + "\n\n" + m_updater->errorString());
+        }
     } else if (state == Updater::CheckState) {
+        statusLabel->setText(tr("Checking for updates.."));
+    } else if (state == Updater::DownloadState) {
         statusLabel->setText(tr("Downloading update.."));
         progressBar->show();
     } else if (state == Updater::InstallState) {
         statusLabel->setText(tr("Installing update.."));
-        progressBar->hide();
     } else if (state == Updater::PromptState) {
         statusLabel->setText(QString("<p>%1</p><p><b>%2</b></p><pre>%3</pre><p>%4</p>")
                 .arg(tr("Version %1 of %2 is available. Do you want to install it?")
@@ -165,7 +176,6 @@ void UpdateDialog::_q_stateChanged(Updater::State state)
                 .arg(m_updater->updateChanges())
                 .arg(tr("%1 will automatically exit to allow you to install the new version.")
                     .arg(qApp->applicationName())));
-        progressBar->hide();
         buttonBox->setStandardButtons(QDialogButtonBox::Yes | QDialogButtonBox::No);
         show();
         buttonBox->button(QDialogButtonBox::Yes)->setFocus();
