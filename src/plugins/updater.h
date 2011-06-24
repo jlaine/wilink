@@ -34,6 +34,8 @@ class Updater : public QObject
 {
     Q_OBJECT
     Q_ENUMS(Error State)
+    Q_PROPERTY(int progressMaximum READ progressMaximum CONSTANT)
+    Q_PROPERTY(int progressValue READ progressValue NOTIFY progressValueChanged)
     Q_PROPERTY(State state READ state NOTIFY stateChanged)
     Q_PROPERTY(QString updateChanges READ updateChanges NOTIFY updateChanged)
     Q_PROPERTY(QString updateVersion READ updateVersion NOTIFY updateChanged)
@@ -58,6 +60,8 @@ public:
     Updater(QObject *parent);
     ~Updater();
 
+    int progressMaximum() const;
+    int progressValue() const;
     State state() const;
     QString updateChanges() const;
     QString updateVersion() const;
@@ -69,12 +73,13 @@ public slots:
     void install();
 
 signals:
-    void downloadProgress(qint64 done, qint64 total);
     void error(Updater::Error error, const QString &errorString);
+    void progressValueChanged(int value);
     void stateChanged(Updater::State state);
     void updateChanged();
 
 private slots:
+    void _q_downloadProgress(qint64 done, qint64 total);
     void _q_saveUpdate();
     void _q_processStatus();
 

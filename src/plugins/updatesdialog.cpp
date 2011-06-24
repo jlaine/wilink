@@ -73,8 +73,10 @@ UpdateDialog::UpdateDialog(QWidget *parent)
                     this, SLOT(error(Updater::Error, const QString&)));
     Q_ASSERT(check);
 
-    check = connect(m_updates, SIGNAL(downloadProgress(qint64, qint64)),
-                    this, SLOT(downloadProgress(qint64, qint64)));
+    progressBar->setMaximum(m_updates->progressMaximum());
+    progressBar->setValue(m_updates->progressValue());
+    check = connect(m_updates, SIGNAL(progressValueChanged(int)),
+                    progressBar, SLOT(setValue(int)));
     Q_ASSERT(check);
 
     check = connect(m_updates, SIGNAL(stateChanged(Updater::State)),

@@ -42,6 +42,7 @@
 #include "updater.h"
 
 #define CHUNK_SIZE 16384
+#define PROGRESS_MAX 100
 
 class Release
 {
@@ -61,6 +62,8 @@ public:
 
     Release release;
     QUrl updatesUrl;
+
+    int progressValue;
 
     QNetworkAccessManager *network;
     Updater::State state;
@@ -102,16 +105,22 @@ Updater::Updater(QObject *parent)
     : QObject(parent),
     d(new UpdaterPrivate)
 {
+    bool check;
+
+    d->progressValue = 0;
     d->updatesUrl = QUrl("https://download.wifirst.net/wiLink/");
     d->network = new NetworkAccessManager(this);
     d->state = IdleState;
 
-    /* schedule updates */
+    // schedule updates
     d->timer = new QTimer(this);
-    d->timer->setInterval(500);
     d->timer->setSingleShot(true);
-    connect(d->timer, SIGNAL(timeout()), this, SLOT(check()));
-    d->timer->start();
+    check = connect(d->timer, SIGNAL(timeout()),
+                    this, SLOT(check()));
+    Q_ASSERT(check);
+    Q_UNUSED(check);
+
+    d->timer->start(500);
 }
 
 /** Destroys an updates checker.
@@ -187,7 +196,7 @@ void Updater::download()
 
     bool check;
     check = connect(reply, SIGNAL(downloadProgress(qint64, qint64)),
-                    this, SIGNAL(downloadProgress(qint64, qint64)));
+                    this, SLOT(_q_downloadProgress(qint64, qint64)));
     Q_ASSERT(check);
 
     check = connect(reply, SIGNAL(finished()),
@@ -265,6 +274,16 @@ void Updater::install()
 #endif
 }
 
+int Updater::progressMaximum() const
+{
+    return PROGRESS_MAX;
+}
+
+int Updater::progressValue() const
+{
+    return d->progressValue;
+}
+
 QString Updater::updateChanges() const
 {
     return d->release.changes;
@@ -273,6 +292,15 @@ QString Updater::updateChanges() const
 QString Updater::updateVersion() const
 {
     return d->release.version;
+}
+
+void Updater::_q_downloadProgress(qint64 done, qint64 total)
+{
+    const int value = (total > 0) ? (done * PROGRESS_MAX) / total : 0;
+    if (value != d->progressValue) {
+        d->progressValue = value;
+        emit progressValueChanged(d->progressValue);
+    }
 }
 
 /** Once a release has been downloaded, verify its checksum and write it
@@ -359,15 +387,13 @@ void Updater::_q_processStatus()
             download();
             return;
         } else {
-            // check again in two days
-            d->timer->setInterval(2 * 24 * 3600 * 1000);
-            d->timer->start();
+            // no update available, check again in two days
+            d->timer->start(2 * 24 * 3600 * 1000);
         }
 
     } else {
-        // network error, retry in 5mn */
-        d->timer->setInterval(300 * 1000);
-        d->timer->start();
+        // network error, retry in 5mn
+        d->timer->start(5 * 60 * 1000);
         emit error(NetworkError, reply->errorString());
     }
 
