@@ -32,7 +32,7 @@ class QProgressBar;
 class UpdateDialog : public QDialog
 {
     Q_OBJECT
-    Q_PROPERTY(Updater* updater READ updater WRITE setUpdater)
+    Q_PROPERTY(Updater* updater READ updater WRITE setUpdater NOTIFY updaterChanged)
 
 public:
     UpdateDialog(QWidget *parent = NULL);
