@@ -23,6 +23,7 @@ Rectangle {
     id: dialog
 
     property alias contents: item
+    property Component footerComponent: dialogFooter
     property alias helpText: help.text
     property alias title: label.text
     property int minimumWidth: 320
@@ -39,6 +40,24 @@ Rectangle {
     opacity: 0
     radius: 10
     smooth: true
+
+    Component {
+        id: dialogFooter
+
+        Row {
+            spacing: 8
+
+            Button {
+                text: qsTr('OK')
+                onClicked: dialog.accepted()
+            }
+
+            Button {
+                text: qsTr('Cancel')
+                onClicked: dialog.rejected()
+            }
+        }
+    }
 
     // FIXME: this is a hack waiting 'blur' or 'shadow' attribute in qml
     BorderImage {
@@ -130,24 +149,14 @@ Rectangle {
         anchors.margins: 8
     }
 
-    Row {
+    Loader {
         id: footer
 
         anchors.margins: 8
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
         height: 32
-        spacing: 8
-
-        Button {
-            text: qsTr('OK')
-            onClicked: dialog.accepted()
-        }
-
-        Button {
-            text: qsTr('Cancel')
-            onClicked: dialog.rejected()
-        }
+        sourceComponent: footerComponent
     }
 
     Image {
