@@ -22,9 +22,9 @@
 
 #include <QMainWindow>
 
-class Application;
 class QFileDialog;
 class QMessageBox;
+class QUrl;
 
 /** Chat represents the user interface's main window.
  */
@@ -34,7 +34,7 @@ class Window : public QMainWindow
     Q_PROPERTY(bool isActiveWindow READ isActiveWindow NOTIFY isActiveWindowChanged)
 
 public:
-    Window(const QString &jid, QWidget *parent = 0);
+    Window(const QUrl &url, const QString &jid, QWidget *parent = 0);
 
 signals:
     void isActiveWindowChanged();

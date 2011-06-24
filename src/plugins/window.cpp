@@ -31,11 +31,9 @@
 
 #include "application.h"
 #include "declarative.h"
-#include "photos.h"
-#include "roster.h"
 #include "window.h"
 
-Window::Window(const QString &jid, QWidget *parent)
+Window::Window(const QUrl &url, const QString &jid, QWidget *parent)
     : QMainWindow(parent)
 {
     bool check;
@@ -45,23 +43,24 @@ Window::Window(const QString &jid, QWidget *parent)
     //logger->setLoggingType(QXmppLogger::SignalLogging);
 
     // create declarative view
-    QDeclarativeView *rosterView = new QDeclarativeView;
-    rosterView->setMinimumWidth(240);
-    rosterView->setResizeMode(QDeclarativeView::SizeRootObjectToView);
-    rosterView->engine()->addImageProvider("photo", new PhotoImageProvider);
-    rosterView->engine()->addImageProvider("roster", new RosterImageProvider);
-    rosterView->engine()->setNetworkAccessManagerFactory(new NetworkAccessManagerFactory);
+    QDeclarativeView *view = new QDeclarativeView;
+    view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
 
-    rosterView->setAttribute(Qt::WA_OpaquePaintEvent);
-    rosterView->setAttribute(Qt::WA_NoSystemBackground);
-    rosterView->viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
-    rosterView->viewport()->setAttribute(Qt::WA_NoSystemBackground);
+    // load plugin
+    Plugin plugin;
+    plugin.registerTypes("wiLink");
+    plugin.initializeEngine(view->engine(), "wiLink");
 
-    QDeclarativeContext *context = rosterView->rootContext();
+    view->setAttribute(Qt::WA_OpaquePaintEvent);
+    view->setAttribute(Qt::WA_NoSystemBackground);
+    view->viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
+    view->viewport()->setAttribute(Qt::WA_NoSystemBackground);
+
+    QDeclarativeContext *context = view->rootContext();
     context->setContextProperty("application", wApp);
     context->setContextProperty("window", this);
 
-    setCentralWidget(rosterView);
+    setCentralWidget(view);
 
     /* "File" menu */
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
@@ -105,13 +104,14 @@ Window::Window(const QString &jid, QWidget *parent)
 #endif
 
     // resize
+    setMinimumWidth(240);
     QSize size = QApplication::desktop()->availableGeometry(this).size();
     size.setHeight(size.height() - 100);
     size.setWidth((size.height() * 4.0) / 3.0);
     resize(size);
 
     // load QML
-    rosterView->setSource(QUrl("qrc:/main.qml"));
+    view->setSource(url);
 }
 
 void Window::alert()

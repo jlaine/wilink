@@ -32,6 +32,11 @@ FocusScope {
         id: appStyle
     }
 
+    Rectangle {
+        color: 'white'
+        anchors.fill: parent
+    }
+
     AccountAddPanel {
         id: panel
 

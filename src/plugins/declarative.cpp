@@ -199,6 +199,13 @@ void DeclarativeWallet::set(const QString &jid, const QString &password)
     }
 }
 
+void Plugin::initializeEngine(QDeclarativeEngine *engine, const char *uri)
+{
+    engine->addImageProvider("photo", new PhotoImageProvider);
+    engine->addImageProvider("roster", new RosterImageProvider);
+    engine->setNetworkAccessManagerFactory(new NetworkAccessManagerFactory);
+}
+
 void Plugin::registerTypes(const char *uri)
 {
     // QXmpp

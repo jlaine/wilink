@@ -460,17 +460,12 @@ void Application::resetWindows()
     /* check we have a valid account */
     if (chatAccounts().isEmpty()) {
 
-        QDeclarativeView *view = new QDeclarativeView;
-        view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
-        view->engine()->setNetworkAccessManagerFactory(new NetworkAccessManagerFactory);
-        view->rootContext()->setContextProperty("application", this);
-        view->setSource(QUrl("qrc:/setup.qml"));
-
-        const QSize size = QApplication::desktop()->availableGeometry(view).size();
-        view->move((size.width() - view->width()) / 2, (size.height() - view->height()) / 2);
-        view->show();
-        view->raise();
-        d->chats << view;
+        Window *window = new Window(QUrl("qrc:/setup.qml"), QString());
+        const QSize size = QApplication::desktop()->availableGeometry(window).size();
+        window->move((size.width() - window->width()) / 2, (size.height() - window->height()) / 2);
+        window->show();
+        window->raise();
+        d->chats << window;
         return;
     }
 
@@ -479,7 +474,7 @@ void Application::resetWindows()
     int ypos = 20;
     const QStringList chatJids = chatAccounts();
     foreach (const QString &jid, chatJids) {
-        Window *chat = new Window(jid);
+        Window *chat = new Window(QUrl("qrc:/main.qml"), jid);
         if (chatJids.size() == 1)
             chat->setWindowTitle(qApp->applicationName());
         else
