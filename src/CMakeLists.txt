@@ -66,7 +66,7 @@ set(wiLink_SOURCES
     plugins/roster.cpp
     plugins/shares.cpp
     plugins/systeminfo.cpp
-    plugins/updates.cpp
+    plugins/updater.cpp
     plugins/updatesdialog.cpp
     plugins/window.cpp)
 
@@ -93,7 +93,7 @@ set(wiLink_MOC_HEADERS
     plugins/rooms.h
     plugins/roster.h
     plugins/shares.h
-    plugins/updates.h
+    plugins/updater.h
     plugins/updatesdialog.h
     plugins/window.h)
 

@@ -62,23 +62,23 @@ UpdateDialog::UpdateDialog(QWidget *parent)
     setWindowTitle(tr("%1 software update").arg(qApp->applicationName()));
 
     /* updates */
-    m_updates = new Updates(this);
+    m_updates = new Updater(this);
 
     bool check;
     check = connect(buttonBox, SIGNAL(clicked(QAbstractButton*)),
                     this, SLOT(buttonClicked(QAbstractButton*)));
     Q_ASSERT(check);
 
-    check = connect(m_updates, SIGNAL(error(Updates::Error, const QString&)),
-                    this, SLOT(error(Updates::Error, const QString&)));
+    check = connect(m_updates, SIGNAL(error(Updater::Error, const QString&)),
+                    this, SLOT(error(Updater::Error, const QString&)));
     Q_ASSERT(check);
 
     check = connect(m_updates, SIGNAL(downloadProgress(qint64, qint64)),
                     this, SLOT(downloadProgress(qint64, qint64)));
     Q_ASSERT(check);
 
-    check = connect(m_updates, SIGNAL(stateChanged(Updates::State)),
-                    this, SLOT(_q_stateChanged(Updates::State)));
+    check = connect(m_updates, SIGNAL(stateChanged(Updater::State)),
+                    this, SLOT(_q_stateChanged(Updater::State)));
     Q_ASSERT(check);
 }
 
@@ -113,30 +113,30 @@ void UpdateDialog::downloadProgress(qint64 done, qint64 total)
     progressBar->setValue(done);
 }
 
-void UpdateDialog::error(Updates::Error error, const QString &errorString)
+void UpdateDialog::error(Updater::Error error, const QString &errorString)
 {
     Q_UNUSED(error);
 
     statusLabel->setText(tr("Could not run software update, please try again later.") + "\n\n" + errorString);
 }
 
-Updates *UpdateDialog::updater() const
+Updater *UpdateDialog::updater() const
 {
     return m_updates;
 }
 
-void UpdateDialog::_q_stateChanged(Updates::State state)
+void UpdateDialog::_q_stateChanged(Updater::State state)
 {
-    if (state == Updates::CheckState) {
+    if (state == Updater::CheckState) {
         statusLabel->setText(tr("Checking for updates.."));
         progressBar->hide();
-    } else if (state == Updates::CheckState) {
+    } else if (state == Updater::CheckState) {
         statusLabel->setText(tr("Downloading update.."));
         progressBar->show();
-    } else if (state == Updates::InstallState) {
+    } else if (state == Updater::InstallState) {
         statusLabel->setText(tr("Installing update.."));
         progressBar->hide();
-    } else if (state == Updates::PromptState) {
+    } else if (state == Updater::PromptState) {
         statusLabel->setText(QString("<p>%1</p><p><b>%2</b></p><pre>%3</pre><p>%4</p>")
                 .arg(tr("Version %1 of %2 is available. Do you want to install it?")
                     .arg(m_updates->updateVersion())

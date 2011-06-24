@@ -25,12 +25,12 @@
 
 class QNetworkReply;
 
-class UpdatesPrivate;
+class UpdaterPrivate;
 
-/** The Updates class handling checking for software updates
+/** The Updater class handling checking for software updates
  *  and installing them.
  */
-class Updates : public QObject
+class Updater : public QObject
 {
     Q_OBJECT
     Q_ENUMS(Error State)
@@ -55,8 +55,8 @@ public:
         InstallState,
     };
 
-    Updates(QObject *parent);
-    ~Updates();
+    Updater(QObject *parent);
+    ~Updater();
 
     State state() const;
     QString updateChanges() const;
@@ -70,8 +70,8 @@ public slots:
 
 signals:
     void downloadProgress(qint64 done, qint64 total);
-    void error(Updates::Error error, const QString &errorString);
-    void stateChanged(Updates::State state);
+    void error(Updater::Error error, const QString &errorString);
+    void stateChanged(Updater::State state);
     void updateChanged();
 
 private slots:
@@ -80,7 +80,7 @@ private slots:
 
 private:
     void download();
-    UpdatesPrivate * const d;
+    UpdaterPrivate * const d;
 };
 
 #endif

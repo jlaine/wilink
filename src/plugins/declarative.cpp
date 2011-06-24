@@ -250,7 +250,7 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterUncreatableType<QSoundPlayer>(uri, 1, 2, "SoundPlayer", "");
     qmlRegisterType<QSoundTester>(uri, 1, 2, "SoundTester");
     qmlRegisterUncreatableType<UpdateDialog>(uri, 1, 2, "UpdateDialog", "");
-    qmlRegisterUncreatableType<Updates>(uri, 1, 2, "Updater", "");
+    qmlRegisterUncreatableType<Updater>(uri, 1, 2, "Updater", "");
     qmlRegisterType<VCard>(uri, 1, 2, "VCard");
     qmlRegisterType<DeclarativeWallet>(uri, 1, 2, "Wallet");
     qmlRegisterUncreatableType<Window>(uri, 1, 2, "Window", "");

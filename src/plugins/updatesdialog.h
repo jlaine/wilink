@@ -22,13 +22,12 @@
 
 #include <QDialog>
 
-#include "updates.h"
+#include "updater.h"
 
 class QAbstractButton;
 class QDialogButtonBox;
 class QLabel;
 class QProgressBar;
-class QUrl;
 
 class UpdateDialog : public QDialog
 {
@@ -37,7 +36,7 @@ class UpdateDialog : public QDialog
 public:
     UpdateDialog(QWidget *parent = NULL);
 
-    Updates *updater() const;
+    Updater *updater() const;
 
 public slots:
     void check();
@@ -45,14 +44,14 @@ public slots:
 private slots:
     void buttonClicked(QAbstractButton *button);
     void downloadProgress(qint64 done, qint64 total);
-    void error(Updates::Error error, const QString &errorString);
-    void _q_stateChanged(Updates::State state);
+    void error(Updater::Error error, const QString &errorString);
+    void _q_stateChanged(Updater::State state);
 
 private:
     QDialogButtonBox *buttonBox;
     QProgressBar *progressBar;
     QLabel *statusLabel;
-    Updates *m_updates;
+    Updater *m_updates;
 };
 
 #endif

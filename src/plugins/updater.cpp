@@ -39,7 +39,7 @@
 #include "application.h"
 #include "declarative.h"
 #include "systeminfo.h"
-#include "updates.h"
+#include "updater.h"
 
 #define CHUNK_SIZE 16384
 
@@ -53,7 +53,7 @@ public:
     QMap<QString, QByteArray> hashes;
 };
 
-class UpdatesPrivate
+class UpdaterPrivate
 {
 public:
     QString cacheFile() const;
@@ -63,16 +63,16 @@ public:
     QUrl updatesUrl;
 
     QNetworkAccessManager *network;
-    Updates::State state;
+    Updater::State state;
     QTimer *timer;
 };
 
-QString UpdatesPrivate::cacheFile() const
+QString UpdaterPrivate::cacheFile() const
 {
     return QDir(wApp->downloadsLocation()).filePath(QFileInfo(release.url.path()).fileName());
 }
 
-bool UpdatesPrivate::checkCachedFile() const
+bool UpdaterPrivate::checkCachedFile() const
 {
     /* check file integrity */
     foreach (const QString &type, release.hashes.keys()) {
@@ -98,9 +98,9 @@ bool UpdatesPrivate::checkCachedFile() const
  *
  * @param parent
  */
-Updates::Updates(QObject *parent)
+Updater::Updater(QObject *parent)
     : QObject(parent),
-    d(new UpdatesPrivate)
+    d(new UpdaterPrivate)
 {
     d->updatesUrl = QUrl("https://download.wifirst.net/wiLink/");
     d->network = new NetworkAccessManager(this);
@@ -116,14 +116,14 @@ Updates::Updates(QObject *parent)
 
 /** Destroys an updates checker.
  */
-Updates::~Updates()
+Updater::~Updater()
 {
     delete d;
 }
 
 /** Requests the current release information from the updates server.
  */
-void Updates::check()
+void Updater::check()
 {
     if (d->state != IdleState) {
         qWarning("Not starting check, operation in progress");
@@ -153,7 +153,7 @@ void Updates::check()
     emit stateChanged(d->state);
 }
 
-int Updates::compareVersions(const QString &v1, const QString v2)
+int Updater::compareVersions(const QString &v1, const QString v2)
 {
     QStringList bits1 = v1.split(".");
     QStringList bits2 = v2.split(".");
@@ -172,7 +172,7 @@ int Updates::compareVersions(const QString &v1, const QString v2)
 
 /** Downloads the specified release to the given file.
  */
-void Updates::download()
+void Updater::download()
 {
     // check cached file
     if (d->checkCachedFile()) {
@@ -198,12 +198,12 @@ void Updates::download()
     emit stateChanged(d->state);
 }
 
-Updates::State Updates::state() const
+Updater::State Updater::state() const
 {
     return d->state;
 }
 
-void Updates::install()
+void Updater::install()
 {
     if (d->state != PromptState) {
         qWarning("Not starting install, operation in progress");
@@ -265,12 +265,12 @@ void Updates::install()
 #endif
 }
 
-QString Updates::updateChanges() const
+QString Updater::updateChanges() const
 {
     return d->release.changes;
 }
 
-QString Updates::updateVersion() const
+QString Updater::updateVersion() const
 {
     return d->release.version;
 }
@@ -278,7 +278,7 @@ QString Updates::updateVersion() const
 /** Once a release has been downloaded, verify its checksum and write it
  *  to disk.
  */
-void Updates::_q_saveUpdate()
+void Updater::_q_saveUpdate()
 {
     QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
     Q_ASSERT(reply != NULL);
@@ -319,7 +319,7 @@ void Updates::_q_saveUpdate()
 /** Handle a response from the updates server containing the current
  *  release information.
  */
-void Updates::_q_processStatus()
+void Updater::_q_processStatus()
 {
     QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
     Q_ASSERT(reply != NULL);
@@ -347,7 +347,7 @@ void Updates::_q_processStatus()
         if (!urlString.isEmpty())
             release.url = d->updatesUrl.resolved(QUrl(urlString));
 
-        if (Updates::compareVersions(release.version, qApp->applicationVersion()) > 0 &&
+        if (Updater::compareVersions(release.version, qApp->applicationVersion()) > 0 &&
             release.url.isValid() &&
             release.url.scheme() == "https" &&
             release.hashes.contains("sha1"))

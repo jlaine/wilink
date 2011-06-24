@@ -43,7 +43,7 @@ SOURCES += \
     roster.cpp \
     shares.cpp \
     systeminfo.cpp \
-    updates.cpp \
+    updater.cpp \
     updatesdialog.cpp \
     window.cpp
 
@@ -67,7 +67,7 @@ HEADERS += \
     roster.h \
     shares.h \
     systeminfo.h \
-    updates.h \
+    updater.h \
     updatesdialog.h \
     window.h \
 

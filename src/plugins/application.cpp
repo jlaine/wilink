@@ -47,7 +47,7 @@
 #include "application.h"
 #include "declarative.h"
 #include "systeminfo.h"
-#include "updates.h"
+#include "updater.h"
 #include "updatesdialog.h"
 #include "window.h"
 
@@ -128,7 +128,7 @@ Application::Application(int &argc, char **argv)
     const QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
     QDir().mkpath(dataPath);
     const QString lastRunVersion = d->settings->value("LastRunVersion").toString();
-    if (lastRunVersion.isEmpty() || Updates::compareVersions(lastRunVersion, "1.1.900") < 0) {
+    if (lastRunVersion.isEmpty() || Updater::compareVersions(lastRunVersion, "1.1.900") < 0) {
         QNetworkDiskCache cache;
         cache.setCacheDirectory(QDir(dataPath).filePath("cache"));
         cache.clear();
@@ -768,7 +768,7 @@ void Application::setUpdateDialog(UpdateDialog *updateDialog)
     d->updates = updateDialog;
 }
 
-Updates *Application::updater() const
+Updater *Application::updater() const
 {
     return d->updates->updater();
 }
