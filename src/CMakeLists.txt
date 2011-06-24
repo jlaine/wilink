@@ -183,6 +183,7 @@ if(APPLE)
     set_target_properties(wiLink PROPERTIES MACOSX_BUNDLE_SHORT_VERSION_STRING ${WILINK_VERSION})
     add_custom_command(TARGET wiLink POST_BUILD
         COMMAND mkdir -p ${BUNDLE_LOCATION}/Contents/Resources/
+        COMMAND touch ${BUNDLE_LOCATION}/Contents/Resources/empty.lproj
         COMMAND cp ${CPACK_BUNDLE_ICON} ${BUNDLE_LOCATION}/Contents/Resources/
         COMMAND ${QT_BINARY_DIR}/macdeployqt ${BUNDLE_LOCATION} -no-plugins
         COMMAND ${CMAKE_SOURCE_DIR}/cmake/copyplugins ${BUNDLE_LOCATION} ${QT_QMAKE_EXECUTABLE} ${WILINK_EXTRA_PLUGINS}
