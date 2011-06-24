@@ -38,6 +38,10 @@ Window::Window(const QUrl &url, const QString &jid, QWidget *parent)
 {
     bool check;
     setObjectName(jid);
+    if (jid.isEmpty())
+        setWindowTitle(qApp->applicationName());
+    else
+        setWindowTitle(QString("%1 - %2").arg(jid, qApp->applicationName()));
 
     // FIXME: set logger
     //logger->setLoggingType(QXmppLogger::SignalLogging);

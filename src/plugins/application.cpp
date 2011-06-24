@@ -468,10 +468,6 @@ void Application::resetWindows()
     const QStringList chatJids = chatAccounts();
     foreach (const QString &jid, chatJids) {
         Window *chat = new Window(QUrl("qrc:/main.qml"), jid);
-        if (chatJids.size() == 1)
-            chat->setWindowTitle(qApp->applicationName());
-        else
-            chat->setWindowTitle(QString("%1 - %2").arg(jid, qApp->applicationName()));
 
 #ifdef WILINK_EMBEDDED
         Q_UNUSED(ypos);
