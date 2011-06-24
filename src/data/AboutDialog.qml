@@ -25,6 +25,30 @@ Dialog {
 
     property QtObject appUpdater: application.updater
 
+    footerComponent: Row {
+        spacing: 8
+
+        Button {
+            enabled: Qt.isQtObject(appUpdater) && appUpdater.state == Updater.IdleState;
+            iconSource: 'refresh.png'
+            text: qsTr('Check for updates')
+            onClicked: appUpdater.check()
+        }
+
+        Button {
+            iconSource: 'start.png'
+            text: qsTr('Install')
+            visible: Qt.isQtObject(appUpdater) && appUpdater.state == Updater.PromptState;
+            onClicked: appUpdater.install()
+        }
+
+        Button {
+            iconSource: 'close.png'
+            text: qsTr('Close')
+            onClicked: dialog.rejected()
+        }
+    }
+
     title: qsTr('About %1').replace('%1', application.applicationName)
 
     Item {

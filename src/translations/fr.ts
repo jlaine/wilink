@@ -43,6 +43,18 @@
         <source>Could not run software update, please try again later.</source>
         <translation>La mise à jour a échoué, merci de re-essayer ultérieurement.</translation>
     </message>
+    <message>
+        <source>Check for updates</source>
+        <translation>Mettre à jour</translation>
+    </message>
+    <message>
+        <source>Install</source>
+        <translation>Installer</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Fermer</translation>
+    </message>
 </context>
 <context>
     <name>AccountAddPanel</name>
