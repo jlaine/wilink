@@ -251,7 +251,7 @@ void Updater::install()
     // we cannot use QProcess::startDetached() because NSIS wants the
     // /D=.. argument to be absolutely unescaped.
     QString args = QString("\"%1\" /S /D=%2")
-        .arg(d->cacheFile(d->release).replace(QLatin1Char('/'), QLatin1Char('\\')))
+        .arg(d->cacheFile().replace(QLatin1Char('/'), QLatin1Char('\\')))
         .arg(installDir.absolutePath().replace(QLatin1Char('/'), QLatin1Char('\\')));
 
     STARTUPINFOW startupInfo = { sizeof( STARTUPINFO ), 0, 0, 0,
