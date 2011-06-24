@@ -120,7 +120,8 @@ Updater::Updater(QObject *parent)
     Q_ASSERT(check);
     Q_UNUSED(check);
 
-    d->timer->start(500);
+    // run initial check after 10s
+    d->timer->start(10 * 1000);
 }
 
 /** Destroys an updates checker.
