@@ -64,7 +64,6 @@ class Application : public QApplication
     Q_PROPERTY(bool showOfflineContacts READ showOfflineContacts WRITE setShowOfflineContacts NOTIFY showOfflineContactsChanged)
     Q_PROPERTY(bool sortContactsByStatus READ sortContactsByStatus WRITE setSortContactsByStatus NOTIFY sortContactsByStatusChanged)
     Q_PROPERTY(QSoundPlayer* soundPlayer READ soundPlayer CONSTANT)
-    Q_PROPERTY(UpdateDialog* updateDialog READ updateDialog WRITE setUpdateDialog)
     Q_PROPERTY(Updater* updater READ updater CONSTANT)
 
 public:
@@ -77,8 +76,6 @@ public:
     void createSystemTrayIcon();
     QSoundPlayer *soundPlayer();
     QThread *soundThread();
-    UpdateDialog *updateDialog() const;
-    void setUpdateDialog(UpdateDialog *updateDialog);
     Updater *updater() const;
 #ifdef USE_SYSTRAY
     QSystemTrayIcon *trayIcon();

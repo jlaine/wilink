@@ -391,20 +391,8 @@ Acceptez-vous?</translation>
         <translation>Trier les contacts par état</translation>
     </message>
     <message>
-        <source>version %1</source>
-        <translation>version %1</translation>
-    </message>
-    <message>
         <source>General options</source>
         <translation>Options générales</translation>
-    </message>
-    <message>
-        <source>About %1</source>
-        <translation>À propos de %1</translation>
-    </message>
-    <message>
-        <source>Check for updates</source>
-        <translation>Mettre à jour</translation>
     </message>
 </context>
 <context>
@@ -838,57 +826,10 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>UpdateDialog</name>
-    <message>
-        <source>Changes:</source>
-        <translation>Changements :</translation>
-    </message>
-    <message>
-        <source>Version %1 of %2 is available. Do you want to install it?</source>
-        <translation>La version %1 de %2 est disponible. Voulez-vous l&apos;installer ?</translation>
-    </message>
-    <message>
-        <source>%1 will automatically exit to allow you to install the new version.</source>
-        <translation>%1 quittera automatiquement afin de vous laisser installer la nouvelle version.</translation>
-    </message>
-    <message>
-        <source>Downloading update..</source>
-        <translation>Téléchargement de la mise à jour..</translation>
-    </message>
-    <message>
-        <source>Installing update..</source>
-        <translation>Installation de la mise à jour..</translation>
-    </message>
-    <message>
-        <source>Checking for updates..</source>
-        <translation>Recherche de mise à jour..</translation>
-    </message>
-    <message>
-        <source>%1 software update</source>
-        <translation>Mise à jour de %1</translation>
-    </message>
-    <message>
-        <source>Could not run software update, please try again later.</source>
-        <translation>La mise à jour a échoué, merci de re-essayer ultérieurement.</translation>
-    </message>
-    <message>
-        <source>Not installing update.</source>
-        <translation>La mise à jour ne sera pas installée.</translation>
-    </message>
-    <message>
-        <source>Your version of %1 is up to date.</source>
-        <translation>Votre version de %1 est à jour.</translation>
-    </message>
-</context>
-<context>
     <name>Window</name>
     <message>
         <source>&amp;Quit</source>
         <translation>&amp;Quitter</translation>
-    </message>
-    <message>
-        <source>Check for &amp;updates</source>
-        <translation>&amp;Mettre à jour</translation>
     </message>
     <message numerus="yes">
         <source>%n message(s)</source>

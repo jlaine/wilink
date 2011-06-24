@@ -60,7 +60,7 @@ public:
         InstallState,
     };
 
-    Updater(QObject *parent);
+    Updater(QObject *parent = 0);
     ~Updater();
 
     Error error() const;

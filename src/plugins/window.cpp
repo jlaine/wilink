@@ -33,7 +33,6 @@
 #include "declarative.h"
 #include "photos.h"
 #include "roster.h"
-#include "updatesdialog.h"
 #include "window.h"
 
 Window::Window(const QString &jid, QWidget *parent)
@@ -67,19 +66,13 @@ Window::Window(const QString &jid, QWidget *parent)
     /* "File" menu */
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
 
-    QAction *action = fileMenu->addAction(QIcon(":/options.png"), tr("&Preferences"));
+    QAction *action = fileMenu->addAction(tr("&Preferences"));
     action->setMenuRole(QAction::PreferencesRole);
     check = connect(action, SIGNAL(triggered()),
                     this, SIGNAL(showPreferences()));
     Q_ASSERT(check);
 
-    if (wApp->updateDialog())
-    {
-        action = fileMenu->addAction(QIcon(":/refresh.png"), tr("Check for &updates"));
-        connect(action, SIGNAL(triggered(bool)), wApp->updateDialog(), SLOT(check()));
-    }
-
-    action = fileMenu->addAction(QIcon(":/close.png"), tr("&Quit"));
+    action = fileMenu->addAction(tr("&Quit"));
     action->setMenuRole(QAction::QuitRole);
     action->setShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_Q));
     check = connect(action, SIGNAL(triggered(bool)),

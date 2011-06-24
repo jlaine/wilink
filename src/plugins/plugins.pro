@@ -44,7 +44,6 @@ SOURCES += \
     shares.cpp \
     systeminfo.cpp \
     updater.cpp \
-    updatesdialog.cpp \
     window.cpp
 
 HEADERS += \
@@ -68,7 +67,6 @@ HEADERS += \
     shares.h \
     systeminfo.h \
     updater.h \
-    updatesdialog.h \
     window.h \
 
 mac {

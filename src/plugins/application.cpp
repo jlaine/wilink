@@ -48,7 +48,6 @@
 #include "declarative.h"
 #include "systeminfo.h"
 #include "updater.h"
-#include "updatesdialog.h"
 #include "window.h"
 
 Application *wApp = 0;
@@ -72,7 +71,7 @@ public:
     QSystemTrayIcon *trayIcon;
     QMenu *trayMenu;
 #endif
-    UpdateDialog *updates;
+    Updater *updater;
 };
 
 ApplicationPrivate::ApplicationPrivate()
@@ -85,7 +84,7 @@ ApplicationPrivate::ApplicationPrivate()
     trayIcon(0),
     trayMenu(0),
 #endif
-    updates(0)
+    updater(0)
 {
 }
 
@@ -167,8 +166,11 @@ Application::Application(int &argc, char **argv)
     }
 #endif
 
-    /* add SSL root CA for wifirst.net and download.wifirst.net */
+    // add SSL root CA for wifirst.net and download.wifirst.net
     QSslSocket::addDefaultCaCertificates(":/UTN_USERFirst_Hardware_Root_CA.pem");
+
+    // create software updater
+    d->updater = new Updater;
 }
 
 Application::~Application()
@@ -758,18 +760,8 @@ QSystemTrayIcon *Application::trayIcon()
 }
 #endif
 
-UpdateDialog *Application::updateDialog() const
-{
-    return d->updates;
-}
-
-void Application::setUpdateDialog(UpdateDialog *updateDialog)
-{
-    d->updates = updateDialog;
-}
-
 Updater *Application::updater() const
 {
-    return d->updates->updater();
+    return d->updater;
 }
 

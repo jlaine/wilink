@@ -67,7 +67,6 @@ set(wiLink_SOURCES
     plugins/shares.cpp
     plugins/systeminfo.cpp
     plugins/updater.cpp
-    plugins/updatesdialog.cpp
     plugins/window.cpp)
 
 if(APPLE)
@@ -94,14 +93,12 @@ set(wiLink_MOC_HEADERS
     plugins/roster.h
     plugins/shares.h
     plugins/updater.h
-    plugins/updatesdialog.h
     plugins/window.h)
 
 configure_file(translations/translations.qrc.cmake ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc)
 if(RELOAD_TRANSLATIONS)
     qt4_create_translation(QM_FILES
         plugins/application.cpp
-        plugins/updatesdialog.cpp
         plugins/window.cpp
         data/main.qml
         data/setup.qml
