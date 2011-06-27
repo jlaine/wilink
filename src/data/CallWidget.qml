@@ -130,7 +130,7 @@ Item {
             anchors.right: cameraButton.left
             anchors.margins: 4
             maximumValue: audio.maximumVolume
-            value: audio.outputVolume
+            value: audio.inputVolume
         }
 
         ProgressBar {
@@ -141,7 +141,7 @@ Item {
             anchors.leftMargin: 4
             anchors.rightMargin: 4
             maximumValue: audio.maximumVolume
-            value: audio.inputVolume
+            value: audio.outputVolume
         }
 
         Image {
