@@ -109,6 +109,10 @@ int main(int argc, char *argv[])
         qDebug(" - supports RGB24");
         format.setPixelFormat(QXmppVideoFrame::Format_RGB24);
     }
+    if (pixelFormats.contains(QXmppVideoFrame::Format_UYVY)) {
+        qDebug(" - supports UYVY");
+        format.setPixelFormat(QXmppVideoFrame::Format_UYVY);
+    }
     if (pixelFormats.contains(QXmppVideoFrame::Format_YUYV)) {
         qDebug(" - supports YUYV");
         format.setPixelFormat(QXmppVideoFrame::Format_YUYV);
