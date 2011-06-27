@@ -280,6 +280,7 @@ Panel {
             box.text = qsTr('%1 wants to talk to you.\n\nDo you accept?').replace('%1', contactName);
             box.windowTitle = qsTr('Call from %1').replace('%1', contactName);
             if (box.exec() == QMessageBox.Yes) {
+                swapper.showPanel('PhonePanel.qml');
                 call.accept();
             } else {
                 call.hangup();
