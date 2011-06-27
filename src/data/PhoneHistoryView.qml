@@ -124,23 +124,19 @@ Item {
                     if (mouse.button == Qt.LeftButton) {
                         block.addressClicked(model.address);
                     } else if (mouse.button == Qt.RightButton) {
-                        if (model.active) {
-                            menuLoader.hide();
-                            return;
+                        if (!model.active) {
+                            // show context menu
+                            var pos = mapToItem(menuLoader.parent, mouse.x, mouse.y);
+                            menuLoader.sourceComponent = phoneMenu;
+                            menuLoader.item.callAddress = model.address;
+                            menuLoader.item.callId = model.id;
+                            menuLoader.show(pos.x, pos.y);
                         }
-
-                        // show context menu
-                        var pos = mapToItem(menuLoader.parent, mouse.x, mouse.y);
-                        menuLoader.sourceComponent = phoneMenu;
-                        menuLoader.item.callAddress = model.address;
-                        menuLoader.item.callId = model.id;
-                        menuLoader.show(pos.x, pos.y);
                     }
                 }
                 onDoubleClicked: {
                     if (mouse.button == Qt.LeftButton) {
-                        menu.hide();
-                        view.model.call(address)
+                        view.model.call(address);
                     }
                 }
             }
