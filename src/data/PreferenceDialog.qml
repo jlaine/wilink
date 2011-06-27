@@ -117,7 +117,6 @@ Dialog {
                     acceptedButtons: Qt.LeftButton
 
                     onClicked: {
-                        tabList.currentIndex = model.index;
                         prefSwapper.showPanel(model.source);
                     }
                 }
@@ -136,6 +135,16 @@ Dialog {
             anchors.left: tabList.right
             anchors.leftMargin: 8
             anchors.right: parent.right 
+
+            onCurrentSourceChanged: {
+                for (var i = 0; i < tabList.model.count; i++) {
+                    if (tabList.model.get(i).source == prefSwapper.currentSource) {
+                        tabList.currentIndex = i;
+                        return;
+                    }
+                }
+                tabList.currentIndex = -1;
+            }
         }
     }
 }
