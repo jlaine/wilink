@@ -48,6 +48,8 @@ Panel {
             }
 
             ToolButton {
+                id: preferenceButton
+
                 iconSource: 'options.png'
                 text: qsTr('Options')
 
@@ -169,5 +171,13 @@ Panel {
         anchors.bottom: parent.bottom
         height: queueView.count > 0 ? 120 : 0
         model: view.model.queue
+    }
+
+    // run one-time configuration dialog
+    Component.onCompleted: {
+        if (!application.sharesConfigured) {
+            preferenceButton.clicked();
+            application.sharesConfigured = true;
+        }
     }
 }
