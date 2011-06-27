@@ -368,7 +368,6 @@ bool QVideoGrabberPrivate::open()
     CoUninitialize();
 
     QPair<int, int> metrics = QVideoGrabber::byteMetrics(videoFormat.pixelFormat(), videoFormat.frameSize());
-    qDebug("expecting frames to be %i", metrics.second);
     currentFrame = QXmppVideoFrame(metrics.second, videoFormat.frameSize(), metrics.first, videoFormat.pixelFormat());
     opened = true;
     return true;
