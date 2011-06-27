@@ -194,6 +194,7 @@ CallAudioHelper::CallAudioHelper(QObject *parent)
     m_call(0)
 {
     d = new CallAudioHelperPrivate(this);
+    d->moveToThread(wApp->soundThread());
 }
 
 QXmppCall* CallAudioHelper::call() const
@@ -213,8 +214,8 @@ void CallAudioHelper::setCall(QXmppCall *call)
             bool check;
 
             d->m_channel = call->audioChannel();
-//            d->m_channel->setParent(0);
-//            d->m_channel->moveToThread(wApp->soundThread());
+            d->m_channel->setParent(0);
+            d->m_channel->moveToThread(wApp->soundThread());
 
             check = connect(call, SIGNAL(audioModeChanged(QIODevice::OpenMode)),
                             d, SLOT(audioModeChanged(QIODevice::OpenMode)));
