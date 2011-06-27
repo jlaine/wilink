@@ -496,7 +496,8 @@ QList<QVideoGrabberInfo> QVideoGrabberInfo::availableGrabbers()
                                 if ((pmt->majortype == MEDIATYPE_Video) &&
                                     (pmt->formattype == FORMAT_VideoInfo)) {
                                     QXmppVideoFrame::PixelFormat format = ds_to_qxmpp_PixelFormat(pmt->subtype);
-                                    if (format != QXmppVideoFrame::Format_Invalid)
+                                    if (format != QXmppVideoFrame::Format_Invalid &&
+                                        !grabber.d->supportedPixelFormats.contains(format))
                                         grabber.d->supportedPixelFormats << format;
                                 }
                                 QVideoGrabberPrivate::freeMediaType(*pmt);
