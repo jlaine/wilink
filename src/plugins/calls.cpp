@@ -84,6 +84,8 @@ CallAudioHelper::CallAudioHelper(QObject *parent)
 
 void CallAudioHelper::audioModeChanged(QIODevice::OpenMode mode)
 {
+    bool check;
+
     qDebug("audio mode changed %i", (int)mode);
     QXmppRtpAudioChannel *channel = m_call->audioChannel();
     Q_ASSERT(channel);
@@ -102,9 +104,15 @@ void CallAudioHelper::audioModeChanged(QIODevice::OpenMode mode)
     const bool canRead = (mode & QIODevice::ReadOnly);
     if (canRead && !m_audioOutput) {
         m_audioOutput = new QAudioOutput(wApp->audioOutputDevice(), format, this);
+        check = connect(m_audioOutput, SIGNAL(stateChanged(QAudio::State)),
+                        this, SLOT(audioStateChanged()));
+        Q_ASSERT(check);
+
         m_audioOutputMeter = new QSoundMeter(format, channel, this);
-        QObject::connect(m_audioOutputMeter, SIGNAL(valueChanged(int)),
-                         this, SIGNAL(outputVolumeChanged(int)));
+        check = connect(m_audioOutputMeter, SIGNAL(valueChanged(int)),
+                        this, SIGNAL(outputVolumeChanged(int)));
+        Q_ASSERT(check);
+
         m_audioOutput->setBufferSize(bufferSize);
         m_audioOutput->start(m_audioOutputMeter);
     } else if (!canRead && m_audioOutput) {
@@ -121,9 +129,15 @@ void CallAudioHelper::audioModeChanged(QIODevice::OpenMode mode)
     const bool canWrite = (mode & QIODevice::WriteOnly);
     if (canWrite && !m_audioInput) {
         m_audioInput = new QAudioInput(wApp->audioInputDevice(), format, this);
+        check = connect(m_audioInput, SIGNAL(stateChanged(QAudio::State)),
+                        this, SLOT(audioStateChanged()));
+        Q_ASSERT(check);
+
         m_audioInputMeter = new QSoundMeter(format, channel, this);
-        QObject::connect(m_audioInputMeter, SIGNAL(valueChanged(int)),
-                         this, SIGNAL(inputVolumeChanged(int)));
+        check = connect(m_audioInputMeter, SIGNAL(valueChanged(int)),
+                        this, SIGNAL(inputVolumeChanged(int)));
+        Q_ASSERT(check);
+
         m_audioInput->setBufferSize(bufferSize);
         m_audioInput->start(m_audioInputMeter);
     } else if (!canWrite && m_audioInput) {
@@ -137,6 +151,35 @@ void CallAudioHelper::audioModeChanged(QIODevice::OpenMode mode)
     }
 }
 
+void CallAudioHelper::audioStateChanged()
+{
+    QObject *audio = sender();
+    if (!audio)
+        return;
+#if 0
+    else if (audio == m_audioInput) {
+        qDebug("Audio input state %i error %i",
+            m_audioInput->state(),
+            m_audioInput->error());
+    }
+#endif
+    else if (audio == m_audioOutput) {
+#if 0
+        qDebug("Audio output state %i error %i",
+            m_audioOutput->state(),
+            m_audioOutput->error());
+#endif
+
+        // Restart audio output if we get an underrun.
+        //
+        // NOTE: seen on Linux with pulseaudio
+        if (m_audioOutput->state() == QAudio::IdleState &&
+            m_audioOutput->error() == QAudio::UnderrunError) {
+            qWarning("Audio output needs restart due to buffer underrun");
+            m_audioOutput->start(m_audioOutputMeter);
+        }
+    }
+}
 QXmppCall* CallAudioHelper::call() const
 {
     return m_call;
@@ -145,13 +188,21 @@ QXmppCall* CallAudioHelper::call() const
 void CallAudioHelper::setCall(QXmppCall *call)
 {
     if (call != m_call) {
+        // disconnect old signals
+        if (m_call)
+            m_call->disconnect(this);
+
+        // connect new signals
+        if (call) {
+            bool check;
+            check = connect(call, SIGNAL(audioModeChanged(QIODevice::OpenMode)),
+                            this, SLOT(audioModeChanged(QIODevice::OpenMode)));
+            Q_ASSERT(check);
+            Q_UNUSED(check);
+        }
+
+        // change call
         m_call = call;
-
-        bool check;
-        check = connect(call, SIGNAL(audioModeChanged(QIODevice::OpenMode)),
-                        this, SLOT(audioModeChanged(QIODevice::OpenMode)));
-        Q_ASSERT(check);
-
         emit callChanged(call);
     }
 }
