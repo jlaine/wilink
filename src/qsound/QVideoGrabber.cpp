@@ -47,7 +47,8 @@ QPair<int,int> QVideoGrabber::byteMetrics(QXmppVideoFrame::PixelFormat format, c
     } else if (format == QXmppVideoFrame::Format_RGB24) {
         bytesPerLine = width * 3;
         mappedBytes = bytesPerLine * height;
-    } else if (format == QXmppVideoFrame::Format_YUYV) {
+    } else if (format == QXmppVideoFrame::Format_UYVY ||
+               format == QXmppVideoFrame::Format_YUYV) {
         bytesPerLine = width * 2;
         mappedBytes = bytesPerLine * height;
     } else if (format == QXmppVideoFrame::Format_YUV420P) {
@@ -124,6 +125,26 @@ void QVideoGrabber::convert(const QSize &size,
                     cb_row += c_stride;
                     cr_row += c_stride;
                 }
+                o_row += outputStride/4;
+            }
+
+        } else if (inputFormat == QXmppVideoFrame::Format_UYVY) {
+
+            // convert UYVY to RGB32
+            const uchar *i_row = input;
+            QRgb *o_row = reinterpret_cast<QRgb*>(output);
+            for (int y = 0; y < height; ++y) {
+                const uchar *i_ptr = i_row;
+                QRgb *o_ptr = o_row;
+                for (int x = 0; x < width; x += 2) {
+                    const float cb = *(i_ptr++) - 128.0;
+                    const float yp1 = *(i_ptr++);
+                    const float cr = *(i_ptr++) - 128.0;
+                    const float yp2 = *(i_ptr++);
+                    *(o_ptr++) = YCBCR_to_RGB(yp1, cb, cr);
+                    *(o_ptr++) = YCBCR_to_RGB(yp2, cb, cr);
+                }
+                i_row += inputStride;
                 o_row += outputStride/4;
             }
 
