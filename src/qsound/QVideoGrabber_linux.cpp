@@ -33,6 +33,8 @@
 static QXmppVideoFrame::PixelFormat v4l_to_qxmpp_PixelFormat(__u32 pixelFormat)
 {
     switch (pixelFormat) {
+    case V4L2_PIX_FMT_UYVY:
+        return QXmppVideoFrame::Format_UYVY;
     case V4L2_PIX_FMT_YUYV:
         return QXmppVideoFrame::Format_YUYV;
     case V4L2_PIX_FMT_YUV420:
@@ -132,8 +134,17 @@ bool QVideoGrabberPrivate::open()
     }
     format.fmt.pix.width = videoFormat.frameWidth();
     format.fmt.pix.height = videoFormat.frameHeight();
-    format.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
     format.fmt.pix.field = V4L2_FIELD_INTERLACED;
+    if (videoFormat.pixelFormat() == QXmppVideoFrame::Format_UYVY)
+        format.fmt.pix.pixelformat = V4L2_PIX_FMT_UYVY;
+    else if (videoFormat.pixelFormat() == QXmppVideoFrame::Format_YUYV)
+        format.fmt.pix.pixelformat = V4L2_PIX_FMT_YUYV;
+    else if (videoFormat.pixelFormat() == QXmppVideoFrame::Format_YUV420P)
+        format.fmt.pix.pixelformat = V4L2_PIX_FMT_YUV420;
+    else {
+        qWarning("QVideoGrabber(%s): invalid pixel format requested", qPrintable(deviceName));
+        return false;
+    }
     if (ioctl(fd, VIDIOC_S_FMT, &format) < 0) {
         qWarning("QVideoGrabber(%s): could not set format to device", qPrintable(deviceName));
         close();
