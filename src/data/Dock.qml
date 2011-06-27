@@ -102,9 +102,13 @@ Rectangle {
                 }
             }
 
-            Component.onCompleted: {
-                if (visible) {
-                    swapper.addPanel(panelSource);
+            Connections {
+                target: appClient
+
+                onConnected: {
+                    if (visible) {
+                        swapper.addPanel(phoneButton.panelSource);
+                    }
                 }
             }
         }
@@ -125,9 +129,13 @@ Rectangle {
                 }
             }
 
-            onVisibleChanged: {
-                if (visible) {
-                    swapper.addPanel(panelSource);
+            Connections {
+                target: appClient
+
+                onConnected: {
+                    if (visible) {
+                        swapper.addPanel(shareButton.panelSource);
+                    }
                 }
             }
         }
