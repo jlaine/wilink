@@ -26,14 +26,38 @@
 #include "QXmppCallManager.h"
 #include "QXmppLogger.h"
 
+class CallAudioHelper;
 class CallVideoItem;
 class QAudioInput;
 class QAudioOutput;
 class QSoundMeter;
 class QTimer;
 class QVideoGrabber;
+class QXmppRtpAudioChannel;
 class QXmppVideoFormat;
 class QXmppVideoFrame;
+
+class CallAudioHelperPrivate : public QObject
+{
+    Q_OBJECT
+
+public:
+    CallAudioHelperPrivate(CallAudioHelper *qq);
+
+public slots:
+    void audioModeChanged(QIODevice::OpenMode mode);
+    void audioStateChanged();
+
+private:
+    QAudioInput *m_audioInput;
+    QSoundMeter *m_audioInputMeter;
+    QAudioOutput *m_audioOutput;
+    QSoundMeter *m_audioOutputMeter;
+    QXmppRtpAudioChannel *m_channel;
+    CallAudioHelper *q;
+
+    friend class CallAudioHelper;
+};
 
 class CallAudioHelper : public QObject
 {
@@ -62,16 +86,10 @@ signals:
     // This signal is emitted when the output volume changes.
     void outputVolumeChanged(int volume);
 
-private slots:
-    void audioModeChanged(QIODevice::OpenMode mode);
-    void audioStateChanged();
-
 private:
-    QAudioInput *m_audioInput;
-    QSoundMeter *m_audioInputMeter;
-    QAudioOutput *m_audioOutput;
-    QSoundMeter *m_audioOutputMeter;
     QXmppCall *m_call;
+    CallAudioHelperPrivate *d;
+    friend class CallAudioHelperPrivate;
 };
 
 class CallVideoHelper : public QObject

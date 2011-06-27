@@ -72,25 +72,24 @@ void DeclarativePen::setWidth(int w)
     emit penChanged();
 }
 
-CallAudioHelper::CallAudioHelper(QObject *parent)
-    : QObject(parent),
+CallAudioHelperPrivate::CallAudioHelperPrivate(CallAudioHelper *qq)
+    : QObject(0),
     m_audioInput(0),
     m_audioInputMeter(0),
     m_audioOutput(0),
     m_audioOutputMeter(0),
-    m_call(0)
+    q(qq)
 {
 }
 
-void CallAudioHelper::audioModeChanged(QIODevice::OpenMode mode)
+void CallAudioHelperPrivate::audioModeChanged(QIODevice::OpenMode mode)
 {
     bool check;
 
     qDebug("audio mode changed %i", (int)mode);
-    QXmppRtpAudioChannel *channel = m_call->audioChannel();
-    Q_ASSERT(channel);
+    Q_ASSERT(m_channel);
 
-    QAudioFormat format = formatFor(channel->payloadType());
+    QAudioFormat format = formatFor(m_channel->payloadType());
 
 #ifdef Q_OS_MAC
     // 128ms at 8kHz
@@ -108,9 +107,9 @@ void CallAudioHelper::audioModeChanged(QIODevice::OpenMode mode)
                         this, SLOT(audioStateChanged()));
         Q_ASSERT(check);
 
-        m_audioOutputMeter = new QSoundMeter(format, channel, this);
+        m_audioOutputMeter = new QSoundMeter(format, m_channel, this);
         check = connect(m_audioOutputMeter, SIGNAL(valueChanged(int)),
-                        this, SIGNAL(outputVolumeChanged(int)));
+                        q, SIGNAL(outputVolumeChanged(int)));
         Q_ASSERT(check);
 
         m_audioOutput->setBufferSize(bufferSize);
@@ -122,7 +121,7 @@ void CallAudioHelper::audioModeChanged(QIODevice::OpenMode mode)
         delete m_audioOutputMeter;
         m_audioOutputMeter = 0;
 
-        emit outputVolumeChanged(0);
+        q->outputVolumeChanged(0);
     }
 
     // start or stop capture
@@ -133,9 +132,9 @@ void CallAudioHelper::audioModeChanged(QIODevice::OpenMode mode)
                         this, SLOT(audioStateChanged()));
         Q_ASSERT(check);
 
-        m_audioInputMeter = new QSoundMeter(format, channel, this);
+        m_audioInputMeter = new QSoundMeter(format, m_channel, this);
         check = connect(m_audioInputMeter, SIGNAL(valueChanged(int)),
-                        this, SIGNAL(inputVolumeChanged(int)));
+                        q, SIGNAL(inputVolumeChanged(int)));
         Q_ASSERT(check);
 
         m_audioInput->setBufferSize(bufferSize);
@@ -147,11 +146,11 @@ void CallAudioHelper::audioModeChanged(QIODevice::OpenMode mode)
         delete m_audioInputMeter;
         m_audioInputMeter = 0;
 
-        emit inputVolumeChanged(0);
+        q->inputVolumeChanged(0);
     }
 }
 
-void CallAudioHelper::audioStateChanged()
+void CallAudioHelperPrivate::audioStateChanged()
 {
     QObject *audio = sender();
     if (!audio)
@@ -189,6 +188,14 @@ void CallAudioHelper::audioStateChanged()
         }
     }
 }
+
+CallAudioHelper::CallAudioHelper(QObject *parent)
+    : QObject(parent),
+    m_call(0)
+{
+    d = new CallAudioHelperPrivate(this);
+}
+
 QXmppCall* CallAudioHelper::call() const
 {
     return m_call;
@@ -204,8 +211,13 @@ void CallAudioHelper::setCall(QXmppCall *call)
         // connect new signals
         if (call) {
             bool check;
+
+            d->m_channel = call->audioChannel();
+//            d->m_channel->setParent(0);
+//            d->m_channel->moveToThread(wApp->soundThread());
+
             check = connect(call, SIGNAL(audioModeChanged(QIODevice::OpenMode)),
-                            this, SLOT(audioModeChanged(QIODevice::OpenMode)));
+                            d, SLOT(audioModeChanged(QIODevice::OpenMode)));
             Q_ASSERT(check);
             Q_UNUSED(check);
         }
@@ -218,7 +230,7 @@ void CallAudioHelper::setCall(QXmppCall *call)
 
 int CallAudioHelper::inputVolume() const
 {
-    return m_audioInputMeter ? m_audioInputMeter->value() : 0;
+    return d->m_audioInputMeter ? d->m_audioInputMeter->value() : 0;
 }
 
 int CallAudioHelper::maximumVolume() const
@@ -228,7 +240,7 @@ int CallAudioHelper::maximumVolume() const
 
 int CallAudioHelper::outputVolume() const
 {
-    return m_audioOutputMeter ? m_audioOutputMeter->value() : 0;
+    return d->m_audioOutputMeter ? d->m_audioOutputMeter->value() : 0;
 }
 
 CallVideoHelper::CallVideoHelper(QObject *parent)
