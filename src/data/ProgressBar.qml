@@ -40,8 +40,8 @@ Rectangle {
         anchors.left: parent.left
         radius: 4
         smooth: true
-        width: orientation == Qt.Horizontal ? parent.width * position : parent.width
-        height: orientation == Qt.Horizontal ? parent.height : parent.height * position
+        width: orientation == Qt.Horizontal ? Math.round(parent.width * position) : parent.width
+        height: orientation == Qt.Horizontal ? parent.height : Math.round(parent.height * position)
     }
 }
 
