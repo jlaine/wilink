@@ -110,6 +110,9 @@ Item {
                 button.clicked();
             }
         }
+        onDoubleClicked: {
+            // skip double click
+        }
         onPressed: {
             if (button.enabled) {
                 pressed = true;
