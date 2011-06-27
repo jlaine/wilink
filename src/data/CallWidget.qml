@@ -28,7 +28,7 @@ Item {
 
     anchors.left: parent ? parent.left : undefined
     anchors.right: parent ? parent.right : undefined
-    height: video.openMode != CallVideoHelper.NotOpen ? 288 : 40
+    height: video.openMode != CallVideoHelper.NotOpen ? 248 : 40
 
     CallAudioHelper {
         id: audio
@@ -91,10 +91,9 @@ Item {
         CallVideoItem {
             id: videoMonitor
 
-            anchors.top: videoOutput.bottom
+            anchors.bottom: videoOutput.bottom
             anchors.left: videoOutput.right
-            anchors.leftMargin: -100
-            anchors.topMargin: -80
+            anchors.leftMargin: appStyle.spacing.horizontal
             border.width: 1
             border.color: '#ff0000'
             radius: 8
