@@ -179,8 +179,6 @@ Item {
     }
 
     transitions: Transition {
-        from: ''
-        to: 'hiden'
         PropertyAnimation { target: callWidget; properties: 'opacity'; duration: 500 }
     }
 }
