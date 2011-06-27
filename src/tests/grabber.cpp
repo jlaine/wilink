@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
         qDebug(" - supports YUV420P");
         format.setPixelFormat(QXmppVideoFrame::Format_YUV420P);
     }
-    if (!format.pixelFormat() == QXmppVideoFrame::Format_Invalid) {
+    if (format.pixelFormat() == QXmppVideoFrame::Format_Invalid) {
         qWarning("No valid formats found");
     }
 
