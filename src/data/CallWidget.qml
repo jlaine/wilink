@@ -45,16 +45,14 @@ Item {
     }
 
     Rectangle {
+        id: background
         anchors.fill: parent
-        border.color: '#2689d6'
+        border.color: '#93b9f2'
+        border.width: 1
         gradient: Gradient {
-            GradientStop { position: 0.0; color: '#e7f4fe' }
-            GradientStop { position: 0.2; color: '#bfddf4' }
-            GradientStop { position: 0.8; color: '#bfddf4' }
-            GradientStop { position: 1.0; color: '#e7f4fe' }
+            GradientStop { position: 0; color: '#e7effd' }
+            GradientStop { position: 1; color: '#cbdaf1' }
         }
-        radius: 8
-        smooth: true
 
         Text {
             id: status
@@ -171,5 +169,18 @@ Item {
     Connections {
         target: cameraButton
         onClicked: call.startVideo()
+    }
+
+    state: call && call.state == QXmppCall.FinishedState ? 'inactive' : ''
+
+    states: State {
+          name: 'inactive'
+          PropertyChanges { target: callWidget; opacity: 0 }
+    }
+
+    transitions: Transition {
+        from: ''
+        to: 'hiden'
+        PropertyAnimation { target: callWidget; properties: 'opacity'; duration: 500 }
     }
 }

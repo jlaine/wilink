@@ -136,7 +136,7 @@ endif(RELOAD_TRANSLATIONS)
 qt4_add_translation(QM_FILES ../translations/qt_fr.ts)
 
 set(wiLink_RCCS
-    ${CMAKE_CURRENT_BINARY_DIR}/../translations.qrc
+    ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc
     ${CMAKE_CURRENT_SOURCE_DIR}/../data/wiLink.qrc)
 
 qt4_add_resources(wiLink_RCC_SOURCES ${wiLink_RCCS})
