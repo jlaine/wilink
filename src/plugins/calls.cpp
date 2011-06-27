@@ -113,6 +113,8 @@ void CallAudioHelper::audioModeChanged(QIODevice::OpenMode mode)
         m_audioOutput = 0;
         delete m_audioOutputMeter;
         m_audioOutputMeter = 0;
+
+        emit outputVolumeChanged(0);
     }
 
     // start or stop capture
@@ -130,6 +132,8 @@ void CallAudioHelper::audioModeChanged(QIODevice::OpenMode mode)
         m_audioInput = 0;
         delete m_audioInputMeter;
         m_audioInputMeter = 0;
+
+        emit inputVolumeChanged(0);
     }
 }
 
