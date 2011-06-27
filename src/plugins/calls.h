@@ -69,6 +69,7 @@ class CallAudioHelper : public QObject
 
 public:
     CallAudioHelper(QObject *parent = 0);
+    ~CallAudioHelper();
 
     QXmppCall *call() const;
     void setCall(QXmppCall *call);

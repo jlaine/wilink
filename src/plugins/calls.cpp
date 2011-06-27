@@ -197,6 +197,14 @@ CallAudioHelper::CallAudioHelper(QObject *parent)
     d->moveToThread(wApp->soundThread());
 }
 
+CallAudioHelper::~CallAudioHelper()
+{
+    if (m_call) {
+        m_call->hangup();
+        m_call->deleteLater();
+    }
+}
+
 QXmppCall* CallAudioHelper::call() const
 {
     return m_call;
