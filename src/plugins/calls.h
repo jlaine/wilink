@@ -95,29 +95,37 @@ private:
 class CallVideoHelper : public QObject
 {
     Q_OBJECT
+    Q_FLAGS(OpenModeFlag OpenMode)
     Q_PROPERTY(QXmppCall* call READ call WRITE setCall NOTIFY callChanged)
-    Q_PROPERTY(bool enabled READ enabled NOTIFY enabledChanged)
     Q_PROPERTY(CallVideoItem* monitor READ monitor WRITE setMonitor NOTIFY monitorChanged)
+    Q_PROPERTY(OpenMode openMode READ openMode NOTIFY openModeChanged)
     Q_PROPERTY(CallVideoItem* output READ output WRITE setOutput NOTIFY outputChanged)
 
 public:
+    enum OpenModeFlag {
+        NotOpen = 0x0000,
+        ReadOnly = 0x0001,
+        WriteOnly = 0x0002,
+    };
+    Q_DECLARE_FLAGS(OpenMode, OpenModeFlag)
+
     CallVideoHelper(QObject *parent = 0);
 
     QXmppCall *call() const;
     void setCall(QXmppCall *call);
 
-    bool enabled() const;
-
     CallVideoItem *monitor() const;
     void setMonitor(CallVideoItem *monitor);
+
+    OpenMode openMode() const;
 
     CallVideoItem *output() const;
     void setOutput(CallVideoItem *output);
 
 signals:
     void callChanged(QXmppCall *call);
-    void enabledChanged(bool enabled);
     void monitorChanged(CallVideoItem *monitor);
+    void openModeChanged();
     void outputChanged(CallVideoItem *output);
 
 private slots:

@@ -86,7 +86,7 @@ void CallAudioHelperPrivate::audioModeChanged(QIODevice::OpenMode mode)
 {
     bool check;
 
-    qDebug("audio mode changed %i", (int)mode);
+    //qDebug("audio mode changed %i", (int)mode);
     Q_ASSERT(m_channel);
 
     QAudioFormat format = formatFor(m_channel->payloadType());
@@ -275,12 +275,18 @@ void CallVideoHelper::setCall(QXmppCall *call)
         Q_ASSERT(check);
 
         emit callChanged(call);
+        emit openModeChanged();
     }
 }
 
-bool CallVideoHelper::enabled() const
+CallVideoHelper::OpenMode CallVideoHelper::openMode() const
 {
-    return m_call && ((m_call->videoMode() && QIODevice::ReadWrite) != QIODevice::NotOpen);
+    OpenMode mode = NotOpen;
+    if (m_call && (m_call->videoMode() & QIODevice::ReadOnly))
+        mode |= ReadOnly;
+    if (m_call && (m_call->videoMode() & QIODevice::WriteOnly))
+        mode |= WriteOnly;
+    return mode;
 }
 
 CallVideoItem *CallVideoHelper::output() const
@@ -313,7 +319,7 @@ void CallVideoHelper::videoModeChanged(QIODevice::OpenMode mode)
 {
     Q_ASSERT(m_call);
 
-    qDebug("video mode changed %i", (int)mode);
+    //qDebug("video mode changed %i", (int)mode);
     QXmppRtpVideoChannel *channel = m_call->videoChannel();
     if (!channel)
         mode = QIODevice::NotOpen;
@@ -370,7 +376,7 @@ void CallVideoHelper::videoModeChanged(QIODevice::OpenMode mode)
         }
     }
 
-    emit enabledChanged(canRead || canWrite);
+    emit openModeChanged();
 }
 
 void CallVideoHelper::videoCapture(const QXmppVideoFrame &frame)

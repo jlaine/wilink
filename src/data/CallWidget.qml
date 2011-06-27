@@ -28,7 +28,7 @@ Item {
 
     anchors.left: parent ? parent.left : undefined
     anchors.right: parent ? parent.right : undefined
-    height: video.enabled ? 288 : 40
+    height: video.openMode != CallVideoHelper.NotOpen ? 288 : 40
 
     CallAudioHelper {
         id: audio
@@ -85,7 +85,7 @@ Item {
             radius: 8
             height: 240
             width: 320
-            visible: video.enabled
+            visible: video.openMode != CallVideoHelper.NotOpen
         }
 
         CallVideoItem {
@@ -100,7 +100,7 @@ Item {
             radius: 8
             height: 120
             width: 160
-            visible: video.enabled
+            visible: (video.openMode & CallVideoHelper.WriteOnly) != 0
         }
 
         Button {
@@ -168,7 +168,12 @@ Item {
 
     Connections {
         target: cameraButton
-        onClicked: call.startVideo()
+        onClicked: {
+            if (video.openMode & CallVideoHelper.WriteOnly)
+                call.stopVideo();
+            else
+                call.startVideo();
+        }
     }
 
     state: call && call.state == QXmppCall.FinishedState ? 'inactive' : ''
