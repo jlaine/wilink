@@ -279,7 +279,11 @@ Panel {
             box.standardButton = QMessageBox.Yes | QMessageBox.No;
             box.text = qsTr('%1 wants to talk to you.\n\nDo you accept?').replace('%1', contactName);
             box.windowTitle = qsTr('Call from %1').replace('%1', contactName);
-            box.exec();
+            if (box.exec() == QMessageBox.Yes) {
+                call.accept();
+            } else {
+                call.hangup();
+            }
         }
     }
 }

@@ -260,7 +260,7 @@ Panel {
                 box.windowTitle = qsTranslate('ChatPanel', 'Call from %1').replace('%1', contactName);
                 box.text = qsTranslate('ChatPanel', '%1 wants to talk to you.\n\nDo you accept?').replace('%1', contactName);
                 box.standardButtons = QMessageBox.Yes | QMessageBox.No;
-                if (box.exec()) {
+                if (box.exec() == QMessageBox.Yes) {
                     showConversation(call.jid);
                     call.accept();
                 } else {
@@ -280,7 +280,7 @@ Panel {
                 box.windowTitle = qsTranslate('ChatPanel', 'File from %1').replace('%1', contactName);
                 box.text = qsTranslate('ChatPanel', "%1 wants to send you a file called '%2' (%3).\n\nDo you accept?").replace('%1', contactName).replace('%2', job.fileName).replace('%3', job.fileSize);
                 box.standardButtons = QMessageBox.Yes | QMessageBox.No;
-                if (box.exec()) {
+                if (box.exec() == QMessageBox.Yes) {
                     // FIXME: this silently overwrite existing files!
                     var path = application.downloadsLocation + '/' + job.fileName;
                     console.log("File accepted: " + path);
