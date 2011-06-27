@@ -154,6 +154,12 @@ bool QVideoGrabberPrivate::open()
 {
     AutoReleasePool pool;
 
+    // check format
+    if (videoFormat.pixelFormat() != QXmppVideoFrame::Format_YUYV) {
+        qWarning("QVideoGrabber: invalid pixel format requested");
+        return false;
+    }
+
     // create device
     device = [QTCaptureDevice defaultInputDeviceWithMediaType:QTMediaTypeVideo];
     if (!device)

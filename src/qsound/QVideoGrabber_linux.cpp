@@ -120,7 +120,7 @@ bool QVideoGrabberPrivate::open()
         return false;
     }
     if (!(capability.capabilities & V4L2_CAP_STREAMING)) {
-        qDebug("Video device supports streaming I/O");
+        qWarning("QVideoGrabber(%s): Video device does not support streaming I/O", qPrintable(deviceName));
         close();
         return false;
     }
@@ -143,6 +143,7 @@ bool QVideoGrabberPrivate::open()
         format.fmt.pix.pixelformat = V4L2_PIX_FMT_YUV420;
     else {
         qWarning("QVideoGrabber(%s): invalid pixel format requested", qPrintable(deviceName));
+        close();
         return false;
     }
     if (ioctl(fd, VIDIOC_S_FMT, &format) < 0) {
