@@ -193,6 +193,26 @@ void QVideoGrabber::convert(const QSize &size,
                 i_row += inputStride;
                 o_row += outputStride;
             }
+        } else if (inputFormat == QXmppVideoFrame::Format_UYVY) {
+            // convert UYUV to YUYV
+            const uchar *i_row = input;
+            uchar *o_row = output;
+            for (int y = 0; y < height; ++y) {
+                const uchar *i_ptr = i_row;
+                uchar *o_ptr = o_row;
+                for (int x = 0; x < width; x += 2) {
+                    const quint8 u = *(i_ptr++);
+                    const quint8 y1 = *(i_ptr++);
+                    const quint8 v = *(i_ptr++);
+                    const quint8 y2 = *(i_ptr++);
+                    *(o_ptr++) = y1;
+                    *(o_ptr++) = u;
+                    *(o_ptr++) = y2;
+                    *(o_ptr++) = v;
+                }
+                i_row += inputStride;
+                o_row += outputStride;
+            }
         }
     }
 }
