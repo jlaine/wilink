@@ -156,13 +156,22 @@ void CallAudioHelper::audioStateChanged()
     QObject *audio = sender();
     if (!audio)
         return;
-#if 0
     else if (audio == m_audioInput) {
+#if 0
         qDebug("Audio input state %i error %i",
             m_audioInput->state(),
             m_audioInput->error());
-    }
 #endif
+
+        // Restart audio input if we get an underrun.
+        //
+        // NOTE: seen on Mac OS X 10.6
+        if (m_audioInput->state() == QAudio::IdleState &&
+            m_audioInput->error() == QAudio::UnderrunError) {
+            qWarning("Audio input needs restart due to buffer underrun");
+            m_audioInput->start(m_audioInputMeter);
+        }
+    }
     else if (audio == m_audioOutput) {
 #if 0
         qDebug("Audio output state %i error %i",
