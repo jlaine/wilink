@@ -115,6 +115,32 @@ Item {
                             wrapMode: Text.Wrap
                             onLinkActivated: Qt.openUrlExternally(link)
                         }
+
+                        Button {
+                            id: copyButton
+
+                            anchors.top: parent.top
+                            anchors.right: parent.right
+                            anchors.margins: 3
+                            opacity: 0
+                            iconSource: 'copy.png'
+                            width: 22
+                            height: 22
+                            z: 1
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            hoverEnabled: true
+
+                            onEntered: rect.state = 'hovered'
+                            onExited: rect.state = ''
+                        }
+
+                        states: State {
+                            name:  'hovered'
+                            PropertyChanges { target: copyButton; opacity: 1 }
+                        }
                     }
 
                     Item {
