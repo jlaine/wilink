@@ -115,6 +115,23 @@ Item {
                             wrapMode: Text.Wrap
                             onLinkActivated: Qt.openUrlExternally(link)
                         }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            onEntered: {
+                                copyButtonLoader.sourceComponent = copyButtonComponent
+                                copyHelper.text = model.body
+                            }
+                            onExited: copyButtonLoader.sourceComponent = undefined
+                        }
+
+                        Loader {
+                            id: copyButtonLoader
+                            anchors.top: parent.top
+                            anchors.right: parent.right
+                            anchors.margins: 3
+                        }
                     }
 
                     Item {
@@ -218,6 +235,25 @@ Item {
             }
         }
 */
+    }
+
+    Component {
+        id: copyButtonComponent
+
+        Button {
+            iconSource: 'copy.png'
+            width: 22
+            height: 22
+            onClicked: {
+                copyHelper.selectAll()
+                copyHelper.copy()
+            }
+        }
+    }
+
+    TextEdit {
+        id: copyHelper
+        visible: false
     }
 
     Rectangle {
