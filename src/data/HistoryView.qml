@@ -120,17 +120,18 @@ Item {
                             anchors.fill: parent
                             hoverEnabled: true
                             onEntered: {
-                                copyButtonLoader.sourceComponent = copyButtonComponent
-                                copyHelper.text = model.body
+                                copyButtonLoader.sourceComponent = copyButtonComponent;
+                                copyHelper.text = model.body;
                             }
-                            onExited: copyButtonLoader.sourceComponent = undefined
+                            onExited: {
+                                copyButtonLoader.sourceComponent = undefined;
+                            }
                         }
 
                         Loader {
                             id: copyButtonLoader
                             anchors.top: parent.top
                             anchors.right: parent.right
-                            anchors.margins: 3
                         }
                     }
 
@@ -241,12 +242,13 @@ Item {
         id: copyButtonComponent
 
         Button {
+            text: qsTr('copy')
             iconSource: 'copy.png'
-            width: 22
-            height: 22
+            radius: 8
+            height: 24
             onClicked: {
-                copyHelper.selectAll()
-                copyHelper.copy()
+                copyHelper.selectAll();
+                copyHelper.copy();
             }
         }
     }
