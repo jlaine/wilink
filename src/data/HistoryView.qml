@@ -130,8 +130,8 @@ Item {
 
                         Loader {
                             id: copyButtonLoader
-                            anchors.top: parent.top
                             anchors.right: parent.right
+                            anchors.verticalCenter: parent.verticalCenter
                         }
                     }
 
@@ -242,10 +242,9 @@ Item {
         id: copyButtonComponent
 
         Button {
-            text: qsTr('Copy')
             iconSource: 'copy.png'
-            radius: 8
-            height: appStyle.icon.smallSize
+            text: qsTr('Copy')
+
             onClicked: {
                 copyHelper.selectAll();
                 copyHelper.copy();
