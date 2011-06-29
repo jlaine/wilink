@@ -272,6 +272,13 @@ Panel {
         target: historyModel.client
 
         onCallReceived: {
+            if (historyModel.currentCalls) {
+                // if already busy, refuse call
+                call.hangup();
+                return;
+            }
+
+            historyModel.addCall(call);
             dialogSwapper.showPanel('PhoneNotification.qml', {
                 'call': call,
                 'caller': parseAddress(call.recipient),
