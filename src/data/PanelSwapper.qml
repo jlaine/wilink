@@ -67,25 +67,20 @@ FocusScope {
                 panel[key] = properties[key];
             }
 
-            function hidePanel(i) {
-                // if the panel was visible, show last remaining panel
-                if (swapper.currentItem == panel) {
-                    if (panels.count == 1)
-                        swapper.setCurrentItem(null);
-                    else if (i == panels.count - 1)
-                        swapper.setCurrentItem(panels.get(i - 1).panel);
-                    else
-                        swapper.setCurrentItem(panels.get(i + 1).panel);
-                }
-            }
-
             panel.close.connect(function() {
                 for (var i = 0; i < panels.count; i += 1) {
                     if (panels.get(i).panel == panel) {
                         console.log("removing panel " + panels.get(i).source + " " + propDump(panels.get(i).properties));
 
-                        // hide panel
-                        hidePanel(i);
+                        // if the panel was visible, show last remaining panel
+                        if (swapper.currentItem == panel) {
+                            if (panels.count == 1)
+                                swapper.setCurrentItem(null);
+                            else if (i == panels.count - 1)
+                                swapper.setCurrentItem(panels.get(i - 1).panel);
+                            else
+                                swapper.setCurrentItem(panels.get(i + 1).panel);
+                        }
 
                         // destroy panel
                         panels.remove(i);
