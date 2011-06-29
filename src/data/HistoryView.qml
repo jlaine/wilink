@@ -242,7 +242,7 @@ Item {
         id: copyButtonComponent
 
         Button {
-            text: qsTr('copy')
+            text: qsTr('Copy')
             iconSource: 'copy.png'
             radius: 8
             height: 24

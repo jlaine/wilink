@@ -398,8 +398,8 @@ Acceptez-vous?</translation>
 <context>
     <name>HistoryView</name>
     <message>
-        <source>copy</source>
-        <translation>copier</translation>
+        <source>Copy</source>
+        <translation>Copier</translation>
     </message>
 </context>
 <context>
