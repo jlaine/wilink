@@ -24,7 +24,6 @@ Notification {
     id: dialog
 
     property QtObject call
-    property bool callHandled: false
     property Item panel
     property int soundId: 0
 
@@ -42,17 +41,16 @@ Notification {
     onAccepted: {
         panel.showConversation(call.jid);
         dialog.call.accept();
-        dialog.callHandled = true;
         dialog.close();
     }
 
     onClose: {
         // stop sound
         application.soundPlayer.stop(dialog.soundId);
+    }
 
-        if (!dialog.callHandled) {
-            dialog.call.hangup();
-        }
+    onRejected: {
+        dialog.call.hangup();
     }
 
     Component.onCompleted: {
