@@ -73,8 +73,6 @@ Item {
         }
         border.color: '#aa567dbc'
         border.width: 1
-
-        width: parent.width
         height: 24
         z: 1
 
@@ -90,10 +88,9 @@ Item {
 
         Button {
             anchors.right: parent.right
-            anchors.rightMargin:2
+            anchors.rightMargin: 2
             anchors.verticalCenter: parent.verticalCenter
-            height: 20
-            width: 20
+            iconSize: appStyle.icon.tinySize
             iconSource: 'add.png'
 
             onClicked: block.addClicked()
