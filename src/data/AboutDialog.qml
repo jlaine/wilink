@@ -50,7 +50,7 @@ Dialog {
             onClicked: {
                 if (prompting)
                     appUpdater.refuse();
-                dialog.rejected();
+                dialog.close();
             }
         }
     }
