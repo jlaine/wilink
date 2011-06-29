@@ -19,7 +19,7 @@
 
 import QtQuick 1.0
 
-Rectangle {
+FocusScope {
     id: dialog
 
     property alias contents: item
@@ -31,16 +31,23 @@ Rectangle {
 
     signal accepted
     signal close
+    signal notify
 
-    border.color: '#aa567dbc'
-    border.width: 1
-    gradient: Gradient {
-        GradientStop { id: backgroundStop1; position: 1.0; color: '#e7effd' }
-        GradientStop { id: backgroundStop2; position: 0.0; color: '#cbdaf1' }
-    }
     opacity: 0
-    radius: 10
-    smooth: true
+
+    Rectangle {
+        id: background
+
+        anchors.fill: parent
+        border.color: '#aa567dbc'
+        border.width: 1
+        gradient: Gradient {
+            GradientStop { id: backgroundStop1; position: 1.0; color: '#e7effd' }
+            GradientStop { id: backgroundStop2; position: 0.0; color: '#cbdaf1' }
+        }
+        radius: 10
+        smooth: true
+    }
 
     Component {
         id: dialogFooter
@@ -91,7 +98,7 @@ Rectangle {
             GradientStop { position:1.0; color: '#9fb7dd' }
         }
         height: 20
-        radius: dialog.radius
+        radius: background.radius
         smooth: true
 
         Text {
