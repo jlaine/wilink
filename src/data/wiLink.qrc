@@ -122,6 +122,7 @@
     <file>ProgressBar.qml</file>
     <file>RoomConfigurationDialog.qml</file>
     <file>RoomInviteDialog.qml</file>
+    <file>RoomInviteNotification.qml</file>
     <file>RoomJoinDialog.qml</file>
     <file>RoomKickDialog.qml</file>
     <file>RoomPanel.qml</file>

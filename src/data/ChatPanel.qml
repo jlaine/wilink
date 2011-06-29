@@ -34,6 +34,7 @@ Panel {
     /** Convenience method to show a chat room panel.
      */
     function showRoom(jid) {
+        swapper.showPanel('ChatPanel.qml');
         chatSwapper.showPanel('RoomPanel.qml', {'jid': jid})
     }
 
@@ -62,7 +63,7 @@ Panel {
                         if (chatSwapper.currentItem) {
                             chatSwapper.addPanel('RoomPanel.qml', {'jid': jid});
                         } else {
-                            chatPanel.showRoom(jid);
+                            chatSwapper.showPanel('RoomPanel.qml', {'jid': jid});
                         }
                     }
                 }
@@ -84,15 +85,10 @@ Panel {
                 target: appClient.mucManager
 
                 onInvitationReceived: {
-                    var jid = Utils.jidToBareJid(inviter);
-                    var box = window.messageBox();
-                    box.windowTitle = qsTranslate('ChatPanel', 'Invitation from %1').replace('%1', jid);
-                    box.text = qsTranslate('ChatPanel', "%1 has invited you to join the '%2' chat room.\n\nDo you accept?").replace('%1', jid).replace('%2', roomJid);
-                    box.standardButtons = QMessageBox.Yes | QMessageBox.No;
-                    if (box.exec() == QMessageBox.Yes) {
-                        swapper.showPanel('ChatPanel.qml');
-                        showRoom(roomJid);
-                    }
+                    dialogSwapper.showPanel('RoomInviteNotification.qml', {
+                        'jid': Utils.jidToBareJid(inviter),
+                        'panel': chatPanel,
+                        'roomJid': roomJid});
                 }
             }
         }

@@ -28,7 +28,6 @@ Notification {
     property int soundId: 0
 
     iconSource: vcard.avatar
-    minimumHeight: 150
     text: qsTr('%1 wants to talk to you.\n\nDo you accept?').replace('%1', vcard.name)
     title: qsTr('Call from %1').replace('%1', vcard.name)
 

@@ -24,9 +24,11 @@ Notification {
     id: dialog
 
     property alias jid: vcard.jid
+    property Item panel
+    property string roomJid
 
     iconSource: vcard.avatar
-    text: qsTr('%1 has asked to add you to his or her contact list.\n\nDo you accept?').replace('%1', jid);
+    text: qsTr("%1 has invited you to join the '%2' chat room.\n\nDo you accept?").replace('%1', vcard.name).replace('%2', roomJid)
     title: qsTr('Invitation from %1').replace('%1', vcard.name)
 
     VCard {
@@ -34,23 +36,7 @@ Notification {
     }
 
     onAccepted: {
-        console.log("Contact accepted " + jid);
-
-        // accept subscription
-        appClient.rosterManager.acceptSubscription(jid);
-
-        // request reciprocal subscription
-        appClient.rosterManager.subscribe(jid);
-
-        // close dialog
-        dialog.close();
-    }
-
-    onRejected: {
-        console.log("Contact rejected " + jid);
-
-        // refuse subscription
-        appClient.rosterManager.refuseSubscription(jid);
+        panel.showRoom(roomJid);
     }
 }
 

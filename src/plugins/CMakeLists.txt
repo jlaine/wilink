@@ -122,6 +122,7 @@ if(RELOAD_TRANSLATIONS)
         ../data/PhotoPanel.qml
         ../data/PreferenceDialog.qml
         ../data/RoomInviteDialog.qml
+        ../data/RoomInviteNotification.qml
         ../data/RoomJoinDialog.qml
         ../data/RoomKickDialog.qml
         ../data/RoomPanel.qml

@@ -188,10 +188,6 @@ Acceptez-vous?</translation>
         <translation>Mes contacts</translation>
     </message>
     <message>
-        <source>Invitation from %1</source>
-        <translation>Invitation de %1</translation>
-    </message>
-    <message>
         <source>File from %1</source>
         <translation>Fichier de %1</translation>
     </message>
@@ -200,14 +196,6 @@ Acceptez-vous?</translation>
 
 Do you accept?</source>
         <translation>%1 souhaite vous envoyer un fichier intitulé &apos;%2&apos; (%3).
-
-Acceptez-vous?</translation>
-    </message>
-    <message>
-        <source>%1 has invited you to join the &apos;%2&apos; chat room.
-
-Do you accept?</source>
-        <translation>%1 vous as invité à rejoindre le salon &apos;%2&apos;.
 
 Acceptez-vous?</translation>
     </message>
@@ -586,6 +574,21 @@ Acceptez-vous?</translation>
     <message>
         <source>Invite your contacts</source>
         <translation>Inviter vos contacts</translation>
+    </message>
+</context>
+<context>
+    <name>RoomInviteNotification</name>
+    <message>
+        <source>%1 has invited you to join the &apos;%2&apos; chat room.
+
+Do you accept?</source>
+        <translation>%1 vous as invité à rejoindre le salon &apos;%2&apos;.
+
+Acceptez-vous?</translation>
+    </message>
+    <message>
+        <source>Invitation from %1</source>
+        <translation>Invitation de %1</translation>
     </message>
 </context>
 <context>
