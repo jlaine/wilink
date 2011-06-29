@@ -157,11 +157,7 @@ FocusScope {
         }
 
         var password = appWallet.get(jid);
-        if (password == '') {
-            dialogLoader.showDialog('AccountPasswordDialog.qml', {'jid': jid});
-        } else {
-            appClient.connectToServer(jid, password);
-        }
+        appClient.connectToServer(jid, password);
         swapper.showPanel('ChatPanel.qml');
     }
 

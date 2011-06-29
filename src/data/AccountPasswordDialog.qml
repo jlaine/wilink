@@ -66,6 +66,8 @@ Dialog {
                 validator: RegExpValidator {
                     regExp: /.+/
                 }
+
+                Keys.onReturnPressed: dialog.accepted()
             }
         }
 
@@ -80,6 +82,9 @@ Dialog {
     }
 
     onAccepted: {
+        if (!passwordInput.acceptableInput)
+            return;
+
         var password = passwordInput.text;
         appWallet.set(dialog.jid, password);
         appClient.connectToServer(dialog.jid, password);
