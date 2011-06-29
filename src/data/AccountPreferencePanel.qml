@@ -77,8 +77,8 @@ Panel {
             opacity: 0
 
             onAccepted: {
-                panel.state = '';
                 listPanel.model.append({'jid': jid, 'password': password});
+                addPanel.close();
             }
             onClose: panel.state = ''
         }

@@ -32,7 +32,7 @@ FocusScope {
     property string testPassword
 
     signal accepted(string jid, string password)
-    signal rejected
+    signal close
 
     PanelHelp {
         id: help
@@ -176,7 +176,7 @@ FocusScope {
                 jidInput.text = '';
                 passwordInput.Text = '';
                 testClient.disconnectFromServer();
-                panel.rejected();
+                panel.close();
             }
         }
     }
