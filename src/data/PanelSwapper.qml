@@ -29,7 +29,7 @@ FocusScope {
         id: panels
     }
 
-    function addPanel(source, properties) {
+    function addPanel(source, properties, show) {
         if (properties == undefined)
             properties = {};
 
@@ -43,58 +43,71 @@ FocusScope {
         // if the panel already exists, return it
         var panel = findPanel(source, properties);
         if (panel) {
-            return panel;
+            if (show)
+                swapper.setCurrentItem(panel);
+            return;
         }
 
         // otherwise create the panel
         console.log("creating panel " + source + " " + propDump(properties));
         var component = Qt.createComponent(source);
-        // FIXME: when Qt Quick 1.1 becomes available,
-        // let createObject assign the properties itself.
-        var panel = component.createObject(swapper);
-        for (var key in properties) {
-            panel[key] = properties[key];
-        }
+        if (component.status == Component.Ready)
+            finishCreation();
+        else
+            component.statusChanged.connect(finishCreation);
 
-        function hidePanel(i) {
-            // if the panel was visible, show last remaining panel
-            if (swapper.currentItem == panel) {
-                if (panels.count == 1)
-                    swapper.setCurrentItem(null);
-                else if (i == panels.count - 1)
-                    swapper.setCurrentItem(panels.get(i - 1).panel);
-                else
-                    swapper.setCurrentItem(panels.get(i + 1).panel);
+        function finishCreation() {
+            if (component.status != Component.Ready)
+                return;
+
+            // FIXME: when Qt Quick 1.1 becomes available,
+            // let createObject assign the properties itself.
+            var panel = component.createObject(swapper);
+            for (var key in properties) {
+                panel[key] = properties[key];
             }
-        }
 
-        panel.close.connect(function() {
-            for (var i = 0; i < panels.count; i += 1) {
-                if (panels.get(i).panel == panel) {
-                    console.log("removing panel " + panels.get(i).source + " " + propDump(panels.get(i).properties));
-
-                    // hide panel
-                    hidePanel(i);
-
-                    // destroy panel
-                    panels.remove(i);
-                    panel.destroy();
-                    break;
+            function hidePanel(i) {
+                // if the panel was visible, show last remaining panel
+                if (swapper.currentItem == panel) {
+                    if (panels.count == 1)
+                        swapper.setCurrentItem(null);
+                    else if (i == panels.count - 1)
+                        swapper.setCurrentItem(panels.get(i - 1).panel);
+                    else
+                        swapper.setCurrentItem(panels.get(i + 1).panel);
                 }
             }
-        });
-        panel.notify.connect(function(title, text) {
-            // show notification
-            application.showMessage(panel, title, text);
 
-            // alert window
-            window.alert();
+            panel.close.connect(function() {
+                for (var i = 0; i < panels.count; i += 1) {
+                    if (panels.get(i).panel == panel) {
+                        console.log("removing panel " + panels.get(i).source + " " + propDump(panels.get(i).properties));
 
-            // play a sound
-            application.soundPlayer.play(application.incomingMessageSound);
-        });
-        panels.append({'source': source, 'properties': properties, 'panel': panel});
-        return panel;
+                        // hide panel
+                        hidePanel(i);
+
+                        // destroy panel
+                        panels.remove(i);
+                        panel.destroy();
+                        break;
+                    }
+                }
+            });
+            panel.notify.connect(function(title, text) {
+                // show notification
+                application.showMessage(panel, title, text);
+
+                // alert window
+                window.alert();
+
+                // play a sound
+                application.soundPlayer.play(application.incomingMessageSound);
+            });
+            panels.append({'source': source, 'properties': properties, 'panel': panel});
+            if (show)
+                swapper.setCurrentItem(panel);
+        }
     }
 
     function findPanel(source, properties) {
@@ -122,9 +135,7 @@ FocusScope {
     }
 
     function showPanel(source, properties) {
-        var panel = addPanel(source, properties);
-        swapper.setCurrentItem(panel);
-        return panel;
+        addPanel(source, properties, true);
     }
 
     function setCurrentItem(panel) {
