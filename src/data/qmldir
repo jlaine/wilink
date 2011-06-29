@@ -37,6 +37,7 @@ PanelHelp 1.0 PanelHelp.qml
 PanelSwapper 1.0 PanelSwapper.qml
 PhoneHistoryView 1.0 PhoneHistoryView.qml
 PhonePanel 1.0 PhonePanel.qml
+PhotoAlbumDialog 1.0 PhotoAlbumDialog.qml
 PhotoPanel 1.0 PhotoPanel.qml
 PhotoUploadView 1.0 PhotoUploadView.qml
 PlayerPanel 1.0 PlayerPanel.qml
@@ -45,9 +46,11 @@ ProgressBar 1.0 ProgressBar.qml
 RoomConfigurationDialog 1.0 RoomConfigurationDialog.qml
 RoomInviteDialog 1.0 RoomInviteDialog.qml
 RoomJoinDialog 1.0 RoomJoinDialog.qml
+RoomKickDialog 1.0 RoomKickDialog.qml
 RoomPanel 1.0 RoomPanel.qml
 RoomParticipantView 1.0 RoomParticipantView.qml
 RoomPermissionDialog 1.0 RoomPermissionDialog.qml
+RoomSubjectDialog 1.0 RoomSubjectDialog.qml
 RosterView 1.0 RosterView.qml
 ScrollBar 1.0 ScrollBar.qml
 SharePanel 1.0 SharePanel.qml
