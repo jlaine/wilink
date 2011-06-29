@@ -95,11 +95,6 @@ FocusScope {
             swapper.focus = true;
         }
 
-        function show() {
-            dialogLoader.item.opacity = 1;
-            dialogLoader.focus = true;
-        }
-
         function showDialog(source, properties) {
             if (dialogLoader.lastSource == source) {
                 for (var key in properties) {

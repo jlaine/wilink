@@ -54,9 +54,7 @@ Panel {
                 text: qsTr('Options')
 
                 onClicked: {
-                    dialogLoader.source = 'PreferenceDialog.qml';
-                    dialogLoader.item.showPanel('SharePreferencePanel.qml');
-                    dialogLoader.show();
+                    dialogLoader.showDialog('PreferenceDialog.qml');
                 }
             }
         }
