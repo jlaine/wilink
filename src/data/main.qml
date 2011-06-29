@@ -18,6 +18,7 @@
  */
 
 import QtQuick 1.0
+import QXmpp 0.4
 import wiLink 1.2
 import 'utils.js' as Utils
 
@@ -27,6 +28,30 @@ FocusScope {
 
     Client {
         id: appClient
+
+        logger: QXmppLogger {
+            loggingType: QXmppLogger.SignalLogging
+        }
+
+        onAuthenticationFailed: {
+            console.log("Failed to authenticate with chat server");
+            var jid = Utils.jidToBareJid(appClient.jid);
+            dialogLoader.source = 'AccountPasswordDialog.qml';
+            dialogLoader.item.jid = jid;
+            dialogLoader.item.accepted.connect(function() {
+                var password = dialogLoader.item.password;
+                dialogLoader.hide();
+                dialogLoader.source = '';
+                appWallet.set(jid, password);
+                appClient.connectToServer(jid, password);
+            });
+            dialogLoader.show();
+        }
+
+        onConflictReceived: {
+            console.log("Received a resource conflict from chat server");
+            application.quit();
+        }
     }
 
     Style {
@@ -112,30 +137,6 @@ FocusScope {
         Connections {
             target: menuLoader.item
             onItemClicked: menuLoader.hide()
-        }
-    }
-
-    Connections {
-        target: appClient
-
-        onAuthenticationFailed: {
-            console.log("Failed to authenticate with chat server");
-            var jid = Utils.jidToBareJid(appClient.jid);
-            dialogLoader.source = 'AccountPasswordDialog.qml';
-            dialogLoader.item.jid = jid;
-            dialogLoader.item.accepted.connect(function() {
-                var password = dialogLoader.item.password;
-                dialogLoader.hide();
-                dialogLoader.source = '';
-                appWallet.set(jid, password);
-                appClient.connectToServer(jid, password);
-            });
-            dialogLoader.show();
-        }
-
-        onConflictReceived: {
-            console.log("Received a resource conflict from chat server");
-            application.quit();
         }
     }
 
