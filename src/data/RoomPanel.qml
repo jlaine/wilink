@@ -180,12 +180,9 @@ Panel {
         target: room
 
         onError: {
-            var box = window.messageBox();
-            box.icon = QMessageBox.Warning;
-            box.windowTitle = qsTranslate('RoomPanel', 'Chat room error');
-            // FIXME: get reason
-            box.text = qsTranslate('RoomPanel', "Sorry, but you cannot join chat room '%1'.\n\n%2").replace('%1', jid).replace('%2', '');
-            box.show();
+            dialogSwapper.showPanel('Notification.qml', {
+                'title': qsTranslate('RoomPanel', 'Chat room error'),
+                'text': qsTranslate('RoomPanel', "Sorry, but you cannot join chat room '%1'.\n\n%2").replace('%1', room.jid).replace('%2', '')});
         }
 
         onJoined: {
@@ -193,11 +190,9 @@ Panel {
         }
 
         onKicked: {
-            var box = window.messageBox();
-            box.icon = QMessageBox.Warning;
-            box.windowTitle = qsTranslate('RoomPanel', 'Chat room error');
-            box.text = qsTranslate('RoomPanel', "Sorry, but you were kicked from chat room '%1'.\n\n%2").replace('%1', jid).replace('%2', reason);
-            box.show();
+            dialogSwapper.showPanel('Notification.qml', {
+                'title': qsTranslate('RoomPanel', 'Chat room error'),
+                'text': qsTranslate('RoomPanel', "Sorry, but you were kicked from chat room '%1'.\n\n%2").replace('%1', room.jid).replace('%2', reason)});
         }
     }
 

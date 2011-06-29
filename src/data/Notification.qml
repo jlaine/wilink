@@ -35,7 +35,6 @@ Dialog {
 
             anchors.top: parent.top
             anchors.left: parent.left
-            source: vcard.avatar
         }
 
         Text {
