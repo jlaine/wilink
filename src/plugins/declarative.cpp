@@ -20,7 +20,6 @@
 #include <QCoreApplication>
 #include <QDeclarativeItem>
 #include <QDeclarativeEngine>
-#include <QMessageBox>
 #include <QNetworkRequest>
 
 #include "QXmppCallManager.h"
@@ -265,6 +264,5 @@ void Plugin::registerTypes(const char *uri)
     qRegisterMetaType<QIODevice::OpenMode>("QIODevice::OpenMode");
     qmlRegisterUncreatableType<QAbstractItemModel>(uri, 1, 2, "QAbstractItemModel", "");
     qmlRegisterUncreatableType<QFileDialog>(uri, 1, 2, "QFileDialog", "");
-    qmlRegisterUncreatableType<QMessageBox>(uri, 1, 2, "QMessageBox", "");
     qmlRegisterType<QDeclarativeSortFilterProxyModel>(uri, 1, 2, "SortFilterProxyModel");
 }

@@ -23,7 +23,6 @@
 #include <QMainWindow>
 
 class QFileDialog;
-class QMessageBox;
 class QUrl;
 
 /** Chat represents the user interface's main window.
@@ -45,7 +44,6 @@ signals:
 public slots:
     void alert();
     QFileDialog *fileDialog();
-    QMessageBox *messageBox();
 
 protected:
     void changeEvent(QEvent *event);

@@ -25,7 +25,6 @@
 #include <QDesktopWidget>
 #include <QFileDialog>
 #include <QMenuBar>
-#include <QMessageBox>
 #include <QShortcut>
 #include <QStringList>
 
@@ -144,12 +143,5 @@ QFileDialog *Window::fileDialog()
 {
     QFileDialog *dialog = new QDeclarativeFileDialog(this);
     return dialog;
-}
-
-QMessageBox *Window::messageBox()
-{
-    QMessageBox *box = new QMessageBox(this);
-    box->setIcon(QMessageBox::Question);
-    return box;
 }
 
