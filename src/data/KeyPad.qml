@@ -32,47 +32,15 @@ GridView {
     width: cellWidth * 3
     height: cellHeight * 4
 
-    delegate: Rectangle {
+    delegate: Button {
         id: button
 
-        border.width: 1
-        border.color: '#adacab'
-        gradient: Gradient {
-            GradientStop { id: stop1; position: 0.0; color: '#ffffff' }
-            GradientStop { id: stop2; position: 1.0; color: '#edeceb' }
-        }
+        text: model.name
+        width: 35
+        height: 35
 
-        color: '#edeceb'
-        width: grid.cellWidth - 6
-        height: grid.cellHeight - 6
-        radius: 5
-        smooth: true
-
-        Text  {
-            anchors.centerIn: parent
-            text: model.name
-        }
-
-        MouseArea {
-            anchors.fill: parent
-
-            onPressed: {
-                button.state = 'pressed'
-                grid.keyPressed(model)
-            }
-
-            onReleased: {
-                button.state = ''
-                grid.keyReleased(model)
-            }
-        }
-
-        states: State {
-            name: 'pressed'
-            PropertyChanges { target: button; border.color: '#b0e2ff' }
-            PropertyChanges { target: stop2;  color: '#b0e2ff' }
-            PropertyChanges { target: stop1;  color: '#ffffff' }
-        }
+        onPressed: grid.keyPressed(model)
+        onReleased: grid.keyReleased(model)
     }
     model: ListModel {
         ListElement { name: '1'; tone: QXmppRtpAudioChannel.Tone_1 }
