@@ -22,14 +22,14 @@ import QtQuick 1.0
 InputDialog {
     id: dialog
 
-    property string jid
     property QtObject room
 
-    title: qsTr('Kick user')
-    labelText: qsTr('Enter the reason for kicking the user from the room.')
+    title: qsTr('Change subject')
+    labelText: qsTr('Enter the new room subject.')
+    textValue: Qt.isQtObject(room) ? room.subject : ''
 
     onAccepted: {
-        room.kick(jid, dialog.textValue);
+        room.subject = dialog.textValue;
         dialogLoader.hide();
     }
 }

@@ -635,14 +635,6 @@ Acceptez-vous?</translation>
         <source>Close</source>
         <translation>Fermer</translation>
     </message>
-    <message>
-        <source>Change subject</source>
-        <translation>Changer le sujet</translation>
-    </message>
-    <message>
-        <source>Enter the new room subject.</source>
-        <translation>Saisissez le nouveau sujet du salon.</translation>
-    </message>
 </context>
 <context>
     <name>RoomParticipantView</name>
@@ -676,6 +668,17 @@ Acceptez-vous?</translation>
     <message>
         <source>Chat room permissions</source>
         <translation>Permissions du salon de discussion</translation>
+    </message>
+</context>
+<context>
+    <name>RoomSubjectDialog</name>
+    <message>
+        <source>Change subject</source>
+        <translation>Changer le sujet</translation>
+    </message>
+    <message>
+        <source>Enter the new room subject.</source>
+        <translation>Saisissez le nouveau sujet du salon.</translation>
     </message>
 </context>
 <context>

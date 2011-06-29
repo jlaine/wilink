@@ -110,22 +110,23 @@ if(RELOAD_TRANSLATIONS)
         ../data/Dialog.qml
         ../data/DiscoveryPanel.qml
         ../data/Dock.qml
+        ../data/GeneralPreferencePanel.qml
         ../data/HistoryView.qml
         ../data/InputMenu.qml
         ../data/LogPanel.qml
-        ../data/RoomInviteDialog.qml
-        ../data/RoomJoinDialog.qml
-        ../data/RoomKickDialog.qml
-        ../data/RoomParticipantView.qml
-        ../data/RoomPermissionDialog.qml
         ../data/PhoneHistoryView.qml
         ../data/PhonePanel.qml
         ../data/PhotoPanel.qml
         ../data/PreferenceDialog.qml
-        ../data/GeneralPreferencePanel.qml
+        ../data/RoomInviteDialog.qml
+        ../data/RoomJoinDialog.qml
+        ../data/RoomKickDialog.qml
+        ../data/RoomPanel.qml
+        ../data/RoomParticipantView.qml
+        ../data/RoomPermissionDialog.qml
+        ../data/RoomSubjectDialog.qml
         ../data/SharePreferencePanel.qml
         ../data/SoundPreferencePanel.qml
-        ../data/RoomPanel.qml
         ../data/SharePanel.qml
         ../data/ShareQueueView.qml
         ../data/ShareView.qml
