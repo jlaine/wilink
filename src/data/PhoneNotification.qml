@@ -24,15 +24,16 @@ Notification {
     id: dialog
 
     property QtObject call
-    //property Item panel
+    property string caller
+    property Item swapper
     property int soundId: 0
 
     iconSource: 'phone.png'
-    text: qsTr('%1 wants to talk to you.\n\nDo you accept?').replace('%1', call.recipient)
-    title: qsTr('Call from %1').replace('%1', call.recipient)
+    text: qsTr('%1 wants to talk to you.\n\nDo you accept?').replace('%1', caller)
+    title: qsTr('Call from %1').replace('%1', caller)
 
     onAccepted: {
-        //swapper.showPanel('PhonePanel.qml');
+        swapper.showPanel('PhonePanel.qml');
         dialog.call.accept();
         dialog.close();
     }

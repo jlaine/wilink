@@ -274,6 +274,8 @@ Panel {
         onCallReceived: {
             dialogSwapper.showPanel('PhoneNotification.qml', {
                 'call': call,
+                'caller': parseAddress(call.recipient),
+                'swapper': swapper,
             });
         }
     }
