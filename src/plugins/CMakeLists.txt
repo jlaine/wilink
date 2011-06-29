@@ -110,6 +110,7 @@ if(RELOAD_TRANSLATIONS)
         ../data/Dialog.qml
         ../data/DiscoveryPanel.qml
         ../data/Dock.qml
+        ../data/HistoryView.qml
         ../data/InputMenu.qml
         ../data/LogPanel.qml
         ../data/RoomInviteDialog.qml
