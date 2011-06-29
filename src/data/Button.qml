@@ -25,12 +25,13 @@ Rectangle {
     property bool enabled: true
     property int iconSize: iconSource != '' ? appStyle.icon.smallSize : 0
     property alias iconSource: image.source
+    property int margins: 4
     property string text: ''
 
     signal clicked
 
-    height: button.visible ? (Math.max(iconSize, labelHelper.height) + 8) : 0
-    width: button.visible ? labelHelper.width + iconSize + ((iconSource != '' && text != '') ? 3 : 2) * image.anchors.margins : 0
+    height: button.visible ? (Math.max(iconSize, labelHelper.height) + 2 * margins) : 0
+    width: button.visible ? labelHelper.width + iconSize + ((iconSource != '' && text != '') ? 3 : 2) * margins : 0
     border.color: '#84bde8'
     gradient: Gradient {
         GradientStop { id: stop1; position: 0.0; color: '#ffffff' }
@@ -45,7 +46,7 @@ Rectangle {
         height: iconSize
         width: iconSize
         anchors.left: parent.left
-        anchors.margins: 4
+        anchors.leftMargin: margins
         anchors.verticalCenter: parent.verticalCenter
         smooth: true
     }
@@ -54,8 +55,9 @@ Rectangle {
         id: label
 
         anchors.left: image.right
-        anchors.leftMargin: iconSource != '' ? 4 : 0
+        anchors.leftMargin: iconSource != '' ? margins : 0
         anchors.right: parent.right
+        anchors.rightMargin: margins
         anchors.verticalCenter: parent.verticalCenter
         elide: Text.ElideRight
         text: button.text
