@@ -95,6 +95,7 @@
     <file>DiscoveryPanel.qml</file>
     <file>Dock.qml</file>
     <file>DockButton.qml</file>
+    <file>GeneralPreferencePanel.qml</file>
     <file>GroupBox.qml</file>
     <file>Highlight.qml</file>
     <file>HistoryView.qml</file>
@@ -105,6 +106,7 @@
     <file>LogPanel.qml</file>
     <file>Menu.qml</file>
     <file>MenuDelegate.qml</file>
+    <file>Notification.qml</file>
     <file>Panel.qml</file>
     <file>PanelHeader.qml</file>
     <file>PanelHelp.qml</file>
@@ -116,9 +118,6 @@
     <file>PhotoUploadView.qml</file>
     <file>PlayerPanel.qml</file>
     <file>PreferenceDialog.qml</file>
-    <file>GeneralPreferencePanel.qml</file>
-    <file>SharePreferencePanel.qml</file>
-    <file>SoundPreferencePanel.qml</file>
     <file>ProgressBar.qml</file>
     <file>RoomConfigurationDialog.qml</file>
     <file>RoomInviteDialog.qml</file>
@@ -131,8 +130,10 @@
     <file>RosterView.qml</file>
     <file>ScrollBar.qml</file>
     <file>SharePanel.qml</file>
+    <file>SharePreferencePanel.qml</file>
     <file>ShareQueueView.qml</file>
     <file>ShareView.qml</file>
+    <file>SoundPreferencePanel.qml</file>
     <file>StatusBar.qml</file>
     <file>StatusPill.qml</file>
     <file>Style.qml</file>

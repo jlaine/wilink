@@ -11,6 +11,7 @@ ChatPanel 1.0 ChatPanel.qml
 CheckBox 1.0 CheckBox.qml
 ComboBox 1.0 ComboBox.qml
 ContactAddDialog 1.0 ContactAddDialog.qml
+ContactAddNotification 1.0 ContactAddNotification.qml
 ContactMenu 1.0 ContactMenu.qml
 ContactRemoveDialog 1.0 ContactRemoveDialog.qml
 ContactRenameDialog 1.0 ContactRenameDialog.qml
@@ -32,6 +33,7 @@ KeyPad 1.0 KeyPad.qml
 LogPanel 1.0 LogPanel.qml
 Menu 1.0 Menu.qml
 MenuDelegate 1.0 MenuDelegate.qml
+Notification 1.0 Notification.qml
 Panel 1.0 Panel.qml
 PanelHeader 1.0 PanelHeader.qml
 PanelHelp 1.0 PanelHelp.qml

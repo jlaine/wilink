@@ -20,7 +20,7 @@
 import QtQuick 1.0
 import wiLink 1.2
 
-Dialog {
+Notification {
     id: dialog
 
     property QtObject call
@@ -28,34 +28,15 @@ Dialog {
     property Item panel
     property int soundId: 0
 
+    iconSource: vcard.avatar
     minimumHeight: 150
+    text: qsTr('%1 wants to talk to you.\n\nDo you accept?').replace('%1', vcard.name)
     title: qsTr('Call from %1').replace('%1', vcard.name)
 
     VCard {
         id: vcard
 
         jid: Qt.isQtObject(call) ? call.jid : ''
-    }
-
-    Item {
-        anchors.fill: contents
-
-        Image {
-            id: image
-
-            anchors.top: parent.top
-            anchors.left: parent.left
-            source: vcard.avatar
-        }
-
-        Text {
-            anchors.top: parent.top
-            anchors.left: image.right
-            anchors.leftMargin: 8
-            anchors.right: parent.right
-            text: qsTr('%1 wants to talk to you.\n\nDo you accept?').replace('%1', vcard.name)
-            wrapMode: Text.WordWrap
-        }
     }
 
     onAccepted: {
