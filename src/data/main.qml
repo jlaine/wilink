@@ -82,45 +82,17 @@ FocusScope {
         onClicked: menuLoader.hide()
     }
 
-    Loader {
+    PanelSwapper {
         id: dialogSwapper
-
-        property variant lastSource
-        property variant properties
-
         z: 10
 
-        function showPanel(source, properties) {
-            if (dialogSwapper.lastSource == source) {
-                for (var key in properties) {
-                    dialogSwapper.item[key] = properties[key];
-                }
-                dialogSwapper.item.opacity = 1;
-                dialogSwapper.forceActiveFocus();
+        onCurrentItemChanged: {
+            if (currentItem) {
+                dialogSwapper.focus = true;
+                x = Math.max(0, Math.floor((parent.width - currentItem.width) / 2));
+                y = Math.max(0, Math.floor((parent.height - currentItem.height) / 2));
             } else {
-                dialogSwapper.properties = properties;
-                dialogSwapper.source = source;
-                dialogSwapper.lastSource = source;
-            }
-        }
-
-        onLoaded: {
-            x = Math.max(0, Math.floor((parent.width - width) / 2));
-            y = Math.max(0, Math.floor((parent.height - height) / 2));
-            for (var key in dialogSwapper.properties) {
-                dialogSwapper.item[key] = dialogSwapper.properties[key];
-            }
-            dialogSwapper.item.opacity = 1;
-            dialogSwapper.forceActiveFocus();
-        }
-
-        Connections {
-            target: dialogSwapper.item
-
-            onClose: {
-                dialogSwapper.source = '';
-                dialogSwapper.lastSource = '';
-                swapper.forceActiveFocus();
+                swapper.focus = true;
             }
         }
     }
