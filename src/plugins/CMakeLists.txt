@@ -135,6 +135,7 @@ if(RELOAD_TRANSLATIONS)
         ../data/ShareQueueView.qml
         ../data/ShareView.qml
         ../data/StatusBar.qml
+        ../data/TransferNotification.qml
         ../data/TransferWidget.qml
         ../translations/fr.ts)
 else(RELOAD_TRANSLATIONS)

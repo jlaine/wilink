@@ -19,25 +19,33 @@
 
 import QtQuick 1.0
 import wiLink 1.2
+import 'utils.js' as Utils
 
 Notification {
     id: dialog
 
-    property alias jid: vcard.jid
+    property QtObject job
     property Item panel
-    property string roomJid
 
     iconSource: vcard.avatar
-    text: qsTr("%1 has invited you to join the '%2' chat room.\n\nDo you accept?").replace('%1', vcard.name).replace('%2', roomJid)
-    title: qsTr('Invitation from %1').replace('%1', vcard.name)
+    text: Qt.isQtObject(job) ? qsTr("%1 wants to send you a file called '%2' (%3).\n\nDo you accept?").replace('%1', vcard.name).replace('%2', job.fileName).replace('%3', Utils.formatSize(job.fileSize)) : ''
+    title: qsTr('File from %1').replace('%1', vcard.name)
 
     VCard {
         id: vcard
+        jid: Qt.isQtObject(job) ? job.jid : ''
     }
 
     onAccepted: {
-        panel.showRoom(roomJid);
+        // FIXME: this silently overwrite existing files!
+        var path = application.downloadsLocation + '/' + job.fileName;
+        console.log("File accepted: " + path);
+        panel.showConversation(job.jid);
+        job.accept(path);
+
         dialog.close();
     }
+
+    onRejected: job.abort()
 }
 

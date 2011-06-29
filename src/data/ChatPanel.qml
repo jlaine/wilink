@@ -237,23 +237,9 @@ Panel {
         Connections {
             target: appClient.transferManager
             onFileReceived: {
-                var contactName = job.jid;
-                console.log("File received: " + contactName);
-
-                // prompt user
-                var box = window.messageBox();
-                box.windowTitle = qsTranslate('ChatPanel', 'File from %1').replace('%1', contactName);
-                box.text = qsTranslate('ChatPanel', "%1 wants to send you a file called '%2' (%3).\n\nDo you accept?").replace('%1', contactName).replace('%2', job.fileName).replace('%3', job.fileSize);
-                box.standardButtons = QMessageBox.Yes | QMessageBox.No;
-                if (box.exec() == QMessageBox.Yes) {
-                    // FIXME: this silently overwrite existing files!
-                    var path = application.downloadsLocation + '/' + job.fileName;
-                    console.log("File accepted: " + path);
-                    showConversation(job.jid);
-                    job.accept(path);
-                } else {
-                    job.abort();
-                }
+                dialogSwapper.showPanel('TransferNotification.qml', {
+                    'job': job,
+                    'panel': chatPanel});
             }
         }
     }
