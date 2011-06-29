@@ -84,6 +84,8 @@ FocusScope {
 
     PanelSwapper {
         id: dialogSwapper
+
+        opacity: 0
         z: 10
 
         onCurrentItemChanged: {
@@ -91,8 +93,10 @@ FocusScope {
                 dialogSwapper.focus = true;
                 x = Math.max(0, Math.floor((parent.width - currentItem.width) / 2));
                 y = Math.max(0, Math.floor((parent.height - currentItem.height) / 2));
+                opacity = 1;
             } else {
                 swapper.focus = true;
+                opacity = 0;
             }
         }
     }
