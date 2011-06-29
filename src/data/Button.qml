@@ -23,12 +23,14 @@ Rectangle {
     id: button
 
     property bool enabled: true
+    property int iconSize: iconSource != '' ? appStyle.icon.smallSize : 0
     property alias iconSource: image.source
-    property alias text: label.text
+    property string text: ''
+
     signal clicked
 
-    height: button.visible ? (image.sourceSize.height ? 32 : 24) : 0
-    width: button.visible ? label.width + image.width + 2 * image.anchors.margins : 0
+    height: button.visible ? (Math.max(iconSize, labelHelper.height) + 8) : 0
+    width: button.visible ? labelHelper.width + iconSize + ((iconSource != '' && text != '') ? 3 : 2) * image.anchors.margins : 0
     border.color: '#84bde8'
     gradient: Gradient {
         GradientStop { id: stop1; position: 0.0; color: '#ffffff' }
@@ -37,21 +39,11 @@ Rectangle {
     radius: 4
     smooth: true
 
-    Rectangle {
-        id: overlay
-        anchors.fill: button
-        color: '#99ffffff'
-        visible: !button.enabled
-        radius: 4
-        smooth: true
-        z: 10
-    }
-
     Image {
         id: image
 
-        height: button.height - 8
-        width: sourceSize.width ? (button.height - 8) : 0
+        height: iconSize
+        width: iconSize
         anchors.left: parent.left
         anchors.margins: 4
         anchors.verticalCenter: parent.verticalCenter
@@ -61,10 +53,29 @@ Rectangle {
     Text {
         id: label
 
-        anchors.bottom: parent.bottom
         anchors.left: image.right
-        anchors.top: parent.top
-        verticalAlignment: Text.AlignVCenter
+        anchors.leftMargin: iconSource != '' ? 4 : 0
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        elide: Text.ElideRight
+        text: button.text
+    }
+
+    Text {
+        id: labelHelper
+
+        opacity: 0
+        text: button.text
+    }
+
+    Rectangle {
+        id: overlay
+
+        anchors.fill: button
+        color: '#99ffffff'
+        visible: !button.enabled
+        radius: button.radius
+        smooth: true
     }
 
     MouseArea {
