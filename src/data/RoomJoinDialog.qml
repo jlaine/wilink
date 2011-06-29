@@ -82,7 +82,7 @@ Dialog {
                     width: appStyle.icon.smallSize
                     height: appStyle.icon.smallSize
                     smooth: true
-                    source: model.avatar
+                    source: 'chat.png'
                 }
 
                 Text {
