@@ -55,9 +55,7 @@ QVariant DiscoveryModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || !item)
         return QVariant();
 
-    if (role == ChatModel::AvatarRole)
-        return QUrl("qrc:/peer.png");
-    else if (role == ChatModel::NameRole)
+    if (role == ChatModel::NameRole)
         return item->name;
     else if (role == ChatModel::JidRole)
         return item->jid;
