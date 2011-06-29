@@ -159,8 +159,7 @@ void HistoryModel::addMessage(const HistoryMessage &message)
         foreach (HistoryMessage *curMessage, bubble->messages) {
 
             // check for collision
-            if (message.archived != curMessage->archived &&
-                message.jid == curMessage->jid &&
+            if (message.jid == curMessage->jid &&
                 message.body == curMessage->body &&
                 qAbs(message.date.secsTo(curMessage->date)) < 10)
                 return;
