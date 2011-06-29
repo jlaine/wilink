@@ -28,6 +28,7 @@ Dialog {
     property Item panel
     property int soundId: 0
 
+    minimumHeight: 150
     title: qsTr('Call from %1').replace('%1', vcard.name)
 
     VCard {
