@@ -245,12 +245,6 @@ Panel {
         Connections {
             target: appClient.callManager
             onCallReceived: {
-                console.log("Call received: " + call.jid);
-
-                // FIXME: start incoming tone
-                //int soundId = wApp->soundPlayer()->play(":/call-incoming.ogg", true);
-
-                // prompt user
                 dialogSwapper.showPanel('CallNotification.qml', {
                     'call': call,
                     'panel': chatPanel});

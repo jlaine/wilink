@@ -26,6 +26,7 @@ Dialog {
     property QtObject call
     property bool callHandled: false
     property Item panel
+    property int soundId: 0
 
     title: qsTr('Call from %1').replace('%1', vcard.name)
 
@@ -58,15 +59,26 @@ Dialog {
 
     onAccepted: {
         panel.showConversation(call.jid);
-        call.accept();
+        dialog.call.accept();
         dialog.callHandled = true;
         dialog.close();
     }
 
     onClose: {
+        // stop sound
+        application.soundPlayer.stop(dialog.soundId);
+
         if (!dialog.callHandled) {
-            call.hangup();
+            dialog.call.hangup();
         }
+    }
+
+    Component.onCompleted: {
+        // alert window
+        window.alert();
+
+        // play a sound
+        dialog.soundId = application.soundPlayer.play(":/call-incoming.ogg", true);
     }
 }
 
