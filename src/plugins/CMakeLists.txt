@@ -112,6 +112,7 @@ if(RELOAD_TRANSLATIONS)
         ../data/Dialog.qml
         ../data/DiscoveryPanel.qml
         ../data/Dock.qml
+        ../data/ErrorNotification.qml
         ../data/GeneralPreferencePanel.qml
         ../data/HistoryView.qml
         ../data/InputMenu.qml

@@ -180,7 +180,7 @@ Panel {
         target: room
 
         onError: {
-            dialogSwapper.showPanel('Notification.qml', {
+            dialogSwapper.showPanel('ErrorNotification.qml', {
                 'iconSource': 'chat.png',
                 'title': qsTranslate('RoomPanel', 'Chat room error'),
                 'text': qsTranslate('RoomPanel', "Sorry, but you cannot join chat room '%1'.\n\n%2").replace('%1', room.jid).replace('%2', ''),
@@ -192,7 +192,7 @@ Panel {
         }
 
         onKicked: {
-            dialogSwapper.showPanel('Notification.qml', {
+            dialogSwapper.showPanel('ErrorNotification.qml', {
                 'iconSource': 'chat.png',
                 'title': qsTranslate('RoomPanel', 'Chat room error'),
                 'text': qsTranslate('RoomPanel', "Sorry, but you were kicked from chat room '%1'.\n\n%2").replace('%1', room.jid).replace('%2', reason),

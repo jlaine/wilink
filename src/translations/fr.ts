@@ -363,6 +363,13 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>ErrorNotification</name>
+    <message>
+        <source>Close</source>
+        <translation>Fermer</translation>
+    </message>
+</context>
+<context>
     <name>GeneralPreferencePanel</name>
     <message>
         <source>Open at login</source>

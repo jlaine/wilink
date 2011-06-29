@@ -69,7 +69,7 @@ Panel {
         }
 
         onError: {
-            dialogSwapper.showPanel('Notification.qml', {
+            dialogSwapper.showPanel('ErrorNotification.qml', {
                 'iconSource': 'phone.png',
                 'title': qsTr('Call failed'),
                 'text': qsTr('Sorry, but the call could not be completed.') + '\n\n' + error,
