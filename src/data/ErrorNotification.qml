@@ -22,7 +22,7 @@ import QtQuick 1.0
 Notification {
     id: dialog
 
-    footer: Button {
+    footerComponent: Button {
         iconSource: 'close.png'
         text: qsTr('Close')
         onClicked: dialog.close()
