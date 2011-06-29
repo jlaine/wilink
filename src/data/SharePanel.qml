@@ -55,6 +55,8 @@ Panel {
 
                 onClicked: {
                     dialogSwapper.showPanel('PreferenceDialog.qml');
+                    var panel = dialogSwapper.findPanel('PreferenceDialog.qml');
+                    panel.showPanel('SharePreferencePanel.qml');
                 }
             }
         }
