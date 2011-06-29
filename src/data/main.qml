@@ -93,7 +93,7 @@ FocusScope {
         function hide() {
             dialogLoader.source = '';
             dialogLoader.lastSource = '';
-            swapper.focus = true;
+            swapper.forceActiveFocus();
         }
 
         function showDialog(source, properties) {
@@ -102,7 +102,7 @@ FocusScope {
                     dialogLoader.item[key] = properties[key];
                 }
                 dialogLoader.item.opacity = 1;
-                dialogLoader.focus = true;
+                dialogLoader.forceActiveFocus();
             } else {
                 dialogLoader.properties = properties;
                 dialogLoader.source = source;
@@ -117,7 +117,7 @@ FocusScope {
                 dialogLoader.item[key] = dialogLoader.properties[key];
             }
             dialogLoader.item.opacity = 1;
-            dialogLoader.focus = true;
+            dialogLoader.forceActiveFocus();
         }
 
         Connections {
