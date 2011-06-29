@@ -503,6 +503,17 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>PhotoAlbumDialog</name>
+    <message>
+        <source>Create an album</source>
+        <translation>Créer un album</translation>
+    </message>
+    <message>
+        <source>Album name:</source>
+        <translation>Nom de l&apos;album :</translation>
+    </message>
+</context>
+<context>
     <name>PhotoPanel</name>
     <message>
         <source>Photos</source>
@@ -523,10 +534,6 @@ Acceptez-vous?</translation>
     <message>
         <source>To upload your photos to wifirst.net, simply drag and drop them to an album.</source>
         <translation>Pour transférer vos photos vers wifirst.net, il vous suffit de les faire glisser sur un album.</translation>
-    </message>
-    <message>
-        <source>Album name:</source>
-        <translation>Nom de l&apos;album :</translation>
     </message>
     <message>
         <source>Upload photos</source>

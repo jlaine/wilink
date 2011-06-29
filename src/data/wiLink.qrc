@@ -110,6 +110,7 @@
     <file>PanelSwapper.qml</file>
     <file>PhoneHistoryView.qml</file>
     <file>PhonePanel.qml</file>
+    <file>PhotoAlbumDialog.qml</file>
     <file>PhotoPanel.qml</file>
     <file>PhotoUploadView.qml</file>
     <file>PlayerPanel.qml</file>
