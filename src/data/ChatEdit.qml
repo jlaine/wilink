@@ -175,7 +175,7 @@ Rectangle {
             onPressed: {
                 var pos = mapToItem(menuLoader.parent, mouse.x, mouse.y);
                 menuLoader.source = 'InputMenu.qml';
-                menuLoader.item.target = chatEdit;
+                menuLoader.item.target = input;
                 menuLoader.show(pos.x, pos.y - menuLoader.item.height);
             }
         }
