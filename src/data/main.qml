@@ -91,7 +91,8 @@ FocusScope {
         z: 10
 
         function hide() {
-            dialogLoader.item.opacity = 0;
+            dialogLoader.source = '';
+            dialogLoader.lastSource = '';
             swapper.focus = true;
         }
 

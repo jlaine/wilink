@@ -38,13 +38,7 @@ Dialog {
                 panel.save()
             }
         }
-        parent.hide();
-        parent.source = '';
-    }
-
-    onRejected: {
-        parent.hide();
-        parent.source = '';
+        dialogLoader.hide();
     }
 
     Item {

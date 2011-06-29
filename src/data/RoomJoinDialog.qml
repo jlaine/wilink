@@ -36,8 +36,8 @@ Dialog {
             var jid = roomEdit.text;
             if (jid.indexOf('@') < 0)
                 jid += '@' + view.model.rootJid;
-            parent.hide();
             panel.showRoom(jid);
+            dialogLoader.hide();
         }
     }
 

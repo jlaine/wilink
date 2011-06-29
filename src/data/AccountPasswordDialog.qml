@@ -84,7 +84,6 @@ Dialog {
         appWallet.set(dialog.jid, password);
         appClient.connectToServer(dialog.jid, password);
         dialogLoader.hide();
-        dialogLoader.source = '';
     }
 }
 

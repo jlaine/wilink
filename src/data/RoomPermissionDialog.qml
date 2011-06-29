@@ -181,11 +181,5 @@ Dialog {
     onAccepted: {
         permissionModel.save();
         dialogLoader.hide();
-        dialogLoader.source = '';
-    }
-
-    onRejected: {
-        dialogLoader.hide();
-        dialogLoader.source = '';
     }
 }
