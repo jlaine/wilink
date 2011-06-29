@@ -23,7 +23,6 @@ Dialog {
     id: dialog
 
     property string jid
-    property alias password: passwordInput.text
 
     minimumHeight: 250
     title: qsTr('Password required')
@@ -78,6 +77,14 @@ Dialog {
 
             text: qsTr('If you need help, please refer to the <a href="%1">%2 FAQ</a>.').replace('%1', 'https://www.wifirst.net/wilink/faq').replace('%2', application.applicationName)
         }
+    }
+
+    onAccepted: {
+        var password = passwordInput.text;
+        appWallet.set(dialog.jid, password);
+        appClient.connectToServer(dialog.jid, password);
+        dialogLoader.hide();
+        dialogLoader.source = '';
     }
 }
 

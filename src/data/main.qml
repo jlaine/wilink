@@ -36,16 +36,7 @@ FocusScope {
         onAuthenticationFailed: {
             console.log("Failed to authenticate with chat server");
             var jid = Utils.jidToBareJid(appClient.jid);
-            dialogLoader.source = 'AccountPasswordDialog.qml';
-            dialogLoader.item.jid = jid;
-            dialogLoader.item.accepted.connect(function() {
-                var password = dialogLoader.item.password;
-                dialogLoader.hide();
-                dialogLoader.source = '';
-                appWallet.set(jid, password);
-                appClient.connectToServer(jid, password);
-            });
-            dialogLoader.show();
+            dialogLoader.showDialog('AccountPasswordDialog.qml', {'jid': jid});
         }
 
         onConflictReceived: {
@@ -124,8 +115,8 @@ FocusScope {
         }
 
         onLoaded: {
-            x = Math.floor((parent.width - width) / 2);
-            y = Math.floor((parent.height - height) / 2);
+            x = Math.max(0, Math.floor((parent.width - width) / 2));
+            y = Math.max(0, Math.floor((parent.height - height) / 2));
             for (var key in dialogLoader.properties) {
                 dialogLoader.item[key] = dialogLoader.properties[key];
             }
@@ -171,18 +162,10 @@ FocusScope {
 
         var password = appWallet.get(jid);
         if (password == '') {
-            console.log("no password");
-            dialogLoader.source = 'AccountPasswordDialog.qml';
-            dialogLoader.item.jid = jid;
-            dialogLoader.item.accepted.connect(function() {
-                var password = dialogLoader.item.password;
-                dialogLoader.hide();
-                dialogLoader.source = '';
-                appWallet.set(jid, password);
-                appClient.connectToServer(jid, password);
-            });
+            dialogLoader.showDialog('AccountPasswordDialog.qml', {'jid': jid});
+        } else {
+            appClient.connectToServer(jid, password);
         }
-        appClient.connectToServer(jid, password);
         swapper.showPanel('ChatPanel.qml');
     }
 
