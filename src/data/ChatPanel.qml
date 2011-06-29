@@ -71,9 +71,7 @@ Panel {
             height: 24 + (count > 0 ? 4 : 0) + 30 * Math.min(count, 8);
 
             onAddClicked: {
-                dialogLoader.source = 'RoomJoinDialog.qml';
-                dialogLoader.item.panel = chatPanel;
-                dialogLoader.show();
+                dialogLoader.showDialog('RoomJoinDialog.qml', {'panel': chatPanel});
             }
 
             onCurrentJidChanged: {
@@ -172,8 +170,7 @@ Panel {
             title: qsTr('My contacts')
 
             onAddClicked: {
-                dialogLoader.source = 'ContactAddDialog.qml';
-                dialogLoader.show();
+                dialogLoader.showDialog('ContactAddDialog.qml');
             }
 
             onCurrentJidChanged: {

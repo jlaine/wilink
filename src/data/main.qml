@@ -94,6 +94,9 @@ FocusScope {
     Loader {
         id: dialogLoader
 
+        property variant lastSource
+        property variant properties
+
         z: 10
 
         function hide() {
@@ -106,9 +109,28 @@ FocusScope {
             dialogLoader.focus = true;
         }
 
+        function showDialog(source, properties) {
+            if (dialogLoader.lastSource == source) {
+                for (var key in properties) {
+                    dialogLoader.item[key] = properties[key];
+                }
+                dialogLoader.item.opacity = 1;
+                dialogLoader.focus = true;
+            } else {
+                dialogLoader.properties = properties;
+                dialogLoader.source = source;
+                dialogLoader.lastSource = source;
+            }
+        }
+
         onLoaded: {
             x = Math.floor((parent.width - width) / 2);
             y = Math.floor((parent.height - height) / 2);
+            for (var key in dialogLoader.properties) {
+                dialogLoader.item[key] = dialogLoader.properties[key];
+            }
+            dialogLoader.item.opacity = 1;
+            dialogLoader.focus = true;
         }
 
         Connections {
