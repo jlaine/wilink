@@ -94,16 +94,6 @@ FocusScope {
                     }
                 }
             });
-            panel.notify.connect(function(title, text) {
-                // show notification
-                application.showMessage(panel, title, text);
-
-                // alert window
-                window.alert();
-
-                // play a sound
-                application.soundPlayer.play(application.incomingMessageSound);
-            });
             panels.append({'source': source, 'properties': properties, 'panel': panel});
             if (show)
                 swapper.setCurrentItem(panel);

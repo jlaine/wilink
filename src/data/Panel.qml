@@ -23,8 +23,18 @@ FocusScope {
     id: panel
 
     signal close
-    signal notify(string title, string text)
     property alias color: background.color
+
+    function notify(title, text) {
+        // show notification
+        application.showMessage(panel, title, text);
+
+        // alert window
+        window.alert();
+
+        // play a sound
+        application.soundPlayer.play(application.incomingMessageSound);
+    }
 
     anchors.fill: parent
     opacity: 0

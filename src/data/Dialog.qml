@@ -31,7 +31,6 @@ FocusScope {
 
     signal accepted
     signal close
-    signal notify
 
     opacity: 0
 
