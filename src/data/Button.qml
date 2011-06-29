@@ -29,6 +29,8 @@ Rectangle {
     property string text: ''
 
     signal clicked
+    signal pressed
+    signal released
 
     height: button.visible ? (Math.max(iconSize, labelHelper.height) + 2 * margins) : 0
     width: button.visible ? labelHelper.width + iconSize + ((iconSource != '' && text != '') ? 3 : 2) * margins : 0
@@ -60,6 +62,7 @@ Rectangle {
         anchors.rightMargin: margins
         anchors.verticalCenter: parent.verticalCenter
         elide: Text.ElideRight
+        horizontalAlignment: Text.AlignHCenter
         text: button.text
     }
 
@@ -85,8 +88,14 @@ Rectangle {
         enabled: button.enabled
 
         onClicked: button.clicked()
-        onPressed: button.state = 'pressed'
-        onReleased: button.state = ''
+        onPressed: {
+            button.state = 'pressed';
+            button.pressed();
+        }
+        onReleased: {
+            button.state = '';
+            button.released();
+        }
     }
 
     states: State {
