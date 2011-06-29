@@ -2,6 +2,7 @@ HIGH PRIORITY
 
 - restore copy & paste in chat history
 - make pending messages easier to view
+- fix calling state when receiving a voip call (can't hangup)
 
 LOW PRIORITY
 
