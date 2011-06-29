@@ -18,35 +18,40 @@
  */
 
 import QtQuick 1.0
+import wiLink 1.2
 
-Dialog {
+Notification {
     id: dialog
 
-    property alias iconSource: image.source
-    property alias text: label.text
+    property alias jid: vcard.jid
 
+    iconSource: vcard.avatar
     minimumHeight: 150
+    text: qsTr('%1 has asked to add you to his or her contact list.\n\nDo you accept?').replace('%1', jid);
+    title: qsTr('Invitation from %1').replace('%1', vcard.name)
 
-    Item {
-        anchors.fill: contents
+    VCard {
+        id: vcard
+    }
 
-        Image {
-            id: image
+    onAccepted: {
+        console.log("Contact accepted " + jid);
 
-            anchors.top: parent.top
-            anchors.left: parent.left
-            source: vcard.avatar
-        }
+        // accept subscription
+        appClient.rosterManager.acceptSubscription(jid);
 
-        Text {
-            id: label
+        // request reciprocal subscription
+        appClient.rosterManager.subscribe(jid);
 
-            anchors.top: parent.top
-            anchors.left: image.right
-            anchors.leftMargin: 8
-            anchors.right: parent.right
-            wrapMode: Text.WordWrap
-        }
+        // close dialog
+        dialog.close();
+    }
+
+    onRejected: {
+        console.log("Contact rejected " + jid);
+
+        // refuse subscription
+        appClient.rosterManager.refuseSubscription(jid);
     }
 }
 

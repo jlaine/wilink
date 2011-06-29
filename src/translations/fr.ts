@@ -192,14 +192,6 @@ Acceptez-vous?</translation>
         <translation>Invitation de %1</translation>
     </message>
     <message>
-        <source>%1 has asked to add you to his or her contact list.
-
-Do you accept?</source>
-        <translation>%1 a demandé à vous ajouter à sa liste de contacts.
-
-Acceptez-vous?</translation>
-    </message>
-    <message>
         <source>File from %1</source>
         <translation>Fichier de %1</translation>
     </message>
@@ -233,6 +225,21 @@ Acceptez-vous?</translation>
     <message>
         <source>Add a contact</source>
         <translation>Ajouter un contact</translation>
+    </message>
+</context>
+<context>
+    <name>ContactAddNotification</name>
+    <message>
+        <source>%1 has asked to add you to his or her contact list.
+
+Do you accept?</source>
+        <translation>%1 a demandé à vous ajouter à sa liste de contacts.
+
+Acceptez-vous?</translation>
+    </message>
+    <message>
+        <source>Invitation from %1</source>
+        <translation>Invitation de %1</translation>
     </message>
 </context>
 <context>

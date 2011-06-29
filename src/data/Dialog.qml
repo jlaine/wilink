@@ -31,6 +31,7 @@ FocusScope {
 
     signal accepted
     signal close
+    signal rejected
 
     opacity: 0
 
@@ -61,7 +62,7 @@ FocusScope {
 
             Button {
                 text: qsTr('Cancel')
-                onClicked: dialog.close()
+                onClicked: dialog.rejected()
             }
         }
     }
@@ -216,6 +217,7 @@ FocusScope {
         width = minimumWidth;
     }
 
-    Keys.onEscapePressed: dialog.close()
+    onRejected: dialog.close()
+    Keys.onEscapePressed: dialog.rejected()
 }
 

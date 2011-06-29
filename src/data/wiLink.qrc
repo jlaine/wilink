@@ -85,6 +85,7 @@
     <file>CheckBox.qml</file>
     <file>ComboBox.qml</file>
     <file>ContactAddDialog.qml</file>
+    <file>ContactAddNotification.qml</file>
     <file>ContactMenu.qml</file>
     <file>ContactRemoveDialog.qml</file>
     <file>ContactRenameDialog.qml</file>

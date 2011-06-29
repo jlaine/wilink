@@ -103,6 +103,7 @@ if(RELOAD_TRANSLATIONS)
         ../data/CallWidget.qml
         ../data/ChatPanel.qml
         ../data/ContactAddDialog.qml
+        ../data/ContactAddNotification.qml
         ../data/ContactMenu.qml
         ../data/ContactRenameDialog.qml
         ../data/ContactRemoveDialog.qml

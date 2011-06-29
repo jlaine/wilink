@@ -202,20 +202,7 @@ Panel {
                         return;
                     }
 
-                    var box = window.messageBox();
-                    box.windowTitle = qsTranslate('ChatPanel', 'Invitation from %1').replace('%1', bareJid);
-                    box.text = qsTranslate('ChatPanel', '%1 has asked to add you to his or her contact list.\n\nDo you accept?').replace('%1', bareJid);
-                    box.standardButtons = QMessageBox.Yes | QMessageBox.No;
-                    if (box.exec() == QMessageBox.Yes) {
-                        // accept subscription
-                        appClient.rosterManager.acceptSubscription(bareJid);
-
-                        // request reciprocal subscription
-                        appClient.rosterManager.subscribe(bareJid);
-                    } else {
-                        // refuse subscription
-                        appClient.rosterManager.refuseSubscription(bareJid);
-                    }
+                    dialogSwapper.showPanel('ContactAddNotification.qml', {'jid': bareJid});
                 }
             }
         }
