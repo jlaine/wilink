@@ -396,6 +396,13 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>HistoryView</name>
+    <message>
+        <source>copy</source>
+        <translation>copier</translation>
+    </message>
+</context>
+<context>
     <name>InputMenu</name>
     <message>
         <source>Cut</source>
