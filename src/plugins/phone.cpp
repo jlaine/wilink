@@ -360,7 +360,7 @@ void PhoneCallsModel::hangup()
 {
     for (int i = m_items.size() - 1; i >= 0; --i)
         if (m_items[i]->call)
-            QMetaObject::invokeMethod(m_items[i]->call, "hangup");
+            m_items[i]->call->hangup();
 }
 
 int PhoneCallsModel::inputVolume() const

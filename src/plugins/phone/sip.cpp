@@ -26,6 +26,7 @@
 #include <QNetworkInterface>
 #include <QPair>
 #include <QUdpSocket>
+#include <QThread>
 #include <QTimer>
 
 #include "QSoundMeter.h"
@@ -846,6 +847,12 @@ void SipCall::hangup()
     if (d->state == QXmppCall::DisconnectingState ||
         d->state == QXmppCall::FinishedState)
         return;
+
+    // check we are in the right thread
+    if (QThread::currentThread() != thread()) {
+        QMetaObject::invokeMethod(this, "hangup", Qt::QueuedConnection);
+        return;
+    }
 
     debug(QString("SIP call %1 hangup").arg(
             QString::fromUtf8(d->id)));
