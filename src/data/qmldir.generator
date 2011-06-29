@@ -1,0 +1,11 @@
+#!/usr/bin/env python
+
+import os
+import re
+
+fp = open('qmldir', 'w')
+for name in sorted(os.listdir('.')):
+    m = re.match('^(.+)\.qml$', name)
+    if m:
+        fp.write("%s 1.0 %s\n" % (m.group(1), name))
+fp.close()
