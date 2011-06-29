@@ -26,7 +26,6 @@ Notification {
     property QtObject call
     property string caller
     property Item swapper
-    property int soundId: 0
 
     iconSource: 'phone.png'
     text: qsTr('%1 wants to talk to you.\n\nDo you accept?').replace('%1', caller)
@@ -38,15 +37,9 @@ Notification {
         dialog.close();
     }
 
-    // stop sound
-    onClose: application.soundPlayer.stop(dialog.soundId)
-
     onRejected: dialog.call.hangup()
 
     Component.onCompleted: {
-        // alert window
-        window.alert();
-
         // play a sound
         dialog.soundId = application.soundPlayer.play(":/call-incoming.ogg", true);
     }

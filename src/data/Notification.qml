@@ -23,6 +23,7 @@ Dialog {
     id: dialog
 
     property alias iconSource: image.source
+    property int soundId: 0
     property alias text: label.text
 
     minimumHeight: 150
@@ -46,6 +47,16 @@ Dialog {
             anchors.right: parent.right
             wrapMode: Text.WordWrap
         }
+    }
+
+    onClose: {
+        // stop sound
+        application.soundPlayer.stop(dialog.soundId);
+    }
+
+    Component.onCompleted: {
+        // alert window
+        window.alert();
     }
 }
 

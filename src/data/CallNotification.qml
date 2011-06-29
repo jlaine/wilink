@@ -25,7 +25,6 @@ Notification {
 
     property QtObject call
     property Item panel
-    property int soundId: 0
 
     iconSource: vcard.avatar
     text: qsTr('%1 wants to talk to you.\n\nDo you accept?').replace('%1', vcard.name)
@@ -43,19 +42,11 @@ Notification {
         dialog.close();
     }
 
-    onClose: {
-        // stop sound
-        application.soundPlayer.stop(dialog.soundId);
-    }
-
     onRejected: {
         dialog.call.hangup();
     }
 
     Component.onCompleted: {
-        // alert window
-        window.alert();
-
         // play a sound
         dialog.soundId = application.soundPlayer.play(":/call-incoming.ogg", true);
     }
