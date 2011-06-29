@@ -245,7 +245,7 @@ Item {
             text: qsTr('Copy')
             iconSource: 'copy.png'
             radius: 8
-            height: 24
+            height: appStyle.icon.smallSize
             onClicked: {
                 copyHelper.selectAll();
                 copyHelper.copy();
@@ -283,6 +283,8 @@ Item {
             }
         }
     }
+
+    Style { id: appStyle }
 
     Connections {
         target: historyView
