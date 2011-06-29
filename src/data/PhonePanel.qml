@@ -69,11 +69,11 @@ Panel {
         }
 
         onError: {
-            var box = window.messageBox();
-            box.icon = QMessageBox.Warning;
-            box.text = qsTr('Sorry, but the call could not be completed.') + '\n\n' + error;
-            box.windowTitle = qsTr('Call failed');
-            box.show();
+            dialogSwapper.showPanel('Notification.qml', {
+                'iconSource': 'phone.png',
+                'title': qsTr('Call failed'),
+                'text': qsTr('Sorry, but the call could not be completed.') + '\n\n' + error,
+            });
         }
     }
 
