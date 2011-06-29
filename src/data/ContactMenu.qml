@@ -37,9 +37,9 @@ Menu {
         if (item.action == 'profile') {
             Qt.openUrlExternally(vcard.url);
         } else if (item.action == 'rename') {
-            dialogLoader.showDialog('ContactRenameDialog.qml', {'jid': jid});
+            dialogSwapper.showPanel('ContactRenameDialog.qml', {'jid': jid});
         } else if (item.action == 'remove') {
-            dialogLoader.showDialog('ContactRemoveDialog.qml', {'jid': jid});
+            dialogSwapper.showPanel('ContactRemoveDialog.qml', {'jid': jid});
         }
     }
 

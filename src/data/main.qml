@@ -36,7 +36,7 @@ FocusScope {
         onAuthenticationFailed: {
             console.log("Failed to authenticate with chat server");
             var jid = Utils.jidToBareJid(appClient.jid);
-            dialogLoader.showDialog('AccountPasswordDialog.qml', {'jid': jid});
+            dialogSwapper.showPanel('AccountPasswordDialog.qml', {'jid': jid});
         }
 
         onConflictReceived: {
@@ -83,43 +83,43 @@ FocusScope {
     }
 
     Loader {
-        id: dialogLoader
+        id: dialogSwapper
 
         property variant lastSource
         property variant properties
 
         z: 10
 
-        function showDialog(source, properties) {
-            if (dialogLoader.lastSource == source) {
+        function showPanel(source, properties) {
+            if (dialogSwapper.lastSource == source) {
                 for (var key in properties) {
-                    dialogLoader.item[key] = properties[key];
+                    dialogSwapper.item[key] = properties[key];
                 }
-                dialogLoader.item.opacity = 1;
-                dialogLoader.forceActiveFocus();
+                dialogSwapper.item.opacity = 1;
+                dialogSwapper.forceActiveFocus();
             } else {
-                dialogLoader.properties = properties;
-                dialogLoader.source = source;
-                dialogLoader.lastSource = source;
+                dialogSwapper.properties = properties;
+                dialogSwapper.source = source;
+                dialogSwapper.lastSource = source;
             }
         }
 
         onLoaded: {
             x = Math.max(0, Math.floor((parent.width - width) / 2));
             y = Math.max(0, Math.floor((parent.height - height) / 2));
-            for (var key in dialogLoader.properties) {
-                dialogLoader.item[key] = dialogLoader.properties[key];
+            for (var key in dialogSwapper.properties) {
+                dialogSwapper.item[key] = dialogSwapper.properties[key];
             }
-            dialogLoader.item.opacity = 1;
-            dialogLoader.forceActiveFocus();
+            dialogSwapper.item.opacity = 1;
+            dialogSwapper.forceActiveFocus();
         }
 
         Connections {
-            target: dialogLoader.item
+            target: dialogSwapper.item
 
             onClose: {
-                dialogLoader.source = '';
-                dialogLoader.lastSource = '';
+                dialogSwapper.source = '';
+                dialogSwapper.lastSource = '';
                 swapper.forceActiveFocus();
             }
         }

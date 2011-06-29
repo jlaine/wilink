@@ -54,7 +54,7 @@ Panel {
                 text: qsTr('Options')
 
                 onClicked: {
-                    dialogLoader.showDialog('PreferenceDialog.qml');
+                    dialogSwapper.showPanel('PreferenceDialog.qml');
                 }
             }
         }
