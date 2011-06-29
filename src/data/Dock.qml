@@ -166,10 +166,8 @@ Rectangle {
             text: qsTr('Preferences')
             visible: true
             onClicked: {
-                dialogLoader.source = 'PreferenceDialog.qml';
-                dialogLoader.show();
+                dialogLoader.showDialog('PreferenceDialog.qml');
             }
-
         }
 
         DockButton {
@@ -216,8 +214,7 @@ Rectangle {
         onStateChanged: {
             // when an update is ready to install, prompt user
             if (application.updater.state == Updater.PromptState) {
-                dialogLoader.source = 'AboutDialog.qml';
-                dialogLoader.show();
+                dialogLoader.showDialog('AboutDialog.qml');
             }
         }
     }
@@ -226,8 +223,7 @@ Rectangle {
         target: window
 
         onShowAbout: {
-            dialogLoader.source = 'AboutDialog.qml';
-            dialogLoader.show();
+            dialogLoader.showDialog('AboutDialog.qml');
         }
 
         onShowHelp: Qt.openUrlExternally('https://www.wifirst.net/wilink/faq')

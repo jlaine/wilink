@@ -127,10 +127,10 @@ Item {
                 if (item.action == 'profile') {
                     Qt.openUrlExternally(vcard.url)
                 } else if (item.action == 'kick') {
-                    dialogLoader.source = 'RoomKickDialog.qml';
-                    dialogLoader.item.jid = jid;
-                    dialogLoader.item.room = room;
-                    dialogLoader.show();
+                    dialogLoader.showDialog('RoomKickDialog.qml', {
+                        'jid': jid,
+                        'room': room,
+                    });
                 }
             }
 

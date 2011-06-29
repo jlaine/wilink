@@ -83,9 +83,7 @@ Panel {
                 enabled: crumbBar.model.count == 1
 
                 onClicked: {
-                    dialogLoader.source = 'PhotoAlbumDialog.qml';
-                    dialogLoader.item.model = photoModel;
-                    dialogLoader.show();
+                    dialogLoader.showDialog('PhotoAlbumDialog.qml', {'model': photoModel});
                 }
             }
         }

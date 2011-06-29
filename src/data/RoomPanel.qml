@@ -68,10 +68,10 @@ Panel {
                 text: qsTr('Invite')
 
                 onClicked: {
-                    dialogLoader.source = 'RoomInviteDialog.qml';
-                    dialogLoader.item.contacts = onlineContacts;
-                    dialogLoader.item.room = room;
-                    dialogLoader.show()
+                    dialogLoader.showDialog('RoomInviteDialog.qml', {
+                        'contacts': onlineContacts,
+                        'room': room,
+                    });
                 }
             }
 
@@ -81,9 +81,7 @@ Panel {
                 visible: Qt.isQtObject(room) && (room.allowedActions & QXmppMucRoom.SubjectAction)
 
                 onClicked: {
-                    dialogLoader.source = 'RoomSubjectDialog.qml';
-                    dialogLoader.item.room = room;
-                    dialogLoader.show()
+                    dialogLoader.showDialog('RoomSubjectDialog.qml', {'room': room});
                 }
             }
 
@@ -93,9 +91,7 @@ Panel {
                 visible: Qt.isQtObject(room) && (room.allowedActions & QXmppMucRoom.ConfigurationAction)
 
                 onClicked: {
-                    dialogLoader.source = 'RoomConfigurationDialog.qml';
-                    dialogLoader.item.room = room;
-                    dialogLoader.show();
+                    dialogLoader.showDialog('RoomConfigurationDialog.qml', {'room': room});
                 }
             }
 
@@ -105,9 +101,7 @@ Panel {
                 visible: Qt.isQtObject(room) && (room.allowedActions & QXmppMucRoom.PermissionsAction)
 
                 onClicked: {
-                    dialogLoader.source = 'RoomPermissionDialog.qml';
-                    dialogLoader.item.room = room;
-                    dialogLoader.show();
+                    dialogLoader.showDialog('RoomPermissionDialog.qml', {'room': room});
                 }
             }
 
