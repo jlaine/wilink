@@ -115,6 +115,7 @@ if(RELOAD_TRANSLATIONS)
         ../data/LogPanel.qml
         ../data/RoomInviteDialog.qml
         ../data/RoomJoinDialog.qml
+        ../data/RoomKickDialog.qml
         ../data/RoomParticipantView.qml
         ../data/RoomPermissionDialog.qml
         ../data/PhoneHistoryView.qml

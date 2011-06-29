@@ -127,13 +127,9 @@ Item {
                 if (item.action == 'profile') {
                     Qt.openUrlExternally(vcard.url)
                 } else if (item.action == 'kick') {
-                    dialogLoader.source = 'InputDialog.qml';
-                    dialogLoader.item.title = qsTr('Kick user');
-                    dialogLoader.item.labelText = qsTr('Enter the reason for kicking the user from the room.');
-                    dialogLoader.item.accepted.connect(function() {
-                        room.kick(jid, dialogLoader.item.textValue);
-                        dialogLoader.hide();
-                    });
+                    dialogLoader.source = 'RoomKickDialog.qml';
+                    dialogLoader.item.jid = jid;
+                    dialogLoader.item.room = room;
                     dialogLoader.show();
                 }
             }

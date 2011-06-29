@@ -583,6 +583,17 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>RoomKickDialog</name>
+    <message>
+        <source>Kick user</source>
+        <translation>Ejecter l&apos;utilisateur</translation>
+    </message>
+    <message>
+        <source>Enter the reason for kicking the user from the room.</source>
+        <translation>Saisissez la raison pour laquelle vous éjectez l&apos;utilisateur du salon.</translation>
+    </message>
+</context>
+<context>
     <name>RoomPanel</name>
     <message>
         <source>Chat room error</source>
@@ -642,10 +653,6 @@ Acceptez-vous?</translation>
     <message>
         <source>Kick user</source>
         <translation>Ejecter l&apos;utilisateur</translation>
-    </message>
-    <message>
-        <source>Enter the reason for kicking the user from the room.</source>
-        <translation>Saisissez la raison pour laquelle vous éjectez l&apos;utilisateur du salon.</translation>
     </message>
 </context>
 <context>

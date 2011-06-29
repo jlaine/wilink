@@ -124,6 +124,7 @@
     <file>RoomPermissionDialog.qml</file>
     <file>RoomInviteDialog.qml</file>
     <file>RoomJoinDialog.qml</file>
+    <file>RoomKickDialog.qml</file>
     <file>RosterView.qml</file>
     <file>ScrollBar.qml</file>
     <file>SharePanel.qml</file>
