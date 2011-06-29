@@ -144,6 +144,21 @@
     </message>
 </context>
 <context>
+    <name>CallNotification</name>
+    <message>
+        <source>Call from %1</source>
+        <translation>Appel de %1</translation>
+    </message>
+    <message>
+        <source>%1 wants to talk to you.
+
+Do you accept?</source>
+        <translation>%1 souhaite vous parler.
+
+Acceptez-vous?</translation>
+    </message>
+</context>
+<context>
     <name>CallWidget</name>
     <message>
         <source>Connecting..</source>
@@ -181,18 +196,6 @@
 
 Do you accept?</source>
         <translation>%1 a demandé à vous ajouter à sa liste de contacts.
-
-Acceptez-vous?</translation>
-    </message>
-    <message>
-        <source>Call from %1</source>
-        <translation>Appel de %1</translation>
-    </message>
-    <message>
-        <source>%1 wants to talk to you.
-
-Do you accept?</source>
-        <translation>%1 souhaite vous parler.
 
 Acceptez-vous?</translation>
     </message>

@@ -245,24 +245,15 @@ Panel {
         Connections {
             target: appClient.callManager
             onCallReceived: {
-                var contactName = call.jid;
-                console.log("Call received: " + contactName);
+                console.log("Call received: " + call.jid);
 
-                // start incoming tone
+                // FIXME: start incoming tone
                 //int soundId = wApp->soundPlayer()->play(":/call-incoming.ogg", true);
-                //m_callQueue.insert(call, soundId);
 
                 // prompt user
-                var box = window.messageBox();
-                box.windowTitle = qsTranslate('ChatPanel', 'Call from %1').replace('%1', contactName);
-                box.text = qsTranslate('ChatPanel', '%1 wants to talk to you.\n\nDo you accept?').replace('%1', contactName);
-                box.standardButtons = QMessageBox.Yes | QMessageBox.No;
-                if (box.exec() == QMessageBox.Yes) {
-                    showConversation(call.jid);
-                    call.accept();
-                } else {
-                    call.hangup();
-                }
+                dialogSwapper.showPanel('CallNotification.qml', {
+                    'call': call,
+                    'panel': chatPanel});
             }
         }
 

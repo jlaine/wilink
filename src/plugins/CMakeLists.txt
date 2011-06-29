@@ -99,6 +99,7 @@ if(RELOAD_TRANSLATIONS)
         ../data/AccountListPanel.qml
         ../data/AccountPasswordDialog.qml
         ../data/AccountPreferencePanel.qml
+        ../data/CallNotification.qml
         ../data/CallWidget.qml
         ../data/ChatPanel.qml
         ../data/ContactAddDialog.qml

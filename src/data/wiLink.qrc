@@ -79,6 +79,7 @@
     <file>AccountPreferencePanel.qml</file>
     <file>Button.qml</file>
     <file>ChatEdit.qml</file>
+    <file>CallNotification.qml</file>
     <file>CallWidget.qml</file>
     <file>ChatPanel.qml</file>
     <file>CheckBox.qml</file>
