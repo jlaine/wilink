@@ -152,8 +152,7 @@ Dialog {
             console.log("inviting " + selection[i]);
             room.sendInvitation(selection[i], reason);
         }
-        selection = [];
-        hide()
+        dialog.close();
     }
 
 }
