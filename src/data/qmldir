@@ -39,6 +39,7 @@ PanelHeader 1.0 PanelHeader.qml
 PanelHelp 1.0 PanelHelp.qml
 PanelSwapper 1.0 PanelSwapper.qml
 PhoneHistoryView 1.0 PhoneHistoryView.qml
+PhoneNotification 1.0 PhoneNotification.qml
 PhonePanel 1.0 PhonePanel.qml
 PhotoAlbumDialog 1.0 PhotoAlbumDialog.qml
 PhotoPanel 1.0 PhotoPanel.qml
@@ -48,6 +49,7 @@ PreferenceDialog 1.0 PreferenceDialog.qml
 ProgressBar 1.0 ProgressBar.qml
 RoomConfigurationDialog 1.0 RoomConfigurationDialog.qml
 RoomInviteDialog 1.0 RoomInviteDialog.qml
+RoomInviteNotification 1.0 RoomInviteNotification.qml
 RoomJoinDialog 1.0 RoomJoinDialog.qml
 RoomKickDialog 1.0 RoomKickDialog.qml
 RoomPanel 1.0 RoomPanel.qml
@@ -65,6 +67,7 @@ StatusBar 1.0 StatusBar.qml
 StatusPill 1.0 StatusPill.qml
 Style 1.0 Style.qml
 ToolButton 1.0 ToolButton.qml
+TransferNotification 1.0 TransferNotification.qml
 TransferWidget 1.0 TransferWidget.qml
 Wifirst 1.0 Wifirst.qml
 main 1.0 main.qml

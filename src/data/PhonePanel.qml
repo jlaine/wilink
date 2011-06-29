@@ -272,19 +272,9 @@ Panel {
         target: historyModel.client
 
         onCallReceived: {
-            var contactName = call.recipient;
-
-            var box = window.messageBox();
-            box.icon = QMessageBox.Question;
-            box.standardButtons = QMessageBox.Yes | QMessageBox.No;
-            box.text = qsTr('%1 wants to talk to you.\n\nDo you accept?').replace('%1', contactName);
-            box.windowTitle = qsTr('Call from %1').replace('%1', contactName);
-            if (box.exec() == QMessageBox.Yes) {
-                swapper.showPanel('PhonePanel.qml');
-                call.accept();
-            } else {
-                call.hangup();
-            }
+            dialogSwapper.showPanel('PhoneNotification.qml', {
+                'call': call,
+            });
         }
     }
 }

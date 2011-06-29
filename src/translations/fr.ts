@@ -442,15 +442,7 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>PhonePanel</name>
-    <message>
-        <source>Phone</source>
-        <translation>Téléphone</translation>
-    </message>
-    <message>
-        <source>Call from %1</source>
-        <translation>Appel de %1</translation>
-    </message>
+    <name>PhoneNotification</name>
     <message>
         <source>%1 wants to talk to you.
 
@@ -458,6 +450,17 @@ Do you accept?</source>
         <translation>%1 souhaite vous parler.
 
 Acceptez-vous?</translation>
+    </message>
+    <message>
+        <source>Call from %1</source>
+        <translation>Appel de %1</translation>
+    </message>
+</context>
+<context>
+    <name>PhonePanel</name>
+    <message>
+        <source>Phone</source>
+        <translation>Téléphone</translation>
     </message>
     <message>
         <source>Your number is %1</source>

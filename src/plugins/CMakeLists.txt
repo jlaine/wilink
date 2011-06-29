@@ -117,6 +117,7 @@ if(RELOAD_TRANSLATIONS)
         ../data/InputMenu.qml
         ../data/LogPanel.qml
         ../data/PhoneHistoryView.qml
+        ../data/PhoneNotification.qml
         ../data/PhonePanel.qml
         ../data/PhotoAlbumDialog.qml
         ../data/PhotoPanel.qml
