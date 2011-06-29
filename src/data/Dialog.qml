@@ -28,8 +28,9 @@ Rectangle {
     property alias title: label.text
     property int minimumWidth: 360
     property int minimumHeight: 240
+
     signal accepted
-    signal rejected
+    signal close
 
     border.color: '#aa567dbc'
     border.width: 1
@@ -54,7 +55,7 @@ Rectangle {
 
             Button {
                 text: qsTr('Cancel')
-                onClicked: dialog.rejected()
+                onClicked: dialog.close()
             }
         }
     }
@@ -209,6 +210,6 @@ Rectangle {
         width = minimumWidth;
     }
 
-    Keys.onEscapePressed: dialog.rejected()
+    Keys.onEscapePressed: dialog.close()
 }
 

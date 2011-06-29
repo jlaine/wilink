@@ -30,7 +30,7 @@ InputDialog {
 
     onAccepted: {
         room.subject = dialog.textValue;
-        dialogLoader.hide();
+        dialog.close();
     }
 }
 

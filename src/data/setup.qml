@@ -53,7 +53,7 @@ FocusScope {
             application.chatAccounts = [jid];
             application.resetWindows();
         }
-        onRejected: application.quit()
+        onClose: application.quit()
     }
 
     PanelHelp {

@@ -90,12 +90,6 @@ FocusScope {
 
         z: 10
 
-        function hide() {
-            dialogLoader.source = '';
-            dialogLoader.lastSource = '';
-            swapper.forceActiveFocus();
-        }
-
         function showDialog(source, properties) {
             if (dialogLoader.lastSource == source) {
                 for (var key in properties) {
@@ -122,7 +116,12 @@ FocusScope {
 
         Connections {
             target: dialogLoader.item
-            onRejected: dialogLoader.hide()
+
+            onClose: {
+                dialogLoader.source = '';
+                dialogLoader.lastSource = '';
+                swapper.forceActiveFocus();
+            }
         }
     }
 

@@ -71,7 +71,7 @@ Dialog {
         var name = bar.text;
         console.log("Rename contact " + jid + ": " + name);
         appClient.rosterManager.renameItem(jid, name);
-        dialogLoader.hide();
+        dialog.close();
     }
 }
 

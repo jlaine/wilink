@@ -80,7 +80,7 @@ Panel {
                 panel.state = '';
                 listPanel.model.append({'jid': jid, 'password': password});
             }
-            onRejected: panel.state = ''
+            onClose: panel.state = ''
         }
     }
 

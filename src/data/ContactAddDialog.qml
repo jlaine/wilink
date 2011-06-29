@@ -21,6 +21,8 @@ import QtQuick 1.0
 import 'utils.js' as Utils
 
 InputDialog {
+    id: dialog
+
     property string domain: Utils.jidToDomain(appClient.jid)
 
     helpText: domain == 'wifirst.net' ? qsTr('Your wAmis are automatically added to your chat contacts, so the easiest way to add Wifirst contacts is to <a href=\"%1\">add them as wAmis</a>').replace('%1', 'https://www.wifirst.net/w/friends?from=wiLink') : ''
@@ -33,7 +35,7 @@ InputDialog {
         if (jid.match(/^[^@/]+@[^@/]+$/)) {
             console.log("Add contact " + jid);
             appClient.rosterManager.subscribe(jid);
-            dialogLoader.hide();
+            dialog.close();
         }
     }
 }

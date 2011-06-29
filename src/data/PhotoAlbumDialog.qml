@@ -31,8 +31,8 @@ InputDialog {
         var name = dialog.textValue;
         if (name.length > 0) {
             dialog.model.createAlbum(name);
+            dialog.close();
         }
-        dialogLoader.hide();
     }
 }
 

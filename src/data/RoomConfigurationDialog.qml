@@ -107,6 +107,6 @@ Dialog {
 
     onAccepted: {
         configurationModel.save();
-        dialogLoader.hide();
+        dialog.close();
     }
 }

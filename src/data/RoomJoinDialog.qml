@@ -37,7 +37,7 @@ Dialog {
             if (jid.indexOf('@') < 0)
                 jid += '@' + view.model.rootJid;
             panel.showRoom(jid);
-            dialogLoader.hide();
+            dialog.close();
         }
     }
 

@@ -180,6 +180,6 @@ Dialog {
 
     onAccepted: {
         permissionModel.save();
-        dialogLoader.hide();
+        dialog.close();
     }
 }

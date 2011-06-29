@@ -88,7 +88,7 @@ Dialog {
         var password = passwordInput.text;
         appWallet.set(dialog.jid, password);
         appClient.connectToServer(dialog.jid, password);
-        dialogLoader.hide();
+        dialog.close();
     }
 }
 

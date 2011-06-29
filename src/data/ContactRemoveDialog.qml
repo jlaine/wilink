@@ -21,6 +21,8 @@ import QtQuick 1.0
 import wiLink 1.2
 
 Dialog {
+    id: dialog
+
     property alias jid: vcard.jid
 
     minimumHeight: 150
@@ -54,7 +56,7 @@ Dialog {
     onAccepted: {
         console.log("Remove contact " + vcard.jid);
         appClient.rosterManager.removeItem(vcard.jid);
-        dialogLoader.hide();
+        dialog.close();
     }
 }
 

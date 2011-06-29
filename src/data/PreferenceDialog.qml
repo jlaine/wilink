@@ -38,7 +38,7 @@ Dialog {
                 panel.save()
             }
         }
-        dialogLoader.hide();
+        dialog.close();
     }
 
     Item {
