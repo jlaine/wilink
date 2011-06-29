@@ -132,7 +132,7 @@ QUrl PhotoCache::imageUrl(const QUrl &url, FileSystem::Type type, FileSystem *fs
             return cacheUrl;
         }
     }
-    return QUrl(":/file-128.png");
+    return QUrl("qrc:/file-128.png");
 }
 
 PhotoCache *PhotoCache::instance()
