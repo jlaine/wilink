@@ -106,23 +106,6 @@ static QString transformToken(const QString &token, const QString &meName)
         return output;
     }
 
-    // handle smileys
-    foreach (const QString &key, smileys.keys()) {
-        if (token == key)
-            return QString("<img alt=\"%1\" src=\"%2\" />").arg(key, smileys.value(token));
-    }
-
-    // handle links
-    if (linkRegex.exactMatch(token))
-        return QString("<a href=\"%1\">%2</a>").arg(token, Qt::escape(token));
-
-    // me
-    if (!meName.isEmpty() && meRegex.exactMatch(token)) {
-        QString output(token);
-        output.replace(meRegex, "<b>" + meName + "\\1</b>");
-        return output;
-    }
-
     // default
     return Qt::escape(token);
 }
@@ -133,17 +116,6 @@ static QString transformToken(const QString &token, const QString &meName)
  */
 QString HistoryMessage::html(const QString &meName) const
 {
-    QMap<QString, QString> smileys;
-    smileys.insert(":@", ":/smiley-angry.png");
-    smileys.insert(":s", ":/smiley-confused.png");
-    smileys.insert(":)", ":/smiley-happy.png");
-    smileys.insert(":|", ":/smiley-neutral.png");
-    smileys.insert(":p", ":/smiley-raspberry.png");
-    smileys.insert(":(", ":/smiley-sad.png");
-    smileys.insert(";)", ":/smiley-wink.png");
-
-    QRegExp linkRegex("(ftp|http|https)://.+");
-
     const QStringList input = body.split(QRegExp("[ \t]+"));
     QStringList output;
     foreach (const QString &token, input) {
