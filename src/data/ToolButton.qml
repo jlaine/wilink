@@ -29,7 +29,7 @@ Item {
 
     height: 40
     state: mouseArea.pressed ? 'pressed' : (mouseArea.hovered ? 'hovered' : '')
-    width: visible ? (label.paintedWidth + appStyle.icon.smallSize) : 0
+    width: visible ? 64 : 0
 
     Gradient {
         id: hoverGradient
@@ -78,7 +78,10 @@ Item {
         id: label
 
         anchors.top: image.bottom
-        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.left: parent.left
+        anchors.right: parent.right
+        elide: Text.ElideRight
+        horizontalAlignment: Text.AlignHCenter
         opacity: button.enabled ? 1 : 0.5
         color: 'white'
         font.pixelSize: appStyle.font.smallSize
