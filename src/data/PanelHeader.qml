@@ -23,6 +23,7 @@ Item {
     id: header
 
     property alias toolBar: toolBarLoader.sourceComponent
+    property alias iconSize: iconImage.width
     property alias iconSource: iconImage.source
     property alias title: titleText.text
     property alias subTitle: subTitleText.text

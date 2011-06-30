@@ -126,11 +126,12 @@ Panel {
 
         StatusPill {
             anchors.left: parent.left
-            anchors.leftMargin: appStyle.icon.normalSize - 3
+            anchors.leftMargin: header.iconSize - 3
             anchors.top: parent.top
-            anchors.topMargin: appStyle.icon.normalSize - 3
+            anchors.topMargin: header.iconSize - 3
             height: appStyle.icon.tinySize
             width: appStyle.icon.tinySize
+            opacity: header.iconSize > 0 ? 1: 0
             presenceStatus: vcard.status
         }
     }
