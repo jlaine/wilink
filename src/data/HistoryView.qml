@@ -64,6 +64,7 @@ Item {
                         onClicked: block.participantClicked(model.from);
                     }
                 }
+
                 Column {
                     width: parent.width - parent.spacing - avatar.width
 
@@ -75,9 +76,13 @@ Item {
 
                         Text {
                             id: fromText
+
                             anchors.left: parent.left
                             anchors.leftMargin: 10
+                            anchors.right: parent.right
+                            anchors.rightMargin: 10
                             color: model.received ? '#2689d6': '#7b7b7b'
+                            elide: Text.ElideRight
                             font.pixelSize: appStyle.font.smallSize
                             text: model.from
 
@@ -88,10 +93,13 @@ Item {
                         }
 
                         Text {
-                            anchors.right: parent.right
-                            anchors.rightMargin: 10
+                            id: dateText
+
+                            anchors.right: fromText.right
                             color: model.received ? '#2689d6': '#7b7b7b'
                             font.pixelSize: appStyle.font.smallSize
+                            // FIXME: this is a rough estimation of required width
+                            opacity: fromText.width > 0.7 * (fromText.font.pixelSize * fromText.text.length + dateText.font.pixelSize * dateText.text.length) ? 1 : 0
                             text: Qt.formatDateTime(model.date, 'dd MMM hh:mm')
                         }
                     }
