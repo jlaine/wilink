@@ -211,4 +211,10 @@ Panel {
     }
 
     Keys.forwardTo: historyView
+
+    states: State {
+        name: 'no-participants'
+        when: panel.width < 300
+        PropertyChanges { target: participantView; opacity: 0; width: 0 }
+    }
 }
