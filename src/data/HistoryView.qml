@@ -257,6 +257,7 @@ Item {
 
         Button {
             iconSource: 'copy.png'
+            iconSize: appStyle.icon.tinySize
             text: qsTr('Copy')
 
             onClicked: {
