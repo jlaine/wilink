@@ -454,7 +454,6 @@ void Application::resetWindows()
     if (chatAccounts().isEmpty()) {
 
         Window *window = new Window(QUrl("qrc:/setup.qml"), QString());
-        window->resize(360, 360);
 
         const QSize size = QApplication::desktop()->availableGeometry(window).size();
         window->move((size.width() - window->width()) / 2, (size.height() - window->height()) / 2);
