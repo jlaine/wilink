@@ -39,7 +39,7 @@ FocusScope {
         id: background
 
         anchors.fill: parent
-        border.color: '#aa567dbc'
+        border.color: '#88a4d1'
         border.width: 1
         gradient: Gradient {
             GradientStop { id: backgroundStop1; position: 1.0; color: '#e7effd' }
@@ -90,7 +90,7 @@ FocusScope {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        border.color: '#aa567dbc'
+        border.color: '#88a4d1'
         border.width: 1
         gradient: Gradient {
             GradientStop { position:0.0; color: '#9fb7dd' }
