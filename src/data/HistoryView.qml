@@ -268,9 +268,9 @@ Item {
     Rectangle {
         id: border
 
+        anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.right: parent.right
-        anchors.top: parent.top
         color: '#597fbe'
         width: 1
     }
@@ -290,8 +290,6 @@ Item {
             }
         }
     }
-
-    Style { id: appStyle }
 
     Connections {
         target: historyView
