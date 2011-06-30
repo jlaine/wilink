@@ -76,13 +76,7 @@ Item {
             anchors.right: parent.right
             color: 'white'
             elide: Text.ElideRight
-/*
-            states: State {
-                name: 'collapsed'
-                when: subTitleText.text.length === 0
-                PropertyChanges { target: subTitleText; height: 0 }
-            }
-*/
+            visible: text != ''
         }
     }
 
