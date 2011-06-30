@@ -93,8 +93,11 @@ static QString transformToken(const QString &token, const QString &meName)
     }
 
     // handle links
-    if (linkRegex.exactMatch(token))
-        return QString("<a href=\"%1\">%2</a>").arg(token, Qt::escape(token));
+    if (linkRegex.exactMatch(token)) {
+        QUrl url;
+        url.setEncodedUrl(token.toUtf8());
+        return QString("<a href=\"%1\">%2</a>").arg(url.toString(), url.toString());
+    }
 
     // me
     if (!meName.isEmpty() && meRegex.exactMatch(token)) {
