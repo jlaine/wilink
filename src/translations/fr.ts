@@ -281,6 +281,10 @@ Acceptez-vous?</translation>
         <source>has closed the conversation</source>
         <translation>a fermé la conversation</translation>
     </message>
+    <message>
+        <source>Send</source>
+        <translation>Envoyer</translation>
+    </message>
 </context>
 <context>
     <name>DiagnosticPanel</name>

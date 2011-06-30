@@ -86,7 +86,7 @@ Panel {
 
             ToolButton {
                 iconSource: 'upload.png'
-                text: qsTr('Send a file')
+                text: qsTr('Send')
                 visible: vcard.features & VCard.FileTransferFeature
 
                 onClicked: {
