@@ -38,14 +38,7 @@ Panel {
         anchors.top: parent.top
         iconSource: 'photos.png'
         title: '<b>' + qsTr('Photos') + '</b>'
-        z: 1
-
-        Row {
-            id: toolBar
-
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.right: parent.right
-
+        toolBar: Row {
             ToolButton {
                 enabled: crumbBar.model.count > 1
                 iconSource: 'back.png'

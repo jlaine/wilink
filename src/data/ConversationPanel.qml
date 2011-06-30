@@ -41,47 +41,7 @@ Panel {
         anchors.right: parent.right
         iconSource: vcard.avatar
         title: '<b>' + vcard.name + '</b> ' + stateText() + '<br/>' + extraText()
-        z: 1
-
-        function extraText() {
-            var domain = Utils.jidToDomain(vcard.jid);
-            if (domain == 'wifirst.net') {
-                // for wifirst accounts, return the nickname if it is
-                // different from the display name
-                if (vcard.name != vcard.nickName)
-                    return vcard.nickName;
-                else
-                    return '';
-            } else {
-                return vcard.jid;
-            }
-        }
-
-        function stateText() {
-            if (conversation.remoteState == QXmppMessage.Composing)
-                return qsTr('is composing a message');
-            else if (conversation.remoteState == QXmppMessage.Gone)
-                return qsTr('has closed the conversation');
-            else
-                return '';
-        }
-
-        StatusPill {
-            anchors.left: parent.left
-            anchors.leftMargin: appStyle.icon.normalSize - 3
-            anchors.top: parent.top
-            anchors.topMargin: appStyle.icon.normalSize - 3
-            height: appStyle.icon.tinySize
-            width: appStyle.icon.tinySize
-            presenceStatus: vcard.status
-        }
-
-        Row {
-            id: toolBar
-
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.right: parent.right
-
+        toolBar: Row {
             ToolButton {
                 iconSource: 'call.png'
                 text: qsTr('Call')
@@ -144,9 +104,37 @@ Panel {
             }
         }
 
-        VCard {
-            id: vcard
-            jid: conversation.jid
+        function extraText() {
+            var domain = Utils.jidToDomain(vcard.jid);
+            if (domain == 'wifirst.net') {
+                // for wifirst accounts, return the nickname if it is
+                // different from the display name
+                if (vcard.name != vcard.nickName)
+                    return vcard.nickName;
+                else
+                    return '';
+            } else {
+                return vcard.jid;
+            }
+        }
+
+        function stateText() {
+            if (conversation.remoteState == QXmppMessage.Composing)
+                return qsTr('is composing a message');
+            else if (conversation.remoteState == QXmppMessage.Gone)
+                return qsTr('has closed the conversation');
+            else
+                return '';
+        }
+
+        StatusPill {
+            anchors.left: parent.left
+            anchors.leftMargin: appStyle.icon.normalSize - 3
+            anchors.top: parent.top
+            anchors.topMargin: appStyle.icon.normalSize - 3
+            height: appStyle.icon.tinySize
+            width: appStyle.icon.tinySize
+            presenceStatus: vcard.status
         }
     }
 
@@ -203,6 +191,11 @@ Panel {
                 }
             }
         }
+    }
+
+    VCard {
+        id: vcard
+        jid: conversation.jid
     }
 
     Keys.forwardTo: historyView

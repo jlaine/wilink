@@ -22,6 +22,7 @@ import QtQuick 1.0
 Rectangle {
     id: header
 
+    property alias toolBar: toolBarLoader.sourceComponent
     property alias iconSource: iconImage.source
     property alias title: titleText.text
 
@@ -33,6 +34,7 @@ Rectangle {
     }
     height: 46
     width: 200
+    z: 1
 
     Image {
         id: iconImage
@@ -54,6 +56,13 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         color: 'white'
         width: 150
+    }
+
+    Loader {
+        id: toolBarLoader
+
+        anchors.right: parent.right
+        anchors.verticalCenter: parent.verticalCenter
     }
 }
 

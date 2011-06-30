@@ -31,14 +31,7 @@ Panel {
         anchors.top: parent.top
         iconSource: 'share.png'
         title: '<b>' + qsTr('Shares') + '</b>'
-        z: 1
-
-        Row {
-            id: toolBar
-
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.right: parent.right
-
+        toolBar: Row {
             ToolButton {
                 iconSource: 'back.png'
                 text: qsTr('Go back')

@@ -131,14 +131,7 @@ Panel {
         anchors.right: parent.right
         iconSource: 'start.png'
         title: qsTr('Media player')
-        z: 1
-
-        Row {
-            id: toolBar
-
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.right: parent.right
-
+        toolBar: Row {
             ToolButton {
                 iconSource: 'stop.png'
                 text: qsTr('Stop')

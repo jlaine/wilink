@@ -32,14 +32,7 @@ Panel {
         anchors.right: parent.right
         iconSource: 'options.png'
         title: qsTr('Debugging console')
-        z: 1
-
-        Row {
-            id: toolBar
-
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.right: parent.right
-
+        toolBar: Row {
             ToolButton {
                 iconSource: 'start.png'
                 text: qsTr('Start')
