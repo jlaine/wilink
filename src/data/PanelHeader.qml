@@ -56,8 +56,7 @@ Item {
     Column {
         anchors.left: iconImage.right
         anchors.leftMargin: 8
-        anchors.right: parent.right
-        anchors.rightMargin: 8
+        anchors.right: toolBarLoader.left
         anchors.verticalCenter: parent.verticalCenter
 
         Text {
