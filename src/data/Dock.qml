@@ -62,10 +62,10 @@ Rectangle {
             onClicked: {
                 var panel = swapper.findPanel(panelSource);
                 if (panel == swapper.currentItem) {
-                    if (panel.state == 'noroster')
+                    if (panel.state == 'no-roster')
                         panel.state = '';
                     else
-                        panel.state = 'noroster';
+                        panel.state = 'no-roster';
                 } else {
                     swapper.setCurrentItem(panel);
                 }

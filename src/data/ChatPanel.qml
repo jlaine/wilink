@@ -271,7 +271,7 @@ Panel {
     }
 
     states: State {
-        name: 'noroster'
+        name: 'no-roster'
 
         PropertyChanges { target: left; width: 0 }
     }
