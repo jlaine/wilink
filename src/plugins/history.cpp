@@ -27,7 +27,7 @@
 typedef QPair<QRegExp, QString> TextTransform;
 static QList<TextTransform> textTransforms;
 
-static const QRegExp meRegex = QRegExp("^/me( .*)");
+static const QRegExp meRegex = QRegExp("^/me[ \t]+(.*)");
 
 class HistoryItem : public ChatModelItem
 {
@@ -72,7 +72,7 @@ bool HistoryMessage::groupWith(const HistoryMessage &other) const
         qAbs(date.secsTo(other.date)) < 3600; // 1 hour
 }
 
-static QString transformToken(const QString &token, const QString &meName)
+static QString transformToken(const QString &token)
 {
     QMap<QString, QString> smileys;
     smileys.insert(":@", ":/smiley-angry.png");
@@ -105,13 +105,6 @@ static QString transformToken(const QString &token, const QString &meName)
         return QString("<a href=\"%1\">%2</a>").arg(url.toString(), url.toString());
     }
 
-    // me
-    if (!meName.isEmpty() && meRegex.exactMatch(token)) {
-        QString output(token);
-        output.replace(meRegex, "<b>" + meName + "\\1</b>");
-        return output;
-    }
-
     // default
     return Qt::escape(token);
 }
@@ -122,10 +115,15 @@ static QString transformToken(const QString &token, const QString &meName)
  */
 QString HistoryMessage::html(const QString &meName) const
 {
+    // me
+    QRegExp re(meRegex);
+    if (!meName.isEmpty() && re.exactMatch(body))
+        return QString("<b>%1 %2</b>").arg(meName, Qt::escape(re.cap(1)));
+
     const QStringList input = body.split(QRegExp("[ \t]+"));
     QStringList output;
     foreach (const QString &token, input) {
-        QString tokenHtml = transformToken(token, meName);
+        QString tokenHtml = transformToken(token);
         foreach (const TextTransform &transform, textTransforms)
             tokenHtml.replace(transform.first, transform.second);
         output << tokenHtml;
@@ -141,7 +139,7 @@ QString HistoryMessage::html(const QString &meName) const
  */
 bool HistoryMessage::isAction() const
 {
-    return body.indexOf(meRegex) >= 0;
+    return meRegex.exactMatch(body);
 }
 
 class HistoryModelPrivate
