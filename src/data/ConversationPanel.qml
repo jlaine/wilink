@@ -40,8 +40,28 @@ Panel {
         anchors.left: parent.left
         anchors.right: parent.right
         iconSource: vcard.avatar
-        title: '<b>' + vcard.name + '</b> ' + stateText() + '<br/>' + extraText()
-        toolBar: Row {
+        title: {
+            var text = vcard.jid;
+            if (conversation.remoteState == QXmppMessage.Composing)
+                text += ' ' + qsTr('is composing a message');
+            else if (conversation.remoteState == QXmppMessage.Gone)
+                text += ' ' + qsTr('has closed the conversation');
+            return text;
+        }
+        subTitle: {
+            var domain = Utils.jidToDomain(vcard.jid);
+            if (domain == 'wifirst.net') {
+                // for wifirst accounts, return the nickname if it is
+                // different from the display name
+                if (vcard.name != vcard.nickName)
+                    return vcard.nickName;
+                else
+                    return '';
+            } else {
+                return vcard.jid;
+            }
+        }
+        toolBar: ToolBar {
             ToolButton {
                 iconSource: 'call.png'
                 text: qsTr('Call')
@@ -102,29 +122,6 @@ Panel {
                     panel.close()
                 }
             }
-        }
-
-        function extraText() {
-            var domain = Utils.jidToDomain(vcard.jid);
-            if (domain == 'wifirst.net') {
-                // for wifirst accounts, return the nickname if it is
-                // different from the display name
-                if (vcard.name != vcard.nickName)
-                    return vcard.nickName;
-                else
-                    return '';
-            } else {
-                return vcard.jid;
-            }
-        }
-
-        function stateText() {
-            if (conversation.remoteState == QXmppMessage.Composing)
-                return qsTr('is composing a message');
-            else if (conversation.remoteState == QXmppMessage.Gone)
-                return qsTr('has closed the conversation');
-            else
-                return '';
         }
 
         StatusPill {

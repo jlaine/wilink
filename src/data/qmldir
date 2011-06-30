@@ -22,6 +22,7 @@ Dialog 1.0 Dialog.qml
 DiscoveryPanel 1.0 DiscoveryPanel.qml
 Dock 1.0 Dock.qml
 DockButton 1.0 DockButton.qml
+ErrorNotification 1.0 ErrorNotification.qml
 GeneralPreferencePanel 1.0 GeneralPreferencePanel.qml
 GroupBox 1.0 GroupBox.qml
 Highlight 1.0 Highlight.qml
@@ -66,6 +67,7 @@ SoundPreferencePanel 1.0 SoundPreferencePanel.qml
 StatusBar 1.0 StatusBar.qml
 StatusPill 1.0 StatusPill.qml
 Style 1.0 Style.qml
+ToolBar 1.0 ToolBar.qml
 ToolButton 1.0 ToolButton.qml
 TransferNotification 1.0 TransferNotification.qml
 TransferWidget 1.0 TransferWidget.qml

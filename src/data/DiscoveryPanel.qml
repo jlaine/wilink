@@ -32,7 +32,7 @@ Panel {
         anchors.right: parent.right
         iconSource: 'diagnostics.png'
         title: qsTr('Service discovery')
-        toolBar: Row {
+        toolBar: ToolBar {
             ToolButton {
                 iconSource: 'back.png'
                 text: qsTr('Go back')

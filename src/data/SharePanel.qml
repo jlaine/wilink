@@ -30,8 +30,8 @@ Panel {
         anchors.right: parent.right
         anchors.top: parent.top
         iconSource: 'share.png'
-        title: '<b>' + qsTr('Shares') + '</b>'
-        toolBar: Row {
+        title: qsTr('Shares')
+        toolBar: ToolBar {
             ToolButton {
                 iconSource: 'back.png'
                 text: qsTr('Go back')

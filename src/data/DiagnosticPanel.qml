@@ -30,8 +30,8 @@ Panel {
         anchors.left: parent.left
         anchors.right: parent.right
         iconSource: 'diagnostics.png'
-        title: '<b>' + qsTr('Diagnostics') + '</b>'
-        toolBar: Row {
+        title: qsTr('Diagnostics')
+        toolBar: ToolBar {
             ToolButton {
                 iconSource: 'refresh.png'
                 enabled: !appClient.diagnosticManager.running

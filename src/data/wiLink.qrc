@@ -141,6 +141,7 @@
     <file>StatusBar.qml</file>
     <file>StatusPill.qml</file>
     <file>Style.qml</file>
+    <file>ToolBar.qml</file>
     <file>ToolButton.qml</file>
     <file>TransferNotification.qml</file>
     <file>TransferWidget.qml</file>

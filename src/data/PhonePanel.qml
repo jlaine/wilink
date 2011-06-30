@@ -94,7 +94,8 @@ Panel {
         anchors.right: parent.right
         anchors.top: parent.top
         iconSource: 'phone.png'
-        title: '<b>' + qsTr('Phone') + '</b><br />' + (historyModel.phoneNumber ? qsTr('Your number is %1').replace('%1', historyModel.phoneNumber) : '')
+        title: qsTr('Phone')
+        subTitle: historyModel.phoneNumber ? qsTr('Your number is %1').replace('%1', historyModel.phoneNumber) : ''
     }
 
     PanelHelp {

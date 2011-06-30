@@ -54,8 +54,9 @@ Panel {
         anchors.left: parent.left
         anchors.right: parent.right
         iconSource: 'chat.png'
-        title: '<b>' + Utils.jidToUser(jid) + '</b>' + '<br/>' + (Qt.isQtObject(room) ? room.subject : '')
-        toolBar: Row {
+        title: Utils.jidToUser(jid)
+        subTitle: Qt.isQtObject(room) ? room.subject : ''
+        toolBar: ToolBar {
             ToolButton {
                 iconSource: 'invite.png'
                 text: qsTr('Invite')

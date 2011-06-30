@@ -25,11 +25,11 @@ Item {
     property alias toolBar: toolBarLoader.sourceComponent
     property alias iconSource: iconImage.source
     property alias title: titleText.text
+    property alias subTitle: subTitleText.text
 
     signal itemClicked(int index)
 
     height: 46
-    width: 200
     z: 1
 
     Rectangle {
@@ -53,15 +53,38 @@ Item {
         width: appStyle.icon.normalSize
     }
 
-    Text {
-        id: titleText
-
+    Column {
         anchors.left: iconImage.right
         anchors.leftMargin: 8
         anchors.right: parent.right
+        anchors.rightMargin: 8
         anchors.verticalCenter: parent.verticalCenter
-        color: 'white'
-        width: 150
+
+        Text {
+            id: titleText
+
+            anchors.left: parent.left
+            anchors.right: parent.right
+            color: 'white'
+            elide: Text.ElideRight
+            font.bold: true
+        }
+
+        Text {
+            id: subTitleText
+
+            anchors.left: parent.left
+            anchors.right: parent.right
+            color: 'white'
+            elide: Text.ElideRight
+/*
+            states: State {
+                name: 'collapsed'
+                when: subTitleText.text.length === 0
+                PropertyChanges { target: subTitleText; height: 0 }
+            }
+*/
+        }
     }
 
     Loader {
