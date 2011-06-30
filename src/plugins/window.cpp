@@ -106,9 +106,6 @@ Window::Window(const QUrl &url, const QString &jid, QWidget *parent)
     connect(shortcut, SIGNAL(activated()), this, SLOT(close()));
 #endif
 
-    setMinimumHeight(240);
-    setMinimumWidth(320);
-
     // load QML
     view->setSource(url);
 }

@@ -125,6 +125,9 @@ FocusScope {
     }
 
     Component.onCompleted: {
+        window.minimumWidth = 360;
+        window.minimumHeight = 360;
+
         var jid = window.objectName;
         if (jid == '') {
             console.log("Failed to get window JID");

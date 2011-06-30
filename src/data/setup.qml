@@ -76,4 +76,9 @@ FocusScope {
 
         onShowHelp: Qt.openUrlExternally('https://www.wifirst.net/wilink/faq')
     }
+
+    Component.onCompleted: {
+        window.minimumWidth = 360;
+        window.minimumHeight = 240;
+    }
 }
