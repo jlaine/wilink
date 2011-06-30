@@ -5,8 +5,11 @@ SUBDIRS = \
     qdjango \
     qnetio \
     qsound \
-    qxmpp \
-    translations \
-    plugins
+    qxmpp
 
+!symbian {
+    SUBDIRS += translations
+}
+
+SUBDIRS += plugins
 CONFIG += ordered

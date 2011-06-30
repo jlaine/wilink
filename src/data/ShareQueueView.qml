@@ -95,10 +95,9 @@ Item {
             Button {
                 id: cancelButton
 
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
                 anchors.right: parent.right
-                anchors.margins: 2
+                anchors.verticalCenter: parent.verticalCenter
+                iconSize: appStyle.icon.tinySize
                 iconSource: 'close.png'
                 text: qsTr('Cancel')
 
