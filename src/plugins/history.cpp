@@ -27,7 +27,6 @@
 typedef QPair<QRegExp, QString> TextTransform;
 static QList<TextTransform> textTransforms;
 
-static const QRegExp linkRegex = QRegExp("(ftp|http|https)://[^\\s]+");
 static const QRegExp meRegex = QRegExp("^/me( .*)");
 
 class HistoryItem : public ChatModelItem
@@ -84,7 +83,7 @@ static QString transformToken(const QString &token, const QString &meName)
     smileys.insert(":(", ":/smiley-sad.png");
     smileys.insert(";)", ":/smiley-wink.png");
 
-    QRegExp linkRegex("(ftp|http|https)://.+");
+    const QRegExp linkRegex("(ftp|http|https)://.+");
 
     // handle smileys
     foreach (const QString &key, smileys.keys()) {
