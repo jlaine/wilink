@@ -141,6 +141,12 @@ Item {
                             anchors.right: parent.right
                             anchors.verticalCenter: parent.verticalCenter
                         }
+
+                        states: State {
+                            name: "no-copyButton"
+                            when: rect.width < 100
+                            PropertyChanges { target: copyButtonLoader; visible: false }
+                        }
                     }
 
                     Item {
