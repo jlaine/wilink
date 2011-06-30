@@ -20,6 +20,7 @@
 #include <QCoreApplication>
 #include <QDeclarativeItem>
 #include <QDeclarativeEngine>
+#include <QNetworkDiskCache>
 #include <QNetworkRequest>
 
 #include "QXmppCallManager.h"
@@ -134,6 +135,10 @@ NetworkAccessManager::NetworkAccessManager(QObject *parent)
     : QNetworkAccessManager(parent)
 {
     bool check;
+
+    QNetworkDiskCache *cache = new QNetworkDiskCache(this);
+    cache->setCacheDirectory(wApp->cacheDirectory());
+    setCache(cache);
 
     check = QObject::connect(this, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)),
                              QNetIO::Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
