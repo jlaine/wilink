@@ -43,5 +43,10 @@ Notification {
         // play a sound
         dialog.soundId = application.soundPlayer.play(":/call-incoming.ogg", true);
     }
+
+    Connections {
+        target: call
+        onFinished: dialog.close()
+    }
 }
 
