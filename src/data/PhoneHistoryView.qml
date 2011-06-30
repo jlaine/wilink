@@ -29,7 +29,7 @@ Item {
     Rectangle {
         id: background
         anchors.fill: parent
-        border.color: '#aa567dbc'
+        border.color: '#88a4d1'
         border.width: 1
         color: '#ffffff'
         smooth: true
@@ -39,7 +39,7 @@ Item {
         id: header
         anchors.left: parent.left
         anchors.right: parent.right
-        border.color: '#aa567dbc'
+        border.color: '#88a4d1'
         border.width: 1
         gradient: Gradient {
             GradientStop { position:0.0; color: '#9fb7dd' }
