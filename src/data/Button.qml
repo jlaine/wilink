@@ -100,8 +100,8 @@ Rectangle {
 
     states: State {
         name: 'pressed'
-        PropertyChanges { target: stop1; color: '#aacbd9f0' }
-        PropertyChanges { target: stop2; color: '#aaffffff' }
+        PropertyChanges { target: stop1; color: '#d5e2f5' }
+        PropertyChanges { target: stop2; color: '#f5fafe' }
     }
 }
 
