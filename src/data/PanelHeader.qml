@@ -19,7 +19,7 @@
 
 import QtQuick 1.0
 
-Rectangle {
+Item {
     id: header
 
     property alias toolBar: toolBarLoader.sourceComponent
@@ -28,13 +28,19 @@ Rectangle {
 
     signal itemClicked(int index)
 
-    gradient: Gradient {
-        GradientStop { position: 0; color: '#9bbdf4' }
-        GradientStop { position: 1; color: '#90acd8' }
-    }
     height: 46
     width: 200
     z: 1
+
+    Rectangle {
+        id: background
+
+        anchors.fill: parent
+        gradient: Gradient {
+            GradientStop { position: 0; color: '#9bbdf4' }
+            GradientStop { position: 1; color: '#90acd8' }
+        }
+    }
 
     Image {
         id: iconImage
