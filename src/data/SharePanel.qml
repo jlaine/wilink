@@ -162,6 +162,7 @@ Panel {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
+        clip: true
         height: queueView.count > 0 ? 120 : 0
         model: view.model.queue
     }
