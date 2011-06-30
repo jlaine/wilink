@@ -33,9 +33,9 @@ Item {
 
     Gradient {
         id: hoverGradient
-        GradientStop { id: hoverStop1; position: 0.0; color: '#00ffffff' }
-        GradientStop { id: hoverStop2; position: 0.5; color: '#00ffffff' }
-        GradientStop { id: hoverStop3; position: 1.0; color: '#00ffffff' }
+        GradientStop { id: hoverStop1; position: 0.0; color: 'transparent' }
+        GradientStop { id: hoverStop2; position: 0.5; color: 'transparent' }
+        GradientStop { id: hoverStop3; position: 1.0; color: 'transparent' }
     }
 
     // background
