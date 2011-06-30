@@ -95,7 +95,7 @@ static QString transformToken(const QString &token, const QString &meName)
     // handle links
     if (linkRegex.exactMatch(token)) {
         QUrl url;
-        url.setEncodedUrl(token.toUtf8());
+        url.setEncodedUrl(token.toAscii());
         return QString("<a href=\"%1\">%2</a>").arg(url.toString(), url.toString());
     }
 
