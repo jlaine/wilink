@@ -29,6 +29,7 @@ Item {
 
     signal itemClicked(int index)
 
+    clip: true
     height: 46
     z: 1
 
@@ -51,6 +52,12 @@ Item {
         smooth: true
         height: appStyle.icon.normalSize
         width: appStyle.icon.normalSize
+
+        states: State {
+            name: 'collapsed'
+            when: header.width < 400
+            PropertyChanges { target: iconImage; anchors.leftMargin: 0; width: 0; opacity: 0 }
+        }
     }
 
     Column {
