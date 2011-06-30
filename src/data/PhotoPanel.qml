@@ -257,6 +257,7 @@ Panel {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
+        clip: true
         model: photoModel.uploads
         z: 1
     }

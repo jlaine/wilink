@@ -23,45 +23,73 @@ Item {
     id: block
 
     property alias model: view.model
-    
-    height: view.count * 32
+
+    height: view.count > 0 ? 120 : 0
+
+    Rectangle {
+        id: background
+
+        anchors.fill: parent
+        color: '#ffffff'
+    }
+
+    Rectangle {
+        id: border
+
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        color: '#93b9f2'
+        height: 1
+    }
 
     ListView {
         id: view
 
-        anchors.top: parent.top
+        anchors.top: border.bottom
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: scrollBar.left
+        spacing: 4
 
-        delegate: Rectangle {
-            color: 'green'
+        delegate: Item {
             width: view.width - 1
-            height: 32
+            height: appStyle.icon.smallSize
 
             Image {
-                id: image
+                id: thumbnail
+
 
                 anchors.left: parent.left
+                anchors.leftMargin: 4
                 anchors.verticalCenter: parent.verticalCenter
                 fillMode: Image.PreserveAspectFit
-                width: 32
-                height: 32
+                width: appStyle.icon.smallSize
+                height: appStyle.icon.smallSize
+                smooth: true
                 source: model.avatar
             }
 
-            ProgressBar {
-                id: progress
+            Item {
+                id: main
 
-                anchors.margins: 8
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.left: image.right
+                anchors.left: thumbnail.right
                 anchors.right: parent.right
-                maximumValue: 1.0
-                value: model.progress
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                anchors.margins: 4
+
+                ProgressBar {
+                    anchors.fill: parent
+                    maximumValue: 1.0
+                    value: model.progress
+                }
 
                 Text {
-                    anchors.centerIn: parent
+                    anchors.fill: parent
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: Text.AlignHCenter
+                    elide: Text.ElideRight
                     text: model.name
                 }
             }
