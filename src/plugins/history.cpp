@@ -27,7 +27,7 @@
 typedef QPair<QRegExp, QString> TextTransform;
 static QList<TextTransform> textTransforms;
 
-static const QRegExp linkRegex = QRegExp("\\b((ftp|http|https)://[^\\s]+)");
+static const QRegExp linkRegex = QRegExp("(ftp|http|https)://[^\\s]+");
 static const QRegExp meRegex = QRegExp("^/me( .*)");
 
 class HistoryItem : public ChatModelItem
@@ -73,31 +73,85 @@ bool HistoryMessage::groupWith(const HistoryMessage &other) const
         qAbs(date.secsTo(other.date)) < 3600; // 1 hour
 }
 
+static QString transformToken(const QString &token, const QString &meName)
+{
+    QMap<QString, QString> smileys;
+    smileys.insert(":@", ":/smiley-angry.png");
+    smileys.insert(":s", ":/smiley-confused.png");
+    smileys.insert(":)", ":/smiley-happy.png");
+    smileys.insert(":|", ":/smiley-neutral.png");
+    smileys.insert(":p", ":/smiley-raspberry.png");
+    smileys.insert(":(", ":/smiley-sad.png");
+    smileys.insert(";)", ":/smiley-wink.png");
+
+    QRegExp linkRegex("(ftp|http|https)://.+");
+
+    // handle smileys
+    foreach (const QString &key, smileys.keys()) {
+        if (token == key)
+            return QString("<img alt=\"%1\" src=\"%2\" />").arg(key, smileys.value(token));
+    }
+
+    // handle links
+    if (linkRegex.exactMatch(token))
+        return QString("<a href=\"%1\">%2</a>").arg(token, Qt::escape(token));
+
+    // me
+    if (!meName.isEmpty() && meRegex.exactMatch(token)) {
+        QString output(token);
+        output.replace(meRegex, "<b>" + meName + "\\1</b>");
+        return output;
+    }
+
+    // handle smileys
+    foreach (const QString &key, smileys.keys()) {
+        if (token == key)
+            return QString("<img alt=\"%1\" src=\"%2\" />").arg(key, smileys.value(token));
+    }
+
+    // handle links
+    if (linkRegex.exactMatch(token))
+        return QString("<a href=\"%1\">%2</a>").arg(token, Qt::escape(token));
+
+    // me
+    if (!meName.isEmpty() && meRegex.exactMatch(token)) {
+        QString output(token);
+        output.replace(meRegex, "<b>" + meName + "\\1</b>");
+        return output;
+    }
+
+    // default
+    return Qt::escape(token);
+}
+
 /** Returns the HTML for the message body.
  *
  * @param meName
  */
 QString HistoryMessage::html(const QString &meName) const
 {
-    QString bodyHtml = Qt::escape(body);
+    QMap<QString, QString> smileys;
+    smileys.insert(":@", ":/smiley-angry.png");
+    smileys.insert(":s", ":/smiley-confused.png");
+    smileys.insert(":)", ":/smiley-happy.png");
+    smileys.insert(":|", ":/smiley-neutral.png");
+    smileys.insert(":p", ":/smiley-raspberry.png");
+    smileys.insert(":(", ":/smiley-sad.png");
+    smileys.insert(";)", ":/smiley-wink.png");
 
-#ifdef USE_SMILEYS
-    bodyHtml.replace(":@", "<img alt=\":@\" src=\":/smiley-angry.png\" />");
-    bodyHtml.replace(":s", "<img alt=\":s\" src=\":/smiley-confused.png\" />");
-    bodyHtml.replace(":)", "<img alt=\":)\" src=\":/smiley-happy.png\" />");
-    bodyHtml.replace(":|", "<img alt=\":|\" src=\":/smiley-neutral.png\" />");
-    bodyHtml.replace(":p", "<img alt=\":p\" src=\":/smiley-raspberry.png\" />");
-    bodyHtml.replace(":(", "<img alt=\":(\" src=\":/smiley-sad.png\" />");
-    // FIXME: wink smiley corrupt HTML entities
-    bodyHtml.replace(";)", "<img alt=\";)\" src=\":/smiley-wink.png\" />");
-#endif
+    QRegExp linkRegex("(ftp|http|https)://.+");
 
-    bodyHtml.replace(linkRegex, "<a href=\"\\1\">\\1</a>");
+    const QStringList input = body.split(QRegExp("[ \t]+"));
+    QStringList output;
+    foreach (const QString &token, input) {
+        QString tokenHtml = transformToken(token, meName);
+        foreach (const TextTransform &transform, textTransforms)
+            tokenHtml.replace(transform.first, transform.second);
+        output << tokenHtml;
+    }
+
+    QString bodyHtml = output.join(" ");
     bodyHtml.replace("\n", "<br/>");
-    if (!meName.isEmpty())
-        bodyHtml.replace(meRegex, "<b>" + meName + "\\1</b>");
-    foreach (const TextTransform &transform, textTransforms)
-        bodyHtml.replace(transform.first, transform.second);
     return bodyHtml;
 }
 
