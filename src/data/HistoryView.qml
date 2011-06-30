@@ -113,17 +113,6 @@ Item {
                         radius: 8
                         width: parent.width
 
-                        Text {
-                            id: bodyText
-
-                            anchors.centerIn: parent
-                            width: rect.width - 20
-                            text: model.html
-                            textFormat: Qt.RichText
-                            wrapMode: Text.Wrap
-                            onLinkActivated: Qt.openUrlExternally(link)
-                        }
-
                         MouseArea {
                             anchors.fill: parent
                             hoverEnabled: true
@@ -134,6 +123,18 @@ Item {
                             onExited: {
                                 copyButtonLoader.sourceComponent = undefined;
                             }
+                        }
+
+                        Text {
+                            id: bodyText
+
+                            anchors.centerIn: parent
+                            width: rect.width - 20
+                            text: model.html
+                            textFormat: Qt.RichText
+                            wrapMode: Text.Wrap
+
+                            onLinkActivated: Qt.openUrlExternally(link)
                         }
 
                         Loader {
