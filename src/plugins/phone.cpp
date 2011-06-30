@@ -260,9 +260,7 @@ void PhoneCallsModel::callStateChanged(QXmppCall::State state)
                 this, SIGNAL(outputVolumeChanged(int)));
     }
     else if (state == QXmppCall::FinishedState) {
-        emit inputVolumeChanged(0);
-        emit outputVolumeChanged(0);
-
+        call->disconnect(this);
         item->call = 0;
         item->duration = call->duration();
         if (!call->error().isEmpty()) {
@@ -270,6 +268,8 @@ void PhoneCallsModel::callStateChanged(QXmppCall::State state)
             emit error(call->error());
         }
         emit currentCallsChanged();
+        emit inputVolumeChanged(0);
+        emit outputVolumeChanged(0);
 
         QUrl url = m_url;
         url.setPath(url.path() + QString::number(item->id) + "/");
