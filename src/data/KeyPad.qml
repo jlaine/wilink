@@ -20,41 +20,46 @@
 import QtQuick 1.0
 import QXmpp 0.4
 
-GridView {
+Item {
     id: grid
 
     signal keyPressed(variant key)
     signal keyReleased(variant key)
 
-    cellWidth: 40
-    cellHeight: 40
-    interactive: false
-    width: cellWidth * 3
-    height: cellHeight * 4
+    width: 115
+    height: 155
 
-    delegate: Button {
-        id: button
+    GridView {
+        cellWidth: 40
+        cellHeight: 40
+        interactive: false
+        width: cellWidth * 3
+        height: cellHeight * 4
 
-        text: model.name
-        width: 35
-        height: 35
+        delegate: Button {
+            id: button
 
-        onPressed: grid.keyPressed(model)
-        onReleased: grid.keyReleased(model)
-    }
-    model: ListModel {
-        ListElement { name: '1'; tone: QXmppRtpAudioChannel.Tone_1 }
-        ListElement { name: '2'; tone: QXmppRtpAudioChannel.Tone_2 }
-        ListElement { name: '3'; tone: QXmppRtpAudioChannel.Tone_3 }
-        ListElement { name: '4'; tone: QXmppRtpAudioChannel.Tone_4 }
-        ListElement { name: '5'; tone: QXmppRtpAudioChannel.Tone_5 }
-        ListElement { name: '6'; tone: QXmppRtpAudioChannel.Tone_6 }
-        ListElement { name: '7'; tone: QXmppRtpAudioChannel.Tone_7 }
-        ListElement { name: '8'; tone: QXmppRtpAudioChannel.Tone_8 }
-        ListElement { name: '9'; tone: QXmppRtpAudioChannel.Tone_9 }
-        ListElement { name: '*'; tone: QXmppRtpAudioChannel.Tone_Star }
-        ListElement { name: '0'; tone: QXmppRtpAudioChannel.Tone_0 }
-        ListElement { name: '#'; tone: QXmppRtpAudioChannel.Tone_Pound }
+            text: model.name
+            width: 35
+            height: 35
+
+            onPressed: grid.keyPressed(model)
+            onReleased: grid.keyReleased(model)
+        }
+        model: ListModel {
+            ListElement { name: '1'; tone: QXmppRtpAudioChannel.Tone_1 }
+            ListElement { name: '2'; tone: QXmppRtpAudioChannel.Tone_2 }
+            ListElement { name: '3'; tone: QXmppRtpAudioChannel.Tone_3 }
+            ListElement { name: '4'; tone: QXmppRtpAudioChannel.Tone_4 }
+            ListElement { name: '5'; tone: QXmppRtpAudioChannel.Tone_5 }
+            ListElement { name: '6'; tone: QXmppRtpAudioChannel.Tone_6 }
+            ListElement { name: '7'; tone: QXmppRtpAudioChannel.Tone_7 }
+            ListElement { name: '8'; tone: QXmppRtpAudioChannel.Tone_8 }
+            ListElement { name: '9'; tone: QXmppRtpAudioChannel.Tone_9 }
+            ListElement { name: '*'; tone: QXmppRtpAudioChannel.Tone_Star }
+            ListElement { name: '0'; tone: QXmppRtpAudioChannel.Tone_0 }
+            ListElement { name: '#'; tone: QXmppRtpAudioChannel.Tone_Pound }
+        }
     }
 }
 
