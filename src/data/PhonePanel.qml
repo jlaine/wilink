@@ -112,18 +112,21 @@ Panel {
         id: numberRow
 
         anchors.left: parent.left
+        anchors.leftMargin: appStyle.spacing.horizontal
         anchors.right: parent.right
+        anchors.rightMargin: appStyle.spacing.horizontal
         anchors.top: help.bottom
-        anchors.margins: 4
+        anchors.topMargin: appStyle.spacing.vertical
         height: 32
 
         InputBar {
             id: numberEdit
 
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.right: buttonBox.left
-            anchors.rightMargin: 4
-            anchors.verticalCenter: parent.verticalCenter
+            anchors.rightMargin: appStyle.spacing.horizontal
             hintText: qsTr('Enter the number you want to call')
 
             Keys.onReturnPressed: {
@@ -139,7 +142,7 @@ Panel {
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             anchors.right: parent.right
-            spacing: 4
+            spacing: appStyle.spacing.horizontal
 
             Button {
                 id: backButton
@@ -190,8 +193,8 @@ Panel {
 
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: numberRow.bottom
-        anchors.topMargin: 8
-        spacing: 4
+        anchors.topMargin: appStyle.spacing.vertical
+        spacing: appStyle.spacing.horizontal
 
         KeyPad {
             id: keypad
@@ -213,12 +216,17 @@ Panel {
             }
         }
 
-        Column {
-            spacing: 8
+        Item {
+            anchors.top: keypad.top
+            anchors.bottom: keypad.bottom
+            width: 32
 
             ProgressBar {
                 id: inputVolume
 
+                anchors.top: parent.top
+                anchors.bottom: inputIcon.top
+                anchors.bottomMargin: appStyle.spacing.vertical
                 anchors.horizontalCenter: parent.horizontalCenter
                 orientation: Qt.Vertical
                 maximumValue: Qt.isQtObject(historyModel) ? historyModel.maximumVolume : 100
@@ -226,6 +234,9 @@ Panel {
             }
 
             Image {
+                id: inputIcon
+
+                anchors.bottom: parent.bottom
                 anchors.horizontalCenter: parent.horizontalCenter
                 source: 'audio-input.png'
                 height: 32
@@ -233,12 +244,17 @@ Panel {
             }
         }
 
-        Column {
-            spacing: 8
+        Item {
+            anchors.top: keypad.top
+            anchors.bottom: keypad.bottom
+            width: 32
 
             ProgressBar {
                 id: outputVolume
 
+                anchors.top: parent.top
+                anchors.bottom: outputIcon.top
+                anchors.bottomMargin: appStyle.spacing.vertical
                 anchors.horizontalCenter: parent.horizontalCenter
                 orientation: Qt.Vertical
                 maximumValue: Qt.isQtObject(historyModel) ? historyModel.maximumVolume : 100
@@ -246,6 +262,9 @@ Panel {
             }
 
             Image {
+                id: outputIcon
+
+                anchors.bottom: parent.bottom
                 anchors.horizontalCenter: parent.horizontalCenter
                 source: 'audio-output.png'
                 height: 32
@@ -260,8 +279,8 @@ Panel {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: controls.bottom
+        anchors.topMargin: appStyle.spacing.vertical
         anchors.bottom: parent.bottom
-        anchors.margins: 10
         model: historyModel
 
         onAddressClicked: {
