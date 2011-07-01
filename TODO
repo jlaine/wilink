@@ -11,6 +11,7 @@ LOW PRIORITY
 
 ENHANCEMENTS
 
+- make it possible to clear archived messages
 - display users list in share panel
 - add a "do not disturb" option for SIP
 - save / restore window size and position
