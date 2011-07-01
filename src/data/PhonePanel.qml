@@ -120,10 +120,10 @@ Panel {
         InputBar {
             id: numberEdit
 
-            anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: buttonBox.left
             anchors.rightMargin: 4
+            anchors.verticalCenter: parent.verticalCenter
             hintText: qsTr('Enter the number you want to call')
 
             Keys.onReturnPressed: {
