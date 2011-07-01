@@ -29,12 +29,22 @@
 
 #include "QXmppClient.h"
 
+#include "declarative.h"
 #include "photos.h"
 
 static const QSize UPLOAD_SIZE(2048, 2048);
 
 static PhotoCache *photoCache = 0;
 static QCache<QString, QImage> photoImageCache;
+
+class PhotoNetworkAccessManagerFactory : public FileSystemNetworkAccessManagerFactory
+{
+public:
+    QNetworkAccessManager *create(QObject *parent)
+    {
+        return new NetworkAccessManager(parent);
+    };
+};
 
 class PhotoDownloadItem
 {
@@ -271,6 +281,8 @@ void PhotoModel::setRootUrl(const QUrl &rootUrl)
 
     if (!m_fs) {
         bool check;
+
+        FileSystem::setNetworkAccessManagerFactory(new PhotoNetworkAccessManagerFactory);
 
         m_fs = FileSystem::factory(m_rootUrl, this);
         check = connect(m_fs, SIGNAL(commandFinished(int, bool, const FileInfoList&)),
