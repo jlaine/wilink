@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -12,10 +13,13 @@
    height="22"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.46"
+   inkscape:version="0.48.0 r9654"
    sodipodi:docname="back.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
-   version="1.0">
+   version="1.0"
+   inkscape:export-filename="/Users/sharky/Development/wilink/src/data/back.png"
+   inkscape:export-xdpi="130.90909"
+   inkscape:export-ydpi="130.90909">
   <defs
      id="defs4">
     <linearGradient
@@ -136,7 +140,7 @@
      inkscape:pageshadow="2"
      inkscape:zoom="27.577164"
      inkscape:cx="8.6215945"
-     inkscape:cy="10.680031"
+     inkscape:cy="13.321115"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -158,7 +162,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -168,8 +172,10 @@
      id="layer1"
      transform="translate(0,2)">
     <path
-       style="fill:#2d2d2d;fill-rule:evenodd;stroke:#000000;stroke-width:0.20000000000000001;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none;fill-opacity:1;filter:url(#filter4337)"
-       d="M 15,4 L 15,13 L 7,8 L 15,4 z"
-       id="path2404" />
+       style="fill:#2d2d2d;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="M 14,4 14,14 6,9 z"
+       id="path2404"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccc" />
   </g>
 </svg>

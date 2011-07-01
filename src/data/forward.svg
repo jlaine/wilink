@@ -13,10 +13,13 @@
    height="22"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.47 r22583"
-   sodipodi:docname="forward.svg"
+   inkscape:version="0.48.0 r9654"
+   sodipodi:docname="back.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
-   version="1.0">
+   version="1.0"
+   inkscape:export-filename="/Users/sharky/Development/wilink/src/data/back.png"
+   inkscape:export-xdpi="130.90909"
+   inkscape:export-ydpi="130.90909">
   <defs
      id="defs4">
     <linearGradient
@@ -59,35 +62,68 @@
        inkscape:vp_x="0 : 526.18109 : 1"
        sodipodi:type="inkscape:persp3d" />
     <filter
-       id="filter2876"
+       id="filter2819"
        inkscape:label="Drop shadow"
        width="1.5"
        height="1.5"
        x="-.25"
        y="-.25">
       <feGaussianBlur
-         id="feGaussianBlur2878"
+         id="feGaussianBlur2821"
          in="SourceAlpha"
          stdDeviation="0.500000"
          result="blur" />
       <feColorMatrix
-         id="feColorMatrix2880"
+         id="feColorMatrix2823"
          result="bluralpha"
          type="matrix"
          values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.750000 0 " />
       <feOffset
-         id="feOffset2882"
+         id="feOffset2825"
          in="bluralpha"
          dx="1.000000"
          dy="1.000000"
          result="offsetBlur" />
       <feMerge
-         id="feMerge2884">
+         id="feMerge2827">
         <feMergeNode
-           id="feMergeNode2886"
+           id="feMergeNode2829"
            in="offsetBlur" />
         <feMergeNode
-           id="feMergeNode2888"
+           id="feMergeNode2831"
+           in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <filter
+       id="filter4337"
+       inkscape:label="Drop shadow"
+       width="1.5"
+       height="1.5"
+       x="-.25"
+       y="-.25">
+      <feGaussianBlur
+         id="feGaussianBlur4339"
+         in="SourceAlpha"
+         stdDeviation="0.500000"
+         result="blur" />
+      <feColorMatrix
+         id="feColorMatrix4341"
+         result="bluralpha"
+         type="matrix"
+         values="1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0.750000 0 " />
+      <feOffset
+         id="feOffset4343"
+         in="bluralpha"
+         dx="1.000000"
+         dy="1.000000"
+         result="offsetBlur" />
+      <feMerge
+         id="feMerge4345">
+        <feMergeNode
+           id="feMergeNode4347"
+           in="offsetBlur" />
+        <feMergeNode
+           id="feMergeNode4349"
            in="SourceGraphic" />
       </feMerge>
     </filter>
@@ -103,15 +139,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="27.577164"
-     inkscape:cx="-0.1531072"
-     inkscape:cy="10.680031"
+     inkscape:cx="8.6215945"
+     inkscape:cy="13.321115"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
-     inkscape:window-width="1680"
-     inkscape:window-height="988"
-     inkscape:window-x="-4"
-     inkscape:window-y="-3"
+     inkscape:window-width="1280"
+     inkscape:window-height="752"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
      inkscape:window-maximized="1"
      inkscape:snap-global="true">
     <inkscape:grid
@@ -126,7 +162,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -136,8 +172,10 @@
      id="layer1"
      transform="translate(0,2)">
     <path
-       style="fill:#2d2d2d;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.20000000000000001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;filter:url(#filter2876)"
-       d="M 7,4 7,13 15,8 7,4 z"
-       id="path2404" />
+       style="fill:#2d2d2d;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="M 8,4 8,14 16,9 z"
+       id="path2404"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccc" />
   </g>
 </svg>
