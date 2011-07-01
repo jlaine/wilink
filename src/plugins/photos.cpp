@@ -450,9 +450,10 @@ void PhotoUploadModel::processQueue()
                 m_uploadDevice->open(QIODevice::ReadOnly);
             } else {
                 m_uploadDevice = new QFile(item->sourcePath, this);
+                m_uploadDevice->open(QIODevice::ReadOnly);
             }
 
-            item->fileSystem->put(m_uploadDevice, item->destinationPath);
+            item->fileSystem->put(item->destinationPath, m_uploadDevice);
             break;
         }
     }
