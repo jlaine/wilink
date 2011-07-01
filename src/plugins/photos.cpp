@@ -457,8 +457,7 @@ void PhotoUploadModel::_q_commandFinished(int cmd, bool error, const FileInfoLis
         return;
 
     if (m_uploadItem) {
-        m_uploadItem->finished = true;
-        emit dataChanged(createIndex(m_uploadItem), createIndex(m_uploadItem));
+        removeItem(m_uploadItem);
         m_uploadItem = 0;
 
         delete m_uploadDevice;
