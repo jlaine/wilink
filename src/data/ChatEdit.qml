@@ -132,6 +132,10 @@ Rectangle {
                 }
             }
 
+            Keys.onEnterPressed: {
+                chatEdit.returnPressed();
+            }
+
             Keys.onReturnPressed: {
                 if (event.modifiers == Qt.NoModifier) {
                     chatEdit.returnPressed();
