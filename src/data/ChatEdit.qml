@@ -191,7 +191,13 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         anchors.right: parent.right
         anchors.rightMargin: 4
-        iconSource: 'upload.png'
+        text: qsTr('Send')
         onClicked: chatEdit.returnPressed()
+
+        Component.onCompleted: {
+            var oldHeight = sendButton.height;
+            sendButton.height = wrapper.height
+            sendButton.width = sendButton.width + (wrapper.height - oldHeight);
+        }
     }
 }
