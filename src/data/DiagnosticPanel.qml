@@ -65,5 +65,9 @@ Panel {
         anchors.right: parent.right
         flickableItem: flickable
     }
+
+    Component.onCompleted: {
+        appClient.diagnosticManager.refresh()
+    }
 }
 
