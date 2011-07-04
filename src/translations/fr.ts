@@ -303,6 +303,14 @@ Acceptez-vous?</translation>
         <source>Diagnostics</source>
         <translation>Diagnostics</translation>
     </message>
+    <message>
+        <source>Copy</source>
+        <translation>Copier</translation>
+    </message>
+    <message>
+        <source>Diagnostics in progress..</source>
+        <translation>Diagnostics en cours...</translation>
+    </message>
 </context>
 <context>
     <name>Dialog</name>

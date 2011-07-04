@@ -91,7 +91,7 @@ Panel {
         Text {
             anchors.centerIn: parent
             font.pixelSize: appStyle.font.largeSize
-            text: 'Diagnostics in progress..'
+            text: qsTr('Diagnostics in progress..')
         }
     }
 
