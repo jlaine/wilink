@@ -3,6 +3,7 @@ HIGH PRIORITY
 - restore copy & paste in chat history
 - make pending messages easier to view
 - fix messages disparition in chat history
+- fix TransferWidget & CallWidget appearance with constrained size
 
 LOW PRIORITY
 
