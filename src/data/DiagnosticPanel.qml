@@ -103,5 +103,7 @@ Panel {
     Component.onCompleted: {
         appClient.diagnosticManager.refresh()
     }
+
+    Keys.forwardTo: scrollBar
 }
 
