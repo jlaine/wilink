@@ -46,7 +46,7 @@ Panel {
         id: flickable
 
         anchors.left: parent.left
-        anchors.right: scrollBar.right
+        anchors.right: scrollBar.left
         anchors.top: header.bottom
         anchors.bottom: parent.bottom
         contentHeight: diagnostic.height
