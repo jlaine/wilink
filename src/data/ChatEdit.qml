@@ -58,6 +58,12 @@ Rectangle {
     color: '#dfdfdf'
     height: wrapper.height + 8
 
+    // This mousearea prevents hover effects on items behind ChatEdit
+    MouseArea {
+        anchors.fill: parent;
+        hoverEnabled: true;
+    }
+
     Rectangle {
         id: wrapper
 
