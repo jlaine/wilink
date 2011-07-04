@@ -66,6 +66,24 @@ Panel {
         flickableItem: flickable
     }
 
+    Rectangle {
+        id: overlay
+
+        anchors.left: parent.left
+        anchors.right: scrollBar.left
+        anchors.top: header.bottom
+        anchors.bottom: parent.bottom
+        color: '#aaffffff'
+        visible: appClient.diagnosticManager.running
+        z: 10
+
+        Text {
+            anchors.centerIn: parent
+            font.pixelSize: appStyle.font.largeSize
+            text: 'Diagnostics in progress..'
+        }
+    }
+
     Component.onCompleted: {
         appClient.diagnosticManager.refresh()
     }
