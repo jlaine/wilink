@@ -539,10 +539,6 @@ Acceptez-vous?</translation>
         <translation>Retour</translation>
     </message>
     <message>
-        <source>Create an album</source>
-        <translation>Créer un album</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
@@ -561,6 +557,10 @@ Acceptez-vous?</translation>
     <message>
         <source>Home</source>
         <translation>Accueil</translation>
+    </message>
+    <message>
+        <source>Create</source>
+        <translation>Créer</translation>
     </message>
 </context>
 <context>
