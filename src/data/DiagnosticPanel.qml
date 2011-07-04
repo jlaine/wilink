@@ -33,6 +33,17 @@ Panel {
         title: qsTr('Diagnostics')
         toolBar: ToolBar {
             ToolButton {
+                iconSource: 'copy.png'
+                enabled: !appClient.diagnosticManager.running
+                text: qsTr('Copy')
+
+                onClicked: {
+                    copyHelper.text = diagnostic.text;
+                    copyHelper.selectAll();
+                    copyHelper.copy();
+                }
+            }
+            ToolButton {
                 iconSource: 'refresh.png'
                 enabled: !appClient.diagnosticManager.running
                 text: qsTr('Refresh')
@@ -82,6 +93,11 @@ Panel {
             font.pixelSize: appStyle.font.largeSize
             text: 'Diagnostics in progress..'
         }
+    }
+
+    TextEdit {
+        id: copyHelper
+        visible: false
     }
 
     Component.onCompleted: {
