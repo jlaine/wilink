@@ -178,6 +178,13 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>ChatEdit</name>
+    <message>
+        <source>Send</source>
+        <translation>Envoyer</translation>
+    </message>
+</context>
+<context>
     <name>ChatPanel</name>
     <message>
         <source>My rooms</source>

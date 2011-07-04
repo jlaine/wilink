@@ -101,6 +101,7 @@ if(RELOAD_TRANSLATIONS)
         ../data/AccountPreferencePanel.qml
         ../data/CallNotification.qml
         ../data/CallWidget.qml
+        ../data/ChatEdit.qml
         ../data/ChatPanel.qml
         ../data/ContactAddDialog.qml
         ../data/ContactAddNotification.qml
