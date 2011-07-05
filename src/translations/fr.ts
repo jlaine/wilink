@@ -265,10 +265,6 @@ Acceptez-vous?</translation>
 <context>
     <name>ConversationPanel</name>
     <message>
-        <source>Close</source>
-        <translation>Fermer</translation>
-    </message>
-    <message>
         <source>Call</source>
         <translation>Appeler</translation>
     </message>

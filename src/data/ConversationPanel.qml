@@ -113,15 +113,6 @@ Panel {
                     }
                 }
             }
-
-            ToolButton {
-                iconSource: 'close.png'
-                text: qsTr('Close')
-                onClicked: {
-                    conversation.localState = QXmppMessage.Gone
-                    panel.close()
-                }
-            }
         }
 
         StatusPill {
