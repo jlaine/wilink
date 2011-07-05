@@ -171,7 +171,7 @@ Dialog {
                 iconSource: 'add.png'
 
                 onClicked: {
-                    if (input.text != '') {
+                    if (input.acceptableInput) {
                         permissionModel.setPermission(input.text, affiliationModel.get(combo.currentIndex).value);
                         input.text = '';
                     }
