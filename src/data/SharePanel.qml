@@ -96,6 +96,13 @@ Panel {
             anchors.verticalCenter: parent.verticalCenter
             anchors.margins: 8
             hintText: qsTr('Enter the name of the file you are looking for.')
+            onTextChanged: searchTimer.restart()
+
+            Timer {
+                id: searchTimer
+                interval: 500
+                onTriggered: view.model.filter = searchEdit.text
+            }
         }
     }
 
@@ -123,7 +130,6 @@ Panel {
 
         model: ShareModel {
             client: appClient
-            filter: searchEdit.text
             onBusyChanged: {
                 if (view.count == 0 && !busy && searchEdit.text.length > 0)
                     searchEdit.state = 'error';
