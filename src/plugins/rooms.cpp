@@ -159,21 +159,9 @@ RoomListModel::RoomListModel(QObject *parent)
     : ChatModel(parent),
     m_client(0)
 {
-}
-
-void RoomListModel::bookmarksReceived()
-{
-    Q_ASSERT(m_client);
-
-    QXmppBookmarkManager *bookmarkManager = m_client->findExtension<QXmppBookmarkManager>();
-    Q_ASSERT(bookmarkManager);
-
-    // join rooms marked as "autojoin"
-    const QXmppBookmarkSet &bookmarks = bookmarkManager->bookmarks();
-    foreach (const QXmppBookmarkConference &conference, bookmarks.conferences()) {
-        if (conference.autoJoin())
-            addRoom(conference.jid());
-    }
+    QHash<int, QByteArray> names = roleNames();
+    names.insert(ParticipantsRole, "participants");
+    setRoleNames(names);
 }
 
 QVariant RoomListModel::data(const QModelIndex &index, int role) const
@@ -190,6 +178,15 @@ QVariant RoomListModel::data(const QModelIndex &index, int role) const
         return item->messages;
     } else if (role == ChatModel::NameRole) {
         return jidToUser(item->jid);
+    } else if (role == ParticipantsRole) {
+        if (m_client) {
+            const QList<QXmppMucRoom*> rooms = m_client->mucManager()->rooms();
+            foreach (const QXmppMucRoom *room, rooms) {
+                if (room->jid() == item->jid)
+                    return room->participants().size();
+            }
+        }
+        return 0;
     }
 
     return QVariant();
@@ -218,8 +215,11 @@ void RoomListModel::setClient(ChatClient *client)
 
             // connect signals
             check = connect(bookmarkManager, SIGNAL(bookmarksReceived(QXmppBookmarkSet)),
-                            this, SLOT(bookmarksReceived()));
+                            this, SLOT(_q_bookmarksReceived()));
             Q_ASSERT(check);
+
+            check = connect(client->mucManager(), SIGNAL(roomAdded(QXmppMucRoom*)),
+                            this, SLOT(_q_roomAdded(QXmppMucRoom*)));
         }
 
         emit clientChanged(m_client);
@@ -330,6 +330,45 @@ void RoomListModel::removeRoom(const QString &jid)
             }
         }
     }
+}
+
+void RoomListModel::_q_bookmarksReceived()
+{
+    Q_ASSERT(m_client);
+
+    QXmppBookmarkManager *bookmarkManager = m_client->findExtension<QXmppBookmarkManager>();
+    Q_ASSERT(bookmarkManager);
+
+    // join rooms marked as "autojoin"
+    const QXmppBookmarkSet &bookmarks = bookmarkManager->bookmarks();
+    foreach (const QXmppBookmarkConference &conference, bookmarks.conferences()) {
+        if (conference.autoJoin())
+            addRoom(conference.jid());
+    }
+}
+
+void RoomListModel::_q_participantsChanged()
+{
+    QXmppMucRoom *room = qobject_cast<QXmppMucRoom*>(sender());
+    if (!room)
+        return;
+
+    foreach (ChatModelItem *ptr, rootItem->children) {
+        RoomListItem *item = static_cast<RoomListItem*>(ptr);
+        if (item->jid == room->jid()) {
+            emit dataChanged(createIndex(item), createIndex(item));
+            return;
+        }
+    }
+}
+
+void RoomListModel::_q_roomAdded(QXmppMucRoom *room)
+{
+    bool check;
+    check = connect(room, SIGNAL(participantsChanged()),
+                    this, SLOT(_q_participantsChanged()));
+    Q_ASSERT(check);
+    Q_UNUSED(check);
 }
 
 class ChatRoomItem : public ChatModelItem

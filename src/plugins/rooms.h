@@ -74,6 +74,10 @@ class RoomListModel : public ChatModel
     Q_PROPERTY(ChatClient* client READ client WRITE setClient NOTIFY clientChanged)
 
 public:
+    enum Role {
+        ParticipantsRole = ChatModel::UserRole,
+    };
+
     RoomListModel(QObject *parent = 0);
 
     ChatClient *client() const;
@@ -93,7 +97,9 @@ public slots:
     void removeRoom(const QString &jid);
 
 private slots:
-    void bookmarksReceived();
+    void _q_bookmarksReceived();
+    void _q_participantsChanged();
+    void _q_roomAdded(QXmppMucRoom *room);
 
 private:
     ChatClient *m_client;

@@ -135,7 +135,7 @@ Item {
                     anchors.leftMargin: 3
                     anchors.verticalCenter: parent.verticalCenter
                     elide: Text.ElideRight
-                    text: model.name
+                    text: model.participants > 0 ? model.name + ' (' + model.participants + ')' : model.name
                 }
 
                 Rectangle {
