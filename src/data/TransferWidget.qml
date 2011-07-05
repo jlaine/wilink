@@ -63,9 +63,9 @@ Item {
 
         Text {
             anchors.fill: parent
-            elide: Text.ElideRight
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
+            clip: true
             text: {
                 if (!job)
                     return '';

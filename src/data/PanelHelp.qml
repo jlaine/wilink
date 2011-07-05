@@ -30,7 +30,8 @@ Rectangle {
         GradientStop { position: 1; color: '#cbdaf1' }
     }
     height: visible ? label.height + 2 * label.anchors.margins : 0
- 
+    visible: label.text != ''
+
     Image {
         id: icon
         anchors.left: parent.left
