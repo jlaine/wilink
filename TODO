@@ -3,6 +3,9 @@ HIGH PRIORITY
 - make pending messages easier to view when not in "chat" view
 - make share navigation more robust : make sure the view is
   cleared even if we don't receive any results
+- in the shares preference tab, the detailed folder selector
+  does not work on OS X
+- verify that the periodic update check actually works
 
 LOW PRIORITY
 
