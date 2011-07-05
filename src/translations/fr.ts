@@ -178,6 +178,13 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>ChatEdit</name>
+    <message>
+        <source>Send</source>
+        <translation>Envoyer</translation>
+    </message>
+</context>
+<context>
     <name>ChatPanel</name>
     <message>
         <source>My rooms</source>
@@ -295,6 +302,14 @@ Acceptez-vous?</translation>
     <message>
         <source>Diagnostics</source>
         <translation>Diagnostics</translation>
+    </message>
+    <message>
+        <source>Copy</source>
+        <translation>Copier</translation>
+    </message>
+    <message>
+        <source>Diagnostics in progress..</source>
+        <translation>Diagnostics en cours...</translation>
     </message>
 </context>
 <context>
@@ -524,10 +539,6 @@ Acceptez-vous?</translation>
         <translation>Retour</translation>
     </message>
     <message>
-        <source>Create an album</source>
-        <translation>Créer un album</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
@@ -546,6 +557,10 @@ Acceptez-vous?</translation>
     <message>
         <source>Home</source>
         <translation>Accueil</translation>
+    </message>
+    <message>
+        <source>Create</source>
+        <translation>Créer</translation>
     </message>
 </context>
 <context>

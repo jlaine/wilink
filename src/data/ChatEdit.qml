@@ -58,6 +58,12 @@ Rectangle {
     color: '#dfdfdf'
     height: wrapper.height + 8
 
+    // This mousearea prevents hover effects on items behind ChatEdit
+    MouseArea {
+        anchors.fill: parent;
+        hoverEnabled: true;
+    }
+
     Rectangle {
         id: wrapper
 
@@ -132,6 +138,10 @@ Rectangle {
                 }
             }
 
+            Keys.onEnterPressed: {
+                chatEdit.returnPressed();
+            }
+
             Keys.onReturnPressed: {
                 if (event.modifiers == Qt.NoModifier) {
                     chatEdit.returnPressed();
@@ -187,7 +197,13 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         anchors.right: parent.right
         anchors.rightMargin: 4
-        iconSource: 'upload.png'
+        text: qsTr('Send')
         onClicked: chatEdit.returnPressed()
+
+        Component.onCompleted: {
+            var oldHeight = sendButton.height;
+            sendButton.height = wrapper.height
+            sendButton.width = sendButton.width + (wrapper.height - oldHeight);
+        }
     }
 }

@@ -6,6 +6,8 @@ HIGH PRIORITY
 - in the shares preference tab, the detailed folder selector
   does not work on OS X
 - verify that the periodic update check actually works
+- fix messages disparition in chat history
+- fix TransferWidget & CallWidget appearance with constrained size
 
 LOW PRIORITY
 

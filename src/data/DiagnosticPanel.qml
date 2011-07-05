@@ -33,6 +33,17 @@ Panel {
         title: qsTr('Diagnostics')
         toolBar: ToolBar {
             ToolButton {
+                iconSource: 'copy.png'
+                enabled: !appClient.diagnosticManager.running
+                text: qsTr('Copy')
+
+                onClicked: {
+                    copyHelper.text = diagnostic.text;
+                    copyHelper.selectAll();
+                    copyHelper.copy();
+                }
+            }
+            ToolButton {
                 iconSource: 'refresh.png'
                 enabled: !appClient.diagnosticManager.running
                 text: qsTr('Refresh')
@@ -46,7 +57,7 @@ Panel {
         id: flickable
 
         anchors.left: parent.left
-        anchors.right: scrollBar.right
+        anchors.right: scrollBar.left
         anchors.top: header.bottom
         anchors.bottom: parent.bottom
         contentHeight: diagnostic.height
@@ -65,5 +76,34 @@ Panel {
         anchors.right: parent.right
         flickableItem: flickable
     }
+
+    Rectangle {
+        id: overlay
+
+        anchors.left: parent.left
+        anchors.right: scrollBar.left
+        anchors.top: header.bottom
+        anchors.bottom: parent.bottom
+        color: '#aaffffff'
+        visible: appClient.diagnosticManager.running
+        z: 10
+
+        Text {
+            anchors.centerIn: parent
+            font.pixelSize: appStyle.font.largeSize
+            text: qsTr('Diagnostics in progress..')
+        }
+    }
+
+    TextEdit {
+        id: copyHelper
+        visible: false
+    }
+
+    Component.onCompleted: {
+        appClient.diagnosticManager.refresh()
+    }
+
+    Keys.forwardTo: scrollBar
 }
 

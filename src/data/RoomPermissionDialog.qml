@@ -171,8 +171,10 @@ Dialog {
                 iconSource: 'add.png'
 
                 onClicked: {
-                    permissionModel.setPermission(input.text, affiliationModel.get(combo.currentIndex).value);
-                    input.text = '';
+                    if (input.text != '') {
+                        permissionModel.setPermission(input.text, affiliationModel.get(combo.currentIndex).value);
+                        input.text = '';
+                    }
                 }
             }
         }

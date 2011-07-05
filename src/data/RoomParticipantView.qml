@@ -29,9 +29,9 @@ Item {
 
     // FIXME: a non-static width crashes the program if chat room is empty
     // width: view.cellWidth + scrollBar.width
-    width: 91
+    width: 95
 
-    GridView {
+    ListView {
         id: view
 
         anchors.top: parent.top
@@ -39,13 +39,11 @@ Item {
         anchors.left: parent.left
         anchors.right: scrollBar.left
         anchors.margins: 2
-        cellWidth: 80
-        cellHeight: 54
 
         delegate: Item {
             id: item
-            width: view.cellWidth
-            height: view.cellHeight
+            width: 80
+            height: 54
 
             Highlight {
                 id: highlight

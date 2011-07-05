@@ -51,10 +51,10 @@ FocusScope {
     TextInput {
         id: edit
 
-        anchors.top: parent.top
+        anchors.verticalCenter: parent.verticalCenter
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.margins: 4
+        anchors.margins: (parent.height - height) / 2
         focus: true
         smooth: true
         selectByMouse: true

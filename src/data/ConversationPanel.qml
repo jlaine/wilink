@@ -41,7 +41,7 @@ Panel {
         anchors.right: parent.right
         iconSource: vcard.avatar
         title: {
-            var text = vcard.jid;
+            var text = vcard.name;
             if (conversation.remoteState == QXmppMessage.Composing)
                 text += ' ' + qsTr('is composing a message');
             else if (conversation.remoteState == QXmppMessage.Gone)

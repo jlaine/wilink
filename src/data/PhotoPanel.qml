@@ -72,7 +72,7 @@ Panel {
 
             ToolButton {
                 iconSource: 'add.png'
-                text: qsTr('Create an album')
+                text: qsTr('Create')
                 enabled: crumbBar.model.count == 1
 
                 onClicked: {
