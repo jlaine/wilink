@@ -11,9 +11,10 @@ HIGH PRIORITY
 
 LOW PRIORITY
 
+- improve camera button in calls to show whether camera is on/off
 - restore "find" feature
 - restore drag & drop file transfers
-- allow users to invert image on video calls
+- detect inverted image in video calls and/or allow users to invert manually
 
 ENHANCEMENTS
 
