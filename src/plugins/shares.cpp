@@ -212,6 +212,11 @@ void ShareModel::setFilter(const QString &filter)
     }
 }
 
+bool ShareModel::isBusy() const
+{
+    return !d->requestId.isEmpty();
+}
+
 ShareQueueModel* ShareModel::queue() const
 {
     return d->queueModel;
@@ -387,6 +392,7 @@ void ShareModel::refresh()
     // browse files
     clear();
     d->requestId = shareManager->search(QXmppShareLocation(d->rootJid, d->rootNode), 1, d->filter);
+    emit isBusyChanged();
 }
 
 int ShareModel::rowCount(const QModelIndex &parent) const
@@ -561,6 +567,12 @@ void ShareModel::_q_searchReceived(const QXmppShareSearchIq &shareIq)
             rootItem->removeChild(oldChild);
             endRemoveRows();
         }
+    }
+
+    // notify busy change
+    if (shareIq.id() == d->requestId) {
+        d->requestId.clear();
+        emit isBusyChanged();
     }
 }
 

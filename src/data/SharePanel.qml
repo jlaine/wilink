@@ -96,11 +96,6 @@ Panel {
             anchors.verticalCenter: parent.verticalCenter
             anchors.margins: 8
             hintText: qsTr('Enter the name of the file you are looking for.')
-
-            states: State {
-                name: 'noresults'
-                PropertyChanges { target: searchEdit; color: '#ffaaaa' }
-            }
         }
     }
 
@@ -129,6 +124,12 @@ Panel {
         model: ShareModel {
             client: appClient
             filter: searchEdit.text
+            onBusyChanged: {
+                if (view.count == 0 && !busy && searchEdit.text.length > 0)
+                    searchEdit.state = 'error';
+                else
+                    searchEdit.state = '';
+            }
 
             onShareServerChanged: {
                 if (!crumbBar.model.count) {
@@ -136,14 +137,6 @@ Panel {
                 }
             }
         }
-
-        onCountChanged: {
-            if (count == 0 && searchEdit.text.length > 0)
-                searchEdit.state = 'noresults';
-            else
-                searchEdit.state = '';
-        }
-
     }
 
     PanelHelp {

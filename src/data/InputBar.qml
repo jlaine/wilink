@@ -42,6 +42,8 @@ FocusScope {
     height: edit.height + 8
 
     Rectangle {
+        id: background
+
         anchors.fill: parent
         border.color: '#c3c3c3'
         border.width: 1
@@ -79,6 +81,11 @@ FocusScope {
             menuLoader.item.target = edit;
             menuLoader.show(pos.x, pos.y);
         }
+    }
+
+    states: State {
+        name: 'error'
+        PropertyChanges { target: background; color: '#ffaaaa' }
     }
 }
 
