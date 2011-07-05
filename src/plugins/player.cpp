@@ -25,7 +25,6 @@
 #include <QFileInfo>
 #include <QImageReader>
 #include <QNetworkAccessManager>
-#include <QNetworkDiskCache>
 #include <QNetworkReply>
 #include <QPixmapCache>
 #include <QSettings>
@@ -113,7 +112,6 @@ public:
     QNetworkReply *dataReply;
     Item *cursorItem;
     QNetworkAccessManager *network;
-    QNetworkDiskCache *networkCache;
     QSoundPlayer *player;
     int playId;
     bool playStop;
@@ -217,7 +215,7 @@ QIODevice *PlayerModelPrivate::dataFile(Item *item)
         return new QFile(item->url.toLocalFile());
     else if (dataCache.contains(item->url)) {
         const QUrl dataUrl = dataCache.value(item->url);
-        return networkCache->data(dataUrl);
+        return network->cache()->data(dataUrl);
     }
     return 0;
 }
@@ -228,7 +226,7 @@ QSoundFile::FileType PlayerModelPrivate::dataType(Item *item)
         return QSoundFile::typeFromFileName(item->url.toLocalFile());
     } else if (dataCache.contains(item->url)) {
         const QUrl audioUrl = dataCache.value(item->url);
-        QNetworkCacheMetaData::RawHeaderList headers = networkCache->metaData(audioUrl).rawHeaders();
+        QNetworkCacheMetaData::RawHeaderList headers = network->cache()->metaData(audioUrl).rawHeaders();
         foreach (const QNetworkCacheMetaData::RawHeader &header, headers)
         {
             if (header.first.toLower() == "content-type")
@@ -267,10 +265,7 @@ PlayerModel::PlayerModel(QObject *parent)
     bool check;
     d = new PlayerModelPrivate(this);
 
-    d->networkCache = new QNetworkDiskCache(this);
-    d->networkCache->setCacheDirectory(wApp->cacheDirectory());
     d->network = new NetworkAccessManager(this);
-    d->network->setCache(d->networkCache);
 
     // init player
     d->player = wApp->soundPlayer();
