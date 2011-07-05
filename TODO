@@ -10,6 +10,7 @@ HIGH PRIORITY
 - stop advertising drag & drop photo transfers
 - remove "Close" button from conversations
 - improve "active" photo icon in dock to make it more colourful
+- fix handling of disconnect / reconnect in shares
 
 LOW PRIORITY
 
@@ -18,7 +19,7 @@ LOW PRIORITY
 - restore drag & drop file transfers
 - restore drag & drop photo transfers
 - detect inverted image in video calls and/or allow users to invert manually
-- make prefs icon active
+- make preference dock icon active when preference dialog is shown
 - fix TransferWidget & CallWidget appearance with constrained size
 - rename "Close" button in chat rooms
 - save / restore window size and position
@@ -33,3 +34,4 @@ ENHANCEMENTS
 - improve selection / copy in chat history
 - merge windows for different accounts into a single window
 - make it possible to access chat history offline
+
