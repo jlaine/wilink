@@ -258,7 +258,7 @@ Panel {
                 anchors.horizontalCenter: parent.horizontalCenter
                 orientation: Qt.Vertical
                 maximumValue: Qt.isQtObject(historyModel) ? historyModel.maximumVolume : 100
-                value: Qt.isQtObject(historyModel) ? historyModel.inputVolume : 0
+                value: Qt.isQtObject(historyModel) ? historyModel.outputVolume : 0
             }
 
             Image {
