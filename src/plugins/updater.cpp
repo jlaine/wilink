@@ -354,6 +354,7 @@ void Updater::_q_saveUpdate()
     if (!d->checkCachedFile()) {
         downloadFile.remove();
         d->fail(IntegrityError, "The checksum of the downloaded file is incorrect");
+        return;
     }
 
     // prompt user
