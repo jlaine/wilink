@@ -22,7 +22,7 @@ import QtQuick 1.0
 Item {
     id: button
 
-    property bool active: swapper.currentSource == panelSource
+    property bool active: dialogSwapper.currentSource == 'PreferenceDialog.qml' ? dialogSwapper.currentSource == panelSource : swapper.currentSource == panelSource
     property bool enabled: true
     property string iconSource: ''
     property string iconPress: ''

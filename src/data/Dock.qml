@@ -163,10 +163,11 @@ Rectangle {
 
             iconSource: 'dock-options.png'
             iconPress: 'options.png'
+            panelSource: 'PreferenceDialog.qml'
             text: qsTr('Preferences')
             visible: true
             onClicked: {
-                dialogSwapper.showPanel('PreferenceDialog.qml');
+                dialogSwapper.showPanel(panelSource);
             }
         }
 
