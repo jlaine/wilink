@@ -163,6 +163,7 @@ class ShareFolderModel : public QFileSystemModel
 {
     Q_OBJECT
     Q_PROPERTY(QString forcedFolder READ forcedFolder WRITE setForcedFolder NOTIFY forcedFolderChanged)
+    Q_PROPERTY(bool isUnix READ isUnix CONSTANT)
     Q_PROPERTY(QStringList selectedFolders READ selectedFolders WRITE setSelectedFolders NOTIFY selectedFoldersChanged)
 
 public:
@@ -174,6 +175,8 @@ public:
     QString forcedFolder() const;
     void setForcedFolder(const QString &forced);
 
+    bool isUnix() const;
+
     QStringList selectedFolders() const;
     void setSelectedFolders(const QStringList &selected);
 
@@ -182,7 +185,6 @@ signals:
     void selectedFoldersChanged(const QStringList &selected);
 
 public slots:
-    QModelIndex index(const QString &path) const { return QFileSystemModel::index(path); }
     void setCheckState(const QString &path, int state);
 
 private:

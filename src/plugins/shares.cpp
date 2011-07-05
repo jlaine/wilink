@@ -1066,6 +1066,11 @@ void ShareFolderModel::setForcedFolder(const QString &forced)
     emit forcedFolderChanged(m_forced);
 }
 
+bool ShareFolderModel::isUnix() const
+{
+    return QDir::rootPath() == QLatin1String("/");
+}
+
 QStringList ShareFolderModel::selectedFolders() const
 {
     return m_selected;

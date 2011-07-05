@@ -130,8 +130,8 @@ Panel {
                         anchors.right: parent.right
                         z: 1
 
-                        onLocationChanged: {
-                            visualModel.rootIndex = folderModel.index(location.path);
+                        onLocationPopped: {
+                            visualModel.rootIndex = visualModel.parentModelIndex();
                         }
                     }
 
@@ -190,9 +190,19 @@ Panel {
 
                                     onClicked: {
                                         crumbs.push({'name': model.name, 'path': model.path});
+                                        visualModel.rootIndex = visualModel.modelIndex(model.index);
                                     }
                                 }
 
+                            }
+
+                            Component.onCompleted: {
+                                crumbs.push({'name': qsTr('My computer')});
+
+                                // navigate into '/' on *nix
+                                if (folderModel.isUnix) {
+                                    rootIndex = modelIndex(0);
+                                }
                             }
                         }
                     }

@@ -771,6 +771,10 @@ Acceptez-vous?</translation>
         <source>Fewer folders..</source>
         <translation>Moins de dossiers..</translation>
     </message>
+    <message>
+        <source>My computer</source>
+        <translation>Poste de travail</translation>
+    </message>
 </context>
 <context>
     <name>ShareQueueView</name>
