@@ -385,6 +385,7 @@ void ShareModel::refresh()
         return;
 
     // browse files
+    clear();
     d->requestId = shareManager->search(QXmppShareLocation(d->rootJid, d->rootNode), 1, d->filter);
 }
 
