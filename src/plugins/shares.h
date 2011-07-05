@@ -44,6 +44,7 @@ class ShareModel : public QAbstractItemModel
     Q_ENUMS(Recurse)
     Q_PROPERTY(bool busy READ isBusy NOTIFY isBusyChanged)
     Q_PROPERTY(ChatClient* client READ client WRITE setClient NOTIFY clientChanged)
+    Q_PROPERTY(bool connected READ isConnected NOTIFY isConnectedChanged)
     Q_PROPERTY(QString filter READ filter WRITE setFilter NOTIFY filterChanged)
     Q_PROPERTY(ShareQueueModel *queue READ queue CONSTANT)
     Q_PROPERTY(QString rootJid READ rootJid WRITE setRootJid NOTIFY rootJidChanged)
@@ -72,6 +73,7 @@ public:
     void setFilter(const QString &filter);
 
     bool isBusy() const;
+    bool isConnected() const;
 
     ShareQueueModel *queue() const;
 
@@ -96,6 +98,7 @@ signals:
     void clientChanged(ChatClient *client);
     void filterChanged(const QString &filter);
     void isBusyChanged();
+    void isConnectedChanged();
     void rootJidChanged(const QString &rootJid);
     void rootNodeChanged(const QString &rootNode);
     void shareServerChanged(const QString &shareServer);

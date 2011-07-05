@@ -75,6 +75,7 @@ public:
     QXmppShareManager *shareManager();
 
     ChatClient *client;
+    bool connected;
     QString filter;
     QString requestId;
     QString rootJid;
@@ -90,6 +91,7 @@ private:
 
 ShareModelPrivate::ShareModelPrivate(ShareModel *qq)
     : client(0),
+      connected(false),
       shareClient(0),
       q(qq)
 {
@@ -218,6 +220,11 @@ void ShareModel::setFilter(const QString &filter)
 bool ShareModel::isBusy() const
 {
     return !d->requestId.isEmpty();
+}
+
+bool ShareModel::isConnected() const
+{
+    return d->connected;
 }
 
 ShareQueueModel* ShareModel::queue() const
@@ -416,6 +423,10 @@ void ShareModel::_q_disconnected()
         d->setShareClient(d->client);
 
     // clear model and any pending request
+    if (d->connected) {
+        d->connected = false;
+        emit isConnectedChanged();
+    }
     clear();
     d->requestId.clear();
     emit isBusyChanged();
@@ -465,7 +476,10 @@ void ShareModel::_q_presenceReceived(const QXmppPresence &presence)
         }
         d->queueModel->setManager(shareManager);
 
-        emit shareServerChanged(d->shareServer);
+        if (!d->connected) {
+            d->connected = true;
+            emit isConnectedChanged();
+        }
     }
     else if (presence.type() == QXmppPresence::Error &&
         presence.error().type() == QXmppStanza::Error::Modify &&
@@ -493,7 +507,9 @@ void ShareModel::_q_serverChanged(const QString &server)
 {
     Q_ASSERT(d->shareClient);
 
+    // update server
     d->shareServer = server;
+    emit shareServerChanged(d->shareServer);
     if (d->shareServer.isEmpty())
         return;
 

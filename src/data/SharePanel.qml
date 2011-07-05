@@ -137,9 +137,15 @@ Panel {
                     searchEdit.state = '';
             }
 
-            onShareServerChanged: {
-                if (!crumbBar.model.count) {
-                    crumbBar.push({'name': qsTr('Home'), 'jid': view.model.shareServer, 'node': ''});
+            onConnectedChanged: {
+                if (connected) {
+                    if (!crumbBar.model.count) {
+                        crumbBar.push({'name': qsTr('Home'), 'jid': view.model.shareServer, 'node': ''});
+                    } else {
+                        crumbBar.model.setProperty(0, 'jid', view.model.shareServer);
+                        crumbBar.model.setProperty(0, 'node', '');
+                        refresh();
+                    }
                 }
             }
         }
