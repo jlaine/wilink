@@ -407,7 +407,11 @@ int ShareModel::rowCount(const QModelIndex &parent) const
 
 void ShareModel::_q_disconnected()
 {
-
+    if (sender() == d->shareClient) {
+        clear();
+        d->requestId.clear();
+        emit isBusyChanged();
+    }
 }
 
 void ShareModel::_q_presenceReceived(const QXmppPresence &presence)
