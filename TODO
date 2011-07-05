@@ -1,7 +1,8 @@
 HIGH PRIORITY
 
-- restore copy & paste in chat history
-- make pending messages easier to view
+- make pending messages easier to view when not in "chat" view
+- make share navigation more robust : make sure the view is
+  cleared even if we don't receive any results
 
 LOW PRIORITY
 
