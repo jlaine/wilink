@@ -421,9 +421,11 @@ void RoomModel::messageReceived(const QXmppMessage &msg)
     message.body = msg.body();
     message.date = msg.stamp();
     if (!message.date.isValid()) {
-        // FIXME: restore this!
-        // chat->client()->serverTime();
-        message.date = QDateTime::currentDateTime();
+        ChatClient *client = m_manager ? qobject_cast<ChatClient*>(m_manager->parent()) : 0;
+        if (client)
+            message.date = client->serverTime();
+        else
+            message.date = QDateTime::currentDateTime();
     }
     message.jid = msg.from();
     message.received = jidToResource(msg.from()) != m_room->nickName();
