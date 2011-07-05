@@ -6,20 +6,30 @@ HIGH PRIORITY
 - in the shares preference tab, the detailed folder selector
   does not work on OS X
 - verify that the periodic update check actually works
-- fix messages disparition in chat history
-- fix TransferWidget & CallWidget appearance with constrained size
-- either restore drag & drop photo transfers or stop advertising it
+- fix duplicate message handling in chat history
+- stop advertising drag & drop photo transfers
+- remove "Close" button from conversations
+- improve "active" photo icon in dock to make it more colourful
 
 LOW PRIORITY
 
 - improve camera button in calls to show whether camera is on/off
-- restore "find" feature
+- restore "find" feature in chat history
 - restore drag & drop file transfers
+- restore drag & drop photo transfers
 - detect inverted image in video calls and/or allow users to invert manually
+- make prefs icon active
+- fix TransferWidget & CallWidget appearance with constrained size
+- rename "Close" button in chat rooms
+- save / restore window size and position
 
 ENHANCEMENTS
 
 - make it possible to clear archived messages
 - display users list in share panel
 - add a "do not disturb" option for SIP
-- save / restore window size and position
+- define and implement a framework for games
+- add a "you have mail" notifier
+- improve selection / copy in chat history
+- merge windows for different accounts into a single window
+- make it possible to access chat history offline
