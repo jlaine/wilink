@@ -8,6 +8,7 @@ HIGH PRIORITY
 - verify that the periodic update check actually works
 - fix messages disparition in chat history
 - fix TransferWidget & CallWidget appearance with constrained size
+- either restore drag & drop photo transfers or stop advertising it
 
 LOW PRIORITY
 
