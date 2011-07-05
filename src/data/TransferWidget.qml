@@ -90,6 +90,12 @@ Item {
         visible: Qt.isQtObject(job) && job.state == QXmppTransferJob.FinishedState && job.direction == QXmppTransferJob.IncomingDirection
 
         onClicked: Qt.openUrlExternally(job.localFileUrl)
+
+        states: State {
+            name: 'collapsed'
+            when: item.width < 200
+            PropertyChanges { target: openButton; width: 0; opacity: 0 }
+        }
     }
 
     Button {
