@@ -116,8 +116,11 @@ void ShareModelPrivate::setShareClient(ChatClient *newClient)
         return;
 
     // delete old share client
-    if (shareClient && shareClient != client)
-        shareClient->deleteLater();
+    if (shareClient) {
+        shareClient->disconnect(q);
+        if (shareClient != client)
+            shareClient->deleteLater();
+    }
 
     // set new share client
     shareClient = newClient;
@@ -407,11 +410,15 @@ int ShareModel::rowCount(const QModelIndex &parent) const
 
 void ShareModel::_q_disconnected()
 {
-    if (sender() == d->shareClient) {
-        clear();
-        d->requestId.clear();
-        emit isBusyChanged();
-    }
+    // if we are using a slave client and the main client
+    // disconnects, kill the slave
+    if (d->client != d->shareClient && sender() == d->client)
+        d->setShareClient(d->client);
+
+    // clear model and any pending request
+    clear();
+    d->requestId.clear();
+    emit isBusyChanged();
 }
 
 void ShareModel::_q_presenceReceived(const QXmppPresence &presence)
