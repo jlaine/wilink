@@ -263,22 +263,6 @@ void PhotoModel::createAlbum(const QString &name)
  */
 void PhotoModel::refresh()
 {
-    if (m_fs)
-        m_fs->list(m_rootUrl);
-}
-
-QUrl PhotoModel::rootUrl() const
-{
-    return m_rootUrl;
-}
-
-void PhotoModel::setRootUrl(const QUrl &rootUrl)
-{
-    if (rootUrl == m_rootUrl)
-        return;
-
-    m_rootUrl = rootUrl;
-
     if (!m_fs) {
         bool check;
 
@@ -299,10 +283,23 @@ void PhotoModel::setRootUrl(const QUrl &rootUrl)
 
         m_fs->open(m_rootUrl);
     } else {
+        removeRows(0, rootItem->children.size());
         m_fs->list(m_rootUrl);
     }
+}
 
-    emit rootUrlChanged(m_rootUrl);
+QUrl PhotoModel::rootUrl() const
+{
+    return m_rootUrl;
+}
+
+void PhotoModel::setRootUrl(const QUrl &rootUrl)
+{
+    if (rootUrl != m_rootUrl) {
+        m_rootUrl = rootUrl;
+        refresh();
+        emit rootUrlChanged(m_rootUrl);
+    }
 }
 
 void PhotoModel::upload(const QString &filePath)
