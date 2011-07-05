@@ -172,8 +172,11 @@ HistoryModel::HistoryModel(QObject *parent)
 
 /** Adds a message in the chat history.
  *
- * The message is checked for duplicates, inserted in chronological order
- * and grouped with related messages.
+ * The message is inserted in chronological order and grouped with
+ * related messages (adjacent messages from the same sender, which
+ * are not "actions" such as /me, and which are less than 1 hour apart).
+ *
+ * \note Archived messages are checked for duplicates.
  *
  * @param message
  */
@@ -191,10 +194,11 @@ void HistoryModel::addMessage(const HistoryMessage &message)
         HistoryItem *bubble = static_cast<HistoryItem*>(bubblePtr);
         foreach (HistoryMessage *curMessage, bubble->messages) {
 
-            // check for collision
-            if (message.jid == curMessage->jid &&
+            // check for duplicate
+            if (message.archived &&
+                message.jid == curMessage->jid &&
                 message.body == curMessage->body &&
-                qAbs(message.date.secsTo(curMessage->date)) < 10)
+                qAbs(message.date.secsTo(curMessage->date)) <= 1)
                 return;
 
             // we use greater or equal comparison (and not strictly greater) dates
