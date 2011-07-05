@@ -26,6 +26,7 @@ Item {
     property alias model: crumbView.model
 
     signal locationChanged(variant location)
+    signal locationPopped()
 
     height: 24
 
@@ -37,6 +38,7 @@ Item {
     function pop() {
         if (crumbs.count > 1) {
             crumbs.remove(crumbs.count - 1);
+            crumbBar.locationPopped();
             crumbBar.locationChanged(crumbs.get(crumbs.count - 1));
         }
     }
@@ -114,6 +116,7 @@ Item {
                                 // remove crumbs below current location
                                 for (var i = crumbs.count - 1; i > model.index; i--) {
                                     crumbs.remove(i);
+                                    crumbBar.locationPopped();
                                 }
                                 crumbBar.locationChanged(model);
                             }
