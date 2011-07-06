@@ -132,7 +132,7 @@ Panel {
                 target: historyView.model
                 onMessageReceived: {
                     var re = new RegExp('@' + Utils.escapeRegExp(room.nickName) + '[,:]');
-                    if (text.match(re) && (!window.isActiveWindow || panel.opacity == 0)) {
+                    if (text.match(re) && (!window.isActiveWindow || swapper.currentSource != 'ChatPanel.qml' || panel.opacity == 0)) {
                         // show notification
                         application.showMessage(panel, Utils.jidToResource(jid), text);
 

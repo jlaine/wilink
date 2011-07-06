@@ -151,7 +151,7 @@ Panel {
         Connections {
             target: historyView.model
             onMessageReceived: {
-                if (!window.isActiveWindow || panel.opacity == 0) {
+                if (!window.isActiveWindow || swapper.currentSource != 'ChatPanel.qml' || panel.opacity == 0) {
                     // show notification
                     application.showMessage(panel, vcard.name, text);
 

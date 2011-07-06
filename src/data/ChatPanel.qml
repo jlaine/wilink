@@ -255,7 +255,10 @@ Panel {
 
         Connections {
             target: application
-            onMessageClicked: chatSwapper.setCurrentItem(context)
+            onMessageClicked: {
+                swapper.showPanel('ChatPanel.qml');
+                chatSwapper.setCurrentItem(context);
+            }
         }
     }
 
