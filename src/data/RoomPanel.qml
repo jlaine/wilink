@@ -134,7 +134,7 @@ Panel {
                     var re = new RegExp('@' + Utils.escapeRegExp(room.nickName) + '[,:]');
                     if (text.match(re) && (!window.isActiveWindow || swapper.currentSource != 'ChatPanel.qml' || panel.opacity == 0)) {
                         // show notification
-                        var handle = application.showMessage(Utils.jidToResource(jid), text);
+                        var handle = application.showMessage(Utils.jidToResource(jid), text, qsTranslate('RoomPanel', 'Show this room'));
                         if (handle) {
                             handle.clicked.connect(function() { showRoom(jid); });
                         }

@@ -138,10 +138,6 @@
         <source>&amp;Quit</source>
         <translation>&amp;Quitter</translation>
     </message>
-    <message>
-        <source>Show this conversation</source>
-        <translation>Afficher la conversation</translation>
-    </message>
 </context>
 <context>
     <name>CallNotification</name>
@@ -287,6 +283,10 @@ Acceptez-vous?</translation>
     <message>
         <source>Send</source>
         <translation>Envoyer</translation>
+    </message>
+    <message>
+        <source>Show this conversation</source>
+        <translation>Afficher la conversation</translation>
     </message>
 </context>
 <context>
@@ -667,6 +667,10 @@ Acceptez-vous?</translation>
     <message>
         <source>Close</source>
         <translation>Fermer</translation>
+    </message>
+    <message>
+        <source>Show this room</source>
+        <translation>Affiche le salon</translation>
     </message>
 </context>
 <context>

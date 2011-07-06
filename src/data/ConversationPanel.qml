@@ -153,7 +153,7 @@ Panel {
             onMessageReceived: {
                 if (!window.isActiveWindow || swapper.currentSource != 'ChatPanel.qml' || panel.opacity == 0) {
                     // show notification
-                    var handle = application.showMessage(vcard.name, text);
+                    var handle = application.showMessage(vcard.name, text, qsTranslate('ConversationPanel', 'Show this conversation'));
                     if (handle) {
                         handle.clicked.connect(function() { showConversation(jid); });
                     }

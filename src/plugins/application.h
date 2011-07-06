@@ -153,11 +153,11 @@ signals:
     void sortContactsByStatusChanged(bool sort);
 
 public slots:
-    void resetWindows();
-    Notification *showMessage(const QString &title, const QString &message);
+    Notification *showMessage(const QString &title, const QString &message, const QString &action);
     void showWindows();
 
 private slots:
+    void resetWindows();
 #ifdef USE_SYSTRAY
     void trayActivated(QSystemTrayIcon::ActivationReason reason);
     void trayClicked();

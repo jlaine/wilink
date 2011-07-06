@@ -632,7 +632,7 @@ static void notificationClosed(NotifyNotification *notification)
 }
 #endif
 
-Notification *Application::showMessage(const QString &title, const QString &message)
+Notification *Application::showMessage(const QString &title, const QString &message, const QString &action)
 {
     Notification *handle = 0;
 
@@ -658,7 +658,7 @@ Notification *Application::showMessage(const QString &title, const QString &mess
         handle = new Notification(this);
         notify_notification_add_action(notification,
                                        "show-conversation",
-                                       tr("Show this conversation").toUtf8(),
+                                       action.toUtf8(),
                                        (NotifyActionCallback) &notificationClicked,
                                        handle,
                                        FALSE);
@@ -678,9 +678,9 @@ Notification *Application::showMessage(const QString &title, const QString &mess
         d->trayIcon->showMessage(title, message);
     }
 #else
-    Q_UNUSED(context);
     Q_UNUSED(title);
     Q_UNUSED(message);
+    Q_UNUSED(action);
 #endif
     return handle;
 }
