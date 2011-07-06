@@ -24,19 +24,13 @@ Item {
 
     property bool active: dialogSwapper.currentSource == 'PreferenceDialog.qml' ? dialogSwapper.currentSource == panelSource : swapper.currentSource == panelSource
     property bool enabled: true
+    property bool notified: false
     property string iconSource: ''
     property string iconPress: ''
     property string panelSource: ''
     property string text
     property int shortcut: 0
     signal clicked
-
-    function startAnimation() {
-        blinkingEffect.loops = Animation.Infinite
-    }
-    function stopAnimation() {
-        blinkingEffect.loops = 0
-    }
 
     height: 32
     width: 32
@@ -61,16 +55,6 @@ Item {
         source: (button.iconPress != '' && button.active) ? button.iconPress : button.iconSource
         width: parent.width
         height: parent.height
-
-        PropertyAnimation on opacity  {
-            id: blinkingEffect
-
-            duration: 1000
-            easing.type: Easing.OutSine
-            loops: 0
-            from: 0.0
-            to: 1.0
-        }
     }
 
     Rectangle {
@@ -161,5 +145,13 @@ Item {
             }
         }
         onExited: hovered = false
+    }
+
+    PropertyAnimation on x  {
+        duration: 1500
+        easing.type: Easing.OutElastic
+        loops: notified && button.state == '' ? Animation.Infinite : 0
+        from: 24
+        to: 0
     }
 }
