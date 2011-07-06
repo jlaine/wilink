@@ -33,7 +33,7 @@
     </message>
     <message>
         <source>Check for updates</source>
-        <translation>Mettre à jour</translation>
+        <translation>Vérifier les mises à jour</translation>
     </message>
     <message>
         <source>Install</source>
