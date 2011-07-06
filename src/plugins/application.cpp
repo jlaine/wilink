@@ -644,7 +644,7 @@ Notification *Application::showMessage(const QString &title, const QString &mess
 
     if( !notification ) {
         qWarning("Failed to create notification");
-        return;
+        return 0;
     }
 
     // Set timeout
