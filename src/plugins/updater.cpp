@@ -333,6 +333,8 @@ void Updater::_q_saveUpdate()
     Q_ASSERT(reply != NULL);
 
     if (reply->error() != QNetworkReply::NoError) {
+        // network error, retry in 5mn
+        d->timer->start(5 * 60 * 1000);
         d->fail(NetworkError, reply->errorString());
         return;
     }
