@@ -150,13 +150,17 @@ Item {
     SequentialAnimation on x {
         loops: notified && button.state == '' ? Animation.Infinite : 0
         PropertyAnimation {
-            duration: 200
-            easing.type: Easing.InQuint
-            to: 24
+            duration: 100
+            easing.type: Easing.OutExpo
+            to: 32
         }
         PropertyAnimation {
-            duration: 1500
-            easing.type: Easing.OutElastic
+            duration: 1200
+            easing.type: Easing.OutBounce
+            to: 0
+        }
+        PropertyAnimation {
+            duration: 1000
             to: 0
         }
     }
