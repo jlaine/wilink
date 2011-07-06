@@ -153,7 +153,10 @@ Panel {
             onMessageReceived: {
                 if (!window.isActiveWindow || swapper.currentSource != 'ChatPanel.qml' || panel.opacity == 0) {
                     // show notification
-                    application.showMessage(panel, vcard.name, text);
+                    var handle = application.showMessage(vcard.name, text);
+                    if (handle) {
+                        handle.clicked.connect(function() { showConversation(jid); });
+                    }
 
                     // alert window
                     window.alert();

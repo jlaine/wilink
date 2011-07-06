@@ -42,6 +42,18 @@ class QThread;
 
 class ApplicationPrivate;
 
+class Notification : public QObject
+{
+    Q_OBJECT
+
+public:
+    Notification(QObject *parent = 0) : QObject(parent)
+    {}
+
+signals:
+    void clicked();
+};
+
 class Application : public QApplication
 {
     Q_OBJECT
@@ -133,7 +145,6 @@ signals:
     void chatAccountsChanged(const QStringList &accounts);
     void incomingMessageSoundChanged(const QString &sound);
     void outgoingMessageSoundChanged(const QString &sound);
-    void messageClicked(QObject *context);
     void openAtLoginChanged(bool run);
     void sharesConfiguredChanged(bool configured);
     void sharesDirectoriesChanged(const QStringList &directories);
@@ -143,7 +154,7 @@ signals:
 
 public slots:
     void resetWindows();
-    void showMessage(QObject *context, const QString &title, const QString &message);
+    Notification *showMessage(const QString &title, const QString &message);
     void showWindows();
 
 private slots:

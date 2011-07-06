@@ -64,6 +64,7 @@ public:
 #ifdef USE_SYSTRAY
     QSystemTrayIcon *trayIcon;
     QMenu *trayMenu;
+    Notification *trayNotification;
 #endif
     Updater *updater;
 };
@@ -76,6 +77,7 @@ ApplicationPrivate::ApplicationPrivate()
 #ifdef USE_SYSTRAY
     trayIcon(0),
     trayMenu(0),
+    trayNotification(0),
 #endif
     updater(0)
 {
@@ -615,9 +617,8 @@ static void notificationClicked(NotifyNotification *notification, char *action, 
 {
     if(g_strcmp0(action, "show-conversation") == 0)
     {
-        QObject *context = (QObject*)data;
-        if (trayContexts.removeAll(context))
-            QMetaObject::invokeMethod(wApp, "messageClicked", Q_ARG(QObject*, context));
+        Notification *handle = static_cast<Notification*>(data);
+        QMetaObject::invokeMethod(handle, "clicked");
         notify_notification_close(notification, NULL);
     }
 }
@@ -631,8 +632,10 @@ static void notificationClosed(NotifyNotification *notification)
 }
 #endif
 
-void Application::showMessage(QObject *context, const QString &title, const QString &message)
+Notification *Application::showMessage(const QString &title, const QString &message)
 {
+    Notification *handle = 0;
+
 #if defined(USE_LIBNOTIFY)
     NotifyNotification *notification = notify_notification_new((const char *)title.toUtf8(),
                                                                (const char *)message.toUtf8(),
@@ -652,14 +655,12 @@ void Application::showMessage(QObject *context, const QString &title, const QStr
 
     // Set callback if supported
     if(d->libnotify_accepts_actions) {
-        trayContexts << context;
-        connect(context, SIGNAL(destroyed(QObject*)),
-                this, SLOT(trayContextDestroyed(QObject*)));
+        handle = new Notification(this);
         notify_notification_add_action(notification,
                                        "show-conversation",
                                        tr("Show this conversation").toUtf8(),
                                        (NotifyActionCallback) &notificationClicked,
-                                       context,
+                                       handle,
                                        FALSE);
     }
 
@@ -670,10 +671,10 @@ void Application::showMessage(QObject *context, const QString &title, const QStr
 #elif defined(USE_SYSTRAY)
     if (d->trayIcon)
     {
-        trayContexts.clear();
-        trayContexts << context;
-        connect(context, SIGNAL(destroyed(QObject*)),
-                this, SLOT(trayContextDestroyed(QObject*)));
+        handle = new Notification(this);
+        if (d->trayNotification)
+            delete d->trayNotification;
+        d->trayNotification = handle;
         d->trayIcon->showMessage(title, message);
     }
 #else
@@ -681,6 +682,7 @@ void Application::showMessage(QObject *context, const QString &title, const QStr
     Q_UNUSED(title);
     Q_UNUSED(message);
 #endif
+    return handle;
 }
 
 /** Returns true if shares have been configured.
@@ -748,9 +750,9 @@ void Application::trayActivated(QSystemTrayIcon::ActivationReason reason)
 
 void Application::trayClicked()
 {
-    if (!trayContexts.isEmpty()) {
-        QObject *context = trayContexts.takeFirst();
-        emit messageClicked(context);
+    if (d->trayNotification) {
+        QMetaObject::invokeMethod(d->trayNotification, "clicked");
+        d->trayNotification = 0;
     }
 }
 

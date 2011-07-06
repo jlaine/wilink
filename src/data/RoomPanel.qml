@@ -134,7 +134,11 @@ Panel {
                     var re = new RegExp('@' + Utils.escapeRegExp(room.nickName) + '[,:]');
                     if (text.match(re) && (!window.isActiveWindow || swapper.currentSource != 'ChatPanel.qml' || panel.opacity == 0)) {
                         // show notification
-                        application.showMessage(panel, Utils.jidToResource(jid), text);
+                        var handle = application.showMessage(Utils.jidToResource(jid), text);
+                        if (handle) {
+                            handle.clicked.connect(function() { showConversation(jid); });
+                        }
+
 
                         // alert window
                         window.alert();

@@ -252,14 +252,6 @@ Panel {
         anchors.left: left.right
         anchors.right: parent.right
         focus: true
-
-        Connections {
-            target: application
-            onMessageClicked: {
-                swapper.showPanel('ChatPanel.qml');
-                chatSwapper.setCurrentItem(context);
-            }
-        }
     }
 
     Loader {
