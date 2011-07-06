@@ -132,24 +132,11 @@ QPixmap RosterImageProvider::requestPixmap(const QString &id, QSize *size, const
 class RosterModelPrivate
 {
 public:
-    int countPendingMessages();
     RosterItem* find(const QString &id, ChatModelItem *parent = 0);
 
     RosterModel *q;
     ChatClient *client;
 };
-
-/** Count the current number of pending messages.
- */
-int RosterModelPrivate::countPendingMessages()
-{
-    int pending = 0;
-    foreach (ChatModelItem *item, q->rootItem->children) {
-        RosterItem *child = static_cast<RosterItem*>(item);
-        pending += child->messages;
-    }
-    return pending;
-}
 
 RosterItem *RosterModelPrivate::find(const QString &id, ChatModelItem *parent)
 {
@@ -361,7 +348,7 @@ void RosterModel::addPendingMessage(const QString &bareJid)
     {
         item->messages++;
         emit dataChanged(createIndex(item), createIndex(item));
-        emit pendingMessages(d->countPendingMessages());
+        emit pendingMessagesChanged();
     }
 }
 
@@ -371,8 +358,20 @@ void RosterModel::clearPendingMessages(const QString &bareJid)
     if (item && item->messages) {
         item->messages = 0;
         emit dataChanged(createIndex(item), createIndex(item));
-        emit pendingMessages(d->countPendingMessages());
+        emit pendingMessagesChanged();
     }
+}
+
+/** Returns the total number of pending messages.
+ */
+int RosterModel::pendingMessages() const
+{
+    int pending = 0;
+    foreach (ChatModelItem *item, rootItem->children) {
+        RosterItem *child = static_cast<RosterItem*>(item);
+        pending += child->messages;
+    }
+    return pending;
 }
 
 class VCardCachePrivate
