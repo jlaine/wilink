@@ -670,7 +670,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>Show this room</source>
-        <translation>Affiche le salon</translation>
+        <translation>Afficher le salon</translation>
     </message>
 </context>
 <context>

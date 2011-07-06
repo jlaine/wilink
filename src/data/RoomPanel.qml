@@ -139,7 +139,6 @@ Panel {
                             handle.clicked.connect(function() { showRoom(jid); });
                         }
 
-
                         // alert window
                         window.alert();
 
