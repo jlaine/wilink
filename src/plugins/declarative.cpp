@@ -243,6 +243,7 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterType<Idle>(uri, 1, 2, "Idle");
     qmlRegisterType<ListHelper>(uri, 1, 2, "ListHelper");
     qmlRegisterType<LogModel>(uri, 1, 2, "LogModel");
+    qmlRegisterUncreatableType<Notification>(uri, 1, 2, "Notification", "");
     qmlRegisterType<PhoneCallsModel>(uri, 1, 2, "PhoneCallsModel");
     qmlRegisterUncreatableType<SipClient>(uri, 1, 2, "SipClient", "");
     qmlRegisterUncreatableType<SipCall>(uri, 1, 2, "SipCall", "");
