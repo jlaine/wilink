@@ -57,6 +57,7 @@ Rectangle {
         DockButton {
             iconSource: 'dock-chat.png'
             iconPress: 'chat.png'
+            notified: root.pendingMessages != 0
             panelSource: 'ChatPanel.qml'
             text: qsTr('Chat')
             onClicked: {

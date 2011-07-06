@@ -148,7 +148,9 @@ Item {
     }
 
     SequentialAnimation on x {
-        loops: notified && button.state == '' ? Animation.Infinite : 0
+        loops: Animation.Infinite
+        running: notified && button.state == ''
+
         PropertyAnimation {
             duration: 100
             easing.type: Easing.OutExpo

@@ -265,6 +265,12 @@ Panel {
         }
     }
 
+    Binding {
+        target: root
+        property: 'pendingMessages'
+        value: roomListModel.pendingMessages + rosterModel.pendingMessages
+    }
+
     states: State {
         name: 'no-roster'
 

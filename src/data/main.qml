@@ -24,6 +24,8 @@ import 'utils.js' as Utils
 
 FocusScope {
     id: root
+
+    property int pendingMessages
     focus: true
 
     Client {
