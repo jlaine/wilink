@@ -133,9 +133,18 @@ Panel {
                 onMessageReceived: {
                     var re = new RegExp('@' + Utils.escapeRegExp(room.nickName) + '[,:]');
                     if (text.match(re) && (!window.isActiveWindow || panel.opacity == 0)) {
-                        panel.notify(Utils.jidToResource(jid), text);
+                        // show notification
+                        application.showMessage(panel, Utils.jidToResource(jid), text);
+
+                        // alert window
+                        window.alert();
+
+                        // play a sound
+                        application.soundPlayer.play(application.incomingMessageSound);
+
+                        // add pending message
                         if (panel.opacity == 0)
-                            roomListModel.addPendingMessage(participantModel.jid);
+                            roomListModel.addPendingMessage(jid);
                     }
                 }
             }

@@ -152,7 +152,16 @@ Panel {
             target: historyView.model
             onMessageReceived: {
                 if (!window.isActiveWindow || panel.opacity == 0) {
-                    panel.notify(vcard.name, text);
+                    // show notification
+                    application.showMessage(panel, vcard.name, text);
+
+                    // alert window
+                    window.alert();
+
+                    // play a sound
+                    application.soundPlayer.play(application.incomingMessageSound);
+
+                    // add pending message
                     if (panel.opacity == 0)
                         rosterModel.addPendingMessage(jid);
                 }
