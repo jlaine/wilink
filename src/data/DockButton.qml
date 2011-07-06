@@ -148,6 +148,7 @@ Item {
     }
 
     SequentialAnimation on x {
+        alwaysRunToEnd: true
         loops: Animation.Infinite
         running: notified && button.state == ''
 
