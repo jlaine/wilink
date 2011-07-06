@@ -45,6 +45,8 @@
 
 Application *wApp = 0;
 
+static QList<QObject*> trayContexts;
+
 class ApplicationPrivate
 {
 public:
@@ -60,7 +62,6 @@ public:
     bool libnotify_accepts_actions;
 #endif
 #ifdef USE_SYSTRAY
-    QObject *trayContext;
     QSystemTrayIcon *trayIcon;
     QMenu *trayMenu;
 #endif
@@ -73,7 +74,6 @@ ApplicationPrivate::ApplicationPrivate()
     libnotify_accepts_actions(0),
 #endif
 #ifdef USE_SYSTRAY
-    trayContext(0),
     trayIcon(0),
     trayMenu(0),
 #endif
@@ -615,7 +615,9 @@ static void notificationClicked(NotifyNotification *notification, char *action, 
 {
     if(g_strcmp0(action, "show-conversation") == 0)
     {
-        QMetaObject::invokeMethod(wApp, "messageClicked", Q_ARG(QObject*, (QObject*)data));
+        QObject *context = (QObject*)data;
+        if (trayContexts.removeAll(context))
+            QMetaObject::invokeMethod(wApp, "messageClicked", Q_ARG(QObject*, context));
         notify_notification_close(notification, NULL);
     }
 }
@@ -650,6 +652,9 @@ void Application::showMessage(QObject *context, const QString &title, const QStr
 
     // Set callback if supported
     if(d->libnotify_accepts_actions) {
+        trayContexts << context;
+        connect(context, SIGNAL(destroyed(QObject*)),
+                this, SLOT(trayContextDestroyed(QObject*)));
         notify_notification_add_action(notification,
                                        "show-conversation",
                                        tr("Show this conversation").toUtf8(),
@@ -665,7 +670,10 @@ void Application::showMessage(QObject *context, const QString &title, const QStr
 #elif defined(USE_SYSTRAY)
     if (d->trayIcon)
     {
-        d->trayContext = context;
+        trayContexts.clear();
+        trayContexts << context;
+        connect(context, SIGNAL(destroyed(QObject*)),
+                this, SLOT(trayContextDestroyed(QObject*)));
         d->trayIcon->showMessage(title, message);
     }
 #else
@@ -740,7 +748,15 @@ void Application::trayActivated(QSystemTrayIcon::ActivationReason reason)
 
 void Application::trayClicked()
 {
-    emit messageClicked(d->trayContext);
+    if (!trayContexts.isEmpty()) {
+        QObject *context = trayContexts.takeFirst();
+        emit messageClicked(context);
+    }
+}
+
+void Application::trayContextDestroyed(QObject *context)
+{
+    trayContexts.removeAll(context);
 }
 
 QSystemTrayIcon *Application::trayIcon()

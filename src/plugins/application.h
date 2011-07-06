@@ -150,6 +150,7 @@ private slots:
 #ifdef USE_SYSTRAY
     void trayActivated(QSystemTrayIcon::ActivationReason reason);
     void trayClicked();
+    void trayContextDestroyed(QObject *context);
 #endif
 
 private:
