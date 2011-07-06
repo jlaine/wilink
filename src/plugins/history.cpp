@@ -198,7 +198,7 @@ void HistoryModel::addMessage(const HistoryMessage &message)
             if (message.archived &&
                 message.jid == curMessage->jid &&
                 message.body == curMessage->body &&
-                message.date.msecsTo(curMessage->date) < 1000)
+                message.date.msecsTo(curMessage->date) < 2000)
                 return;
 
             // we use greater or equal comparison (and not strictly greater) dates
