@@ -136,7 +136,7 @@ Panel {
                         // show notification
                         var handle = application.showMessage(Utils.jidToResource(jid), text);
                         if (handle) {
-                            handle.clicked.connect(function() { showConversation(jid); });
+                            handle.clicked.connect(function() { showRoom(jid); });
                         }
 
 
