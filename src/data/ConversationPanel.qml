@@ -151,7 +151,7 @@ Panel {
         Connections {
             target: historyView.model
             onMessageReceived: {
-                if (!window.isActiveWindow || swapper.currentSource != 'ChatPanel.qml' || panel.opacity == 0) {
+                if (contacts.currentJid != jid) {
                     // show notification
                     var handle = application.showMessage(vcard.name, text, qsTranslate('ConversationPanel', 'Show this conversation'));
                     if (handle) {
@@ -165,8 +165,7 @@ Panel {
                     application.soundPlayer.play(application.incomingMessageSound);
 
                     // add pending message
-                    if (panel.opacity == 0)
-                        rosterModel.addPendingMessage(jid);
+                    rosterModel.addPendingMessage(jid);
                 }
             }
         }
