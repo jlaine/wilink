@@ -147,11 +147,17 @@ Item {
         onExited: hovered = false
     }
 
-    PropertyAnimation on x  {
-        duration: 1500
-        easing.type: Easing.OutElastic
+    SequentialAnimation on x {
         loops: notified && button.state == '' ? Animation.Infinite : 0
-        from: 24
-        to: 0
+        PropertyAnimation {
+            duration: 200
+            easing.type: Easing.InQuint
+            to: 24
+        }
+        PropertyAnimation {
+            duration: 1500
+            easing.type: Easing.OutElastic
+            to: 0
+        }
     }
 }
