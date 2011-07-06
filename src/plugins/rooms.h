@@ -72,6 +72,7 @@ class RoomListModel : public ChatModel
 {
     Q_OBJECT
     Q_PROPERTY(ChatClient* client READ client WRITE setClient NOTIFY clientChanged)
+    Q_PROPERTY(int pendingMessages READ pendingMessages NOTIFY pendingMessagesChanged)
 
 public:
     enum Role {
@@ -83,10 +84,13 @@ public:
     ChatClient *client() const;
     void setClient(ChatClient *client);
 
+    int pendingMessages() const;
+
     QVariant data(const QModelIndex &index, int role) const;
 
 signals:
     void clientChanged(ChatClient *client);
+    void pendingMessagesChanged();
     void roomAdded(const QString &jid);
 
 public slots:

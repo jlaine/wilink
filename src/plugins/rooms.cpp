@@ -233,6 +233,7 @@ void RoomListModel::addPendingMessage(const QString &jid)
         if (item->jid == jid) {
             item->messages++;
             emit dataChanged(createIndex(item), createIndex(item));
+            emit pendingMessagesChanged();
             break;
         }
     }
@@ -246,10 +247,21 @@ void RoomListModel::clearPendingMessages(const QString &jid)
             if (item->messages > 0) {
                 item->messages = 0;
                 emit dataChanged(createIndex(item), createIndex(item));
+                emit pendingMessagesChanged();
             }
             break;
         }
     }
+}
+
+int RoomListModel::pendingMessages() const
+{
+    int pending = 0;
+    foreach (ChatModelItem *ptr, rootItem->children) {
+        RoomListItem *item = static_cast<RoomListItem*>(ptr);
+        pending += item->messages;
+    }
+    return pending;
 }
 
 void RoomListModel::addRoom(const QString &jid)
