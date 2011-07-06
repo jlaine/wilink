@@ -216,6 +216,7 @@ Rectangle {
             // when an update is ready to install, prompt user
             if (application.updater.state == Updater.PromptState) {
                 dialogSwapper.showPanel('AboutDialog.qml');
+                window.alert();
             }
         }
     }
