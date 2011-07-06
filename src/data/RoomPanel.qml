@@ -131,6 +131,7 @@ Panel {
             Connections {
                 target: historyView.model
                 onMessageReceived: {
+                    var jid = participantModel.jid;
                     var re = new RegExp('@' + Utils.escapeRegExp(room.nickName) + '[,:]');
                     if (text.match(re) && rooms.currentJid != jid) {
                         // show notification
