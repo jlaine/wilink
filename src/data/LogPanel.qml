@@ -24,6 +24,11 @@ import wiLink 1.2
 Panel {
     id: panel
 
+    ListHelper {
+        id: listHelper
+        model: view.model
+    }
+
     PanelHeader {
         id: header
 
@@ -47,6 +52,23 @@ Panel {
                 visible: logModel.enabled
 
                 onClicked: logModel.enabled = false
+            }
+
+            ToolButton {
+                iconSource: 'copy.png'
+                text: qsTr('Copy')
+                onClicked: {
+                    // copy the 20 last messages, to avoid freeze with important log
+                    copyHelper.text = '';
+                    var count = listHelper.count;
+                    for (var i = Math.max(0, count - 20); i < count; i++) {
+                        var item = listHelper.get(i);
+                        copyHelper.text += Qt.formatDateTime(item.date, 'hh:mm:ss') + '\n';
+                        copyHelper.text += item.content + '\n';
+                    }
+                    copyHelper.selectAll();
+                    copyHelper.copy();
+                }
             }
 
             ToolButton {
@@ -115,7 +137,6 @@ Panel {
         }
     }
 
-
     ScrollBar {
         id: scrollBar
 
@@ -125,5 +146,9 @@ Panel {
         flickableItem: view
     }
 
+    TextEdit {
+        id: copyHelper
+        visible: false
+    }
 }
 
