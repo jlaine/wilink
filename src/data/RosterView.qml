@@ -126,7 +126,6 @@ Item {
                     height: appStyle.icon.smallSize
                     smooth: true
                     source: model.avatar
-
                 }
 
                 Text {
