@@ -19,7 +19,7 @@
 
 import QtQuick 1.0
 
-Notification {
+NotificationDialog {
     id: dialog
 
     footerComponent: Button {

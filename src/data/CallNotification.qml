@@ -20,7 +20,7 @@
 import QtQuick 1.0
 import wiLink 1.2
 
-Notification {
+NotificationDialog {
     id: dialog
 
     property QtObject call
