@@ -37,12 +37,15 @@ Item {
     state: mouseArea.pressed ? 'pressed' : (mouseArea.hovered ? 'hovered' : '')
 
     Rectangle {
+        id: background
+
         anchors.bottom: parent.bottom
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.leftMargin: 40
+        anchors.leftMargin: 40 - button.x
         color: '#aa597fbe'
+        opacity: 0
     }
 
     Image {
@@ -98,6 +101,7 @@ Item {
         State {
             name: 'hovered'
             PropertyChanges { target: label; opacity: 1 }
+            PropertyChanges { target: background; opacity: 1 }
             PropertyChanges { target: labelBackground; opacity: 1 }
             PropertyChanges { target: image; height: 32; width: 32 }
             PropertyChanges { target: button; height: 32 + label.paintedHeight; width: 32 + label.paintedWidth }
@@ -105,6 +109,7 @@ Item {
         State {
             name: 'pressed'
             PropertyChanges { target: label; opacity: 0.5 }
+            PropertyChanges { target: background; opacity: 1 }
             PropertyChanges { target: labelBackground; opacity: 1 }
             PropertyChanges { target: image; height: 32; width: 32 }
             PropertyChanges { target: button; height: 32 + label.paintedHeight; width: 32 + label.paintedWidth }
