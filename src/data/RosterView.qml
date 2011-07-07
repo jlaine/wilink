@@ -138,36 +138,14 @@ Item {
                     text: model.participants > 0 ? model.name + ' (' + model.participants + ')' : model.name
                 }
 
-                Rectangle {
+                Bubble {
                     id: bubble
 
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: status.left
                     anchors.margins: 3
-                    border.color: '#de0000'
-                    border.width: 1
-                    gradient: Gradient {
-                        GradientStop { position: 0.0; color: '#dea1a1' }
-                        GradientStop { position: 0.6; color: '#de0000' }
-                        GradientStop { position: 1.0; color: '#dea1a1' }
-                    }
-                    height: label.paintedHeight + 6
-                    width: Math.max(label.paintedWidth + 6, label.paintedHeight + 6)
                     opacity: model.messages > 0 ? 1 : 0
-                    radius: 10
-                    smooth: true
-
-                    Text {
-                        id: label
-
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        color: 'white'
-                        font.bold: true
-                        font.pixelSize: appStyle.font.smallSize
-                        text: model.messages
-                        verticalAlignment: Text.AlignVCenter
-                    }
+                    text: model.messages
                 }
 
                 StatusPill {
