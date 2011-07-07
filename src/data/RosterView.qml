@@ -144,7 +144,7 @@ Item {
                     anchors.right: status.left
                     anchors.margins: 3
                     opacity: model.messages > 0 ? 1 : 0
-                    text: model.messages
+                    text: model.messages > 0 ? model.messages : 0
                 }
 
                 StatusPill {

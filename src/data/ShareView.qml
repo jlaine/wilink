@@ -68,32 +68,12 @@ Item {
                 smooth: true
                 source: model.isDir ? (model.node.length ? 'album.png' : 'peer.png') : 'file.png'
 
-                Rectangle {
+                Bubble {
                     anchors.top: parent.top
                     anchors.left: parent.left
                     anchors.margins: 4
-                    border.color: '#597fbe'
-                    border.width: 1
-                    gradient: Gradient {
-                        GradientStop { position: 0.0; color: '#66597fbe' }
-                        GradientStop { position: 0.6; color: '#597fbe' }
-                        GradientStop { position: 1.0; color: '#66597fbe' }
-                    }
-                    height: popularity.paintedHeight + 4
-                    width: popularity.paintedWidth + 4
-                    radius: 9
-                    smooth: true
-                    visible: model.popularity != 0
-
-                    Text {
-                        id: popularity
-
-                        anchors.centerIn: parent
-                        color: '#ffffff'
-                        font.pixelSize: appStyle.font.smallSize
-                        font.bold: true
-                        text: model.popularity > 0 ? model.popularity : ''
-                    }
+                    opacity: model.popularity > 0 ? 1 : 0
+                    text: model.popularity > 0 ? model.popularity : ''
                 }
             }
 
