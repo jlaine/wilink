@@ -56,7 +56,7 @@ Panel {
 
             ToolButton {
                 iconSource: 'copy.png'
-                text: qsTr('Copier')
+                text: qsTr('Copy')
                 onClicked: {
                     // copy the 20 last messages, to avoid freeze with important log
                     copyHelper.text = '';
