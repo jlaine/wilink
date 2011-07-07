@@ -88,6 +88,7 @@ signals:
 public slots:
     void createAlbum(const QString &name);
     void refresh();
+    bool removeRow(int row);
     void upload(const QString &filePath);
 
 private slots:

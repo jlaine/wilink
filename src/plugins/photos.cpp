@@ -302,6 +302,17 @@ void PhotoModel::setRootUrl(const QUrl &rootUrl)
     }
 }
 
+bool PhotoModel::removeRow(int row)
+{
+    if (row < 0 || row >= rootItem->children.size())
+        return false;
+
+    PhotoItem *item = static_cast<PhotoItem*>(rootItem->children.at(row));
+    if (!item->isDir())
+        m_fs->remove(item->url());
+    return true;
+}
+
 void PhotoModel::upload(const QString &filePath)
 {
     QString base = m_rootUrl.toString();
