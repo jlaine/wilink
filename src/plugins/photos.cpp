@@ -160,8 +160,8 @@ void PhotoCache::processQueue()
     PhotoDownloadItem *job = m_downloadQueue.takeFirst();
     if (!m_fileSystems.contains(job->fs)) {
         m_fileSystems << job->fs;
-        connect(job->fs, SIGNAL(commandFinished(int, bool, const FileInfoList&)),
-                this, SLOT(_q_commandFinished(int, bool, const FileInfoList&)));
+        connect(job->fs, SIGNAL(commandFinished(int,bool,FileInfoList)),
+                this, SLOT(_q_commandFinished(int,bool,FileInfoList)));
     }
     m_downloadItem = job;
     m_downloadDevice = job->fs->get(job->url, job->type);
@@ -269,16 +269,16 @@ void PhotoModel::refresh()
         FileSystem::setNetworkAccessManagerFactory(new PhotoNetworkAccessManagerFactory);
 
         m_fs = FileSystem::factory(m_rootUrl, this);
-        check = connect(m_fs, SIGNAL(commandFinished(int, bool, const FileInfoList&)),
-                        this, SLOT(_q_commandFinished(int, bool, const FileInfoList&)));
+        check = connect(m_fs, SIGNAL(commandFinished(int,bool,FileInfoList)),
+                        this, SLOT(_q_commandFinished(int,bool,FileInfoList)));
         Q_ASSERT(check);
 
-        check = connect(m_fs, SIGNAL(commandFinished(int, bool, const FileInfoList&)),
-                        m_uploads, SLOT(_q_commandFinished(int, bool, const FileInfoList&)));
+        check = connect(m_fs, SIGNAL(commandFinished(int,bool,FileInfoList)),
+                        m_uploads, SLOT(_q_commandFinished(int,bool,FileInfoList)));
         Q_ASSERT(check);
 
-        check = connect(m_fs, SIGNAL(putProgress(int, int)),
-                        m_uploads, SLOT(_q_putProgress(int, int)));
+        check = connect(m_fs, SIGNAL(putProgress(int,int)),
+                        m_uploads, SLOT(_q_putProgress(int,int)));
         Q_ASSERT(check);
 
         m_fs->open(m_rootUrl);

@@ -140,8 +140,8 @@ NetworkAccessManager::NetworkAccessManager(QObject *parent)
     cache->setCacheDirectory(wApp->cacheDirectory());
     setCache(cache);
 
-    check = QObject::connect(this, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)),
-                             QNetIO::Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*, QAuthenticator*)));
+    check = QObject::connect(this, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
+                             QNetIO::Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*,QAuthenticator*)));
     Q_ASSERT(check);
     Q_UNUSED(check);
 }

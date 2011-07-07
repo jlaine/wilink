@@ -133,8 +133,8 @@ void ShareModelPrivate::setShareClient(ChatClient *newClient)
                            q, SLOT(_q_disconnected()));
         Q_ASSERT(check);
 
-        check = q->connect(shareClient, SIGNAL(presenceReceived(const QXmppPresence&)),
-                           q, SLOT(_q_presenceReceived(const QXmppPresence&)));
+        check = q->connect(shareClient, SIGNAL(presenceReceived(QXmppPresence)),
+                           q, SLOT(_q_presenceReceived(QXmppPresence)));
         Q_ASSERT(check);
 
         check = q->connect(shareClient, SIGNAL(shareServerChanged(QString)),
