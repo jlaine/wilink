@@ -68,6 +68,7 @@ Item {
                 smooth: true
                 source: model.isDir ? (model.node.length ? 'album.png' : 'peer.png') : 'file.png'
 
+/*
                 Bubble {
                     anchors.top: parent.top
                     anchors.left: parent.left
@@ -75,6 +76,7 @@ Item {
                     opacity: model.popularity > 0 ? 1 : 0
                     text: model.popularity > 0 ? model.popularity : ''
                 }
+*/
             }
 
             Item {
