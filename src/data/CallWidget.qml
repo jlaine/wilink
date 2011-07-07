@@ -28,6 +28,7 @@ Item {
 
     anchors.left: parent ? parent.left : undefined
     anchors.right: parent ? parent.right : undefined
+    clip: true
     height: video.openMode != CallVideoHelper.NotOpen ? 248 : 40
 
     CallAudioHelper {
@@ -61,6 +62,8 @@ Item {
             anchors.leftMargin: 4
             anchors.top: parent.top
             anchors.topMargin: 12
+            anchors.right: inputIcon.left
+            elide: Text.ElideRight
             text: {
                 if (!call || call.state == QXmppCall.ConnectingState) {
                     return qsTr('Connecting..');
@@ -100,6 +103,16 @@ Item {
             height: 120
             width: 160
             visible: (video.openMode & CallVideoHelper.WriteOnly) != 0
+        }
+
+        Rectangle {
+            anchors.top: parent.top
+            anchors.right: parent.right
+            anchors.left: inputIcon.left
+            height: 40
+            border.color: background.border.color
+            border.width: background.border.width
+            gradient: background.gradient
         }
 
         Button {
@@ -142,6 +155,8 @@ Item {
         }
 
         Image {
+            id: inputIcon
+
             anchors.top: inputVolume.top
             anchors.right: inputVolume.left
             anchors.rightMargin: 5
@@ -151,6 +166,8 @@ Item {
         }
 
         Image {
+            id: outputIcon
+
             anchors.top: outputVolume.top
             anchors.right: outputVolume.left
             anchors.rightMargin: 5
