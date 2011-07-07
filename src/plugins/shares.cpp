@@ -119,7 +119,8 @@ void ShareModelPrivate::setShareClient(ChatClient *newClient)
 
     // delete old share client
     if (shareClient) {
-        shareClient->disconnect(q);
+        shareClient->disconnect(q, SLOT(_q_presenceReceived(QXmppPresence)));
+        shareClient->disconnect(q, SLOT(_q_serverChanged(QString)));
         if (shareClient != client)
             shareClient->deleteLater();
     }
@@ -128,10 +129,6 @@ void ShareModelPrivate::setShareClient(ChatClient *newClient)
     shareClient = newClient;
     if (shareClient) {
         bool check;
-
-        check = q->connect(shareClient, SIGNAL(disconnected()),
-                           q, SLOT(_q_disconnected()));
-        Q_ASSERT(check);
 
         check = q->connect(shareClient, SIGNAL(presenceReceived(QXmppPresence)),
                            q, SLOT(_q_presenceReceived(QXmppPresence)));
@@ -196,8 +193,15 @@ ChatClient *ShareModel::client() const
 
 void ShareModel::setClient(ChatClient *client)
 {
+    bool check;
+
     if (client != d->client) {
         d->client = client;
+
+        check = connect(d->client, SIGNAL(disconnected()),
+                        this, SLOT(_q_disconnected()));
+        Q_ASSERT(check);
+
         d->setShareClient(d->client);
         emit clientChanged(d->client);
     }
@@ -434,6 +438,8 @@ void ShareModel::_q_disconnected()
 
 void ShareModel::_q_presenceReceived(const QXmppPresence &presence)
 {
+    bool check;
+
     Q_ASSERT(d->shareClient);
     if (d->shareServer.isEmpty() || presence.from() != d->shareServer)
         return;
@@ -465,8 +471,6 @@ void ShareModel::_q_presenceReceived(const QXmppPresence &presence)
         // add share manager
         QXmppShareManager *shareManager = d->shareClient->findExtension<QXmppShareManager>();
         if (!shareManager) {
-            bool check;
-
             shareManager = new QXmppShareManager(d->shareClient, database());
             d->shareClient->addExtension(shareManager);
 
@@ -489,17 +493,25 @@ void ShareModel::_q_presenceReceived(const QXmppPresence &presence)
         const QString newJid = d->client->configuration().user() + '@' + newDomain;
 
         // avoid redirect loop
-        if (newDomain == d->client->configuration().domain())
+        if (d->shareClient != d->client ||
+            newDomain == d->client->configuration().domain()) {
+            qWarning("Not redirecting to %s", qPrintable(newDomain));
             return;
+        }
+
+        // replace client
+        ChatClient *newClient = new ChatClient(this);
+        newClient->setLogger(d->client->logger());
+
+        check = connect(newClient, SIGNAL(disconnected()),
+                        this, SLOT(_q_disconnected()));
+        Q_ASSERT(check);
+
+        d->setShareClient(newClient);
 
         // reconnect to another server
         qDebug("Redirecting to %s", qPrintable(newDomain));
-        ChatClient *newClient = new ChatClient(this);
-        newClient->setLogger(d->client->logger());
         newClient->connectToServer(newJid, d->client->configuration().password());
-
-        // replace client
-        d->setShareClient(newClient);
     }
 }
 
