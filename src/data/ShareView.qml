@@ -135,7 +135,7 @@ Item {
                 anchors.margins: 4
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
-                height: thumbnail.height
+                iconSize: appStyle.icon.tinySize
                 iconSource: 'download.png'
                 state: 'inactive'
                 text: qsTr('Download')
