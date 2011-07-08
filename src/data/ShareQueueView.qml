@@ -106,6 +106,7 @@ Item {
                 id: cancelButton
 
                 anchors.right: parent.right
+                anchors.rightMargin: 4
                 anchors.verticalCenter: parent.verticalCenter
                 iconSize: appStyle.icon.tinySize
                 iconSource: 'close.png'
