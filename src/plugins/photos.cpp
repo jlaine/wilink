@@ -448,6 +448,8 @@ void PhotoUploadModel::processQueue()
             FileSystemJob *job = item->fileSystem->put(item->destinationPath, m_uploadDevice);
             connect(job, SIGNAL(finished()),
                     this, SLOT(_q_jobFinished()));
+            connect(job, SIGNAL(uploadProgress(qint64,qint64)),
+                    this, SLOT(_q_uploadProgress(qint64,qint64)));
             break;
         }
     }
@@ -470,7 +472,7 @@ void PhotoUploadModel::_q_jobFinished()
 
 /** When upload progress changes, emit notifications.
  */
-void PhotoUploadModel::_q_putProgress(int done, int total)
+void PhotoUploadModel::_q_uploadProgress(qint64 done, qint64 total)
 {
     if (m_uploadItem) {
         m_uploadItem->size = total;

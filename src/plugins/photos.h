@@ -115,7 +115,7 @@ public:
 
 private slots:
     void _q_jobFinished();
-    void _q_putProgress(int done, int total);
+    void _q_uploadProgress(qint64 done, qint64 total);
 
 private:
     void processQueue();
