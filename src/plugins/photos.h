@@ -113,6 +113,9 @@ public:
     // QAbstractItemModel
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
+public slots:
+    void cancel(int row);
+
 private slots:
     void _q_jobFinished();
     void _q_uploadProgress(qint64 done, qint64 total);

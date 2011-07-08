@@ -367,6 +367,7 @@ public:
     QString destinationPath;
     FileSystem *fileSystem;
     bool finished;
+    FileSystemJob *job;
     qreal progress;
     qint64 size;
 };
@@ -393,12 +394,23 @@ void PhotoUploadModel::append(const QString &filePath, FileSystem *fileSystem, c
 {
     qDebug("Adding item %s", qPrintable(filePath));
     PhotoUploadItem *item = new PhotoUploadItem;
+    item->job = 0;
     item->sourcePath = filePath;
     item->destinationPath = destinationPath;
     item->fileSystem = fileSystem;
     addItem(item, rootItem);
 
     processQueue();
+}
+
+void PhotoUploadModel::cancel(int row)
+{
+    if (row < 0 || row > rootItem->children.size() - 1)
+        return;
+
+    PhotoUploadItem *item = static_cast<PhotoUploadItem*>(rootItem->children.at(row));
+    if (item->job)
+        item->job->abort();
 }
 
 QVariant PhotoUploadModel::data(const QModelIndex &index, int role) const
@@ -445,10 +457,10 @@ void PhotoUploadModel::processQueue()
                 m_uploadDevice->open(QIODevice::ReadOnly);
             }
 
-            FileSystemJob *job = item->fileSystem->put(item->destinationPath, m_uploadDevice);
-            connect(job, SIGNAL(finished()),
+            item->job = item->fileSystem->put(item->destinationPath, m_uploadDevice);
+            connect(item->job, SIGNAL(finished()),
                     this, SLOT(_q_jobFinished()));
-            connect(job, SIGNAL(uploadProgress(qint64,qint64)),
+            connect(item->job, SIGNAL(uploadProgress(qint64,qint64)),
                     this, SLOT(_q_uploadProgress(qint64,qint64)));
             break;
         }
