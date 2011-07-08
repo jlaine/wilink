@@ -44,7 +44,7 @@ PhoneNotification 1.0 PhoneNotification.qml
 PhonePanel 1.0 PhonePanel.qml
 PhotoAlbumDialog 1.0 PhotoAlbumDialog.qml
 PhotoPanel 1.0 PhotoPanel.qml
-PhotoUploadView 1.0 PhotoUploadView.qml
+PhotoQueueView 1.0 PhotoQueueView.qml
 PlayerPanel 1.0 PlayerPanel.qml
 PreferenceDialog 1.0 PreferenceDialog.qml
 ProgressBar 1.0 ProgressBar.qml

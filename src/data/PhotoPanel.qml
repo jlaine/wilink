@@ -251,7 +251,7 @@ Panel {
         }
     }
 
-    PhotoUploadView {
+    PhotoQueueView {
         id: footer
 
         anchors.left: parent.left
