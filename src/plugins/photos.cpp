@@ -72,35 +72,28 @@ static bool isImage(const QString &fileName)
 }
 
 PhotoCache::PhotoCache()
-    : m_downloadDevice(0),
-      m_downloadItem(0)
+    : m_downloadItem(0),
+    m_downloadJob(0)
 {
 }
 
 /** When a download finishes, process the results.
  */
-void PhotoCache::_q_commandFinished(int cmd, bool error, const FileInfoList &results)
+void PhotoCache::_q_jobFinished()
 {
-    Q_UNUSED(results);
-    if (cmd != FileSystem::Get)
-        return;
-
-    Q_ASSERT(m_downloadDevice);
     Q_ASSERT(m_downloadItem);
+    Q_ASSERT(m_downloadJob);
 
-    if (!error) {
+    if (m_downloadJob->error() == FileSystemJob::NoError) {
         // load image
-        m_downloadDevice->reset();
         QImage *image = new QImage;
-        image->load(m_downloadDevice, NULL);
-        m_downloadDevice->close();
-
+        image->load(m_downloadJob->data(), NULL);
         photoImageCache.insert(QString::number(m_downloadItem->type) + m_downloadItem->url.toString(), image);
         emit photoChanged(m_downloadItem->url, m_downloadItem->type);
     }
 
-    m_downloadDevice->deleteLater();
-    m_downloadDevice = 0;
+    m_downloadJob->deleteLater();
+    m_downloadJob = 0;
     delete m_downloadItem;
     m_downloadItem = 0;
 
@@ -154,17 +147,17 @@ PhotoCache *PhotoCache::instance()
 
 void PhotoCache::processQueue()
 {
-    if (m_downloadDevice || m_downloadQueue.isEmpty())
+    if (m_downloadJob || m_downloadQueue.isEmpty())
         return;
 
     PhotoDownloadItem *job = m_downloadQueue.takeFirst();
     if (!m_fileSystems.contains(job->fs)) {
         m_fileSystems << job->fs;
-        connect(job->fs, SIGNAL(commandFinished(int,bool,FileInfoList)),
-                this, SLOT(_q_commandFinished(int,bool,FileInfoList)));
     }
     m_downloadItem = job;
-    m_downloadDevice = job->fs->get(job->url, job->type);
+    m_downloadJob = job->fs->get(job->url, job->type);
+    connect(m_downloadJob, SIGNAL(finished()),
+            this, SLOT(_q_jobFinished()));
 }
 
 PhotoImageProvider::PhotoImageProvider()
@@ -269,16 +262,8 @@ void PhotoModel::refresh()
         FileSystem::setNetworkAccessManagerFactory(new PhotoNetworkAccessManagerFactory);
 
         m_fs = FileSystem::factory(m_rootUrl, this);
-        check = connect(m_fs, SIGNAL(commandFinished(int,bool,FileInfoList)),
-                        this, SLOT(_q_commandFinished(int,bool,FileInfoList)));
-        Q_ASSERT(check);
-
-        check = connect(m_fs, SIGNAL(commandFinished(int,bool,FileInfoList)),
-                        m_uploads, SLOT(_q_commandFinished(int,bool,FileInfoList)));
-        Q_ASSERT(check);
-
-        check = connect(m_fs, SIGNAL(putProgress(int,int)),
-                        m_uploads, SLOT(_q_putProgress(int,int)));
+        check = connect(m_fs, SIGNAL(jobFinished(FileSystemJob*)),
+                        this, SLOT(_q_jobFinished(FileSystemJob*)));
         Q_ASSERT(check);
 
         m_fs->open(m_rootUrl);
@@ -329,30 +314,29 @@ PhotoUploadModel *PhotoModel::uploads() const
 
 /** When a command finishes, process its results.
  *
- * @param cmd
- * @param error
- * @param results
+ * @param job
  */
-void PhotoModel::_q_commandFinished(int cmd, bool error, const FileInfoList &results)
+void PhotoModel::_q_jobFinished(FileSystemJob *job)
 {
     Q_ASSERT(m_fs);
 
-    if (error) {
-        qWarning() << m_fs->commandName(cmd) << "command failed";
+    if (job->error() != FileSystemJob::NoError) {
+        qWarning() << job->operationName() << "command failed";
         return;
     }
 
-    switch (cmd)
+    switch (job->operation())
     {
-    case FileSystem::Open:
-    case FileSystem::Mkdir:
-    case FileSystem::Put:
-    case FileSystem::Remove:
+    case FileSystemJob::Open:
+    case FileSystemJob::Mkdir:
+    case FileSystemJob::Put:
+    case FileSystemJob::Remove:
+    case FileSystemJob::Rmdir:
         refresh();
         break;
-    case FileSystem::List:
+    case FileSystemJob::List:
         removeRows(0, rootItem->children.size());
-        foreach (const FileInfo& info, results) {
+        foreach (const FileInfo& info, job->results()) {
             if (info.isDir() || isImage(info.name())) {
                 PhotoItem *item = new PhotoItem(info);
                 addItem(item, rootItem);
@@ -461,7 +445,9 @@ void PhotoUploadModel::processQueue()
                 m_uploadDevice->open(QIODevice::ReadOnly);
             }
 
-            item->fileSystem->put(item->destinationPath, m_uploadDevice);
+            FileSystemJob *job = item->fileSystem->put(item->destinationPath, m_uploadDevice);
+            connect(job, SIGNAL(finished()),
+                    this, SLOT(_q_jobFinished()));
             break;
         }
     }
@@ -469,14 +455,8 @@ void PhotoUploadModel::processQueue()
 
 /** When an upload finishes, process the results.
  */
-void PhotoUploadModel::_q_commandFinished(int cmd, bool error, const FileInfoList &results)
+void PhotoUploadModel::_q_jobFinished()
 {
-    Q_UNUSED(error);
-    Q_UNUSED(results);
-
-    if (cmd != FileSystem::Put)
-        return;
-
     if (m_uploadItem) {
         removeItem(m_uploadItem);
         m_uploadItem = 0;

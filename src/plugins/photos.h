@@ -46,7 +46,7 @@ signals:
     void photoChanged(const QUrl &url, FileSystem::Type size);
 
 private slots:
-    void _q_commandFinished(int cmd, bool error, const FileInfoList &results);
+    void _q_jobFinished();
 
 private:
     PhotoCache();
@@ -54,8 +54,8 @@ private:
 
     QSet<FileSystem*> m_fileSystems;
     QList<PhotoDownloadItem*> m_downloadQueue;
-    QIODevice *m_downloadDevice;
     PhotoDownloadItem *m_downloadItem;
+    FileSystemJob *m_downloadJob;
 };
 
 class PhotoImageProvider : public QDeclarativeImageProvider
@@ -92,7 +92,7 @@ public slots:
     void upload(const QString &filePath);
 
 private slots:
-    void _q_commandFinished(int cmd, bool error, const FileInfoList &results);
+    void _q_jobFinished(FileSystemJob *job);
     void _q_photoChanged(const QUrl &url, FileSystem::Type size);
 
 private:
@@ -114,7 +114,7 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
 private slots:
-    void _q_commandFinished(int cmd, bool error, const FileInfoList &results);
+    void _q_jobFinished();
     void _q_putProgress(int done, int total);
 
 private:
