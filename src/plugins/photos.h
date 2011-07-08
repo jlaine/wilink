@@ -31,8 +31,8 @@ using namespace QNetIO;
 
 class PhotoCachePrivate;
 class PhotoDownloadItem;
-class PhotoUploadItem;
-class PhotoUploadModel;
+class PhotoQueueItem;
+class PhotoQueueModel;
 
 class PhotoCache : public QObject
 {
@@ -69,7 +69,7 @@ class PhotoModel : public ChatModel
 {
     Q_OBJECT
     Q_PROPERTY(QUrl rootUrl READ rootUrl WRITE setRootUrl NOTIFY rootUrlChanged)
-    Q_PROPERTY(PhotoUploadModel* uploads READ uploads CONSTANT)
+    Q_PROPERTY(PhotoQueueModel* uploads READ uploads CONSTANT)
 
 public:
     PhotoModel(QObject *parent = 0);
@@ -77,7 +77,7 @@ public:
     QUrl rootUrl() const;
     void setRootUrl(const QUrl &rootUrl);
 
-    PhotoUploadModel *uploads() const;
+    PhotoQueueModel *uploads() const;
 
     // QAbstractItemModel
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
@@ -98,15 +98,15 @@ private slots:
 private:
     FileSystem *m_fs;
     QUrl m_rootUrl;
-    PhotoUploadModel *m_uploads;
+    PhotoQueueModel *m_uploads;
 };
 
-class PhotoUploadModel : public ChatModel
+class PhotoQueueModel : public ChatModel
 {
     Q_OBJECT
 
 public:
-    PhotoUploadModel(QObject *parent = 0);
+    PhotoQueueModel(QObject *parent = 0);
 
     void append(const QString &sourcePath, FileSystem *fileSystem, const QString &destinationPath);
 
@@ -125,7 +125,7 @@ private:
 
     PhotoModel *m_photoModel;
     QIODevice *m_uploadDevice;
-    PhotoUploadItem *m_uploadItem;
+    PhotoQueueItem *m_uploadItem;
 };
 
 #endif

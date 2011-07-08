@@ -203,7 +203,7 @@ PhotoModel::PhotoModel(QObject *parent)
     names.insert(UrlRole, "url");
     setRoleNames(names);
 
-    m_uploads = new PhotoUploadModel(this);
+    m_uploads = new PhotoQueueModel(this);
 
     check = connect(PhotoCache::instance(), SIGNAL(photoChanged(QUrl,FileSystem::Type)),
                     this, SLOT(_q_photoChanged(QUrl,FileSystem::Type)));
@@ -307,7 +307,7 @@ void PhotoModel::upload(const QString &filePath)
     m_uploads->append(filePath, m_fs, base + "/" + QFileInfo(filePath).fileName());
 }
 
-PhotoUploadModel *PhotoModel::uploads() const
+PhotoQueueModel *PhotoModel::uploads() const
 {
     return m_uploads;
 }
@@ -360,7 +360,7 @@ void PhotoModel::_q_photoChanged(const QUrl &url, FileSystem::Type size)
     }
 }
 
-class PhotoUploadItem : public ChatModelItem
+class PhotoQueueItem : public ChatModelItem
 {
 public:
     QString sourcePath;
@@ -372,7 +372,7 @@ public:
     qint64 size;
 };
 
-PhotoUploadModel::PhotoUploadModel(QObject *parent)
+PhotoQueueModel::PhotoQueueModel(QObject *parent)
     : ChatModel(parent),
     m_uploadDevice(0),
     m_uploadItem(0)
@@ -384,16 +384,16 @@ PhotoUploadModel::PhotoUploadModel(QObject *parent)
 }
 
 #if 0
-void PhotoUploadModel::abort()
+void PhotoQueueModel::abort()
 {
     //fs->abort();
 }
 #endif
 
-void PhotoUploadModel::append(const QString &filePath, FileSystem *fileSystem, const QString &destinationPath)
+void PhotoQueueModel::append(const QString &filePath, FileSystem *fileSystem, const QString &destinationPath)
 {
     qDebug("Adding item %s", qPrintable(filePath));
-    PhotoUploadItem *item = new PhotoUploadItem;
+    PhotoQueueItem *item = new PhotoQueueItem;
     item->job = 0;
     item->sourcePath = filePath;
     item->destinationPath = destinationPath;
@@ -403,19 +403,19 @@ void PhotoUploadModel::append(const QString &filePath, FileSystem *fileSystem, c
     processQueue();
 }
 
-void PhotoUploadModel::cancel(int row)
+void PhotoQueueModel::cancel(int row)
 {
     if (row < 0 || row > rootItem->children.size() - 1)
         return;
 
-    PhotoUploadItem *item = static_cast<PhotoUploadItem*>(rootItem->children.at(row));
+    PhotoQueueItem *item = static_cast<PhotoQueueItem*>(rootItem->children.at(row));
     if (item->job)
         item->job->abort();
 }
 
-QVariant PhotoUploadModel::data(const QModelIndex &index, int role) const
+QVariant PhotoQueueModel::data(const QModelIndex &index, int role) const
 {
-    PhotoUploadItem *item = static_cast<PhotoUploadItem*>(index.internalPointer());
+    PhotoQueueItem *item = static_cast<PhotoQueueItem*>(index.internalPointer());
     if (!index.isValid() || !item)
         return QVariant();
 
@@ -431,13 +431,13 @@ QVariant PhotoUploadModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-void PhotoUploadModel::processQueue()
+void PhotoQueueModel::processQueue()
 {
     if (m_uploadItem)
         return;
 
     foreach (ChatModelItem *ptr, rootItem->children) {
-        PhotoUploadItem *item = static_cast<PhotoUploadItem*>(ptr);
+        PhotoQueueItem *item = static_cast<PhotoQueueItem*>(ptr);
         if (!item->finished) {
             m_uploadItem = item;
 
@@ -469,7 +469,7 @@ void PhotoUploadModel::processQueue()
 
 /** When an upload finishes, process the results.
  */
-void PhotoUploadModel::_q_jobFinished()
+void PhotoQueueModel::_q_jobFinished()
 {
     if (m_uploadItem) {
         removeItem(m_uploadItem);
@@ -484,7 +484,7 @@ void PhotoUploadModel::_q_jobFinished()
 
 /** When upload progress changes, emit notifications.
  */
-void PhotoUploadModel::_q_uploadProgress(qint64 done, qint64 total)
+void PhotoQueueModel::_q_uploadProgress(qint64 done, qint64 total)
 {
     if (m_uploadItem) {
         m_uploadItem->size = total;

@@ -247,7 +247,7 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterType<PhoneCallsModel>(uri, 1, 2, "PhoneCallsModel");
     qmlRegisterUncreatableType<SipClient>(uri, 1, 2, "SipClient", "");
     qmlRegisterUncreatableType<SipCall>(uri, 1, 2, "SipCall", "");
-    qmlRegisterUncreatableType<PhotoUploadModel>(uri, 1, 2, "PhotoUploadModel", "");
+    qmlRegisterUncreatableType<PhotoQueueModel>(uri, 1, 2, "PhotoQueueModel", "");
     qmlRegisterType<PhotoModel>(uri, 1, 2, "PhotoModel");
     qmlRegisterType<PlayerModel>(uri, 1, 2, "PlayerModel");
     qmlRegisterType<RoomConfigurationModel>(uri, 1, 2, "RoomConfigurationModel");
