@@ -406,8 +406,12 @@ Acceptez-vous?</translation>
 <context>
     <name>HistoryView</name>
     <message>
-        <source>Copy</source>
-        <translation>Copier</translation>
+        <source>Select</source>
+        <translation>Sélectionner</translation>
+    </message>
+    <message>
+        <source>Copy selection</source>
+        <translation>Copier la sélection</translation>
     </message>
 </context>
 <context>

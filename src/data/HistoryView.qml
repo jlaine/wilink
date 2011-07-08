@@ -18,6 +18,7 @@
  */
 
 import QtQuick 1.0
+import wiLink 1.2
 
 Item {
     id: block
@@ -25,11 +26,19 @@ Item {
     property alias model: historyView.model
     signal participantClicked(string participant)
 
+    ListHelper {
+        id: listHelper
+        model: historyView.model
+    }
+
     ListView {
         id: historyView
 
         property bool scrollBarAtBottom
         property bool bottomChanging: false
+        property int messageSelected
+        property int selectionStart
+        property int selectionEnd
 
         anchors.top: parent.top
         anchors.bottom: parent.bottom
@@ -118,7 +127,16 @@ Item {
                             hoverEnabled: true
                             onEntered: {
                                 copyButtonLoader.sourceComponent = copyButtonComponent;
-                                copyHelper.text = model.body;
+                                var rectCoords = mapToItem(historyView.contentItem, rect.x, rect.y);
+                                historyView.messageSelected = historyView.indexAt(rectCoords.x, rectCoords.y);
+
+                                // set selection
+                                if (block.state == 'selection') {
+                                    selection.endPos = rect.mapToItem(historyView.contentItem, 0, rect.y + bodyText.height).y;
+                                } else {
+                                    selection.startPos = fromText.mapToItem(historyView.contentItem, 0, fromText.y).y;
+                                    selection.endPos = rect.mapToItem(historyView.contentItem, 0, rect.y + bodyText.height).y;
+                                }
                             }
                             onExited: {
                                 copyButtonLoader.sourceComponent = undefined;
@@ -141,6 +159,7 @@ Item {
                             id: copyButtonLoader
                             anchors.right: parent.right
                             anchors.verticalCenter: parent.verticalCenter
+                            visible: block.state != 'selection'
                         }
 
                         states: State {
@@ -253,17 +272,69 @@ Item {
 */
     }
 
+    MouseArea {
+        id: cancelSelection
+
+        anchors.fill: historyView
+        enabled: block.state == 'selection'
+        onClicked: {
+            // cancel selection
+            block.state = '';
+            selection.startPos = 0;
+            selection.endPos = 0;
+        }
+    }
+
+    Rectangle {
+        id: selection
+
+        property int startPos: 0
+        property int endPos: 0
+
+        anchors.left: parent.left
+        anchors.right: scrollBar.left
+        color: '#aa86abd9'
+        visible: false
+
+        y: startPos - historyView.contentY
+        height: endPos - startPos
+
+        Button {
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            iconSource: 'copy.png'
+            iconSize: appStyle.icon.tinySize
+            text: qsTr('Copy selection')
+            visible: parent.height > 0
+
+            onClicked: {
+                cancelSelection.clicked(null)
+                historyView.selectionEnd = Math.min(listHelper.count-1, historyView.messageSelected);
+
+                // copy elements
+                copyHelper.text = '';
+                for( var i = historyView.selectionStart; i <= historyView.selectionEnd; i++) {
+                    var item = listHelper.get(i);
+                    copyHelper.text += '>> ' + item.from + ':\n' + item.body + '\n';
+                    copyHelper.selectAll();
+                    copyHelper.copy();
+                }
+            }
+        }
+    }
+
     Component {
         id: copyButtonComponent
 
         Button {
-            iconSource: 'copy.png'
+            iconSource: 'resize.png'
             iconSize: appStyle.icon.tinySize
-            text: qsTr('Copy')
+            text: qsTr('Select')
 
             onClicked: {
-                copyHelper.selectAll();
-                copyHelper.copy();
+                // start selection
+                block.state = 'selection';
+                historyView.selectionStart = Math.max(0, historyView.messageSelected);
             }
         }
     }
@@ -326,4 +397,9 @@ Item {
     }
 
     Keys.forwardTo: scrollBar
+
+    states: State {
+        name: 'selection'
+        PropertyChanges { target: selection; visible: true }
+    }
 }
