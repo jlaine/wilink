@@ -74,7 +74,7 @@ Item {
                 id: main
 
                 anchors.left: thumbnail.right
-                anchors.right: parent.right
+                anchors.right: cancelButton.left
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
                 anchors.margins: 4
@@ -92,6 +92,18 @@ Item {
                     elide: Text.ElideRight
                     text: model.name
                 }
+            }
+
+            Button {
+                id: cancelButton
+
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                iconSize: appStyle.icon.tinySize
+                iconSource: 'close.png'
+                text: qsTr('Cancel')
+
+                onClicked: view.model.cancel(model.index)
             }
         }
     }
