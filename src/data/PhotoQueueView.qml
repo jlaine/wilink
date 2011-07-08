@@ -80,8 +80,8 @@ Item {
 
                 ProgressBar {
                     anchors.fill: parent
-                    maximumValue: 1.0
-                    value: model.progress
+                    maximumValue: model.totalBytes
+                    value: model.doneBytes
                 }
 
                 Text {

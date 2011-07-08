@@ -58,7 +58,6 @@ enum PhotoRole
 {
     ImageRole = ChatModel::UserRole,
     IsDirRole,
-    ProgressRole,
     SizeRole,
     UrlRole,
 };
@@ -363,38 +362,46 @@ void PhotoModel::_q_photoChanged(const QUrl &url, FileSystem::Type size)
 class PhotoQueueItem : public ChatModelItem
 {
 public:
+    PhotoQueueItem();
+
     QString sourcePath;
     QString destinationPath;
     FileSystem *fileSystem;
     bool finished;
     FileSystemJob *job;
-    qreal progress;
-    qint64 size;
+
+    qint64 doneBytes;
+    qint64 totalBytes;
 };
+
+PhotoQueueItem::PhotoQueueItem()
+    : fileSystem(0),
+    job(0),
+    doneBytes(0),
+    totalBytes(0)
+{
+}
 
 PhotoQueueModel::PhotoQueueModel(QObject *parent)
     : ChatModel(parent),
     m_uploadDevice(0),
     m_uploadItem(0)
 {
+    // set role names
     QHash<int, QByteArray> names = roleNames();
-    names.insert(ProgressRole, "progress");
-    names.insert(SizeRole, "size");
+    names.insert(IsDirRole, "isDir");
+    names.insert(SpeedRole, "speed");
+    names.insert(DoneBytesRole, "doneBytes");
+    names.insert(DoneFilesRole, "doneFiles");
+    names.insert(TotalBytesRole, "totalBytes");
+    names.insert(TotalFilesRole, "totalFiles");
     setRoleNames(names);
 }
-
-#if 0
-void PhotoQueueModel::abort()
-{
-    //fs->abort();
-}
-#endif
 
 void PhotoQueueModel::append(const QString &filePath, FileSystem *fileSystem, const QString &destinationPath)
 {
     qDebug("Adding item %s", qPrintable(filePath));
     PhotoQueueItem *item = new PhotoQueueItem;
-    item->job = 0;
     item->sourcePath = filePath;
     item->destinationPath = destinationPath;
     item->fileSystem = fileSystem;
@@ -423,10 +430,14 @@ QVariant PhotoQueueModel::data(const QModelIndex &index, int role) const
         return QUrl::fromLocalFile(item->sourcePath);
     } else if (role == NameRole) {
         return QFileInfo(item->sourcePath).fileName();
-    } else if (role == ProgressRole) {
-        return item->progress;
-    } else if (role == SizeRole) {
-        return item->size;
+    } else if (role == DoneBytesRole) {
+        return item->doneBytes;
+    } else if (role == DoneFilesRole) {
+        return 0;
+    } else if (role == TotalBytesRole) {
+        return item->totalBytes;
+    } else if (role == TotalFilesRole) {
+        return 1;
     }
     return QVariant();
 }
@@ -487,8 +498,8 @@ void PhotoQueueModel::_q_jobFinished()
 void PhotoQueueModel::_q_uploadProgress(qint64 done, qint64 total)
 {
     if (m_uploadItem) {
-        m_uploadItem->size = total;
-        m_uploadItem->progress = total ? qreal(done) / qreal(total) : 0;
+        m_uploadItem->doneBytes = done;
+        m_uploadItem->totalBytes = total;
         emit dataChanged(createIndex(m_uploadItem), createIndex(m_uploadItem));
     }
 }

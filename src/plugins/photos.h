@@ -106,6 +106,15 @@ class PhotoQueueModel : public ChatModel
     Q_OBJECT
 
 public:
+    enum Role {
+        IsDirRole = ChatModel::UserRole,
+        SpeedRole,
+        DoneBytesRole,
+        DoneFilesRole,
+        TotalBytesRole,
+        TotalFilesRole,
+    };
+
     PhotoQueueModel(QObject *parent = 0);
 
     void append(const QString &sourcePath, FileSystem *fileSystem, const QString &destinationPath);

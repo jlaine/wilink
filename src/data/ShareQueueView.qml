@@ -81,7 +81,6 @@ Item {
                     anchors.fill: parent
                     maximumValue: model.totalBytes
                     value: model.doneBytes
-                    //visible: model.doneBytes > 0
                 }
 
                 Text {
