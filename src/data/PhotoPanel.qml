@@ -251,7 +251,7 @@ Panel {
         }
     }
 
-    PhotoQueueView {
+    ShareQueueView {
         id: footer
 
         anchors.left: parent.left

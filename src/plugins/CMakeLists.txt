@@ -123,7 +123,6 @@ if(RELOAD_TRANSLATIONS)
         ../data/PhonePanel.qml
         ../data/PhotoAlbumDialog.qml
         ../data/PhotoPanel.qml
-        ../data/PhotoQueueView.qml
         ../data/PreferenceDialog.qml
         ../data/RoomInviteDialog.qml
         ../data/RoomInviteNotification.qml

@@ -170,6 +170,7 @@ Panel {
         clip: true
         height: queueView.count > 0 ? 120 : 0
         model: view.model.queue
+        style: 'shares'
     }
 
     // run one-time configuration dialog

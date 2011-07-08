@@ -564,17 +564,6 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>PhotoQueueView</name>
-    <message>
-        <source>Cancel</source>
-        <translation>Annuler</translation>
-    </message>
-    <message>
-        <source>%1 files</source>
-        <translation>%1 fichiers</translation>
-    </message>
-</context>
-<context>
     <name>PreferenceDialog</name>
     <message>
         <source>Preferences</source>

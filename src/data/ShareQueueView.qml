@@ -25,6 +25,7 @@ Item {
 
     property alias count: view.count
     property alias model: view.model
+    property string style: ''
 
     Rectangle {
         id: background
@@ -66,7 +67,7 @@ Item {
                 width: appStyle.icon.smallSize
                 height: appStyle.icon.smallSize
                 smooth: true
-                source: model.isDir ? (model.node.length ? 'album.png' : 'peer.png') : 'file.png'
+                source: block.style == 'shares' ? (model.isDir ? (model.node.length ? 'album.png' : 'peer.png') : 'file.png') : model.avatar
             }
 
             Item {

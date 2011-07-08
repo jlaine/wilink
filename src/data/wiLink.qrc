@@ -119,7 +119,6 @@
     <file>PhonePanel.qml</file>
     <file>PhotoAlbumDialog.qml</file>
     <file>PhotoPanel.qml</file>
-    <file>PhotoQueueView.qml</file>
     <file>PlayerPanel.qml</file>
     <file>PreferenceDialog.qml</file>
     <file>ProgressBar.qml</file>
