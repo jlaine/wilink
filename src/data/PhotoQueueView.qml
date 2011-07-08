@@ -18,13 +18,13 @@
  */
 
 import QtQuick 1.0
+import 'utils.js' as Utils
 
 Item {
     id: block
 
+    property alias count: view.count
     property alias model: view.model
-
-    height: view.count > 0 ? 120 : 0
 
     Rectangle {
         id: background
@@ -58,7 +58,6 @@ Item {
 
             Image {
                 id: thumbnail
-
 
                 anchors.left: parent.left
                 anchors.leftMargin: 4

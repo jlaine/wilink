@@ -33,26 +33,35 @@ Item {
         color: '#ffffff'
     }
 
+    Rectangle {
+        id: border
+
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        color: '#93b9f2'
+        height: 1
+    }
+
     ListView {
         id: view
 
-        anchors.top: parent.top
+        anchors.top: border.bottom
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: scrollBar.left
         spacing: 4
 
         delegate: Item {
-            id: item
             width: view.width - 1
             height: appStyle.icon.smallSize
 
             Image {
                 id: thumbnail
 
-                anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
-                anchors.margins: 4
+                anchors.leftMargin: 4
+                anchors.verticalCenter: parent.verticalCenter
                 width: appStyle.icon.smallSize
                 height: appStyle.icon.smallSize
                 smooth: true
@@ -103,7 +112,6 @@ Item {
 
                 onClicked: view.model.cancel(model.index)
             }
-
         }
     }
 

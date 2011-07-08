@@ -257,6 +257,7 @@ Panel {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
+        height: footer.count > 0 ? 120 : 0
         clip: true
         model: photoModel.uploads
         z: 1
