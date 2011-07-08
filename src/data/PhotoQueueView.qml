@@ -89,7 +89,15 @@ Item {
                     verticalAlignment: Text.AlignVCenter
                     horizontalAlignment: Text.AlignHCenter
                     elide: Text.ElideRight
-                    text: model.name
+                    text: {
+                        var text = model.name + ' - ';
+                        if (model.totalFiles > 1)
+                            text +=  qsTr('%1 files').replace('%1', model.totalFiles) + ', ';
+                        text += Utils.formatSize(model.totalBytes);
+                        if (model.speed > 0)
+                            text += ' - ' + Utils.formatSpeed(model.speed);
+                        return text;
+                    }
                 }
             }
 

@@ -62,6 +62,7 @@ Item {
                 anchors.left: parent.left
                 anchors.leftMargin: 4
                 anchors.verticalCenter: parent.verticalCenter
+                fillMode: Image.PreserveAspectFit
                 width: appStyle.icon.smallSize
                 height: appStyle.icon.smallSize
                 smooth: true

@@ -569,6 +569,10 @@ Acceptez-vous?</translation>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
+    <message>
+        <source>%1 files</source>
+        <translation>%1 fichiers</translation>
+    </message>
 </context>
 <context>
     <name>PreferenceDialog</name>
