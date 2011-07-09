@@ -129,6 +129,7 @@ void ShareModelPrivate::setShareClient(ChatClient *newClient)
     shareClient = newClient;
     if (shareClient) {
         bool check;
+        Q_UNUSED(check);
 
         check = q->connect(shareClient, SIGNAL(presenceReceived(QXmppPresence)),
                            q, SLOT(_q_presenceReceived(QXmppPresence)));
@@ -194,6 +195,7 @@ ChatClient *ShareModel::client() const
 void ShareModel::setClient(ChatClient *client)
 {
     bool check;
+    Q_UNUSED(check);
 
     if (client != d->client) {
         d->client = client;
@@ -327,9 +329,10 @@ QVariant ShareModel::data(const QModelIndex &index, int role) const
 
 QXmppShareDatabase *ShareModel::database()
 {
-    if (!globalDatabase) {
-        bool check;
+    bool check;
+    Q_UNUSED(check);
 
+    if (!globalDatabase) {
         // initialise database
         const QString databaseName = QDir(QDesktopServices::storageLocation(QDesktopServices::DataLocation)).filePath("database.sqlite");
         QSqlDatabase sharesDb = QSqlDatabase::addDatabase("QSQLITE");
@@ -439,6 +442,7 @@ void ShareModel::_q_disconnected()
 void ShareModel::_q_presenceReceived(const QXmppPresence &presence)
 {
     bool check;
+    Q_UNUSED(check);
 
     Q_ASSERT(d->shareClient);
     if (d->shareServer.isEmpty() || presence.from() != d->shareServer)
@@ -719,6 +723,7 @@ void ShareQueueModelPrivate::process()
             QXmppShareTransfer *transfer = manager->get(*file);
             if (transfer) {
                 bool check;
+                Q_UNUSED(check);
 
                 check = q->connect(transfer, SIGNAL(finished()),
                                    q, SLOT(_q_transferFinished()));
@@ -742,6 +747,7 @@ ShareQueueModel::ShareQueueModel(QObject *parent)
     : ChatModel(parent)
 {
     bool check;
+    Q_UNUSED(check);
 
     d = new ShareQueueModelPrivate(this);
 
@@ -860,6 +866,7 @@ void ShareQueueModel::setManager(QXmppShareManager *manager)
         d->manager = manager;
         if (d->manager) {
             bool check;
+            Q_UNUSED(check);
 
             check = connect(d->manager, SIGNAL(shareSearchIqReceived(QXmppShareSearchIq)),
                             this, SLOT(_q_searchReceived(QXmppShareSearchIq)));
@@ -1121,11 +1128,13 @@ QModelIndex SharePlaceModel::index(int row, int column, const QModelIndex& paren
 
 QModelIndex SharePlaceModel::parent(const QModelIndex &index) const
 {
+    Q_UNUSED(index);
     return QModelIndex();
 }
 
 int SharePlaceModel::columnCount(const QModelIndex &parent) const
 {
+    Q_UNUSED(parent);
     return 1;
 }
 
