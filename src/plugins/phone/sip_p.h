@@ -29,6 +29,7 @@
 class QAudioInput;
 class QAudioOutput;
 class QSoundMeter;
+class QSoundStream;
 class QUdpSocket;
 class QTimer;
 class QXmppRtpChannel;
@@ -69,10 +70,7 @@ public:
     QXmppCall::State state;
     QByteArray activeTime;
     QXmppRtpAudioChannel *audioChannel;
-    QAudioInput *audioInput;
-    QSoundMeter *audioInputMeter;
-    QAudioOutput *audioOutput;
-    QSoundMeter *audioOutputMeter;
+    QSoundStream *audioStream;
     QXmppIceConnection *iceConnection;
     bool invitePending;
     bool inviteQueued;

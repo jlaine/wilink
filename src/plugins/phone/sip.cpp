@@ -17,8 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QAudioInput>
-#include <QAudioOutput>
 #include <QByteArrayMatcher>
 #include <QCoreApplication>
 #include <QDateTime>
@@ -29,8 +27,8 @@
 #include <QThread>
 #include <QTimer>
 
-#include "QSoundMeter.h"
 #include "QSoundPlayer.h"
+#include "QSoundStream.h"
 
 #include "QXmppRtpChannel.h"
 #include "QXmppSaslAuth.h"
@@ -163,10 +161,7 @@ bool SipCallContext::handleAuthentication(const SipMessage &reply)
 SipCallPrivate::SipCallPrivate(SipCall *qq)
     : state(QXmppCall::ConnectingState),
     activeTime("0 0"),
-    audioInput(0),
-    audioInputMeter(0),
-    audioOutput(0),
-    audioOutputMeter(0),
+    audioStream(0),
     invitePending(false),
     inviteQueued(false),
     q(qq)
@@ -535,64 +530,24 @@ void SipCallPrivate::onStateChanged()
         format.setByteOrder(QAudioFormat::LittleEndian);
         format.setSampleType(QAudioFormat::SignedInt);
 
-#ifdef Q_OS_MAC
-        // 128ms at 8kHz
-        const int bufferSize = 2048 * format.channels();
-#else
-        // 160ms at 8kHz
-        const int bufferSize = 2560 * format.channels();
-#endif
-
-        // initialise audio output
-        if (!audioOutput) {
-            QTime tm;
-            tm.start();
-            audioOutput = new QAudioOutput(client->d->soundPlayer->outputDevice(), format, q);
-            QObject::connect(audioOutput, SIGNAL(stateChanged(QAudio::State)),
-                             q, SLOT(audioStateChanged()));
-            audioOutputMeter = new QSoundMeter(format, audioChannel, q);
-            QObject::connect(audioOutputMeter, SIGNAL(valueChanged(int)),
+        if (!audioStream) {
+            audioStream = new QSoundStream(client->d->soundPlayer);
+            QObject::connect(audioStream, SIGNAL(outputVolumeChanged(int)),
                              q, SIGNAL(outputVolumeChanged(int)));
-            audioOutput->setBufferSize(bufferSize);
-            audioOutput->start(audioOutputMeter);
-            q->debug(QString("Audio output initialized in %1 ms").arg(QString::number(tm.elapsed())));
-            q->debug(QString("Audio output buffer size %1 (asked for %2)").arg(QString::number(audioOutput->bufferSize()), QString::number(bufferSize)));
-        }
-
-        // initialise audio input
-        if (!audioInput) {
-            QTime tm;
-            tm.start();
-            audioInput = new QAudioInput(client->d->soundPlayer->inputDevice(), format, q);
-            QObject::connect(audioInput, SIGNAL(stateChanged(QAudio::State)),
-                             q, SLOT(audioStateChanged()));
-            audioInputMeter = new QSoundMeter(format, audioChannel, q);
-            QObject::connect(audioInputMeter, SIGNAL(valueChanged(int)),
-                             q, SIGNAL(inputVolumeChanged(int)));
-            audioInput->setBufferSize(bufferSize);
-            audioInput->start(audioInputMeter);
-            q->debug(QString("Audio input initialized in %1 ms").arg(QString::number(tm.elapsed())));
-            q->debug(QString("Audio input buffer size %1 (asked for %2)").arg(QString::number(audioInput->bufferSize()), QString::number(bufferSize)));
+            audioStream->startOutput(format, audioChannel);
+            audioStream->startInput(format, audioChannel);
         }
 
     } else {
         if (startTime.isValid() && !stopTime.isValid())
             stopTime.start();
 
-        // stop audio input
-        if (audioInput)
-        {
-            audioInput->stop();
-            delete audioInput;
-            audioInput = 0;
-        }
-
-        // stop audio output
-        if (audioOutput)
-        {
-            audioOutput->stop();
-            delete audioOutput;
-            audioOutput = 0;
+        // stop audio input / output
+        if (audioStream) {
+            audioStream->stopInput();
+            audioStream->stopOutput();
+            delete audioStream;
+            audioStream = 0;
         }
     }
 }
@@ -697,43 +652,6 @@ QXmppRtpAudioChannel *SipCall::audioChannel() const
     return d->audioChannel;
 }
 
-void SipCall::audioStateChanged()
-{
-    QObject *audio = sender();
-    if (!audio)
-        return;
-    else if (audio == d->audioInput) {
-#if 0
-        debug(QString("Audio input state %1 error %2").arg(
-            QString::number(d->audioInput->state()),
-            QString::number(d->audioInput->error())));
-#endif
-
-        // restart audio input if we get an underrun
-        if (d->audioInput->state() == QAudio::IdleState &&
-            d->audioInput->error() == QAudio::UnderrunError)
-        {
-            warning("Audio input needs restart due to buffer underrun");
-            d->audioInput->start(d->audioChannel);
-        }
-    }
-    else if (audio == d->audioOutput) {
-#if 0
-        debug(QString("Audio output state %1 error %2").arg(
-            QString::number(d->audioOutput->state()),
-            QString::number(d->audioOutput->error())));
-#endif
-
-        // restart audio output if we get an underrun
-        if (d->audioOutput->state() == QAudio::IdleState &&
-            d->audioOutput->error() == QAudio::UnderrunError)
-        {
-            warning("Audio output needs restart due to buffer underrun");
-            d->audioOutput->start(d->audioChannel);
-        }
-    }
-}
-
 /// Returns the call's direction.
 ///
 
@@ -771,12 +689,12 @@ QByteArray SipCall::id() const
 
 int SipCall::inputVolume() const
 {
-    return d->audioInputMeter ? d->audioInputMeter->value() : 0;
+    return d->audioStream ? d->audioStream->inputVolume() : 0;
 }
 
 int SipCall::outputVolume() const
 {
-    return d->audioOutputMeter ? d->audioOutputMeter->value() : 0;
+    return d->audioStream ? d->audioStream->outputVolume() : 0;
 }
 
 void SipCall::localCandidatesChanged()

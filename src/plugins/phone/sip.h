@@ -197,7 +197,6 @@ public slots:
     void hangup();
 
 private slots:
-    void audioStateChanged();
     void handleTimeout();
     void localCandidatesChanged();
     void transactionFinished();
