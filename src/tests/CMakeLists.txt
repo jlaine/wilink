@@ -3,7 +3,7 @@ set(QT_USE_QTSQL 1)
 set(QT_USE_QTXML 1)
 include(${QT_USE_FILE})
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qsound)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qsound/src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp/src)
 add_definitions(-DWILINK_VERSION="${WILINK_VERSION}")
 

@@ -1,7 +1,7 @@
 # Common definitions
 
-QSOUND_INCLUDE_DIR = $$PWD
-QSOUND_LIBRARY_DIR = $$PWD
+QSOUND_INCLUDE_DIR = $$PWD/src
+QSOUND_LIBRARY_DIR = $$PWD/src
 QSOUND_LIBRARY_NAME = qsound
 
 android {
