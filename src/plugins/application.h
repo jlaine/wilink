@@ -120,7 +120,6 @@ private slots:
 
 private:
     static QString executablePath();
-    void migrateFromWdesktop();
 
     ApplicationPrivate * const d;
 };
