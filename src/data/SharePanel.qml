@@ -175,9 +175,9 @@ Panel {
 
     // run one-time configuration dialog
     Component.onCompleted: {
-        if (!application.sharesConfigured) {
+        if (!application.settings.sharesConfigured) {
             preferenceButton.clicked();
-            application.sharesConfigured = true;
+            application.settings.sharesConfigured = true;
         }
     }
 }

@@ -577,35 +577,6 @@ void Application::setAudioOutputDeviceName(const QString &name)
     setAudioOutputDevice(QAudioDeviceInfo::defaultOutputDevice());
 }
 
-QStringList Application::sharesDirectories() const
-{
-    return d->settings->value("SharesDirectories").toStringList();
-}
-
-void Application::setSharesDirectories(const QStringList &directories)
-{
-    if (directories != sharesDirectories()) {
-        d->settings->setValue("SharesDirectories", directories);
-        emit sharesDirectoriesChanged(sharesDirectories());
-    }
-}
-
-QString Application::sharesLocation() const
-{
-    QString sharesDirectory = d->settings->value("SharesLocation",  QDir::home().filePath("Public")).toString();
-    if (sharesDirectory.endsWith("/"))
-        sharesDirectory.chop(1);
-    return sharesDirectory;
-}
-
-void Application::setSharesLocation(const QString &location)
-{
-    if (location != sharesLocation()) {
-        d->settings->setValue("SharesLocation", location);
-        emit sharesLocationChanged(sharesLocation());
-    }
-}
-
 #ifdef USE_LIBNOTIFY
 static void notificationClicked(NotifyNotification *notification, char *action, gpointer data)
 {
@@ -677,23 +648,6 @@ Notification *Application::showMessage(const QString &title, const QString &mess
     Q_UNUSED(action);
 #endif
     return handle;
-}
-
-/** Returns true if shares have been configured.
- */
-bool Application::sharesConfigured() const
-{
-    return d->settings->value("SharesConfigured", false).toBool();
-}
-
-/** Sets whether shares have been configured.
- */
-void Application::setSharesConfigured(bool configured)
-{
-    if (configured != sharesConfigured()) {
-        d->settings->setValue("SharesConfigured", configured);
-        emit sharesConfiguredChanged(configured);
-    }
 }
 
 /** Returns true if offline contacts should be displayed.
@@ -800,5 +754,51 @@ QString ApplicationSettings::downloadsLocation() const
     return QDesktopServices::storageLocation(QDesktopServices::DesktopLocation);
 #endif
     return QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation);
+}
+
+/** Returns true if shares have been configured.
+ */
+bool ApplicationSettings::sharesConfigured() const
+{
+    return d->settings->value("SharesConfigured", false).toBool();
+}
+
+/** Sets whether shares have been configured.
+ */
+void ApplicationSettings::setSharesConfigured(bool configured)
+{
+    if (configured != sharesConfigured()) {
+        d->settings->setValue("SharesConfigured", configured);
+        emit sharesConfiguredChanged(configured);
+    }
+}
+
+QStringList ApplicationSettings::sharesDirectories() const
+{
+    return d->settings->value("SharesDirectories").toStringList();
+}
+
+void ApplicationSettings::setSharesDirectories(const QStringList &directories)
+{
+    if (directories != sharesDirectories()) {
+        d->settings->setValue("SharesDirectories", directories);
+        emit sharesDirectoriesChanged(sharesDirectories());
+    }
+}
+
+QString ApplicationSettings::sharesLocation() const
+{
+    QString sharesDirectory = d->settings->value("SharesLocation",  QDir::home().filePath("Public")).toString();
+    if (sharesDirectory.endsWith("/"))
+        sharesDirectory.chop(1);
+    return sharesDirectory;
+}
+
+void ApplicationSettings::setSharesLocation(const QString &location)
+{
+    if (location != sharesLocation()) {
+        d->settings->setValue("SharesLocation", location);
+        emit sharesLocationChanged(sharesLocation());
+    }
 }
 

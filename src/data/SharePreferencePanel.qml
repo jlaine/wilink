@@ -24,8 +24,8 @@ Panel {
     id: panel
 
     function save() {
-        application.sharesLocation = sharesLocation.text;
-        application.sharesDirectories = folderModel.selectedFolders;
+        application.settings.sharesLocation = sharesLocation.text;
+        application.settings.sharesDirectories = folderModel.selectedFolders;
     }
 
     color: 'transparent'
@@ -43,8 +43,8 @@ Panel {
         ShareFolderModel {
             id: folderModel
 
-            forcedFolder: application.sharesLocation
-            selectedFolders: application.sharesDirectories
+            forcedFolder: application.settings.sharesLocation
+            selectedFolders: application.settings.sharesDirectories
         }
 
         SharePlaceModel {
@@ -273,7 +273,7 @@ Panel {
                     anchors.left: parent.left
                     anchors.right: button.left
                     anchors.rightMargin: appStyle.spacing.horizontal
-                    text: application.sharesLocation
+                    text: application.settings.sharesLocation
                 }
 
                 Button {
@@ -285,12 +285,12 @@ Panel {
 
                     onClicked: {
                         var dialog = window.fileDialog();
-                        dialog.directory = application.sharesLocation;
+                        dialog.directory = application.settings.sharesLocation;
                         dialog.fileMode = QFileDialog.Directory;
                         dialog.options = QFileDialog.ShowDirsOnly;
                         dialog.windowTitle = qsTr('Downloads folder');
                         if (dialog.exec() && dialog.selectedFiles.length > 0) {
-                            application.sharesLocation = dialog.selectedFiles[0];
+                            application.settings.sharesLocation = dialog.selectedFiles[0];
                         }
                     }
                 }

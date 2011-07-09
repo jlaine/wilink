@@ -346,12 +346,12 @@ QXmppShareDatabase *ShareModel::database()
 
         // create shares database
         globalDatabase = new QXmppShareDatabase;
-        globalDatabase->setDirectory(wApp->sharesLocation());
-        globalDatabase->setMappedDirectories(wApp->sharesDirectories());
-        check = connect(wApp, SIGNAL(sharesDirectoriesChanged(QStringList)),
+        globalDatabase->setDirectory(wApp->settings()->sharesLocation());
+        globalDatabase->setMappedDirectories(wApp->settings()->sharesDirectories());
+        check = connect(wApp->settings(), SIGNAL(sharesDirectoriesChanged(QStringList)),
                         globalDatabase, SLOT(setMappedDirectories(QStringList)));
         Q_ASSERT(check);
-        check = connect(wApp, SIGNAL(sharesLocationChanged(QString)),
+        check = connect(wApp->settings(), SIGNAL(sharesLocationChanged(QString)),
                         globalDatabase, SLOT(setDirectory(QString)));
         Q_ASSERT(check);
         qAddPostRoutine(closeDatabase);
