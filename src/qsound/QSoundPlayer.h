@@ -25,6 +25,7 @@
 #include <QIODevice>
 #include <QMap>
 #include <QPair>
+#include <QStringList>
 
 class QFile;
 class QSoundFile;

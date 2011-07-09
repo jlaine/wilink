@@ -20,15 +20,12 @@
 #ifndef __WILINK_SOUND_TESTER_H__
 #define __WILINK_SOUND_TESTER_H__
 
-#include <QMap>
-#include <QObject>
-#include <QStringList>
+#include <QAudioFormat>
 
 #include "QSoundPlayer.h"
 
-class QAudioInput;
-class QAudioOutput;
 class QBuffer;
+class QSoundStream;
 
 class QSoundTester : public QSoundPlayer
 {
@@ -66,9 +63,9 @@ private slots:
 
 private:
     QBuffer *m_buffer;
-    QAudioInput *m_input;
-    QAudioOutput *m_output;
+    QAudioFormat m_format;
     State m_state;
+    QSoundStream *m_stream;
     int m_volume;
 };
 

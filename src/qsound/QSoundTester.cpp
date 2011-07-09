@@ -23,16 +23,29 @@
 #include <QTimer>
 
 #include "QSoundMeter.h"
+#include "QSoundStream.h"
 #include "QSoundTester.h"
 
 QSoundTester::QSoundTester(QObject *parent)
     : QSoundPlayer(parent),
-    m_input(0),
-    m_output(0),
     m_state(IdleState),
     m_volume(0)
 {
     m_buffer = new QBuffer(this);
+
+    // prepare audio format
+    m_format.setFrequency(8000);
+    m_format.setChannels(1);
+    m_format.setSampleSize(16);
+    m_format.setCodec("audio/pcm");
+    m_format.setByteOrder(QAudioFormat::LittleEndian);
+    m_format.setSampleType(QAudioFormat::SignedInt);
+
+    m_stream = new QSoundStream(this);
+    connect(m_stream, SIGNAL(inputVolumeChanged(int)),
+            this, SLOT(_q_volumeChanged(int)));
+    connect(m_stream, SIGNAL(outputVolumeChanged(int)),
+            this, SLOT(_q_volumeChanged(int)));
 }
 
 int QSoundTester::duration() const
@@ -50,34 +63,10 @@ void QSoundTester::start(const QString &inputDeviceName, const QString &outputDe
     setInputDeviceName(inputDeviceName);
     setOutputDeviceName(outputDeviceName);
 
-    // prepare audio format
-    QAudioFormat format;
-    format.setFrequency(8000);
-    format.setChannels(1);
-    format.setSampleSize(16);
-    format.setCodec("audio/pcm");
-    format.setByteOrder(QAudioFormat::LittleEndian);
-    format.setSampleType(QAudioFormat::SignedInt);
-
-    // create audio input and output
-#ifdef Q_OS_MAC
-    // 128ms at 8kHz
-    const int bufferSize = 2048 * format.channels();
-#else
-    // 160ms at 8kHz
-    const int bufferSize = 2560 * format.channels();
-#endif
-    m_input = new QAudioInput(inputDevice(), format, this);
-    m_input->setBufferSize(bufferSize);
-    m_output = new QAudioOutput(outputDevice(), format, this);
-    m_output->setBufferSize(bufferSize);
-
     // start input
     m_buffer->open(QIODevice::WriteOnly);
     m_buffer->reset();
-    QSoundMeter *inputMeter = new QSoundMeter(m_input->format(), m_buffer, m_input);
-    connect(inputMeter, SIGNAL(valueChanged(int)), this, SLOT(_q_volumeChanged(int)));
-    m_input->start(inputMeter);
+    m_stream->startInput(m_format, m_buffer);
     QTimer::singleShot(duration() * 1000, this, SLOT(_q_playback()));
 
     // update state
@@ -97,15 +86,13 @@ int QSoundTester::volume() const
 
 void QSoundTester::_q_playback()
 {
-    m_input->stop();
+    m_stream->stopInput();
     _q_volumeChanged(0);
 
     // start output
     m_buffer->open(QIODevice::ReadOnly);
     m_buffer->reset();
-    QSoundMeter *outputMeter = new QSoundMeter(m_output->format(), m_buffer, m_output);
-    connect(outputMeter, SIGNAL(valueChanged(int)), this, SLOT(_q_volumeChanged(int)));
-    m_output->start(outputMeter);
+    m_stream->startOutput(m_format, m_buffer);
     QTimer::singleShot(duration() * 1000, this, SLOT(_q_stop()));
 
     // update state
@@ -115,14 +102,8 @@ void QSoundTester::_q_playback()
 
 void QSoundTester::_q_stop()
 {
-    m_output->stop();
+    m_stream->stopOutput();
     _q_volumeChanged(0);
-
-    // cleanup
-    delete m_input;
-    m_input = 0;
-    delete m_output;
-    m_output = 0;
 
     // update state
     m_state = IdleState;
