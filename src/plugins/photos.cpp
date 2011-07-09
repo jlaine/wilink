@@ -194,6 +194,7 @@ PhotoModel::PhotoModel(QObject *parent)
     m_fs(0)
 {
     bool check;
+    Q_UNUSED(check);
 
     QHash<int, QByteArray> names = roleNames();
     names.insert(ImageRole, "image");
@@ -255,8 +256,10 @@ void PhotoModel::createAlbum(const QString &name)
  */
 void PhotoModel::refresh()
 {
+    bool check;
+    Q_UNUSED(check);
+
     if (!m_fs) {
-        bool check;
 
         FileSystem::setNetworkAccessManagerFactory(new PhotoNetworkAccessManagerFactory);
 
@@ -351,6 +354,7 @@ void PhotoModel::_q_jobFinished(FileSystemJob *job)
  */
 void PhotoModel::_q_photoChanged(const QUrl &url, FileSystem::ImageSize size)
 {
+    Q_UNUSED(size);
     foreach (ChatModelItem *ptr, rootItem->children) {
         PhotoItem *item = static_cast<PhotoItem*>(ptr);
         if (item->url() == url) {

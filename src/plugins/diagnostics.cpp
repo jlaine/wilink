@@ -462,6 +462,7 @@ void DiagnosticManager::refresh()
 void DiagnosticManager::run(const DiagnosticsIq &request)
 {
     bool check;
+    Q_UNUSED(check);
 
     if (m_thread)
         return;

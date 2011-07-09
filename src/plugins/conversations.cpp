@@ -57,6 +57,7 @@ ChatClient *Conversation::client() const
 void Conversation::setClient(ChatClient *client)
 {
     bool check;
+    Q_UNUSED(check);
 
     if (client != m_client) {
         m_client = client;

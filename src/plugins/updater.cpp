@@ -427,6 +427,8 @@ void Updater::_q_processStatus()
     reply = d->network->get(req);
 
     bool check;
+    Q_UNUSED(check);
+
     check = connect(reply, SIGNAL(downloadProgress(qint64,qint64)),
                     this, SLOT(_q_downloadProgress(qint64,qint64)));
     Q_ASSERT(check);

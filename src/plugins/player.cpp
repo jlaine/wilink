@@ -263,6 +263,8 @@ PlayerModel::PlayerModel(QObject *parent)
     : ChatModel(parent)
 {
     bool check;
+    Q_UNUSED(check);
+
     d = new PlayerModelPrivate(this);
 
     d->network = new NetworkAccessManager(this);

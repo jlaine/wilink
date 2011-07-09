@@ -96,6 +96,7 @@ PhoneCallsModel::PhoneCallsModel(QObject *parent)
     m_registeredHandler(false)
 {
     bool check;
+    Q_UNUSED(check);
 
     // set role names
     QHash<int, QByteArray> roleNames;

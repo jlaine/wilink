@@ -217,6 +217,7 @@ void DeclarativeWallet::set(const QString &jid, const QString &password)
 
 void Plugin::initializeEngine(QDeclarativeEngine *engine, const char *uri)
 {
+    Q_UNUSED(uri);
     engine->addImageProvider("photo", new PhotoImageProvider);
     engine->addImageProvider("roster", new RosterImageProvider);
     engine->setNetworkAccessManagerFactory(new NetworkAccessManagerFactory);
