@@ -27,7 +27,6 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QPixmapCache>
-#include <QSettings>
 #include <QTime>
 
 #include "QSoundFile.h"
@@ -252,11 +251,10 @@ QSoundFile *PlayerModelPrivate::soundFile(Item *item)
 
 void PlayerModelPrivate::save()
 {
-    QSettings settings;
     QStringList values;
     foreach (ChatModelItem *item, q->rootItem->children)
         values << static_cast<Item*>(item)->url.toString();
-    settings.setValue("PlayerUrls", values);
+    wApp->settings()->setPlayerUrls(values);
 }
 
 PlayerModel::PlayerModel(QObject *parent)
@@ -288,9 +286,7 @@ PlayerModel::PlayerModel(QObject *parent)
     setRoleNames(roleNames);
 
     // load saved playlist
-    QSettings settings;
-    QStringList values = settings.value("PlayerUrls").toStringList();
-    foreach (const QString &value, values)
+    foreach (const QString &value, wApp->settings()->playerUrls())
         addUrl(QUrl(value));
 }
 

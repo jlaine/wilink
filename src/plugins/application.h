@@ -131,6 +131,7 @@ class ApplicationSettings : public QObject
     Q_PROPERTY(QString lastRunVersion READ lastRunVersion WRITE setLastRunVersion NOTIFY lastRunVersionChanged)
     Q_PROPERTY(bool openAtLogin READ openAtLogin WRITE setOpenAtLogin NOTIFY openAtLoginChanged)
     Q_PROPERTY(QString outgoingMessageSound READ outgoingMessageSound WRITE setOutgoingMessageSound NOTIFY outgoingMessageSoundChanged)
+    Q_PROPERTY(QStringList playerUrls READ playerUrls WRITE setPlayerUrls NOTIFY playerUrlsChanged)
     Q_PROPERTY(bool sharesConfigured READ sharesConfigured WRITE setSharesConfigured NOTIFY sharesConfiguredChanged)
     Q_PROPERTY(QStringList sharesDirectories READ sharesDirectories WRITE setSharesDirectories NOTIFY sharesDirectoriesChanged)
     Q_PROPERTY(QString sharesLocation READ sharesLocation WRITE setSharesLocation NOTIFY sharesLocationChanged)
@@ -151,17 +152,20 @@ public:
 
     QString downloadsLocation() const;
 
-    bool openAtLogin() const;
-    void setOpenAtLogin(bool run);
-
     QString incomingMessageSound() const;
     void setIncomingMessageSound(const QString &soundFile);
 
     QString lastRunVersion() const;
     void setLastRunVersion(const QString &version);
 
+    bool openAtLogin() const;
+    void setOpenAtLogin(bool run);
+
     QString outgoingMessageSound() const;
     void setOutgoingMessageSound(const QString &soundFile);
+
+    QStringList playerUrls() const;
+    void setPlayerUrls(const QStringList &urls);
 
     bool sharesConfigured() const;
     void setSharesConfigured(bool configured);
@@ -187,8 +191,9 @@ signals:
     void chatAccountsChanged(const QStringList &accounts);
     void incomingMessageSoundChanged(const QString &sound);
     void lastRunVersionChanged(const QString &version);
-    void outgoingMessageSoundChanged(const QString &sound);
     void openAtLoginChanged(bool run);
+    void outgoingMessageSoundChanged(const QString &sound);
+    void playerUrlsChanged(const QStringList &urls);
     void sharesConfiguredChanged(bool configured);
     void sharesDirectoriesChanged(const QStringList &directories);
     void sharesLocationChanged(const QString &location);

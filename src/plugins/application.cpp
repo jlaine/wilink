@@ -681,6 +681,19 @@ void ApplicationSettings::setOutgoingMessageSound(const QString &soundFile)
     }
 }
 
+QStringList ApplicationSettings::playerUrls() const
+{
+    return d->settings->value("PlayerUrls").toStringList();
+}
+
+void ApplicationSettings::setPlayerUrls(const QStringList &urls)
+{
+    if (urls != playerUrls()) {
+        d->settings->setValue("PlayerUrls", urls);
+        emit playerUrlsChanged(urls);
+    }
+}
+
 /** Returns true if shares have been configured.
  */
 bool ApplicationSettings::sharesConfigured() const

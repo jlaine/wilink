@@ -21,7 +21,6 @@
 #include <signal.h>
 
 #include <QLocale>
-#include <QSettings>
 #include <QTimer>
 #include <QTranslator>
 
