@@ -205,8 +205,8 @@ PhotoModel::PhotoModel(QObject *parent)
 
     m_uploads = new PhotoQueueModel(this);
 
-    check = connect(PhotoCache::instance(), SIGNAL(photoChanged(QUrl,FileSystem::Type)),
-                    this, SLOT(_q_photoChanged(QUrl,FileSystem::Type)));
+    check = connect(PhotoCache::instance(), SIGNAL(photoChanged(QUrl,FileSystem::ImageSize)),
+                    this, SLOT(_q_photoChanged(QUrl,FileSystem::ImageSize)));
     Q_ASSERT(check);
 }
 
