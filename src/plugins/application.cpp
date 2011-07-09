@@ -54,8 +54,6 @@ public:
     ApplicationSettings *appSettings;
     QSoundPlayer *soundPlayer;
     QThread *soundThread;
-    QAudioDeviceInfo audioInputDevice;
-    QAudioDeviceInfo audioOutputDevice;
 #ifdef USE_LIBNOTIFY
     bool libnotify_accepts_actions;
 #endif
@@ -89,7 +87,6 @@ Application::Application(int &argc, char **argv)
     Q_UNUSED(check);
 
     wApp = this;
-    qRegisterMetaType<QAudioDeviceInfo>();
 
     // set application properties
     setApplicationName("wiLink");

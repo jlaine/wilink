@@ -21,7 +21,6 @@
 #define __APPLICATION_H__
 
 #include <QApplication>
-#include <QAudioDeviceInfo>
 #include <QString>
 #include <QStringList>
 #include <QUrl>

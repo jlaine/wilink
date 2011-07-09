@@ -27,6 +27,7 @@ QSoundPlayer::QSoundPlayer(QObject *parent)
     : QObject(parent),
     m_readerId(0)
 {
+    qRegisterMetaType<QAudioDeviceInfo>();
 }
 
 int QSoundPlayer::play(const QString &name, bool repeat)
