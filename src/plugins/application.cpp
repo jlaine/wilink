@@ -106,16 +106,6 @@ Application::Application(int &argc, char **argv)
     if (isInstalled() && openAtLogin())
         setOpenAtLogin(true);
 
-    // clean acounts
-    QStringList cleanAccounts = d->appSettings->chatAccounts();
-    foreach (const QString &jid, cleanAccounts) {
-        if (!QRegExp("^[^@/ ]+@[^@/ ]+$").exactMatch(jid)) {
-            qWarning("Removing bad account %s", qPrintable(jid));
-            cleanAccounts.removeAll(jid);
-        }
-    }
-    settings()->setChatAccounts(cleanAccounts);
-
     /* initialise cache and wallet */
     const QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
     QDir().mkpath(dataPath);
@@ -561,6 +551,16 @@ ApplicationSettings::ApplicationSettings(QObject *parent)
     d(new ApplicationSettingsPrivate)
 {
     d->settings = new QSettings(this);
+
+    // clean acounts
+    QStringList cleanAccounts = chatAccounts();
+    foreach (const QString &jid, cleanAccounts) {
+        if (!QRegExp("^[^@/ ]+@[^@/ ]+$").exactMatch(jid)) {
+            qWarning("Removing bad account %s", qPrintable(jid));
+            cleanAccounts.removeAll(jid);
+        }
+    }
+    setChatAccounts(cleanAccounts);
 }
 
 QString ApplicationSettings::audioInputDeviceName() const
