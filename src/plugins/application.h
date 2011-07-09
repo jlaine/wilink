@@ -65,7 +65,6 @@ class Application : public QApplication
     Q_PROPERTY(QString osType READ osType CONSTANT)
     Q_PROPERTY(ApplicationSettings* settings READ settings CONSTANT)
     Q_PROPERTY(bool isInstalled READ isInstalled CONSTANT)
-    Q_PROPERTY(bool openAtLogin READ openAtLogin WRITE setOpenAtLogin NOTIFY openAtLoginChanged)
     Q_PROPERTY(QSoundPlayer* soundPlayer READ soundPlayer CONSTANT)
     Q_PROPERTY(Updater* updater READ updater CONSTANT)
 
@@ -84,6 +83,8 @@ public:
     QSystemTrayIcon *trayIcon();
 #endif
 
+    QString executablePath() const;
+
     bool isInstalled();
     QString osType() const;
 
@@ -97,15 +98,9 @@ public:
     // preferences
     ApplicationSettings *settings() const;
 
-    bool openAtLogin() const;
-    void setOpenAtLogin(bool run);
-
 signals:
     void audioInputDeviceChanged(const QAudioDeviceInfo &device);
     void audioOutputDeviceChanged(const QAudioDeviceInfo &device);
-    void incomingMessageSoundChanged(const QString &sound);
-    void outgoingMessageSoundChanged(const QString &sound);
-    void openAtLoginChanged(bool run);
 
 public slots:
     void resetWindows();
@@ -119,7 +114,6 @@ private slots:
 #endif
 
 private:
-    static QString executablePath();
 
     ApplicationPrivate * const d;
 };
@@ -135,6 +129,7 @@ class ApplicationSettings : public QObject
     Q_PROPERTY(QString downloadsLocation READ downloadsLocation CONSTANT)
     Q_PROPERTY(QString incomingMessageSound READ incomingMessageSound WRITE setIncomingMessageSound NOTIFY incomingMessageSoundChanged)
     Q_PROPERTY(QString lastRunVersion READ lastRunVersion WRITE setLastRunVersion NOTIFY lastRunVersionChanged)
+    Q_PROPERTY(bool openAtLogin READ openAtLogin WRITE setOpenAtLogin NOTIFY openAtLoginChanged)
     Q_PROPERTY(QString outgoingMessageSound READ outgoingMessageSound WRITE setOutgoingMessageSound NOTIFY outgoingMessageSoundChanged)
     Q_PROPERTY(bool sharesConfigured READ sharesConfigured WRITE setSharesConfigured NOTIFY sharesConfiguredChanged)
     Q_PROPERTY(QStringList sharesDirectories READ sharesDirectories WRITE setSharesDirectories NOTIFY sharesDirectoriesChanged)

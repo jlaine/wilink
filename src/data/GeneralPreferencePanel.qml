@@ -24,7 +24,7 @@ Panel {
 
     function save() {
         if (openAtLogin.enabled)
-            application.openAtLogin = openAtLogin.checked;
+            application.settings.openAtLogin = openAtLogin.checked;
         application.settings.showOfflineContacts = showOfflineContacts.checked;
         application.settings.sortContactsByStatus = sortContactsByStatus.checked;
     }
@@ -46,7 +46,7 @@ Panel {
 
                 anchors.left: parent.left
                 anchors.right:  parent.right
-                checked: application.openAtLogin
+                checked: application.settings.openAtLogin
                 enabled: application.isInstalled
                 text: qsTr('Open at login')
                 onClicked: checked = !checked

@@ -51,7 +51,6 @@ public:
     ApplicationPrivate();
 
     QList<QWidget*> chats;
-    QSettings *oldSettings;
     ApplicationSettings *appSettings;
     QSoundPlayer *soundPlayer;
     QThread *soundThread;
@@ -69,7 +68,7 @@ public:
 };
 
 ApplicationPrivate::ApplicationPrivate()
-    : oldSettings(0),
+    :
 #ifdef USE_LIBNOTIFY
     libnotify_accepts_actions(0),
 #endif
@@ -100,11 +99,10 @@ Application::Application(int &argc, char **argv)
 #endif
 
     /* initialise settings */
-    d->oldSettings = new QSettings(this);
     d->appSettings = new ApplicationSettings(this);
 
-    if (isInstalled() && openAtLogin())
-        setOpenAtLogin(true);
+    if (isInstalled() && d->appSettings->openAtLogin())
+        d->appSettings->setOpenAtLogin(true);
 
     /* initialise cache and wallet */
     const QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
@@ -126,7 +124,7 @@ Application::Application(int &argc, char **argv)
     d->soundThread->start();
     d->soundPlayer = new QSoundPlayer;
     d->soundPlayer->setAudioOutputDevice(d->audioOutputDevice);
-    connect(wApp, SIGNAL(audioOutputDeviceChanged(QAudioDeviceInfo)),
+    connect(this, SIGNAL(audioOutputDeviceChanged(QAudioDeviceInfo)),
             d->soundPlayer, SLOT(setAudioOutputDevice(QAudioDeviceInfo)));
     d->soundPlayer->moveToThread(d->soundThread);
 
@@ -238,18 +236,18 @@ void Application::createSystemTrayIcon()
 #endif
 }
 
-QString Application::executablePath()
+QString Application::executablePath() const
 {
 #ifdef Q_OS_MAC
     const QString macDir("/Contents/MacOS");
-    const QString appDir = qApp->applicationDirPath();
+    const QString appDir = applicationDirPath();
     if (appDir.endsWith(macDir))
         return appDir.left(appDir.size() - macDir.size());
 #endif
 #ifdef Q_OS_WIN
-    return qApp->applicationFilePath().replace("/", "\\");
+    return applicationFilePath().replace("/", "\\");
 #endif
-    return qApp->applicationFilePath();
+    return applicationFilePath();
 }
 
 bool Application::isInstalled()
@@ -261,66 +259,6 @@ bool Application::isInstalled()
 QString Application::osType() const
 {
     return SystemInfo::osType();
-}
-
-bool Application::openAtLogin() const
-{
-    return d->oldSettings->value("OpenAtLogin", true).toBool();
-}
-
-void Application::setOpenAtLogin(bool run)
-{
-    const QString appName = qApp->applicationName();
-    const QString appPath = executablePath();
-#if defined(Q_OS_MAC)
-    QString script = run ?
-        QString("tell application \"System Events\"\n"
-            "\tmake login item at end with properties {path:\"%1\"}\n"
-            "end tell\n").arg(appPath) :
-        QString("tell application \"System Events\"\n"
-            "\tdelete login item \"%1\"\n"
-            "end tell\n").arg(appName);
-    QProcess process;
-    process.start("osascript");
-    process.write(script.toAscii());
-    process.closeWriteChannel();
-    process.waitForFinished();
-#elif defined(Q_OS_WIN)
-    QSettings registry("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
-    if (run)
-        registry.setValue(appName, appPath);
-    else
-        registry.remove(appName);
-#else
-    QDir autostartDir(QDir::home().filePath(".config/autostart"));
-    if (autostartDir.exists())
-    {
-        QFile desktop(autostartDir.filePath(appName + ".desktop"));
-        const QString fileName = appName + ".desktop";
-        if (run)
-        {
-            if (desktop.open(QIODevice::WriteOnly))
-            {
-                QTextStream stream(&desktop);
-                stream << "[Desktop Entry]\n";
-                stream << QString("Name=%1\n").arg(appName);
-                stream << QString("Exec=%1\n").arg(appPath);
-                stream << "Type=Application\n";
-            }
-        }
-        else
-        {
-            desktop.remove();
-        }
-    }
-#endif
-
-    // store preference
-    if (run != openAtLogin())
-    {
-        d->oldSettings->setValue("OpenAtLogin", run);
-        emit openAtLoginChanged(run);
-    }
 }
 
 #if 0
@@ -656,6 +594,73 @@ void ApplicationSettings::setLastRunVersion(const QString &version)
         emit lastRunVersionChanged(version);
     }
 }
+
+/** Returns whether the application should be run at login.
+ */
+bool ApplicationSettings::openAtLogin() const
+{
+    return d->settings->value("OpenAtLogin", true).toBool();
+}
+
+/** Sets whether the application should be run at login.
+ *
+ * @param run
+ */
+void ApplicationSettings::setOpenAtLogin(bool run)
+{
+    const QString appName = wApp->applicationName();
+    const QString appPath = wApp->executablePath();
+#if defined(Q_OS_MAC)
+    QString script = run ?
+        QString("tell application \"System Events\"\n"
+            "\tmake login item at end with properties {path:\"%1\"}\n"
+            "end tell\n").arg(appPath) :
+        QString("tell application \"System Events\"\n"
+            "\tdelete login item \"%1\"\n"
+            "end tell\n").arg(appName);
+    QProcess process;
+    process.start("osascript");
+    process.write(script.toAscii());
+    process.closeWriteChannel();
+    process.waitForFinished();
+#elif defined(Q_OS_WIN)
+    QSettings registry("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
+    if (run)
+        registry.setValue(appName, appPath);
+    else
+        registry.remove(appName);
+#else
+    QDir autostartDir(QDir::home().filePath(".config/autostart"));
+    if (autostartDir.exists())
+    {
+        QFile desktop(autostartDir.filePath(appName + ".desktop"));
+        const QString fileName = appName + ".desktop";
+        if (run)
+        {
+            if (desktop.open(QIODevice::WriteOnly))
+            {
+                QTextStream stream(&desktop);
+                stream << "[Desktop Entry]\n";
+                stream << QString("Name=%1\n").arg(appName);
+                stream << QString("Exec=%1\n").arg(appPath);
+                stream << "Type=Application\n";
+            }
+        }
+        else
+        {
+            desktop.remove();
+        }
+    }
+#endif
+
+    // store preference
+    if (run != openAtLogin())
+    {
+        d->settings->setValue("OpenAtLogin", run);
+        emit openAtLoginChanged(run);
+    }
+}
+
 
 /** Returns the sound to play for outgoing messages.
  */
