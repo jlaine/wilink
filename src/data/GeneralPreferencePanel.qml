@@ -25,8 +25,8 @@ Panel {
     function save() {
         if (openAtLogin.enabled)
             application.openAtLogin = openAtLogin.checked;
-        application.showOfflineContacts = showOfflineContacts.checked;
-        application.sortContactsByStatus = sortContactsByStatus.checked;
+        application.settings.showOfflineContacts = showOfflineContacts.checked;
+        application.settings.sortContactsByStatus = sortContactsByStatus.checked;
     }
 
     color: 'transparent'
@@ -57,7 +57,7 @@ Panel {
 
                 anchors.left: parent.left
                 anchors.right:  parent.right
-                checked: application.showOfflineContacts
+                checked: application.settings.showOfflineContacts
                 text: qsTr('Show offline contacts')
                 onClicked: checked = !checked
             }
@@ -67,7 +67,7 @@ Panel {
 
                 anchors.left: parent.left
                 anchors.right:  parent.right
-                checked: application.sortContactsByStatus
+                checked: application.settings.sortContactsByStatus
                 text: qsTr('Sort contacts by status')
                 onClicked: checked = !checked
             }

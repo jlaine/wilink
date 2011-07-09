@@ -152,8 +152,8 @@ Panel {
 
                 dynamicSortFilter: true
                 sortCaseSensitivity: Qt.CaseInsensitive
-                sortRole: application.sortContactsByStatus ? RosterModel.StatusSortRole : RosterModel.NameRole
-                sourceModel: application.showOfflineContacts ? rosterModel : onlineContacts
+                sortRole: application.settings.sortContactsByStatus ? RosterModel.StatusSortRole : RosterModel.NameRole
+                sourceModel: application.settings.showOfflineContacts ? rosterModel : onlineContacts
                 Component.onCompleted: sort(0)
             }
 

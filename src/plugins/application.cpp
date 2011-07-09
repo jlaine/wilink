@@ -650,45 +650,6 @@ Notification *Application::showMessage(const QString &title, const QString &mess
     return handle;
 }
 
-/** Returns true if offline contacts should be displayed.
- */
-bool Application::showOfflineContacts() const
-{
-    return d->settings->value("ShowOfflineContacts", true).toBool();
-}
-
-/** Sets whether offline contacts should be displayed.
- *
- * @param show
- */
-void Application::setShowOfflineContacts(bool show)
-{
-    if (show != showOfflineContacts()) {
-        d->settings->setValue("ShowOfflineContacts", show);
-        emit showOfflineContactsChanged(show);
-    }
-}
-
-/** Returns true if offline contacts should be displayed.
- */
-bool Application::sortContactsByStatus() const
-{
-    return d->settings->value("SortContactsByStatus", true).toBool();
-}
-
-/** Sets whether contacts should be sorted by status.
- *
- * @param sort
- */
-void Application::setSortContactsByStatus(bool sort)
-{
-    if (sort != sortContactsByStatus())
-    {
-        d->settings->setValue("SortContactsByStatus", sort);
-        emit sortContactsByStatusChanged(sort);
-    }
-}
-
 #ifdef USE_SYSTRAY
 void Application::trayActivated(QSystemTrayIcon::ActivationReason reason)
 {
@@ -799,6 +760,45 @@ void ApplicationSettings::setSharesLocation(const QString &location)
     if (location != sharesLocation()) {
         d->settings->setValue("SharesLocation", location);
         emit sharesLocationChanged(sharesLocation());
+    }
+}
+
+/** Returns true if offline contacts should be displayed.
+ */
+bool ApplicationSettings::showOfflineContacts() const
+{
+    return d->settings->value("ShowOfflineContacts", true).toBool();
+}
+
+/** Sets whether offline contacts should be displayed.
+ *
+ * @param show
+ */
+void ApplicationSettings::setShowOfflineContacts(bool show)
+{
+    if (show != showOfflineContacts()) {
+        d->settings->setValue("ShowOfflineContacts", show);
+        emit showOfflineContactsChanged(show);
+    }
+}
+
+/** Returns true if offline contacts should be displayed.
+ */
+bool ApplicationSettings::sortContactsByStatus() const
+{
+    return d->settings->value("SortContactsByStatus", true).toBool();
+}
+
+/** Sets whether contacts should be sorted by status.
+ *
+ * @param sort
+ */
+void ApplicationSettings::setSortContactsByStatus(bool sort)
+{
+    if (sort != sortContactsByStatus())
+    {
+        d->settings->setValue("SortContactsByStatus", sort);
+        emit sortContactsByStatusChanged(sort);
     }
 }
 
