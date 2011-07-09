@@ -530,8 +530,11 @@ void SipCallPrivate::onStateChanged()
         format.setByteOrder(QAudioFormat::LittleEndian);
         format.setSampleType(QAudioFormat::SignedInt);
 
+        // start audio input / output
         if (!audioStream) {
             audioStream = new QSoundStream(client->d->soundPlayer);
+            QObject::connect(audioStream, SIGNAL(inputVolumeChanged(int)),
+                             q, SIGNAL(inputVolumeChanged(int)));
             QObject::connect(audioStream, SIGNAL(outputVolumeChanged(int)),
                              q, SIGNAL(outputVolumeChanged(int)));
             audioStream->startOutput(format, audioChannel);
