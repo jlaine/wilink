@@ -41,6 +41,8 @@ class QSystemTrayIcon;
 class QThread;
 
 class ApplicationPrivate;
+class ApplicationSettings;
+class ApplicationSettingsPrivate;
 
 class Notification : public QObject
 {
@@ -61,10 +63,9 @@ class Application : public QApplication
     Q_PROPERTY(QString applicationVersion READ applicationVersion CONSTANT)
     Q_PROPERTY(QString organizationName READ organizationName CONSTANT)
     Q_PROPERTY(QString osType READ osType CONSTANT)
-
+    Q_PROPERTY(ApplicationSettings* settings READ settings CONSTANT)
     Q_PROPERTY(QString audioInputDeviceName READ audioInputDeviceName WRITE setAudioInputDeviceName NOTIFY audioInputDeviceChanged)
     Q_PROPERTY(QString audioOutputDeviceName READ audioOutputDeviceName WRITE setAudioOutputDeviceName NOTIFY audioOutputDeviceChanged)
-    Q_PROPERTY(QStringList chatAccounts READ chatAccounts WRITE setChatAccounts NOTIFY chatAccountsChanged)
     Q_PROPERTY(QString downloadsLocation READ downloadsLocation CONSTANT)
     Q_PROPERTY(QString incomingMessageSound READ incomingMessageSound WRITE setIncomingMessageSound NOTIFY incomingMessageSoundChanged)
     Q_PROPERTY(QString outgoingMessageSound READ outgoingMessageSound WRITE setOutgoingMessageSound NOTIFY outgoingMessageSoundChanged)
@@ -104,14 +105,13 @@ public:
     void setAudioOutputDevice(const QAudioDeviceInfo &device);
 
     // preferences
+    ApplicationSettings *settings() const;
+
     QString audioInputDeviceName() const;
     void setAudioInputDeviceName(const QString &name);
 
     QString audioOutputDeviceName() const;
     void setAudioOutputDeviceName(const QString &name);
-
-    QStringList chatAccounts() const;
-    void setChatAccounts(const QStringList &accounts);
 
     QString downloadsLocation() const;
 
@@ -168,6 +168,66 @@ private:
     void migrateFromWdesktop();
 
     ApplicationPrivate * const d;
+};
+
+class ApplicationSettings : public QObject
+{
+    Q_OBJECT
+    Q_PROPERTY(QStringList chatAccounts READ chatAccounts WRITE setChatAccounts NOTIFY chatAccountsChanged)
+
+public:
+    ApplicationSettings(QObject *parent = 0);
+
+    QString audioInputDeviceName() const;
+    void setAudioInputDeviceName(const QString &name);
+
+    QString audioOutputDeviceName() const;
+    void setAudioOutputDeviceName(const QString &name);
+
+    QStringList chatAccounts() const;
+    void setChatAccounts(const QStringList &accounts);
+
+    QString downloadsLocation() const;
+
+    bool openAtLogin() const;
+    void setOpenAtLogin(bool run);
+
+    QString incomingMessageSound() const;
+    void setIncomingMessageSound(const QString &soundFile);
+
+    QString outgoingMessageSound() const;
+    void setOutgoingMessageSound(const QString &soundFile);
+
+    bool sharesConfigured() const;
+    void setSharesConfigured(bool configured);
+
+    QStringList sharesDirectories() const;
+    void setSharesDirectories(const QStringList &directories);
+
+    QString sharesLocation() const;
+    void setSharesLocation(const QString &location);
+
+    bool showOfflineContacts() const;
+    void setShowOfflineContacts(bool show);
+
+    bool sortContactsByStatus() const;
+    void setSortContactsByStatus(bool sort);
+
+signals:
+    void audioInputDeviceChanged(const QAudioDeviceInfo &device);
+    void audioOutputDeviceChanged(const QAudioDeviceInfo &device);
+    void chatAccountsChanged(const QStringList &accounts);
+    void incomingMessageSoundChanged(const QString &sound);
+    void outgoingMessageSoundChanged(const QString &sound);
+    void openAtLoginChanged(bool run);
+    void sharesConfiguredChanged(bool configured);
+    void sharesDirectoriesChanged(const QStringList &directories);
+    void sharesLocationChanged(const QString &location);
+    void showOfflineContactsChanged(bool show);
+    void sortContactsByStatusChanged(bool sort);
+
+private:
+    ApplicationSettingsPrivate *d;
 };
 
 extern Application *wApp;

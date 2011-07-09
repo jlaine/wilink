@@ -245,6 +245,7 @@ void Plugin::registerTypes(const char *uri)
     qRegisterMetaType<QXmppVideoFrame>("QXmppVideoFrame");
 
     // wiLink
+    qmlRegisterUncreatableType<ApplicationSettings>(uri, 1, 2, "ApplicationSettings", "");
     qmlRegisterType<CallAudioHelper>(uri, 1, 2, "CallAudioHelper");
     qmlRegisterType<CallVideoHelper>(uri, 1, 2, "CallVideoHelper");
     qmlRegisterType<CallVideoItem>(uri, 1, 2, "CallVideoItem");

@@ -47,8 +47,8 @@ Item {
         anchors.right: scrollBar.left
         model: ListModel {
             Component.onCompleted: {
-                for (var i in application.chatAccounts) {
-                    append({'jid': application.chatAccounts[i]});
+                for (var i in application.settings.chatAccounts) {
+                    append({'jid': application.settings.chatAccounts[i]});
                 }
             }
         }

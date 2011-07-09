@@ -50,7 +50,7 @@ FocusScope {
 
         onAccepted: {
             wallet.set(jid, password);
-            application.chatAccounts = [jid];
+            application.settings.chatAccounts = [jid];
             application.resetWindows();
         }
         onClose: application.quit()

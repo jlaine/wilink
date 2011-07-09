@@ -37,7 +37,7 @@ Panel {
         }
 
         // remove password for removed accounts
-        var oldJids = application.chatAccounts;
+        var oldJids = application.settings.chatAccounts;
         for (var i = 0; i < oldJids.length; i++) {
             var jid = oldJids[i];
             if (newJids.indexOf(jid) < 0) {
@@ -46,7 +46,7 @@ Panel {
         }
 
         // save accounts
-        application.chatAccounts = newJids;
+        application.settings.chatAccounts = newJids;
         application.resetWindows();
     }
 

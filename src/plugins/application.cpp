@@ -52,6 +52,7 @@ public:
 
     QList<QWidget*> chats;
     QSettings *settings;
+    ApplicationSettings *appSettings;
     QSoundPlayer *soundPlayer;
     QThread *soundThread;
     QAudioDeviceInfo audioInputDevice;
@@ -101,20 +102,22 @@ Application::Application(int &argc, char **argv)
     /* initialise settings */
     migrateFromWdesktop();
     d->settings = new QSettings(this);
+    d->appSettings = new ApplicationSettings(this);
+
     if (isInstalled() && openAtLogin())
         setOpenAtLogin(true);
     setAudioInputDeviceName(d->settings->value("AudioInputDevice").toString());
     setAudioOutputDeviceName(d->settings->value("AudioOutputDevice").toString());
 
     // clean acounts
-    QStringList cleanAccounts = wApp->chatAccounts();
+    QStringList cleanAccounts = d->appSettings->chatAccounts();
     foreach (const QString &jid, cleanAccounts) {
         if (!QRegExp("^[^@/ ]+@[^@/ ]+$").exactMatch(jid)) {
             qWarning("Removing bad account %s", qPrintable(jid));
             cleanAccounts.removeAll(jid);
         }
     }
-    setChatAccounts(cleanAccounts);
+    settings()->setChatAccounts(cleanAccounts);
 
     /* initialise cache and wallet */
     const QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
@@ -224,19 +227,6 @@ QString Application::cacheDirectory() const
 {
     const QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
     return QDir(dataPath).filePath("cache");
-}
-
-QStringList Application::chatAccounts() const
-{
-    return d->settings->value("ChatAccounts").toStringList();
-}
-
-void Application::setChatAccounts(const QStringList &accounts)
-{
-    if (accounts != chatAccounts()) {
-        d->settings->setValue("ChatAccounts", accounts);
-        emit chatAccountsChanged(accounts);
-    }
 }
 
 /** Create the system tray icon.
@@ -427,6 +417,11 @@ void Application::openUrl(const QUrl &url)
 }
 #endif
 
+ApplicationSettings* Application::settings() const
+{
+    return d->appSettings;
+}
+
 QString Application::incomingMessageSound() const
 {
     return d->settings->value("IncomingMessageSound").toString();
@@ -461,7 +456,7 @@ void Application::resetWindows()
     d->chats.clear();
 
     /* check we have a valid account */
-    if (chatAccounts().isEmpty()) {
+    if (d->appSettings->chatAccounts().isEmpty()) {
 
         Window *window = new Window(QUrl("qrc:/setup.qml"), QString());
 
@@ -476,7 +471,7 @@ void Application::resetWindows()
     /* connect to chat accounts */
     int xpos = 30;
     int ypos = 20;
-    const QStringList chatJids = chatAccounts();
+    const QStringList chatJids = d->appSettings->chatAccounts();
     foreach (const QString &jid, chatJids) {
         Window *window = new Window(QUrl("qrc:/main.qml"), jid);
 
@@ -779,5 +774,31 @@ QSystemTrayIcon *Application::trayIcon()
 Updater *Application::updater() const
 {
     return d->updater;
+}
+
+class ApplicationSettingsPrivate
+{
+public:
+    QSettings *settings;
+};
+
+ApplicationSettings::ApplicationSettings(QObject *parent)
+    : QObject(parent),
+    d(new ApplicationSettingsPrivate)
+{
+    d->settings = new QSettings(this);
+}
+
+QStringList ApplicationSettings::chatAccounts() const
+{
+    return d->settings->value("ChatAccounts").toStringList();
+}
+
+void ApplicationSettings::setChatAccounts(const QStringList &accounts)
+{
+    if (accounts != chatAccounts()) {
+        d->settings->setValue("ChatAccounts", accounts);
+        emit chatAccountsChanged(accounts);
+    }
 }
 
