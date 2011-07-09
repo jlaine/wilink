@@ -50,7 +50,7 @@ class PhotoDownloadItem
 {
 public:
     FileSystem *fs;
-    FileSystem::Type type;
+    FileSystem::ImageSize type;
     QUrl url;
 };
 
@@ -99,7 +99,7 @@ void PhotoCache::_q_jobFinished()
     processQueue();
 }
 
-QUrl PhotoCache::imageUrl(const QUrl &url, FileSystem::Type type, FileSystem *fs)
+QUrl PhotoCache::imageUrl(const QUrl &url, FileSystem::ImageSize type, FileSystem *fs)
 {
     const QString key = QString::number(type) + url.toString();
     if (photoImageCache.contains(key)) {
@@ -349,7 +349,7 @@ void PhotoModel::_q_jobFinished(FileSystemJob *job)
 
 /** When a photo changes, emit notifications.
  */
-void PhotoModel::_q_photoChanged(const QUrl &url, FileSystem::Type size)
+void PhotoModel::_q_photoChanged(const QUrl &url, FileSystem::ImageSize size)
 {
     foreach (ChatModelItem *ptr, rootItem->children) {
         PhotoItem *item = static_cast<PhotoItem*>(ptr);

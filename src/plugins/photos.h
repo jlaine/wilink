@@ -24,8 +24,9 @@
 #include <QSet>
 #include <QUrl>
 
+#include "filesystem.h"
+
 #include "model.h"
-#include "qnetio/filesystem.h"
 
 using namespace QNetIO;
 
@@ -40,10 +41,10 @@ class PhotoCache : public QObject
 
 public:
     static PhotoCache *instance();
-    QUrl imageUrl(const QUrl &url, FileSystem::Type size, FileSystem *fs);
+    QUrl imageUrl(const QUrl &url, FileSystem::ImageSize size, FileSystem *fs);
 
 signals:
-    void photoChanged(const QUrl &url, FileSystem::Type size);
+    void photoChanged(const QUrl &url, FileSystem::ImageSize size);
 
 private slots:
     void _q_jobFinished();
@@ -93,7 +94,7 @@ public slots:
 
 private slots:
     void _q_jobFinished(FileSystemJob *job);
-    void _q_photoChanged(const QUrl &url, FileSystem::Type size);
+    void _q_photoChanged(const QUrl &url, FileSystem::ImageSize size);
 
 private:
     FileSystem *m_fs;

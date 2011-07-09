@@ -35,7 +35,7 @@
 #include <QThread>
 #include <QUrl>
 
-#include "qnetio/wallet.h"
+#include "wallet.h"
 #include "QSoundPlayer.h"
 
 #include "application.h"

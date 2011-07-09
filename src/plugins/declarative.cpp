@@ -34,7 +34,7 @@
 #include "QSoundPlayer.h"
 #include "QSoundTester.h"
 
-#include "qnetio/wallet.h"
+#include "wallet.h"
 
 #include "application.h"
 #include "idle/idle.h"

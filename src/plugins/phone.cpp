@@ -30,8 +30,6 @@
 #include "QSoundPlayer.h"
 #include "QXmppUtils.h"
 
-#include "qnetio/wallet.h"
-
 #include "application.h"
 #include "declarative.h"
 #include "history.h"
