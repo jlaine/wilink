@@ -43,6 +43,7 @@ signals:
 
 public slots:
     int play(const QString &name, bool repeat = false);
+    QAudioDeviceInfo audioOutputDevice() const;
     void setAudioOutputDevice(const QAudioDeviceInfo &audioDevice);
     void stop(int id);
 
@@ -52,8 +53,9 @@ private slots:
     void _q_stateChanged(QAudio::State state);
 
 private:
-    QAudioDeviceInfo m_audioDevice;
     int m_readerId;
+    QAudioDeviceInfo m_inputDevice;
+    QAudioDeviceInfo m_outputDevice;
     QMap<int, QAudioOutput*> m_outputs;
     QMap<int, QSoundFile*> m_readers;
 };

@@ -27,7 +27,8 @@ QSoundPlayer::QSoundPlayer(QObject *parent)
     : QObject(parent),
     m_readerId(0)
 {
-    m_audioDevice = QAudioDeviceInfo::defaultOutputDevice();
+    m_inputDevice = QAudioDeviceInfo::defaultInputDevice();
+    m_outputDevice = QAudioDeviceInfo::defaultOutputDevice();
 }
 
 int QSoundPlayer::play(const QString &name, bool repeat)
@@ -61,9 +62,14 @@ int QSoundPlayer::play(QSoundFile *reader)
     return id;
 }
 
+QAudioDeviceInfo QSoundPlayer::audioOutputDevice() const
+{
+    return m_outputDevice;
+}
+
 void QSoundPlayer::setAudioOutputDevice(const QAudioDeviceInfo &device)
 {
-    m_audioDevice = device;
+    m_outputDevice = device;
 }
 
 void QSoundPlayer::stop(int id)
@@ -78,7 +84,7 @@ void QSoundPlayer::_q_start(int id)
     if (!reader)
         return;
 
-    QAudioOutput *output = new QAudioOutput(m_audioDevice, reader->format(), this);
+    QAudioOutput *output = new QAudioOutput(m_outputDevice, reader->format(), this);
     connect(output, SIGNAL(stateChanged(QAudio::State)),
             this, SLOT(_q_stateChanged(QAudio::State)));
     m_outputs.insert(id, output);
