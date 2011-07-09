@@ -36,13 +36,36 @@ static int bufferFor(const QAudioFormat &format)
 #endif
 }
 
-QSoundStream::QSoundStream(QSoundPlayer *player)
-    : m_audioInput(0),
-    m_audioInputMeter(0),
-    m_audioOutput(0),
-    m_audioOutputMeter(0),
-    m_soundPlayer(player)
+class QSoundStreamPrivate
 {
+public:
+    QSoundStreamPrivate();
+
+    QAudioInput *audioInput;
+    QSoundMeter *audioInputMeter;
+    QAudioOutput *audioOutput;
+    QSoundMeter *audioOutputMeter;
+    QSoundPlayer *soundPlayer;
+};
+
+QSoundStreamPrivate::QSoundStreamPrivate()
+    : audioInput(0),
+    audioInputMeter(0),
+    audioOutput(0),
+    audioOutputMeter(0),
+    soundPlayer(0)
+{
+}
+
+QSoundStream::QSoundStream(QSoundPlayer *player)
+{
+    d = new QSoundStreamPrivate;
+    d->soundPlayer = player;
+}
+
+QSoundStream::~QSoundStream()
+{
+    delete d;
 }
 
 QAudioFormat QSoundStream::pcmAudioFormat(unsigned char channels, unsigned int clockrate)
@@ -64,27 +87,27 @@ void QSoundStream::startInput(const QAudioFormat &format, QIODevice *device)
     bool check;
     Q_UNUSED(check);
 
-    if (!m_audioInput) {
+    if (!d->audioInput) {
         const int bufferSize = bufferFor(format);
 
         QTime tm;
         tm.start();
 
-        m_audioInput = new QAudioInput(m_soundPlayer->inputDevice(), format, this);
-        check = connect(m_audioInput, SIGNAL(stateChanged(QAudio::State)),
+        d->audioInput = new QAudioInput(d->soundPlayer->inputDevice(), format, this);
+        check = connect(d->audioInput, SIGNAL(stateChanged(QAudio::State)),
                         this, SLOT(_q_audioInputStateChanged()));
         Q_ASSERT(check);
 
-        m_audioInputMeter = new QSoundMeter(format, device, this);
-        check = connect(m_audioInputMeter, SIGNAL(valueChanged(int)),
+        d->audioInputMeter = new QSoundMeter(format, device, this);
+        check = connect(d->audioInputMeter, SIGNAL(valueChanged(int)),
                         this, SIGNAL(inputVolumeChanged(int)));
         Q_ASSERT(check);
 
-        m_audioInput->setBufferSize(bufferSize);
-        m_audioInput->start(m_audioInputMeter);
+        d->audioInput->setBufferSize(bufferSize);
+        d->audioInput->start(d->audioInputMeter);
 
         qDebug("Audio input initialized in %i ms", tm.elapsed());
-        qDebug("Audio input buffer size %i (asked for %i)", m_audioInput->bufferSize(), bufferSize);
+        qDebug("Audio input buffer size %i (asked for %i)", d->audioInput->bufferSize(), bufferSize);
     }
 }
 
@@ -92,12 +115,12 @@ void QSoundStream::startInput(const QAudioFormat &format, QIODevice *device)
  */
 void QSoundStream::stopInput()
 {
-    if (m_audioInput) {
-        m_audioInput->stop();
-        delete m_audioInput;
-        m_audioInput = 0;
-        delete m_audioInputMeter;
-        m_audioInputMeter = 0;
+    if (d->audioInput) {
+        d->audioInput->stop();
+        delete d->audioInput;
+        d->audioInput = 0;
+        delete d->audioInputMeter;
+        d->audioInputMeter = 0;
 
         emit inputVolumeChanged(0);
     }
@@ -110,27 +133,27 @@ void QSoundStream::startOutput(const QAudioFormat &format, QIODevice *device)
     bool check;
     Q_UNUSED(check);
 
-    if (!m_audioOutput) {
+    if (!d->audioOutput) {
         const int bufferSize = bufferFor(format);
 
         QTime tm;
         tm.start();
 
-        m_audioOutput = new QAudioOutput(m_soundPlayer->outputDevice(), format, this);
-        check = connect(m_audioOutput, SIGNAL(stateChanged(QAudio::State)),
+        d->audioOutput = new QAudioOutput(d->soundPlayer->outputDevice(), format, this);
+        check = connect(d->audioOutput, SIGNAL(stateChanged(QAudio::State)),
                         this, SLOT(_q_audioOutputStateChanged()));
         Q_ASSERT(check);
 
-        m_audioOutputMeter = new QSoundMeter(format, device, this);
-        check = connect(m_audioOutputMeter, SIGNAL(valueChanged(int)),
+        d->audioOutputMeter = new QSoundMeter(format, device, this);
+        check = connect(d->audioOutputMeter, SIGNAL(valueChanged(int)),
                         this, SIGNAL(outputVolumeChanged(int)));
         Q_ASSERT(check);
 
-        m_audioOutput->setBufferSize(bufferSize);
-        m_audioOutput->start(m_audioOutputMeter);
+        d->audioOutput->setBufferSize(bufferSize);
+        d->audioOutput->start(d->audioOutputMeter);
 
         qDebug("Audio output initialized in %i ms", tm.elapsed());
-        qDebug("Audio output buffer size %i (asked for %i)", m_audioOutput->bufferSize(), bufferSize);
+        qDebug("Audio output buffer size %i (asked for %i)", d->audioOutput->bufferSize(), bufferSize);
     }
 }
 
@@ -138,12 +161,12 @@ void QSoundStream::startOutput(const QAudioFormat &format, QIODevice *device)
  */
 void QSoundStream::stopOutput()
 {
-    if (m_audioOutput) {
-        m_audioOutput->stop();
-        delete m_audioOutput;
-        m_audioOutput = 0;
-        delete m_audioOutputMeter;
-        m_audioOutputMeter = 0;
+    if (d->audioOutput) {
+        d->audioOutput->stop();
+        delete d->audioOutput;
+        d->audioOutput = 0;
+        delete d->audioOutputMeter;
+        d->audioOutputMeter = 0;
 
         emit outputVolumeChanged(0);
     }
@@ -151,7 +174,7 @@ void QSoundStream::stopOutput()
 
 int QSoundStream::inputVolume() const
 {
-    return m_audioInputMeter ? m_audioInputMeter->value() : 0;
+    return d->audioInputMeter ? d->audioInputMeter->value() : 0;
 }
 
 int QSoundStream::maximumVolume() const
@@ -161,24 +184,24 @@ int QSoundStream::maximumVolume() const
 
 int QSoundStream::outputVolume() const
 {
-    return m_audioOutputMeter ? m_audioOutputMeter->value() : 0;
+    return d->audioOutputMeter ? d->audioOutputMeter->value() : 0;
 }
 
 void QSoundStream::_q_audioInputStateChanged()
 {
 #if 0
     qDebug("Audio input state %i error %i",
-           m_audioInput->state(),
-           m_audioInput->error());
+           d->audioInput->state(),
+           d->audioInput->error());
 #endif
 
     // Restart audio input if we get an underrun.
     //
     // NOTE: seen on Mac OS X 10.6
-    if (m_audioInput->state() == QAudio::IdleState &&
-            m_audioInput->error() == QAudio::UnderrunError) {
+    if (d->audioInput->state() == QAudio::IdleState &&
+            d->audioInput->error() == QAudio::UnderrunError) {
         qWarning("Audio input needs restart due to buffer underrun");
-        m_audioInput->start(m_audioInputMeter);
+        d->audioInput->start(d->audioInputMeter);
     }
 }
 
@@ -186,16 +209,16 @@ void QSoundStream::_q_audioOutputStateChanged()
 {
 #if 0
     qDebug("Audio output state %i error %i",
-           m_audioOutput->state(),
-           m_audioOutput->error());
+           d->audioOutput->state(),
+           d->audioOutput->error());
 #endif
 
     // Restart audio output if we get an underrun.
     //
     // NOTE: seen on Linux with pulseaudio
-    if (m_audioOutput->state() == QAudio::IdleState &&
-            m_audioOutput->error() == QAudio::UnderrunError) {
+    if (d->audioOutput->state() == QAudio::IdleState &&
+            d->audioOutput->error() == QAudio::UnderrunError) {
         qWarning("Audio output needs restart due to buffer underrun");
-        m_audioOutput->start(m_audioOutputMeter);
+        d->audioOutput->start(d->audioOutputMeter);
     }
 }

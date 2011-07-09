@@ -23,10 +23,8 @@
 #include <QIODevice>
 
 class QAudioFormat;
-class QAudioInput;
-class QAudioOutput;
-class QSoundMeter;
 class QSoundPlayer;
+class QSoundStreamPrivate;
 
 class QSoundStream : public QObject
 {
@@ -37,6 +35,7 @@ class QSoundStream : public QObject
 
 public:
     QSoundStream(QSoundPlayer *player);
+    ~QSoundStream();
 
     int inputVolume() const;
     int maximumVolume() const;
@@ -62,11 +61,7 @@ private slots:
     void _q_audioOutputStateChanged();
 
 private:
-    QAudioInput *m_audioInput;
-    QSoundMeter *m_audioInputMeter;
-    QAudioOutput *m_audioOutput;
-    QSoundMeter *m_audioOutputMeter;
-    QSoundPlayer *m_soundPlayer;
+    QSoundStreamPrivate *d;
 };
 
 #endif
