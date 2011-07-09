@@ -155,11 +155,16 @@ private:
 
 class NetworkAccessManager : public QNetworkAccessManager
 {
+    Q_OBJECT
+
 public:
     NetworkAccessManager(QObject *parent = 0);
 
 protected:
     virtual QNetworkReply *createRequest(Operation op, const QNetworkRequest &req, QIODevice *outgoingData = 0);
+
+private slots:
+    void onSslErrors(QNetworkReply *reply, const QList<QSslError> &errors);
 };
 
 class NetworkAccessManagerFactory : public QDeclarativeNetworkAccessManagerFactory

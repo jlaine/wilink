@@ -260,7 +260,7 @@ void PhotoModel::refresh()
 
         FileSystem::setNetworkAccessManagerFactory(new PhotoNetworkAccessManagerFactory);
 
-        m_fs = FileSystem::factory(m_rootUrl, this);
+        m_fs = FileSystem::create(m_rootUrl, this);
         check = connect(m_fs, SIGNAL(jobFinished(FileSystemJob*)),
                         this, SLOT(_q_jobFinished(FileSystemJob*)));
         Q_ASSERT(check);

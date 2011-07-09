@@ -22,6 +22,7 @@
 #include <QDeclarativeEngine>
 #include <QNetworkDiskCache>
 #include <QNetworkRequest>
+#include <QSslError>
 
 #include "QXmppCallManager.h"
 #include "QXmppDiscoveryManager.h"
@@ -152,6 +153,17 @@ QNetworkReply *NetworkAccessManager::createRequest(Operation op, const QNetworkR
     request.setRawHeader("Accept-Language", QLocale::system().name().toAscii());
     request.setRawHeader("User-Agent", QString(qApp->applicationName() + "/" + qApp->applicationVersion()).toAscii());
     return QNetworkAccessManager::createRequest(op, request, outgoingData);
+}
+
+void NetworkAccessManager::onSslErrors(QNetworkReply *reply, const QList<QSslError> &errors)
+{
+    QList<QSslError>::const_iterator iter;
+
+    qWarning("Wallet SSL errors:");
+    for (iter = errors.constBegin(); iter != errors.constEnd(); iter++)
+        qWarning("* %s", qPrintable(iter->errorString()));
+
+    reply->ignoreSslErrors();
 }
 
 DeclarativeWallet::DeclarativeWallet(QObject *parent)
