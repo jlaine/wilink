@@ -122,13 +122,13 @@ Application::Application(int &argc, char **argv)
     d->soundThread = new QThread(this);
     d->soundThread->start();
     d->soundPlayer = new QSoundPlayer;
-    d->soundPlayer->setAudioInputDeviceName(d->appSettings->audioInputDeviceName());
+    d->soundPlayer->setInputDeviceName(d->appSettings->audioInputDeviceName());
     check = connect(d->appSettings, SIGNAL(audioInputDeviceNameChanged(QString)),
-                    d->soundPlayer, SLOT(setAudioInputDeviceName(QString)));
+                    d->soundPlayer, SLOT(setInputDeviceName(QString)));
     Q_ASSERT(check);
-    d->soundPlayer->setAudioOutputDeviceName(d->appSettings->audioOutputDeviceName());
+    d->soundPlayer->setOutputDeviceName(d->appSettings->audioOutputDeviceName());
     check = connect(d->appSettings, SIGNAL(audioOutputDeviceNameChanged(QString)),
-                    d->soundPlayer, SLOT(setAudioOutputDeviceName(QString)));
+                    d->soundPlayer, SLOT(setOutputDeviceName(QString)));
     Q_ASSERT(check);
     d->soundPlayer->moveToThread(d->soundThread);
 

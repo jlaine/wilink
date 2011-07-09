@@ -547,7 +547,7 @@ void SipCallPrivate::onStateChanged()
         if (!audioOutput) {
             QTime tm;
             tm.start();
-            audioOutput = new QAudioOutput(client->d->soundPlayer->audioOutputDevice(), format, q);
+            audioOutput = new QAudioOutput(client->d->soundPlayer->outputDevice(), format, q);
             QObject::connect(audioOutput, SIGNAL(stateChanged(QAudio::State)),
                              q, SLOT(audioStateChanged()));
             audioOutputMeter = new QSoundMeter(format, audioChannel, q);
@@ -563,7 +563,7 @@ void SipCallPrivate::onStateChanged()
         if (!audioInput) {
             QTime tm;
             tm.start();
-            audioInput = new QAudioInput(client->d->soundPlayer->audioInputDevice(), format, q);
+            audioInput = new QAudioInput(client->d->soundPlayer->inputDevice(), format, q);
             QObject::connect(audioInput, SIGNAL(stateChanged(QAudio::State)),
                              q, SLOT(audioStateChanged()));
             audioInputMeter = new QSoundMeter(format, audioChannel, q);

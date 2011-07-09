@@ -61,7 +61,7 @@ int QSoundPlayer::play(QSoundFile *reader)
     return id;
 }
 
-QAudioDeviceInfo QSoundPlayer::audioInputDevice() const
+QAudioDeviceInfo QSoundPlayer::inputDevice() const
 {
     foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioInput)) {
         if (info.deviceName() == m_inputName)
@@ -70,12 +70,20 @@ QAudioDeviceInfo QSoundPlayer::audioInputDevice() const
     return QAudioDeviceInfo::defaultInputDevice();
 }
 
-void QSoundPlayer::setAudioInputDeviceName(const QString &name)
+void QSoundPlayer::setInputDeviceName(const QString &name)
 {
     m_inputName = name;
 }
 
-QAudioDeviceInfo QSoundPlayer::audioOutputDevice() const
+QStringList QSoundPlayer::inputDeviceNames() const
+{
+    QStringList names;
+    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioInput))
+        names << info.deviceName();
+    return names;
+}
+
+QAudioDeviceInfo QSoundPlayer::outputDevice() const
 {
     foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioOutput)) {
         if (info.deviceName() == m_outputName)
@@ -84,9 +92,17 @@ QAudioDeviceInfo QSoundPlayer::audioOutputDevice() const
     return QAudioDeviceInfo::defaultOutputDevice();
 }
 
-void QSoundPlayer::setAudioOutputDeviceName(const QString &name)
+void QSoundPlayer::setOutputDeviceName(const QString &name)
 {
     m_outputName = name;
+}
+
+QStringList QSoundPlayer::outputDeviceNames() const
+{
+    QStringList names;
+    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioOutput))
+        names << info.deviceName();
+    return names;
 }
 
 void QSoundPlayer::stop(int id)
@@ -101,7 +117,7 @@ void QSoundPlayer::_q_start(int id)
     if (!reader)
         return;
 
-    QAudioOutput *output = new QAudioOutput(audioOutputDevice(), reader->format(), this);
+    QAudioOutput *output = new QAudioOutput(outputDevice(), reader->format(), this);
     connect(output, SIGNAL(stateChanged(QAudio::State)),
             this, SLOT(_q_stateChanged(QAudio::State)));
     m_outputs.insert(id, output);

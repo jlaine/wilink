@@ -52,7 +52,7 @@ void QSoundStream::startInput(const QAudioFormat &format, QIODevice *device)
     Q_UNUSED(check);
 
     if (!m_audioInput) {
-        m_audioInput = new QAudioInput(m_soundPlayer->audioInputDevice(), format, this);
+        m_audioInput = new QAudioInput(m_soundPlayer->inputDevice(), format, this);
         check = connect(m_audioInput, SIGNAL(stateChanged(QAudio::State)),
                         this, SLOT(_q_audioInputStateChanged()));
         Q_ASSERT(check);
@@ -90,7 +90,7 @@ void QSoundStream::startOutput(const QAudioFormat &format, QIODevice *device)
     Q_UNUSED(check);
 
     if (!m_audioOutput) {
-        m_audioOutput = new QAudioOutput(m_soundPlayer->audioOutputDevice(), format, this);
+        m_audioOutput = new QAudioOutput(m_soundPlayer->outputDevice(), format, this);
         check = connect(m_audioOutput, SIGNAL(stateChanged(QAudio::State)),
                         this, SLOT(_q_audioOutputStateChanged()));
         Q_ASSERT(check);
