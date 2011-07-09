@@ -18,8 +18,6 @@
  */
 
 #include <QAudioFormat>
-#include <QAudioInput>
-#include <QAudioOutput>
 #include <QDeclarativeItem>
 #include <QFile>
 #include <QHostInfo>
@@ -73,130 +71,16 @@ void DeclarativePen::setWidth(int w)
     emit penChanged();
 }
 
-CallAudioHelperPrivate::CallAudioHelperPrivate(CallAudioHelper *qq)
-    : QObject(0),
-    m_audioInput(0),
-    m_audioInputMeter(0),
-    m_audioOutput(0),
-    m_audioOutputMeter(0),
-    q(qq)
-{
-}
-
-void CallAudioHelperPrivate::audioModeChanged(QIODevice::OpenMode mode)
-{
-    bool check;
-    Q_UNUSED(check);
-
-    //qDebug("audio mode changed %i", (int)mode);
-    Q_ASSERT(m_channel);
-
-    QAudioFormat format = formatFor(m_channel->payloadType());
-
-#ifdef Q_OS_MAC
-    // 128ms at 8kHz
-    const int bufferSize = 2048 * format.channels();
-#else
-    // 160ms at 8kHz
-    const int bufferSize = 2560 * format.channels();
-#endif
-
-    // start or stop playback
-    const bool canRead = (mode & QIODevice::ReadOnly);
-    if (canRead && !m_audioOutput) {
-        m_audioOutput = new QAudioOutput(wApp->soundPlayer()->outputDevice(), format, this);
-        check = connect(m_audioOutput, SIGNAL(stateChanged(QAudio::State)),
-                        this, SLOT(audioStateChanged()));
-        Q_ASSERT(check);
-
-        m_audioOutputMeter = new QSoundMeter(format, m_channel, this);
-        check = connect(m_audioOutputMeter, SIGNAL(valueChanged(int)),
-                        q, SIGNAL(outputVolumeChanged(int)));
-        Q_ASSERT(check);
-
-        m_audioOutput->setBufferSize(bufferSize);
-        m_audioOutput->start(m_audioOutputMeter);
-    } else if (!canRead && m_audioOutput) {
-        m_audioOutput->stop();
-        delete m_audioOutput;
-        m_audioOutput = 0;
-        delete m_audioOutputMeter;
-        m_audioOutputMeter = 0;
-
-        q->outputVolumeChanged(0);
-    }
-
-    // start or stop capture
-    const bool canWrite = (mode & QIODevice::WriteOnly);
-    if (canWrite && !m_audioInput) {
-        m_audioInput = new QAudioInput(wApp->soundPlayer()->inputDevice(), format, this);
-        check = connect(m_audioInput, SIGNAL(stateChanged(QAudio::State)),
-                        this, SLOT(audioStateChanged()));
-        Q_ASSERT(check);
-
-        m_audioInputMeter = new QSoundMeter(format, m_channel, this);
-        check = connect(m_audioInputMeter, SIGNAL(valueChanged(int)),
-                        q, SIGNAL(inputVolumeChanged(int)));
-        Q_ASSERT(check);
-
-        m_audioInput->setBufferSize(bufferSize);
-        m_audioInput->start(m_audioInputMeter);
-    } else if (!canWrite && m_audioInput) {
-        m_audioInput->stop();
-        delete m_audioInput;
-        m_audioInput = 0;
-        delete m_audioInputMeter;
-        m_audioInputMeter = 0;
-
-        q->inputVolumeChanged(0);
-    }
-}
-
-void CallAudioHelperPrivate::audioStateChanged()
-{
-    QObject *audio = sender();
-    if (!audio)
-        return;
-    else if (audio == m_audioInput) {
-#if 0
-        qDebug("Audio input state %i error %i",
-            m_audioInput->state(),
-            m_audioInput->error());
-#endif
-
-        // Restart audio input if we get an underrun.
-        //
-        // NOTE: seen on Mac OS X 10.6
-        if (m_audioInput->state() == QAudio::IdleState &&
-            m_audioInput->error() == QAudio::UnderrunError) {
-            qWarning("Audio input needs restart due to buffer underrun");
-            m_audioInput->start(m_audioInputMeter);
-        }
-    }
-    else if (audio == m_audioOutput) {
-#if 0
-        qDebug("Audio output state %i error %i",
-            m_audioOutput->state(),
-            m_audioOutput->error());
-#endif
-
-        // Restart audio output if we get an underrun.
-        //
-        // NOTE: seen on Linux with pulseaudio
-        if (m_audioOutput->state() == QAudio::IdleState &&
-            m_audioOutput->error() == QAudio::UnderrunError) {
-            qWarning("Audio output needs restart due to buffer underrun");
-            m_audioOutput->start(m_audioOutputMeter);
-        }
-    }
-}
-
 CallAudioHelper::CallAudioHelper(QObject *parent)
     : QObject(parent),
     m_call(0)
 {
-    d = new CallAudioHelperPrivate(this);
-    d->moveToThread(wApp->soundThread());
+    m_stream = new QSoundStream(wApp->soundPlayer());
+    connect(m_stream, SIGNAL(inputVolumeChanged(int)),
+            this, SIGNAL(inputVolumeChanged(int)));
+    connect(m_stream, SIGNAL(outputVolumeChanged(int)),
+            this, SIGNAL(outputVolumeChanged(int)));
+    m_stream->moveToThread(wApp->soundThread());
 }
 
 CallAudioHelper::~CallAudioHelper()
@@ -223,12 +107,11 @@ void CallAudioHelper::setCall(QXmppCall *call)
         if (call) {
             bool check;
 
-            d->m_channel = call->audioChannel();
-            d->m_channel->setParent(0);
-            d->m_channel->moveToThread(wApp->soundThread());
+            call->audioChannel()->setParent(0);
+            call->audioChannel()->moveToThread(wApp->soundThread());
 
             check = connect(call, SIGNAL(audioModeChanged(QIODevice::OpenMode)),
-                            d, SLOT(audioModeChanged(QIODevice::OpenMode)));
+                            this, SLOT(_q_audioModeChanged(QIODevice::OpenMode)));
             Q_ASSERT(check);
             Q_UNUSED(check);
         }
@@ -241,17 +124,35 @@ void CallAudioHelper::setCall(QXmppCall *call)
 
 int CallAudioHelper::inputVolume() const
 {
-    return d->m_audioInputMeter ? d->m_audioInputMeter->value() : 0;
+    return m_stream->inputVolume();
 }
 
 int CallAudioHelper::maximumVolume() const
 {
-    return QSoundMeter::maximum();
+    return m_stream->maximumVolume();
 }
 
 int CallAudioHelper::outputVolume() const
 {
-    return d->m_audioOutputMeter ? d->m_audioOutputMeter->value() : 0;
+    return m_stream->outputVolume();
+}
+
+void CallAudioHelper::_q_audioModeChanged(QIODevice::OpenMode mode)
+{
+    Q_ASSERT(m_call);
+    const QAudioFormat format = formatFor(m_call->audioChannel()->payloadType());
+
+    // start or stop playback
+    if (mode & QIODevice::ReadOnly)
+        m_stream->startOutput(format, m_call->audioChannel());
+    else
+        m_stream->stopOutput();
+
+    // start or stop capture
+    if (mode & QIODevice::WriteOnly)
+        m_stream->startInput(format, m_call->audioChannel());
+    else
+        m_stream->stopInput();
 }
 
 CallVideoHelper::CallVideoHelper(QObject *parent)
