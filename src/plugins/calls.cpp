@@ -37,6 +37,7 @@
 #include "QXmppUtils.h"
 
 #include "QSoundMeter.h"
+#include "QSoundStream.h"
 #include "QSoundPlayer.h"
 #include "QVideoGrabber.h"
 

@@ -87,7 +87,6 @@ int QSoundTester::volume() const
 void QSoundTester::_q_playback()
 {
     m_stream->stopInput();
-    _q_volumeChanged(0);
 
     // start output
     m_buffer->open(QIODevice::ReadOnly);
@@ -103,7 +102,6 @@ void QSoundTester::_q_playback()
 void QSoundTester::_q_stop()
 {
     m_stream->stopOutput();
-    _q_volumeChanged(0);
 
     // update state
     m_state = IdleState;

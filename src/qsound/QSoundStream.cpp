@@ -133,7 +133,7 @@ void QSoundStream::stopOutput()
         delete m_audioOutputMeter;
         m_audioOutputMeter = 0;
 
-        outputVolumeChanged(0);
+        emit outputVolumeChanged(0);
     }
 }
 
