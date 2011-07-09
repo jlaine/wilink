@@ -40,22 +40,6 @@ int QSoundTester::duration() const
     return 5;
 }
 
-QStringList QSoundTester::inputDeviceNames() const
-{
-    QStringList names;
-    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioInput))
-        names << info.deviceName();
-    return names;
-}
-
-QStringList QSoundTester::outputDeviceNames() const
-{
-    QStringList names;
-    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioOutput))
-        names << info.deviceName();
-    return names;
-}
-
 int QSoundTester::maximumVolume() const
 {
     return QSoundMeter::maximum();

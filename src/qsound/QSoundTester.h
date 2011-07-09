@@ -20,7 +20,6 @@
 #ifndef __WILINK_SOUND_TESTER_H__
 #define __WILINK_SOUND_TESTER_H__
 
-#include <QAudioDeviceInfo>
 #include <QMap>
 #include <QObject>
 #include <QStringList>
@@ -36,8 +35,6 @@ class QSoundTester : public QSoundPlayer
     Q_OBJECT
     Q_ENUMS(State)
     Q_PROPERTY(int duration READ duration CONSTANT)
-    Q_PROPERTY(QStringList inputDeviceNames READ inputDeviceNames CONSTANT)
-    Q_PROPERTY(QStringList outputDeviceNames READ outputDeviceNames CONSTANT)
     Q_PROPERTY(State state READ state NOTIFY stateChanged)
     Q_PROPERTY(int volume READ volume NOTIFY volumeChanged)
     Q_PROPERTY(int maximumVolume READ maximumVolume CONSTANT)
@@ -51,8 +48,6 @@ public:
 
     QSoundTester(QObject *parent = 0);
     int duration() const;
-    QStringList inputDeviceNames() const;
-    QStringList outputDeviceNames() const;
     State state() const;
     int volume() const;
     int maximumVolume() const;
