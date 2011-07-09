@@ -186,6 +186,7 @@ public:
     void setWindowGeometry(const QString &key, const QByteArray &geometry);
 
 signals:
+    /// \cond
     void audioInputDeviceNameChanged(const QString &name);
     void audioOutputDeviceNameChanged(const QString &name);
     void chatAccountsChanged(const QStringList &accounts);
@@ -199,6 +200,7 @@ signals:
     void sharesLocationChanged(const QString &location);
     void showOfflineContactsChanged(bool show);
     void sortContactsByStatusChanged(bool sort);
+    /// \endcond
 
 private:
     ApplicationSettingsPrivate *d;

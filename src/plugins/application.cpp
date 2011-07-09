@@ -815,11 +815,20 @@ void ApplicationSettings::setSortContactsByStatus(bool sort)
     }
 }
 
+/** Retrieves the stored geometry of a window.
+ *
+ * @param key
+ */
 QByteArray ApplicationSettings::windowGeometry(const QString &key) const
 {
     return d->settings->value("WindowGeometry/" + key).toByteArray();
 }
 
+/** Stores the geometry of a window.
+ *
+ * @param key
+ * @param geometry
+ */
 void ApplicationSettings::setWindowGeometry(const QString &key, const QByteArray &geometry)
 {
     d->settings->setValue("WindowGeometry/" + key, geometry);
