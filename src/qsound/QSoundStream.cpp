@@ -19,6 +19,7 @@
 
 #include <QAudioInput>
 #include <QAudioOutput>
+#include <QTime>
 
 #include "QSoundMeter.h"
 #include "QSoundPlayer.h"
@@ -52,6 +53,11 @@ void QSoundStream::startInput(const QAudioFormat &format, QIODevice *device)
     Q_UNUSED(check);
 
     if (!m_audioInput) {
+        const int bufferSize = bufferFor(format);
+
+        QTime tm;
+        tm.start();
+
         m_audioInput = new QAudioInput(m_soundPlayer->inputDevice(), format, this);
         check = connect(m_audioInput, SIGNAL(stateChanged(QAudio::State)),
                         this, SLOT(_q_audioInputStateChanged()));
@@ -62,8 +68,11 @@ void QSoundStream::startInput(const QAudioFormat &format, QIODevice *device)
                         this, SIGNAL(inputVolumeChanged(int)));
         Q_ASSERT(check);
 
-        m_audioInput->setBufferSize(bufferFor(format));
+        m_audioInput->setBufferSize(bufferSize);
         m_audioInput->start(m_audioInputMeter);
+
+        qDebug("Audio input initialized in %i ms", tm.elapsed());
+        qDebug("Audio input buffer size %i (asked for %i)", m_audioInput->bufferSize(), bufferSize);
     }
 }
 
@@ -90,6 +99,11 @@ void QSoundStream::startOutput(const QAudioFormat &format, QIODevice *device)
     Q_UNUSED(check);
 
     if (!m_audioOutput) {
+        const int bufferSize = bufferFor(format);
+
+        QTime tm;
+        tm.start();
+
         m_audioOutput = new QAudioOutput(m_soundPlayer->outputDevice(), format, this);
         check = connect(m_audioOutput, SIGNAL(stateChanged(QAudio::State)),
                         this, SLOT(_q_audioOutputStateChanged()));
@@ -100,9 +114,11 @@ void QSoundStream::startOutput(const QAudioFormat &format, QIODevice *device)
                         this, SIGNAL(outputVolumeChanged(int)));
         Q_ASSERT(check);
 
-        m_audioOutput->setBufferSize(bufferFor(format));
+        m_audioOutput->setBufferSize(bufferSize);
         m_audioOutput->start(m_audioOutputMeter);
 
+        qDebug("Audio output initialized in %i ms", tm.elapsed());
+        qDebug("Audio output buffer size %i (asked for %i)", m_audioOutput->bufferSize(), bufferSize);
     }
 }
 
