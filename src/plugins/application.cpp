@@ -422,32 +422,6 @@ ApplicationSettings* Application::settings() const
     return d->appSettings;
 }
 
-QString Application::incomingMessageSound() const
-{
-    return d->settings->value("IncomingMessageSound").toString();
-}
-
-void Application::setIncomingMessageSound(const QString &soundFile)
-{
-    if (soundFile != incomingMessageSound()) {
-        d->settings->setValue("IncomingMessageSound", soundFile);
-        emit incomingMessageSoundChanged(soundFile);
-    }
-}
-
-QString Application::outgoingMessageSound() const
-{
-    return d->settings->value("OutgoingMessageSound").toString();
-}
-
-void Application::setOutgoingMessageSound(const QString &soundFile)
-{
-    if (soundFile != outgoingMessageSound()) {
-        d->settings->setValue("OutgoingMessageSound", soundFile);
-        emit outgoingMessageSoundChanged(soundFile);
-    }
-}
-
 void Application::resetWindows()
 {
     /* close any existing windows */
@@ -715,6 +689,32 @@ QString ApplicationSettings::downloadsLocation() const
     return QDesktopServices::storageLocation(QDesktopServices::DesktopLocation);
 #endif
     return QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation);
+}
+
+QString ApplicationSettings::incomingMessageSound() const
+{
+    return d->settings->value("IncomingMessageSound").toString();
+}
+
+void ApplicationSettings::setIncomingMessageSound(const QString &soundFile)
+{
+    if (soundFile != incomingMessageSound()) {
+        d->settings->setValue("IncomingMessageSound", soundFile);
+        emit incomingMessageSoundChanged(soundFile);
+    }
+}
+
+QString ApplicationSettings::outgoingMessageSound() const
+{
+    return d->settings->value("OutgoingMessageSound").toString();
+}
+
+void ApplicationSettings::setOutgoingMessageSound(const QString &soundFile)
+{
+    if (soundFile != outgoingMessageSound()) {
+        d->settings->setValue("OutgoingMessageSound", soundFile);
+        emit outgoingMessageSoundChanged(soundFile);
+    }
 }
 
 /** Returns true if shares have been configured.

@@ -144,7 +144,7 @@ Panel {
                         window.alert();
 
                         // play a sound
-                        application.soundPlayer.play(application.incomingMessageSound);
+                        application.soundPlayer.play(application.settings.incomingMessageSound);
 
                         // add pending message
                         roomListModel.addPendingMessage(jid);
@@ -177,7 +177,7 @@ Panel {
             var text = chatInput.text;
             if (room.sendMessage(text)) {
                 chatInput.text = '';
-                application.soundPlayer.play(application.outgoingMessageSound);
+                application.soundPlayer.play(application.settings.outgoingMessageSound);
             }
         }
     }

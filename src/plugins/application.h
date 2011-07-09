@@ -66,8 +66,6 @@ class Application : public QApplication
     Q_PROPERTY(ApplicationSettings* settings READ settings CONSTANT)
     Q_PROPERTY(QString audioInputDeviceName READ audioInputDeviceName WRITE setAudioInputDeviceName NOTIFY audioInputDeviceChanged)
     Q_PROPERTY(QString audioOutputDeviceName READ audioOutputDeviceName WRITE setAudioOutputDeviceName NOTIFY audioOutputDeviceChanged)
-    Q_PROPERTY(QString incomingMessageSound READ incomingMessageSound WRITE setIncomingMessageSound NOTIFY incomingMessageSoundChanged)
-    Q_PROPERTY(QString outgoingMessageSound READ outgoingMessageSound WRITE setOutgoingMessageSound NOTIFY outgoingMessageSoundChanged)
     Q_PROPERTY(bool isInstalled READ isInstalled CONSTANT)
     Q_PROPERTY(bool openAtLogin READ openAtLogin WRITE setOpenAtLogin NOTIFY openAtLoginChanged)
     Q_PROPERTY(QSoundPlayer* soundPlayer READ soundPlayer CONSTANT)
@@ -110,12 +108,6 @@ public:
     bool openAtLogin() const;
     void setOpenAtLogin(bool run);
 
-    QString incomingMessageSound() const;
-    void setIncomingMessageSound(const QString &soundFile);
-
-    QString outgoingMessageSound() const;
-    void setOutgoingMessageSound(const QString &soundFile);
-
 signals:
     void audioInputDeviceChanged(const QAudioDeviceInfo &device);
     void audioOutputDeviceChanged(const QAudioDeviceInfo &device);
@@ -146,6 +138,8 @@ class ApplicationSettings : public QObject
     Q_OBJECT
     Q_PROPERTY(QStringList chatAccounts READ chatAccounts WRITE setChatAccounts NOTIFY chatAccountsChanged)
     Q_PROPERTY(QString downloadsLocation READ downloadsLocation CONSTANT)
+    Q_PROPERTY(QString incomingMessageSound READ incomingMessageSound WRITE setIncomingMessageSound NOTIFY incomingMessageSoundChanged)
+    Q_PROPERTY(QString outgoingMessageSound READ outgoingMessageSound WRITE setOutgoingMessageSound NOTIFY outgoingMessageSoundChanged)
     Q_PROPERTY(bool sharesConfigured READ sharesConfigured WRITE setSharesConfigured NOTIFY sharesConfiguredChanged)
     Q_PROPERTY(QStringList sharesDirectories READ sharesDirectories WRITE setSharesDirectories NOTIFY sharesDirectoriesChanged)
     Q_PROPERTY(QString sharesLocation READ sharesLocation WRITE setSharesLocation NOTIFY sharesLocationChanged)

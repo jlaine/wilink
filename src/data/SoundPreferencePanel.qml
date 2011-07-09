@@ -35,8 +35,8 @@ Panel {
         }
 
         // notifications
-        application.incomingMessageSound = incomingMessageSound.checked ? ':/message-incoming.ogg' : '';
-        application.outgoingMessageSound = outgoingMessageSound.checked ? ':/message-outgoing.ogg' : '';
+        application.settings.incomingMessageSound = incomingMessageSound.checked ? ':/message-incoming.ogg' : '';
+        application.settings.outgoingMessageSound = outgoingMessageSound.checked ? ':/message-outgoing.ogg' : '';
     }
 
     color: 'transparent'
@@ -222,7 +222,7 @@ Panel {
 
                 anchors.left: parent.left
                 anchors.right:  parent.right
-                checked: application.incomingMessageSound.length > 0
+                checked: application.settings.incomingMessageSound.length > 0
                 text: qsTr('Incoming message')
                 onClicked: checked = !checked
             }
@@ -232,7 +232,7 @@ Panel {
 
                 anchors.left: parent.left
                 anchors.right:  parent.right
-                checked: application.outgoingMessageSound.length > 0
+                checked: application.settings.outgoingMessageSound.length > 0
                 text: qsTr('Outgoing message')
                 onClicked: checked = !checked
             }
