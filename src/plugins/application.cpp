@@ -501,11 +501,17 @@ ApplicationSettings::ApplicationSettings(QObject *parent)
     setChatAccounts(cleanAccounts);
 }
 
+/** Returns the name of the audio input device.
+ */
 QString ApplicationSettings::audioInputDeviceName() const
 {
     return d->settings->value("AudioInputDevice").toString();
 }
 
+/** Sets the name of the audio input device.
+ *
+ * @param name
+ */
 void ApplicationSettings::setAudioInputDeviceName(const QString &name)
 {
     if (name != audioInputDeviceName()) {
@@ -514,11 +520,17 @@ void ApplicationSettings::setAudioInputDeviceName(const QString &name)
     }
 }
 
+/** Returns the name of the audio output device.
+ */
 QString ApplicationSettings::audioOutputDeviceName() const
 {
     return d->settings->value("AudioOutputDevice").toString();
 }
 
+/** Sets the name of the audio output device.
+ *
+ * @param name
+ */
 void ApplicationSettings::setAudioOutputDeviceName(const QString &name)
 {
     if (name != audioOutputDeviceName()) {
@@ -582,11 +594,17 @@ void ApplicationSettings::setIncomingMessageSound(const QString &soundFile)
     }
 }
 
+/** Returns the last version of the application which was run.
+ */
 QString ApplicationSettings::lastRunVersion() const
 {
     return d->settings->value("LastRunVersion").toString();
 }
 
+/** Sets the last version of the application which was run.
+ *
+ * @param version
+ */
 void ApplicationSettings::setLastRunVersion(const QString &version)
 {
     if (version != lastRunVersion()) {
@@ -681,11 +699,17 @@ void ApplicationSettings::setOutgoingMessageSound(const QString &soundFile)
     }
 }
 
+/** Returns the list of recently used media URLs.
+ */
 QStringList ApplicationSettings::playerUrls() const
 {
     return d->settings->value("PlayerUrls").toStringList();
 }
 
+/** Sets the list of recently used media URLs.
+ *
+ * @param urls
+ */
 void ApplicationSettings::setPlayerUrls(const QStringList &urls)
 {
     if (urls != playerUrls()) {
