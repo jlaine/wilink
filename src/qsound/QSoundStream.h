@@ -59,7 +59,7 @@ private slots:
     void _q_audioInputStateChanged();
     void _q_audioOutputStateChanged();
 
-public:
+private:
     QAudioInput *m_audioInput;
     QSoundMeter *m_audioInputMeter;
     QAudioOutput *m_audioOutput;
