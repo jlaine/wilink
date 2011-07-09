@@ -45,8 +45,6 @@
 
 Application *wApp = 0;
 
-static QList<QObject*> trayContexts;
-
 class ApplicationPrivate
 {
 public:
@@ -770,11 +768,6 @@ void Application::trayClicked()
         QMetaObject::invokeMethod(d->trayNotification, "clicked");
         d->trayNotification = 0;
     }
-}
-
-void Application::trayContextDestroyed(QObject *context)
-{
-    trayContexts.removeAll(context);
 }
 
 QSystemTrayIcon *Application::trayIcon()
