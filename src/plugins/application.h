@@ -133,12 +133,15 @@ private:
     ApplicationPrivate * const d;
 };
 
+/** The ApplicationSettings class represents the Application's settings.
+ */
 class ApplicationSettings : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QStringList chatAccounts READ chatAccounts WRITE setChatAccounts NOTIFY chatAccountsChanged)
     Q_PROPERTY(QString downloadsLocation READ downloadsLocation CONSTANT)
     Q_PROPERTY(QString incomingMessageSound READ incomingMessageSound WRITE setIncomingMessageSound NOTIFY incomingMessageSoundChanged)
+    Q_PROPERTY(QString lastRunVersion READ lastRunVersion WRITE setLastRunVersion NOTIFY lastRunVersionChanged)
     Q_PROPERTY(QString outgoingMessageSound READ outgoingMessageSound WRITE setOutgoingMessageSound NOTIFY outgoingMessageSoundChanged)
     Q_PROPERTY(bool sharesConfigured READ sharesConfigured WRITE setSharesConfigured NOTIFY sharesConfiguredChanged)
     Q_PROPERTY(QStringList sharesDirectories READ sharesDirectories WRITE setSharesDirectories NOTIFY sharesDirectoriesChanged)
@@ -166,6 +169,9 @@ public:
     QString incomingMessageSound() const;
     void setIncomingMessageSound(const QString &soundFile);
 
+    QString lastRunVersion() const;
+    void setLastRunVersion(const QString &version);
+
     QString outgoingMessageSound() const;
     void setOutgoingMessageSound(const QString &soundFile);
 
@@ -189,6 +195,7 @@ signals:
     void audioOutputDeviceChanged(const QAudioDeviceInfo &device);
     void chatAccountsChanged(const QStringList &accounts);
     void incomingMessageSoundChanged(const QString &sound);
+    void lastRunVersionChanged(const QString &version);
     void outgoingMessageSoundChanged(const QString &sound);
     void openAtLoginChanged(bool run);
     void sharesConfiguredChanged(bool configured);

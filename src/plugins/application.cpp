@@ -122,13 +122,13 @@ Application::Application(int &argc, char **argv)
     /* initialise cache and wallet */
     const QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
     QDir().mkpath(dataPath);
-    const QString lastRunVersion = d->settings->value("LastRunVersion").toString();
+    const QString lastRunVersion = d->appSettings->lastRunVersion();
     if (lastRunVersion.isEmpty() || Updater::compareVersions(lastRunVersion, "1.1.900") < 0) {
         QNetworkDiskCache cache;
         cache.setCacheDirectory(QDir(dataPath).filePath("cache"));
         cache.clear();
     }
-    d->settings->setValue("LastRunVersion", WILINK_VERSION);
+    d->appSettings->setLastRunVersion(WILINK_VERSION);
     QNetIO::Wallet::setDataPath(QDir(dataPath).filePath("wallet"));
 
     // FIXME: register URL handler
@@ -663,11 +663,17 @@ ApplicationSettings::ApplicationSettings(QObject *parent)
     d->settings = new QSettings(this);
 }
 
+/** Returns the list of chat account JIDs.
+ */
 QStringList ApplicationSettings::chatAccounts() const
 {
     return d->settings->value("ChatAccounts").toStringList();
 }
 
+/** Sets the list of chat account JIDs.
+ *
+ * @param accounts
+ */
 void ApplicationSettings::setChatAccounts(const QStringList &accounts)
 {
     if (accounts != chatAccounts()) {
@@ -676,6 +682,8 @@ void ApplicationSettings::setChatAccounts(const QStringList &accounts)
     }
 }
 
+/** Returns the directory where downloaded files are stored.
+ */
 QString ApplicationSettings::downloadsLocation() const
 {
     QStringList dirNames = QStringList() << "Downloads" << "Download";
@@ -691,11 +699,17 @@ QString ApplicationSettings::downloadsLocation() const
     return QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation);
 }
 
+/** Returns the sound to play for incoming messages.
+ */
 QString ApplicationSettings::incomingMessageSound() const
 {
     return d->settings->value("IncomingMessageSound").toString();
 }
 
+/** Sets the sound to play for incoming messages.
+ *
+ * @param soundFile
+ */
 void ApplicationSettings::setIncomingMessageSound(const QString &soundFile)
 {
     if (soundFile != incomingMessageSound()) {
@@ -704,11 +718,30 @@ void ApplicationSettings::setIncomingMessageSound(const QString &soundFile)
     }
 }
 
+QString ApplicationSettings::lastRunVersion() const
+{
+    return d->settings->value("LastRunVersion").toString();
+}
+
+void ApplicationSettings::setLastRunVersion(const QString &version)
+{
+    if (version != lastRunVersion()) {
+        d->settings->setValue("LastRunVersion", version);
+        emit lastRunVersionChanged(version);
+    }
+}
+
+/** Returns the sound to play for outgoing messages.
+ */
 QString ApplicationSettings::outgoingMessageSound() const
 {
     return d->settings->value("OutgoingMessageSound").toString();
 }
 
+/** Sets the sound to play for outgoing messages.
+ *
+ * @param soundFile
+ */
 void ApplicationSettings::setOutgoingMessageSound(const QString &soundFile)
 {
     if (soundFile != outgoingMessageSound()) {
@@ -734,11 +767,17 @@ void ApplicationSettings::setSharesConfigured(bool configured)
     }
 }
 
+/** Returns the list of shared directories.
+ */
 QStringList ApplicationSettings::sharesDirectories() const
 {
     return d->settings->value("SharesDirectories").toStringList();
 }
 
+/** Sets the list of shared directories.
+ *
+ * @param directories
+ */
 void ApplicationSettings::setSharesDirectories(const QStringList &directories)
 {
     if (directories != sharesDirectories()) {
@@ -747,6 +786,8 @@ void ApplicationSettings::setSharesDirectories(const QStringList &directories)
     }
 }
 
+/** Returns the base share directory.
+ */
 QString ApplicationSettings::sharesLocation() const
 {
     QString sharesDirectory = d->settings->value("SharesLocation",  QDir::home().filePath("Public")).toString();
@@ -755,6 +796,10 @@ QString ApplicationSettings::sharesLocation() const
     return sharesDirectory;
 }
 
+/** Sets the base share directory.
+ *
+ * @param location
+ */
 void ApplicationSettings::setSharesLocation(const QString &location)
 {
     if (location != sharesLocation()) {
