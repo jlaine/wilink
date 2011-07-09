@@ -30,6 +30,7 @@
 #include <QTimer>
 
 #include "QSoundMeter.h"
+#include "QSoundPlayer.h"
 
 #include "QXmppRtpChannel.h"
 #include "QXmppSaslAuth.h"
@@ -546,7 +547,7 @@ void SipCallPrivate::onStateChanged()
         if (!audioOutput) {
             QTime tm;
             tm.start();
-            audioOutput = new QAudioOutput(client->d->outputDevice, format, q);
+            audioOutput = new QAudioOutput(client->d->soundPlayer->audioOutputDevice(), format, q);
             QObject::connect(audioOutput, SIGNAL(stateChanged(QAudio::State)),
                              q, SLOT(audioStateChanged()));
             audioOutputMeter = new QSoundMeter(format, audioChannel, q);
@@ -562,7 +563,7 @@ void SipCallPrivate::onStateChanged()
         if (!audioInput) {
             QTime tm;
             tm.start();
-            audioInput = new QAudioInput(client->d->inputDevice, format, q);
+            audioInput = new QAudioInput(client->d->soundPlayer->audioInputDevice(), format, q);
             QObject::connect(audioInput, SIGNAL(stateChanged(QAudio::State)),
                              q, SLOT(audioStateChanged()));
             audioInputMeter = new QSoundMeter(format, audioChannel, q);
@@ -869,7 +870,8 @@ void SipCall::hangup()
 }
 
 SipClientPrivate::SipClientPrivate(SipClient *qq)
-    : state(SipClient::DisconnectedState),
+    : soundPlayer(0),
+    state(SipClient::DisconnectedState),
     contactPort(0),
     stunCookie(0),
     stunDone(false),
@@ -877,8 +879,6 @@ SipClientPrivate::SipClientPrivate(SipClient *qq)
     stunServerPort(0),
     q(qq)
 {
-    inputDevice = QAudioDeviceInfo::defaultInputDevice();
-    outputDevice = QAudioDeviceInfo::defaultOutputDevice();
 }
 
 QByteArray SipClientPrivate::authorization(const SipMessage &request, const QMap<QByteArray, QByteArray> &challenge) const
@@ -1472,14 +1472,14 @@ void SipClient::setUsername(const QString &username)
     d->username = username;
 }
 
-void SipClient::setAudioInputDevice(const QAudioDeviceInfo &device)
+QSoundPlayer *SipClient::soundPlayer() const
 {
-    d->inputDevice = device;
+    return d->soundPlayer;
 }
 
-void SipClient::setAudioOutputDevice(const QAudioDeviceInfo &device)
+void SipClient::setSoundPlayer(QSoundPlayer *soundPlayer)
 {
-    d->outputDevice = device;
+    d->soundPlayer = soundPlayer;
 }
 
 SipMessage::SipMessage(const QByteArray &bytes)

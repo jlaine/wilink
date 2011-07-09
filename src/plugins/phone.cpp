@@ -115,14 +115,7 @@ PhoneCallsModel::PhoneCallsModel(QObject *parent)
 
     // sip
     m_client = new SipClient;
-    m_client->setAudioInputDevice(wApp->soundPlayer()->audioInputDevice());
-    m_client->setAudioOutputDevice(wApp->soundPlayer()->audioOutputDevice());
-    check = connect(wApp->soundPlayer(), SIGNAL(audioInputDeviceChanged(QAudioDeviceInfo)),
-                    m_client, SLOT(setAudioInputDevice(QAudioDeviceInfo)));
-    Q_ASSERT(check);
-    check = connect(wApp->soundPlayer(), SIGNAL(audioOutputDeviceChanged(QAudioDeviceInfo)),
-                    m_client, SLOT(setAudioOutputDevice(QAudioDeviceInfo)));
-    Q_ASSERT(check);
+    m_client->setSoundPlayer(wApp->soundPlayer());
     check = connect(m_client, SIGNAL(callDialled(SipCall*)),
                     this, SLOT(addCall(SipCall*)));
     Q_ASSERT(check);

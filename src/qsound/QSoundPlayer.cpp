@@ -73,7 +73,6 @@ QAudioDeviceInfo QSoundPlayer::audioInputDevice() const
 void QSoundPlayer::setAudioInputDeviceName(const QString &name)
 {
     m_inputName = name;
-    emit audioInputDeviceChanged(audioInputDevice());
 }
 
 QAudioDeviceInfo QSoundPlayer::audioOutputDevice() const
@@ -88,7 +87,6 @@ QAudioDeviceInfo QSoundPlayer::audioOutputDevice() const
 void QSoundPlayer::setAudioOutputDeviceName(const QString &name)
 {
     m_outputName = name;
-    emit audioOutputDeviceChanged(audioInputDevice());
 }
 
 void QSoundPlayer::stop(int id)

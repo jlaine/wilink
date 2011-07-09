@@ -30,6 +30,7 @@
 class QAudioDeviceInfo;
 class QHostInfo;
 class QUdpSocket;
+class QSoundPlayer;
 class QTimer;
 class QXmppRtpAudioChannel;
 class QXmppSrvInfo;
@@ -249,6 +250,9 @@ public:
     QString username() const;
     void setUsername(const QString &user);
 
+    QSoundPlayer *soundPlayer() const;
+    void setSoundPlayer(QSoundPlayer *soundPlayer);
+
 signals:
     void connected();
     void disconnected();
@@ -270,8 +274,6 @@ public slots:
     void connectToServer();
     void disconnectFromServer();
     void sendMessage(const SipMessage &message);
-    void setAudioInputDevice(const QAudioDeviceInfo &device);
-    void setAudioOutputDevice(const QAudioDeviceInfo &device);
 
 private slots:
     void callDestroyed(QObject *object);

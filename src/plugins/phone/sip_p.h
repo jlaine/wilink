@@ -100,8 +100,7 @@ public:
     void setState(SipClient::State state);
 
     // audio
-    QAudioDeviceInfo inputDevice;
-    QAudioDeviceInfo outputDevice;
+    QSoundPlayer *soundPlayer;
 
     // timers
     QTimer *connectTimer;

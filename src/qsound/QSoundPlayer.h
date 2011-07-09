@@ -42,8 +42,6 @@ public:
     int play(QSoundFile *reader);
 
 signals:
-    void audioInputDeviceChanged(const QAudioDeviceInfo &device);
-    void audioOutputDeviceChanged(const QAudioDeviceInfo &device);
     void finished(int id);
 
 public slots:
