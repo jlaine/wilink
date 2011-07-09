@@ -138,6 +138,8 @@ private:
 class ApplicationSettings : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QString audioInputDeviceName READ audioInputDeviceName WRITE setAudioInputDeviceName NOTIFY audioInputDeviceNameChanged)
+    Q_PROPERTY(QString audioOutputDeviceName READ audioOutputDeviceName WRITE setAudioOutputDeviceName NOTIFY audioOutputDeviceNameChanged)
     Q_PROPERTY(QStringList chatAccounts READ chatAccounts WRITE setChatAccounts NOTIFY chatAccountsChanged)
     Q_PROPERTY(QString downloadsLocation READ downloadsLocation CONSTANT)
     Q_PROPERTY(QString incomingMessageSound READ incomingMessageSound WRITE setIncomingMessageSound NOTIFY incomingMessageSoundChanged)
@@ -191,8 +193,8 @@ public:
     void setSortContactsByStatus(bool sort);
 
 signals:
-    void audioInputDeviceChanged(const QAudioDeviceInfo &device);
-    void audioOutputDeviceChanged(const QAudioDeviceInfo &device);
+    void audioInputDeviceNameChanged(const QString &name);
+    void audioOutputDeviceNameChanged(const QString &name);
     void chatAccountsChanged(const QStringList &accounts);
     void incomingMessageSoundChanged(const QString &sound);
     void lastRunVersionChanged(const QString &version);

@@ -663,6 +663,32 @@ ApplicationSettings::ApplicationSettings(QObject *parent)
     d->settings = new QSettings(this);
 }
 
+QString ApplicationSettings::audioInputDeviceName() const
+{
+    return d->settings->value("AudioInputDevice").toString();
+}
+
+void ApplicationSettings::setAudioInputDeviceName(const QString &name)
+{
+    if (name != audioInputDeviceName()) {
+        d->settings->setValue("AudioInputDevice", name);
+        emit audioInputDeviceNameChanged(name);
+    }
+}
+
+QString ApplicationSettings::audioOutputDeviceName() const
+{
+    return d->settings->value("AudioOutputDevice").toString();
+}
+
+void ApplicationSettings::setAudioOutputDeviceName(const QString &name)
+{
+    if (name != audioOutputDeviceName()) {
+        d->settings->setValue("AudioOutputDevice", name);
+        emit audioOutputDeviceNameChanged(name);
+    }
+}
+
 /** Returns the list of chat account JIDs.
  */
 QStringList ApplicationSettings::chatAccounts() const

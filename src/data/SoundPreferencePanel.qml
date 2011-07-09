@@ -27,11 +27,11 @@ Panel {
         // devices
         if (input.currentIndex >= 0) {
             var device = input.model.get(input.currentIndex).text;
-            application.audioInputDeviceName = device;
+            application.settings.audioInputDeviceName = device;
         }
         if (output.currentIndex >= 0) {
             var device = output.model.get(output.currentIndex).text;
-            application.audioOutputDeviceName = device;
+            application.settings.audioOutputDeviceName = device;
         }
 
         // notifications
@@ -96,7 +96,7 @@ Panel {
                     for (var i in names) {
                         var device = names[i];
                         model.append({'text': device});
-                        if (device == application.audioOutputDeviceName) {
+                        if (device == application.settings.audioOutputDeviceName) {
                             console.log("found output " + device + " at " + i);
                             output.currentIndex = i;
                         }
@@ -132,7 +132,7 @@ Panel {
                     for (var i in names) {
                         var device = names[i];
                         model.append({'text': device});
-                        if (device == application.audioInputDeviceName) {
+                        if (device == application.settings.audioInputDeviceName) {
                             console.log("found input " + device + " at " + i);
                             input.currentIndex = i;
                         }
