@@ -66,7 +66,6 @@ class Application : public QApplication
     Q_PROPERTY(ApplicationSettings* settings READ settings CONSTANT)
     Q_PROPERTY(QString audioInputDeviceName READ audioInputDeviceName WRITE setAudioInputDeviceName NOTIFY audioInputDeviceChanged)
     Q_PROPERTY(QString audioOutputDeviceName READ audioOutputDeviceName WRITE setAudioOutputDeviceName NOTIFY audioOutputDeviceChanged)
-    Q_PROPERTY(QString downloadsLocation READ downloadsLocation CONSTANT)
     Q_PROPERTY(QString incomingMessageSound READ incomingMessageSound WRITE setIncomingMessageSound NOTIFY incomingMessageSoundChanged)
     Q_PROPERTY(QString outgoingMessageSound READ outgoingMessageSound WRITE setOutgoingMessageSound NOTIFY outgoingMessageSoundChanged)
     Q_PROPERTY(bool isInstalled READ isInstalled CONSTANT)
@@ -112,8 +111,6 @@ public:
 
     QString audioOutputDeviceName() const;
     void setAudioOutputDeviceName(const QString &name);
-
-    QString downloadsLocation() const;
 
     bool openAtLogin() const;
     void setOpenAtLogin(bool run);
@@ -174,6 +171,7 @@ class ApplicationSettings : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QStringList chatAccounts READ chatAccounts WRITE setChatAccounts NOTIFY chatAccountsChanged)
+    Q_PROPERTY(QString downloadsLocation READ downloadsLocation CONSTANT)
 
 public:
     ApplicationSettings(QObject *parent = 0);

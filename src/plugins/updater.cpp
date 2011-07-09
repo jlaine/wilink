@@ -100,7 +100,7 @@ void UpdaterPrivate::fail(Updater::Error newError, const QString &newString)
 
 QString UpdaterPrivate::cacheFile() const
 {
-    return QDir(wApp->downloadsLocation()).filePath(QFileInfo(release.url.path()).fileName());
+    return QDir(wApp->settings()->downloadsLocation()).filePath(QFileInfo(release.url.path()).fileName());
 }
 
 bool UpdaterPrivate::checkCachedFile() const

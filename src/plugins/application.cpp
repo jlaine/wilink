@@ -577,21 +577,6 @@ void Application::setAudioOutputDeviceName(const QString &name)
     setAudioOutputDevice(QAudioDeviceInfo::defaultOutputDevice());
 }
 
-QString Application::downloadsLocation() const
-{
-    QStringList dirNames = QStringList() << "Downloads" << "Download";
-    foreach (const QString &dirName, dirNames)
-    {
-        QDir downloads(QDir::home().filePath(dirName));
-        if (downloads.exists())
-            return downloads.absolutePath();
-    }
-#ifdef Q_OS_WIN
-    return QDesktopServices::storageLocation(QDesktopServices::DesktopLocation);
-#endif
-    return QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation);
-}
-
 QStringList Application::sharesDirectories() const
 {
     return d->settings->value("SharesDirectories").toStringList();
@@ -800,5 +785,20 @@ void ApplicationSettings::setChatAccounts(const QStringList &accounts)
         d->settings->setValue("ChatAccounts", accounts);
         emit chatAccountsChanged(accounts);
     }
+}
+
+QString ApplicationSettings::downloadsLocation() const
+{
+    QStringList dirNames = QStringList() << "Downloads" << "Download";
+    foreach (const QString &dirName, dirNames)
+    {
+        QDir downloads(QDir::home().filePath(dirName));
+        if (downloads.exists())
+            return downloads.absolutePath();
+    }
+#ifdef Q_OS_WIN
+    return QDesktopServices::storageLocation(QDesktopServices::DesktopLocation);
+#endif
+    return QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation);
 }
 
