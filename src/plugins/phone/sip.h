@@ -27,7 +27,6 @@
 #include "QXmppCallManager.h"
 #include "QXmppLogger.h"
 
-class QAudioDeviceInfo;
 class QHostInfo;
 class QUdpSocket;
 class QSoundPlayer;

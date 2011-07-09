@@ -20,7 +20,6 @@
 #ifndef __WILINK_PHONE_SIP_P_H__
 #define __WILINK_PHONE_SIP_P_H__
 
-#include <QAudioDeviceInfo>
 #include <QHostAddress>
 #include <QMap>
 #include <QObject>
