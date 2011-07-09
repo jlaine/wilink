@@ -26,13 +26,9 @@
 
 #include "sip.h"
 
-class QAudioInput;
-class QAudioOutput;
-class QSoundMeter;
 class QSoundStream;
 class QUdpSocket;
 class QTimer;
-class QXmppRtpChannel;
 
 /** The SipCallContext class represents a SIP dialog.
  */
