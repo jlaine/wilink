@@ -100,6 +100,10 @@ Application::Application(int &argc, char **argv)
 
     /* initialise settings */
     d->appSettings = new ApplicationSettings(this);
+    connect(d->appSettings, SIGNAL(audioInputDeviceNameChanged(QString)),
+            this, SLOT(_q_audioInputDeviceNameChanged(QString)));
+    connect(d->appSettings, SIGNAL(audioOutputDeviceNameChanged(QString)),
+            this, SLOT(_q_audioOutputDeviceNameChanged(QString)));
 
     if (isInstalled() && d->appSettings->openAtLogin())
         d->appSettings->setOpenAtLogin(true);
@@ -450,6 +454,16 @@ Notification *Application::showMessage(const QString &title, const QString &mess
     Q_UNUSED(action);
 #endif
     return handle;
+}
+
+void Application::_q_audioInputDeviceNameChanged(const QString &name)
+{
+    emit audioInputDeviceChanged(audioInputDevice());
+}
+
+void Application::_q_audioOutputDeviceNameChanged(const QString &name)
+{
+    emit audioOutputDeviceChanged(audioOutputDevice());
 }
 
 #ifdef USE_SYSTRAY

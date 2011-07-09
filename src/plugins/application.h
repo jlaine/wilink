@@ -108,6 +108,9 @@ public slots:
     void showWindows();
 
 private slots:
+    void _q_audioInputDeviceNameChanged(const QString &name);
+    void _q_audioOutputDeviceNameChanged(const QString &name);
+
 #ifdef USE_SYSTRAY
     void trayActivated(QSystemTrayIcon::ActivationReason reason);
     void trayClicked();
