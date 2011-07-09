@@ -59,6 +59,8 @@ signals:
 private slots:
     void _q_audioInputStateChanged();
     void _q_audioOutputStateChanged();
+    void _q_startInput(const QAudioFormat &format, QIODevice *device);
+    void _q_startOutput(const QAudioFormat &format, QIODevice *device);
 
 private:
     QSoundStreamPrivate *d;

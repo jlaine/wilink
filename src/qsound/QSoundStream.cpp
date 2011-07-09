@@ -84,6 +84,11 @@ QAudioFormat QSoundStream::pcmAudioFormat(unsigned char channels, unsigned int c
  */
 void QSoundStream::startInput(const QAudioFormat &format, QIODevice *device)
 {
+    QMetaObject::invokeMethod(this, "_q_startInput", Q_ARG(QAudioFormat, format), Q_ARG(QIODevice*, device));
+}
+
+void QSoundStream::_q_startInput(const QAudioFormat &format, QIODevice *device)
+{
     bool check;
     Q_UNUSED(check);
 
@@ -129,6 +134,11 @@ void QSoundStream::stopInput()
 /** Starts audio playback.
  */
 void QSoundStream::startOutput(const QAudioFormat &format, QIODevice *device)
+{
+    QMetaObject::invokeMethod(this, "_q_startOutput", Q_ARG(QAudioFormat, format), Q_ARG(QIODevice*, device));
+}
+
+void QSoundStream::_q_startOutput(const QAudioFormat &format, QIODevice *device)
 {
     bool check;
     Q_UNUSED(check);
