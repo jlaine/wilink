@@ -51,7 +51,7 @@ public:
     ApplicationPrivate();
 
     QList<QWidget*> chats;
-    QSettings *settings;
+    QSettings *oldSettings;
     ApplicationSettings *appSettings;
     QSoundPlayer *soundPlayer;
     QThread *soundThread;
@@ -69,7 +69,7 @@ public:
 };
 
 ApplicationPrivate::ApplicationPrivate()
-    : settings(0),
+    : oldSettings(0),
 #ifdef USE_LIBNOTIFY
     libnotify_accepts_actions(0),
 #endif
@@ -101,13 +101,11 @@ Application::Application(int &argc, char **argv)
 
     /* initialise settings */
     migrateFromWdesktop();
-    d->settings = new QSettings(this);
+    d->oldSettings = new QSettings(this);
     d->appSettings = new ApplicationSettings(this);
 
     if (isInstalled() && openAtLogin())
         setOpenAtLogin(true);
-    setAudioInputDeviceName(d->settings->value("AudioInputDevice").toString());
-    setAudioOutputDeviceName(d->settings->value("AudioOutputDevice").toString());
 
     // clean acounts
     QStringList cleanAccounts = d->appSettings->chatAccounts();
@@ -176,7 +174,7 @@ Application::~Application()
     foreach (QWidget *chat, d->chats) {
         const QString key = chat->objectName();
         if (!key.isEmpty()) {
-            d->settings->setValue("WindowGeometry/" + key, chat->saveGeometry());
+            d->appSettings->setWindowGeometry(key, chat->saveGeometry());
         }
     }
 #endif
@@ -341,7 +339,7 @@ void Application::migrateFromWdesktop()
 
 bool Application::openAtLogin() const
 {
-    return d->settings->value("OpenAtLogin", true).toBool();
+    return d->oldSettings->value("OpenAtLogin", true).toBool();
 }
 
 void Application::setOpenAtLogin(bool run)
@@ -394,7 +392,7 @@ void Application::setOpenAtLogin(bool run)
     // store preference
     if (run != openAtLogin())
     {
-        d->settings->setValue("OpenAtLogin", run);
+        d->oldSettings->setValue("OpenAtLogin", run);
         emit openAtLoginChanged(run);
     }
 }
@@ -455,7 +453,7 @@ void Application::resetWindows()
         window->showFullScreen();
 #else
         // restore window geometry
-        const QByteArray geometry = d->settings->value("WindowGeometry/" + jid).toByteArray();
+        const QByteArray geometry = d->appSettings->windowGeometry(jid);
         if (!geometry.isEmpty()) {
             window->restoreGeometry(geometry);
         } else {
@@ -497,58 +495,24 @@ QThread *Application::soundThread()
 
 QAudioDeviceInfo Application::audioInputDevice() const
 {
-    return d->audioInputDevice;
-}
-
-void Application::setAudioInputDevice(const QAudioDeviceInfo &device)
-{
-    d->settings->setValue("AudioInputDevice", device.deviceName());
-    d->audioInputDevice = device;
-    emit audioInputDeviceChanged(device);
-}
-
-QString Application::audioInputDeviceName() const
-{
-    return d->audioInputDevice.deviceName();
-}
-
-void Application::setAudioInputDeviceName(const QString &name)
-{
+    const QString &name = d->appSettings->audioInputDeviceName();
     foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioInput)) {
         if (info.deviceName() == name) {
-            setAudioInputDevice(info);
-            return;
+            return info;
         }
     }
-    setAudioInputDevice(QAudioDeviceInfo::defaultInputDevice());
+    return QAudioDeviceInfo::defaultInputDevice();
 }
 
 QAudioDeviceInfo Application::audioOutputDevice() const
 {
-    return d->audioOutputDevice;
-}
-
-void Application::setAudioOutputDevice(const QAudioDeviceInfo &device)
-{
-    d->settings->setValue("AudioOutputDevice", device.deviceName());
-    d->audioOutputDevice = device;
-    emit audioOutputDeviceChanged(device);
-}
-
-QString Application::audioOutputDeviceName() const
-{
-    return d->audioOutputDevice.deviceName();
-}
-
-void Application::setAudioOutputDeviceName(const QString &name)
-{
+    const QString name = d->appSettings->audioOutputDeviceName();
     foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioOutput)) {
         if (info.deviceName() == name) {
-            setAudioOutputDevice(info);
-            return;
+            return info;
         }
     }
-    setAudioOutputDevice(QAudioDeviceInfo::defaultOutputDevice());
+    return QAudioDeviceInfo::defaultOutputDevice();
 }
 
 #ifdef USE_LIBNOTIFY
@@ -871,5 +835,15 @@ void ApplicationSettings::setSortContactsByStatus(bool sort)
         d->settings->setValue("SortContactsByStatus", sort);
         emit sortContactsByStatusChanged(sort);
     }
+}
+
+QByteArray ApplicationSettings::windowGeometry(const QString &key) const
+{
+    return d->settings->value("WindowGeometry/" + key).toByteArray();
+}
+
+void ApplicationSettings::setWindowGeometry(const QString &key, const QByteArray &geometry)
+{
+    d->settings->setValue("WindowGeometry/" + key, geometry);
 }
 

@@ -64,8 +64,6 @@ class Application : public QApplication
     Q_PROPERTY(QString organizationName READ organizationName CONSTANT)
     Q_PROPERTY(QString osType READ osType CONSTANT)
     Q_PROPERTY(ApplicationSettings* settings READ settings CONSTANT)
-    Q_PROPERTY(QString audioInputDeviceName READ audioInputDeviceName WRITE setAudioInputDeviceName NOTIFY audioInputDeviceChanged)
-    Q_PROPERTY(QString audioOutputDeviceName READ audioOutputDeviceName WRITE setAudioOutputDeviceName NOTIFY audioOutputDeviceChanged)
     Q_PROPERTY(bool isInstalled READ isInstalled CONSTANT)
     Q_PROPERTY(bool openAtLogin READ openAtLogin WRITE setOpenAtLogin NOTIFY openAtLoginChanged)
     Q_PROPERTY(QSoundPlayer* soundPlayer READ soundPlayer CONSTANT)
@@ -98,12 +96,6 @@ public:
 
     // preferences
     ApplicationSettings *settings() const;
-
-    QString audioInputDeviceName() const;
-    void setAudioInputDeviceName(const QString &name);
-
-    QString audioOutputDeviceName() const;
-    void setAudioOutputDeviceName(const QString &name);
 
     bool openAtLogin() const;
     void setOpenAtLogin(bool run);
@@ -191,6 +183,9 @@ public:
 
     bool sortContactsByStatus() const;
     void setSortContactsByStatus(bool sort);
+
+    QByteArray windowGeometry(const QString &key) const;
+    void setWindowGeometry(const QString &key, const QByteArray &geometry);
 
 signals:
     void audioInputDeviceNameChanged(const QString &name);
