@@ -85,6 +85,7 @@ CallAudioHelperPrivate::CallAudioHelperPrivate(CallAudioHelper *qq)
 void CallAudioHelperPrivate::audioModeChanged(QIODevice::OpenMode mode)
 {
     bool check;
+    Q_UNUSED(check);
 
     //qDebug("audio mode changed %i", (int)mode);
     Q_ASSERT(m_channel);
@@ -261,6 +262,8 @@ CallVideoHelper::CallVideoHelper(QObject *parent)
     m_videoOutput(0)
 {
     bool check;
+    Q_UNUSED(check);
+
     m_videoTimer = new QTimer(this);
     check = connect(m_videoTimer, SIGNAL(timeout()),
                     this, SLOT(videoRefresh()));
@@ -274,10 +277,12 @@ QXmppCall* CallVideoHelper::call() const
 
 void CallVideoHelper::setCall(QXmppCall *call)
 {
+    bool check;
+    Q_UNUSED(check);
+
     if (call != m_call) {
         m_call = call;
 
-        bool check;
         check = connect(call, SIGNAL(videoModeChanged(QIODevice::OpenMode)),
                         this, SLOT(videoModeChanged(QIODevice::OpenMode)));
         Q_ASSERT(check);

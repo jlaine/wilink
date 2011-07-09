@@ -600,6 +600,7 @@ SipCall::SipCall(const QString &recipient, QXmppCall::Direction direction, SipCl
     : QXmppLoggable(parent)
 {
     bool check;
+    Q_UNUSED(check);
 
     d = new SipCallPrivate(this);
     d->client = parent;
@@ -1744,6 +1745,7 @@ SipTransaction::SipTransaction(const SipMessage &request, SipClient *client, QOb
     m_state(Trying)
 {
     bool check;
+    Q_UNUSED(check);
 
     check = connect(this, SIGNAL(sendMessage(SipMessage)),
                     client, SLOT(sendMessage(SipMessage)));

@@ -41,6 +41,7 @@ ChatClient::ChatClient(QObject *parent)
     timeOffset(0)
 {
     bool check;
+    Q_UNUSED(check);
 
     check = connect(this, SIGNAL(connected()),
                     this, SLOT(slotConnected()));
