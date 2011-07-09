@@ -28,6 +28,7 @@
 #include <QPushButton>
 
 #include "QSoundPlayer.h"
+#include "QSoundStream.h"
 #include "QXmppRtpChannel.h"
 
 #include "tones.h"
@@ -137,14 +138,7 @@ ToneGui::ToneGui()
     generator = new ToneGenerator(this);
     generator->open(QIODevice::Unbuffered | QIODevice::ReadOnly);
 
-    QAudioFormat format;
-    format.setChannels(1);
-    format.setFrequency(generator->clockrate());
-    format.setSampleSize(16);
-    format.setCodec("audio/pcm");
-    format.setByteOrder(QAudioFormat::LittleEndian);
-    format.setSampleType(QAudioFormat::SignedInt);
-
+    const QAudioFormat format = QSoundStream::pcmAudioFormat(1, generator->clockrate());
     QAudioOutput *output = new QAudioOutput(format, this);
     output->setBufferSize(4096);
     output->start(generator);

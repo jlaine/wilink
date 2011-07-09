@@ -48,6 +48,8 @@ public:
     void startOutput(const QAudioFormat &format, QIODevice *device);
     void stopOutput();
 
+    static QAudioFormat pcmAudioFormat(unsigned char channels, unsigned int clockrate);
+
 signals:
     // This signal is emitted when the input volume changes.
     void inputVolumeChanged(int volume);

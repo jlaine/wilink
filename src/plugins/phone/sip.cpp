@@ -522,13 +522,9 @@ void SipCallPrivate::onStateChanged()
         startTime.start();
 
         // prepare audio format
-        QAudioFormat format;
-        format.setFrequency(audioChannel->payloadType().clockrate());
-        format.setChannels(audioChannel->payloadType().channels());
-        format.setSampleSize(16);
-        format.setCodec("audio/pcm");
-        format.setByteOrder(QAudioFormat::LittleEndian);
-        format.setSampleType(QAudioFormat::SignedInt);
+        const QAudioFormat format = QSoundStream::pcmAudioFormat(
+            audioChannel->payloadType().channels(),
+            audioChannel->payloadType().clockrate());
 
         // start audio input / output
         if (!audioStream) {

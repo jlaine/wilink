@@ -24,6 +24,7 @@
 #include <QStringList>
 
 #include "QSoundFile.h"
+#include "QSoundStream.h"
 #ifdef USE_MAD
 #include <mad.h>
 #endif
@@ -129,12 +130,9 @@ bool QSoundFileMp3::decodeFrame()
 
     // process header
     if (!m_headerFound) {
-        m_format.setChannels(MAD_NCHANNELS(&m_frame.header));
-        m_format.setFrequency(m_frame.header.samplerate);
-        m_format.setCodec("audio/pcm");
-        m_format.setByteOrder(QAudioFormat::LittleEndian);
-        m_format.setSampleSize(16);
-        m_format.setSampleType(QAudioFormat::SignedInt);
+        m_format = QSoundStream::pcmAudioFormat(
+            MAD_NCHANNELS(&m_frame.header),
+            m_frame.header.samplerate);
         m_headerFound = true;
     }
 
@@ -422,12 +420,7 @@ bool QSoundFileOgg::open(QIODevice::OpenMode mode)
     }
 
     vorbis_info *vi = ov_info(&m_vf, -1);
-    m_format.setChannels(vi->channels);
-    m_format.setFrequency(vi->rate);
-    m_format.setCodec("audio/pcm");
-    m_format.setByteOrder(QAudioFormat::LittleEndian);
-    m_format.setSampleSize(16);
-    m_format.setSampleType(QAudioFormat::SignedInt);
+    m_format = QSoundStream::pcmAudioFormat(vi->channels, vi->rate);
 
     return true;
 }

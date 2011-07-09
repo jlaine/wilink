@@ -45,6 +45,18 @@ QSoundStream::QSoundStream(QSoundPlayer *player)
 {
 }
 
+QAudioFormat QSoundStream::pcmAudioFormat(unsigned char channels, unsigned int clockrate)
+{
+    QAudioFormat format;
+    format.setChannels(channels);
+    format.setFrequency(clockrate);
+    format.setSampleSize(16);
+    format.setCodec("audio/pcm");
+    format.setByteOrder(QAudioFormat::LittleEndian);
+    format.setSampleType(QAudioFormat::SignedInt);
+    return format;
+}
+
 /** Starts audio capture.
  */
 void QSoundStream::startInput(const QAudioFormat &format, QIODevice *device)

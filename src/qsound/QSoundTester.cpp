@@ -32,15 +32,7 @@ QSoundTester::QSoundTester(QObject *parent)
     m_volume(0)
 {
     m_buffer = new QBuffer(this);
-
-    // prepare audio format
-    m_format.setFrequency(8000);
-    m_format.setChannels(1);
-    m_format.setSampleSize(16);
-    m_format.setCodec("audio/pcm");
-    m_format.setByteOrder(QAudioFormat::LittleEndian);
-    m_format.setSampleType(QAudioFormat::SignedInt);
-
+    m_format = QSoundStream::pcmAudioFormat(1, 8000);
     m_stream = new QSoundStream(this);
     connect(m_stream, SIGNAL(inputVolumeChanged(int)),
             this, SLOT(_q_volumeChanged(int)));

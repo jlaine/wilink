@@ -42,18 +42,6 @@
 #include "application.h"
 #include "calls.h"
 
-static QAudioFormat formatFor(const QXmppJinglePayloadType &type)
-{
-    QAudioFormat format;
-    format.setFrequency(type.clockrate());
-    format.setChannels(type.channels());
-    format.setSampleSize(16);
-    format.setCodec("audio/pcm");
-    format.setByteOrder(QAudioFormat::LittleEndian);
-    format.setSampleType(QAudioFormat::SignedInt);
-    return format;
-}
-
 void DeclarativePen::setColor(const QColor &c)
 {
     _color = c;
@@ -140,7 +128,10 @@ int CallAudioHelper::outputVolume() const
 void CallAudioHelper::_q_audioModeChanged(QIODevice::OpenMode mode)
 {
     Q_ASSERT(m_call);
-    const QAudioFormat format = formatFor(m_call->audioChannel()->payloadType());
+
+    const QAudioFormat format = QSoundStream::pcmAudioFormat(
+        m_call->audioChannel()->payloadType().channels(),
+        m_call->audioChannel()->payloadType().clockrate());
 
     // start or stop playback
     if (mode & QIODevice::ReadOnly)
