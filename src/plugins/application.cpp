@@ -170,6 +170,16 @@ Application::Application(int &argc, char **argv)
 
 Application::~Application()
 {
+#ifndef WILINK_EMBEDDED
+    // save window geometry
+    foreach (QWidget *chat, d->chats) {
+        const QString key = chat->objectName();
+        if (!key.isEmpty()) {
+            d->settings->setValue("WindowGeometry/" + key, chat->saveGeometry());
+        }
+    }
+#endif
+
 #ifdef USE_LIBNOTIFY
     // uninitialise libnotify
     notify_uninit();
@@ -471,25 +481,31 @@ void Application::resetWindows()
     const QStringList chatJids = chatAccounts();
     foreach (const QString &jid, chatJids) {
         Window *window = new Window(QUrl("qrc:/main.qml"), jid);
-        QSize size = QApplication::desktop()->availableGeometry(window).size();
-        size.setHeight(size.height() - 100);
-        size.setWidth((size.height() * 4.0) / 3.0);
-        window->resize(size);
 
 #ifdef WILINK_EMBEDDED
+        Q_UNUSED(xpos);
         Q_UNUSED(ypos);
         window->showFullScreen();
 #else
-        window->move(xpos, ypos);
+        // restore window geometry
+        const QByteArray geometry = d->settings->value("WindowGeometry/" + jid).toByteArray();
+        if (!geometry.isEmpty()) {
+            window->restoreGeometry(geometry);
+        } else {
+            QSize size = QApplication::desktop()->availableGeometry(window).size();
+            size.setHeight(size.height() - 100);
+            size.setWidth((size.height() * 4.0) / 3.0);
+            window->resize(size);
+            window->move(xpos, ypos);
+        }
         window->show();
 #endif
+        window->raise();
+        window->activateWindow();
 
         d->chats << window;
-        xpos += 300;
+        xpos += 100;
     }
-
-    /* show chats */
-    showWindows();
 }
 
 void Application::showWindows()
