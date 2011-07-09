@@ -43,9 +43,9 @@ public:
 
     QSoundTester(QObject *parent = 0);
     int duration() const;
+    int maximumVolume() const;
     State state() const;
     int volume() const;
-    int maximumVolume() const;
 
 signals:
     void stateChanged(State state);

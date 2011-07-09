@@ -37,14 +37,16 @@ public:
     QSoundStream(QSoundPlayer *player);
     ~QSoundStream();
 
+    void setFormat(unsigned char channels, unsigned int clockrate);
+
     int inputVolume() const;
     int maximumVolume() const;
     int outputVolume() const;
 
-    void startInput(const QAudioFormat &format, QIODevice *device);
+    void startInput(QIODevice *device);
     void stopInput();
 
-    void startOutput(const QAudioFormat &format, QIODevice *device);
+    void startOutput(QIODevice *device);
     void stopOutput();
 
     static QAudioFormat pcmAudioFormat(unsigned char channels, unsigned int clockrate);
@@ -59,8 +61,8 @@ signals:
 private slots:
     void _q_audioInputStateChanged();
     void _q_audioOutputStateChanged();
-    void _q_startInput(const QAudioFormat &format, QIODevice *device);
-    void _q_startOutput(const QAudioFormat &format, QIODevice *device);
+    void _q_startInput(QIODevice *device);
+    void _q_startOutput(QIODevice *device);
 
 private:
     QSoundStreamPrivate *d;

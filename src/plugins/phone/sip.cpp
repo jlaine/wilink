@@ -522,19 +522,20 @@ void SipCallPrivate::onStateChanged()
         startTime.start();
 
         // prepare audio format
-        const QAudioFormat format = QSoundStream::pcmAudioFormat(
-            audioChannel->payloadType().channels(),
-            audioChannel->payloadType().clockrate());
 
         // start audio input / output
         if (!audioStream) {
             audioStream = new QSoundStream(client->d->soundPlayer);
+            audioStream->setFormat(
+                audioChannel->payloadType().channels(),
+                audioChannel->payloadType().clockrate());
+
             QObject::connect(audioStream, SIGNAL(inputVolumeChanged(int)),
                              q, SIGNAL(inputVolumeChanged(int)));
             QObject::connect(audioStream, SIGNAL(outputVolumeChanged(int)),
                              q, SIGNAL(outputVolumeChanged(int)));
-            audioStream->startOutput(format, audioChannel);
-            audioStream->startInput(format, audioChannel);
+            audioStream->startOutput(audioChannel);
+            audioStream->startInput(audioChannel);
         }
 
     } else {

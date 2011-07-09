@@ -17,7 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QAudioFormat>
 #include <QDeclarativeItem>
 #include <QFile>
 #include <QHostInfo>
@@ -128,19 +127,19 @@ void CallAudioHelper::_q_audioModeChanged(QIODevice::OpenMode mode)
 {
     Q_ASSERT(m_call);
 
-    const QAudioFormat format = QSoundStream::pcmAudioFormat(
+    m_stream->setFormat(
         m_call->audioChannel()->payloadType().channels(),
         m_call->audioChannel()->payloadType().clockrate());
 
     // start or stop playback
     if (mode & QIODevice::ReadOnly)
-        m_stream->startOutput(format, m_call->audioChannel());
+        m_stream->startOutput(m_call->audioChannel());
     else
         m_stream->stopOutput();
 
     // start or stop capture
     if (mode & QIODevice::WriteOnly)
-        m_stream->startInput(format, m_call->audioChannel());
+        m_stream->startInput(m_call->audioChannel());
     else
         m_stream->stopInput();
 }
