@@ -156,6 +156,8 @@ static QXmppRtpAudioChannel::Tone keyTone(QPushButton *key)
         return QXmppRtpAudioChannel::Tone_Star;
     else if (c == '#')
         return QXmppRtpAudioChannel::Tone_Pound;
+    else
+        return QXmppRtpAudioChannel::Tone_A;
 }
 
 void ToneGui::keyPressed()

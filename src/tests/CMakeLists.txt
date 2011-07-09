@@ -42,11 +42,6 @@ qt4_wrap_cpp(stun_MOC_SOURCES stun.h)
 add_executable(stun stun.cpp ${stun_MOC_SOURCES})
 target_link_libraries(stun qxmpp ${QT_LIBRARIES})
 
-#qt4_add_resources(tones_RCC_SOURCES tones.qrc)
-#qt4_wrap_cpp(tones_MOC_SOURCES tones.h)
-#add_executable(tones tones.cpp ${tones_MOC_SOURCES} ${tones_RCC_SOURCES})
-#target_link_libraries(tones qsound ${QT_LIBRARIES})
-
 qt4_wrap_cpp(grabber_MOC_SOURCES grabber.h)
 add_executable(grabber grabber.cpp ${grabber_MOC_SOURCES})
 target_link_libraries(grabber qsound qxmpp ${QT_LIBRARIES})
