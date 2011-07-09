@@ -98,7 +98,6 @@ void QVideoGrabberPrivate::close()
 
 bool QVideoGrabberPrivate::open()
 {
-    v4l2_buffer buffer;
     v4l2_capability capability;
     v4l2_format format;
     v4l2_requestbuffers reqbuf;
@@ -249,7 +248,7 @@ void QVideoGrabber::onFrameCaptured()
         return;
     }
 
-    Q_ASSERT(handle.index < d->buffers.size());
+    Q_ASSERT(handle.index < unsigned(d->buffers.size()));
     memcpy(d->currentFrame.bits(), d->buffers[handle.index].base, d->buffers[handle.index].length);
 
     if (ioctl(d->fd, VIDIOC_QBUF, &handle) < 0)
@@ -267,7 +266,7 @@ bool QVideoGrabber::start()
     memset(&handle, 0, sizeof(handle));
     handle.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
     handle.memory = V4L2_MEMORY_MMAP;
-    for (handle.index = 0; handle.index < d->buffers.size(); ++handle.index) {
+    for (handle.index = 0; handle.index < unsigned(d->buffers.size()); ++handle.index) {
         if (ioctl(d->fd, VIDIOC_QBUF, &handle) < 0) {
             qWarning("QVideoGrabber(%s): could not queue buffer %i", qPrintable(d->deviceName), handle.index);
             return false;
