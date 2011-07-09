@@ -62,8 +62,6 @@ QSoundStream::QSoundStream(QSoundPlayer *player)
 {
     d = new QSoundStreamPrivate;
     d->soundPlayer = player;
-
-    qRegisterMetaType<QAudioFormat>("QAudioFormat");
 }
 
 QSoundStream::~QSoundStream()
