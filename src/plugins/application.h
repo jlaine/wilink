@@ -88,19 +88,8 @@ public:
     bool isInstalled();
     QString osType() const;
 
-    // sound
-    QAudioDeviceInfo audioInputDevice() const;
-    void setAudioInputDevice(const QAudioDeviceInfo &device);
-
-    QAudioDeviceInfo audioOutputDevice() const;
-    void setAudioOutputDevice(const QAudioDeviceInfo &device);
-
     // preferences
     ApplicationSettings *settings() const;
-
-signals:
-    void audioInputDeviceChanged(const QAudioDeviceInfo &device);
-    void audioOutputDeviceChanged(const QAudioDeviceInfo &device);
 
 public slots:
     void resetWindows();
@@ -108,9 +97,6 @@ public slots:
     void showWindows();
 
 private slots:
-    void _q_audioInputDeviceNameChanged(const QString &name);
-    void _q_audioOutputDeviceNameChanged(const QString &name);
-
 #ifdef USE_SYSTRAY
     void trayActivated(QSystemTrayIcon::ActivationReason reason);
     void trayClicked();

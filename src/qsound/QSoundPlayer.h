@@ -36,15 +36,20 @@ class QSoundPlayer : public QObject
 
 public:
     QSoundPlayer(QObject *parent = 0);
+
+    QAudioDeviceInfo audioInputDevice() const;
+    QAudioDeviceInfo audioOutputDevice() const;
     int play(QSoundFile *reader);
 
 signals:
+    void audioInputDeviceChanged(const QAudioDeviceInfo &device);
+    void audioOutputDeviceChanged(const QAudioDeviceInfo &device);
     void finished(int id);
 
 public slots:
     int play(const QString &name, bool repeat = false);
-    QAudioDeviceInfo audioOutputDevice() const;
-    void setAudioOutputDevice(const QAudioDeviceInfo &audioDevice);
+    void setAudioInputDeviceName(const QString &name);
+    void setAudioOutputDeviceName(const QString &name);
     void stop(int id);
 
 private slots:
@@ -54,8 +59,8 @@ private slots:
 
 private:
     int m_readerId;
-    QAudioDeviceInfo m_inputDevice;
-    QAudioDeviceInfo m_outputDevice;
+    QString m_inputName;
+    QString m_outputName;
     QMap<int, QAudioOutput*> m_outputs;
     QMap<int, QSoundFile*> m_readers;
 };

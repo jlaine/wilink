@@ -85,10 +85,13 @@ Application::Application(int &argc, char **argv)
     : QApplication(argc, argv),
     d(new ApplicationPrivate)
 {
+    bool check;
+    Q_UNUSED(check);
+
     wApp = this;
     qRegisterMetaType<QAudioDeviceInfo>();
 
-    /* set application properties */
+    // set application properties
     setApplicationName("wiLink");
     setApplicationVersion(WILINK_VERSION);
     setOrganizationDomain("wifirst.net");
@@ -98,17 +101,12 @@ Application::Application(int &argc, char **argv)
     setWindowIcon(QIcon(":/wiLink.png"));
 #endif
 
-    /* initialise settings */
+    // initialise settings
     d->appSettings = new ApplicationSettings(this);
-    connect(d->appSettings, SIGNAL(audioInputDeviceNameChanged(QString)),
-            this, SLOT(_q_audioInputDeviceNameChanged(QString)));
-    connect(d->appSettings, SIGNAL(audioOutputDeviceNameChanged(QString)),
-            this, SLOT(_q_audioOutputDeviceNameChanged(QString)));
-
     if (isInstalled() && d->appSettings->openAtLogin())
         d->appSettings->setOpenAtLogin(true);
 
-    /* initialise cache and wallet */
+    // initialise cache and wallet
     const QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
     QDir().mkpath(dataPath);
     const QString lastRunVersion = d->appSettings->lastRunVersion();
@@ -123,13 +121,18 @@ Application::Application(int &argc, char **argv)
     // FIXME: register URL handler
     //QDesktopServices::setUrlHandler("xmpp", this, "openUrl");
 
-    /* initialise sound player */
+    // initialise sound player
     d->soundThread = new QThread(this);
     d->soundThread->start();
     d->soundPlayer = new QSoundPlayer;
-    d->soundPlayer->setAudioOutputDevice(d->audioOutputDevice);
-    connect(this, SIGNAL(audioOutputDeviceChanged(QAudioDeviceInfo)),
-            d->soundPlayer, SLOT(setAudioOutputDevice(QAudioDeviceInfo)));
+    d->soundPlayer->setAudioInputDeviceName(d->appSettings->audioInputDeviceName());
+    check = connect(d->appSettings, SIGNAL(audioInputDeviceNameChanged(QString)),
+                    d->soundPlayer, SLOT(setAudioInputDeviceName(QString)));
+    Q_ASSERT(check);
+    d->soundPlayer->setAudioOutputDeviceName(d->appSettings->audioOutputDeviceName());
+    check = connect(d->appSettings, SIGNAL(audioOutputDeviceNameChanged(QString)),
+                    d->soundPlayer, SLOT(setAudioOutputDeviceName(QString)));
+    Q_ASSERT(check);
     d->soundPlayer->moveToThread(d->soundThread);
 
 #ifdef USE_LIBNOTIFY
@@ -361,28 +364,6 @@ QThread *Application::soundThread()
     return d->soundThread;
 }
 
-QAudioDeviceInfo Application::audioInputDevice() const
-{
-    const QString &name = d->appSettings->audioInputDeviceName();
-    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioInput)) {
-        if (info.deviceName() == name) {
-            return info;
-        }
-    }
-    return QAudioDeviceInfo::defaultInputDevice();
-}
-
-QAudioDeviceInfo Application::audioOutputDevice() const
-{
-    const QString name = d->appSettings->audioOutputDeviceName();
-    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioOutput)) {
-        if (info.deviceName() == name) {
-            return info;
-        }
-    }
-    return QAudioDeviceInfo::defaultOutputDevice();
-}
-
 #ifdef USE_LIBNOTIFY
 static void notificationClicked(NotifyNotification *notification, char *action, gpointer data)
 {
@@ -454,16 +435,6 @@ Notification *Application::showMessage(const QString &title, const QString &mess
     Q_UNUSED(action);
 #endif
     return handle;
-}
-
-void Application::_q_audioInputDeviceNameChanged(const QString &name)
-{
-    emit audioInputDeviceChanged(audioInputDevice());
-}
-
-void Application::_q_audioOutputDeviceNameChanged(const QString &name)
-{
-    emit audioOutputDeviceChanged(audioOutputDevice());
 }
 
 #ifdef USE_SYSTRAY

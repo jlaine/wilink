@@ -103,7 +103,7 @@ void CallAudioHelperPrivate::audioModeChanged(QIODevice::OpenMode mode)
     // start or stop playback
     const bool canRead = (mode & QIODevice::ReadOnly);
     if (canRead && !m_audioOutput) {
-        m_audioOutput = new QAudioOutput(wApp->audioOutputDevice(), format, this);
+        m_audioOutput = new QAudioOutput(wApp->soundPlayer()->audioOutputDevice(), format, this);
         check = connect(m_audioOutput, SIGNAL(stateChanged(QAudio::State)),
                         this, SLOT(audioStateChanged()));
         Q_ASSERT(check);
@@ -128,7 +128,7 @@ void CallAudioHelperPrivate::audioModeChanged(QIODevice::OpenMode mode)
     // start or stop capture
     const bool canWrite = (mode & QIODevice::WriteOnly);
     if (canWrite && !m_audioInput) {
-        m_audioInput = new QAudioInput(wApp->audioInputDevice(), format, this);
+        m_audioInput = new QAudioInput(wApp->soundPlayer()->audioInputDevice(), format, this);
         check = connect(m_audioInput, SIGNAL(stateChanged(QAudio::State)),
                         this, SLOT(audioStateChanged()));
         Q_ASSERT(check);
