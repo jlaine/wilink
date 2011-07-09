@@ -23,6 +23,7 @@ HEADERS += \
     QSoundFile.h \
     QSoundMeter.h \
     QSoundPlayer.h \
+    QSoundStream.h \
     QSoundTester.h \
     QVideoGrabber.h \
     QVideoGrabber_p.h
@@ -30,6 +31,7 @@ SOURCES += \
     QSoundFile.cpp \
     QSoundMeter.cpp \
     QSoundPlayer.cpp \
+    QSoundStream.cpp \
     QSoundTester.cpp \
     QVideoGrabber.cpp \
     QVideoGrabber_dummy.cpp
