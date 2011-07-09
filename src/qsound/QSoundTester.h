@@ -25,11 +25,13 @@
 #include <QObject>
 #include <QStringList>
 
+#include "QSoundPlayer.h"
+
 class QAudioInput;
 class QAudioOutput;
 class QBuffer;
 
-class QSoundTester : public QObject
+class QSoundTester : public QSoundPlayer
 {
     Q_OBJECT
     Q_ENUMS(State)

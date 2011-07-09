@@ -26,7 +26,7 @@
 #include "QSoundTester.h"
 
 QSoundTester::QSoundTester(QObject *parent)
-    : QObject(parent),
+    : QSoundPlayer(parent),
     m_input(0),
     m_output(0),
     m_state(IdleState),
@@ -63,35 +63,8 @@ int QSoundTester::maximumVolume() const
 
 void QSoundTester::start(const QString &inputDeviceName, const QString &outputDeviceName)
 {
-    // find input device
-    QAudioDeviceInfo inputDevice;
-    bool found = false;
-    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioInput)) {
-        if (info.deviceName() == inputDeviceName) {
-            inputDevice = info;
-            found = true;
-            break;
-        }
-    }
-    if (!found) {
-        qWarning("Could not find input device");
-        return;
-    }
-
-    // found output device
-    QAudioDeviceInfo outputDevice;
-    found = false;
-    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioOutput)) {
-        if (info.deviceName() == outputDeviceName) {
-            outputDevice = info;
-            found = true;
-            break;
-        }
-    }
-    if (!found) {
-        qWarning("Could not find output device");
-        return;
-    }
+    setAudioInputDeviceName(inputDeviceName);
+    setAudioOutputDeviceName(outputDeviceName);
 
     // prepare audio format
     QAudioFormat format;
@@ -110,9 +83,9 @@ void QSoundTester::start(const QString &inputDeviceName, const QString &outputDe
     // 160ms at 8kHz
     const int bufferSize = 2560 * format.channels();
 #endif
-    m_input = new QAudioInput(inputDevice, format, this);
+    m_input = new QAudioInput(audioInputDevice(), format, this);
     m_input->setBufferSize(bufferSize);
-    m_output = new QAudioOutput(outputDevice, format, this);
+    m_output = new QAudioOutput(audioOutputDevice(), format, this);
     m_output->setBufferSize(bufferSize);
 
     // start input
