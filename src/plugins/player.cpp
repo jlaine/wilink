@@ -382,6 +382,7 @@ void PlayerModel::dataReceived()
 
 int PlayerModel::columnCount(const QModelIndex &parent) const
 {
+    Q_UNUSED(parent);
     return 1;
 }
 

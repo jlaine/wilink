@@ -167,6 +167,7 @@ void DiscoveryModel::setManager(QXmppDiscoveryManager *manager)
         m_manager = manager;
         if (m_manager) {
             bool check;
+            Q_UNUSED(check);
 
             m_client = qobject_cast<QXmppClient*>(m_manager->parent());
             Q_ASSERT(m_client);

@@ -88,9 +88,10 @@ QXmppMucRoom *RoomConfigurationModel::room() const
 
 void RoomConfigurationModel::setRoom(QXmppMucRoom *room)
 {
-    if (room != m_room) {
-        bool check;
+    bool check;
+    Q_UNUSED(check);
 
+    if (room != m_room) {
         if (m_room)
             m_room->disconnect(this);
 
@@ -205,6 +206,7 @@ void RoomListModel::setClient(ChatClient *client)
 
         if (m_client) {
             bool check;
+            Q_UNUSED(check);
 
             // add extension
             QXmppBookmarkManager *bookmarkManager = client->findExtension<QXmppBookmarkManager>();
@@ -542,6 +544,7 @@ QXmppMucRoom *RoomModel::room() const
 void RoomModel::setRoom(QXmppMucRoom *room)
 {
     bool check;
+    Q_UNUSED(check);
 
     if (room == m_room)
         return;
@@ -648,9 +651,10 @@ QXmppMucRoom *RoomPermissionModel::room() const
 
 void RoomPermissionModel::setRoom(QXmppMucRoom *room)
 {
-    if (room != m_room) {
-        bool check;
+    bool check;
+    Q_UNUSED(check);
 
+    if (room != m_room) {
         if (m_room)
             m_room->disconnect(this);
 

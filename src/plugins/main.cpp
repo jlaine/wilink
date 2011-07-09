@@ -34,6 +34,8 @@
 static int aborted = 0;
 static void signal_handler(int sig)
 {
+    Q_UNUSED(sig);
+
     if (aborted)
         exit(1);
 

@@ -185,9 +185,10 @@ ChatClient *RosterModel::client() const
 
 void RosterModel::setClient(ChatClient *client)
 {
-    if (client != d->client) {
-        bool check;
+    bool check;
+    Q_UNUSED(check);
 
+    if (client != d->client) {
         d->client = client;
 
         VCardCache::instance()->addClient(d->client);
@@ -636,6 +637,7 @@ VCardCache *VCardCache::instance()
 void VCardCache::addClient(ChatClient *client)
 {
     bool check;
+    Q_UNUSED(check);
 
     if (!client || d->clients.contains(client))
         return;

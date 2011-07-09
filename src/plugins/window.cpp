@@ -36,6 +36,8 @@ Window::Window(const QUrl &url, const QString &jid, QWidget *parent)
     : QMainWindow(parent)
 {
     bool check;
+    Q_UNUSED(check);
+
     setObjectName(jid);
     if (jid.isEmpty())
         setWindowTitle(qApp->applicationName());
