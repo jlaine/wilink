@@ -64,7 +64,7 @@ Item {
                 text: qsTr('Select')
 
                 onClicked: {
-                    if (state == 'selection') {
+                    if (block.state == 'selection') {
                         // copy selection
                         var text = '';
                         for (var i = 0; i <= listHelper.count; i++) {
@@ -105,7 +105,6 @@ Item {
                 PropertyAnimation { target: button; properties: 'opacity'; duration: 150 }
             }
         }
-        highlightMoveDuration: 0
 
         Component {
             id: historyDelegate
@@ -183,6 +182,14 @@ Item {
                         MouseArea {
                             anchors.fill: parent
                             hoverEnabled: true
+
+                            onClicked: {
+                                // cancel selection
+                                block.state = '';
+                                historyView.selectionStart = -1;
+                                historyView.model.select(-1, -1);
+                            }
+
                             onEntered: {
                                 var rectCoords = mapToItem(historyView.contentItem, rect.x, rect.y);
                                 historyView.currentIndex = historyView.indexAt(rectCoords.x, rectCoords.y);
@@ -207,12 +214,6 @@ Item {
 
                             onLinkActivated: Qt.openUrlExternally(link)
                         }
-
-                        Image {
-                            anchors.right: parent.right
-                            anchors.verticalCenter: parent.verticalCenter
-                            source: model.selected ? 'checkbox-checked.png' : ''
-                        }
                     }
 
                     Item {
@@ -223,19 +224,6 @@ Item {
             }
         }
 
-    }
-
-    MouseArea {
-        id: cancelSelection
-
-        anchors.fill: historyView
-        enabled: block.state == 'selection'
-        onClicked: {
-            // cancel selection
-            block.state = '';
-            historyView.selectionStart = -1;
-            historyView.model.select(-1, -1);
-        }
     }
 
     TextEdit {
