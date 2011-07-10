@@ -7,9 +7,5 @@ SUBDIRS = \
     qsound \
     qxmpp
 
-!symbian {
-    SUBDIRS += translations
-}
-
 SUBDIRS += plugins
 CONFIG += ordered
