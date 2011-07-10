@@ -22,4 +22,6 @@ if(QTMULTIMEDIAKIT_LIBRARY)
 endif()
 
 add_subdirectory(src)
-add_subdirectory(tests)
+if(NOT QSOUND_DONT_USE_TESTS)
+    add_subdirectory(tests)
+endif()
