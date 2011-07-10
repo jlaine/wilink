@@ -436,6 +436,9 @@ QVariant PhotoQueueModel::data(const QModelIndex &index, int role) const
         return QUrl::fromLocalFile(item->sourcePath);
     } else if (role == NameRole) {
         return QFileInfo(item->sourcePath).fileName();
+    } else if (role == SpeedRole) {
+        // FIXME: implement speed calculation
+        return 0;
     } else if (role == DoneBytesRole) {
         return item->doneBytes;
     } else if (role == DoneFilesRole) {
