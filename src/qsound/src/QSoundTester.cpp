@@ -33,6 +33,7 @@ QSoundTester::QSoundTester(QObject *parent)
 {
     m_buffer = new QBuffer(this);
     m_stream = new QSoundStream(this);
+    m_stream->setDevice(m_buffer);
     m_stream->setFormat(1, 8000);
     connect(m_stream, SIGNAL(inputVolumeChanged(int)),
             this, SLOT(_q_volumeChanged(int)));
@@ -58,7 +59,7 @@ void QSoundTester::start(const QString &inputDeviceName, const QString &outputDe
     // start input
     m_buffer->open(QIODevice::WriteOnly);
     m_buffer->reset();
-    m_stream->startInput(m_buffer);
+    m_stream->startInput();
     QTimer::singleShot(duration() * 1000, this, SLOT(_q_playback()));
 
     // update state
@@ -83,7 +84,7 @@ void QSoundTester::_q_playback()
     // start output
     m_buffer->open(QIODevice::ReadOnly);
     m_buffer->reset();
-    m_stream->startOutput(m_buffer);
+    m_stream->startOutput();
     QTimer::singleShot(duration() * 1000, this, SLOT(_q_stop()));
 
     // update state

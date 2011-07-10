@@ -127,19 +127,21 @@ void CallAudioHelper::_q_audioModeChanged(QIODevice::OpenMode mode)
 {
     Q_ASSERT(m_call);
 
+    QXmppRtpAudioChannel *channel = m_call->audioChannel();
+    m_stream->setDevice(channel);
     m_stream->setFormat(
-        m_call->audioChannel()->payloadType().channels(),
-        m_call->audioChannel()->payloadType().clockrate());
+        channel->payloadType().channels(),
+        channel->payloadType().clockrate());
 
     // start or stop playback
     if (mode & QIODevice::ReadOnly)
-        m_stream->startOutput(m_call->audioChannel());
+        m_stream->startOutput();
     else
         m_stream->stopOutput();
 
     // start or stop capture
     if (mode & QIODevice::WriteOnly)
-        m_stream->startInput(m_call->audioChannel());
+        m_stream->startInput();
     else
         m_stream->stopInput();
 }

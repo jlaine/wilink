@@ -46,6 +46,7 @@ public:
     QSoundMeter *audioInputMeter;
     QAudioOutput *audioOutput;
     QSoundMeter *audioOutputMeter;
+    QIODevice *device;
     QSoundPlayer *soundPlayer;
 };
 
@@ -54,6 +55,7 @@ QSoundStreamPrivate::QSoundStreamPrivate()
     audioInputMeter(0),
     audioOutput(0),
     audioOutputMeter(0),
+    device(0),
     soundPlayer(0)
 {
 }
@@ -67,6 +69,11 @@ QSoundStream::QSoundStream(QSoundPlayer *player)
 QSoundStream::~QSoundStream()
 {
     delete d;
+}
+
+void QSoundStream::setDevice(QIODevice *device)
+{
+    d->device = device;
 }
 
 void QSoundStream::setFormat(unsigned char channels, unsigned int clockrate)
@@ -88,15 +95,11 @@ QAudioFormat QSoundStream::pcmAudioFormat(unsigned char channels, unsigned int c
 
 /** Starts audio capture.
  */
-void QSoundStream::startInput(QIODevice *device)
-{
-    QMetaObject::invokeMethod(this, "_q_startInput", Q_ARG(QIODevice*, device));
-}
-
-void QSoundStream::_q_startInput(QIODevice *device)
+void QSoundStream::startInput()
 {
     bool check;
     Q_UNUSED(check);
+    Q_ASSERT(d->device);
 
     if (!d->audioInput) {
         const int bufferSize = bufferFor(d->audioFormat);
@@ -109,7 +112,7 @@ void QSoundStream::_q_startInput(QIODevice *device)
                         this, SLOT(_q_audioInputStateChanged()));
         Q_ASSERT(check);
 
-        d->audioInputMeter = new QSoundMeter(d->audioFormat, device, this);
+        d->audioInputMeter = new QSoundMeter(d->audioFormat, d->device, this);
         check = connect(d->audioInputMeter, SIGNAL(valueChanged(int)),
                         this, SIGNAL(inputVolumeChanged(int)));
         Q_ASSERT(check);
@@ -139,15 +142,11 @@ void QSoundStream::stopInput()
 
 /** Starts audio playback.
  */
-void QSoundStream::startOutput(QIODevice *device)
-{
-    QMetaObject::invokeMethod(this, "_q_startOutput", Q_ARG(QIODevice*, device));
-}
-
-void QSoundStream::_q_startOutput(QIODevice *device)
+void QSoundStream::startOutput()
 {
     bool check;
     Q_UNUSED(check);
+    Q_ASSERT(d->device);
 
     if (!d->audioOutput) {
         const int bufferSize = bufferFor(d->audioFormat);
@@ -160,7 +159,7 @@ void QSoundStream::_q_startOutput(QIODevice *device)
                         this, SLOT(_q_audioOutputStateChanged()));
         Q_ASSERT(check);
 
-        d->audioOutputMeter = new QSoundMeter(d->audioFormat, device, this);
+        d->audioOutputMeter = new QSoundMeter(d->audioFormat, d->device, this);
         check = connect(d->audioOutputMeter, SIGNAL(valueChanged(int)),
                         this, SIGNAL(outputVolumeChanged(int)));
         Q_ASSERT(check);

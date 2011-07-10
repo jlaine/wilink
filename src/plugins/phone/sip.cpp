@@ -526,6 +526,7 @@ void SipCallPrivate::onStateChanged()
         // start audio input / output
         if (!audioStream) {
             audioStream = new QSoundStream(client->d->soundPlayer);
+            audioStream->setDevice(audioChannel);
             audioStream->setFormat(
                 audioChannel->payloadType().channels(),
                 audioChannel->payloadType().clockrate());
@@ -534,8 +535,8 @@ void SipCallPrivate::onStateChanged()
                              q, SIGNAL(inputVolumeChanged(int)));
             QObject::connect(audioStream, SIGNAL(outputVolumeChanged(int)),
                              q, SIGNAL(outputVolumeChanged(int)));
-            audioStream->startOutput(audioChannel);
-            audioStream->startInput(audioChannel);
+            audioStream->startOutput();
+            audioStream->startInput();
         }
 
     } else {

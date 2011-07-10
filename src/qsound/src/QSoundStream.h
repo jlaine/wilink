@@ -37,17 +37,12 @@ public:
     QSoundStream(QSoundPlayer *player);
     ~QSoundStream();
 
+    void setDevice(QIODevice *device);
     void setFormat(unsigned char channels, unsigned int clockrate);
 
     int inputVolume() const;
     int maximumVolume() const;
     int outputVolume() const;
-
-    void startInput(QIODevice *device);
-    void stopInput();
-
-    void startOutput(QIODevice *device);
-    void stopOutput();
 
     static QAudioFormat pcmAudioFormat(unsigned char channels, unsigned int clockrate);
 
@@ -58,11 +53,16 @@ signals:
     // This signal is emitted when the output volume changes.
     void outputVolumeChanged(int volume);
 
+public slots:
+    void startInput();
+    void stopInput();
+
+    void startOutput();
+    void stopOutput();
+
 private slots:
     void _q_audioInputStateChanged();
     void _q_audioOutputStateChanged();
-    void _q_startInput(QIODevice *device);
-    void _q_startOutput(QIODevice *device);
 
 private:
     QSoundStreamPrivate *d;
