@@ -402,6 +402,10 @@ PhotoQueueModel::PhotoQueueModel(QObject *parent)
     names.insert(TotalBytesRole, "totalBytes");
     names.insert(TotalFilesRole, "totalFiles");
     setRoleNames(names);
+
+    m_resizer = new PhotoResizer(this);
+    connect(m_resizer, SIGNAL(finished(QIODevice*)),
+            this, SLOT(_q_uploadResized(QIODevice*)));
 }
 
 void PhotoQueueModel::append(const QString &filePath, FileSystem *fileSystem, const QString &destinationPath)
@@ -462,28 +466,7 @@ void PhotoQueueModel::processQueue()
         PhotoQueueItem *item = static_cast<PhotoQueueItem*>(ptr);
         if (!item->finished) {
             m_uploadItem = item;
-
-            // process the next file to upload
-            const QByteArray imageFormat = QImageReader::imageFormat(item->sourcePath);
-            QImage image;
-            if (!imageFormat.isEmpty() && image.load(item->sourcePath, imageFormat.constData()))
-            {
-                if (image.width() > UPLOAD_SIZE.width() || image.height() > UPLOAD_SIZE.height())
-                    image = image.scaled(UPLOAD_SIZE, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-                m_uploadDevice = new QBuffer(this);
-                m_uploadDevice->open(QIODevice::WriteOnly);
-                image.save(m_uploadDevice, imageFormat.constData());
-                m_uploadDevice->open(QIODevice::ReadOnly);
-            } else {
-                m_uploadDevice = new QFile(item->sourcePath, this);
-                m_uploadDevice->open(QIODevice::ReadOnly);
-            }
-
-            item->job = item->fileSystem->put(item->destinationPath, m_uploadDevice);
-            connect(item->job, SIGNAL(finished()),
-                    this, SLOT(_q_jobFinished()));
-            connect(item->job, SIGNAL(uploadProgress(qint64,qint64)),
-                    this, SLOT(_q_uploadProgress(qint64,qint64)));
+            m_resizer->resize(item->sourcePath);
             break;
         }
     }
@@ -513,5 +496,44 @@ void PhotoQueueModel::_q_uploadProgress(qint64 done, qint64 total)
         m_uploadItem->totalBytes = total;
         emit dataChanged(createIndex(m_uploadItem), createIndex(m_uploadItem));
     }
+}
+
+void PhotoQueueModel::_q_uploadResized(QIODevice *device)
+{
+    if (m_uploadItem) {
+        m_uploadDevice = device;
+        m_uploadItem->job = m_uploadItem->fileSystem->put(m_uploadItem->destinationPath, m_uploadDevice);
+        connect(m_uploadItem->job, SIGNAL(finished()),
+                this, SLOT(_q_jobFinished()));
+        connect(m_uploadItem->job, SIGNAL(uploadProgress(qint64,qint64)),
+                this, SLOT(_q_uploadProgress(qint64,qint64)));
+    }
+}
+
+PhotoResizer::PhotoResizer(QObject *parent)
+    : QObject(parent)
+{
+}
+
+void PhotoResizer::resize(const QString &path)
+{
+    QIODevice *device = 0;
+
+    // process the next file to upload
+    const QByteArray imageFormat = QImageReader::imageFormat(path);
+    QImage image;
+    if (!imageFormat.isEmpty() && image.load(path, imageFormat.constData()))
+    {
+        if (image.width() > UPLOAD_SIZE.width() || image.height() > UPLOAD_SIZE.height())
+            image = image.scaled(UPLOAD_SIZE, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        device = new QBuffer;
+        device->open(QIODevice::WriteOnly);
+        image.save(device, imageFormat.constData());
+        device->open(QIODevice::ReadOnly);
+    } else {
+        device = new QFile(path);
+        device->open(QIODevice::ReadOnly);
+    }
+    emit finished(device);
 }
 

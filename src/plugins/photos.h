@@ -34,6 +34,7 @@ class PhotoCachePrivate;
 class PhotoDownloadItem;
 class PhotoQueueItem;
 class PhotoQueueModel;
+class PhotoResizer;
 
 class PhotoCache : public QObject
 {
@@ -129,13 +130,29 @@ public slots:
 private slots:
     void _q_jobFinished();
     void _q_uploadProgress(qint64 done, qint64 total);
+    void _q_uploadResized(QIODevice *device);
 
 private:
     void processQueue();
 
     PhotoModel *m_photoModel;
+    PhotoResizer *m_resizer;
     QIODevice *m_uploadDevice;
     PhotoQueueItem *m_uploadItem;
+};
+
+class PhotoResizer : public QObject
+{
+    Q_OBJECT
+
+public:
+    PhotoResizer(QObject *parent);
+
+signals:
+    void finished(QIODevice *device);
+
+public slots:
+    void resize(const QString &path);
 };
 
 #endif
