@@ -25,6 +25,7 @@ Item {
     id: callWidget
 
     property QtObject call: null
+    property int soundId: 0
 
     anchors.left: parent ? parent.left : undefined
     anchors.right: parent ? parent.right : undefined
@@ -192,10 +193,27 @@ Item {
         }
     }
 
-    state: call && call.state == QXmppCall.FinishedState ? 'inactive' : ''
+    Connections {
+        target: call
+        onStateChanged: {
+            if (callWidget.soundId > 0) {
+                application.soundPlayer.stop(callWidget.soundId);
+                callWidget.soundId = 0;
+            }
+        }
+    }
+
+    onCallChanged: {
+        // play a sound
+        if (callWidget.call.direction == QXmppCall.OutgoingDirection &&
+            callWidget.call.state == QXmppCall.ConnectingState) {
+            callWidget.soundId = application.soundPlayer.play(":/call-outgoing.ogg", true);
+        }
+    }
 
     states: State {
           name: 'inactive'
+          when: Qt.isQtObject(call) && call.state == QXmppCall.FinishedState
           PropertyChanges { target: callWidget; opacity: 0 }
     }
 
