@@ -36,9 +36,8 @@ Item {
 
         property bool scrollBarAtBottom
         property bool bottomChanging: false
-        property int messageSelected
-        property int selectionStart
-        property int selectionEnd
+        property int hoveredIndex: -1
+        property int selectionStart: -1
 
         anchors.top: parent.top
         anchors.bottom: parent.bottom
@@ -118,7 +117,7 @@ Item {
                         height: bodyText.height + 10
                         border.color: model.received ? '#84bde8': '#ababab'
                         border.width: model.action ? 0 : 1
-                        color: model.action ? 'transparent' : (model.received ? '#e7f4fe' : '#fafafa')
+                        color: model.selected ? '#aa86abd9' : (model.action ? 'transparent' : (model.received ? '#e7f4fe' : '#fafafa'))
                         radius: 8
                         width: parent.width
 
@@ -128,14 +127,11 @@ Item {
                             onEntered: {
                                 copyButtonLoader.sourceComponent = copyButtonComponent;
                                 var rectCoords = mapToItem(historyView.contentItem, rect.x, rect.y);
-                                historyView.messageSelected = historyView.indexAt(rectCoords.x, rectCoords.y);
+                                historyView.hoveredIndex = historyView.indexAt(rectCoords.x, rectCoords.y);
 
                                 // set selection
                                 if (block.state == 'selection') {
-                                    selection.endPos = rect.mapToItem(historyView.contentItem, 0, rect.y + bodyText.height).y;
-                                } else {
-                                    selection.startPos = fromText.mapToItem(historyView.contentItem, 0, fromText.y).y;
-                                    selection.endPos = rect.mapToItem(historyView.contentItem, 0, rect.y + bodyText.height).y;
+                                    historyView.model.select(historyView.selectionStart, historyView.hoveredIndex);
                                 }
                             }
                             onExited: {
@@ -153,6 +149,12 @@ Item {
                             wrapMode: Text.Wrap
 
                             onLinkActivated: Qt.openUrlExternally(link)
+                        }
+
+                        Image {
+                            anchors.right: parent.right
+                            anchors.verticalCenter: parent.verticalCenter
+                            source: model.selected ? 'checkbox-checked.png' : ''
                         }
 
                         Loader {
@@ -176,100 +178,6 @@ Item {
                 }
             }
         }
-
-/*
-        MouseArea {
-            id: selector
-
-            property variant press
-            property int selectionStart: 0
-            property int selectionEnd: -1
-
-            anchors.fill: parent
-            acceptedButtons: Qt.LeftButton
-
-            onPressed: {
-                historyView.interactive = false;
-                press = {
-                    'x': mouse.x,
-                    'y': mouse.y,
-                    'index': historyView.indexAt(mouse.x + historyView.contentX, mouse.y + historyView.contentY),
-                };
-
-                // clear old selection
-                for (var i = selectionStart; i <= selectionEnd; i++) {
-                    historyView.currentIndex = i;
-                    if (!historyView.currentItem)
-                        continue;
-                    var item = historyView.currentItem.textItem;
-                    item.select(0, 0);
-                }
-                selectionStart = 0;
-                selectionEnd = -1;
-            }
-
-            onReleased: {
-                historyView.interactive = true;
-            }
-
-            onPositionChanged: {
-                var start, end;
-                var current = {
-                    'x': mouse.x,
-                    'y': mouse.y,
-                    'index': historyView.indexAt(mouse.x + historyView.contentX, mouse.y + historyView.contentY),
-                };
-
-                // determine start / end
-                if (current.index > press.index || (current.index == press.index && current.x > press.x)) {
-                    start = press;
-                    end = current;
-                } else {
-                    start = current;
-                    end = press;
-                }
-
-                // check bounds
-                if (start.index < 0 || end.index < 0)
-                    return;
-
-                function setSelection(item) {
-                    if (!item)
-                        return 0;
-                    var startCoord = mapToItem(item, start.x, start.y);
-                    var startPos = item.positionAt(startCoord.x, startCoord.y);
-                    var endCoord = mapToItem(item, end.x, end.y);
-                    var endPos = item.positionAt(endCoord.x, endCoord.y);
-                    item.select(startPos, endPos);
-                    return startPos >= 0 && endPos >= 0 && endPos != startPos;
-                }
-
-                // set new selection
-                for (var i = start.index; i <= end.index; i++) {
-                    historyView.currentIndex = i;
-                    if (!historyView.currentItem)
-                        continue;
-                    var item = historyView.currentItem.textItem;
-                    setSelection(item);
-                }
-
-                // clear old selection
-                for (var i = selectionStart; i <= selectionEnd; i++) {
-                    historyView.currentIndex = i;
-                    if (!historyView.currentItem)
-                        continue;
-                    if (i < start.index || i > end.index) {
-                        var item = historyView.currentItem.textItem;
-                        item.select(0, 0);
-                    }
-                }
-
-                // store selection
-                selectionStart = start.index;
-                selectionEnd = end.index;
-            }
-        }
-*/
     }
 
     MouseArea {
@@ -280,46 +188,8 @@ Item {
         onClicked: {
             // cancel selection
             block.state = '';
-            selection.startPos = 0;
-            selection.endPos = 0;
-        }
-    }
-
-    Rectangle {
-        id: selection
-
-        property int startPos: 0
-        property int endPos: 0
-
-        anchors.left: parent.left
-        anchors.right: scrollBar.left
-        color: '#aa86abd9'
-        visible: false
-
-        y: startPos - historyView.contentY
-        height: endPos - startPos
-
-        Button {
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
-            iconSource: 'copy.png'
-            iconSize: appStyle.icon.tinySize
-            text: qsTr('Copy selection')
-            visible: parent.height > 0
-
-            onClicked: {
-                cancelSelection.clicked(null)
-                historyView.selectionEnd = Math.min(listHelper.count-1, historyView.messageSelected);
-
-                // copy elements
-                copyHelper.text = '';
-                for( var i = historyView.selectionStart; i <= historyView.selectionEnd; i++) {
-                    var item = listHelper.get(i);
-                    copyHelper.text += '>> ' + item.from + ':\n' + item.body + '\n';
-                    copyHelper.selectAll();
-                    copyHelper.copy();
-                }
-            }
+            historyView.selectionStart = -1;
+            historyView.model.select(-1, -1);
         }
     }
 
@@ -334,7 +204,8 @@ Item {
             onClicked: {
                 // start selection
                 block.state = 'selection';
-                historyView.selectionStart = Math.max(0, historyView.messageSelected);
+                historyView.selectionStart = historyView.hoveredIndex;
+                historyView.model.select(historyView.selectionStart, historyView.selectionStart);
             }
         }
     }

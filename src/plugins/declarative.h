@@ -152,6 +152,7 @@ signals:
 
 private:
     QAbstractItemModel *m_model;
+    QList<QPersistentModelIndex> m_selection;
 };
 
 class NetworkAccessManager : public QNetworkAccessManager

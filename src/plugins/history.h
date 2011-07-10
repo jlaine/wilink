@@ -65,6 +65,7 @@ public:
         FromRole,
         HtmlRole,
         ReceivedRole,
+        SelectedRole,
     };
 
     HistoryModel(QObject *parent = 0);
@@ -82,6 +83,7 @@ signals:
 
 public slots:
     void clear();
+    void select(int from, int to);
 
 private slots:
     void cardChanged();

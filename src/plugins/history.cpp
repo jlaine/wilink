@@ -32,9 +32,11 @@ static const QRegExp meRegex = QRegExp("^/me[ \t]+(.*)");
 class HistoryItem : public ChatModelItem
 {
 public:
+    HistoryItem() : selected(false) {}
     ~HistoryItem();
 
     QList<HistoryMessage*> messages;
+    bool selected;
 };
 
 HistoryItem::~HistoryItem()
@@ -167,6 +169,7 @@ HistoryModel::HistoryModel(QObject *parent)
     roleNames.insert(HtmlRole, "html");
     roleNames.insert(JidRole, "jid");
     roleNames.insert(ReceivedRole, "received");
+    roleNames.insert(SelectedRole, "selected");
     setRoleNames(roleNames);
 }
 
@@ -363,8 +366,27 @@ QVariant HistoryModel::data(const QModelIndex &index, int role) const
         return msg->jid;
     } else if (role == ReceivedRole) {
         return msg->received;
+    } else if (role == SelectedRole) {
+        return item->selected;
     }
 
     return QVariant();
+}
+
+void HistoryModel::select(int from, int to)
+{
+    const int lo = qMin(from, to);
+    const int hi = qMax(from, to);
+
+    int i = 0;
+    foreach (ChatModelItem *it, rootItem->children) {
+        HistoryItem *item = static_cast<HistoryItem*>(it);
+        const bool selected = (i >= lo && i <= hi);
+        if (selected != item->selected) {
+            item->selected = selected;
+            emit dataChanged(createIndex(item), createIndex(item));
+        }
+        ++i;
+    }
 }
 
