@@ -75,9 +75,6 @@ mac {
 }
 
 RESOURCES += ../data/wiLink.qrc
-!symbian {
-    RESOURCES += $$OUT_PWD/../translations/translations.qrc
-}
 
 INCLUDEPATH += \
     $$WILINK_INCLUDE_DIR \
