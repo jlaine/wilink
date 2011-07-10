@@ -53,7 +53,7 @@ Dialog {
             anchors.left: image.right
             anchors.leftMargin: 8
             anchors.right: parent.right
-            text: qsTr('Do you want to delete %1 from your photos?').replace('%1', modelData.name)
+            text: qsTr('Do you want to delete %1 from your photos?').replace('%1', '<b>' + modelData.name + '</b>')
             wrapMode: Text.WordWrap
         }
     }

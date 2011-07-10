@@ -295,7 +295,9 @@ bool PhotoModel::removeRow(int row)
         return false;
 
     PhotoItem *item = static_cast<PhotoItem*>(rootItem->children.at(row));
-    if (!item->isDir())
+    if (item->isDir())
+        m_fs->rmdir(item->url());
+    else
         m_fs->remove(item->url());
     return true;
 }
