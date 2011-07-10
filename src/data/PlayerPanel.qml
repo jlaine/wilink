@@ -133,13 +133,6 @@ Panel {
         title: qsTr('Media player')
         toolBar: ToolBar {
             ToolButton {
-                iconSource: 'stop.png'
-                text: qsTr('Stop')
-                visible: playerModel.playing
-                onClicked: playerModel.stop()
-            }
-
-            ToolButton {
                 iconSource: 'add.png'
                 text: qsTr('Add')
 
@@ -155,6 +148,13 @@ Panel {
                         }
                     }
                 }
+            }
+
+            ToolButton {
+                iconSource: 'stop.png'
+                text: qsTr('Stop')
+                enabled: playerModel.playing
+                onClicked: playerModel.stop()
             }
 
             ToolButton {
