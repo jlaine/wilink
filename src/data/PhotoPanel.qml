@@ -179,7 +179,14 @@ Panel {
         }
 
         Keys.onPressed: {
-            if (event.key == Qt.Key_Back || event.key == Qt.Key_Backspace) {
+            if (event.key == Qt.Key_Delete ||
+               (event.key == Qt.Key_Backspace && event.modifiers == Qt.ControlModifier)) {
+                // FIXME: handle delete
+                if (view.currentIndex >= 0) {
+                    dialogSwapper.showPanel('PhotoDeleteDialog.qml', {'model': photoModel, 'index': view.currentIndex});
+                }
+            }
+            else if (event.key == Qt.Key_Back || event.key == Qt.Key_Backspace) {
                 if (crumbBar.model.count > 1) {
                     crumbBar.pop();
                 }

@@ -118,6 +118,7 @@
     <file>PhoneNotification.qml</file>
     <file>PhonePanel.qml</file>
     <file>PhotoAlbumDialog.qml</file>
+    <file>PhotoDeleteDialog.qml</file>
     <file>PhotoPanel.qml</file>
     <file>PlayerPanel.qml</file>
     <file>PreferenceDialog.qml</file>

@@ -59,6 +59,7 @@ Rectangle {
             iconPress: 'chat.png'
             notified: root.pendingMessages != 0
             panelSource: 'ChatPanel.qml'
+            shortcut: Qt.ControlModifier + Qt.Key_H
             text: qsTr('Chat')
             onClicked: {
                 var panel = swapper.findPanel(panelSource);
@@ -77,7 +78,7 @@ Rectangle {
             iconSource: 'dock-start.png'
             iconPress: 'start.png'
             panelSource: 'PlayerPanel.qml'
-            shortcut: Qt.ControlModifier + Qt.Key_M
+            shortcut: Qt.ControlModifier + Qt.Key_E
             text: qsTr('Media')
             visible: false
 

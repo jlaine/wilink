@@ -123,6 +123,7 @@ if(RELOAD_TRANSLATIONS)
         ../data/PhoneNotification.qml
         ../data/PhonePanel.qml
         ../data/PhotoAlbumDialog.qml
+        ../data/PhotoDeleteDialog.qml
         ../data/PhotoPanel.qml
         ../data/PlayerPanel.qml
         ../data/PreferenceDialog.qml

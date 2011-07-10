@@ -533,6 +533,17 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>PhotoDeleteDialog</name>
+    <message>
+        <source>Delete photo</source>
+        <translation>Supprimer la photo</translation>
+    </message>
+    <message>
+        <source>Do you want to delete %1 from your photos?</source>
+        <translation>Souhaitez-vous supprimer %1 de vos photos ?</translation>
+    </message>
+</context>
+<context>
     <name>PhotoPanel</name>
     <message>
         <source>Photos</source>
