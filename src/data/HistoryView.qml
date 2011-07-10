@@ -36,7 +36,6 @@ Item {
 
         property bool scrollBarAtBottom
         property bool bottomChanging: false
-        property int hoveredIndex: -1
         property int selectionStart: -1
 
         anchors.top: parent.top
@@ -47,6 +46,44 @@ Item {
         delegate: historyDelegate
         header: Rectangle { height: 2 }
         spacing: 6
+
+        highlight: Item {
+            z: 10
+
+            Button {
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                iconSource: block.state == 'selection' ? 'copy.png' : 'resize.png'
+                iconSize: appStyle.icon.tinySize
+                text: block.state == 'selection' ? qsTr('Copy selection') : qsTr('Select')
+
+                onClicked: {
+                    if (state == 'selection') {
+                        // copy selection
+                        var text = '';
+                        for (var i = 0; i <= listHelper.count; i++) {
+                            var item = listHelper.get(i);
+                            if (item.selected) {
+                                text += '>> ' + item.from + ':\n' + item.body + '\n';
+                            }
+                        }
+                        copyHelper.text = text;
+                        copyHelper.selectAll();
+                        copyHelper.copy();
+
+                        // clear selection
+                        block.state = '';
+                        historyView.selectionStart = -1;
+                        historyView.model.select(-1, -1);
+                    } else {
+                        // start selection
+                        block.state = 'selection';
+                        historyView.selectionStart = historyView.currentIndex;
+                        historyView.model.select(historyView.selectionStart, historyView.selectionStart);
+                    }
+                }
+            }
+        }
 
         Component {
             id: historyDelegate
@@ -125,17 +162,15 @@ Item {
                             anchors.fill: parent
                             hoverEnabled: true
                             onEntered: {
-                                copyButtonLoader.sourceComponent = copyButtonComponent;
                                 var rectCoords = mapToItem(historyView.contentItem, rect.x, rect.y);
-                                historyView.hoveredIndex = historyView.indexAt(rectCoords.x, rectCoords.y);
+                                historyView.currentIndex = historyView.indexAt(rectCoords.x, rectCoords.y);
 
                                 // set selection
                                 if (block.state == 'selection') {
-                                    historyView.model.select(historyView.selectionStart, historyView.hoveredIndex);
+                                    historyView.model.select(historyView.selectionStart, historyView.currentIndex);
                                 }
                             }
                             onExited: {
-                                copyButtonLoader.sourceComponent = undefined;
                             }
                         }
 
@@ -156,19 +191,6 @@ Item {
                             anchors.verticalCenter: parent.verticalCenter
                             source: model.selected ? 'checkbox-checked.png' : ''
                         }
-
-                        Loader {
-                            id: copyButtonLoader
-                            anchors.right: parent.right
-                            anchors.verticalCenter: parent.verticalCenter
-                            visible: block.state != 'selection'
-                        }
-
-                        states: State {
-                            name: "no-copyButton"
-                            when: rect.width < 100
-                            PropertyChanges { target: copyButtonLoader; visible: false }
-                        }
                     }
 
                     Item {
@@ -178,6 +200,7 @@ Item {
                 }
             }
         }
+
     }
 
     MouseArea {
@@ -190,23 +213,6 @@ Item {
             block.state = '';
             historyView.selectionStart = -1;
             historyView.model.select(-1, -1);
-        }
-    }
-
-    Component {
-        id: copyButtonComponent
-
-        Button {
-            iconSource: 'resize.png'
-            iconSize: appStyle.icon.tinySize
-            text: qsTr('Select')
-
-            onClicked: {
-                // start selection
-                block.state = 'selection';
-                historyView.selectionStart = historyView.hoveredIndex;
-                historyView.model.select(historyView.selectionStart, historyView.selectionStart);
-            }
         }
     }
 
@@ -268,9 +274,4 @@ Item {
     }
 
     Keys.forwardTo: scrollBar
-
-    states: State {
-        name: 'selection'
-        PropertyChanges { target: selection; visible: true }
-    }
 }

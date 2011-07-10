@@ -411,7 +411,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>Copy selection</source>
-        <translation type="obsolete">Copier la sélection</translation>
+        <translation>Copier la sélection</translation>
     </message>
 </context>
 <context>
