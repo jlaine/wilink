@@ -23,6 +23,7 @@
 
 QVideoGrabber::QVideoGrabber(const QXmppVideoFormat &format)
 {
+    Q_UNUSED(format);
 }
 
 QVideoGrabber::~QVideoGrabber()

@@ -134,7 +134,7 @@ qint64 QSoundMeter::writeData(const char *data, qint64 maxSize)
     return length;
 }
 
-void QSoundMeter::_q_deviceDestroyed(QObject *obj)
+void QSoundMeter::_q_deviceDestroyed(QObject*)
 {
     m_device = 0;
 }
