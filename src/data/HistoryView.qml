@@ -50,7 +50,6 @@ Item {
         highlight: Item {
             id: highlight
 
-            opacity: 0
             state: block.state
             z: 10
 
@@ -62,8 +61,8 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 iconSource: 'copy.png'
                 iconSize: appStyle.icon.tinySize
-                opacity: 0
                 text: qsTr('Copy selection')
+                visible: false
 
                 onClicked: {
                     // copy selection
@@ -93,8 +92,8 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 iconSource: 'close.png'
                 iconSize: appStyle.icon.tinySize
-                opacity: 0
                 text: qsTr('Cancel')
+                visible: false
 
                 onClicked: {
                     // cancel selection
@@ -113,6 +112,7 @@ Item {
                 iconSource: 'resize.png'
                 iconSize: appStyle.icon.tinySize
                 text: qsTr('Select')
+                visible: false
 
                 onClicked: {
                     // start selection
@@ -125,20 +125,14 @@ Item {
             states: [
                 State {
                     name: 'hover'
-                    PropertyChanges { target: highlight; opacity: 1 }
+                    PropertyChanges { target: selectButton; visible: 1 }
                 },
                 State {
                     name: 'selection'
-                    PropertyChanges { target: highlight; opacity: 1 }
-                    PropertyChanges { target: cancelButton; opacity: 1 }
-                    PropertyChanges { target: copyButton; opacity: 1 }
-                    PropertyChanges { target: selectButton; opacity: 0 }
+                    PropertyChanges { target: cancelButton; visible: 1 }
+                    PropertyChanges { target: copyButton; visible: 1 }
                 }
             ]
-
-            transitions: Transition {
-                PropertyAnimation { target: highlight; properties: 'opacity'; duration: 150 }
-            }
         }
 
         Component {
