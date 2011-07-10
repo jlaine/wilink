@@ -47,6 +47,7 @@ public:
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
 
 public slots:
+    bool addLocalFile(const QString &path);
     bool addUrl(const QUrl &url);
     void play(const QModelIndex &index);
     void stop();

@@ -34,6 +34,7 @@ class QDeclarativeFileDialog : public QFileDialog
 {
     Q_OBJECT
     Q_PROPERTY(QString directory READ directory WRITE setDirectory)
+    Q_PROPERTY(QStringList nameFilters READ nameFilters WRITE setNameFilters)
     Q_PROPERTY(QStringList selectedFiles READ selectedFiles)
 
 public:

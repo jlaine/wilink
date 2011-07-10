@@ -140,6 +140,24 @@ Panel {
             }
 
             ToolButton {
+                iconSource: 'add.png'
+                text: qsTr('Add')
+
+                onClicked: {
+                    var dialog = window.fileDialog();
+                    dialog.fileMode = QFileDialog.ExistingFiles;
+                    dialog.nameFilters = [qsTr("Sound files") + " (*.mp3 *.ogg *.wav)",
+                                          qsTr("All files") +" (*)"];
+                    dialog.windowTitle = qsTr('Add files');
+                    if (dialog.exec()) {
+                        for (var i in dialog.selectedFiles) {
+                            playerModel.addLocalFile(dialog.selectedFiles[i]);
+                        }
+                    }
+                }
+            }
+
+            ToolButton {
                 iconSource: 'close.png'
                 text: qsTr('Close')
                 onClicked: panel.close()

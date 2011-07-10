@@ -568,6 +568,37 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>PlayerPanel</name>
+    <message>
+        <source>Media player</source>
+        <translation>Lecteur média</translation>
+    </message>
+    <message>
+        <source>Stop</source>
+        <translation>Arrêter</translation>
+    </message>
+    <message>
+        <source>Add</source>
+        <translation>Ajouter</translation>
+    </message>
+    <message>
+        <source>Sound files</source>
+        <translation>Fichiers son</translation>
+    </message>
+    <message>
+        <source>All files</source>
+        <translation>Tous les fichiers</translation>
+    </message>
+    <message>
+        <source>Add files</source>
+        <translation>Ajouter des fichiers</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>Fermer</translation>
+    </message>
+</context>
+<context>
     <name>PreferenceDialog</name>
     <message>
         <source>Preferences</source>

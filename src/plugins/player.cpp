@@ -295,6 +295,11 @@ PlayerModel::~PlayerModel()
     delete d;
 }
 
+bool PlayerModel::addLocalFile(const QString &path)
+{
+    return addUrl(QUrl::fromLocalFile(path));
+}
+
 bool PlayerModel::addUrl(const QUrl &url)
 {
     if (!url.isValid())
