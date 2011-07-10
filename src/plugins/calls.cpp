@@ -135,15 +135,15 @@ void CallAudioHelper::_q_audioModeChanged(QIODevice::OpenMode mode)
 
     // start or stop playback
     if (mode & QIODevice::ReadOnly)
-        m_stream->startOutput();
+        QMetaObject::invokeMethod(m_stream, "startOutput");
     else
-        m_stream->stopOutput();
+        QMetaObject::invokeMethod(m_stream, "stopOutput");
 
     // start or stop capture
     if (mode & QIODevice::WriteOnly)
-        m_stream->startInput();
+        QMetaObject::invokeMethod(m_stream, "startInput");
     else
-        m_stream->stopInput();
+        QMetaObject::invokeMethod(m_stream, "stopInput");
 }
 
 CallVideoHelper::CallVideoHelper(QObject *parent)
