@@ -577,6 +577,14 @@ Acceptez-vous?</translation>
         <source>Create</source>
         <translation>Créer</translation>
     </message>
+    <message>
+        <source>Image files</source>
+        <translation>Fichiers images</translation>
+    </message>
+    <message>
+        <source>All files</source>
+        <translation>Tous les fichiers</translation>
+    </message>
 </context>
 <context>
     <name>PlayerPanel</name>
@@ -594,7 +602,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>Sound files</source>
-        <translation>Fichiers son</translation>
+        <translation>Fichiers sons</translation>
     </message>
     <message>
         <source>All files</source>

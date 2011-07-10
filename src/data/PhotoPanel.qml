@@ -55,6 +55,8 @@ Panel {
                 onClicked: {
                     var dialog = window.fileDialog();
                     dialog.fileMode = QFileDialog.ExistingFiles;
+                    dialog.nameFilters = [qsTr("Image files") + " (*.jpg *.jpeg *.png *.gif)",
+                                          qsTr("All files") +" (*)"];
                     dialog.windowTitle = qsTr('Upload photos');
                     if (dialog.exec()) {
                         for (var i in dialog.selectedFiles) {
