@@ -26,6 +26,7 @@
 #include <QImage>
 #include <QImageReader>
 #include <QLayout>
+#include <QThread>
 
 #include "QXmppClient.h"
 
@@ -390,6 +391,8 @@ PhotoQueueItem::PhotoQueueItem()
 
 PhotoQueueModel::PhotoQueueModel(QObject *parent)
     : ChatModel(parent),
+    m_resizer(0),
+    m_resizerThread(0),
     m_uploadDevice(0),
     m_uploadItem(0)
 {
@@ -403,9 +406,21 @@ PhotoQueueModel::PhotoQueueModel(QObject *parent)
     names.insert(TotalFilesRole, "totalFiles");
     setRoleNames(names);
 
-    m_resizer = new PhotoResizer(this);
+    m_resizerThread = new QThread;
+    m_resizerThread->start();
+
+    m_resizer = new PhotoResizer;
+    m_resizer->moveToThread(m_resizerThread);
     connect(m_resizer, SIGNAL(finished(QIODevice*)),
             this, SLOT(_q_uploadResized(QIODevice*)));
+}
+
+PhotoQueueModel::~PhotoQueueModel()
+{
+    m_resizerThread->quit();
+    m_resizerThread->wait();
+    delete m_resizer;
+    delete m_resizerThread;
 }
 
 void PhotoQueueModel::append(const QString &filePath, FileSystem *fileSystem, const QString &destinationPath)
@@ -439,7 +454,10 @@ QVariant PhotoQueueModel::data(const QModelIndex &index, int role) const
         return QVariant();
 
     if (role == AvatarRole) {
-        return QUrl::fromLocalFile(item->sourcePath);
+        // FIXME: using a thumbnail for large pictures
+        // is a total performance killer
+        //return QUrl::fromLocalFile(item->sourcePath);
+        return QUrl("qrc:/file.png");
     } else if (role == NameRole) {
         return QFileInfo(item->sourcePath).fileName();
     } else if (role == SpeedRole) {
@@ -466,7 +484,7 @@ void PhotoQueueModel::processQueue()
         PhotoQueueItem *item = static_cast<PhotoQueueItem*>(ptr);
         if (!item->finished) {
             m_uploadItem = item;
-            m_resizer->resize(item->sourcePath);
+            QMetaObject::invokeMethod(m_resizer, "resize", Q_ARG(QString, item->sourcePath));
             break;
         }
     }
@@ -479,7 +497,9 @@ void PhotoQueueModel::_q_jobFinished()
     if (m_uploadItem) {
         removeItem(m_uploadItem);
         m_uploadItem = 0;
+    }
 
+    if (m_uploadDevice) {
         delete m_uploadDevice;
         m_uploadDevice = 0;
     }

@@ -35,6 +35,7 @@ class PhotoDownloadItem;
 class PhotoQueueItem;
 class PhotoQueueModel;
 class PhotoResizer;
+class QThread;
 
 class PhotoCache : public QObject
 {
@@ -118,6 +119,7 @@ public:
     };
 
     PhotoQueueModel(QObject *parent = 0);
+    ~PhotoQueueModel();
 
     void append(const QString &sourcePath, FileSystem *fileSystem, const QString &destinationPath);
 
@@ -137,6 +139,7 @@ private:
 
     PhotoModel *m_photoModel;
     PhotoResizer *m_resizer;
+    QThread *m_resizerThread;
     QIODevice *m_uploadDevice;
     PhotoQueueItem *m_uploadItem;
 };
@@ -146,7 +149,7 @@ class PhotoResizer : public QObject
     Q_OBJECT
 
 public:
-    PhotoResizer(QObject *parent);
+    PhotoResizer(QObject *parent = 0);
 
 signals:
     void finished(QIODevice *device);
