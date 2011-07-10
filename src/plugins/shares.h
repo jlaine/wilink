@@ -24,7 +24,7 @@
 #include <QFileSystemModel>
 #include <QUrl>
 
-#include "shares/QXmppShareIq.h"
+#include "QXmppShareIq.h"
 
 #include "model.h"
 

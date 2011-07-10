@@ -10,7 +10,9 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qdjango/src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qnetio/src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qsound/src)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp/src)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp/src/core)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp/src/diagnostics)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp/src/shares)
 
 # Needed for Qt >= 4.7 on Debian/Ubuntu
 find_library(QTMULTIMEDIAKIT_LIBRARY QtMultimediaKit)
