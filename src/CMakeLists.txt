@@ -12,4 +12,4 @@ add_subdirectory(qxmpp)
 add_subdirectory(plugins)
 
 # tests
-add_subdirectory(tests)
+#add_subdirectory(tests)

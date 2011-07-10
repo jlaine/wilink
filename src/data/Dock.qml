@@ -59,7 +59,6 @@ Rectangle {
             iconPress: 'chat.png'
             notified: root.pendingMessages != 0
             panelSource: 'ChatPanel.qml'
-            shortcut: Qt.ControlModifier + Qt.Key_H
             text: qsTr('Chat')
             onClicked: {
                 var panel = swapper.findPanel(panelSource);
