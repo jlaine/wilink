@@ -48,14 +48,20 @@ Item {
         spacing: 6
 
         highlight: Item {
+            state: block.state
             z: 10
 
             Button {
+                id: button
+
+                property string copyText: qsTr('Copy selection')
+
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
                 iconSource: block.state == 'selection' ? 'copy.png' : 'resize.png'
                 iconSize: appStyle.icon.tinySize
-                text: block.state == 'selection' ? qsTr('Copy selection') : qsTr('Select')
+                opacity: 0
+                text: qsTr('Select')
 
                 onClicked: {
                     if (state == 'selection') {
@@ -83,7 +89,23 @@ Item {
                     }
                 }
             }
+
+            states: [
+                State {
+                    name: 'hover'
+                    PropertyChanges { target: button; opacity: 1 }
+                },
+                State {
+                    name: 'selection'
+                    PropertyChanges { target: button; opacity: 1; text: button.copyText }
+                }
+            ]
+
+            transitions: Transition {
+                PropertyAnimation { target: button; properties: 'opacity'; duration: 150 }
+            }
         }
+        highlightMoveDuration: 0
 
         Component {
             id: historyDelegate
@@ -168,9 +190,9 @@ Item {
                                 // set selection
                                 if (block.state == 'selection') {
                                     historyView.model.select(historyView.selectionStart, historyView.currentIndex);
+                                } else {
+                                    block.state = 'hover';
                                 }
-                            }
-                            onExited: {
                             }
                         }
 
