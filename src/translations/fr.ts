@@ -413,6 +413,10 @@ Acceptez-vous?</translation>
         <source>Copy selection</source>
         <translation>Copier la sélection</translation>
     </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
+    </message>
 </context>
 <context>
     <name>InputMenu</name>

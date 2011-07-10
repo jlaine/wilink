@@ -48,61 +48,96 @@ Item {
         spacing: 6
 
         highlight: Item {
+            id: highlight
+
+            opacity: 0
             state: block.state
             z: 10
 
             Button {
-                id: button
+                id: copyButton
 
-                property string copyText: qsTr('Copy selection')
-
-                anchors.right: parent.right
+                anchors.right: cancelButton.left
+                anchors.rightMargin: appStyle.spacing.horizontal
                 anchors.verticalCenter: parent.verticalCenter
-                iconSource: block.state == 'selection' ? 'copy.png' : 'resize.png'
+                iconSource: 'copy.png'
                 iconSize: appStyle.icon.tinySize
                 opacity: 0
+                text: qsTr('Copy selection')
+
+                onClicked: {
+                    // copy selection
+                    var text = '';
+                    for (var i = 0; i <= listHelper.count; i++) {
+                        var item = listHelper.get(i);
+                        if (item.selected) {
+                            text += '>> ' + item.from + ':\n' + item.body + '\n';
+                        }
+                    }
+                    copyHelper.text = text;
+                    copyHelper.selectAll();
+                    copyHelper.copy();
+
+                    // clear selection
+                    block.state = '';
+                    historyView.selectionStart = -1;
+                    historyView.model.select(-1, -1);
+                }
+            }
+
+            Button {
+                id: cancelButton
+
+                anchors.right: parent.right
+                anchors.rightMargin: appStyle.spacing.horizontal
+                anchors.verticalCenter: parent.verticalCenter
+                iconSource: 'close.png'
+                iconSize: appStyle.icon.tinySize
+                opacity: 0
+                text: qsTr('Cancel')
+
+                onClicked: {
+                    // cancel selection
+                    block.state = '';
+                    historyView.selectionStart = -1;
+                    historyView.model.select(-1, -1);
+                }
+            }
+
+            Button {
+                id: selectButton
+
+                anchors.right: parent.right
+                anchors.rightMargin: appStyle.spacing.horizontal
+                anchors.verticalCenter: parent.verticalCenter
+                iconSource: 'resize.png'
+                iconSize: appStyle.icon.tinySize
                 text: qsTr('Select')
 
                 onClicked: {
-                    if (block.state == 'selection') {
-                        // copy selection
-                        var text = '';
-                        for (var i = 0; i <= listHelper.count; i++) {
-                            var item = listHelper.get(i);
-                            if (item.selected) {
-                                text += '>> ' + item.from + ':\n' + item.body + '\n';
-                            }
-                        }
-                        copyHelper.text = text;
-                        copyHelper.selectAll();
-                        copyHelper.copy();
-
-                        // clear selection
-                        block.state = '';
-                        historyView.selectionStart = -1;
-                        historyView.model.select(-1, -1);
-                    } else {
-                        // start selection
-                        block.state = 'selection';
-                        historyView.selectionStart = historyView.currentIndex;
-                        historyView.model.select(historyView.selectionStart, historyView.selectionStart);
-                    }
+                    // start selection
+                    block.state = 'selection';
+                    historyView.selectionStart = historyView.currentIndex;
+                    historyView.model.select(historyView.selectionStart, historyView.selectionStart);
                 }
             }
 
             states: [
                 State {
                     name: 'hover'
-                    PropertyChanges { target: button; opacity: 1 }
+                    PropertyChanges { target: highlight; opacity: 1 }
                 },
                 State {
                     name: 'selection'
-                    PropertyChanges { target: button; opacity: 1; text: button.copyText }
+                    PropertyChanges { target: highlight; opacity: 1 }
+                    PropertyChanges { target: cancelButton; opacity: 1 }
+                    PropertyChanges { target: copyButton; opacity: 1 }
+                    PropertyChanges { target: selectButton; opacity: 0 }
                 }
             ]
 
             transitions: Transition {
-                PropertyAnimation { target: button; properties: 'opacity'; duration: 150 }
+                PropertyAnimation { target: highlight; properties: 'opacity'; duration: 150 }
             }
         }
 
@@ -182,13 +217,6 @@ Item {
                         MouseArea {
                             anchors.fill: parent
                             hoverEnabled: true
-
-                            onClicked: {
-                                // cancel selection
-                                block.state = '';
-                                historyView.selectionStart = -1;
-                                historyView.model.select(-1, -1);
-                            }
 
                             onEntered: {
                                 var rectCoords = mapToItem(historyView.contentItem, rect.x, rect.y);
