@@ -136,15 +136,19 @@ NetworkAccessManager::NetworkAccessManager(QObject *parent)
     : QNetworkAccessManager(parent)
 {
     bool check;
+    Q_UNUSED(check);
 
     QNetworkDiskCache *cache = new QNetworkDiskCache(this);
     cache->setCacheDirectory(wApp->cacheDirectory());
     setCache(cache);
 
-    check = QObject::connect(this, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
-                             QNetIO::Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*,QAuthenticator*)));
+    check = connect(this, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
+                    QNetIO::Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*,QAuthenticator*)));
     Q_ASSERT(check);
-    Q_UNUSED(check);
+
+    check = connect(this, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)),
+                    this, SLOT(onSslErrors(QNetworkReply*,QList<QSslError>)));
+    Q_ASSERT(check);
 }
 
 QNetworkReply *NetworkAccessManager::createRequest(Operation op, const QNetworkRequest &req, QIODevice *outgoingData)
@@ -159,11 +163,12 @@ void NetworkAccessManager::onSslErrors(QNetworkReply *reply, const QList<QSslErr
 {
     QList<QSslError>::const_iterator iter;
 
-    qWarning("Wallet SSL errors:");
+    qWarning("SSL errors:");
     for (iter = errors.constBegin(); iter != errors.constEnd(); iter++)
         qWarning("* %s", qPrintable(iter->errorString()));
 
-    reply->ignoreSslErrors();
+    // uncomment for debugging purposes only
+    //reply->ignoreSslErrors();
 }
 
 DeclarativeWallet::DeclarativeWallet(QObject *parent)
