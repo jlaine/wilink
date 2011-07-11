@@ -47,10 +47,12 @@ Item {
         header: Rectangle { height: 2 }
         spacing: 6
 
+        highlightMoveDuration: 500
         highlight: Item {
             id: highlight
 
             state: block.state
+            width: parent.width - 1
             z: 10
 
             Button {
