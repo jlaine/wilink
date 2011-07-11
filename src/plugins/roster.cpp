@@ -106,7 +106,6 @@ RosterItem::~RosterItem()
 VCard *RosterItem::vcard()
 {
     if (!m_vcard) {
-        qDebug("creating vcard %s", qPrintable(jid));
         m_vcard = new VCard;
         m_vcard->setJid(jid);
     }
@@ -416,6 +415,9 @@ VCard::VCard(QObject *parent)
     m_cache(0),
     m_features(0)
 {
+#ifdef DEBUG_ROSTER
+    qDebug("creating vcard %s", qPrintable(jid));
+#endif
 }
 
 QUrl VCard::avatar() const
@@ -610,7 +612,9 @@ VCard::Features VCardCache::features(const QString &jid) const
                 if (d->features.contains(fullJid)) {
                     features |= d->features.value(fullJid);
                 } else if (!d->discoQueue.contains(fullJid)) {
+#ifdef DEBUG_ROSTER
                     qDebug("requesting disco %s", qPrintable(fullJid));
+#endif
                     client->discoveryManager()->requestInfo(fullJid);
                     d->discoQueue.insert(fullJid);
                 }
@@ -637,7 +641,9 @@ bool VCardCache::get(const QString &jid, QXmppVCardIq *iq)
         return true;
     ChatClient *client = this->client(jid);
     if (client) {
+#ifdef DEBUG_ROSTER
         qDebug("requesting vCard %s", qPrintable(jid));
+#endif
         d->vcardQueue.insert(jid);
         client->vCardManager().requestVCard(jid);
     }
@@ -709,7 +715,9 @@ void VCardCache::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
     if (!d->discoQueue.remove(jid) || disco.type() != QXmppIq::Result)
         return;
 
+#ifdef DEBUG_ROSTER
     qDebug("received disco %s", qPrintable(jid));
+#endif
     VCard::Features features = 0;
     foreach (const QString &var, disco.features())
     {
@@ -780,12 +788,16 @@ void VCardCache::vCardReceived(const QXmppVCardIq& vCard)
         return;
 
     if (vCard.type() == QXmppIq::Result) {
+#ifdef DEBUG_ROSTER
         qDebug("received vCard %s", qPrintable(jid));
+#endif
         d->vcardFailed.remove(jid);
         writeIq(d->cache, QString("xmpp:%1?vcard").arg(jid), vCard, 3600);
         emit cardChanged(jid);
     } else if (vCard.type() == QXmppIq::Error) {
-        qDebug("failed vCard %s", qPrintable(jid));
+#ifdef DEBUG_ROSTER
+        qWarning("failed vCard %s", qPrintable(jid));
+#endif
         d->vcardFailed.insert(jid);
     }
 }

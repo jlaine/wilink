@@ -445,7 +445,7 @@ void PhoneCallsModel::stopTone(QXmppRtpAudioChannel::Tone tone)
  */
 void PhoneCallsModel::_q_getSettings()
 {
-    qDebug("fetching phone settings");
+    qDebug("Fetching phone settings");
     QNetworkRequest req(QUrl("https://www.wifirst.net/wilink/voip"));
     req.setRawHeader("Accept", "application/xml");
     req.setRawHeader("User-Agent", QString(qApp->applicationName() + "/" + qApp->applicationVersion()).toAscii());
@@ -459,7 +459,7 @@ void PhoneCallsModel::_q_handleSettings()
     Q_ASSERT(reply);
 
     if (reply->error() != QNetworkReply::NoError) {
-        qWarning("failed to retrieve phone settings: %s", qPrintable(reply->errorString()));
+        qWarning("Failed to retrieve phone settings: %s", qPrintable(reply->errorString()));
         // retry in 5mn
         m_timer->start(300000);
         return;

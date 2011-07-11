@@ -467,7 +467,7 @@ void ShareModel::_q_presenceReceived(const QXmppPresence &presence)
         const QString forceProxy = shareExtension.firstChildElement("force-proxy").value();
         QXmppTransferManager *transferManager = d->shareClient->findExtension<QXmppTransferManager>();
         if (forceProxy == QLatin1String("1") && !transferManager->proxyOnly()) {
-            qDebug("Forcing SOCKS5 proxy");
+            qDebug("Shares forcing SOCKS5 proxy");
             transferManager->setProxyOnly(true);
         }
 
@@ -498,7 +498,7 @@ void ShareModel::_q_presenceReceived(const QXmppPresence &presence)
         // avoid redirect loop
         if (d->shareClient != d->client ||
             newDomain == d->client->configuration().domain()) {
-            qWarning("Not redirecting to %s", qPrintable(newDomain));
+            qWarning("Shares not redirecting to domain %s", qPrintable(newDomain));
             return;
         }
 
@@ -513,7 +513,7 @@ void ShareModel::_q_presenceReceived(const QXmppPresence &presence)
         d->setShareClient(newClient);
 
         // reconnect to another server
-        qDebug("Redirecting to %s", qPrintable(newDomain));
+        qDebug("Shares redirecting to %s", qPrintable(newDomain));
         newClient->connectToServer(newJid, d->client->configuration().password());
     }
 }
@@ -528,7 +528,7 @@ void ShareModel::_q_serverChanged(const QString &server)
     if (d->shareServer.isEmpty())
         return;
 
-    qDebug("registering with %s", qPrintable(d->shareServer));
+    qDebug("Shares registering with %s", qPrintable(d->shareServer));
 
     // register with server
     QXmppElement x;
