@@ -238,16 +238,16 @@ void ChatClient::slotDiscoveryInfoReceived(const QXmppDiscoveryIq &disco)
     foreach (const QXmppDiscoveryIq::Identity &id, disco.identities())
     {
         // check if it's a conference server
-        if (id.category() == "conference" &&
-            id.type() == "text")
+        if (id.category() == QLatin1String("conference") &&
+            id.type() == QLatin1String("text"))
         {
             m_mucServer = disco.from();
             info("Found chat room server " + m_mucServer);
             emit mucServerChanged(m_mucServer);
         }
         // check if it's a diagnostics server
-        else if (id.category() == "diagnostics" &&
-                 id.type() == "server")
+        else if (id.category() == QLatin1String("diagnostics") &&
+                 id.type() == QLatin1String("server"))
         {
             m_diagnosticServer = disco.from();
             info("Found diagnostics server " + m_diagnosticServer);
@@ -255,8 +255,8 @@ void ChatClient::slotDiscoveryInfoReceived(const QXmppDiscoveryIq &disco)
         }
 #if 0
         // check if it's a publish-subscribe server
-        else if (id.category() == "pubsub" &&
-                 id.type() == "service")
+        else if (id.category() == QLatin1String("pubsub") &&
+                 id.type() == QLatin1String("service"))
         {
             m_pubSubServer = disco.from();
             info("Found pubsub server " + m_pubSubServer);
@@ -264,8 +264,8 @@ void ChatClient::slotDiscoveryInfoReceived(const QXmppDiscoveryIq &disco)
         }
 #endif
         // check if it's a SOCKS5 proxy server
-        else if (id.category() == "proxy" &&
-                 id.type() == "bytestreams")
+        else if (id.category() == QLatin1String("proxy") &&
+                 id.type() == QLatin1String("bytestreams"))
         {
             info("Found bytestream proxy " + disco.from());
             QXmppTransferManager *transferManager = findExtension<QXmppTransferManager>();
@@ -273,8 +273,8 @@ void ChatClient::slotDiscoveryInfoReceived(const QXmppDiscoveryIq &disco)
                 transferManager->setProxy(disco.from());
         }
         // check if it's a file sharing server
-        else if (id.category() == "store" &&
-                 id.type() == "file")
+        else if (id.category() == QLatin1String("store") &&
+                 id.type() == QLatin1String("file"))
         {
             m_shareServer = disco.from();
             info("Found share server " + m_shareServer);

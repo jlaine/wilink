@@ -148,7 +148,7 @@ void DiagnosticsAgent::handle(const DiagnosticsIq &request)
                 {
                     if (!gateways.contains(address))
                         gateways.append(address);
-                    if (hostName == "www.google.fr")
+                    if (hostName == QLatin1String("www.google.fr"))
                         longPing.append(address);
                     break;
                 }
@@ -417,7 +417,7 @@ void DiagnosticManager::handleResults(const DiagnosticsIq &results)
 
 bool DiagnosticManager::handleStanza(const QDomElement &stanza)
 {
-    if (stanza.tagName() == "iq" && DiagnosticsIq::isDiagnosticsIq(stanza)) {
+    if (stanza.tagName() == QLatin1String("iq") && DiagnosticsIq::isDiagnosticsIq(stanza)) {
         DiagnosticsIq iq;
         iq.parse(stanza);
 
