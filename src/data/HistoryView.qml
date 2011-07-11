@@ -69,12 +69,24 @@ Item {
                 visible: false
 
                 onClicked: {
+                    // get selection
+                    var selection = [];
+                    for (var i = 0; i <= listHelper.count; i++) {
+                        if (listHelper.getProperty(i, 'selected'))
+                            selection.push(i);
+                    }
+
                     // copy selection
                     var text = '';
-                    for (var i = 0; i <= listHelper.count; i++) {
-                        var item = listHelper.get(i);
-                        if (item.selected) {
-                            text += '>> ' + item.from + ':\n' + item.body + '\n';
+                    if (selection.length == 1) {
+                        text = listHelper.get(selection[0]).body;
+                    } else {
+                        for (var i in selection) {
+                            var item = listHelper.get(selection[i]);
+                            text += '[ ' + item.from + ' - ' + Qt.formatDateTime(item.date, 'dd MMM hh:mm') + ' ]\n';
+                            text += item.body;
+                            if (i < selection.length - 1)
+                                text += '\n\n';
                         }
                     }
                     appClipboard.copy(text);
