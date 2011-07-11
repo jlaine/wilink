@@ -1,7 +1,10 @@
 Jeremy Lainé <jeremy.laine@bolloretelecom.eu>
- * Principal developer of wiLink
+ * Principal developer of wiLink.
 
 Adrien Demarez <adrien.demarez@bolloretelecom.eu>
  * Support for vCard images in chat application.
  * Support for browsing images in photos application.
 
+Nicolas Pellegrin <nicolas.pellegrin@bolloretelecom.eu>
+ * Icons, partly based on KDE's Oxygen icons.
+ * A large number of QML user interfaces and general styling.
