@@ -1,20 +1,29 @@
 wiLink 1.2.0 (UNRELEASED)
+ * Full user interface rewrite in QML.
  * Calls:
   - Add support for double NAT traversal using TURN.
-  - Add initial support for video calls.
+  - Add support for video calls on Linux/Mac/Windows.
   - Add a "call" action in conversations instead of right-click.
+  - Display input / output volume using bars.
  * Conversations:
   - Display avatars in chat history.
+  - Display contact status in the top bar.
   - Do not regroup messages over one hour apart.
   - Update friendly names in history as roster changes.
   - Improve notification bubbles on Linux.
+  - Significant performance improvements for large histories.
  * Menu:
   - Raise retry interval to 5 minutes.
   - Make sure there are no concurrent refreshes.
  * Player:
   - Do not use app-wide network cache (fixes crash on account add/remove).
+ * Photos:
+  - Smooth animation when switching between photos.
+ * Preferences:
+  - Unify all preferences into a single dialog.
  * Roster:
   - Invalidate client capabilities when the verification string changes.
+  - Performance improvements.
  * Transfers:
   - Add a "send file" action in conversations instead of right-click.
  * Telephone:
