@@ -4,7 +4,7 @@ set(QT_USE_QTXML 1)
 include(${QT_USE_FILE})
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qsound/src)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp/src)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp/src/core)
 add_definitions(-DWILINK_VERSION="${WILINK_VERSION}")
 
 # tests

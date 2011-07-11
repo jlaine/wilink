@@ -24,8 +24,8 @@
 #include "QDjango.h"
 #include "QXmppClient.h"
 #include "QXmppPresence.h"
-#include "QXmppShareManager.h"
 #include "QXmppShareDatabase.h"
+#include "QXmppShareManager.h"
 #include "QXmppTransferManager.h"
 #include "QXmppUtils.h"
 

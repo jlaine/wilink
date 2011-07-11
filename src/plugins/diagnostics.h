@@ -22,7 +22,7 @@
 
 #include "QXmppClientExtension.h"
 
-#include "diagnostics/iq.h"
+#include "iq.h"
 
 class DiagnosticManager;
 class QTimer;
