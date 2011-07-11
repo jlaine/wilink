@@ -428,7 +428,6 @@ PhotoQueueModel::~PhotoQueueModel()
 
 void PhotoQueueModel::append(const QString &filePath, FileSystem *fileSystem, const QString &destinationPath)
 {
-    qDebug("Adding item %s", qPrintable(filePath));
     PhotoQueueItem *item = new PhotoQueueItem;
     item->sourcePath = filePath;
     item->destinationPath = destinationPath;
