@@ -49,7 +49,7 @@ FocusScope {
         }
 
         // otherwise create the panel
-        console.log("creating panel " + source + " " + propDump(properties));
+        console.log("PanelSwapper creating panel " + source + " " + propDump(properties));
         var component = Qt.createComponent(source);
         if (component.status == Component.Ready)
             finishCreation();
@@ -70,7 +70,7 @@ FocusScope {
             panel.close.connect(function() {
                 for (var i = 0; i < panels.count; i += 1) {
                     if (panels.get(i).panel == panel) {
-                        console.log("removing panel " + panels.get(i).source + " " + propDump(panels.get(i).properties));
+                        console.log("PanelSwapper removing panel " + panels.get(i).source + " " + propDump(panels.get(i).properties));
 
                         // if the panel was visible, show last remaining panel
                         if (swapper.currentItem == panel) {
