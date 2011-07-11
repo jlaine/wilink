@@ -1113,7 +1113,10 @@ SharePlaceModel::SharePlaceModel(QObject *parent)
         QDir dir(path);
         if (path.isEmpty() || dir == QDir::home())
             continue;
-        m_paths << path;
+
+        // do not use "path" directly, on Windows it uses back slashes
+        // where the rest of Qt uses forward slashes
+        m_paths << dir.path();
     }
 }
 
