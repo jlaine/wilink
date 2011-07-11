@@ -51,6 +51,7 @@ Item {
             id: highlight
 
             state: block.state
+            width: parent.width - 1
             z: 10
 
             Button {
