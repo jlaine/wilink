@@ -131,6 +131,7 @@ Item {
             anchors.right: hangupButton.left
             anchors.top: parent.top
             anchors.margins: 4
+            enabled: Qt.isQtObject(call) && call.state == QXmppCall.ActiveState
             iconSource: 'camera.png'
         }
 
