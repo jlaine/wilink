@@ -466,8 +466,7 @@ void ShareModel::_q_presenceReceived(const QXmppPresence &presence)
         // configure transfer manager
         const QString forceProxy = shareExtension.firstChildElement("force-proxy").value();
         QXmppTransferManager *transferManager = d->shareClient->findExtension<QXmppTransferManager>();
-        if (forceProxy == "1" && !transferManager->proxyOnly())
-        {
+        if (forceProxy == QLatin1String("1") && !transferManager->proxyOnly()) {
             qDebug("Forcing SOCKS5 proxy");
             transferManager->setProxyOnly(true);
         }

@@ -700,7 +700,7 @@ void VCardCache::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
             features |= VCard::VideoFeature;
     }
     foreach (const QXmppDiscoveryIq::Identity& id, disco.identities()) {
-        if (id.name() == "iChatAgent")
+        if (id.name() == QLatin1String("iChatAgent"))
             features |= VCard::ChatStatesFeature;
     }
     d->features.insert(jid, features);

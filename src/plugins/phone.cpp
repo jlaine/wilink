@@ -470,7 +470,7 @@ void PhoneCallsModel::_q_handleSettings()
     QDomElement settings = doc.documentElement();
 
     // parse settings from server
-    const bool enabled = settings.firstChildElement("enabled").text() == "true";
+    const bool enabled = settings.firstChildElement("enabled").text() == QLatin1String("true");
     const QString domain = settings.firstChildElement("domain").text();
     const QString username = settings.firstChildElement("username").text();
     const QString password = settings.firstChildElement("password").text();

@@ -67,8 +67,11 @@ static bool isImage(const QString &fileName)
 {
     if (fileName.isEmpty())
         return false;
-    QString extension = fileName.split(".").last().toLower();
-    return (extension == "gif" || extension == "jpg" || extension == "jpeg" || extension == "png");
+    const QString extension = fileName.split(".").last().toLower();
+    return (extension == QLatin1String("gif") ||
+            extension == QLatin1String("jpg") ||
+            extension == QLatin1String("jpeg") ||
+            extension == QLatin1String("png"));
 }
 
 PhotoCache::PhotoCache()

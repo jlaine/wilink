@@ -107,7 +107,7 @@ bool UpdaterPrivate::checkCachedFile() const
 {
     /* check file integrity */
     foreach (const QString &type, release.hashes.keys()) {
-        if (type == "sha1") {
+        if (type == QLatin1String("sha1")) {
             QFile downloadFile(cacheFile());
             if (!downloadFile.open(QIODevice::ReadOnly))
                 return false;

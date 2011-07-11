@@ -49,7 +49,8 @@ enum PlayerRole {
 
 static bool isLocal(const QUrl &url)
 {
-    return url.scheme() == "file" || url.scheme() == "qrc";
+    return url.scheme() == QLatin1String("file") ||
+           url.scheme() == QLatin1String("qrc");
 }
 
 class Item : public ChatModelItem
@@ -225,9 +226,8 @@ QSoundFile::FileType PlayerModelPrivate::dataType(Item *item)
         return QSoundFile::typeFromFileName(item->url.toLocalFile());
     } else if (dataCache.contains(item->url)) {
         const QUrl audioUrl = dataCache.value(item->url);
-        QNetworkCacheMetaData::RawHeaderList headers = network->cache()->metaData(audioUrl).rawHeaders();
-        foreach (const QNetworkCacheMetaData::RawHeader &header, headers)
-        {
+        const QNetworkCacheMetaData::RawHeaderList headers = network->cache()->metaData(audioUrl).rawHeaders();
+        foreach (const QNetworkCacheMetaData::RawHeader &header, headers) {
             if (header.first.toLower() == "content-type")
                 return QSoundFile::typeFromMimeType(header.second);
         }
@@ -365,7 +365,7 @@ void PlayerModel::dataReceived()
     const QString mimeType = reply->header(QNetworkRequest::ContentTypeHeader).toString();
     QList<Item*> items = d->find(rootItem, UrlRole, dataUrl);
     foreach (Item *item, items) {
-        if (mimeType == "application/xml") {
+        if (mimeType == QLatin1String("application/xml")) {
             QIODevice *device = d->dataFile(item);
             d->processXml(item, device);
             delete device;
