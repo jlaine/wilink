@@ -821,15 +821,15 @@ QSoundFile::FileType QSoundFile::typeFromFileName(const QString &name)
  */
 QSoundFile::FileType QSoundFile::typeFromMimeType(const QByteArray &mimeType)
 {
-    if (mimeType == QLatin1String("audio/mpeg"))
+    if (mimeType == "audio/mpeg")
         return QSoundFile::Mp3File;
-    else if (mimeType == QLatin1String("audio/ogg") ||
-             mimeType == QLatin1String("application/ogg"))
+    else if (mimeType == "audio/ogg" ||
+             mimeType == "application/ogg")
         return QSoundFile::OggFile;
-    else if (mimeType == QLatin1String("audio/vnd.wave") ||
-             mimeType == QLatin1String("audio/wav") ||
-             mimeType == QLatin1String("audio/wave") ||
-             mimeType == QLatin1String("audio/x-wav"))
+    else if (mimeType == "audio/vnd.wave" ||
+             mimeType == "audio/wav" ||
+             mimeType == "audio/wave" ||
+             mimeType == "audio/x-wav")
         return QSoundFile::WavFile;
     else
         return QSoundFile::UnknownFile;
