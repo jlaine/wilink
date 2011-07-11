@@ -77,7 +77,43 @@ void writeIq(QAbstractNetworkCache *cache, const QUrl &url, const T &iq, int cac
     cache->insert(ioDevice);
 }
 
-static QString getStatusName(const QString &jid)
+class RosterItem : public ChatModelItem
+{
+public:
+    RosterItem();
+    ~RosterItem();
+    QString statusName() const;
+    VCard* vcard();
+
+    QString jid;
+    int messages;
+
+private:
+    VCard *m_vcard;
+};
+
+RosterItem::RosterItem()
+    : m_vcard(0)
+{
+}
+
+RosterItem::~RosterItem()
+{
+    if (m_vcard)
+        delete m_vcard;
+}
+
+VCard *RosterItem::vcard()
+{
+    if (!m_vcard) {
+        qDebug("creating vcard %s", qPrintable(jid));
+        m_vcard = new VCard;
+        m_vcard->setJid(jid);
+    }
+    return m_vcard;
+}
+
+QString RosterItem::statusName() const
 {
     const QXmppPresence::Status::Type type = VCardCache::instance()->presenceStatus(jid);
     if (type == QXmppPresence::Status::Offline)
@@ -89,13 +125,6 @@ static QString getStatusName(const QString &jid)
     else
         return "busy";
 }
-
-class RosterItem : public ChatModelItem
-{
-public:
-    QString jid;
-    int messages;
-};
 
 RosterImageProvider::RosterImageProvider()
     : QDeclarativeImageProvider(Pixmap)
@@ -234,21 +263,17 @@ QVariant RosterModel::data(const QModelIndex &index, int role) const
     if (role == JidRole) {
         return item->jid;
     } else if (role == AvatarRole) {
-        return VCardCache::instance()->imageUrl(item->jid);
+        return item->vcard()->avatar();
     } else if (role == MessagesRole) {
         return item->messages;
     } else if (role == NameRole) {
-        VCard card;
-        card.setJid(item->jid);
-        return card.name();
+        return item->vcard()->name();
     } else if (role == StatusRole) {
         return VCardCache::instance()->presenceStatus(item->jid);
     } else if (role == StatusFilterRole) {
-        return getStatusName(item->jid);
+        return item->statusName();
     } else if (role == StatusSortRole) {
-        VCard card;
-        card.setJid(item->jid);
-        return getStatusName(item->jid) + sortSeparator + card.name().toLower() + sortSeparator + item->jid.toLower();
+        return item->statusName() + sortSeparator + item->vcard()->name().toLower() + sortSeparator + item->jid.toLower();
     }
 
     return QVariant();
