@@ -31,6 +31,15 @@ Item {
             var req = new XMLHttpRequest();
             req.onreadystatechange = function() {
                 if (req.readyState == XMLHttpRequest.DONE) {
+                    if (req.status != 200) {
+                        // retry in 5mn
+                        var refresh = 300;
+                        console.log("Menu failed, retry in " + refresh + "s");
+                        timer.interval = refresh * 1000;
+                        timer.start();
+                        return;
+                    }
+
                     var root = req.responseXML.documentElement;
 
                     // parse menu
@@ -40,7 +49,7 @@ Item {
                         var image = Utils.getElementsByTagName(entries[i], 'image')[0].firstChild.nodeValue;
                         var label = Utils.getElementsByTagName(entries[i], 'label')[0].firstChild.nodeValue;
                         var link = Utils.getElementsByTagName(entries[i], 'link')[0].firstChild.nodeValue;
-                        console.log("menu entry '" + label + "' -> " + link);
+                        //console.log("Menu entry '" + label + "' -> " + link);
 
                         // check for "home" chat room
                         var roomCap = link.match(/xmpp:([^?]+)\?join/);
@@ -53,7 +62,7 @@ Item {
                     var prefs = Utils.getElementsByTagName(root, 'preferences')[0];
                     var refresh = parseInt(Utils.getElementsByTagName(prefs, 'refresh')[0].firstChild.nodeValue);
                     if (refresh > 0) {
-                        console.log("menu refresh in " + refresh);
+                        console.log("Menu succeeded, refresh in " + refresh + "s");
                         timer.interval = refresh * 1000;
                         timer.start();
                     }
