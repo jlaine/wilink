@@ -6,6 +6,7 @@ wiLink 1.2.0 (UNRELEASED)
   - Add a "call" action in conversations instead of right-click.
   - Display input / output volume using bars.
  * Conversations:
+  - Add support for smileys :)
   - Display avatars in chat history.
   - Display contact status in the top bar.
   - Do not regroup messages over one hour apart.
