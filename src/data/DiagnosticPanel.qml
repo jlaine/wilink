@@ -37,11 +37,7 @@ Panel {
                 enabled: !appClient.diagnosticManager.running
                 text: qsTr('Copy')
 
-                onClicked: {
-                    copyHelper.text = diagnostic.text;
-                    copyHelper.selectAll();
-                    copyHelper.copy();
-                }
+                onClicked: appClipboard.copy(diagnostic.text)
             }
             ToolButton {
                 iconSource: 'refresh.png'
@@ -93,11 +89,6 @@ Panel {
             font.pixelSize: appStyle.font.largeSize
             text: qsTr('Diagnostics in progress..')
         }
-    }
-
-    TextEdit {
-        id: copyHelper
-        visible: false
     }
 
     Component.onCompleted: {

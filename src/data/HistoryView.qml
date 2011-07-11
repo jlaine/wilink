@@ -77,9 +77,7 @@ Item {
                             text += '>> ' + item.from + ':\n' + item.body + '\n';
                         }
                     }
-                    copyHelper.text = text;
-                    copyHelper.selectAll();
-                    copyHelper.copy();
+                    appClipboard.copy(text);
 
                     // clear selection
                     block.state = '';
@@ -231,11 +229,6 @@ Item {
             }
         }
 
-    }
-
-    TextEdit {
-        id: copyHelper
-        visible: false
     }
 
     Rectangle {

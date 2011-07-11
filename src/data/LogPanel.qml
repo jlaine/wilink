@@ -59,15 +59,14 @@ Panel {
                 text: qsTr('Copy')
                 onClicked: {
                     // copy the 20 last messages, to avoid freeze with important log
-                    copyHelper.text = '';
+                    var text = '';
                     var count = listHelper.count;
                     for (var i = Math.max(0, count - 20); i < count; i++) {
                         var item = listHelper.get(i);
-                        copyHelper.text += Qt.formatDateTime(item.date, 'hh:mm:ss') + '\n';
-                        copyHelper.text += item.content + '\n';
+                        text += Qt.formatDateTime(item.date, 'hh:mm:ss') + '\n';
+                        text += item.content + '\n';
                     }
-                    copyHelper.selectAll();
-                    copyHelper.copy();
+                    appClipboard.copy(text);
                 }
             }
 
@@ -144,11 +143,6 @@ Panel {
         anchors.bottom: parent.bottom
         anchors.right: parent.right
         flickableItem: view
-    }
-
-    TextEdit {
-        id: copyHelper
-        visible: false
     }
 }
 
