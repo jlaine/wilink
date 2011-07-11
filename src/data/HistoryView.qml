@@ -65,7 +65,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 iconSource: 'copy.png'
                 iconSize: appStyle.icon.tinySize
-                text: qsTr('Copy selection')
+                text: qsTr('Copy')
                 visible: false
 
                 onClicked: {
@@ -107,30 +107,7 @@ Item {
                 }
             }
 
-            Button {
-                id: selectButton
-
-                anchors.right: parent.right
-                anchors.rightMargin: appStyle.spacing.horizontal
-                anchors.verticalCenter: parent.verticalCenter
-                iconSource: 'resize.png'
-                iconSize: appStyle.icon.tinySize
-                text: qsTr('Select')
-                visible: false
-
-                onClicked: {
-                    // start selection
-                    block.state = 'selection';
-                    historyView.selectionStart = historyView.currentIndex;
-                    historyView.model.select(historyView.selectionStart, historyView.selectionStart);
-                }
-            }
-
             states: [
-                State {
-                    name: 'hover'
-                    PropertyChanges { target: selectButton; visible: 1 }
-                },
                 State {
                     name: 'selection'
                     PropertyChanges { target: cancelButton; visible: 1 }
@@ -214,17 +191,21 @@ Item {
 
                         MouseArea {
                             anchors.fill: parent
-                            hoverEnabled: true
+                            hoverEnabled: block.state == 'selection'
+
+                            onDoubleClicked: {
+                                // start selection
+                                historyView.currentIndex = model.index;
+                                historyView.selectionStart = model.index;
+                                historyView.model.select(model.index, model.index);
+                                block.state = 'selection';
+                            }
 
                             onEntered: {
-                                var rectCoords = mapToItem(historyView.contentItem, rect.x, rect.y);
-                                historyView.currentIndex = historyView.indexAt(rectCoords.x, rectCoords.y);
-
-                                // set selection
                                 if (block.state == 'selection') {
+                                    // update selection
+                                    historyView.currentIndex = model.index;
                                     historyView.model.select(historyView.selectionStart, historyView.currentIndex);
-                                } else {
-                                    block.state = 'hover';
                                 }
                             }
                         }
