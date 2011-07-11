@@ -26,6 +26,8 @@ Item {
     property alias model: historyView.model
     signal participantClicked(string participant)
 
+    clip: true
+
     ListHelper {
         id: listHelper
         model: historyView.model
