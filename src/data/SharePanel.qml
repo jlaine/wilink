@@ -51,6 +51,14 @@ Panel {
                     var panel = dialogSwapper.findPanel('PreferenceDialog.qml');
                     panel.showPanel('SharePreferencePanel.qml');
                 }
+
+                // run one-time configuration dialog
+                Component.onCompleted: {
+                    if (!application.settings.sharesConfigured) {
+                        preferenceButton.clicked();
+                        application.settings.sharesConfigured = true;
+                    }
+                }
             }
         }
     }
@@ -171,13 +179,5 @@ Panel {
         height: queueView.count > 0 ? 120 : 0
         model: view.model.queue
         style: 'shares'
-    }
-
-    // run one-time configuration dialog
-    Component.onCompleted: {
-        if (!application.settings.sharesConfigured) {
-            preferenceButton.clicked();
-            application.settings.sharesConfigured = true;
-        }
     }
 }
