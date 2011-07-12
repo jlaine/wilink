@@ -27,6 +27,7 @@
 #include "QXmppCallManager.h"
 #include "QXmppDiscoveryManager.h"
 #include "QXmppMucManager.h"
+#include "QXmppRtpChannel.h"
 #include "QXmppRosterManager.h"
 #include "QXmppTransferManager.h"
 #include "QXmppUtils.h"

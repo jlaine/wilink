@@ -28,6 +28,7 @@
 
 #include "QSoundMeter.h"
 #include "QSoundPlayer.h"
+#include "QXmppRtpChannel.h"
 #include "QXmppUtils.h"
 
 #include "application.h"
@@ -425,18 +426,25 @@ QUrl PhoneCallsModel::selfcareUrl() const
  *
  * @param tone
  */
-void PhoneCallsModel::startTone(QXmppRtpAudioChannel::Tone tone)
+void PhoneCallsModel::startTone(int toneValue)
 {
-    foreach (SipCall *call, activeCalls())
+    if (toneValue < QXmppRtpAudioChannel::Tone_0 || toneValue > QXmppRtpAudioChannel::Tone_D)
+        return;
+    QXmppRtpAudioChannel::Tone tone = static_cast<QXmppRtpAudioChannel::Tone>(toneValue);
+    foreach (SipCall *call, activeCalls()) {
         call->audioChannel()->startTone(tone);
+    }
 }
 
 /** Stops sending a tone.
  *
  * @param tone
  */
-void PhoneCallsModel::stopTone(QXmppRtpAudioChannel::Tone tone)
+void PhoneCallsModel::stopTone(int toneValue)
 {
+    if (toneValue < QXmppRtpAudioChannel::Tone_0 || toneValue > QXmppRtpAudioChannel::Tone_D)
+        return;
+    QXmppRtpAudioChannel::Tone tone = static_cast<QXmppRtpAudioChannel::Tone>(toneValue);
     foreach (SipCall *call, activeCalls())
         call->audioChannel()->stopTone(tone);
 }
