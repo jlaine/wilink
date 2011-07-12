@@ -97,10 +97,11 @@ Panel {
                         var device = names[i];
                         model.append({'text': device});
                         if (device == application.settings.audioOutputDeviceName) {
-                            console.log("found output " + device + " at " + i);
                             output.currentIndex = i;
                         }
                     }
+                    if (output.currentIndex < 0 && names.length > 0)
+                        output.currentIndex = 0;
                 }
             }
 
@@ -133,10 +134,11 @@ Panel {
                         var device = names[i];
                         model.append({'text': device});
                         if (device == application.settings.audioInputDeviceName) {
-                            console.log("found input " + device + " at " + i);
                             input.currentIndex = i;
                         }
                     }
+                    if (input.currentIndex < 0 && names.length > 0)
+                        input.currentIndex = 0;
                 }
             }
 
