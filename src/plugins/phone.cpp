@@ -270,7 +270,9 @@ void PhoneCallsModel::callStateChanged(QXmppCall::State state)
         request.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
         m_network->put(request, item->data());
 
-        call->deleteLater();
+        // FIXME: ugly workaround for a race condition causing a crash in
+        // PhoneNotification.qml
+        QTimer::singleShot(1000, call, SLOT(deleteLater()));
     }
     emit dataChanged(createIndex(row, 0), createIndex(row, 0));
 }
