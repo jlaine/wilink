@@ -19,7 +19,9 @@ wiLink 1.2.0 (UNRELEASED)
  * Player:
   - Do not use app-wide network cache (fixes crash on account add/remove).
  * Photos:
+  - Make UI more responsive by using thumbnails then full photo.
   - Smooth animation when switching between photos.
+  - Improve keyboard navigation.
  * Preferences:
   - Unify all preferences into a single dialog.
  * Roster:
