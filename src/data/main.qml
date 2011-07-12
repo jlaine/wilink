@@ -19,7 +19,7 @@
 
 import QtQuick 1.0
 import QXmpp 0.4
-import wiLink 1.2
+import wiLink 2.0
 import 'utils.js' as Utils
 
 FocusScope {

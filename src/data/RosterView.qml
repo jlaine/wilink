@@ -18,7 +18,7 @@
  */
 
 import QtQuick 1.0
-import wiLink 1.2
+import wiLink 2.0
 
 Item {
     id: block
