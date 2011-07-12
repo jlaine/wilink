@@ -1,5 +1,7 @@
-wiLink 2.0.0 (2011-07-12)
- * Full user interface rewrite in QML.
+wiLink 2.0.1 (2011-07-12)
+ * Application:
+  - Full user interface rewrite in QML.
+  - Save and restore window geometries.
  * Calls:
   - Add support for double NAT traversal using TURN.
   - Add support for video calls on Linux/Mac/Windows.
