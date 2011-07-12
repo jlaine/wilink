@@ -1,4 +1,4 @@
-wiLink 1.2.0 (UNRELEASED)
+wiLink 2.0.0 (2011-07-12)
  * Full user interface rewrite in QML.
  * Calls:
   - Add support for double NAT traversal using TURN.

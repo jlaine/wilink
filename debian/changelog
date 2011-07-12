@@ -1,8 +1,8 @@
-wilink (1.1.911-1) unstable; urgency=low
+wilink (2.0.0-1) unstable; urgency=low
 
   * New upstream release.
 
- -- Jeremy Lainé <jeremy.laine@bolloretelecom.eu>  Mon, 11 Jul 2011 18:12:47 +0200
+ -- Jeremy Lainé <jeremy.laine@bolloretelecom.eu>  Mon, 12 Jul 2011 11:39:12 +0200
 
 wilink (1.1.0-1) unstable; urgency=low
 
