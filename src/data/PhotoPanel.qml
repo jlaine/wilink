@@ -188,12 +188,14 @@ Panel {
                     dialogSwapper.showPanel('PhotoDeleteDialog.qml', {'model': photoModel, 'index': view.currentIndex});
                 }
             }
-            else if (event.key == Qt.Key_Back || event.key == Qt.Key_Backspace) {
+            else if (event.key == Qt.Key_Back ||
+                     event.key == Qt.Key_Backspace) {
                 if (crumbBar.model.count > 1) {
                     crumbBar.pop();
                 }
             }
-            else if (event.key == Qt.Key_Return || event.key == Qt.Key_Enter) {
+            else if (event.key == Qt.Key_Enter ||
+                     event.key == Qt.Key_Return) {
                 view.currentItem.clicked();
             }
         }
@@ -251,10 +253,16 @@ Panel {
             }
 
             Keys.onPressed: {
-                if (event.key == Qt.Key_Back || event.key == Qt.Key_Backspace) {
+                if (event.key == Qt.Key_Back ||
+                    event.key == Qt.Key_Backspace) {
                     if (crumbBar.model.count > 1) {
                         crumbBar.pop();
                     }
+                }
+                else if (event.key == Qt.Key_Enter ||
+                         event.key == Qt.Key_Return ||
+                         event.key == Qt.Key_Space) {
+                    displayView.incrementCurrentIndex();
                 }
             }
         }
