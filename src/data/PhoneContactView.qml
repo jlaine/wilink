@@ -95,8 +95,6 @@ Item {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        currentIndex: -1
-        highlight: Highlight {}
 
         delegate: Item {
             id: item
@@ -106,7 +104,7 @@ Item {
 
             Column {
                 anchors.left: parent.left
-                anchors.right: callButton.left
+                anchors.right: callButtonLoader.left
                 anchors.leftMargin: 6
                 anchors.verticalCenter: parent.verticalCenter
 
@@ -130,9 +128,19 @@ Item {
                 }
             }
 
+            Loader {
+                id: callButtonLoader
+
+                anchors.right: parent.right
+                anchors.rightMargin: 6
+                anchors.verticalCenter: parent.verticalCenter
+                z: 1
+            }
+
             MouseArea {
                 acceptedButtons: Qt.LeftButton | Qt.RightButton
                 anchors.fill: parent
+                hoverEnabled: true
 
                 onClicked: {
                     if (mouse.button == Qt.LeftButton) {
@@ -145,21 +153,13 @@ Item {
                         block.itemContextMenu(model, block.mapFromItem(item, mouse.x, mouse.y));
                     }
                 }
-            }
 
-            Button {
-                id: callButton
+                onEntered: {
+                    callButtonLoader.sourceComponent = callButtonComponent;
+                }
 
-                anchors.right: parent.right
-                anchors.rightMargin: 6
-                anchors.verticalCenter: parent.verticalCenter
-                iconSize: appStyle.icon.tinySize
-                iconSource: 'call.png'
-                smooth: true
-
-                onClicked: {
-                    view.currentIndex = model.index;
-                    block.itemClicked(model);
+                onExited: {
+                    callButtonLoader.sourceComponent = undefined;
                 }
             }
 
@@ -167,6 +167,20 @@ Item {
                 name: 'expanded'
                 PropertyChanges { target: item; height: 40 }
                 PropertyChanges { target: phone; visible: true }
+            }
+        }
+    }
+
+    Component {
+        id: callButtonComponent
+
+        Button {
+            iconSize: appStyle.icon.tinySize
+            iconSource: 'call.png'
+            smooth: true
+
+            onClicked: {
+                block.itemClicked(view.model);
             }
         }
     }
