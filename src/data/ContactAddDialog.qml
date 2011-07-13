@@ -29,14 +29,18 @@ InputDialog {
     labelText: qsTr('Enter the address of the contact you want to add.')
     textValue: (domain != '') ? '@' + domain : ''
     title: qsTr('Add a contact')
+    validator: RegExpValidator {
+        regExp: /^[^@/ ]+@[^@/ ]+$/
+    }
 
     onAccepted: {
+        if (!dialog.acceptableInput)
+            return;
+
         var jid = textValue;
-        if (jid.match(/^[^@/]+@[^@/]+$/)) {
-            console.log("Add contact " + jid);
-            appClient.rosterManager.subscribe(jid);
-            dialog.close();
-        }
+        console.log("Add contact " + jid);
+        appClient.rosterManager.subscribe(jid);
+        dialog.close();
     }
 }
 

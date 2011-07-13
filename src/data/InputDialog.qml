@@ -22,8 +22,10 @@ import QtQuick 1.0
 Dialog {
     id: dialog
 
+    property alias acceptableInput: bar.acceptableInput
     property alias labelText: label.text
     property alias textValue: bar.text
+    property alias validator: bar.validator
 
     minimumWidth: 280
     minimumHeight: (helpText.length > 0) ? 270 : 150
