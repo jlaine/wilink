@@ -65,6 +65,8 @@ signals:
 
 public slots:
     void addContact(const QString &name, const QString &phone);
+    void removeContact(int id);
+    void updateContact(int id, const QString &name, const QString &phone);
 
 private slots:
     void _q_handleCreate();
@@ -123,8 +125,6 @@ public:
     // QAbstractListModel
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-    Q_INVOKABLE bool removeRow(int row, const QModelIndex &parent = QModelIndex());
-    bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
 signals:
@@ -143,6 +143,7 @@ public slots:
     void addCall(SipCall *call);
     bool call(const QString &address);
     void hangup();
+    void removeCall(int id);
     void startTone(int tone);
     void stopTone(int tone);
 

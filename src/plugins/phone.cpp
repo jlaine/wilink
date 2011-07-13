@@ -136,6 +136,33 @@ QVariant PhoneContactModel::data(const QModelIndex &index, int role) const
     }
 }
 
+/** Removes the contact with the given \a id.
+ *
+ * @param id
+ */
+void PhoneContactModel::removeContact(int id)
+{
+    for (int row = 0; row < m_items.size(); ++row) {
+        PhoneContactItem *item = m_items[row];
+        if (item->id == id) {
+            beginRemoveRows(QModelIndex(), row, row);
+
+            QUrl url = m_url;
+            url.setPath(url.path() + QString::number(item->id) + "/");
+
+            QNetworkRequest request(url);
+            request.setRawHeader("Accept", "application/xml");
+            m_network->deleteResource(request);
+
+            m_items.removeAt(row);
+            delete item;            delete item;
+
+            endRemoveRows();
+            break;
+        }
+    }
+}
+
 /** Returns the number of rows under the given \a parent.
  *
  * @param parent
@@ -144,6 +171,34 @@ int PhoneContactModel::rowCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent);
     return m_items.size();
+}
+
+/** Updates the contact with the given \a id.
+ *
+ * @param id
+ * @param name
+ * @param phone
+ */
+void PhoneContactModel::updateContact(int id, const QString &name, const QString &phone)
+{
+    for (int row = 0; row < m_items.size(); ++row) {
+        PhoneContactItem *item = m_items[row];
+        if (item->id == id) {
+            item->name = name;
+            item->phone = phone;
+
+            QUrl url = m_url;
+            url.setPath(url.path() + QString::number(item->id) + "/");
+
+            QNetworkRequest request(url);
+            request.setRawHeader("Accept", "application/xml");
+            request.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
+            m_network->put(request, item->data());
+
+            emit dataChanged(createIndex(row, 0), createIndex(row, 0));
+            break;
+        }
+    }
 }
 
 QUrl PhoneContactModel::url() const
@@ -572,42 +627,33 @@ QString PhoneHistoryModel::phoneNumber() const
     return m_phoneNumber;
 }
 
-/** Removes the given \a row under the given \a parent.
+/** Removes the call with the given \a id.
  *
- * @param row
- * @param parent
+ * @param id
  */
-bool PhoneHistoryModel::removeRow(int row, const QModelIndex &parent)
+void PhoneHistoryModel::removeCall(int id)
 {
-    QAbstractListModel::removeRow(row, parent);
-}
+    for (int row = 0; row < m_items.size(); ++row) {
+        PhoneHistoryItem *item = m_items[row];
+        if (item->id == id) {
+            if (item->call)
+                return;
 
-/** Removes \a count rows starting at the given \a row under the given \a parent.
- *
- * @param row
- * @param count
- * @param parent
- */
-bool PhoneHistoryModel::removeRows(int row, int count, const QModelIndex &parent)
-{
-    int last = row + count - 1;
-    if (parent.isValid() || row < 0 || count < 0 || last >= m_items.size())
-        return false;
+            beginRemoveRows(QModelIndex(), row, row);
 
-    beginRemoveRows(parent, row, last);
-    for (int i = last; i >= row; --i) {
-        PhoneHistoryItem *item = m_items[i];
-        QUrl url = m_url;
-        url.setPath(url.path() + QString::number(item->id) + "/");
+            QUrl url = m_url;
+            url.setPath(url.path() + QString::number(item->id) + "/");
 
-        QNetworkRequest request(url);
-        request.setRawHeader("Accept", "application/xml");
-        m_network->deleteResource(request);
-        delete item;
-        m_items.removeAt(i);
+            QNetworkRequest request(url);
+            request.setRawHeader("Accept", "application/xml");
+            m_network->deleteResource(request);
+            m_items.removeAt(row);
+            delete item;
+
+            endRemoveRows();
+            break;
+        }
     }
-    endRemoveRows();
-    return true;
 }
 
 /** Returns the number of rows under the given \a parent.

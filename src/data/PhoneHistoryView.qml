@@ -27,16 +27,6 @@ Item {
     property alias model: view.model
     signal addressClicked(string address)
 
-    function removeCall(id) {
-        var i=0;
-        while(i < listHelper.count && listHelper.get(i).id != id) {
-            i++;
-        }
-        if (i < listHelper.count) {
-            view.model.removeRow(i);
-        }
-    }
-
     ListHelper {
         id: listHelper
         model: view.model
@@ -173,7 +163,7 @@ Item {
                 if (item.action == 'call') {
                     view.model.call(callAddress)
                 } else if (item.action == 'remove') {
-                    block.removeCall(callId);
+                    view.model.removeCall(callId);
                 }
             }
 
