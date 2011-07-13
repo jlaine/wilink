@@ -95,7 +95,7 @@ Panel {
         anchors.left: parent.left
         width: 200
 
-        RosterView {
+        PhoneContactView {
             id: addressbook
 
             anchors.fill: parent
