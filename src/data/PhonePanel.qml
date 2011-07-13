@@ -100,12 +100,13 @@ Panel {
 
             anchors.fill: parent
             model: PhoneContactModel {
+                id: contactModel
                 url: historyModel.contactsUrl
             }
             title: qsTr('My contacts')
 
             onAddClicked: {
-                dialogSwapper.showPanel('PhoneContactDialog.qml');
+                dialogSwapper.showPanel('PhoneContactDialog.qml', {'model': contactModel});
             }
 
             //onItemClicked:

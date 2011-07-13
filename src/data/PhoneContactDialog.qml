@@ -23,6 +23,9 @@ import wiLink 2.0
 Dialog {
     id: dialog
 
+    property bool acceptableInput: (nameInput.acceptableInput && phoneInput.acceptableInput)
+    property QtObject model
+
     minimumHeight: 150
     title: qsTr('Add a contact')
 
@@ -77,6 +80,14 @@ Dialog {
                 anchors.right: parent.right
             }
         }
+    }
+
+    onAccepted: {
+        if (!dialog.acceptableInput)
+            return;
+
+        dialog.model.addContact(nameInput.text, phoneInput.text);
+        dialog.close();
     }
 }
 
