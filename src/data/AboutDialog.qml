@@ -30,6 +30,8 @@ Dialog {
         spacing: 8
 
         Button {
+            id: refreshButton
+
             enabled: Qt.isQtObject(appUpdater) && appUpdater.state == Updater.IdleState
             iconSource: 'refresh.png'
             text: qsTr('Check for updates')
@@ -38,6 +40,8 @@ Dialog {
         }
 
         Button {
+            id: installButton
+
             iconSource: 'start.png'
             text: qsTr('Install')
             visible: prompting
@@ -56,7 +60,18 @@ Dialog {
             }
         }
 
-        Keys.onEscapePressed: rejectButton.clicked()
+        Keys.onPressed: {
+            if (event.key == Qt.Key_Enter ||
+                event.key == Qt.Key_Return) {
+                if (installButton.visible && installButton.enabled)
+                    installButton.clicked();
+                else if (refreshButton.visible && refreshButton.enabled)
+                    refreshButton.clicked();
+            }
+            else if (event.key == Qt.Key_Escape) {
+                rejectButton.clicked()
+            }
+        }
     }
 
     minimumHeight: 280
