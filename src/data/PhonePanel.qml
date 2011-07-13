@@ -100,6 +100,7 @@ Panel {
 
             anchors.fill: parent
             model: PhoneContactModel {
+                url: historyModel.contactsUrl
             }
             title: qsTr('My contacts')
 

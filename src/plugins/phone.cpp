@@ -108,6 +108,19 @@ int PhoneContactModel::rowCount(const QModelIndex& parent) const
     return m_items.size();
 }
 
+QUrl PhoneContactModel::url() const
+{
+    return m_url;
+}
+
+void PhoneContactModel::setUrl(const QUrl &url)
+{
+    if (url != m_url) {
+        m_url = url;
+        emit urlChanged(m_url);
+    }
+}
+
 void PhoneContactModel::_q_handleList()
 {
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
@@ -389,6 +402,11 @@ int PhoneHistoryModel::columnCount(const QModelIndex &parent) const
     return 1;
 }
 
+QUrl PhoneHistoryModel::contactsUrl() const
+{
+    return m_contactsUrl;
+}
+
 int PhoneHistoryModel::currentCalls() const
 {
     return activeCalls().size();
@@ -556,7 +574,6 @@ void PhoneHistoryModel::_q_getSettings()
     qDebug("Phone fetching settings");
     QNetworkRequest req(QUrl("https://www.wifirst.net/wilink/voip"));
     req.setRawHeader("Accept", "application/xml");
-    req.setRawHeader("User-Agent", QString(qApp->applicationName() + "/" + qApp->applicationVersion()).toAscii());
     QNetworkReply *reply = m_network->get(req);
     connect(reply, SIGNAL(finished()), this, SLOT(_q_handleSettings()));
 }
@@ -584,8 +601,15 @@ void PhoneHistoryModel::_q_handleSettings()
     const QString password = settings.firstChildElement("password").text();
     const QString number = settings.firstChildElement("number").text();
     const QString callsUrl = settings.firstChildElement("calls-url").text();
+    const QUrl contactsUrl = QUrl(settings.firstChildElement("contacts-url").text());
     const QUrl selfcareUrl = QUrl(settings.firstChildElement("selfcare-url").text());
     const QString voicemailNumber = settings.firstChildElement("voicemail-number").text();
+
+    // update contacts url
+    if (contactsUrl != m_contactsUrl) {
+        m_contactsUrl = contactsUrl;
+        emit contactsUrlChanged(contactsUrl);
+    }
 
     // update phone number
     if (number != m_phoneNumber) {

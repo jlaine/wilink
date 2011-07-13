@@ -41,6 +41,7 @@ class SipClient;
 class PhoneContactModel : public QAbstractListModel
 {
     Q_OBJECT
+    Q_PROPERTY(QUrl url READ url WRITE setUrl NOTIFY urlChanged)
 
 public:
     enum Role {
@@ -51,10 +52,16 @@ public:
 
     PhoneContactModel(QObject *parent = 0);
 
+    QUrl url() const;
+    void setUrl(const QUrl &url);
+
     // QAbstractListModel
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
+
+signals:
+    void urlChanged(const QUrl &url);
 
 private slots:
     void _q_handleList();
@@ -71,6 +78,7 @@ class PhoneHistoryModel : public QAbstractListModel
 {
     Q_OBJECT
     Q_PROPERTY(SipClient* client READ client CONSTANT)
+    Q_PROPERTY(QUrl contactsUrl READ contactsUrl NOTIFY contactsUrlChanged)
     Q_PROPERTY(int currentCalls READ currentCalls NOTIFY currentCallsChanged)
     Q_PROPERTY(bool enabled READ enabled NOTIFY enabledChanged)
     Q_PROPERTY(int inputVolume READ inputVolume NOTIFY inputVolumeChanged)
@@ -96,6 +104,7 @@ public:
     ~PhoneHistoryModel();
 
     SipClient *client() const;
+    QUrl contactsUrl() const;
     int currentCalls() const;
     bool enabled() const;
     int inputVolume() const;
@@ -103,6 +112,8 @@ public:
     int outputVolume() const;
     QString phoneNumber() const;
     QUrl selfcareUrl() const;
+    QUrl url() const;
+    void setUrl(const QUrl &url);
     QString voicemailNumber() const;
 
     // QAbstractListModel
@@ -113,13 +124,15 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
 signals:
+    void contactsUrlChanged(const QUrl &contactsUrl);
     void currentCallsChanged();
     void enabledChanged(bool enabled);
     void error(const QString &error);
     void inputVolumeChanged(int inputVolume);
     void outputVolumeChanged(int outputVolume);
     void phoneNumberChanged(const QString &phoneNumber);
-    void selfcareUrlChanged(const QUrl& selfcareUrl);
+    void selfcareUrlChanged(const QUrl &selfcareUrl);
+    void urlChanged(const QUrl &url);
     void voicemailNumberChanged(const QString &voicemailNumber);
 
 public slots:
@@ -144,6 +157,7 @@ private:
     QNetworkRequest buildRequest(const QUrl &url) const;
 
     SipClient *m_client;
+    QUrl m_contactsUrl;
     bool m_enabled;
     QList<PhoneHistoryItem*> m_items;
     QNetworkAccessManager *m_network;
