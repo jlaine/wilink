@@ -96,6 +96,18 @@ Panel {
         iconSource: 'phone.png'
         title: qsTr('Phone')
         subTitle: historyModel.phoneNumber ? qsTr('Your number is %1').replace('%1', historyModel.phoneNumber) : ''
+        toolBar: ToolBar {
+            ToolButton {
+                iconSource: 'call.png'
+                text: qsTr('Voicemail')
+                visible: historyModel.voicemailNumber != ''
+
+                onClicked: {
+                    var address = buildAddress(historyModel.voicemailNumber, historyModel.client.domain);
+                    historyModel.call(address);
+                }
+            }
+        }
     }
 
     PanelHelp {
