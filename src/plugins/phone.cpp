@@ -42,11 +42,28 @@
 
 class PhoneContactItem
 {
+public:
+    PhoneContactItem();
+
+    QString address;
+    int id;
+    QString name;
 };
+
+PhoneContactItem::PhoneContactItem()
+    : id(0)
+{
+}
 
 PhoneContactModel::PhoneContactModel(QObject *parent)
     : QAbstractListModel(parent)
 {
+    // set role names
+    QHash<int, QByteArray> roleNames;
+    roleNames.insert(AddressRole, "address");
+    roleNames.insert(IdRole, "id");
+    roleNames.insert(NameRole, "name");
+    setRoleNames(roleNames);
 }
 
 /** Returns the number of columns under the given \a parent.
@@ -66,7 +83,16 @@ QVariant PhoneContactModel::data(const QModelIndex &index, int role) const
         return QVariant();
 
     PhoneContactItem *item = m_items.at(row);
-    return QVariant();
+    switch (role) {
+    case AddressRole:
+        return item->address;
+    case IdRole:
+        return item->id;
+    case NameRole:
+        return item->name;
+    default:
+        return QVariant();
+    }
 }
 
 /** Returns the number of rows under the given \a parent.
@@ -360,25 +386,26 @@ QVariant PhoneHistoryModel::data(const QModelIndex &index, int role) const
         return QVariant();
     PhoneHistoryItem *item = m_items[row];
 
-    if (role == Qt::ToolTipRole) {
+    switch (role) {
+    case Qt::ToolTipRole:
         return item->address;
-    } else if (role == AddressRole) {
+    case AddressRole:
         return item->address;
-    } else if (role == ActiveRole) {
+    case ActiveRole:
         return item->call != 0;
-    } else if (role == DateRole) {
+    case DateRole:
         return item->date;
-    } else if (role == DirectionRole) {
+    case DirectionRole:
         return item->flags & FLAGS_DIRECTION;
-    } else if (role == DurationRole) {
+    case DurationRole:
         return item->call ? item->call->duration() : item->duration;
-    } else if (role == IdRole) {
+    case IdRole:
         return item->id;
-    } else if (role == NameRole) {
+    case NameRole:
         return sipAddressToName(item->address);
+    default:
+        return QVariant();
     }
-
-    return QVariant();
 }
 
 /** Returns true if the service is active.

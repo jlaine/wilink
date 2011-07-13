@@ -43,6 +43,12 @@ class PhoneContactModel : public QAbstractListModel
     Q_OBJECT
 
 public:
+    enum Role {
+        AddressRole = Qt::UserRole,
+        IdRole,
+        NameRole,
+    };
+
     PhoneContactModel(QObject *parent = 0);
 
     // QAbstractListModel
