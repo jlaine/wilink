@@ -520,6 +520,10 @@ Acceptez-vous?</translation>
         <source>Enter the number you want to call</source>
         <translation>Saisissez le numéro à appeler</translation>
     </message>
+    <message>
+        <source>Voicemail</source>
+        <translation>Messagerie</translation>
+    </message>
 </context>
 <context>
     <name>PhotoAlbumDialog</name>
