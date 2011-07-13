@@ -103,10 +103,8 @@ Window::Window(const QUrl &url, const QString &jid, QWidget *parent)
     Q_ASSERT(check);
 
     /* set up keyboard shortcuts */
-#ifdef Q_OS_MAC
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_W), this);
     connect(shortcut, SIGNAL(activated()), this, SLOT(close()));
-#endif
 
     // load QML
     view->setSource(url);
