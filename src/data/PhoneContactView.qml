@@ -155,7 +155,6 @@ Item {
                 }
 
                 onEntered: {
-                    callButtonComponent.model = model;
                     callButtonLoader.sourceComponent = callButtonComponent;
                 }
 
@@ -175,15 +174,13 @@ Item {
     Component {
         id: callButtonComponent
 
-        property variant model
-
         Button {
             iconSize: appStyle.icon.tinySize
             iconSource: 'call.png'
             smooth: true
 
             onClicked: {
-                block.itemClicked(model);
+                block.itemClicked(view.model);
             }
         }
     }
