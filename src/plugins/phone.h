@@ -154,7 +154,6 @@ private slots:
 
 private:
     QList<SipCall*> activeCalls() const;
-    QNetworkRequest buildRequest(const QUrl &url) const;
 
     SipClient *m_client;
     QUrl m_contactsUrl;

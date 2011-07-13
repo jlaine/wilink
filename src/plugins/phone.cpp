@@ -117,6 +117,13 @@ void PhoneContactModel::setUrl(const QUrl &url)
 {
     if (url != m_url) {
         m_url = url;
+        if (m_url.isValid()) {
+            QNetworkRequest request(m_url);
+            request.setRawHeader("Accept", "application/xml");
+            QNetworkReply *reply = m_network->get(request);
+            connect(reply, SIGNAL(finished()),
+                    this, SLOT(_q_handleList()));
+        }
         emit urlChanged(m_url);
     }
 }
@@ -131,6 +138,7 @@ void PhoneContactModel::_q_handleList()
         qWarning("Failed to retrieve phone contacts: %s", qPrintable(reply->errorString()));
         return;
     }
+    qDebug("Retrieved phone contacts");
 }
 
 class PhoneHistoryItem
@@ -265,7 +273,8 @@ void PhoneHistoryModel::addCall(SipCall *call)
         item->soundId = wApp->soundPlayer()->play(":/call-incoming.ogg", true);
     else
         connect(item->call, SIGNAL(ringing()), this, SLOT(callRinging()));
-    QNetworkRequest request = buildRequest(m_url);
+    QNetworkRequest request(m_url);
+    request.setRawHeader("Accept", "application/xml");
     request.setRawHeader("Connection", "close");
     request.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
     item->reply = m_network->post(request, item->data());
@@ -282,13 +291,6 @@ void PhoneHistoryModel::addCall(SipCall *call)
 
     // notify change
     emit currentCallsChanged();
-}
-
-QNetworkRequest PhoneHistoryModel::buildRequest(const QUrl &url) const
-{
-    QNetworkRequest req(url);
-    req.setRawHeader("Accept", "application/xml");
-    return req;
 }
 
 bool PhoneHistoryModel::call(const QString &address)
@@ -359,7 +361,9 @@ void PhoneHistoryModel::callStateChanged(QXmppCall::State state)
 
         QUrl url = m_url;
         url.setPath(url.path() + QString::number(item->id) + "/");
-        QNetworkRequest request = buildRequest(url);
+
+        QNetworkRequest request(url);
+        request.setRawHeader("Accept", "application/xml");
         request.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
         m_network->put(request, item->data());
 
@@ -508,7 +512,10 @@ bool PhoneHistoryModel::removeRows(int row, int count, const QModelIndex &parent
         PhoneHistoryItem *item = m_items[i];
         QUrl url = m_url;
         url.setPath(url.path() + QString::number(item->id) + "/");
-        m_network->deleteResource(buildRequest(url));
+
+        QNetworkRequest request(url);
+        request.setRawHeader("Accept", "application/xml");
+        m_network->deleteResource(request);
         delete item;
         m_items.removeAt(i);
     }
@@ -649,7 +656,9 @@ void PhoneHistoryModel::_q_handleSettings()
         if (!callsUrl.isEmpty()) {
             m_url = callsUrl;
 
-            QNetworkReply *reply = m_network->get(buildRequest(m_url));
+            QNetworkRequest request(m_url);
+            request.setRawHeader("Accept", "application/xml");
+            QNetworkReply *reply = m_network->get(request);
             connect(reply, SIGNAL(finished()), this, SLOT(_q_handleList()));
         }
 
