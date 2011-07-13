@@ -130,6 +130,7 @@ Item {
                             menuLoader.sourceComponent = phoneMenu;
                             menuLoader.item.callAddress = model.address;
                             menuLoader.item.callId = model.id;
+                            menuLoader.item.callIndex = model.index;
                             menuLoader.show(pos.x, pos.y);
                         }
                     }
@@ -151,13 +152,14 @@ Item {
 
             property string callAddress
             property int callId
+            property int callIndex
 
             onItemClicked: {
                 var item = menu.model.get(index);
                 if (item.action == 'call') {
                     view.model.call(callAddress)
                 } else if (item.action == 'remove') {
-                    view.model.removeRow(index);
+                    view.model.removeRow(callIndex);
                 }
             }
 
