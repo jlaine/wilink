@@ -121,182 +121,199 @@ Panel {
     }
 
     Item {
-        id: numberRow
+        id: sidebar
 
-        anchors.left: parent.left
-        anchors.leftMargin: appStyle.spacing.horizontal
-        anchors.right: parent.right
-        anchors.rightMargin: appStyle.spacing.horizontal
         anchors.top: help.bottom
-        anchors.topMargin: appStyle.spacing.vertical
-        height: 32
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        width: 200
+    }
 
-        InputBar {
-            id: numberEdit
+    Item {
 
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
+        anchors.top: help.bottom
+        anchors.bottom: parent.bottom
+        anchors.left: sidebar.right
+        anchors.right: parent.right
+
+        Item {
+            id: numberRow
+
             anchors.left: parent.left
-            anchors.right: buttonBox.left
+            anchors.leftMargin: appStyle.spacing.horizontal
+            anchors.right: parent.right
             anchors.rightMargin: appStyle.spacing.horizontal
-            hintText: qsTr('Enter the number you want to call')
+            anchors.top: parent.top
+            anchors.topMargin: appStyle.spacing.vertical
+            height: 32
 
-            Keys.onReturnPressed: {
-                if (callButton.enabled) {
-                    callButton.clicked();
+            InputBar {
+                id: numberEdit
+
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                anchors.left: parent.left
+                anchors.right: buttonBox.left
+                anchors.rightMargin: appStyle.spacing.horizontal
+                hintText: qsTr('Enter the number you want to call')
+
+                Keys.onReturnPressed: {
+                    if (callButton.enabled) {
+                        callButton.clicked();
+                    }
+                }
+            }
+
+            Row {
+                id: buttonBox
+
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                anchors.right: parent.right
+                spacing: appStyle.spacing.horizontal
+
+                Button {
+                    id: backButton
+
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+                    iconSource: 'back.png'
+
+                    onClicked: numberEdit.backspacePressed()
+                }
+
+                Button {
+                    id: callButton
+
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+                    enabled: historyModel.client.state == SipClient.ConnectedState
+                    iconSource: 'call.png'
+                    text: qsTr('Call')
+
+                    onClicked: {
+                        var recipient = numberEdit.text.replace(/\s+/, '');
+                        if (!recipient.length)
+                            return;
+
+                        var address = buildAddress(recipient, historyModel.client.domain);
+                        if (historyModel.call(address))
+                            numberEdit.text = '';
+                    }
+                }
+
+                Button {
+                    id: hangupButton
+
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+                    iconSource: 'hangup.png'
+                    text: qsTr('Hangup')
+                    visible: false
+
+                    onClicked: historyModel.hangup()
                 }
             }
         }
 
         Row {
-            id: buttonBox
+            id: controls
 
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.right: parent.right
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top: numberRow.bottom
+            anchors.topMargin: appStyle.spacing.vertical
             spacing: appStyle.spacing.horizontal
 
-            Button {
-                id: backButton
+            KeyPad {
+                id: keypad
 
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                iconSource: 'back.png'
+                onKeyPressed: {
+                    if (historyModel.currentCalls)
+                        historyModel.startTone(key.tone);
+                }
 
-                onClicked: numberEdit.backspacePressed()
-            }
-
-            Button {
-                id: callButton
-
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                enabled: historyModel.client.state == SipClient.ConnectedState
-                iconSource: 'call.png'
-                text: qsTr('Call')
-
-                onClicked: {
-                    var recipient = numberEdit.text.replace(/\s+/, '');
-                    if (!recipient.length)
-                        return;
-
-                    var address = buildAddress(recipient, historyModel.client.domain);
-                    if (historyModel.call(address))
-                        numberEdit.text = '';
+                onKeyReleased: {
+                    if (historyModel.currentCalls)
+                        historyModel.stopTone(key.tone);
+                    else {
+                        var oldPos = numberEdit.cursorPosition;
+                        var oldText = numberEdit.text;
+                        numberEdit.text = oldText.substr(0, oldPos) + key.name + oldText.substr(oldPos);
+                        numberEdit.cursorPosition = oldPos + 1;
+                    }
                 }
             }
 
-            Button {
-                id: hangupButton
+            Item {
+                anchors.top: keypad.top
+                anchors.bottom: keypad.bottom
+                width: 32
 
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                iconSource: 'hangup.png'
-                text: qsTr('Hangup')
-                visible: false
+                ProgressBar {
+                    id: inputVolume
 
-                onClicked: historyModel.hangup()
-            }
-        }
-    }
-    
-    Row {
-        id: controls
+                    anchors.top: parent.top
+                    anchors.bottom: inputIcon.top
+                    anchors.bottomMargin: appStyle.spacing.vertical
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    orientation: Qt.Vertical
+                    maximumValue: Qt.isQtObject(historyModel) ? historyModel.maximumVolume : 100
+                    value: Qt.isQtObject(historyModel) ? historyModel.inputVolume : 0
+                }
 
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: numberRow.bottom
-        anchors.topMargin: appStyle.spacing.vertical
-        spacing: appStyle.spacing.horizontal
+                Image {
+                    id: inputIcon
 
-        KeyPad {
-            id: keypad
-
-            onKeyPressed: {
-                if (historyModel.currentCalls)
-                    historyModel.startTone(key.tone);
+                    anchors.bottom: parent.bottom
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    source: 'audio-input.png'
+                    height: 32
+                    width: 32
+                }
             }
 
-            onKeyReleased: {
-                if (historyModel.currentCalls)
-                    historyModel.stopTone(key.tone);
-                else {
-                    var oldPos = numberEdit.cursorPosition;
-                    var oldText = numberEdit.text;
-                    numberEdit.text = oldText.substr(0, oldPos) + key.name + oldText.substr(oldPos);
-                    numberEdit.cursorPosition = oldPos + 1;
+            Item {
+                anchors.top: keypad.top
+                anchors.bottom: keypad.bottom
+                width: 32
+
+                ProgressBar {
+                    id: outputVolume
+
+                    anchors.top: parent.top
+                    anchors.bottom: outputIcon.top
+                    anchors.bottomMargin: appStyle.spacing.vertical
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    orientation: Qt.Vertical
+                    maximumValue: Qt.isQtObject(historyModel) ? historyModel.maximumVolume : 100
+                    value: Qt.isQtObject(historyModel) ? historyModel.outputVolume : 0
+                }
+
+                Image {
+                    id: outputIcon
+
+                    anchors.bottom: parent.bottom
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    source: 'audio-output.png'
+                    height: 32
+                    width: 32
                 }
             }
         }
 
-        Item {
-            anchors.top: keypad.top
-            anchors.bottom: keypad.bottom
-            width: 32
+        PhoneHistoryView {
+            id: historyView
 
-            ProgressBar {
-                id: inputVolume
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: controls.bottom
+            anchors.topMargin: appStyle.spacing.vertical
+            anchors.bottom: parent.bottom
+            model: historyModel
 
-                anchors.top: parent.top
-                anchors.bottom: inputIcon.top
-                anchors.bottomMargin: appStyle.spacing.vertical
-                anchors.horizontalCenter: parent.horizontalCenter
-                orientation: Qt.Vertical
-                maximumValue: Qt.isQtObject(historyModel) ? historyModel.maximumVolume : 100
-                value: Qt.isQtObject(historyModel) ? historyModel.inputVolume : 0
+            onAddressClicked: {
+                numberEdit.text = parseAddress(address, historyModel.client.domain);
             }
-
-            Image {
-                id: inputIcon
-
-                anchors.bottom: parent.bottom
-                anchors.horizontalCenter: parent.horizontalCenter
-                source: 'audio-input.png'
-                height: 32
-                width: 32
-            }
-        }
-
-        Item {
-            anchors.top: keypad.top
-            anchors.bottom: keypad.bottom
-            width: 32
-
-            ProgressBar {
-                id: outputVolume
-
-                anchors.top: parent.top
-                anchors.bottom: outputIcon.top
-                anchors.bottomMargin: appStyle.spacing.vertical
-                anchors.horizontalCenter: parent.horizontalCenter
-                orientation: Qt.Vertical
-                maximumValue: Qt.isQtObject(historyModel) ? historyModel.maximumVolume : 100
-                value: Qt.isQtObject(historyModel) ? historyModel.outputVolume : 0
-            }
-
-            Image {
-                id: outputIcon
-
-                anchors.bottom: parent.bottom
-                anchors.horizontalCenter: parent.horizontalCenter
-                source: 'audio-output.png'
-                height: 32
-                width: 32
-            }
-        }
-    }
-
-    PhoneHistoryView {
-        id: historyView
-
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: controls.bottom
-        anchors.topMargin: appStyle.spacing.vertical
-        anchors.bottom: parent.bottom
-        model: historyModel
-
-        onAddressClicked: {
-            numberEdit.text = parseAddress(address, historyModel.client.domain);
         }
     }
 
