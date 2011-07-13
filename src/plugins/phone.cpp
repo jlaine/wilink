@@ -45,6 +45,7 @@ class PhoneContactItem
 public:
     PhoneContactItem();
     QByteArray data() const;
+    void parse(const QDomElement &element);
 
     int id;
     QString name;
@@ -64,6 +65,13 @@ QByteArray PhoneContactItem::data() const
     data.addQueryItem("name", name);
     data.addQueryItem("phone", phone);
     return data.encodedQuery();
+}
+
+void PhoneContactItem::parse(const QDomElement &element)
+{
+    id = element.firstChildElement("id").text().toInt();
+    name = element.firstChildElement("name").text();
+    phone = element.firstChildElement("phone").text();
 }
 
 PhoneContactModel::PhoneContactModel(QObject *parent)
@@ -174,7 +182,26 @@ void PhoneContactModel::_q_handleList()
         qWarning("Failed to retrieve phone contacts: %s", qPrintable(reply->errorString()));
         return;
     }
-    qDebug("Retrieved phone contacts %s", qPrintable(doc.toString()));
+
+    QDomElement element = doc.documentElement().firstChildElement("contact");
+    while (!element.isNull()) {
+        int id = element.firstChildElement("id").text().toInt();
+        foreach (PhoneContactItem *item, m_items) {
+            if (item->id == id) {
+                id = 0;
+                break;
+            }
+        }
+        if (id > 0) {
+            PhoneContactItem *item = new PhoneContactItem;
+            item->parse(element);
+
+            beginInsertRows(QModelIndex(), 0, 0);
+            m_items.prepend(item);
+            endInsertRows();
+        }
+        element = element.nextSiblingElement("contact");
+    }
 }
 
 class PhoneHistoryItem
@@ -182,7 +209,7 @@ class PhoneHistoryItem
 public:
     PhoneHistoryItem();
     QByteArray data() const;
-    void parse(const QDomElement &callElement);
+    void parse(const QDomElement &element);
 
     int id;
     QString address;
@@ -214,13 +241,13 @@ QByteArray PhoneHistoryItem::data() const
     return data.encodedQuery();
 }
 
-void PhoneHistoryItem::parse(const QDomElement &callElement)
+void PhoneHistoryItem::parse(const QDomElement &element)
 {
-    id = callElement.firstChildElement("id").text().toInt();
-    address = callElement.firstChildElement("address").text();
-    date = datetimeFromString(callElement.firstChildElement("date").text());
-    duration = callElement.firstChildElement("duration").text().toInt();
-    flags = callElement.firstChildElement("flags").text().toInt();
+    id = element.firstChildElement("id").text().toInt();
+    address = element.firstChildElement("address").text();
+    date = datetimeFromString(element.firstChildElement("date").text());
+    duration = element.firstChildElement("duration").text().toInt();
+    flags = element.firstChildElement("flags").text().toInt();
 }
 
 /** Constructs a new model representing the call history.
@@ -755,9 +782,9 @@ void PhoneHistoryModel::_q_handleList()
         return;
     }
 
-    QDomElement callElement = doc.documentElement().firstChildElement("call");
-    while (!callElement.isNull()) {
-        int id = callElement.firstChildElement("id").text().toInt();
+    QDomElement element = doc.documentElement().firstChildElement("call");
+    while (!element.isNull()) {
+        int id = element.firstChildElement("id").text().toInt();
         foreach (PhoneHistoryItem *item, m_items) {
             if (item->id == id) {
                 id = 0;
@@ -766,13 +793,13 @@ void PhoneHistoryModel::_q_handleList()
         }
         if (id > 0) {
             PhoneHistoryItem *item = new PhoneHistoryItem;
-            item->parse(callElement);
+            item->parse(element);
 
             beginInsertRows(QModelIndex(), 0, 0);
             m_items.prepend(item);
             endInsertRows();
         }
-        callElement = callElement.nextSiblingElement("call");
+        element = element.nextSiblingElement("call");
     }
 }
 
