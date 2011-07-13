@@ -85,6 +85,7 @@ Panel {
         anchors.bottom: parent.bottom
 
         model: DiscoveryModel {
+            details: true
             manager: appClient.discoveryManager
         }
 
