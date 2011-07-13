@@ -114,6 +114,7 @@
     <file>PanelHeader.qml</file>
     <file>PanelHelp.qml</file>
     <file>PanelSwapper.qml</file>
+    <file>PhoneContactDialog.qml</file>
     <file>PhoneHistoryView.qml</file>
     <file>PhoneNotification.qml</file>
     <file>PhonePanel.qml</file>

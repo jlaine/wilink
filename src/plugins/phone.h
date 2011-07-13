@@ -45,9 +45,9 @@ class PhoneContactModel : public QAbstractListModel
 
 public:
     enum Role {
-        AddressRole = Qt::UserRole,
-        IdRole,
+        IdRole = Qt::UserRole,
         NameRole,
+        PhoneRole,
     };
 
     PhoneContactModel(QObject *parent = 0);
@@ -62,6 +62,9 @@ public:
 
 signals:
     void urlChanged(const QUrl &url);
+
+public slots:
+    void addContact(const QString &name, const QString &phone);
 
 private slots:
     void _q_handleList();

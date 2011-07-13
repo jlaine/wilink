@@ -121,6 +121,7 @@ if(RELOAD_TRANSLATIONS)
         ../data/HistoryView.qml
         ../data/InputMenu.qml
         ../data/LogPanel.qml
+        ../data/PhoneContactDialog.qml
         ../data/PhoneHistoryView.qml
         ../data/PhoneNotification.qml
         ../data/PhonePanel.qml

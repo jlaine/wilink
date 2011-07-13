@@ -457,6 +457,21 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>PhoneContactDialog</name>
+    <message>
+        <source>Add a contact</source>
+        <translation>Ajouter un contact</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Number</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>PhoneHistoryView</name>
     <message>
         <source>Call</source>

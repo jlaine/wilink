@@ -104,7 +104,10 @@ Panel {
             }
             title: qsTr('My contacts')
 
-            //onAddClicked: 
+            onAddClicked: {
+                dialogSwapper.showPanel('PhoneContactDialog.qml');
+            }
+
             //onItemClicked:
         }
     }

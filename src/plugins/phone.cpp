@@ -45,9 +45,9 @@ class PhoneContactItem
 public:
     PhoneContactItem();
 
-    QString address;
     int id;
     QString name;
+    QString phone;
 };
 
 PhoneContactItem::PhoneContactItem()
@@ -60,13 +60,24 @@ PhoneContactModel::PhoneContactModel(QObject *parent)
 {
     // set role names
     QHash<int, QByteArray> roleNames;
-    roleNames.insert(AddressRole, "address");
     roleNames.insert(IdRole, "id");
     roleNames.insert(NameRole, "name");
+    roleNames.insert(PhoneRole, "phone");
     setRoleNames(roleNames);
 
     // http
     m_network = new NetworkAccessManager(this);
+}
+
+void PhoneContactModel::addContact(const QString &name, const QString &phone)
+{
+    PhoneContactItem *item = new PhoneContactItem;
+    item->name = name;
+    item->phone = phone;
+
+    beginInsertRows(QModelIndex(), 0, 0);
+    m_items.prepend(item);
+    endInsertRows();
 }
 
 /** Returns the number of columns under the given \a parent.
@@ -87,12 +98,12 @@ QVariant PhoneContactModel::data(const QModelIndex &index, int role) const
 
     PhoneContactItem *item = m_items.at(row);
     switch (role) {
-    case AddressRole:
-        return item->address;
     case IdRole:
         return item->id;
     case NameRole:
         return item->name;
+    case PhoneRole:
+        return item->phone;
     default:
         return QVariant();
     }
@@ -138,7 +149,7 @@ void PhoneContactModel::_q_handleList()
         qWarning("Failed to retrieve phone contacts: %s", qPrintable(reply->errorString()));
         return;
     }
-    qDebug("Retrieved phone contacts");
+    qDebug("Retrieved phone contacts %s", qPrintable(doc.toString()));
 }
 
 class PhoneHistoryItem
