@@ -63,10 +63,10 @@ Rectangle {
             onClicked: {
                 var panel = swapper.findPanel(panelSource);
                 if (panel == swapper.currentItem) {
-                    if (panel.state == 'no-roster')
+                    if (panel.state == 'no-sidebar')
                         panel.state = '';
                     else
-                        panel.state = 'no-roster';
+                        panel.state = 'no-sidebar';
                 } else {
                     swapper.setCurrentItem(panel);
                 }
@@ -99,7 +99,15 @@ Rectangle {
 
             onClicked: {
                 if (visible) {
-                    swapper.showPanel(panelSource);
+                    var panel = swapper.findPanel(panelSource);
+                    if (panel == swapper.currentItem) {
+                        if (panel.state == 'no-sidebar')
+                            panel.state = '';
+                        else
+                            panel.state = 'no-sidebar';
+                    } else {
+                        swapper.setCurrentItem(panel);
+                    }
                 }
             }
 

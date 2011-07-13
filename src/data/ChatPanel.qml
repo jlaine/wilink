@@ -39,7 +39,7 @@ Panel {
     }
 
     Item {
-        id: left
+        id: sidebar
 
         anchors.left: parent.left
         anchors.top: parent.top
@@ -121,7 +121,7 @@ Panel {
                     if (mouse.buttons & Qt.LeftButton) {
                         var position =  roomsPressHeight + mapToItem(left, mouse.x, mouse.y).y - mousePressY
                         position = Math.max(position, 0)
-                        position = Math.min(position, left.height - splitter.height - statusBar.height)
+                        position = Math.min(position, sidebar.height - splitter.height - statusBar.height)
                         rooms.height = position
                     }
                 }
@@ -249,7 +249,7 @@ Panel {
 
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        anchors.left: left.right
+        anchors.left: sidebar.right
         anchors.right: parent.right
         focus: true
     }
@@ -272,12 +272,12 @@ Panel {
     }
 
     states: State {
-        name: 'no-roster'
+        name: 'no-sidebar'
 
-        PropertyChanges { target: left; width: 0 }
+        PropertyChanges { target: sidebar; width: 0 }
     }
 
     transitions: Transition {
-        PropertyAnimation { target: left; properties: 'width'; duration: 200 }
+        PropertyAnimation { target: sidebar; properties: 'width'; duration: 200 }
     }
 }

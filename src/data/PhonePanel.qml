@@ -335,4 +335,14 @@ Panel {
             });
         }
     }
+
+    states: State {
+        name: 'no-sidebar'
+
+        PropertyChanges { target: sidebar; width: 0 }
+    }
+
+    transitions: Transition {
+        PropertyAnimation { target: sidebar; properties: 'width'; duration: 200 }
+    }
 }
