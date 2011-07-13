@@ -19,12 +19,28 @@
 
 import QtQuick 1.0
 import QXmpp 0.4
+import wiLink 2.0
 
 Item {
     id: block
 
     property alias model: view.model
     signal addressClicked(string address)
+
+    function removeCall(id) {
+        var i=0;
+        while(i < listHelper.count && listHelper.get(i).id != id) {
+            i++;
+        }
+        if (i < listHelper.count) {
+            view.model.removeRow(i);
+        }
+    }
+
+    ListHelper {
+        id: listHelper
+        model: view.model
+    }
 
     Rectangle {
         id: background
@@ -130,7 +146,6 @@ Item {
                             menuLoader.sourceComponent = phoneMenu;
                             menuLoader.item.callAddress = model.address;
                             menuLoader.item.callId = model.id;
-                            menuLoader.item.callIndex = model.index;
                             menuLoader.show(pos.x, pos.y);
                         }
                     }
@@ -152,14 +167,13 @@ Item {
 
             property string callAddress
             property int callId
-            property int callIndex
 
             onItemClicked: {
                 var item = menu.model.get(index);
                 if (item.action == 'call') {
                     view.model.call(callAddress)
                 } else if (item.action == 'remove') {
-                    view.model.removeRow(callIndex);
+                    block.removeCall(callId);
                 }
             }
 
