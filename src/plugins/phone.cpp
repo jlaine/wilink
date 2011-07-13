@@ -170,6 +170,29 @@ void PhoneContactModel::_q_handleCreate()
 {
     QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
     Q_ASSERT(reply);
+
+    // find the item
+    PhoneContactItem *item = 0;
+    int row = -1;
+    for (int i = 0; i < m_items.size(); ++i) {
+        if (m_items[i]->reply == reply) {
+            item = m_items[i];
+            item->reply = 0;
+            row = i;
+            break;
+        }
+    }
+    if (!item)
+        return;
+
+    // update the item
+    QDomDocument doc;
+    if (reply->error() != QNetworkReply::NoError || !doc.setContent(reply)) {
+        qWarning("Failed to create phone contact: %s", qPrintable(reply->errorString()));
+        return;
+    }
+    item->parse(doc.documentElement());
+    emit dataChanged(createIndex(row, 0), createIndex(row, 0));
 }
 
 void PhoneContactModel::_q_handleList()
