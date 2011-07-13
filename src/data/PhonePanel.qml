@@ -87,54 +87,65 @@ Panel {
         }
     }
 
-    PanelHeader {
-        id: header
-
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
-        iconSource: 'phone.png'
-        title: qsTr('Phone')
-        subTitle: historyModel.phoneNumber ? qsTr('Your number is %1').replace('%1', historyModel.phoneNumber) : ''
-        toolBar: ToolBar {
-            ToolButton {
-                iconSource: 'call.png'
-                text: qsTr('Voicemail')
-                visible: historyModel.voicemailNumber != ''
-
-                onClicked: {
-                    var address = buildAddress(historyModel.voicemailNumber, historyModel.client.domain);
-                    historyModel.call(address);
-                }
-            }
-        }
-    }
-
-    PanelHelp {
-        id: help
-
-        anchors.top: header.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        text: qsTr('You can subscribe to the phone service at the following address:') + ' <a href="' + historyModel.selfcareUrl + '">' + historyModel.selfcareUrl + '</a>';
-        visible: !historyModel.enabled
-    }
-
     Item {
         id: sidebar
 
-        anchors.top: help.bottom
+        anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         width: 200
+
+        RosterView {
+            id: addressbook
+
+            anchors.fill: parent
+            model: ListModel {}
+            title: qsTr('My contacts')
+
+            //onAddClicked: 
+            //onItemClicked:
+        }
     }
 
     Item {
 
-        anchors.top: help.bottom
+        anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.left: sidebar.right
         anchors.right: parent.right
+
+        PanelHeader {
+            id: header
+
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.top
+            iconSource: 'phone.png'
+            title: qsTr('Phone')
+            subTitle: historyModel.phoneNumber ? qsTr('Your number is %1').replace('%1', historyModel.phoneNumber) : ''
+            toolBar: ToolBar {
+                ToolButton {
+                    iconSource: 'call.png'
+                    text: qsTr('Voicemail')
+                    visible: historyModel.voicemailNumber != ''
+
+                    onClicked: {
+                        var address = buildAddress(historyModel.voicemailNumber, historyModel.client.domain);
+                        historyModel.call(address);
+                    }
+                }
+            }
+        }
+
+        PanelHelp {
+            id: help
+
+            anchors.top: header.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            text: qsTr('You can subscribe to the phone service at the following address:') + ' <a href="' + historyModel.selfcareUrl + '">' + historyModel.selfcareUrl + '</a>';
+            visible: !historyModel.enabled
+        }
 
         Item {
             id: numberRow
@@ -143,7 +154,7 @@ Panel {
             anchors.leftMargin: appStyle.spacing.horizontal
             anchors.right: parent.right
             anchors.rightMargin: appStyle.spacing.horizontal
-            anchors.top: parent.top
+            anchors.top: help.bottom
             anchors.topMargin: appStyle.spacing.vertical
             height: 32
 

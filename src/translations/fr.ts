@@ -524,6 +524,10 @@ Acceptez-vous?</translation>
         <source>Voicemail</source>
         <translation>Messagerie</translation>
     </message>
+    <message>
+        <source>My contacts</source>
+        <translation>Mes contacts</translation>
+    </message>
 </context>
 <context>
     <name>PhotoAlbumDialog</name>
