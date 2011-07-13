@@ -62,8 +62,6 @@ Dialog {
             anchors.leftMargin: 8
             anchors.right: parent.right
             text: vcard.name
-
-            Keys.onReturnPressed: dialog.accepted()
         }
     }
 

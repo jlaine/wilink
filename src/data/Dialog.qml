@@ -56,14 +56,22 @@ FocusScope {
             spacing: 8
 
             Button {
+                id: acceptButton
+
                 text: qsTr('OK')
                 onClicked: dialog.accepted()
             }
 
             Button {
+                id: rejectButton
+
                 text: qsTr('Cancel')
                 onClicked: dialog.rejected()
             }
+
+            Keys.onEnterPressed: acceptButton.clicked()
+            Keys.onEscapePressed: rejectButton.clicked()
+            Keys.onReturnPressed: acceptButton.clicked()
         }
     }
 
@@ -218,6 +226,7 @@ FocusScope {
     }
 
     onRejected: dialog.close()
-    Keys.onEscapePressed: dialog.rejected()
+
+    Keys.forwardTo: footer.item
 }
 

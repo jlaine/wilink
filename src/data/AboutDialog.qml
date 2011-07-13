@@ -45,14 +45,18 @@ Dialog {
         }
 
         Button {
+            id: rejectButton
+
             iconSource: 'close.png'
             text: prompting ? qsTr('Cancel') : qsTr('Close')
             onClicked: {
                 if (prompting)
                     appUpdater.refuse();
-                dialog.close();
+                dialog.rejected();
             }
         }
+
+        Keys.onEscapePressed: rejectButton.clicked()
     }
 
     minimumHeight: 280

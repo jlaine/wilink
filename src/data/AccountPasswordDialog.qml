@@ -66,8 +66,6 @@ Dialog {
                 validator: RegExpValidator {
                     regExp: /.+/
                 }
-
-                Keys.onReturnPressed: dialog.accepted()
             }
         }
 

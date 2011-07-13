@@ -50,8 +50,6 @@ Dialog {
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
-
-            Keys.onReturnPressed: dialog.accepted()
         }
 
         ListView {
