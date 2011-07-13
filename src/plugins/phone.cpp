@@ -64,6 +64,9 @@ PhoneContactModel::PhoneContactModel(QObject *parent)
     roleNames.insert(IdRole, "id");
     roleNames.insert(NameRole, "name");
     setRoleNames(roleNames);
+
+    // http
+    m_network = new NetworkAccessManager(this);
 }
 
 /** Returns the number of columns under the given \a parent.
@@ -103,6 +106,18 @@ int PhoneContactModel::rowCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent);
     return m_items.size();
+}
+
+void PhoneContactModel::_q_handleList()
+{
+    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+    Q_ASSERT(reply);
+
+    QDomDocument doc;
+    if (reply->error() != QNetworkReply::NoError || !doc.setContent(reply)) {
+        qWarning("Failed to retrieve phone contacts: %s", qPrintable(reply->errorString()));
+        return;
+    }
 }
 
 class PhoneHistoryItem

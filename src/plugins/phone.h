@@ -56,6 +56,9 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
+private slots:
+    void _q_handleList();
+
 private:
     QList<PhoneContactItem*> m_items;
     QNetworkAccessManager *m_network;
