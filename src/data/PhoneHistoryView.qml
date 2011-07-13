@@ -157,7 +157,7 @@ Item {
                 if (item.action == 'call') {
                     view.model.call(callAddress)
                 } else if (item.action == 'remove') {
-                    console.log("remove " + callId);
+                    view.model.removeRow(index);
                 }
             }
 

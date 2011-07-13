@@ -381,6 +381,16 @@ QString PhoneCallsModel::phoneNumber() const
 {
     return m_phoneNumber;
 }
+/** Removes the the given \a row under the given \a parent.
+ *
+ * @param row
+ * @param parent
+ */
+
+bool PhoneCallsModel::removeRow(int row, const QModelIndex &parent)
+{
+    QAbstractListModel::removeRow(row, parent);
+}
 
 /** Removes \a count rows starting at the given \a row under the given \a parent.
  *
