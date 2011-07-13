@@ -31,11 +31,34 @@ class QNetworkAccessManager;
 class QNetworkReply;
 class QNetworkRequest;
 class QTimer;
-class PhoneCallsItem;
+class PhoneContactItem;
+class PhoneHistoryItem;
 class SipCall;
 class SipClient;
 
-class PhoneCallsModel : public QAbstractListModel
+/** The PhoneContactModel class represents the user's phone contacts.
+ */
+class PhoneContactModel : public QAbstractListModel
+{
+    Q_OBJECT
+
+public:
+    PhoneContactModel(QObject *parent = 0);
+
+    // QAbstractListModel
+    int columnCount(const QModelIndex &parent = QModelIndex()) const;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const;
+
+private:
+    QList<PhoneContactItem*> m_items;
+    QNetworkAccessManager *m_network;
+    QUrl m_url;
+};
+
+/** The PhoneHistoryModel class represents the user's phone call history.
+ */
+class PhoneHistoryModel : public QAbstractListModel
 {
     Q_OBJECT
     Q_PROPERTY(SipClient* client READ client CONSTANT)
@@ -60,8 +83,8 @@ public:
         StateRole,
     };
 
-    PhoneCallsModel(QObject *parent = 0);
-    ~PhoneCallsModel();
+    PhoneHistoryModel(QObject *parent = 0);
+    ~PhoneHistoryModel();
 
     SipClient *client() const;
     int currentCalls() const;
@@ -73,6 +96,7 @@ public:
     QUrl selfcareUrl() const;
     QString voicemailNumber() const;
 
+    // QAbstractListModel
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     Q_INVOKABLE bool removeRow(int row, const QModelIndex &parent = QModelIndex());
@@ -112,7 +136,7 @@ private:
 
     SipClient *m_client;
     bool m_enabled;
-    QList<PhoneCallsItem*> m_items;
+    QList<PhoneHistoryItem*> m_items;
     QNetworkAccessManager *m_network;
     QString m_phoneNumber;
     bool m_registeredHandler;

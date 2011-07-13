@@ -55,7 +55,7 @@ Panel {
             return recipient;
     }
 
-    PhoneCallsModel {
+    PhoneHistoryModel {
         id: historyModel
 
         onCurrentCallsChanged: {
@@ -99,7 +99,8 @@ Panel {
             id: addressbook
 
             anchors.fill: parent
-            model: ListModel {}
+            model: PhoneContactModel {
+            }
             title: qsTr('My contacts')
 
             //onAddClicked: 
