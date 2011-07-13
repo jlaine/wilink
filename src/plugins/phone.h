@@ -67,6 +67,7 @@ public slots:
     void addContact(const QString &name, const QString &phone);
 
 private slots:
+    void _q_handleCreate();
     void _q_handleList();
 
 private:

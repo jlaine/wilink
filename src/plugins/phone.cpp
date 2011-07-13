@@ -44,15 +44,26 @@ class PhoneContactItem
 {
 public:
     PhoneContactItem();
+    QByteArray data() const;
 
     int id;
     QString name;
     QString phone;
+    QNetworkReply *reply;
 };
 
 PhoneContactItem::PhoneContactItem()
-    : id(0)
+    : id(0),
+    reply(0)
 {
+}
+
+QByteArray PhoneContactItem::data() const
+{
+    QUrl data;
+    data.addQueryItem("name", name);
+    data.addQueryItem("phone", phone);
+    return data.encodedQuery();
 }
 
 PhoneContactModel::PhoneContactModel(QObject *parent)
@@ -74,6 +85,14 @@ void PhoneContactModel::addContact(const QString &name, const QString &phone)
     PhoneContactItem *item = new PhoneContactItem;
     item->name = name;
     item->phone = phone;
+
+    QNetworkRequest request(m_url);
+    request.setRawHeader("Accept", "application/xml");
+    request.setRawHeader("Connection", "close");
+    request.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
+    item->reply = m_network->post(request, item->data());
+    connect(item->reply, SIGNAL(finished()),
+            this, SLOT(_q_handleCreate()));
 
     beginInsertRows(QModelIndex(), 0, 0);
     m_items.prepend(item);
@@ -137,6 +156,12 @@ void PhoneContactModel::setUrl(const QUrl &url)
         }
         emit urlChanged(m_url);
     }
+}
+
+void PhoneContactModel::_q_handleCreate()
+{
+    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+    Q_ASSERT(reply);
 }
 
 void PhoneContactModel::_q_handleList()
@@ -284,6 +309,7 @@ void PhoneHistoryModel::addCall(SipCall *call)
         item->soundId = wApp->soundPlayer()->play(":/call-incoming.ogg", true);
     else
         connect(item->call, SIGNAL(ringing()), this, SLOT(callRinging()));
+
     QNetworkRequest request(m_url);
     request.setRawHeader("Accept", "application/xml");
     request.setRawHeader("Connection", "close");
