@@ -46,6 +46,7 @@ class PhoneCallsModel : public QAbstractListModel
     Q_PROPERTY(int outputVolume READ outputVolume NOTIFY outputVolumeChanged)
     Q_PROPERTY(QString phoneNumber READ phoneNumber NOTIFY phoneNumberChanged)
     Q_PROPERTY(QUrl selfcareUrl READ selfcareUrl NOTIFY selfcareUrlChanged)
+    Q_PROPERTY(QString voicemailNumber READ voicemailNumber NOTIFY voicemailNumberChanged)
 
 public:
     enum Role {
@@ -70,6 +71,7 @@ public:
     int outputVolume() const;
     QString phoneNumber() const;
     QUrl selfcareUrl() const;
+    QString voicemailNumber() const;
 
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
@@ -84,6 +86,7 @@ signals:
     void outputVolumeChanged(int outputVolume);
     void phoneNumberChanged(const QString &phoneNumber);
     void selfcareUrlChanged(const QUrl& selfcareUrl);
+    void voicemailNumberChanged(const QString &voicemailNumber);
 
 public slots:
     void addCall(SipCall *call);
@@ -116,6 +119,7 @@ private:
     QTimer *m_ticker;
     QTimer *m_timer;
     QUrl m_url;
+    QString m_voicemailNumber;
 };
 
 #endif

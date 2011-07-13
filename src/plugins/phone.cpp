@@ -451,6 +451,13 @@ void PhoneCallsModel::stopTone(int toneValue)
         call->audioChannel()->stopTone(tone);
 }
 
+/** Returns the voicemail service phone number.
+ */
+QString PhoneCallsModel::voicemailNumber() const
+{
+    return m_voicemailNumber;
+}
+
 /** Requests VoIP settings from the server.
  */
 void PhoneCallsModel::_q_getSettings()
@@ -487,6 +494,7 @@ void PhoneCallsModel::_q_handleSettings()
     const QString number = settings.firstChildElement("number").text();
     const QString callsUrl = settings.firstChildElement("calls-url").text();
     const QUrl selfcareUrl = QUrl(settings.firstChildElement("selfcare-url").text());
+    const QString voicemailNumber = settings.firstChildElement("voicemail-number").text();
 
     // update phone number
     if (number != m_phoneNumber) {
@@ -498,6 +506,12 @@ void PhoneCallsModel::_q_handleSettings()
     if (selfcareUrl != m_selfcareUrl) {
         m_selfcareUrl = selfcareUrl;
         emit selfcareUrlChanged(m_selfcareUrl);
+    }
+
+    // update voicemail number
+    if (voicemailNumber != m_voicemailNumber) {
+        m_voicemailNumber = voicemailNumber;
+        emit voicemailNumberChanged(m_voicemailNumber);
     }
 
     // check service is activated
