@@ -81,12 +81,16 @@ static QString transformToken(const QString &token)
     smileys.insert(":-@", ":/smiley-angry.png");
     smileys.insert(":s", ":/smiley-confused.png");
     smileys.insert(":-s", ":/smiley-confused.png");
+    smileys.insert(":S", ":/smiley-confused.png");
+    smileys.insert(":-S", ":/smiley-confused.png");
     smileys.insert(":)", ":/smiley-happy.png");
     smileys.insert(":-)", ":/smiley-happy.png");
     smileys.insert(":|", ":/smiley-neutral.png");
     smileys.insert(":-|", ":/smiley-neutral.png");
     smileys.insert(":p", ":/smiley-raspberry.png");
     smileys.insert(":-p", ":/smiley-raspberry.png");
+    smileys.insert(":P", ":/smiley-raspberry.png");
+    smileys.insert(":-P", ":/smiley-raspberry.png");
     smileys.insert(":(", ":/smiley-sad.png");
     smileys.insert(":-(", ":/smiley-sad.png");
     smileys.insert(";)", ":/smiley-wink.png");
