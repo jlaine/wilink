@@ -126,8 +126,21 @@ Item {
             height: 30
             width: parent.width
 
-            Column {
+            Image {
+                id: avatar
+
                 anchors.left: parent.left
+                anchors.leftMargin: 6
+                anchors.verticalCenter: parent.verticalCenter
+                asynchronous: true
+                width: appStyle.icon.smallSize
+                height: appStyle.icon.smallSize
+                smooth: true
+                source: 'peer.png'
+            }
+
+            Column {
+                anchors.left: avatar.right
                 anchors.right: callButtonLoader.left
                 anchors.leftMargin: 6
                 anchors.verticalCenter: parent.verticalCenter
