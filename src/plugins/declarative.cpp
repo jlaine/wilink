@@ -106,6 +106,7 @@ QVariant ListHelper::get(int row) const
         const QHash<int, QByteArray> roleNames = m_model->roleNames();
         foreach (int role, roleNames.keys())
             result.insert(QString::fromAscii(roleNames[role]), index.data(role));
+        result.insert("index", row);
     }
     return result;
 }

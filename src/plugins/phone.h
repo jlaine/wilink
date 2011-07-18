@@ -65,6 +65,7 @@ signals:
 
 public slots:
     void addContact(const QString &name, const QString &phone);
+    QVariantMap getContact(int id);
     void removeContact(int id);
     void updateContact(int id, const QString &name, const QString &phone);
 

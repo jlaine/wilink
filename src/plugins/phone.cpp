@@ -136,6 +136,26 @@ QVariant PhoneContactModel::data(const QModelIndex &index, int role) const
     }
 }
 
+/** Returns the contact with the given \a id.
+ *
+ * @param id
+ */
+QVariantMap PhoneContactModel::getContact(int id)
+{
+    QVariantMap result;
+    for (int row = 0; row < m_items.size(); ++row) {
+        QModelIndex idx = index(row, 0);
+        if (idx.data(IdRole).toInt() == id) {
+            const QHash<int, QByteArray> names = roleNames();
+            foreach (int role, names.keys())
+                result.insert(QString::fromAscii(names[role]), idx.data(role));
+            result.insert("index", row);
+            break;
+        }
+    }
+    return result;
+}
+
 /** Removes the contact with the given \a id.
  *
  * @param id

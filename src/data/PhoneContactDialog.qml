@@ -24,6 +24,7 @@ Dialog {
     id: dialog
 
     property bool acceptableInput: (nameInput.acceptableInput && phoneInput.acceptableInput)
+    property int contactId: -1
     property QtObject model
 
     minimumHeight: 150
@@ -82,11 +83,30 @@ Dialog {
         }
     }
 
+    // FIXME: this is a hack, we should be able to use
+    // Component.onCompleted with QtQuick 1.1
+    Timer {
+        interval: 100
+        running: true
+
+        onTriggered: {
+            if (dialog.contactId >= 0) {
+                var item = dialog.model.getContact(dialog.contactId);
+                nameInput.text = item.name;
+                phoneInput.text = item.phone;
+            }
+        }
+    }
+
     onAccepted: {
         if (!dialog.acceptableInput)
             return;
 
-        dialog.model.addContact(nameInput.text, phoneInput.text);
+        if (dialog.contactId >= 0) {
+            dialog.model.updateContact(dialog.contactId, nameInput.text, phoneInput.text);
+        } else {
+            dialog.model.addContact(nameInput.text, phoneInput.text);
+        }
         dialog.close();
     }
 }
