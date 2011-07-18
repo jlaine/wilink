@@ -312,6 +312,8 @@ void PhoneContactModel::_q_handleList()
             beginInsertRows(QModelIndex(), 0, 0);
             m_items.prepend(item);
             endInsertRows();
+
+            emit nameChanged(item->phone);
         }
         element = element.nextSiblingElement("contact");
     }
