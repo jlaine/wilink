@@ -95,7 +95,7 @@ Item {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        highlight: Highlight {}
+        anchors.margins: 2
 
         delegate: Item {
             id: item
@@ -172,6 +172,9 @@ Item {
                 PropertyChanges { target: phone; visible: true }
             }
         }
+
+        highlight: Highlight {}
+        highlightMoveDuration: 500
     }
 
     Component {
