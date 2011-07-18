@@ -55,6 +55,7 @@ Dialog {
 
                 anchors.left: nameLabel.right
                 anchors.right: parent.right
+                focus: false
             }
         }
 
@@ -98,6 +99,10 @@ Dialog {
         }
     }
 
+    Component.onCompleted: {
+        nameInput.focus = true;
+    }
+
     onAccepted: {
         if (!dialog.acceptableInput)
             return;
@@ -108,6 +113,13 @@ Dialog {
             dialog.model.addContact(nameInput.text, phoneInput.text);
         }
         dialog.close();
+    }
+
+    Keys.onTabPressed: {
+        if (nameInput.activeFocus)
+            phoneInput.focus = true;
+        else
+            nameInput.focus = true;
     }
 }
 
