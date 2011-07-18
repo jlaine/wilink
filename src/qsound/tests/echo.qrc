@@ -1,0 +1,6 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file>played.ogg</file>
+    <file>recorded.ogg</file>
+</qresource>
+</RCC>

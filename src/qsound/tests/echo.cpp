@@ -72,11 +72,11 @@ int main(int argc, char *argv[])
     signal(SIGINT, signal_handler);
     signal(SIGTERM, signal_handler);
 
-    QSoundFile recorded("mixed.ogg");
+    QSoundFile recorded(":/recorded.ogg");
     check = recorded.open(QIODevice::ReadOnly);
     Q_ASSERT(check);
 
-    QSoundFile played("output.ogg");
+    QSoundFile played(":/played.ogg");
     check = played.open(QIODevice::ReadOnly);
     Q_ASSERT(check);
 
