@@ -505,8 +505,8 @@ Acceptez-vous?</translation>
         <translation>Historique des appels</translation>
     </message>
     <message>
-        <source>Modify contact</source>
-        <translation>Modifier le contact</translation>
+        <source>Add to contacts</source>
+        <translation>Ajouter aux contacts</translation>
     </message>
 </context>
 <context>

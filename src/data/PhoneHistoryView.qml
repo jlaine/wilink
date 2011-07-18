@@ -202,8 +202,8 @@ Item {
                     'text': qsTr('Call')});
                 menu.model.append({
                     'action': 'contact',
-                    'icon': 'peer.png',
-                    'text': qsTr('Modify contact')});
+                    'icon': 'add.png',
+                    'text': qsTr('Add to contacts')});
                 menu.model.append({
                     'action': 'remove',
                     'icon': 'remove.png',
