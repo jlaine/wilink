@@ -25,10 +25,12 @@ Dialog {
 
     property bool acceptableInput: (nameInput.acceptableInput && phoneInput.acceptableInput)
     property int contactId: -1
+    property alias contactName: nameInput.text
+    property alias contactPhone: phoneInput.text
     property QtObject model
 
     minimumHeight: 150
-    title: qsTr('Add a contact')
+    title: contactId >= 0 ? qsTr('Modify a contact') : qsTr('Add a contact')
 
     Column {
         anchors.fill: contents
@@ -80,21 +82,6 @@ Dialog {
 
                 anchors.left: phoneLabel.right
                 anchors.right: parent.right
-            }
-        }
-    }
-
-    // FIXME: this is a hack, we should be able to use
-    // Component.onCompleted with QtQuick 1.1
-    Timer {
-        interval: 100
-        running: true
-
-        onTriggered: {
-            if (dialog.contactId >= 0) {
-                var item = dialog.model.getContact(dialog.contactId);
-                nameInput.text = item.name;
-                phoneInput.text = item.phone;
             }
         }
     }

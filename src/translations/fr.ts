@@ -470,6 +470,10 @@ Acceptez-vous?</translation>
         <source>Number</source>
         <translation>Numéro</translation>
     </message>
+    <message>
+        <source>Modify a contact</source>
+        <translation>Modifier un contact</translation>
+    </message>
 </context>
 <context>
     <name>PhoneContactView</name>

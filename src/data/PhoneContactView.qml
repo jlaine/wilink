@@ -202,8 +202,11 @@ Item {
             onItemClicked: {
                 var item = menu.model.get(index);
                 if (item.action == 'edit') {
+                    var contact = contactModel.getContact(contactId);
                     dialogSwapper.showPanel('PhoneContactDialog.qml', {
                         'contactId': contactId,
+                        'contactName': contact.name,
+                        'contactPhone': contact.phone,
                         'model': contactModel});
                 } else if (item.action == 'remove') {
                     view.model.removeContact(contactId);
