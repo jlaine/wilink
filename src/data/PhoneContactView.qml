@@ -142,7 +142,7 @@ Item {
             Column {
                 anchors.left: avatar.right
                 anchors.right: callButtonLoader.left
-                anchors.leftMargin: 6
+                anchors.leftMargin: 3
                 anchors.verticalCenter: parent.verticalCenter
 
                 Text {
