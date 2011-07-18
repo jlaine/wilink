@@ -106,6 +106,7 @@ public:
         DurationRole,
         IdRole,
         NameRole,
+        PhoneRole,
         StateRole,
     };
 

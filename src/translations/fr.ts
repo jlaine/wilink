@@ -504,6 +504,10 @@ Acceptez-vous?</translation>
         <source>Call history</source>
         <translation>Historique des appels</translation>
     </message>
+    <message>
+        <source>Modify contact</source>
+        <translation>Modifier le contact</translation>
+    </message>
 </context>
 <context>
     <name>PhoneNotification</name>

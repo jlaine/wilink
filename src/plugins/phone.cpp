@@ -396,6 +396,7 @@ PhoneHistoryModel::PhoneHistoryModel(QObject *parent)
     roleNames.insert(DurationRole, "duration");
     roleNames.insert(IdRole, "id");
     roleNames.insert(NameRole, "name");
+    roleNames.insert(PhoneRole, "phone");
     roleNames.insert(StateRole, "state");
     setRoleNames(roleNames);
 
@@ -646,6 +647,8 @@ QVariant PhoneHistoryModel::data(const QModelIndex &index, int role) const
         else
             return sipAddressToName(item->address);
     }
+    case PhoneRole:
+        return item->number();
     default:
         return QVariant();
     }

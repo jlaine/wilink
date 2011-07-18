@@ -32,56 +32,74 @@ Dialog {
     minimumHeight: 150
     title: contactId >= 0 ? qsTr('Modify a contact') : qsTr('Add a contact')
 
-    Column {
+    Item {
         anchors.fill: contents
-        spacing: appStyle.spacing.vertical
 
-        Item {
-            id: nameRow
+        Image {
+            id: image
 
+            anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
-            anchors.right: parent.right
-            height: nameInput.height
-
-            Text {
-                id: nameLabel
-
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.left: parent.left
-                text: qsTr('Name')
-                width: 100
-            }
-
-            InputBar {
-                id: nameInput
-
-                anchors.left: nameLabel.right
-                anchors.right: parent.right
-                focus: false
-            }
+            height: 64
+            width: 64
+            source: 'peer-128.png'
         }
 
-        Item {
-            id: phoneRow
-
-            anchors.left: parent.left
+        Column {
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.left: image.right
+            anchors.leftMargin: 16
             anchors.right: parent.right
-            height: phoneInput.height
+            spacing: appStyle.spacing.vertical
 
-            Text {
-                id: phoneLabel
+            Item {
+                id: nameRow
 
-                anchors.verticalCenter: parent.verticalCenter
                 anchors.left: parent.left
-                text: qsTr('Number')
-                width: 100
+                anchors.right: parent.right
+                height: nameInput.height
+
+                Text {
+                    id: nameLabel
+
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
+                    text: qsTr('Name')
+                    width: 100
+                }
+
+                InputBar {
+                    id: nameInput
+
+                    anchors.left: nameLabel.right
+                    anchors.right: parent.right
+                    focus: false
+                }
             }
 
-            InputBar {
-                id: phoneInput
+            Item {
+                id: phoneRow
 
-                anchors.left: phoneLabel.right
+                anchors.left: parent.left
                 anchors.right: parent.right
+                height: phoneInput.height
+
+                Text {
+                    id: phoneLabel
+
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
+                    text: qsTr('Number')
+                    width: 100
+                }
+
+                InputBar {
+                    id: phoneInput
+
+                    anchors.left: phoneLabel.right
+                    anchors.right: parent.right
+                }
             }
         }
     }

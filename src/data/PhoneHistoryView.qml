@@ -136,6 +136,7 @@ Item {
                             menuLoader.sourceComponent = phoneHistoryMenu;
                             menuLoader.item.callAddress = model.address;
                             menuLoader.item.callId = model.id;
+                            menuLoader.item.callPhone = model.phone;
                             menuLoader.show(pos.x, pos.y);
                         }
                     }
@@ -166,17 +167,26 @@ Item {
 
             property string callAddress
             property int callId
+            property string callPhone
 
             onItemClicked: {
                 var item = menu.model.get(index);
                 if (item.action == 'call') {
                     view.model.call(callAddress)
+                } else if (item.action == 'contact') {
+                    dialogSwapper.showPanel('PhoneContactDialog.qml', {
+                        'contactPhone': callPhone,
+                        'model': view.model.contactsModel});
                 } else if (item.action == 'remove') {
                     view.model.removeCall(callId);
                 }
             }
 
             Component.onCompleted: {
+                menu.model.append({
+                    'action': 'contact',
+                    'icon': 'peer.png',
+                    'text': qsTr('Modify contact')});
                 menu.model.append({
                     'action': 'call',
                     'icon': 'call.png',
