@@ -174,9 +174,18 @@ Item {
                 if (item.action == 'call') {
                     view.model.call(callAddress)
                 } else if (item.action == 'contact') {
-                    dialogSwapper.showPanel('PhoneContactDialog.qml', {
-                        'contactPhone': callPhone,
-                        'model': view.model.contactsModel});
+                    var contact = addressbook.contactForPhone(callPhone);
+                    if (contact != null) {
+                        dialogSwapper.showPanel('PhoneContactDialog.qml', {
+                            'contactId': contact.id,
+                            'contactName': contact.name,
+                            'contactPhone': contact.phone,
+                            'model': view.model.contactsModel});
+                    } else {
+                        dialogSwapper.showPanel('PhoneContactDialog.qml', {
+                            'contactPhone': callPhone,
+                            'model': view.model.contactsModel});
+                    }
                 } else if (item.action == 'remove') {
                     view.model.removeCall(callId);
                 }

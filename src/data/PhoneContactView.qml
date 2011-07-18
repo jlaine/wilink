@@ -18,6 +18,7 @@
  */
 
 import QtQuick 1.0
+import wiLink 2.0
 
 Item {
     id: block
@@ -26,6 +27,21 @@ Item {
     property alias model: view.model
 
     signal itemClicked(variant model)
+
+    function contactForPhone(phone) {
+        for (var i = 0; i < listHelper.count; i++) {
+            if (listHelper.getProperty(i, 'phone') == phone) {
+                return listHelper.get(i);
+            }
+        }
+        return null;
+    }
+
+    ListHelper {
+        id: listHelper
+
+        model: view.model
+    }
 
     Rectangle {
         id: background
