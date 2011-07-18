@@ -122,6 +122,7 @@ if(RELOAD_TRANSLATIONS)
         ../data/InputMenu.qml
         ../data/LogPanel.qml
         ../data/PhoneContactDialog.qml
+        ../data/PhoneContactView.qml
         ../data/PhoneHistoryView.qml
         ../data/PhoneNotification.qml
         ../data/PhonePanel.qml

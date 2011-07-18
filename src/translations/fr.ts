@@ -472,6 +472,21 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>PhoneContactView</name>
+    <message>
+        <source>My contacts</source>
+        <translation>Mes contacts</translation>
+    </message>
+    <message>
+        <source>Modify</source>
+        <translation>Modifier</translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation>Retirer</translation>
+    </message>
+</context>
+<context>
     <name>PhoneHistoryView</name>
     <message>
         <source>Call</source>
@@ -538,10 +553,6 @@ Acceptez-vous?</translation>
     <message>
         <source>Voicemail</source>
         <translation>Messagerie</translation>
-    </message>
-    <message>
-        <source>My contacts</source>
-        <translation>Mes contacts</translation>
     </message>
 </context>
 <context>

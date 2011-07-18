@@ -155,7 +155,7 @@ void PhoneContactModel::removeContact(int id)
             m_network->deleteResource(request);
 
             m_items.removeAt(row);
-            delete item;            delete item;
+            delete item;
 
             endRemoveRows();
             break;
@@ -636,6 +636,7 @@ void PhoneHistoryModel::removeCall(int id)
     for (int row = 0; row < m_items.size(); ++row) {
         PhoneHistoryItem *item = m_items[row];
         if (item->id == id) {
+            // removing active calls is not allowed
             if (item->call)
                 return;
 

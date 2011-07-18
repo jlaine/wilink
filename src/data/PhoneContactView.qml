@@ -24,11 +24,8 @@ Item {
 
     property alias count: view.count
     property alias model: view.model
-    property alias title: titleText.text
 
-    signal addClicked
     signal itemClicked(variant model)
-    signal itemContextMenu(variant model, variant point)
 
     Rectangle {
         id: background
@@ -75,6 +72,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             color: '#ffffff'
             font.bold: true
+            text: qsTr('My contacts')
         }
 
         Button {
@@ -84,7 +82,9 @@ Item {
             iconSize: appStyle.icon.tinySize
             iconSource: 'add.png'
 
-            onClicked: block.addClicked()
+            onClicked: {
+                dialogSwapper.showPanel('PhoneContactDialog.qml', {'model': contactModel});
+            }
         }
     }
 
@@ -150,7 +150,11 @@ Item {
                             item.state = 'expanded';
                         }
                     } else if (mouse.button == Qt.RightButton) {
-                        block.itemContextMenu(model, block.mapFromItem(item, mouse.x, mouse.y));
+                        // show context menu
+                        var pos = mapToItem(menuLoader.parent, mouse.x, mouse.y);
+                        menuLoader.sourceComponent = phoneContactMenu;
+                        menuLoader.item.contactId = model.id;
+                        menuLoader.show(pos.x, pos.y);
                     }
                 }
 
@@ -181,6 +185,36 @@ Item {
 
             onClicked: {
                 block.itemClicked(view.model);
+            }
+        }
+    }
+
+    Component {
+        id: phoneContactMenu
+
+        Menu {
+            id: menu
+
+            property int contactId
+
+            onItemClicked: {
+                var item = menu.model.get(index);
+                if (item.action == 'edit') {
+                    dialogSwapper.showPanel('PhoneContactDialog.qml', {'model': contactModel});
+                } else if (item.action == 'remove') {
+                    view.model.removeContact(contactId);
+                }
+            }
+
+            Component.onCompleted: {
+                menu.model.append({
+                    'action': 'edit',
+                    'icon': 'options.png',
+                    'text': qsTr('Modify')});
+                menu.model.append({
+                    'action': 'remove',
+                    'icon': 'remove.png',
+                    'text': qsTr('Remove')});
             }
         }
     }

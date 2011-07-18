@@ -133,7 +133,7 @@ Item {
                         if (!model.active) {
                             // show context menu
                             var pos = mapToItem(menuLoader.parent, mouse.x, mouse.y);
-                            menuLoader.sourceComponent = phoneMenu;
+                            menuLoader.sourceComponent = phoneHistoryMenu;
                             menuLoader.item.callAddress = model.address;
                             menuLoader.item.callId = model.id;
                             menuLoader.show(pos.x, pos.y);
@@ -149,8 +149,17 @@ Item {
         }
     }
 
+    ScrollBar {
+        id: scrollBar
+
+        anchors.top: header.bottom
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        flickableItem: view
+    }
+
     Component {
-        id: phoneMenu
+        id: phoneHistoryMenu
 
         Menu {
             id: menu
@@ -178,14 +187,5 @@ Item {
                     'text': qsTr('Remove')});
             }
         }
-    }
-
-    ScrollBar {
-        id: scrollBar
-
-        anchors.top: header.bottom
-        anchors.bottom: parent.bottom
-        anchors.right: parent.right
-        flickableItem: view
     }
 }
