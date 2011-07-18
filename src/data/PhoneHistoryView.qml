@@ -127,6 +127,7 @@ Item {
                 anchors.fill: parent
                 hoverEnabled: true
                 onClicked: {
+                    view.currentIndex = model.index;
                     if (mouse.button == Qt.LeftButton) {
                         block.addressClicked(model.address);
                     } else if (mouse.button == Qt.RightButton) {
@@ -148,6 +149,9 @@ Item {
                 }
             }
         }
+
+        highlight: Highlight {}
+        highlightMoveDuration: 500
     }
 
     ScrollBar {
