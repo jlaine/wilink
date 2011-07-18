@@ -95,6 +95,7 @@ Item {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
+        highlight: Highlight {}
 
         delegate: Item {
             id: item
@@ -144,11 +145,7 @@ Item {
 
                 onClicked: {
                     if (mouse.button == Qt.LeftButton) {
-                        if (item.state == 'expanded') {
-                            item.state = '';
-                        } else {
-                            item.state = 'expanded';
-                        }
+                        view.currentIndex = model.index;
                     } else if (mouse.button == Qt.RightButton) {
                         // show context menu
                         var pos = mapToItem(menuLoader.parent, mouse.x, mouse.y);
@@ -169,7 +166,9 @@ Item {
 
             states: State {
                 name: 'expanded'
+                when: view.currentItem == item
                 PropertyChanges { target: item; height: 40 }
+                PropertyChanges { target: name; font.bold: true }
                 PropertyChanges { target: phone; visible: true }
             }
         }
