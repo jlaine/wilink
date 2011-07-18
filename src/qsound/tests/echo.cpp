@@ -23,6 +23,7 @@
 
 #include <QApplication>
 #include <QBuffer>
+#include <QFile>
 #include <QTimer>
 
 #include "QSoundFile.h"
@@ -141,6 +142,28 @@ int main(int argc, char *argv[])
     fftw_free(played_fft);
     fftw_free(recorded_fft);
     fftw_free(in);
+
+    // cancel echo
+    played.close();
+    played.open(QIODevice::ReadOnly);
+
+    recorded.close();
+    recorded.open(QIODevice::ReadOnly);
+
+    QFile file("fixed.raw");
+    file.open(QIODevice::WriteOnly);
+
+    QDataStream output_stream(&file);
+    output_stream.setByteOrder(QDataStream::LittleEndian);
+    qint16 echo;
+    for (int i = 0; i < real_N; ++i) {
+        recorded_stream >> val;
+        if (i >= max_pos) {
+            played_stream >> echo;
+            val -= echo;
+        }
+        output_stream << val;
+    }
 
     return 0;
 }
