@@ -22,7 +22,9 @@
 
 #include <QApplication>
 #include <QBuffer>
+#include <QTimer>
 
+#include "QSoundFile.h"
 #include "QSoundPlayer.h"
 #include "QSoundStream.h"
 #include "echo.h"
@@ -30,13 +32,20 @@
 EchoTester::EchoTester(QObject *parent)
     : QObject(parent)
 {
-    m_buffer = new QBuffer(this);
+    m_file = new QSoundFile("test.wav", this);
 
     m_player = new QSoundPlayer(this);
 
     m_stream = new QSoundStream(m_player);
-    m_stream->setDevice(m_buffer);
     m_stream->setFormat(1, 8000);
+
+    m_file->setFormat(m_stream->format());
+    m_file->open(QIODevice::WriteOnly);
+
+    m_stream->setDevice(m_file);
+    m_stream->startInput();
+
+    QTimer::singleShot(5000, qApp, SLOT(quit()));
 }
 
 static int aborted = 0;

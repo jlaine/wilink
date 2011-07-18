@@ -71,9 +71,19 @@ QSoundStream::~QSoundStream()
     delete d;
 }
 
+QIODevice* QSoundStream::device() const
+{
+    return d->device;
+}
+
 void QSoundStream::setDevice(QIODevice *device)
 {
     d->device = device;
+}
+
+QAudioFormat QSoundStream::format() const
+{
+    return d->audioFormat;
 }
 
 void QSoundStream::setFormat(unsigned char channels, unsigned int clockrate)

@@ -37,7 +37,10 @@ public:
     QSoundStream(QSoundPlayer *player);
     ~QSoundStream();
 
+    QIODevice* device() const;
     void setDevice(QIODevice *device);
+
+    QAudioFormat format() const;
     void setFormat(unsigned char channels, unsigned int clockrate);
 
     int inputVolume() const;
