@@ -19,7 +19,7 @@
 
 #include <QObject>
 
-class QBuffer;
+class QSoundFile;
 class QSoundPlayer;
 class QSoundStream;
 
@@ -31,7 +31,7 @@ public:
     EchoTester(QObject *parent = 0);
 
 private:
-    QBuffer *m_buffer;
+    QSoundFile *m_file;
     QSoundPlayer *m_player;
     QSoundStream *m_stream;
 };
