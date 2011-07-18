@@ -87,6 +87,7 @@ private:
 class PhoneHistoryModel : public QAbstractListModel
 {
     Q_OBJECT
+    Q_ENUMS(Role)
     Q_PROPERTY(SipClient* client READ client CONSTANT)
     Q_PROPERTY(PhoneContactModel* contactsModel READ contactsModel CONSTANT)
     Q_PROPERTY(int currentCalls READ currentCalls NOTIFY currentCallsChanged)

@@ -193,13 +193,13 @@ Item {
 
             Component.onCompleted: {
                 menu.model.append({
-                    'action': 'contact',
-                    'icon': 'peer.png',
-                    'text': qsTr('Modify contact')});
-                menu.model.append({
                     'action': 'call',
                     'icon': 'call.png',
                     'text': qsTr('Call')});
+                menu.model.append({
+                    'action': 'contact',
+                    'icon': 'peer.png',
+                    'text': qsTr('Modify contact')});
                 menu.model.append({
                     'action': 'remove',
                     'icon': 'remove.png',
