@@ -52,6 +52,7 @@ public:
 
     PhoneContactModel(QObject *parent = 0);
 
+    QString name(const QString &number) const;
     QUrl url() const;
     void setUrl(const QUrl &url);
 
@@ -61,6 +62,7 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
 signals:
+    void nameChanged(const QString &number);
     void urlChanged(const QUrl &url);
 
 public slots:
@@ -155,10 +157,12 @@ private slots:
     void _q_handleCreate();
     void _q_handleList();
     void _q_handleSettings();
+    void _q_nameChanged(const QString &phone);
     void _q_openUrl(const QUrl &url);
 
 private:
     QList<SipCall*> activeCalls() const;
+    QModelIndex createIndex(PhoneHistoryItem *item);
 
     SipClient *m_client;
     PhoneContactModel *m_contactsModel;

@@ -41,6 +41,7 @@ class SipClientPrivate;
 
 extern const char *sipAddressPattern;
 QString sipAddressToName(const QString &address);
+QString sipAddressToUri(const QString &address);
 
 class SdpMessage
 {

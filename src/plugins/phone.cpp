@@ -105,6 +105,8 @@ void PhoneContactModel::addContact(const QString &name, const QString &phone)
     beginInsertRows(QModelIndex(), 0, 0);
     m_items.prepend(item);
     endInsertRows();
+
+    emit nameChanged(item->phone);
 }
 
 /** Returns the number of columns under the given \a parent.
@@ -204,6 +206,7 @@ void PhoneContactModel::updateContact(int id, const QString &name, const QString
     for (int row = 0; row < m_items.size(); ++row) {
         PhoneContactItem *item = m_items[row];
         if (item->id == id) {
+            const QString oldPhone = item->phone;
             item->name = name;
             item->phone = phone;
 
@@ -216,9 +219,21 @@ void PhoneContactModel::updateContact(int id, const QString &name, const QString
             m_network->put(request, item->data());
 
             emit dataChanged(createIndex(row, 0), createIndex(row, 0));
+            if (oldPhone != item->phone)
+                emit nameChanged(oldPhone);
+            emit nameChanged(item->phone);
             break;
         }
     }
+}
+
+QString PhoneContactModel::name(const QString &number) const
+{
+    foreach (PhoneContactItem *item, m_items) {
+        if (number == item->phone)
+            return item->name;
+    }
+    return QString();
 }
 
 QUrl PhoneContactModel::url() const
@@ -307,6 +322,7 @@ class PhoneHistoryItem
 public:
     PhoneHistoryItem();
     QByteArray data() const;
+    QString number() const;
     void parse(const QDomElement &element);
 
     int id;
@@ -337,6 +353,16 @@ QByteArray PhoneHistoryItem::data() const
     data.addQueryItem("duration", QString::number(duration));
     data.addQueryItem("flags", QString::number(flags));
     return data.encodedQuery();
+}
+
+QString PhoneHistoryItem::number() const
+{
+    const QString uri = sipAddressToUri(address);
+    const QStringList bits = uri.split('@');
+    if (bits.size() == 2) {
+        return bits[0].mid(4);
+    }
+    return QString();
 }
 
 void PhoneHistoryItem::parse(const QDomElement &element)
@@ -375,6 +401,8 @@ PhoneHistoryModel::PhoneHistoryModel(QObject *parent)
 
     // contacts
     m_contactsModel = new PhoneContactModel(this);
+    connect(m_contactsModel, SIGNAL(nameChanged(QString)),
+            this, SLOT(_q_nameChanged(QString)));
 
     // http
     m_network = new NetworkAccessManager(this);
@@ -536,16 +564,16 @@ void PhoneHistoryModel::callStateChanged(QXmppCall::State state)
         // PhoneNotification.qml
         QTimer::singleShot(1000, call, SLOT(deleteLater()));
     }
-    emit dataChanged(createIndex(row, 0), createIndex(row, 0));
+    emit dataChanged(createIndex(item), createIndex(item));
 }
 
 void PhoneHistoryModel::callTick()
 {
     bool active = false;
-    for (int row = 0; row < m_items.size(); ++row) {
-        if (m_items[row]->call) {
+    foreach (PhoneHistoryItem *item, m_items) {
+        if (item->call) {
             active = true;
-            emit dataChanged(createIndex(row, 0), createIndex(row, 0));
+            emit dataChanged(createIndex(item), createIndex(item));
         }
     }
     if (!active)
@@ -576,6 +604,14 @@ PhoneContactModel* PhoneHistoryModel::contactsModel() const
     return m_contactsModel;
 }
 
+QModelIndex PhoneHistoryModel::createIndex(PhoneHistoryItem *item)
+{
+    const int row = m_items.indexOf(item);
+    if (row >= 0)
+        return QAbstractItemModel::createIndex(row, 0);
+    return QModelIndex();
+}
+
 int PhoneHistoryModel::currentCalls() const
 {
     return activeCalls().size();
@@ -603,8 +639,13 @@ QVariant PhoneHistoryModel::data(const QModelIndex &index, int role) const
         return item->call ? item->call->duration() : item->duration;
     case IdRole:
         return item->id;
-    case NameRole:
-        return sipAddressToName(item->address);
+    case NameRole: {
+        const QString name = m_contactsModel->name(item->number());
+        if (!name.isEmpty())
+            return name;
+        else
+            return sipAddressToName(item->address);
+    }
     default:
         return QVariant();
     }
@@ -858,7 +899,7 @@ void PhoneHistoryModel::_q_handleCreate()
         return;
     }
     item->parse(doc.documentElement());
-    emit dataChanged(createIndex(row, 0), createIndex(row, 0));
+    emit dataChanged(createIndex(item), createIndex(item));
 }
 
 void PhoneHistoryModel::_q_handleList()
@@ -890,6 +931,14 @@ void PhoneHistoryModel::_q_handleList()
             endInsertRows();
         }
         element = element.nextSiblingElement("call");
+    }
+}
+
+void PhoneHistoryModel::_q_nameChanged(const QString &phone)
+{
+    foreach (PhoneHistoryItem *item, m_items) {
+        if (item->number() == phone)
+            emit dataChanged(createIndex(item), createIndex(item));
     }
 }
 

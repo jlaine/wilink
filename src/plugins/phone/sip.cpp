@@ -72,7 +72,7 @@ QString sipAddressToName(const QString &address)
     return name.isEmpty() ? rx.cap(3).split('@').first() : name;
 }
 
-static QString sipAddressToUri(const QString &address)
+QString sipAddressToUri(const QString &address)
 {
     QRegExp rx(sipAddressPattern);
     if (!rx.exactMatch(address)) {
