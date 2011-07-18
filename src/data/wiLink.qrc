@@ -123,6 +123,7 @@
     <file>PhotoDeleteDialog.qml</file>
     <file>PhotoPanel.qml</file>
     <file>PlayerPanel.qml</file>
+    <file>PluginPreferencePanel.qml</file>
     <file>PreferenceDialog.qml</file>
     <file>ProgressBar.qml</file>
     <file>RoomConfigurationDialog.qml</file>
