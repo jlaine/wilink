@@ -99,10 +99,7 @@ Panel {
             id: addressbook
 
             anchors.fill: parent
-            model: PhoneContactModel {
-                id: contactModel
-                url: historyModel.contactsUrl
-            }
+            model: historyModel.contactsModel
         }
     }
 

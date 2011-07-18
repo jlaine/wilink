@@ -83,7 +83,7 @@ Item {
             iconSource: 'add.png'
 
             onClicked: {
-                dialogSwapper.showPanel('PhoneContactDialog.qml', {'model': contactModel});
+                dialogSwapper.showPanel('PhoneContactDialog.qml', {'model': view.model});
             }
         }
     }
@@ -202,12 +202,12 @@ Item {
             onItemClicked: {
                 var item = menu.model.get(index);
                 if (item.action == 'edit') {
-                    var contact = contactModel.getContact(contactId);
+                    var contact = view.model.getContact(contactId);
                     dialogSwapper.showPanel('PhoneContactDialog.qml', {
                         'contactId': contactId,
                         'contactName': contact.name,
                         'contactPhone': contact.phone,
-                        'model': contactModel});
+                        'model': view.model});
                 } else if (item.action == 'remove') {
                     view.model.removeContact(contactId);
                 }

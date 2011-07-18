@@ -85,7 +85,7 @@ class PhoneHistoryModel : public QAbstractListModel
 {
     Q_OBJECT
     Q_PROPERTY(SipClient* client READ client CONSTANT)
-    Q_PROPERTY(QUrl contactsUrl READ contactsUrl NOTIFY contactsUrlChanged)
+    Q_PROPERTY(PhoneContactModel* contactsModel READ contactsModel CONSTANT)
     Q_PROPERTY(int currentCalls READ currentCalls NOTIFY currentCallsChanged)
     Q_PROPERTY(bool enabled READ enabled NOTIFY enabledChanged)
     Q_PROPERTY(int inputVolume READ inputVolume NOTIFY inputVolumeChanged)
@@ -111,7 +111,7 @@ public:
     ~PhoneHistoryModel();
 
     SipClient *client() const;
-    QUrl contactsUrl() const;
+    PhoneContactModel* contactsModel() const;
     int currentCalls() const;
     bool enabled() const;
     int inputVolume() const;
@@ -129,7 +129,6 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
 signals:
-    void contactsUrlChanged(const QUrl &contactsUrl);
     void currentCallsChanged();
     void enabledChanged(bool enabled);
     void error(const QString &error);
@@ -162,7 +161,7 @@ private:
     QList<SipCall*> activeCalls() const;
 
     SipClient *m_client;
-    QUrl m_contactsUrl;
+    PhoneContactModel *m_contactsModel;
     bool m_enabled;
     QList<PhoneHistoryItem*> m_items;
     QNetworkAccessManager *m_network;

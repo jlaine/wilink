@@ -373,6 +373,9 @@ PhoneHistoryModel::PhoneHistoryModel(QObject *parent)
     roleNames.insert(StateRole, "state");
     setRoleNames(roleNames);
 
+    // contacts
+    m_contactsModel = new PhoneContactModel(this);
+
     // http
     m_network = new NetworkAccessManager(this);
 
@@ -568,9 +571,9 @@ int PhoneHistoryModel::columnCount(const QModelIndex &parent) const
     return 1;
 }
 
-QUrl PhoneHistoryModel::contactsUrl() const
+PhoneContactModel* PhoneHistoryModel::contactsModel() const
 {
-    return m_contactsUrl;
+    return m_contactsModel;
 }
 
 int PhoneHistoryModel::currentCalls() const
@@ -767,10 +770,7 @@ void PhoneHistoryModel::_q_handleSettings()
     const QString voicemailNumber = settings.firstChildElement("voicemail-number").text();
 
     // update contacts url
-    if (contactsUrl != m_contactsUrl) {
-        m_contactsUrl = contactsUrl;
-        emit contactsUrlChanged(contactsUrl);
-    }
+    m_contactsModel->setUrl(contactsUrl);
 
     // update phone number
     if (number != m_phoneNumber) {
