@@ -41,6 +41,7 @@ class SipClient;
 class PhoneContactModel : public QAbstractListModel
 {
     Q_OBJECT
+    Q_ENUMS(Role)
     Q_PROPERTY(QUrl url READ url WRITE setUrl NOTIFY urlChanged)
 
 public:

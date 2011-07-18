@@ -24,7 +24,7 @@ Item {
     id: block
 
     property alias count: view.count
-    property alias model: view.model
+    property QtObject model
 
     signal itemClicked(variant model)
 
@@ -40,7 +40,7 @@ Item {
     ListHelper {
         id: listHelper
 
-        model: view.model
+        model: block.model
     }
 
     Rectangle {
@@ -99,7 +99,7 @@ Item {
             iconSource: 'add.png'
 
             onClicked: {
-                dialogSwapper.showPanel('PhoneContactDialog.qml', {'model': view.model});
+                dialogSwapper.showPanel('PhoneContactDialog.qml', {'model': block.model});
             }
         }
     }
@@ -112,6 +112,13 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.margins: 2
+        model: SortFilterProxyModel {
+            dynamicSortFilter: true
+            sortCaseSensitivity: Qt.CaseInsensitive
+            sortRole: PhoneContactModel.NameRole
+            sourceModel: block.model
+            Component.onCompleted: sort(0)
+        }
 
         delegate: Item {
             id: item
@@ -202,7 +209,7 @@ Item {
             smooth: true
 
             onClicked: {
-                block.itemClicked(view.model);
+                block.itemClicked(block.model);
             }
         }
     }
@@ -218,14 +225,14 @@ Item {
             onItemClicked: {
                 var item = menu.model.get(index);
                 if (item.action == 'edit') {
-                    var contact = view.model.getContact(contactId);
+                    var contact = block.model.getContact(contactId);
                     dialogSwapper.showPanel('PhoneContactDialog.qml', {
                         'contactId': contactId,
                         'contactName': contact.name,
                         'contactPhone': contact.phone,
-                        'model': view.model});
+                        'model': block.model});
                 } else if (item.action == 'remove') {
-                    view.model.removeContact(contactId);
+                    block.model.removeContact(contactId);
                 }
             }
 
