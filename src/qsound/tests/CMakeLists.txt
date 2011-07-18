@@ -1,3 +1,7 @@
+qt4_wrap_cpp(qsound-echo_MOC_SOURCES echo.h)
+add_executable(qsound-echo echo.cpp ${qsound-echo_MOC_SOURCES})
+target_link_libraries(qsound-echo qsound ${QT_LIBRARIES})
+
 qt4_wrap_cpp(qvideo-grabber_MOC_SOURCES grabber.h)
 add_executable(qvideo-grabber grabber.cpp ${qvideo-grabber_MOC_SOURCES})
 target_link_libraries(qvideo-grabber qsound qxmpp ${QT_LIBRARIES})
