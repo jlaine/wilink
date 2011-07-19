@@ -179,7 +179,7 @@ Panel {
             id: image
             anchors.left: parent.left
             anchors.top: parent.top
-            source: details.model.image !== '' ? details.model.image : 'plugin.png'
+            source: details.model.image !== undefined && details.model.image !== '' ? details.model.image : 'plugin.png'
         }
 
         Button {
@@ -211,11 +211,11 @@ Panel {
             Text {
                 elide: Text.ElideRight
                 font.bold: true
-                text: details.model.name
+                text: details.model.name !== undefined ? details.model.name : ''
                 width: parent.width
             }
             Text {
-                text: details.model.description
+                text: details.model.description !== undefined ? details.model.description : ''
                 width: parent.width
                 wrapMode: Text.Wrap
             }
