@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <cmath>
 #include <cstdlib>
 #include <csignal>
 #include <fftw3.h>
@@ -34,14 +35,19 @@
 EchoTester::EchoTester(QObject *parent)
     : QObject(parent)
 {
+    QList<QPair<QSoundFile::MetaData, QString> > metaData;
+    metaData << qMakePair(QSoundFile::ArtistMetaData, QString::fromLatin1("TestArtist"));
+    metaData << qMakePair(QSoundFile::AlbumMetaData, QString::fromLatin1("TestAlbum"));
+    metaData << qMakePair(QSoundFile::TitleMetaData, QString::fromLatin1("TestTitle"));
+
     m_file = new QSoundFile("test.wav", this);
 
     m_player = new QSoundPlayer(this);
-
     m_stream = new QSoundStream(m_player);
     m_stream->setFormat(1, 8000);
 
     m_file->setFormat(m_stream->format());
+    m_file->setMetaData(metaData);
     m_file->open(QIODevice::WriteOnly);
 
     m_stream->setDevice(m_file);
@@ -65,12 +71,17 @@ int main(int argc, char *argv[])
     bool check;
 
     const size_t real_N = 8000 * 4;
-    const size_t N = 2*real_N - 1;
+    const size_t N = 2 * real_N;
 
     QApplication app(argc, argv);
     /* Install signal handler */
     signal(SIGINT, signal_handler);
     signal(SIGTERM, signal_handler);
+
+#if 0
+    EchoTester tester;
+    return app.exec();
+#endif
 
     QSoundFile recorded(":/recorded.ogg");
     check = recorded.open(QIODevice::ReadOnly);
@@ -86,7 +97,8 @@ int main(int argc, char *argv[])
     fftw_complex *in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * N);
     fftw_complex *played_fft = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * N);
     fftw_complex *recorded_fft = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * N);
-    fftw_complex *correlation = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * N);
+    fftw_complex *auto_correlation = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * N);
+    fftw_complex *cross_correlation = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * N);
     fftw_plan p;
 
     // FFT of recorded signal
@@ -115,8 +127,17 @@ int main(int argc, char *argv[])
     fftw_execute(p);
     fftw_destroy_plan(p);
 
-    // correlation
-    p = fftw_plan_dft_1d(N, in, correlation, FFTW_BACKWARD, FFTW_ESTIMATE);
+    // auto correlation
+    p = fftw_plan_dft_1d(N, in, auto_correlation, FFTW_BACKWARD, FFTW_ESTIMATE);
+    for (int i = 0; i < N; ++i) {
+        in[i][0] = played_fft[i][0] * played_fft[i][0] + played_fft[i][1] * played_fft[i][1];
+        in[i][1] = 0;
+    }
+    fftw_execute(p);
+    fftw_destroy_plan(p);
+
+    // cross-correlation
+    p = fftw_plan_dft_1d(N, in, cross_correlation, FFTW_BACKWARD, FFTW_ESTIMATE);
     for (int i = 0; i < N; ++i) {
         in[i][0] = recorded_fft[i][0] * played_fft[i][0] + recorded_fft[i][1] * played_fft[i][1];
         in[i][1] = -recorded_fft[i][0] * played_fft[i][1] + recorded_fft[i][1] * played_fft[i][0];
@@ -127,7 +148,7 @@ int main(int argc, char *argv[])
     int max_pos = -1;
     double max_val = 0;
     for (int i = 0; i < N; ++i) {
-        const double corr = correlation[i][0] / N;
+        const double corr = cross_correlation[i][0] / N;
         //qDebug("%f", corr);
         if (max_pos < 0 || corr > max_val) {
             max_pos = i;
@@ -136,9 +157,11 @@ int main(int argc, char *argv[])
     }
     if (max_pos > N/2)
         max_pos = max_pos - N;
+    qDebug("auto correlation %f", cross_correlation[0][0] / N);
     qDebug("max correlation %i: %f", max_pos, max_val);
 
-    fftw_free(correlation);
+    fftw_free(auto_correlation);
+    fftw_free(cross_correlation);
     fftw_free(played_fft);
     fftw_free(recorded_fft);
     fftw_free(in);
