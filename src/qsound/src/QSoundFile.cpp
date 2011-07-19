@@ -21,6 +21,7 @@
 #include <QBuffer>
 #include <QByteArray>
 #include <QFile>
+#include <QMap>
 #include <QStringList>
 
 #include "QSoundFile.h"
@@ -33,8 +34,13 @@
 #include <vorbis/vorbisfile.h>
 #endif
 
-static const quint32 FMT_SIZE = 16;
-static const quint16 FMT_FORMAT = 1;      // linear PCM
+static const quint32 WAV_FMT_SIZE = 16;
+static const quint16 WAV_FMT_FORMAT = 1;      // linear PCM
+
+static const quint8 MP3_ENC_LATIN1 = 0;
+static const quint8 MP3_ENC_UTF8 = 3;
+
+typedef QPair<QSoundFile::MetaData, QString> QSoundInfo;
 
 class QSoundFilePrivate {
 public:
@@ -48,7 +54,7 @@ public:
     
     QString m_name;
     QAudioFormat m_format;
-    QList<QPair<QSoundFile::MetaData, QString> > m_info;
+    QList<QSoundInfo> m_info;
 
     bool m_repeat;
 };
@@ -70,11 +76,12 @@ public:
     qint64 readData(char * data, qint64 maxSize);
     qint64 writeData(const char *data, qint64 maxSize);
 
-
 private:
     QSoundFile *q;
 
     bool decodeFrame();
+    bool readHeader();
+    bool writeHeader();
 
     qint64 m_duration;
     QIODevice *m_file;
@@ -85,6 +92,7 @@ private:
     mad_stream m_stream;
     mad_frame m_frame;
     mad_synth m_synth;
+    QMap<QByteArray, QSoundFile::MetaData> m_tagMap;
 };
 
 static inline qint16 mad_scale(mad_fixed_t sample)
@@ -108,6 +116,14 @@ QSoundFileMp3::QSoundFileMp3(QIODevice *device, QSoundFile *qq)
     m_file(device),
     m_headerFound(false)
 {
+    // tag mapping
+    m_tagMap.insert("TPE1", QSoundFile::ArtistMetaData);
+    m_tagMap.insert("TALB", QSoundFile::AlbumMetaData);
+    m_tagMap.insert("TIT2", QSoundFile::TitleMetaData);
+    m_tagMap.insert("TYER", QSoundFile::DateMetaData);
+    m_tagMap.insert("TCON", QSoundFile::GenreMetaData);
+    m_tagMap.insert("TRCK", QSoundFile::TracknumberMetaData);
+    m_tagMap.insert("COMM", QSoundFile::DescriptionMetaData);
 }
 
 void QSoundFileMp3::close()
@@ -185,16 +201,52 @@ static quint32 read_syncsafe_int(const QByteArray &ba)
     return size;
 }
 
+static QByteArray write_syncsafe_int(quint32 size)
+{
+    QByteArray ba(4, 0);
+    ba[0] = ((size >> 21) & 0x7f);
+    ba[1] = ((size >> 14) & 0x7f);
+    ba[2] = ((size >> 7) & 0x7f);
+    ba[3] = (size & 0x7f);
+    return ba;
+}
+
 bool QSoundFileMp3::open(QIODevice::OpenMode mode)
 {
-    if (mode & QIODevice::WriteOnly) {
-        qWarning("Writing to MP3 is not supported");
-        return false;
-    }
-
-    // read file contents
+    // open file
     if (!m_file->open(mode))
         return false;
+
+    if (mode & QIODevice::ReadOnly) {
+        return readHeader();
+    }
+    else if (mode & QIODevice::WriteOnly) {
+        return writeHeader();
+    }
+    return true;
+}
+
+qint64 QSoundFileMp3::readData(char * data, qint64 maxSize)
+{
+    // decode frames
+    while (m_outputBuffer.size() < maxSize) {
+        if (!decodeFrame())
+            break;
+    }
+
+    // copy output data
+    qint64 bytes = qMin(maxSize, (qint64)m_outputBuffer.size());
+    if (bytes > 0) {
+        memcpy(data, m_outputBuffer.constData(), bytes);
+        m_outputBuffer = m_outputBuffer.mid(bytes);
+    }
+
+    return bytes;
+}
+
+bool QSoundFileMp3::readHeader()
+{
+    // read file contents
     m_inputBuffer = m_file->readAll();
     m_file->close();
 
@@ -239,16 +291,16 @@ bool QSoundFileMp3::open(QIODevice::OpenMode mode)
                 break;
 
             // frame content
-            char enc = contents.at(ptr);
+            const quint8 enc = contents.at(ptr);
             const QByteArray ba = contents.mid(ptr+1, frameSize - 1);
             ptr += frameSize;
 
             QString value;
             switch (enc) {
-            case 0:
+            case MP3_ENC_LATIN1:
                 value = QString::fromLatin1(ba);
                 break;
-            case 3:
+            case MP3_ENC_UTF8:
                 value = QString::fromUtf8(ba);
                 break;
             default:
@@ -256,20 +308,8 @@ bool QSoundFileMp3::open(QIODevice::OpenMode mode)
             }
             //qDebug("frame %s %s", frameId.constData(), qPrintable(value));
 
-            if (frameId == "TPE1")
-                m_info << qMakePair(QSoundFile::ArtistMetaData, value);
-            else if (frameId == "TALB")
-                m_info << qMakePair(QSoundFile::AlbumMetaData, value);
-            else if (frameId == "TIT2")
-                m_info << qMakePair(QSoundFile::TitleMetaData, value);
-            else if (frameId == "TYER")
-                m_info << qMakePair(QSoundFile::DateMetaData, value);
-            else if (frameId == "TCON")
-                m_info << qMakePair(QSoundFile::GenreMetaData, value);
-            else if (frameId == "TRCK")
-                m_info << qMakePair(QSoundFile::TracknumberMetaData, value);
-            else if (frameId == "COMM")
-                m_info << qMakePair(QSoundFile::DescriptionMetaData, value);
+            if (m_tagMap.contains(frameId))
+                m_info << qMakePair(m_tagMap.value(frameId), value);
         }
         pos += size;
         m_inputBuffer = m_inputBuffer.mid(pos);
@@ -308,27 +348,39 @@ void QSoundFileMp3::rewind()
     mad_stream_buffer(&m_stream, (unsigned char*)m_inputBuffer.data(), m_inputBuffer.size());
 }
 
-qint64 QSoundFileMp3::readData(char * data, qint64 maxSize)
-{
-    // decode frames
-    while (m_outputBuffer.size() < maxSize) {
-        if (!decodeFrame())
-            break;
-    }
-
-    // copy output data
-    qint64 bytes = qMin(maxSize, (qint64)m_outputBuffer.size());
-    if (bytes > 0) {
-        memcpy(data, m_outputBuffer.constData(), bytes);
-        m_outputBuffer = m_outputBuffer.mid(bytes);
-    }
-
-    return bytes;
-}
-
 qint64 QSoundFileMp3::writeData(const char *data, qint64 maxSize)
 {
     return -1;
+}
+
+bool QSoundFileMp3::writeHeader()
+{
+    // collect tags
+    QByteArray tags;
+    foreach(const QSoundInfo &info, m_info) {
+        const QByteArray frameId = m_tagMap.key(info.first);
+        if (!frameId.isEmpty()) {
+            qDebug("tag %s %s", frameId.constData(), qPrintable(info.second));
+            const QByteArray value = info.second.toUtf8();
+            tags += frameId;
+            tags += write_syncsafe_int(value.size() + 1);
+            tags += QByteArray(2, 0x00); // flags
+            tags += QByteArray(1, MP3_ENC_UTF8);
+            tags += value;
+        }
+    }
+
+    // identifier + version
+    QDataStream stream(m_file);
+    stream.writeRawData("ID3\x04\x00", 5);
+
+    // flags
+    stream << quint8(0);
+
+    // size
+    tags.prepend(write_syncsafe_int(tags.size()));
+    stream.writeRawData(tags.constData(), tags.size());
+    return true;
 }
 
 #endif
@@ -557,7 +609,7 @@ bool QSoundFileWav::readHeader()
             quint16 audioFormat, channelCount, blockAlign, sampleSize;
             quint32 sampleRate, byteRate;
             stream >> audioFormat;
-            if (chunkSize != FMT_SIZE || audioFormat != FMT_FORMAT) {
+            if (chunkSize != WAV_FMT_SIZE || audioFormat != WAV_FMT_FORMAT) {
                 qWarning("Bad fmt subchunk");
                 return false;
             }
@@ -646,8 +698,8 @@ bool QSoundFileWav::writeHeader()
 
     // fmt subchunk
     stream.writeRawData("fmt ", 4);
-    stream << FMT_SIZE;
-    stream << FMT_FORMAT;
+    stream << WAV_FMT_SIZE;
+    stream << WAV_FMT_FORMAT;
     stream << quint16(m_format.channels());
     stream << quint32(m_format.frequency());
     stream << quint32((m_format.channels() * m_format.sampleSize() * m_format.frequency()) / 8);
