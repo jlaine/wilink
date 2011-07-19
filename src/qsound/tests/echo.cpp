@@ -80,7 +80,7 @@ qint16 EchoFilter::recorded(qint16 r)
     //qDebug("y %f", y);
 
     // remove echo
-    const double e = double(r) - y;
+    const double e = qMax(-32768.0, qMin(double(r) - y, 32767.0));
 
     // update filter
     for (int k = 0; k < L; ++k) {
@@ -145,11 +145,11 @@ int main(int argc, char *argv[])
     return app.exec();
 #endif
 
-    QSoundFile recorded(":/played.ogg");
+    QSoundFile recorded(":/local.ogg");
     check = recorded.open(QIODevice::ReadOnly);
     Q_ASSERT(check);
 
-    QSoundFile played(":/played.ogg");
+    QSoundFile played(":/local.ogg");
     check = played.open(QIODevice::ReadOnly);
     Q_ASSERT(check);
 
