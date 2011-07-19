@@ -1,11 +1,8 @@
 # fftw support
-find_library(FFTW_LIBRARY fftw3)
-if(FFTW_LIBRARY)
-    qt4_add_resources(qsound-echo_RCC_SOURCES echo.qrc)
-    qt4_wrap_cpp(qsound-echo_MOC_SOURCES echo.h)
-    add_executable(qsound-echo echo.cpp ${qsound-echo_MOC_SOURCES} ${qsound-echo_RCC_SOURCES})
-    target_link_libraries(qsound-echo qsound ${QT_LIBRARIES} ${FFTW_LIBRARY})
-endif()
+qt4_add_resources(qsound-echo_RCC_SOURCES echo.qrc)
+qt4_wrap_cpp(qsound-echo_MOC_SOURCES echo.h)
+add_executable(qsound-echo echo.cpp ${qsound-echo_MOC_SOURCES} ${qsound-echo_RCC_SOURCES})
+target_link_libraries(qsound-echo qsound ${QT_LIBRARIES})
 
 qt4_wrap_cpp(qvideo-grabber_MOC_SOURCES grabber.h)
 add_executable(qvideo-grabber grabber.cpp ${qvideo-grabber_MOC_SOURCES})

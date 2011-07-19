@@ -20,7 +20,6 @@
 #include <cmath>
 #include <cstdlib>
 #include <csignal>
-#include <fftw3.h>
 
 #include <QApplication>
 #include <QBuffer>
@@ -32,6 +31,69 @@
 #include "QSoundStream.h"
 #include "echo.h"
 
+#define L 16
+
+class EchoFilter
+{
+public:
+    EchoFilter();
+    void played(qint16 s);
+    qint16 recorded(qint16 x);
+
+private:
+    double m_step;
+    double m_W[L];
+    double m_X[L];
+    int m_Xpos;
+};
+
+EchoFilter::EchoFilter()
+    : m_Xpos(-1)
+{
+    m_step = 0.1 / (419174276.0 * L);
+    for (int i = 0; i < L; ++i) {
+        m_W[i] = 0.0;
+        m_X[i] = 0;
+    }
+}
+
+void EchoFilter::played(qint16 x)
+{
+    m_Xpos = (m_Xpos + 1) % L;
+    m_X[m_Xpos] = x;
+
+#if 0
+    double pow = 0;
+    for (int k = 0; k < L; ++k)
+        pow += m_X[k] * m_X[k];
+    qDebug("pow %f", pow/L);
+#endif
+}
+
+qint16 EchoFilter::recorded(qint16 r)
+{
+    // estimate echo
+    double y = 0;
+    for (int k = 0; k < L; ++k) {
+        y += m_W[k] * m_X[(m_Xpos - k) % L];
+    }
+    //qDebug("y %f", y);
+
+    // remove echo
+    const double e = double(r) - y;
+
+    // update filter
+    for (int k = 0; k < L; ++k) {
+        m_W[k] += m_step * e * m_X[(m_Xpos - k) % L];
+        //qDebug("W[%i] %f", k, m_W[k]);
+    }
+
+    // return filtered value
+    const qint16 f = e;
+    qDebug("filtered %i", f);
+    return f;
+}
+
 EchoTester::EchoTester(QObject *parent)
     : QObject(parent)
 {
@@ -40,7 +102,7 @@ EchoTester::EchoTester(QObject *parent)
     metaData << qMakePair(QSoundFile::AlbumMetaData, QString::fromLatin1("TestAlbum"));
     metaData << qMakePair(QSoundFile::TitleMetaData, QString::fromLatin1("TestTitle"));
 
-    m_file = new QSoundFile("test.wav", this);
+    m_file = new QSoundFile("recorded.wav", this);
 
     m_player = new QSoundPlayer(this);
     m_stream = new QSoundStream(m_player);
@@ -83,7 +145,7 @@ int main(int argc, char *argv[])
     return app.exec();
 #endif
 
-    QSoundFile recorded(":/recorded.ogg");
+    QSoundFile recorded(":/played.ogg");
     check = recorded.open(QIODevice::ReadOnly);
     Q_ASSERT(check);
 
@@ -91,7 +153,34 @@ int main(int argc, char *argv[])
     check = played.open(QIODevice::ReadOnly);
     Q_ASSERT(check);
 
+    QSoundFile output("fixed.wav");
+    output.setFormat(recorded.format());
+    check = output.open(QIODevice::WriteOnly);
+    Q_ASSERT(check);
+
     Q_ASSERT(recorded.format() == played.format());
+
+    // open streams
+    QDataStream recorded_stream(&recorded);
+    QDataStream played_stream(&played);
+    QDataStream output_stream(&output);
+    output_stream.setByteOrder(QDataStream::LittleEndian);
+
+    EchoFilter filter;
+    qint16 val;
+    for (int i = 0; i < real_N; ++i) {
+        played_stream >> val;
+        filter.played(val);
+        recorded_stream >> val;
+        val = filter.recorded(val);
+        output_stream << val;
+    }
+
+    return 0;
+}
+
+#if 0
+    #include <fftw3.h>
 
     // allocate memory
     fftw_complex *in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * N);
@@ -187,6 +276,5 @@ int main(int argc, char *argv[])
         }
         output_stream << val;
     }
+#endif
 
-    return 0;
-}
