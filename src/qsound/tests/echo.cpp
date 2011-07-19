@@ -31,7 +31,7 @@
 #include "QSoundStream.h"
 #include "echo.h"
 
-#define L 16
+#define L 8
 
 class EchoFilter
 {
@@ -50,7 +50,7 @@ private:
 EchoFilter::EchoFilter()
     : m_Xpos(-1)
 {
-    m_step = 0.1 / (419174276.0 * L);
+    m_step = 1 / 1000000000.0;
     for (int i = 0; i < L; ++i) {
         m_W[i] = 0.0;
         m_X[i] = 0;
@@ -80,7 +80,8 @@ qint16 EchoFilter::recorded(qint16 r)
     //qDebug("y %f", y);
 
     // remove echo
-    const double e = qMax(-32768.0, qMin(double(r) - y, 32767.0));
+    //const double e = qMax(-32768.0, qMin(double(r) - y, 32767.0));
+    const double e = double(r) - y;
 
     // update filter
     for (int k = 0; k < L; ++k) {
@@ -89,9 +90,7 @@ qint16 EchoFilter::recorded(qint16 r)
     }
 
     // return filtered value
-    const qint16 f = e;
-    qDebug("filtered %i", f);
-    return f;
+    return e;
 }
 
 EchoTester::EchoTester(QObject *parent)
@@ -132,9 +131,6 @@ int main(int argc, char *argv[])
 {
     bool check;
 
-    const size_t real_N = 8000 * 4;
-    const size_t N = 2 * real_N;
-
     QApplication app(argc, argv);
     /* Install signal handler */
     signal(SIGINT, signal_handler);
@@ -145,35 +141,60 @@ int main(int argc, char *argv[])
     return app.exec();
 #endif
 
-    QSoundFile recorded(":/local.ogg");
-    check = recorded.open(QIODevice::ReadOnly);
+    QSoundFile local(":/local.ogg");
+    check = local.open(QIODevice::ReadOnly);
     Q_ASSERT(check);
+    QDataStream localStream(&local);
+    localStream.setByteOrder(QDataStream::LittleEndian);
 
-    QSoundFile played(":/local.ogg");
-    check = played.open(QIODevice::ReadOnly);
+    QSoundFile remote(":/remote.ogg");
+    check = remote.open(QIODevice::ReadOnly);
     Q_ASSERT(check);
+    QDataStream remoteStream(&remote);
+    remoteStream.setByteOrder(QDataStream::LittleEndian);
 
+    Q_ASSERT(local.format() == remote.format());
+
+    // simulate echo
+    const size_t N = local.format().frequency() * 4;
+
+    QSoundFile buffer("mixed.wav");
+    buffer.setFormat(local.format());
+    check = buffer.open(QBuffer::WriteOnly);
+    Q_ASSERT(check);
+    QDataStream bufferStream(&buffer);
+    bufferStream.setByteOrder(QDataStream::LittleEndian);
+    qint16 val = 0;
+    const int delay = 0;
+    for (int i = 0; i < N; ++i) {
+        localStream >> val;
+        if (i >= delay) {
+            qint16 echo;
+            remoteStream >> echo;
+            val += (echo / 2);
+        }
+        bufferStream << val;
+    }
+    buffer.close();
+    buffer.open(QIODevice::ReadOnly);
+    remote.close();
+    remote.open(QIODevice::ReadOnly);
+
+    // cancel echo
     QSoundFile output("fixed.wav");
-    output.setFormat(recorded.format());
+    output.setFormat(local.format());
     check = output.open(QIODevice::WriteOnly);
     Q_ASSERT(check);
-
-    Q_ASSERT(recorded.format() == played.format());
-
-    // open streams
-    QDataStream recorded_stream(&recorded);
-    QDataStream played_stream(&played);
-    QDataStream output_stream(&output);
-    output_stream.setByteOrder(QDataStream::LittleEndian);
+    QDataStream outputStream(&output);
+    outputStream.setByteOrder(QDataStream::LittleEndian);
 
     EchoFilter filter;
-    qint16 val;
-    for (int i = 0; i < real_N; ++i) {
-        played_stream >> val;
+    for (int i = 0; i < N; ++i) {
+        remoteStream >> val;
         filter.played(val);
-        recorded_stream >> val;
+        bufferStream >> val;
         val = filter.recorded(val);
-        output_stream << val;
+        outputStream << val;
     }
 
     return 0;
