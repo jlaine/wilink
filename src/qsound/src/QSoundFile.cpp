@@ -522,6 +522,7 @@ private:
     QIODevice *m_file;
     qint64 m_beginPos;
     qint64 m_endPos;
+    QMap<QByteArray, QSoundFile::MetaData> m_tagMap;
 };
 
 QSoundFileWav::QSoundFileWav(QIODevice *device, QSoundFile *qq)
@@ -530,6 +531,12 @@ QSoundFileWav::QSoundFileWav(QIODevice *device, QSoundFile *qq)
     m_beginPos(0),
     m_endPos(0)
 {
+    // tag mapping
+    m_tagMap.insert("IART", QSoundFile::ArtistMetaData);
+    m_tagMap.insert("INAM", QSoundFile::TitleMetaData);
+    m_tagMap.insert("ICRD", QSoundFile::DateMetaData);
+    m_tagMap.insert("IGNR", QSoundFile::GenreMetaData);
+    m_tagMap.insert("ICMT", QSoundFile::DescriptionMetaData);
 }
 
 bool QSoundFileWav::open(QIODevice::OpenMode mode)
@@ -648,16 +655,8 @@ bool QSoundFileWav::readHeader()
                     if (pos >= 0)
                         value = value.left(pos);
 
-                    if (key == "IART")
-                        m_info << qMakePair(QSoundFile::ArtistMetaData, QString::fromUtf8(value));
-                    else if (key == "INAM")
-                        m_info << qMakePair(QSoundFile::TitleMetaData, QString::fromUtf8(value));
-                    else if (key == "ICRD")
-                        m_info << qMakePair(QSoundFile::DateMetaData, QString::fromUtf8(value));
-                    else if (key == "IGNR")
-                        m_info << qMakePair(QSoundFile::GenreMetaData, QString::fromUtf8(value));
-                    else if (key == "ICMT")
-                        m_info << qMakePair(QSoundFile::DescriptionMetaData, QString::fromUtf8(value));
+                    if (m_tagMap.contains(key))
+                        m_info << qMakePair(m_tagMap.value(key), QString::fromUtf8(value));
                     chunkSize -= (8 + length);
                 }
             } else {
@@ -714,26 +713,9 @@ bool QSoundFileWav::writeHeader()
         tmp.setByteOrder(QDataStream::LittleEndian);
         QPair<QSoundFile::MetaData, QString> info;
         foreach (info, m_info) {
-            QByteArray key;
-            switch (info.first) {
-            case QSoundFile::ArtistMetaData:
-                key = "IART";
-                break;
-            case QSoundFile::TitleMetaData:
-                key = "INAM";
-                break;
-            case QSoundFile::DateMetaData:
-                key = "ICRD";
-                break;
-            case QSoundFile::GenreMetaData:
-                key = "IGNR";
-                break;
-            case QSoundFile::DescriptionMetaData:
-                key = "ICMT";
-                break;
-            default:
+            const QByteArray key = m_tagMap.key(info.first);
+            if (key.isEmpty())
                 continue;
-            }
             tmp.writeRawData(key.constData(), key.size());
             QByteArray value = info.second.toUtf8() + '\0';
             if (value.size() % 2)
