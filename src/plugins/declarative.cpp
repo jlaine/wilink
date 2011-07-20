@@ -20,6 +20,8 @@
 #include <QCoreApplication>
 #include <QDeclarativeItem>
 #include <QDeclarativeEngine>
+#include <QGraphicsSceneDragDropEvent>
+#include <QMimeData>
 #include <QNetworkDiskCache>
 #include <QNetworkRequest>
 #include <QSslError>
@@ -222,6 +224,27 @@ void DeclarativeWallet::set(const QString &jid, const QString &password)
     }
 }
 
+DropArea::DropArea(QDeclarativeItem *parent)
+    : QDeclarativeItem(parent)
+{
+    setAcceptDrops(true);
+}
+
+void DropArea::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
+{
+    event->setAccepted(event->mimeData()->hasUrls());
+}
+
+void DropArea::dropEvent(QGraphicsSceneDragDropEvent *event)
+{
+    if (event->mimeData()->hasUrls()) {
+        QVariantList urls;
+        foreach (const QUrl &url, event->mimeData()->urls())
+            urls << url;
+        emit urlsDropped(urls);
+    }
+}
+
 void Plugin::initializeEngine(QDeclarativeEngine *engine, const char *uri)
 {
     Q_UNUSED(uri);
@@ -260,6 +283,7 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterType<ChatClient>(uri, 2, 0, "Client");
     qmlRegisterType<Conversation>(uri, 2, 0, "Conversation");
     qmlRegisterType<DiscoveryModel>(uri, 2, 0, "DiscoveryModel");
+    qmlRegisterType<DropArea>(uri, 2, 0, "DropArea");
     qmlRegisterUncreatableType<HistoryModel>(uri, 2, 0, "HistoryModel", "");
     qmlRegisterType<Idle>(uri, 2, 0, "Idle");
     qmlRegisterType<ListHelper>(uri, 2, 0, "ListHelper");

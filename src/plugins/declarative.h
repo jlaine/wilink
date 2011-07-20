@@ -21,6 +21,7 @@
 #define __WILINK_DECLARATIVE_H__
 
 #include <QAbstractItemModel>
+#include <QDeclarativeItem>
 #include <QDeclarativeNetworkAccessManagerFactory>
 #include <QDeclarativeExtensionPlugin>
 #include <QFileDialog>
@@ -190,6 +191,21 @@ public slots:
     QString get(const QString &jid) const;
     void remove(const QString &jid);
     void set(const QString &jid, const QString &password);
+};
+
+class DropArea : public QDeclarativeItem
+{
+    Q_OBJECT
+
+public:
+    DropArea(QDeclarativeItem *parent = 0);
+
+signals:
+    void urlsDropped(const QVariantList &urls);
+
+protected:
+    void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
+    void dropEvent(QGraphicsSceneDragDropEvent *event);
 };
 
 class Plugin : public QDeclarativeExtensionPlugin
