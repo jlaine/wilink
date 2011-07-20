@@ -150,6 +150,7 @@ Item {
 
                     anchors.left: parent.left
                     anchors.right: parent.right
+                    elide: Text.ElideRight
                     text: model.name
                 }
 
@@ -159,6 +160,7 @@ Item {
                     anchors.left: parent.left
                     anchors.leftMargin: 6
                     anchors.right: parent.right
+                    elide: Text.ElideRight
                     font.italic: true
                     text: model.phone
                     visible: false
