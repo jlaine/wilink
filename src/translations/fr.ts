@@ -288,6 +288,10 @@ Acceptez-vous?</translation>
         <source>Show this conversation</source>
         <translation>Afficher la conversation</translation>
     </message>
+    <message>
+        <source>Clear</source>
+        <translation>Effacer</translation>
+    </message>
 </context>
 <context>
     <name>DiagnosticPanel</name>

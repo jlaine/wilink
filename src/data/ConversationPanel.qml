@@ -113,6 +113,16 @@ Panel {
                     }
                 }
             }
+
+            ToolButton {
+                iconSource: 'clear.png'
+                text: qsTr('Clear');
+                visible: true
+
+                onClicked: {
+                    conversation.historyModel.clear();
+                }
+            }
         }
 
         StatusPill {
