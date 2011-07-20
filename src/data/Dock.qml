@@ -72,21 +72,7 @@ Rectangle {
                 }
             }
         }
-/*
-        DockButton {
-            iconSource: 'dock-start.png'
-            iconPress: 'start.png'
-            panelSource: 'PlayerPanel.qml'
-            shortcut: Qt.ControlModifier + Qt.Key_E
-            text: qsTr('Media')
-            visible: false
 
-            onClicked: {
-                visible = true;
-                swapper.showPanel(panelSource);
-            }
-        }
-*/
         DockButton {
             id: phoneButton
 
@@ -203,42 +189,40 @@ Rectangle {
             }
         }
 
-        DockButton {
-            iconSource: 'dock-peer.png'
-            iconPress: 'peer.png'
-            panelSource: 'DiscoveryPanel.qml'
-            shortcut: Qt.ControlModifier + Qt.Key_B
-            text: qsTr('Discovery')
-            visible: false
-
-            onClicked: {
-                visible = true;
-                swapper.showPanel(panelSource);
-            }
-        }
-
         Repeater {
             model: ListModel {
-                ListElement {
-                    iconSource: 'dock-start.png';
-                    iconPress: 'start.png';
-                    panelSource: 'PlayerPanel.qml';
-                    text: 'Media';
-                    visible: true;
-                }
+                id: pluginModel
             }
 
             delegate: DockButton {
                 iconSource: model.iconSource
                 iconPress: model.iconPress
                 panelSource: model.panelSource
-                text: qsTr(model.text)
+                shortcut: model.shortcut
+                text: model.text
                 visible: model.visible
 
                 onClicked: {
                     visible = true;
                     swapper.showPanel(panelSource);
                 }
+            }
+
+            Component.onCompleted: {
+                pluginModel.append({
+                    'iconSource': 'dock-start.png',
+                    'iconPress': 'start.png',
+                    'panelSource': 'PlayerPanel.qml',
+                    'shortcut': Qt.ControlModifier + Qt.Key_E,
+                    'text': qsTr('Media'),
+                    'visible': true});
+                pluginModel.append({
+                    'iconSource': 'dock-peer.png',
+                    'iconPress': 'peer.png',
+                    'panelSource': 'DiscoveryPanel.qml',
+                    'shortcut': Qt.ControlModifier + Qt.Key_B,
+                    'text': qsTr('Discovery'),
+                    'visible': false});
             }
         }
     }
