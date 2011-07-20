@@ -229,8 +229,11 @@ static QStringList droppedFiles(QGraphicsSceneDragDropEvent *event)
     QStringList files;
     if (event->mimeData()->hasUrls()) {
         foreach (const QUrl &url, event->mimeData()->urls()) {
-            if (url.scheme() == "file")
-                files << url.toLocalFile();
+            if (url.scheme() == "file") {
+                QFileInfo info(url.toLocalFile());
+                if (info.exists() && !info.isDir())
+                    files << info.filePath();
+            }
         }
     }
     return files;
