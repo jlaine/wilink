@@ -20,8 +20,6 @@
 #include <QDateTime>
 #include <QTimer>
 
-#include "QXmppArchiveIq.h"
-#include "QXmppArchiveManager.h"
 #include "QXmppConstants.h"
 #include "QXmppMessage.h"
 #include "QXmppUtils.h"
@@ -32,15 +30,8 @@
 #include "history.h"
 #include "roster.h"
 
-#ifdef WILINK_EMBEDDED
-#define HISTORY_DAYS 7
-#else
-#define HISTORY_DAYS 14
-#endif
-
 Conversation::Conversation(QObject *parent)
     : QObject(parent),
-    m_archivesFetched(false),
     m_client(0),
     m_historyModel(0),
     m_localState(QXmppMessage::None),
@@ -68,9 +59,6 @@ void Conversation::setClient(ChatClient *client)
         Q_ASSERT(check);
 
         emit clientChanged(client);
-
-        // try to fetch archives
-        fetchArchives();
     }
 }
 
@@ -90,9 +78,6 @@ void Conversation::setJid(const QString &jid)
         m_jid = jid;
         m_historyModel->setJid(jid);
         emit jidChanged(jid);
-
-        // try to fetch archives
-        fetchArchives();
     }
 }
 
@@ -121,16 +106,6 @@ void Conversation::setLocalState(int state)
 int Conversation::remoteState() const
 {
     return m_remoteState;
-}
-
-void Conversation::fetchArchives()
-{
-    if (m_archivesFetched || !m_client || !m_historyModel || m_jid.isEmpty())
-        return;
-
-    m_client->archiveManager()->listCollections(m_jid,
-        m_client->serverTime().addDays(-HISTORY_DAYS));
-    m_archivesFetched = true;
 }
 
 void Conversation::messageReceived(const QXmppMessage &msg)

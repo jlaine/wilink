@@ -25,7 +25,6 @@
 class ChatClient;
 class HistoryModel;
 class RosterModel;
-class QXmppArchiveChat;
 
 class Conversation : public QObject
 {
@@ -66,11 +65,9 @@ public slots:
     bool sendMessage(const QString &text);
 
 private slots:
-    void fetchArchives();
     void messageReceived(const QXmppMessage &msg);
 
 private:
-    bool m_archivesFetched;
     ChatClient *m_client;
     HistoryModel *m_historyModel;
     QXmppMessage::State m_localState;

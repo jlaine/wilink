@@ -27,6 +27,12 @@
 #include "history.h"
 #include "roster.h"
 
+#ifdef WILINK_EMBEDDED
+#define HISTORY_DAYS 7
+#else
+#define HISTORY_DAYS 14
+#endif
+
 typedef QPair<QRegExp, QString> TextTransform;
 static QList<TextTransform> textTransforms;
 
@@ -154,10 +160,30 @@ bool HistoryMessage::isAction() const
 class HistoryModelPrivate
 {
 public:
+    HistoryModelPrivate();
+    void fetchArchives();
+
+    bool archivesFetched;
     ChatClient *client;
     QString jid;
     QMap<QString, VCard*> rosterCards;
 };
+
+HistoryModelPrivate::HistoryModelPrivate()
+    : archivesFetched(false),
+    client(0)
+{
+}
+
+void HistoryModelPrivate::fetchArchives()
+{
+    if (archivesFetched || !client || jid.isEmpty())
+        return;
+
+    client->archiveManager()->listCollections(jid,
+        client->serverTime().addDays(-HISTORY_DAYS));
+    archivesFetched = true;
+}
 
 /** Constructs a new HistoryModel.
  *
@@ -167,7 +193,6 @@ HistoryModel::HistoryModel(QObject *parent)
     : ChatModel(parent)
 {
     d = new HistoryModelPrivate;
-    d->client = 0;
 
     // set role names
     QHash<int, QByteArray> roleNames;
@@ -327,6 +352,9 @@ void HistoryModel::setClient(ChatClient *client)
 
     d->client = client;
     emit clientChanged(d->client);
+
+    // try to fetch archives
+    d->fetchArchives();
 }
 
 QString HistoryModel::jid() const
@@ -339,6 +367,9 @@ void HistoryModel::setJid(const QString &jid)
     if (jid != d->jid) {
         d->jid = jid;
         emit jidChanged(d->jid);
+
+        // try to fetch archives
+        d->fetchArchives();
     }
 }
 
