@@ -72,7 +72,7 @@ Rectangle {
                 }
             }
         }
-
+/*
         DockButton {
             iconSource: 'dock-start.png'
             iconPress: 'start.png'
@@ -86,7 +86,7 @@ Rectangle {
                 swapper.showPanel(panelSource);
             }
         }
-
+*/
         DockButton {
             id: phoneButton
 
@@ -216,6 +216,39 @@ Rectangle {
                 swapper.showPanel(panelSource);
             }
         }
+    }
+
+    ListView {
+        id: pluginView
+
+        anchors.leftMargin: 4
+        anchors.topMargin: 5
+        anchors.top: control.bottom
+        anchors.left: parent.left
+
+        model: ListModel {
+            ListElement {
+                iconSource: 'dock-start.png';
+                iconPress: 'start.png';
+                panelSource: 'PlayerPanel.qml';
+                text: 'Media';
+                visible: true;
+            }
+        }
+
+        delegate: DockButton {
+            iconSource: model.iconSource
+            iconPress: model.iconPress
+            panelSource: model.panelSource
+            text: qsTr(model.text)
+            visible: model.visible
+
+            onClicked: {
+                visible = true;
+                swapper.showPanel(panelSource);
+            }
+        }
+        interactive: false
     }
 
     Connections {
