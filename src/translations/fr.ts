@@ -605,7 +605,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>To upload your photos to wifirst.net, simply drag and drop them to an album.</source>
-        <translation type="obsolete">Pour transférer vos photos vers wifirst.net, il vous suffit de les faire glisser sur un album.</translation>
+        <translation>Pour transférer vos photos vers wifirst.net, il vous suffit de les faire glisser sur un album.</translation>
     </message>
     <message>
         <source>Upload photos</source>

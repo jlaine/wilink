@@ -201,7 +201,7 @@ public:
     DropArea(QDeclarativeItem *parent = 0);
 
 signals:
-    void urlsDropped(const QVariantList &urls);
+    void filesDropped(const QStringList &files);
 
 protected:
     void dragEnterEvent(QGraphicsSceneDragDropEvent *event);

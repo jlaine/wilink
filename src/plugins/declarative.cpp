@@ -224,6 +224,18 @@ void DeclarativeWallet::set(const QString &jid, const QString &password)
     }
 }
 
+static QStringList droppedFiles(QGraphicsSceneDragDropEvent *event)
+{
+    QStringList files;
+    if (event->mimeData()->hasUrls()) {
+        foreach (const QUrl &url, event->mimeData()->urls()) {
+            if (url.scheme() == "file")
+                files << url.toLocalFile();
+        }
+    }
+    return files;
+}
+
 DropArea::DropArea(QDeclarativeItem *parent)
     : QDeclarativeItem(parent)
 {
@@ -232,16 +244,17 @@ DropArea::DropArea(QDeclarativeItem *parent)
 
 void DropArea::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
 {
-    event->setAccepted(event->mimeData()->hasUrls());
+    event->setAccepted(!droppedFiles(event).isEmpty());
 }
 
 void DropArea::dropEvent(QGraphicsSceneDragDropEvent *event)
 {
-    if (event->mimeData()->hasUrls()) {
-        QVariantList urls;
-        foreach (const QUrl &url, event->mimeData()->urls())
-            urls << url;
-        emit urlsDropped(urls);
+    const QStringList files = droppedFiles(event);
+    if (!files.isEmpty()) {
+        emit filesDropped(files);
+        event->accept();
+    } else {
+        event->ignore();
     }
 }
 
