@@ -19,8 +19,11 @@
 
 #include <QUrl>
 
+#include "QXmppArchiveIq.h"
+#include "QXmppArchiveManager.h"
 #include "QXmppUtils.h"
 
+#include "client.h"
 #include "history.h"
 #include "roster.h"
 
@@ -151,6 +154,8 @@ bool HistoryMessage::isAction() const
 class HistoryModelPrivate
 {
 public:
+    ChatClient *client;
+    QString jid;
     QMap<QString, VCard*> rosterCards;
 };
 
@@ -162,6 +167,7 @@ HistoryModel::HistoryModel(QObject *parent)
     : ChatModel(parent)
 {
     d = new HistoryModelPrivate;
+    d->client = 0;
 
     // set role names
     QHash<int, QByteArray> roleNames;
@@ -287,19 +293,6 @@ void HistoryModel::addMessage(const HistoryMessage &message)
         emit messageReceived(msg->jid, msg->body);
 }
 
-void HistoryModel::cardChanged()
-{
-    VCard *card = qobject_cast<VCard*>(sender());
-    if (!card)
-        return;
-    const QString jid = card->jid();
-    foreach (ChatModelItem *it, rootItem->children) {
-        HistoryItem *item = static_cast<HistoryItem*>(it);
-        if (item->messages.first()->jid == jid)
-            emit dataChanged(createIndex(it), createIndex(it));
-    }
-}
-
 /** Clears all messages.
  */
 void HistoryModel::clear()
@@ -307,6 +300,46 @@ void HistoryModel::clear()
     int rows = rowCount(QModelIndex());
     if (rows > 0)
         removeRows(0, rows);
+}
+
+ChatClient *HistoryModel::client() const
+{
+    return d->client;
+}
+
+void HistoryModel::setClient(ChatClient *client)
+{
+    bool check;
+    Q_UNUSED(check);
+
+    if (client == d->client)
+        return;
+
+    if (client) {
+        check = connect(client->archiveManager(), SIGNAL(archiveChatReceived(QXmppArchiveChat)),
+                        this, SLOT(_q_archiveChatReceived(QXmppArchiveChat)));
+        Q_ASSERT(check);
+
+        check = connect(client->archiveManager(), SIGNAL(archiveListReceived(QList<QXmppArchiveChat>)),
+                        this, SLOT(_q_archiveListReceived(QList<QXmppArchiveChat>)));
+        Q_ASSERT(check);
+    }
+
+    d->client = client;
+    emit clientChanged(d->client);
+}
+
+QString HistoryModel::jid() const
+{
+    return d->jid;
+}
+
+void HistoryModel::setJid(const QString &jid)
+{
+    if (jid != d->jid) {
+        d->jid = jid;
+        emit jidChanged(d->jid);
+    }
 }
 
 /** Returns the number of columns for the children of the given parent.
@@ -356,7 +389,7 @@ QVariant HistoryModel::data(const QModelIndex &index, int role) const
             VCard *card = new VCard((QObject*)this);
             card->setJid(jid);
             connect(card, SIGNAL(nameChanged(QString)),
-                    this, SLOT(cardChanged()));
+                    this, SLOT(_q_cardChanged()));
             d->rosterCards.insert(jid, card);
         }
         return d->rosterCards.value(jid)->name();
@@ -392,5 +425,45 @@ void HistoryModel::select(int from, int to)
         }
         ++i;
     }
+}
+
+void HistoryModel::_q_cardChanged()
+{
+    VCard *card = qobject_cast<VCard*>(sender());
+    if (!card)
+        return;
+    const QString jid = card->jid();
+    foreach (ChatModelItem *it, rootItem->children) {
+        HistoryItem *item = static_cast<HistoryItem*>(it);
+        if (item->messages.first()->jid == jid)
+            emit dataChanged(createIndex(it), createIndex(it));
+    }
+}
+
+void HistoryModel::_q_archiveChatReceived(const QXmppArchiveChat &chat)
+{
+    Q_ASSERT(d->client);
+
+    if (jidToBareJid(chat.with()) != d->jid)
+        return;
+
+    foreach (const QXmppArchiveMessage &msg, chat.messages()) {
+        HistoryMessage message;
+        message.archived = true;
+        message.body = msg.body();
+        message.date = msg.date();
+        message.jid = msg.isReceived() ? jidToBareJid(chat.with()) : d->client->configuration().jidBare();
+        message.received = msg.isReceived();
+        addMessage(message);
+    }
+}
+
+void HistoryModel::_q_archiveListReceived(const QList<QXmppArchiveChat> &chats)
+{
+    Q_ASSERT(d->client);
+
+    for (int i = chats.size() - 1; i >= 0; i--)
+        if (jidToBareJid(chats[i].with()) == d->jid)
+            d->client->archiveManager()->retrieveCollection(chats[i].with(), chats[i].start());
 }
 

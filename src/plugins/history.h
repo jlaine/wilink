@@ -26,8 +26,10 @@
 
 #include "model.h"
 
+class QXmppArchiveChat;
 class QUrl;
 
+class ChatClient;
 class HistoryModel;
 class HistoryModelPrivate;
 
@@ -56,6 +58,8 @@ public:
 class HistoryModel : public ChatModel
 {
     Q_OBJECT
+    Q_PROPERTY(ChatClient* client READ client WRITE setClient NOTIFY clientChanged)
+    Q_PROPERTY(QString jid READ jid WRITE setJid NOTIFY jidChanged)
 
 public:
     enum HistoryRole {
@@ -71,6 +75,12 @@ public:
     HistoryModel(QObject *parent = 0);
     void addMessage(const HistoryMessage &message);
 
+    ChatClient *client() const;
+    void setClient(ChatClient *client);
+
+    QString jid() const;
+    void setJid(const QString &jid);
+
     // QAbstracItemModel
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
@@ -78,6 +88,8 @@ public:
 signals:
     void bottomChanged();
     void bottomAboutToChange();
+    void clientChanged(ChatClient *client);
+    void jidChanged(const QString &jid);
     void messageReceived(const QString &jid, const QString &text);
     void participantModelChanged(QObject *participantModel);
 
@@ -86,7 +98,9 @@ public slots:
     void select(int from, int to);
 
 private slots:
-    void cardChanged();
+    void _q_cardChanged();
+    void _q_archiveChatReceived(const QXmppArchiveChat &chat);
+    void _q_archiveListReceived(const QList<QXmppArchiveChat> &chats);
 
 private:
     friend class HistoryModelPrivate;

@@ -66,8 +66,6 @@ public slots:
     bool sendMessage(const QString &text);
 
 private slots:
-    void archiveChatReceived(const QXmppArchiveChat &chat);
-    void archiveListReceived(const QList<QXmppArchiveChat> &chats);
     void fetchArchives();
     void messageReceived(const QXmppMessage &msg);
 

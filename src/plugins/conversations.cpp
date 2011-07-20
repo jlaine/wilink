@@ -61,16 +61,10 @@ void Conversation::setClient(ChatClient *client)
 
     if (client != m_client) {
         m_client = client;
+        m_historyModel->setClient(client);
+
         check = connect(client, SIGNAL(messageReceived(QXmppMessage)),
                         this, SLOT(messageReceived(QXmppMessage)));
-        Q_ASSERT(check);
-
-        check = connect(client->archiveManager(), SIGNAL(archiveChatReceived(QXmppArchiveChat)),
-                        this, SLOT(archiveChatReceived(QXmppArchiveChat)));
-        Q_ASSERT(check);
-
-        check = connect(client->archiveManager(), SIGNAL(archiveListReceived(QList<QXmppArchiveChat>)),
-                        this, SLOT(archiveListReceived(QList<QXmppArchiveChat>)));
         Q_ASSERT(check);
 
         emit clientChanged(client);
@@ -94,6 +88,7 @@ void Conversation::setJid(const QString &jid)
 {
     if (jid != m_jid) {
         m_jid = jid;
+        m_historyModel->setJid(jid);
         emit jidChanged(jid);
 
         // try to fetch archives
@@ -126,29 +121,6 @@ void Conversation::setLocalState(int state)
 int Conversation::remoteState() const
 {
     return m_remoteState;
-}
-
-void Conversation::archiveChatReceived(const QXmppArchiveChat &chat)
-{
-    if (jidToBareJid(chat.with()) != m_jid)
-        return;
-
-    foreach (const QXmppArchiveMessage &msg, chat.messages()) {
-        HistoryMessage message;
-        message.archived = true;
-        message.body = msg.body();
-        message.date = msg.date();
-        message.jid = msg.isReceived() ? m_jid : m_client->configuration().jidBare();
-        message.received = msg.isReceived();
-        m_historyModel->addMessage(message);
-    }
-}
-
-void Conversation::archiveListReceived(const QList<QXmppArchiveChat> &chats)
-{
-    for (int i = chats.size() - 1; i >= 0; i--)
-        if (jidToBareJid(chats[i].with()) == m_jid)
-            m_client->archiveManager()->retrieveCollection(chats[i].with(), chats[i].start());
 }
 
 void Conversation::fetchArchives()
