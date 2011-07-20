@@ -116,7 +116,7 @@ Panel {
 
             ToolButton {
                 iconSource: 'clear.png'
-                text: qsTr('Clear');
+                text: qsTr('Clear')
                 visible: true
 
                 onClicked: {
