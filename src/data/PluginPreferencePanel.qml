@@ -28,81 +28,49 @@ Panel {
 
     /* hard-coded models */
     ListModel {
-        id: installedModel
-        ListElement { installed: true; name: 'Music'; summary: 'Play sounds and manage albums with wiLink !'; description: 'This plugin add a music manager to wiLink.'; image: 'start.png'; }
-        ListElement { installed: true; name: 'Rss reader'; summary: 'Follow your friends over rss'; description: 'This plugin add a rss reader to wiLink.'; image: 'peer.png'; }
-    }
-    ListModel {
-        id: availableModel
+        id: pluginModel
         ListElement { installed: false; name: 'Pong'; summary: 'Basic pong game'; description: 'This is a pong game with 4 basic levels. Use left and right arrow keys to move.'; image: 'favorite-active.png'; }
+        ListElement { installed: true; name: 'Music'; summary: 'Play sounds and manage albums with wiLink !'; description: 'This plugin add a music manager to wiLink.'; image: 'start.png'; }
         ListElement { installed: false; name: 'Go! Go fish !'; summary: 'Free a lovely fish in wiLink\'s window'; description: 'This application display a pink fish in wiLink\'s window. Yes this is useless, but it\'s really fun !'; image: 'tip.png'; }
         ListElement { installed: false; name: 'H4ck3r'; summary: 'Show a fake hacking console'; description: 'This is a fun fake console, with abstract commands running inside.'; image: ''; }
+        ListElement { installed: true; name: 'Rss reader'; summary: 'Follow your friends over rss'; description: 'This plugin add a rss reader to wiLink.'; image: 'peer.png'; }
         ListElement { installed: false; name: 'Storm'; summary: 'Destroy ! Destroy !'; description: 'Display a storm inside wiLink\'s window'; image: 'diagnostics.png'; }
     }
     /* end: hard-coded models */
 
     GroupBox {
-        id: available
+        id: list
 
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        height: Math.floor(parent.height * 0.6)
-        title: qsTr('Available plugins')
-
-        ListView {
-            id: availableView
-
-            anchors.left: parent.contents.left
-            anchors.top: parent.contents.top
-            anchors.bottom: parent.contents.bottom
-            anchors.right: availableScrollBar.left
-            clip: true
-            delegate: pluginDelegate
-            model: availableModel
-            spacing: appStyle.spacing.vertical
-        }
-
-        ScrollBar {
-            id: availableScrollBar
-
-            anchors.top: parent.contents.top
-            anchors.bottom: parent.contents.bottom
-            anchors.right: parent.contents.right
-            flickableItem: availableView
-        }
-    }
-
-    GroupBox {
-        id: installed
-
-        anchors.top: available.bottom
-        anchors.topMargin: appStyle.spacing.vertical
         anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        title: qsTr('Installed plugins')
+        title: qsTr('Plugins')
 
-        ListView {
-            id: installedView
+        Item {
+            anchors.fill: parent.contents
 
-            anchors.left: parent.contents.left
-            anchors.top: parent.contents.top
-            anchors.bottom: parent.contents.bottom
-            anchors.right: installedScrollBar.left
-            clip: true
-            delegate: pluginDelegate
-            model: installedModel
-            spacing: appStyle.spacing.vertical
-        }
+            ListView {
+                id: view
 
-        ScrollBar {
-            id: installedScrollBar
+                anchors.left: parent.left
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                anchors.right: scrollBar.left
+                clip: true
+                delegate: pluginDelegate
+                model: pluginModel
+                spacing: appStyle.spacing.vertical
+            }
 
-            anchors.top: parent.contents.top
-            anchors.bottom: parent.contents.bottom
-            anchors.right: parent.contents.right
-            flickableItem: installedView
+            ScrollBar {
+                id: scrollBar
+
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                anchors.right: parent.right
+                flickableItem: view
+            }
         }
     }
 
@@ -112,6 +80,7 @@ Panel {
         Item {
             height: 32
             width: parent.width - 1
+            opacity: model.installed ? 1 : 0.5
 
             Rectangle {
                 anchors.fill: parent
@@ -130,7 +99,7 @@ Panel {
 
             Column {
                 anchors.left: image.right
-                anchors.right: button.left
+                anchors.right: checkbox.left
                 anchors.verticalCenter: parent.verticalCenter
 
                 Text {
@@ -156,13 +125,16 @@ Panel {
                  }
             }
 
-            Button {
-                id: button
+            CheckBox {
+                id: checkbox
 
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
-                iconSource: model.installed ? 'close.png' : 'add.png'
-                iconSize: appStyle.icon.tinySize
+                checked: model.installed
+                width: 16
+                height: 16
+
+                onClicked: model.installed = !model.installed
             }
         }
     }
@@ -175,32 +147,37 @@ Panel {
         anchors.fill: parent
         opacity: 0
 
+        Row {
+            id: header
+
+            anchors.right: parent.right
+            anchors.top: parent.top
+            spacing: appStyle.spacing.horizontal
+
+            Button {
+                anchors.top: parent.top
+                iconSize: appStyle.icon.tinySize
+                iconSource: 'back.png'
+                text: qsTr('Back');
+
+                onClicked: panel.state = ''
+            }
+
+            Button {
+                anchors.top: parent.top
+                iconSize: appStyle.icon.tinySize
+                iconSource: details.model.installed ? 'checkbox-checked.png' : 'checkbox.png'
+                text: details.model.installed ? qsTr('Desactivate') : qsTr('Activate')
+
+                onClicked: details.model.installed = !details.model.installed
+            }
+        }
+
         Image {
             id: image
             anchors.left: parent.left
-            anchors.top: parent.top
+            anchors.top: header.bottom
             source: details.model.image !== undefined && details.model.image !== '' ? details.model.image : 'plugin.png'
-        }
-
-        Button {
-            anchors.top: parent.top
-            anchors.right: actionButton.left
-            anchors.rightMargin: appStyle.spacing.horizontal
-            iconSize: appStyle.icon.tinySize
-            iconSource: 'back.png'
-            text: qsTr('Back');
-
-            onClicked: panel.state = ''
-        }
-
-        Button {
-            id: actionButton
-
-            anchors.top: parent.top
-            anchors.right: parent.right
-            iconSize: appStyle.icon.tinySize
-            iconSource: details.model.installed ? 'remove.png' : 'add.png'
-            text: details.model.installed ? qsTr('Uninstall') : qsTr('Install')
         }
 
         Column {
@@ -224,8 +201,7 @@ Panel {
 
     states: State {
         name: 'detailed'
-        PropertyChanges { target: available; opacity: 0 }
-        PropertyChanges { target: installed; opacity: 0 }
+        PropertyChanges { target: list; opacity: 0 }
         PropertyChanges { target: details; opacity: 1 }
     }
 }
