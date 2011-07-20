@@ -123,7 +123,7 @@ Item {
         delegate: Item {
             id: item
 
-            height: 30
+            height: 40
             width: parent.width
 
             Image {
@@ -150,6 +150,7 @@ Item {
 
                     anchors.left: parent.left
                     anchors.right: parent.right
+                    elide: Text.ElideRight
                     text: model.name
                 }
 
@@ -159,6 +160,7 @@ Item {
                     anchors.left: parent.left
                     anchors.leftMargin: 6
                     anchors.right: parent.right
+                    elide: Text.ElideRight
                     font.italic: true
                     text: model.phone
                     visible: false
@@ -203,7 +205,6 @@ Item {
             states: State {
                 name: 'expanded'
                 when: view.currentItem == item
-                PropertyChanges { target: item; height: 40 }
                 PropertyChanges { target: name; font.bold: true }
                 PropertyChanges { target: phone; visible: true }
             }

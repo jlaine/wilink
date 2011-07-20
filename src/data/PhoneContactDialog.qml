@@ -23,7 +23,6 @@ import wiLink 2.0
 Dialog {
     id: dialog
 
-    property bool acceptableInput: (nameInput.acceptableInput && phoneInput.acceptableInput)
     property int contactId: -1
     property alias contactName: nameInput.text
     property alias contactPhone: phoneInput.text
@@ -75,6 +74,9 @@ Dialog {
                     anchors.left: nameLabel.right
                     anchors.right: parent.right
                     focus: false
+                    validator: RegExpValidator {
+                        regExp: /.+/
+                    }
                 }
             }
 
@@ -99,6 +101,9 @@ Dialog {
 
                     anchors.left: phoneLabel.right
                     anchors.right: parent.right
+                    validator: RegExpValidator {
+                        regExp: /.+/
+                    }
                 }
             }
         }
@@ -109,7 +114,7 @@ Dialog {
     }
 
     onAccepted: {
-        if (!dialog.acceptableInput)
+        if (!nameInput.acceptableInput || !phoneInput.acceptableInput)
             return;
 
         if (dialog.contactId >= 0) {
