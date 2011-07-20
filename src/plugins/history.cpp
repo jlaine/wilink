@@ -322,9 +322,14 @@ void HistoryModel::addMessage(const HistoryMessage &message)
  */
 void HistoryModel::clear()
 {
+    // clear model
     int rows = rowCount(QModelIndex());
     if (rows > 0)
         removeRows(0, rows);
+
+    // clear archives
+    if (d->client && !d->jid.isEmpty())
+        d->client->archiveManager()->removeCollections(d->jid);
 }
 
 ChatClient *HistoryModel::client() const
