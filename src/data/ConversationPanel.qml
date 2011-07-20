@@ -179,6 +179,18 @@ Panel {
                 }
             }
         }
+
+        DropArea {
+            anchors.fill: parent
+            enabled: vcard.features & VCard.FileTransferFeature
+
+            onFilesDropped: {
+                for (var i in files) {
+                    var fullJid = vcard.jidForFeature(VCard.FileTransferFeature);
+                    appClient.transferManager.sendFile(fullJid, files[i]);
+                }
+            }
+        }
     }
 
     ChatEdit {
