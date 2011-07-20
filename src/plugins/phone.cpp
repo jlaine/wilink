@@ -177,9 +177,11 @@ void PhoneContactModel::removeContact(int id)
             m_network->deleteResource(request);
 
             m_items.removeAt(row);
+            endRemoveRows();
+
+            emit nameChanged(item->phone);
             delete item;
 
-            endRemoveRows();
             break;
         }
     }
