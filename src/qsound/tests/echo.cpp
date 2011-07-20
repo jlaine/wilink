@@ -21,8 +21,8 @@
 #include <cstdlib>
 #include <csignal>
 
-#include <QApplication>
 #include <QBuffer>
+#include <QCoreApplication>
 #include <QFile>
 #include <QTimer>
 
@@ -31,6 +31,7 @@
 #include "QSoundStream.h"
 #include "echo.h"
 
+#define BETA 0.001
 #define L 8
 
 class EchoFilter
@@ -41,19 +42,19 @@ public:
     qint16 recorded(qint16 x);
 
 private:
-    double m_step;
+    double m_pow;
     double m_W[L];
     double m_X[L];
     int m_Xpos;
 };
 
 EchoFilter::EchoFilter()
-    : m_Xpos(-1)
+    : m_pow(0.0),
+    m_Xpos(-1)
 {
-    m_step = 1 / 1000000000.0;
     for (int i = 0; i < L; ++i) {
         m_W[i] = 0.0;
-        m_X[i] = 0;
+        m_X[i] = 0.0;
     }
 }
 
@@ -62,6 +63,8 @@ void EchoFilter::played(qint16 x)
     m_Xpos = (m_Xpos + 1) % L;
     m_X[m_Xpos] = x;
 
+    //m_pow = (1 - BETA) * m_pow + BETA * (x * x);
+    m_pow = 120000000;
 #if 0
     double pow = 0;
     for (int k = 0; k < L; ++k)
@@ -84,8 +87,9 @@ qint16 EchoFilter::recorded(qint16 r)
     const double e = double(r) - y;
 
     // update filter
+    const double step = e / (1 + L * m_pow);
     for (int k = 0; k < L; ++k) {
-        m_W[k] += m_step * e * m_X[(m_Xpos - k) % L];
+        m_W[k] += step * m_X[(m_Xpos - k) % L];
         //qDebug("W[%i] %f", k, m_W[k]);
     }
 
@@ -131,7 +135,7 @@ int main(int argc, char *argv[])
 {
     bool check;
 
-    QApplication app(argc, argv);
+    QCoreApplication app(argc, argv);
     /* Install signal handler */
     signal(SIGINT, signal_handler);
     signal(SIGTERM, signal_handler);
