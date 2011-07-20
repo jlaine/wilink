@@ -123,7 +123,7 @@ Item {
         delegate: Item {
             id: item
 
-            height: 30
+            height: 40
             width: parent.width
 
             Image {
@@ -203,7 +203,6 @@ Item {
             states: State {
                 name: 'expanded'
                 when: view.currentItem == item
-                PropertyChanges { target: item; height: 40 }
                 PropertyChanges { target: name; font.bold: true }
                 PropertyChanges { target: phone; visible: true }
             }
