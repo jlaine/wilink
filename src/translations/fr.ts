@@ -360,10 +360,6 @@ Acceptez-vous?</translation>
 <context>
     <name>Dock</name>
     <message>
-        <source>Discovery</source>
-        <translation>Découverte de services</translation>
-    </message>
-    <message>
         <source>Phone</source>
         <translation>Téléphone</translation>
     </message>
@@ -468,6 +464,10 @@ Acceptez-vous?</translation>
     <message>
         <source>Debugging</source>
         <translation>Débogage</translation>
+    </message>
+    <message>
+        <source>Discovery</source>
+        <translation>Découverte de services</translation>
     </message>
 </context>
 <context>
@@ -1032,13 +1032,6 @@ Acceptez-vous?</translation>
     <message>
         <source>&amp;Quit</source>
         <translation>&amp;Quitter</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n message(s)</source>
-        <translation type="obsolete">
-            <numerusform>%n message</numerusform>
-            <numerusform>%n messages</numerusform>
-        </translation>
     </message>
     <message>
         <source>&amp;File</source>

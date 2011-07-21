@@ -186,16 +186,6 @@ Rectangle {
                     swapper.showPanel(panelSource);
                 }
             }
-
-            Component.onCompleted: {
-                dock.model.append({
-                    'iconSource': 'dock-peer.png',
-                    'iconPress': 'peer.png',
-                    'panelSource': 'DiscoveryPanel.qml',
-                    'shortcut': Qt.ControlModifier + Qt.Key_B,
-                    'text': qsTr('Discovery'),
-                    'visible': false});
-            }
         }
     }
 

@@ -27,6 +27,14 @@ Plugin {
 
     onLoaded: {
         dock.model.append({
+            'iconSource': 'dock-peer.png',
+            'iconPress': 'peer.png',
+            'panelSource': 'DiscoveryPanel.qml',
+            'shortcut': Qt.ControlModifier + Qt.Key_B,
+            'text': qsTr('Discovery'),
+            'visible': false});
+
+        dock.model.append({
             'iconSource': 'dock-options.png',
             'iconPress': 'options.png',
             'panelSource': 'LogPanel.qml',
