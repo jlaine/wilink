@@ -22,18 +22,26 @@ import QtQuick 1.0
 Item {
     id: loader
 
-    property alias availablePlugins: pluginModel
+    property alias model: pluginModel
 
     ListModel {
         id: pluginModel
 
         ListElement { source: 'DiagnosticPlugin.qml'; loaded: false }
         ListElement { source: 'PlayerPlugin.qml'; loaded: false }
-        ListElement { source: 'RssPlugin.qml'; loaded: false; }
-        ListElement { source: 'LogPlugin.qml'; loaded: false; }
+        ListElement { source: 'RssPlugin.qml'; loaded: false }
+        ListElement { source: 'LogPlugin.qml'; loaded: false }
     }
 
     function loadPlugin(source) {
+        // check plugin is not already loaded
+        for (var i = 0; i < pluginModel.count; i++) {
+            var plugin = pluginModel.get(i);
+            if (plugin.source == source && plugin.loaded) {
+                return;
+            }
+        }
+
         console.log("PluginLoader loading plugin " + source);
         var component = Qt.createComponent(source);
         if (component.status == Component.Ready)
@@ -54,6 +62,20 @@ Item {
                     pluginModel.setProperty(i, 'loaded', true);
                     break;
                 }
+            }
+        }
+    }
+
+    function unloadPlugin(source) {
+        for (var i = 0; i < pluginModel.count; i++) {
+            var plugin = pluginModel.get(i);
+            if (plugin.source == source) {
+                if (plugin.loaded) {
+                    console.log("PluginLoader unloading plugin " + source);
+                    // TODO: unload!
+                    pluginModel.setProperty(i, 'loaded', false);
+                }
+                break;
             }
         }
     }

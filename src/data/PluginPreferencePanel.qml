@@ -22,7 +22,15 @@ import QtQuick 1.0
 Panel {
     id: panel
 
-    function save() { }
+    function save() {
+        for (var i = 0; i < view.model.count; i++) {
+            var plugin = view.model.get(i);
+            if (plugin.selected)
+                appPlugins.loadPlugin(plugin.source);
+            else
+                appPlugins.unloadPlugin(plugin.source);
+        }
+    }
 
     color: 'transparent'
 
@@ -51,9 +59,9 @@ Panel {
                 spacing: appStyle.spacing.vertical
 
                 Component.onCompleted: {
-                    for (var i = 0; i < appPlugins.availablePlugins.count; i++) {
-                        var plugin = appPlugins.availablePlugins.get(i);
-                        view.model.append({'source': plugin.source, 'installed': plugin.loaded}); 
+                    for (var i = 0; i < appPlugins.model.count; i++) {
+                        var plugin = appPlugins.model.get(i);
+                        view.model.append({'source': plugin.source, 'selected': plugin.loaded});
                     }
                 }
             }
@@ -79,7 +87,7 @@ Panel {
 
             height: 32
             width: parent.width - 1
-            opacity: model.installed ? 1 : 0.5
+            opacity: model.selected ? 1 : 0.5
 
             Loader {
                 id: loader
@@ -135,12 +143,12 @@ Panel {
 
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
-                checked: model.installed
+                checked: model.selected
                 width: 16
                 height: 16
 
                 onClicked: {
-                    view.model.setProperty(model.index, 'installed', !model.installed);
+                    view.model.setProperty(model.index, 'selected', !model.selected);
                 }
             }
 
