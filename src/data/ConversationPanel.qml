@@ -183,6 +183,7 @@ Panel {
         DropArea {
             anchors.fill: parent
             enabled: vcard.features & VCard.FileTransferFeature
+            visible: enabled
 
             onFilesDropped: {
                 for (var i in files) {
