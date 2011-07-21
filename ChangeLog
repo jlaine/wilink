@@ -1,3 +1,9 @@
+wiLink 2.1.0 (UNRELEASED)
+ * Conversations:
+  - Make it possible to clear chat history.
+ * Photos:
+  - Add support for drag & dropping photos to upload them.
+
 wiLink 2.0.1 (2011-07-12)
  * Application:
   - Full user interface rewrite in QML.
