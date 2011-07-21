@@ -27,10 +27,10 @@ Item {
     ListModel {
         id: pluginModel
 
-        ListElement { source: 'DiagnosticPlugin.qml'; loaded: false }
-        ListElement { source: 'PlayerPlugin.qml'; loaded: false }
-        ListElement { source: 'RssPlugin.qml'; loaded: false }
-        ListElement { source: 'DebugPlugin.qml'; loaded: false }
+        ListElement { source: 'DiagnosticPlugin.qml' }
+        ListElement { source: 'PlayerPlugin.qml' }
+        ListElement { source: 'RssPlugin.qml' }
+        ListElement { source: 'DebugPlugin.qml' }
     }
 
     function loadPlugin(source) {
@@ -59,7 +59,7 @@ Item {
             // update plugins
             for (var i = 0; i < pluginModel.count; i++) {
                 if (pluginModel.get(i).source == source) {
-                    pluginModel.setProperty(i, 'loaded', true);
+                    pluginModel.setProperty(i, 'loaded', plugin);
                     break;
                 }
             }
@@ -72,8 +72,9 @@ Item {
             if (plugin.source == source) {
                 if (plugin.loaded) {
                     console.log("PluginLoader unloading plugin " + source);
-                    // TODO: unload!
-                    pluginModel.setProperty(i, 'loaded', false);
+                    plugin.loaded.unloaded();
+                    plugin.loaded.destroy();
+                    pluginModel.setProperty(i, 'loaded', undefined);
                 }
                 break;
             }
