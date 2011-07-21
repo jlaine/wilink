@@ -62,26 +62,7 @@ FocusScope {
             }
 
             panel.close.connect(function() {
-                for (var i = 0; i < panels.count; i += 1) {
-                    if (panels.get(i).panel == panel) {
-                        console.log("PanelSwapper removing panel " + panels.get(i).source + " " + Utils.dumpProperties(panels.get(i).properties));
-
-                        // if the panel was visible, show last remaining panel
-                        if (swapper.currentItem == panel) {
-                            if (panels.count == 1)
-                                swapper.setCurrentItem(null);
-                            else if (i == panels.count - 1)
-                                swapper.setCurrentItem(panels.get(i - 1).panel);
-                            else
-                                swapper.setCurrentItem(panels.get(i + 1).panel);
-                        }
-
-                        // destroy panel
-                        panels.remove(i);
-                        panel.destroy();
-                        break;
-                    }
-                }
+                swapper.removePanel(source, properties);
             });
             panels.append({'source': source, 'properties': properties, 'panel': panel});
             if (show)
@@ -100,6 +81,35 @@ FocusScope {
             }
         }
         return null;
+    }
+
+    function removePanel(source, properties) {
+        if (properties == undefined)
+            properties = {};
+
+        for (var i = 0; i < panels.count; i++) {
+            if (panels.get(i).source == source &&
+                Utils.equalProperties(panels.get(i).properties, properties)) {
+                var panel = panels.get(i).panel;
+
+                console.log("PanelSwapper removing panel " + source + " " + Utils.dumpProperties(properties));
+
+                // if the panel was visible, show last remaining panel
+                if (swapper.currentItem == panel) {
+                    if (panels.count == 1)
+                        swapper.setCurrentItem(null);
+                    else if (i == panels.count - 1)
+                        swapper.setCurrentItem(panels.get(i - 1).panel);
+                    else
+                        swapper.setCurrentItem(panels.get(i + 1).panel);
+                }
+
+                // destroy panel
+                panels.remove(i);
+                panel.destroy();
+                break;
+            }
+        }
     }
 
     function showPanel(source, properties) {
