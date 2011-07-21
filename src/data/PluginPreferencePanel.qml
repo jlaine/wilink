@@ -109,12 +109,15 @@ Panel {
                 source: plugin.imageSource
             }
 
-            Column {
+            Item {
                 anchors.top: parent.top
                 anchors.left: image.right
+                anchors.leftMargin: appStyle.spacing.horizontal
                 anchors.right: checkbox.left
 
                 Text {
+                    id: nameLabel
+                    anchors.top: parent.top
                     anchors.left: parent.left
                     anchors.right: parent.right
                     elide: Text.ElideRight
@@ -123,6 +126,9 @@ Panel {
                 }
 
                 Text {
+                    id: summaryLabel
+
+                    anchors.top: nameLabel.bottom
                     anchors.left: parent.left
                     anchors.right: parent.right
                     elide: Text.ElideRight
@@ -132,6 +138,7 @@ Panel {
                 Text {
                     id: descriptionLabel
 
+                    anchors.top: summaryLabel.bottom
                     anchors.topMargin: appStyle.spacing.vertical
                     anchors.left: parent.left
                     anchors.right: parent.right
@@ -174,7 +181,7 @@ Panel {
 
                 PropertyChanges {
                     target: item
-                    height: 64
+                    height: 32 + appStyle.spacing.vertical + descriptionLabel.height
                 }
             }
         }
