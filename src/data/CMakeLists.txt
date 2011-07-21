@@ -47,6 +47,7 @@ generate_png(png
     dock-peer.svg
     dock-phone.svg
     dock-photo.svg
+    dock-rss.svg
     dock-share.svg
     dock-start.svg
     download.svg
@@ -68,6 +69,7 @@ generate_png(png
     refresh.svg
     remove.svg
     resize.svg
+    rss.svg
     search.svg
     share.svg
     start.svg

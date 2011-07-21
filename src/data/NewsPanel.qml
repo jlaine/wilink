@@ -27,7 +27,7 @@ Panel {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        iconSource: 'peer.png'
+        iconSource: 'rss.png'
         title: qsTr('News reader')
     }
 

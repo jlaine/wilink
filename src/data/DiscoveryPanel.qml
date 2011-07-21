@@ -30,7 +30,7 @@ Panel {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        iconSource: 'diagnostics.png'
+        iconSource: 'peer.png'
         title: qsTr('Service discovery')
         toolBar: ToolBar {
             ToolButton {
