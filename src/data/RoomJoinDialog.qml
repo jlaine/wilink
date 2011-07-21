@@ -24,7 +24,6 @@ Dialog {
     id: dialog
 
     property alias model: view.model
-    property QtObject panel: null
 
     helpText: qsTr('Enter the name of the chat room you want to join. If the chat room does not exist yet, it will be created for you.')
     title: qsTr('Join or create a chat room')
@@ -36,6 +35,7 @@ Dialog {
             var jid = roomEdit.text;
             if (jid.indexOf('@') < 0)
                 jid += '@' + view.model.rootJid;
+            var panel = swapper.findPanel('ChatPanel.qml');
             panel.showRoom(jid);
             dialog.close();
         }

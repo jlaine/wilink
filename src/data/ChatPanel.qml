@@ -74,7 +74,7 @@ Panel {
             height: 24 + (count > 0 ? 4 : 0) + 30 * Math.min(count, 8);
 
             onAddClicked: {
-                dialogSwapper.showPanel('RoomJoinDialog.qml', {'panel': chatPanel});
+                dialogSwapper.showPanel('RoomJoinDialog.qml');
             }
 
             onCurrentJidChanged: {
