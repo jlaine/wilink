@@ -73,10 +73,6 @@ FocusScope {
 
     PluginLoader {
         id: appPlugins
-
-        Component.onCompleted: {
-            loadPlugin('DiagnosticPlugin.qml');
-        }
     }
 
     Dock {

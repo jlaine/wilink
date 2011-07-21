@@ -32,6 +32,9 @@ Plugin {
         repeat: false
 
         onTriggered: {
+            if (Utils.jidToDomain(appClient.jid) != 'wifirst.net')
+                return;
+
             var req = new XMLHttpRequest();
             req.onreadystatechange = function() {
                 if (req.readyState == XMLHttpRequest.DONE) {
@@ -79,12 +82,9 @@ Plugin {
         }
     }
 
-    onLoaded: {
-        timer.triggered();
-    }
-
-    onUnloaded: {
-        timer.stop();
+    Connections {
+        target: appClient
+        onConnected: timer.triggered()
     }
 }
 

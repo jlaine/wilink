@@ -262,16 +262,6 @@ Panel {
         value: roomListModel.pendingMessages + rosterModel.pendingMessages
     }
 
-    Connections {
-        target: appClient
-        onConnected: {
-            if (Utils.jidToDomain(appClient.jid) == 'wifirst.net')
-                appPlugins.loadPlugin('WifirstPlugin.qml');
-            else
-                appPlugins.unloadPlugin('WifirstPlugin.qml');
-        }
-    }
-
     states: State {
         name: 'no-sidebar'
 

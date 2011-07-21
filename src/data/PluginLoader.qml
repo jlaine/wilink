@@ -81,4 +81,10 @@ Item {
             }
         }
     }
+
+    // FIXME : get / set preferences
+    Component.onCompleted: {
+        loadPlugin('DiagnosticPlugin.qml');
+        loadPlugin('WifirstPlugin.qml');
+    }
 }
