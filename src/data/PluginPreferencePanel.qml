@@ -106,27 +106,37 @@ Panel {
                 id: image
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
-                source: plugin.imageSource !== '' ? plugin.imageSource : 'plugin.png'
+                source: plugin.imageSource
             }
 
             Column {
+                anchors.top: parent.top
                 anchors.left: image.right
                 anchors.right: checkbox.left
-                anchors.verticalCenter: parent.verticalCenter
 
                 Text {
+                    anchors.left: parent.left
+                    anchors.right: parent.right
                     elide: Text.ElideRight
                     font.bold: true
                     text: plugin.name
-                    width: parent.width
                 }
 
                 Text {
-                    id: textLabel
-
+                    anchors.left: parent.left
+                    anchors.right: parent.right
                     elide: Text.ElideRight
-                    text: view.currentIndex == model.index ? plugin.description : plugin.summary
-                    width: parent.width
+                    text: plugin.summary
+                }
+
+                Text {
+                    id: descriptionLabel
+
+                    anchors.topMargin: appStyle.spacing.vertical
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    visible: false
+                    wrapMode: Text.WordWrap
                 }
             }
 
@@ -154,9 +164,17 @@ Panel {
 
             states: State {
                 name: 'details'
+                when: view.currentIndex == model.index
+
                 PropertyChanges {
-                    target: textLabel
+                    target: descriptionLabel
                     text: plugin.description
+                    visible: true
+                }
+
+                PropertyChanges {
+                    target: item
+                    height: 64
                 }
             }
         }

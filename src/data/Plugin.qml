@@ -30,7 +30,7 @@ Item {
     property string description
 
     // The URL of the plugin's image.
-    property url imageSource
+    property url imageSource: 'plugin.png'
 
     // This signal is emitted when the plugin is enabled.
     //
