@@ -1,6 +1,10 @@
 wiLink 2.1.0 (UNRELEASED)
  * Conversations:
   - Make it possible to clear chat history.
+ * Phone:
+  - Add a contact addressbook.
+  - Add a button to call the voicemail service.
+  - Make it possible to remove call history entries.
  * Photos:
   - Add support for drag & dropping photos to upload them.
 
