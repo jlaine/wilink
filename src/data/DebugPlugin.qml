@@ -23,7 +23,7 @@ Plugin {
     name: qsTr('Debugging')
     summary: 'Debugging console.'
     description: 'This plugin allows you to run view debugging information.'
-    imageSource: 'options.png'
+    imageSource: 'debug.png'
 
     onLoaded: {
         dock.model.append({
@@ -35,8 +35,8 @@ Plugin {
             'visible': true});
 
         dock.model.append({
-            'iconSource': 'dock-options.png',
-            'iconPress': 'options.png',
+            'iconSource': 'dock-debug.png',
+            'iconPress': 'debug.png',
             'panelSource': 'LogPanel.qml',
             'shortcut': Qt.ControlModifier + Qt.Key_L,
             'text': qsTr('Debugging'),
