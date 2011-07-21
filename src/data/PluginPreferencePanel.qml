@@ -55,6 +55,7 @@ Panel {
                 anchors.right: scrollBar.left
                 clip: true
                 delegate: pluginDelegate
+                highlight: Highlight {}
                 model: ListModel {}
                 spacing: appStyle.spacing.vertical
 
@@ -87,19 +88,10 @@ Panel {
 
             height: 32
             width: parent.width - 1
-            opacity: model.selected ? 1 : 0.5
 
             Loader {
                 id: loader
                 source: model.source
-            }
-
-            Rectangle {
-                anchors.fill: parent
-                color: '#999fb7dd'
-                border.color: '#9fb7dd'
-                border.width: 1
-                radius: 5
             }
 
             Image {
