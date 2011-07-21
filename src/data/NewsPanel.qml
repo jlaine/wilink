@@ -70,6 +70,12 @@ Panel {
                 text: model.title
             }
 
+            MouseArea {
+                anchors.fill: parent
+
+                onClicked: view.currentIndex = model.index
+            }
+
             Text {
                 id: descriptionLabel
 
@@ -81,11 +87,8 @@ Panel {
                 anchors.rightMargin: appStyle.spacing.horizontal
                 visible: false
                 wrapMode: Text.WordWrap
-            }
 
-            MouseArea {
-                anchors.fill: parent
-                onClicked: view.currentIndex = model.index
+                onLinkActivated: Qt.openUrlExternally(link)
             }
 
             states: State {
@@ -94,7 +97,7 @@ Panel {
 
                 PropertyChanges {
                     target: descriptionLabel
-                    text: model.description
+                    text: '<p>' + model.description + '</p><p><a href="' + model.link + '">' + model.link + '</a></p>'
                     visible: true
                 }
 
@@ -117,7 +120,7 @@ Panel {
             source: 'http://feeds.bbci.co.uk/news/rss.xml';
 
             XmlRole { name: 'description'; query: 'description/string()' }
-            XmlRole { name: 'link'; query: 'description/string()' }
+            XmlRole { name: 'link'; query: 'link/string()' }
             XmlRole { name: 'pubDate'; query: 'pubDate/string()' }
             XmlRole { name: 'imageSource'; query: '*:thumbnail[1]/@url/string()' }
             XmlRole { name: 'title'; query: 'title/string()' }

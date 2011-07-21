@@ -305,7 +305,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>This plugin allows you to run view debugging information.</source>
-        <translation>Ce greffon vous permet d'afficher des informations de déboggage.</translation>
+        <translation>Ce greffon vous permet d&apos;afficher des informations de déboggage.</translation>
     </message>
 </context>
 <context>
