@@ -74,22 +74,19 @@ Dialog {
                     name: 'Shares'
                     source: 'SharePreferencePanel.qml'
                 }
-/*
+
                 ListElement {
                     avatar: 'plugin.png'
                     name: 'Plugins'
                     source: 'PluginPreferencePanel.qml'
                 }
-*/
 
                 Component.onCompleted: {
                     setProperty(0, 'name', qsTr('General'));
                     setProperty(1, 'name', qsTr('Accounts'));
                     setProperty(2, 'name', qsTr('Sound'));
                     setProperty(3, 'name', qsTr('Shares'));
-/*
                     setProperty(4, 'name', qsTr('Plugins'));
-*/
                 }
             }
 

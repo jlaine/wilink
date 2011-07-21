@@ -57,7 +57,7 @@ Panel {
                 anchors.right: scrollBar.left
                 clip: true
                 delegate: pluginDelegate
-                model: pluginModel
+                model: appPlugins.availablePlugins
                 spacing: appStyle.spacing.vertical
             }
 

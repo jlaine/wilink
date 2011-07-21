@@ -710,6 +710,10 @@ Acceptez-vous?</translation>
         <source>Accounts</source>
         <translation>Comptes</translation>
     </message>
+    <message>
+        <source>Plugins</source>
+        <translation>Greffons</translation>
+    </message>
 </context>
 <context>
     <name>RoomInviteDialog</name>
