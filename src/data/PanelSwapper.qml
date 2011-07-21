@@ -21,7 +21,7 @@ import QtQuick 1.0
 import 'utils.js' as Utils
 
 FocusScope {
-    id: swapper
+    id: panelSwapper
 
     property Item currentItem
     property string currentSource
@@ -38,7 +38,7 @@ FocusScope {
         var panel = findPanel(source, properties);
         if (panel) {
             if (show)
-                swapper.setCurrentItem(panel);
+                panelSwapper.setCurrentItem(panel);
             return;
         }
 
@@ -56,17 +56,17 @@ FocusScope {
 
             // FIXME: when Qt Quick 1.1 becomes available,
             // let createObject assign the properties itself.
-            var panel = component.createObject(swapper);
+            var panel = component.createObject(panelSwapper);
             for (var key in properties) {
                 panel[key] = properties[key];
             }
 
             panel.close.connect(function() {
-                swapper.removePanel(source, properties);
+                panelSwapper.removePanel(source, properties);
             });
             panels.append({'source': source, 'properties': properties, 'panel': panel});
             if (show)
-                swapper.setCurrentItem(panel);
+                panelSwapper.setCurrentItem(panel);
         }
     }
 
@@ -95,13 +95,13 @@ FocusScope {
                 console.log("PanelSwapper removing panel " + source + " " + Utils.dumpProperties(properties));
 
                 // if the panel was visible, show last remaining panel
-                if (swapper.currentItem == panel) {
+                if (panelSwapper.currentItem == panel) {
                     if (panels.count == 1)
-                        swapper.setCurrentItem(null);
+                        panelSwapper.setCurrentItem(null);
                     else if (i == panels.count - 1)
-                        swapper.setCurrentItem(panels.get(i - 1).panel);
+                        panelSwapper.setCurrentItem(panels.get(i - 1).panel);
                     else
-                        swapper.setCurrentItem(panels.get(i + 1).panel);
+                        panelSwapper.setCurrentItem(panels.get(i + 1).panel);
                 }
 
                 // destroy panel
