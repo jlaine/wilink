@@ -40,6 +40,8 @@ Panel {
         anchors.right: scrollBar.left
 
         delegate: Item {
+            id: item
+
             height: appStyle.icon.normalSize
             width: view.width - 1
 
@@ -55,13 +57,49 @@ Panel {
             }
 
             Text {
-                anchors.top: parent.top
+                id: titleLabel
+
+                anchors.verticalCenter: image.verticalCenter
                 anchors.left: image.right
                 anchors.leftMargin: appStyle.spacing.horizontal
                 anchors.right: parent.right
                 anchors.rightMargin: appStyle.spacing.horizontal
                 font.bold: true
                 text: model.title
+            }
+
+            Text {
+                id: descriptionLabel
+
+                anchors.top: image.bottom
+                anchors.topMargin: appStyle.spacing.vertical
+                anchors.left: parent.left
+                anchors.leftMargin: appStyle.spacing.horizontal
+                anchors.right: parent.right
+                anchors.rightMargin: appStyle.spacing.horizontal
+                visible: false
+                wrapMode: Text.WordWrap
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: view.currentIndex = model.index
+            }
+
+            states: State {
+                name: 'details'
+                when: view.currentIndex == model.index
+
+                PropertyChanges {
+                    target: descriptionLabel
+                    text: model.description
+                    visible: true
+                }
+
+                PropertyChanges {
+                    target: item
+                    height: image.height + 2*appStyle.spacing.vertical + descriptionLabel.height
+                }
             }
         }
 
