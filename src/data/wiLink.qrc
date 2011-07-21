@@ -28,6 +28,7 @@
     <file>dock-peer.png</file>
     <file>dock-phone.png</file>
     <file>dock-photo.png</file>
+    <file>dock-rss.png</file>
     <file>dock-share.png</file>
     <file>dock-start.png</file>
     <file>down-arrow.png</file>
@@ -53,6 +54,7 @@
     <file>refresh.png</file>
     <file>remove.png</file>
     <file>resize.png</file>
+    <file>rss.png</file>
     <file>search.png</file>
     <file>shadow.png</file>
     <file>share.png</file>

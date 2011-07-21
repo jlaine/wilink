@@ -27,8 +27,8 @@ Plugin {
 
     onLoaded: {
         dock.model.append({
-            'iconSource': 'dock-peer.png',
-            'iconPress': 'peer.png',
+            'iconSource': 'dock-rss.png',
+            'iconPress': 'rss.png',
             'panelSource': 'NewsPanel.qml',
             'shortcut': Qt.ControlModifier + Qt.Key_N,
             'text': qsTr('News'),
