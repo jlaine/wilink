@@ -133,6 +133,12 @@ Item {
             anchors.margins: 4
             enabled: Qt.isQtObject(call) && call.state == QXmppCall.ActiveState
             iconSource: 'camera.png'
+
+            states: State {
+                name: 'active'
+                when: (video.openMode & CallVideoHelper.WriteOnly) != 0
+                PropertyChanges { target: cameraButton; iconSource: 'camera-active.png' }
+            }
         }
 
         ProgressBar {
