@@ -174,7 +174,7 @@ Item {
         }
 
         highlight: Highlight {}
-        highlightMoveDuration: 500
+        highlightMoveDuration: appStyle.highlightMoveDuration
     }
 
     Rectangle {

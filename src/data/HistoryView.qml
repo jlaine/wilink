@@ -49,7 +49,6 @@ Item {
         header: Rectangle { height: 2 }
         spacing: 6
 
-        highlightMoveDuration: 500
         highlight: Item {
             id: highlight
 
@@ -125,6 +124,7 @@ Item {
                 }
             ]
         }
+        highlightMoveDuration: appStyle.highlightMoveDuration
 
         Component {
             id: historyDelegate

@@ -220,7 +220,7 @@ Item {
         highlight: Highlight {
             width: view.width
         }
-        highlightMoveDuration: 500
+        highlightMoveDuration: appStyle.highlightMoveDuration
     }
 
     Component {

@@ -240,7 +240,7 @@ Panel {
             id: displayView
 
             anchors.fill: parent
-            highlightMoveDuration: 500
+            highlightMoveDuration: appStyle.highlightMoveDuration
             highlightRangeMode: ListView.StrictlyEnforceRange
             model: view.model
             orientation: Qt.Horizontal

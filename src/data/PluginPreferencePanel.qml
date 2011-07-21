@@ -56,6 +56,7 @@ Panel {
                 clip: true
                 delegate: pluginDelegate
                 highlight: Highlight {}
+                highlightMoveDuration: appStyle.highlightMoveDuration
                 model: ListModel {}
                 spacing: appStyle.spacing.vertical
 
