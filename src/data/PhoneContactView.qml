@@ -202,15 +202,24 @@ Item {
                 }
             }
 
-            states: State {
-                name: 'expanded'
-                when: view.currentItem == item
-                PropertyChanges { target: name; font.bold: true }
-                PropertyChanges { target: phone; visible: true }
-            }
+            states: [
+                State {
+                    name: 'no-avatar'
+                    when: view.width < 32
+                    PropertyChanges { target: avatar; visible: false }
+                },
+                State {
+                    name: 'expanded'
+                    when: view.currentItem == item
+                    PropertyChanges { target: name; font.bold: true }
+                    PropertyChanges { target: phone; visible: true }
+                }
+            ]
         }
 
-        highlight: Highlight {}
+        highlight: Highlight {
+            width: view.width
+        }
         highlightMoveDuration: 500
     }
 
