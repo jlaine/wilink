@@ -37,6 +37,8 @@ KeyPad 1.0 KeyPad.qml
 LogPanel 1.0 LogPanel.qml
 Menu 1.0 Menu.qml
 MenuDelegate 1.0 MenuDelegate.qml
+NewsPanel 1.0 NewsPanel.qml
+NewsPlugin 1.0 NewsPlugin.qml
 NotificationDialog 1.0 NotificationDialog.qml
 Panel 1.0 Panel.qml
 PanelHeader 1.0 PanelHeader.qml
@@ -67,7 +69,6 @@ RoomParticipantView 1.0 RoomParticipantView.qml
 RoomPermissionDialog 1.0 RoomPermissionDialog.qml
 RoomSubjectDialog 1.0 RoomSubjectDialog.qml
 RosterView 1.0 RosterView.qml
-RssPlugin 1.0 RssPlugin.qml
 ScrollBar 1.0 ScrollBar.qml
 SharePanel 1.0 SharePanel.qml
 SharePreferencePanel 1.0 SharePreferencePanel.qml

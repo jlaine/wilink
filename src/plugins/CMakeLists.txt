@@ -123,6 +123,8 @@ if(RELOAD_TRANSLATIONS)
         ../data/HistoryView.qml
         ../data/InputMenu.qml
         ../data/LogPanel.qml
+        ../data/NewsPanel.qml
+        ../data/NewsPlugin.qml
         ../data/PhoneContactDialog.qml
         ../data/PhoneContactView.qml
         ../data/PhoneHistoryView.qml

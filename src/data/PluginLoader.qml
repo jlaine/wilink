@@ -30,7 +30,7 @@ Item {
         ListElement { source: 'DebugPlugin.qml' }
         ListElement { source: 'DiagnosticPlugin.qml'; locked: true }
         ListElement { source: 'PlayerPlugin.qml' }
-        ListElement { source: 'RssPlugin.qml' }
+        ListElement { source: 'NewsPlugin.qml' }
         ListElement { source: 'WifirstPlugin.qml'; locked: true }
     }
 

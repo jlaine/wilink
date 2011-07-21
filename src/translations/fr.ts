@@ -471,6 +471,24 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>NewsPanel</name>
+    <message>
+        <source>News reader</source>
+        <translation>Nouvelles</translation>
+    </message>
+</context>
+<context>
+    <name>NewsPlugin</name>
+    <message>
+        <source>News reader</source>
+        <translation>Nouvelles</translation>
+    </message>
+    <message>
+        <source>News</source>
+        <translation>Nouvelles</translation>
+    </message>
+</context>
+<context>
     <name>PhoneContactDialog</name>
     <message>
         <source>Add a contact</source>

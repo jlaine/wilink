@@ -113,6 +113,8 @@
     <file>DebugPlugin.qml</file>
     <file>Menu.qml</file>
     <file>MenuDelegate.qml</file>
+    <file>NewsPanel.qml</file>
+    <file>NewsPlugin.qml</file>
     <file>NotificationDialog.qml</file>
     <file>Panel.qml</file>
     <file>PanelHeader.qml</file>
@@ -143,7 +145,6 @@
     <file>RoomPermissionDialog.qml</file>
     <file>RoomSubjectDialog.qml</file>
     <file>RosterView.qml</file>
-    <file>RssPlugin.qml</file>
     <file>ScrollBar.qml</file>
     <file>SharePanel.qml</file>
     <file>SharePreferencePanel.qml</file>
