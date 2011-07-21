@@ -150,6 +150,7 @@ if(RELOAD_TRANSLATIONS)
         ../data/StatusBar.qml
         ../data/TransferNotification.qml
         ../data/TransferWidget.qml
+        ../data/WifirstPlugin.qml
         ../translations/fr.ts)
 else(RELOAD_TRANSLATIONS)
     qt4_add_translation(QM_FILES ../translations/fr.ts)

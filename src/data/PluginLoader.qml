@@ -27,10 +27,10 @@ Item {
     ListModel {
         id: pluginModel
 
+        ListElement { source: 'DebugPlugin.qml' }
         ListElement { source: 'DiagnosticPlugin.qml' }
         ListElement { source: 'PlayerPlugin.qml' }
         ListElement { source: 'RssPlugin.qml' }
-        ListElement { source: 'DebugPlugin.qml' }
         ListElement { source: 'WifirstPlugin.qml' }
     }
 

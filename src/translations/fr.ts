@@ -1032,6 +1032,17 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>WifirstPlugin</name>
+    <message>
+        <source>This plugin allows you to access Wifirst services.</source>
+        <translation>Ce greffon vous permet d'accéder au services Wifirst.</translation>
+    </message>
+    <message>
+        <source>Access Wifirst services.</source>
+        <translation>Accès aux services Wifirst.</translation>
+    </message>
+</context>
+<context>
     <name>Window</name>
     <message>
         <source>&amp;Quit</source>
