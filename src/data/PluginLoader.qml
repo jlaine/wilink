@@ -30,7 +30,7 @@ Item {
         ListElement { source: 'DiagnosticPlugin.qml'; loaded: false }
         ListElement { source: 'PlayerPlugin.qml'; loaded: false }
         ListElement { source: 'RssPlugin.qml'; loaded: false }
-        ListElement { source: 'LogPlugin.qml'; loaded: false }
+        ListElement { source: 'DebugPlugin.qml'; loaded: false }
     }
 
     function loadPlugin(source) {

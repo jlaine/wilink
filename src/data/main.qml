@@ -75,10 +75,9 @@ FocusScope {
         id: appPlugins
 
         Component.onCompleted: {
-            console.log("load plug");
             loadPlugin('DiagnosticPlugin.qml');
             loadPlugin('PlayerPlugin.qml');
-            loadPlugin('LogPlugin.qml');
+            loadPlugin('DebugPlugin.qml');
         }
     }
 

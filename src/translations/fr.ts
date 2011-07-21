@@ -294,6 +294,17 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>DebugPlugin</name>
+    <message>
+        <source>Debugging</source>
+        <translation>Débogage</translation>
+    </message>
+    <message>
+        <source>Discovery</source>
+        <translation>Découverte de services</translation>
+    </message>
+</context>
+<context>
     <name>DiagnosticPanel</name>
     <message>
         <source>Refresh</source>
@@ -457,17 +468,6 @@ Acceptez-vous?</translation>
     <message>
         <source>Copy</source>
         <translation>Copier</translation>
-    </message>
-</context>
-<context>
-    <name>LogPlugin</name>
-    <message>
-        <source>Debugging</source>
-        <translation>Débogage</translation>
-    </message>
-    <message>
-        <source>Discovery</source>
-        <translation>Découverte de services</translation>
     </message>
 </context>
 <context>

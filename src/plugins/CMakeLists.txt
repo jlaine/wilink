@@ -112,6 +112,7 @@ if(RELOAD_TRANSLATIONS)
         ../data/ContactRenameDialog.qml
         ../data/ContactRemoveDialog.qml
         ../data/ConversationPanel.qml
+        ../data/DebugPlugin.qml
         ../data/DiagnosticPanel.qml
         ../data/DiagnosticPlugin.qml
         ../data/Dialog.qml
@@ -122,7 +123,6 @@ if(RELOAD_TRANSLATIONS)
         ../data/HistoryView.qml
         ../data/InputMenu.qml
         ../data/LogPanel.qml
-        ../data/LogPlugin.qml
         ../data/PhoneContactDialog.qml
         ../data/PhoneContactView.qml
         ../data/PhoneHistoryView.qml
