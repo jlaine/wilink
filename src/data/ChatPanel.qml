@@ -24,6 +24,8 @@ import 'utils.js' as Utils
 Panel {
     id: chatPanel
 
+    property alias rooms: roomListModel
+
     /** Convenience method to show a conversation panel.
      */
     function showConversation(jid) {

@@ -54,7 +54,8 @@ Plugin {
                         // check for "home" chat room
                         var roomCap = link.match(/xmpp:([^?]+)\?join/);
                         if (roomCap) {
-                            roomListModel.addRoom(roomCap[1]);
+                            var panel = swapper.findPanel('ChatPanel.qml');
+                            panel.rooms.addRoom(roomCap[1]);
                         }
                     }
 
