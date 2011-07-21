@@ -313,6 +313,21 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>DiagnosticPlugin</name>
+    <message>
+        <source>Diagnostics</source>
+        <translation>Diagnostics</translation>
+    </message>
+    <message>
+        <source>Diagnostic network issues.</source>
+        <translation>Diagnostiquez votre connexion.</translation>
+    </message>
+    <message>
+        <source>This plugin allows you to run tests to diagnostic network issues.</source>
+        <translation>Ce greffon vous permet de diagnostiquer d&apos;éventuels problèmes réseau.</translation>
+    </message>
+</context>
+<context>
     <name>Dialog</name>
     <message>
         <source>OK</source>
@@ -345,14 +360,6 @@ Acceptez-vous?</translation>
 <context>
     <name>Dock</name>
     <message>
-        <source>Diagnostics</source>
-        <translation>Diagnostics</translation>
-    </message>
-    <message>
-        <source>Debugging</source>
-        <translation>Débogage</translation>
-    </message>
-    <message>
         <source>Discovery</source>
         <translation>Découverte de services</translation>
     </message>
@@ -375,10 +382,6 @@ Acceptez-vous?</translation>
     <message>
         <source>Preferences</source>
         <translation>Préférences</translation>
-    </message>
-    <message>
-        <source>Music</source>
-        <translation>Musique</translation>
     </message>
 </context>
 <context>
@@ -458,6 +461,13 @@ Acceptez-vous?</translation>
     <message>
         <source>Copy</source>
         <translation>Copier</translation>
+    </message>
+</context>
+<context>
+    <name>LogPlugin</name>
+    <message>
+        <source>Debugging</source>
+        <translation>Débogage</translation>
     </message>
 </context>
 <context>
@@ -661,6 +671,21 @@ Acceptez-vous?</translation>
     <message>
         <source>Music player</source>
         <translation>Lecteur de musique</translation>
+    </message>
+</context>
+<context>
+    <name>PlayerPlugin</name>
+    <message>
+        <source>Music</source>
+        <translation>Musique</translation>
+    </message>
+    <message>
+        <source>Play your favorite music!</source>
+        <translation>Ecoutez votre musique préférée !</translation>
+    </message>
+    <message>
+        <source>This plugin adds a music player to wiLink.</source>
+        <translation>Ce greffon ajoute un lecteur de musique à wiLink.</translation>
     </message>
 </context>
 <context>

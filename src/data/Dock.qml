@@ -25,6 +25,8 @@ Rectangle {
     id: dock
     width: 44
 
+    property alias model: repeater.model
+
     Rectangle {
         id: dockBackground
 
@@ -166,33 +168,10 @@ Rectangle {
             }
         }
 
-        DockButton {
-            iconSource: 'dock-diagnostics.png'
-            iconPress: 'diagnostics.png'
-            panelSource: 'DiagnosticPanel.qml'
-            shortcut: Qt.ControlModifier + Qt.Key_I
-            text: qsTr('Diagnostics')
-            onClicked: swapper.showPanel(panelSource)
-        }
-
-        DockButton {
-            iconSource: 'dock-options.png'
-            iconPress: 'options.png'
-            panelSource: 'LogPanel.qml'
-            shortcut: Qt.ControlModifier + Qt.Key_L
-            text: qsTr('Debugging')
-            visible: false
-
-            onClicked: {
-                visible = true;
-                swapper.showPanel(panelSource);
-            }
-        }
-
         Repeater {
-            model: ListModel {
-                id: pluginModel
-            }
+            id: repeater
+
+            model: ListModel {}
 
             delegate: DockButton {
                 iconSource: model.iconSource
@@ -209,14 +188,7 @@ Rectangle {
             }
 
             Component.onCompleted: {
-                pluginModel.append({
-                    'iconSource': 'dock-start.png',
-                    'iconPress': 'start.png',
-                    'panelSource': 'PlayerPanel.qml',
-                    'shortcut': Qt.ControlModifier + Qt.Key_U,
-                    'text': qsTr('Music'),
-                    'visible': true});
-                pluginModel.append({
+                dock.model.append({
                     'iconSource': 'dock-peer.png',
                     'iconPress': 'peer.png',
                     'panelSource': 'DiscoveryPanel.qml',

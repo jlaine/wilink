@@ -71,6 +71,17 @@ FocusScope {
         id: appWallet
     }
 
+    PluginLoader {
+        id: appPlugins
+
+        Component.onCompleted: {
+            console.log("load plug");
+            loadPlugin('DiagnosticPlugin.qml');
+            loadPlugin('PlayerPlugin.qml');
+            loadPlugin('LogPlugin.qml');
+        }
+    }
+
     Dock {
         id: dock
 

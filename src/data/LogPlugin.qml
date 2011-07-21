@@ -19,28 +19,20 @@
 
 import QtQuick 1.0
 
-Item {
-    // The plugin name.
-    property string name
+Plugin {
+    name: qsTr('Debugging')
+    summary: 'Debugging console.'
+    description: 'This plugin allows you to run view debugging information.'
+    imageSource: 'options.png'
 
-    // A short description of the plugin.
-    property string summary
-
-    // The full description of the plugin.
-    property string description
-
-    // The URL of the plugin's image.
-    property url imageSource
-
-    // This signal is emitted when the plugin is enabled.
-    //
-    // You can add an "onLoaded" handler in your plugin for
-    // instance to populate the Dock.
-    signal loaded
-
-    // This signal is emitted when the plugin is disabled.
-    //
-    // You can add an "onRemoved" handled in your plugin for
-    // instance to remove items from the Dock.
-    signal unloaded
+    onLoaded: {
+        dock.model.append({
+            'iconSource': 'dock-options.png',
+            'iconPress': 'options.png',
+            'panelSource': 'LogPanel.qml',
+            'shortcut': Qt.ControlModifier + Qt.Key_L,
+            'text': qsTr('Debugging'),
+            'visible': false});
+    }
 }
+

@@ -29,8 +29,10 @@ Panel {
     /* hard-coded models */
     ListModel {
         id: pluginModel
+        ListElement { source: 'DiagnosticPlugin.qml'; installed: true; }
         ListElement { source: 'PlayerPlugin.qml'; installed: true; }
         ListElement { source: 'RssPlugin.qml'; installed: false; }
+        ListElement { source: 'LogPlugin.qml'; installed: false; }
     }
     /* end: hard-coded models */
 

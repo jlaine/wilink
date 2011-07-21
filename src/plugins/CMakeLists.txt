@@ -113,6 +113,7 @@ if(RELOAD_TRANSLATIONS)
         ../data/ContactRemoveDialog.qml
         ../data/ConversationPanel.qml
         ../data/DiagnosticPanel.qml
+        ../data/DiagnosticPlugin.qml
         ../data/Dialog.qml
         ../data/DiscoveryPanel.qml
         ../data/Dock.qml
@@ -121,6 +122,7 @@ if(RELOAD_TRANSLATIONS)
         ../data/HistoryView.qml
         ../data/InputMenu.qml
         ../data/LogPanel.qml
+        ../data/LogPlugin.qml
         ../data/PhoneContactDialog.qml
         ../data/PhoneContactView.qml
         ../data/PhoneHistoryView.qml
@@ -130,6 +132,7 @@ if(RELOAD_TRANSLATIONS)
         ../data/PhotoDeleteDialog.qml
         ../data/PhotoPanel.qml
         ../data/PlayerPanel.qml
+        ../data/PlayerPlugin.qml
         ../data/PreferenceDialog.qml
         ../data/RoomInviteDialog.qml
         ../data/RoomInviteNotification.qml

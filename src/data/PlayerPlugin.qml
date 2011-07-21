@@ -21,7 +21,17 @@ import QtQuick 1.0
 
 Plugin {
     name: qsTr('Music')
-    summary: 'Play your favorite songs!'
-    description: 'This plugin adds a music player to wiLink.'
+    summary: qsTr('Play your favorite music!')
+    description: qsTr('This plugin adds a music player to wiLink.')
     imageSource: 'start.png'
+
+    onLoaded: {
+        dock.model.append({
+            'iconSource': 'dock-start.png',
+            'iconPress': 'start.png',
+            'panelSource': 'PlayerPanel.qml',
+            'shortcut': Qt.ControlModifier + Qt.Key_U,
+            'text': qsTr('Music'),
+            'visible': true});
+    }
 }

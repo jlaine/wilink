@@ -94,6 +94,7 @@
     <file>CrumbBar.qml</file>
     <file>ConversationPanel.qml</file>
     <file>DiagnosticPanel.qml</file>
+    <file>DiagnosticPlugin.qml</file>
     <file>Dialog.qml</file>
     <file>DiscoveryPanel.qml</file>
     <file>Dock.qml</file>
@@ -108,6 +109,7 @@
     <file>InputMenu.qml</file>
     <file>KeyPad.qml</file>
     <file>LogPanel.qml</file>
+    <file>LogPlugin.qml</file>
     <file>Menu.qml</file>
     <file>MenuDelegate.qml</file>
     <file>NotificationDialog.qml</file>
@@ -126,6 +128,7 @@
     <file>PlayerPanel.qml</file>
     <file>PlayerPlugin.qml</file>
     <file>Plugin.qml</file>
+    <file>PluginLoader.qml</file>
     <file>PluginPreferencePanel.qml</file>
     <file>PreferenceDialog.qml</file>
     <file>ProgressBar.qml</file>
