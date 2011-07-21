@@ -191,6 +191,9 @@ Panel {
                     photoModel.upload(files[i]);
                 }
             }
+
+            // This force DropArea to ignore mouse event when disabled
+            visible: enabled
         }
 
         Keys.onPressed: {
