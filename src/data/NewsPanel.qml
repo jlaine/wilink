@@ -38,6 +38,7 @@ Panel {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: scrollBar.left
+        focus: true
 
         delegate: Item {
             id: item
