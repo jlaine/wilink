@@ -31,6 +31,7 @@ Item {
         ListElement { source: 'PlayerPlugin.qml' }
         ListElement { source: 'RssPlugin.qml' }
         ListElement { source: 'DebugPlugin.qml' }
+        ListElement { source: 'WifirstPlugin.qml' }
     }
 
     function loadPlugin(source) {

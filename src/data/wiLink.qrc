@@ -157,7 +157,7 @@
     <file>ToolButton.qml</file>
     <file>TransferNotification.qml</file>
     <file>TransferWidget.qml</file>
-    <file>Wifirst.qml</file>
+    <file>WifirstPlugin.qml</file>
     <!-- Sounds -->
     <file>call-incoming.ogg</file>
     <file>call-outgoing.ogg</file>

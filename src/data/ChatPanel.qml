@@ -254,21 +254,20 @@ Panel {
         focus: true
     }
 
-    Loader {
-        id: wifirst
-
-        Connections {
-            target: appClient
-            onConnected: {
-                wifirst.source = (Utils.jidToDomain(appClient.jid) == 'wifirst.net') ? 'Wifirst.qml' : '';
-            }
-        }
-    }
-
     Binding {
         target: root
         property: 'pendingMessages'
         value: roomListModel.pendingMessages + rosterModel.pendingMessages
+    }
+
+    Connections {
+        target: appClient
+        onConnected: {
+            if (Utils.jidToDomain(appClient.jid) == 'wifirst.net')
+                appPlugins.loadPlugin('WifirstPlugin.qml');
+            else
+                appPlugins.unloadPlugin('WifirstPlugin.qml');
+        }
     }
 
     states: State {

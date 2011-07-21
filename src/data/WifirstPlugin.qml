@@ -20,7 +20,7 @@
 import QtQuick 1.0
 import 'utils.js' as Utils
 
-Item {
+Plugin {
 
     Timer {
         id: timer
@@ -74,8 +74,12 @@ Item {
         }
     }
 
-    Component.onCompleted: {
+    onLoaded: {
         timer.triggered();
+    }
+
+    onUnloaded: {
+        timer.stop();
     }
 }
 
