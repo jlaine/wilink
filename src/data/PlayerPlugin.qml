@@ -34,4 +34,8 @@ Plugin {
             'text': qsTr('Music'),
             'visible': true});
     }
+
+    onUnloaded: {
+        dock.model.removePanel('PlayerPanel.qml');
+    }
 }

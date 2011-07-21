@@ -35,4 +35,8 @@ Plugin {
             'visible': true,
         });
     }
+
+    onUnloaded: {
+        dock.model.removePanel('DiagnosticPanel.qml');
+    }
 }

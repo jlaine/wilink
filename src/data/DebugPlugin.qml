@@ -42,5 +42,10 @@ Plugin {
             'text': qsTr('Debugging'),
             'visible': false});
     }
+
+    onUnloaded: {
+        dock.model.removePanel('DiscoveryPanel.qml');
+        dock.model.removePanel('LogPanel.qml');
+    }
 }
 

@@ -171,7 +171,17 @@ Rectangle {
         Repeater {
             id: repeater
 
-            model: ListModel {}
+            model: ListModel {
+                function removePanel(source) {
+                    for (var i = 0; i < repeater.model.count; i++) {
+                        if (repeater.model.get(i).panelSource == source) {
+                            swapper.removePanel(source);
+                            repeater.model.remove(i);
+                            break;
+                        }
+                    }
+                }
+            }
 
             delegate: DockButton {
                 iconSource: model.iconSource
