@@ -18,6 +18,7 @@
  */
 
 import QtQuick 1.0
+import 'utils.js' as Utils
 
 FocusScope {
     id: swapper
@@ -33,13 +34,6 @@ FocusScope {
         if (properties == undefined)
             properties = {};
 
-        function propDump(a) {
-            var dump = '';
-            for (var key in a)
-                dump += (dump.length > 0 ? ', ' : '') + key + ': ' + a[key];
-            return '{' + dump + '}';
-        }
-
         // if the panel already exists, return it
         var panel = findPanel(source, properties);
         if (panel) {
@@ -49,7 +43,7 @@ FocusScope {
         }
 
         // otherwise create the panel
-        console.log("PanelSwapper creating panel " + source + " " + propDump(properties));
+        console.log("PanelSwapper creating panel " + source + " " + Utils.dumpProperties(properties));
         var component = Qt.createComponent(source);
         if (component.status == Component.Ready)
             finishCreation();
@@ -70,7 +64,7 @@ FocusScope {
             panel.close.connect(function() {
                 for (var i = 0; i < panels.count; i += 1) {
                     if (panels.get(i).panel == panel) {
-                        console.log("PanelSwapper removing panel " + panels.get(i).source + " " + propDump(panels.get(i).properties));
+                        console.log("PanelSwapper removing panel " + panels.get(i).source + " " + Utils.dumpProperties(panels.get(i).properties));
 
                         // if the panel was visible, show last remaining panel
                         if (swapper.currentItem == panel) {
@@ -99,20 +93,9 @@ FocusScope {
         if (properties == undefined)
             properties = {};
 
-        // helper to compare object properties
-        function propEquals(a, b) {
-            if (a.length != b.length)
-                return false;
-            for (var key in a) {
-                if (a[key] != b[key])
-                    return false;
-            }
-            return true;
-        }
-
         for (var i = 0; i < panels.count; i += 1) {
             if (panels.get(i).source == source &&
-                propEquals(panels.get(i).properties, properties)) {
+                Utils.equalProperties(panels.get(i).properties, properties)) {
                 return panels.get(i).panel;
             }
         }

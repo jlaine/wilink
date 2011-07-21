@@ -78,6 +78,28 @@ function jidToUser(jid) {
     return jid.substring(0, pos);
 }
 
+// Compare the two object's properties and returns
+// true if they are equal, false otherwise.
+
+function equalProperties(a, b) {
+    if (a.length != b.length)
+        return false;
+    for (var key in a) {
+        if (a[key] != b[key])
+            return false;
+    }
+    return true;
+}
+
+// Returns a dump of the object's properties as a string.
+
+function dumpProperties(a) {
+    var dump = '';
+    for (var key in a)
+        dump += (dump.length > 0 ? ', ' : '') + key + ': ' + a[key];
+    return '{' + dump + '}';
+}
+
 // There's no getElementsByTagName method in QML
 // ([http://www.mail-archive.com/qt-qml@trolltech.com/msg01024.html]), so we'll
 // implement our own version.
