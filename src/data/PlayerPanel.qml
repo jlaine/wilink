@@ -176,6 +176,16 @@ Panel {
         delegate: playerDelegate
         focus: true
 
+        DropArea {
+            anchors.fill:  parent
+
+            onFilesDropped: {
+                for (var i in files) {
+                    playerModel.addLocalFile(files[i]);
+                }
+            }
+        }
+
         Keys.onPressed: {
             if (event.key == Qt.Key_Backspace && event.modifiers == Qt.NoModifier) {
                 visualModel.rootIndex = visualModel.parentModelIndex();
