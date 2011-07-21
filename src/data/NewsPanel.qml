@@ -18,6 +18,7 @@
  */
 
 import QtQuick 1.0
+import 'utils.js' as Utils
 
 Panel {
     function trim(text)
@@ -36,10 +37,34 @@ Panel {
     }
 
     ListView {
+        id: view
+
         anchors.top: header.bottom
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: scrollBar.left
+
+        delegate: Item {
+            height: 32
+            width: view.width - 1
+
+            Text {
+                anchors.fill: parent
+                text: model.title
+            }
+        }
+
+        model: XmlListModel {
+            id: newsModel
+
+            query: '/rss/channel/item'
+            source: 'http://feeds.bbci.co.uk/news/rss.xml';
+
+            XmlRole { name: 'description'; query: 'description/string()' }
+            XmlRole { name: 'link'; query: 'description/string()' }
+            XmlRole { name: 'pubDate'; query: 'pubDate/string()' }
+            XmlRole { name: 'title'; query: 'title/string()' }
+        }
     }
 
     ScrollBar {
@@ -48,84 +73,7 @@ Panel {
         anchors.top: header.bottom
         anchors.bottom: parent.bottom
         anchors.right: parent.right
+        flickableItem: view
     }
 }
-
-/*
-News.prototype.showItems = function(error, reply, redirect)
-{
-    if (redirect) {
-        qDebug("Following redirect to " + redirect);
-        this.client.get(redirect, "*");
-        return;
-    }
-
-    if (error) {
-        qWarning("News retrieval failed");
-        if (!this.menus.length)
-            this.quit();
-        return;
-    }
-
-    // Create UI
-    var widget = script.createWidget("BocChoice");
-    widget.accept.connect(this, this.showDetails);
-    widget.info.connect(this, this.info);
-    if (this.widgets.length)
-        widget.cancel.connect(this, this.goBack);
-    else
-        widget.cancel.connect(this, this.quit);
-    this.widgets.push(widget);
-
-    var doc = new QDomDocument();
-    doc.setContent(reply);
-    this.title = doc.elementsByTagName("title").at(0).firstChild().nodeValue();
-    this.description = doc.elementsByTagName("description").at(0).firstChild().nodeValue();
-    var items = doc.elementsByTagName("item");
-
-    var entries = [];
-    for (var i = 0; i < items.length(); i++) {
-        var title = trim(items.at(i).firstChildElement("title").text());
-        var description = trim(items.at(i).firstChildElement("description").text());
-        var link = trim(items.at(i).firstChildElement("link").text());
-
-        var inline = description.length < 16;
-        var summarise = title.length < 32;
-        var maxlen = 24;
-
-        entries[i] = {
-            'link': link,
-            'description': description,
-            'inline': inline
-        };
-        var label = script.createWidget("QLabel");
-        label.alignment = Qt.AlignCenter;
-        label.objectName = i;
-        if (inline) {
-            label.text = "<b>" + title + "</b><br/>" + cleanup_html(description);
-        } else if (summarise) {
-            var extract = strip_html(description);
-            if (extract.length > maxlen)
-                extract = extract.substring(0, maxlen) + "..";
-            label.text = "<b>" + title + "</b><br/><small>" + extract + "</small>";
-        } else {
-            label.text = "<html>" + title + "</html>";
-        }
-        label.textInteractionFlags = Qt.NoTextInteraction;
-        label.wordWrap = true;
-        widget.addWidget(label);
-    }
-    if (!entries.length)
-    {
-        var label = script.createWidget("QLabel");
-        label.alignment = Qt.AlignCenter;
-        label.text = tr("No items");
-        widget.addWidget(label);
-    }
-    this.menus.push(entries);
-
-    script.addWindow(widget);
-    script.removeWindow(this.splash);
-}
-*/
 
