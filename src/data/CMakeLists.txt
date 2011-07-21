@@ -38,9 +38,11 @@ generate_png(png
     close.svg
     copy.svg
     cut.svg
+    debug.svg
     diagnostics.svg
     dock-chat.svg
     dock-diagnostics.svg
+    dock-debug.svg
     dock-options.svg
     dock-peer.svg
     dock-phone.svg
