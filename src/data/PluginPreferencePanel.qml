@@ -55,7 +55,9 @@ Panel {
                 anchors.right: scrollBar.left
                 clip: true
                 delegate: pluginDelegate
-                highlight: Highlight {}
+                highlight: Highlight {
+                    width: view.width
+                }
                 highlightMoveDuration: appStyle.highlightMoveDuration
                 model: ListModel {}
                 spacing: appStyle.spacing.vertical
