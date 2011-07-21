@@ -76,7 +76,6 @@ FocusScope {
 
         Component.onCompleted: {
             loadPlugin('DiagnosticPlugin.qml');
-            loadPlugin('PlayerPlugin.qml');
         }
     }
 
