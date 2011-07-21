@@ -115,6 +115,7 @@ class ApplicationSettings : public QObject
     Q_PROPERTY(QString audioOutputDeviceName READ audioOutputDeviceName WRITE setAudioOutputDeviceName NOTIFY audioOutputDeviceNameChanged)
     Q_PROPERTY(QStringList chatAccounts READ chatAccounts WRITE setChatAccounts NOTIFY chatAccountsChanged)
     Q_PROPERTY(QString downloadsLocation READ downloadsLocation CONSTANT)
+    Q_PROPERTY(QStringList enabledPlugins READ enabledPlugins WRITE setEnabledPlugins NOTIFY enabledPluginsChanged)
     Q_PROPERTY(QString incomingMessageSound READ incomingMessageSound WRITE setIncomingMessageSound NOTIFY incomingMessageSoundChanged)
     Q_PROPERTY(QString lastRunVersion READ lastRunVersion WRITE setLastRunVersion NOTIFY lastRunVersionChanged)
     Q_PROPERTY(bool openAtLogin READ openAtLogin WRITE setOpenAtLogin NOTIFY openAtLoginChanged)
@@ -139,6 +140,9 @@ public:
     void setChatAccounts(const QStringList &accounts);
 
     QString downloadsLocation() const;
+
+    QStringList enabledPlugins() const;
+    void setEnabledPlugins(const QStringList &plugins);
 
     QString incomingMessageSound() const;
     void setIncomingMessageSound(const QString &soundFile);
@@ -178,6 +182,7 @@ signals:
     void audioInputDeviceNameChanged(const QString &name);
     void audioOutputDeviceNameChanged(const QString &name);
     void chatAccountsChanged(const QStringList &accounts);
+    void enabledPluginsChanged(const QStringList &plugins);
     void incomingMessageSoundChanged(const QString &sound);
     void lastRunVersionChanged(const QString &version);
     void openAtLoginChanged(bool run);

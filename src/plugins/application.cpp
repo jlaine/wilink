@@ -557,6 +557,25 @@ QString ApplicationSettings::downloadsLocation() const
     return QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation);
 }
 
+/** Returns the list of enabled plugins.
+ */
+QStringList ApplicationSettings::enabledPlugins() const
+{
+    return d->settings->value("EnabledPlugins").toStringList();
+}
+
+/** Sets the list of enabled plugins.
+ *
+ * @param plugins
+ */
+void ApplicationSettings::setEnabledPlugins(const QStringList &plugins)
+{
+    if (plugins != enabledPlugins()) {
+        d->settings->setValue("EnabledPlugins", plugins);
+        emit enabledPluginsChanged(plugins);
+    }
+}
+
 /** Returns the sound to play for incoming messages.
  */
 QString ApplicationSettings::incomingMessageSound() const
