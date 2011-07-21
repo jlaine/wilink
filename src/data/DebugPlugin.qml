@@ -32,7 +32,7 @@ Plugin {
             'panelSource': 'DiscoveryPanel.qml',
             'shortcut': Qt.ControlModifier + Qt.Key_B,
             'text': qsTr('Discovery'),
-            'visible': false});
+            'visible': true});
 
         dock.model.append({
             'iconSource': 'dock-options.png',
@@ -40,7 +40,7 @@ Plugin {
             'panelSource': 'LogPanel.qml',
             'shortcut': Qt.ControlModifier + Qt.Key_L,
             'text': qsTr('Debugging'),
-            'visible': false});
+            'visible': true});
     }
 
     onUnloaded: {
