@@ -112,7 +112,9 @@ Panel {
 
                 anchors.verticalCenter: image.verticalCenter
                 anchors.left: image.right
+                anchors.leftMargin: appStyle.spacing.horizontal
                 anchors.right: checkbox.left
+                anchors.rightMargin: appStyle.spacing.horizontal
                 elide: Text.ElideRight
                 font.bold: true
                 text: plugin.name
