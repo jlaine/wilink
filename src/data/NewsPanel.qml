@@ -21,11 +21,6 @@ import QtQuick 1.0
 import 'utils.js' as Utils
 
 Panel {
-    function trim(text)
-    {
-        return text.replace(/^\s+|\s+$/g, '');
-    }
-
     PanelHeader {
         id: header
 
@@ -45,14 +40,35 @@ Panel {
         anchors.right: scrollBar.left
 
         delegate: Item {
-            height: 32
+            height: appStyle.icon.normalSize
             width: view.width - 1
 
+            Image {
+                id: image
+
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.leftMargin: appStyle.spacing.horizontal
+                height: appStyle.icon.normalSize
+                width: appStyle.icon.normalSize
+                source: model.imageSource
+            }
+
             Text {
-                anchors.fill: parent
+                anchors.top: parent.top
+                anchors.left: image.right
+                anchors.leftMargin: appStyle.spacing.horizontal
+                anchors.right: parent.right
+                anchors.rightMargin: appStyle.spacing.horizontal
+                font.bold: true
                 text: model.title
             }
         }
+
+        highlight: Highlight {
+            width: view.width
+        }
+        highlightMoveDuration: appStyle.highlightMoveDuration
 
         model: XmlListModel {
             id: newsModel
@@ -63,6 +79,7 @@ Panel {
             XmlRole { name: 'description'; query: 'description/string()' }
             XmlRole { name: 'link'; query: 'description/string()' }
             XmlRole { name: 'pubDate'; query: 'pubDate/string()' }
+            XmlRole { name: 'imageSource'; query: '*:thumbnail[1]/@url/string()' }
             XmlRole { name: 'title'; query: 'title/string()' }
         }
     }
