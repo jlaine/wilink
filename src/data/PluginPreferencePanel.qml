@@ -30,6 +30,7 @@ Panel {
             else
                 appPlugins.unloadPlugin(plugin.source);
         }
+        appPlugins.storePreferences();
     }
 
     color: 'transparent'
@@ -65,7 +66,9 @@ Panel {
                 Component.onCompleted: {
                     for (var i = 0; i < appPlugins.model.count; i++) {
                         var plugin = appPlugins.model.get(i);
-                        view.model.append({'source': plugin.source, 'selected': plugin.loaded != undefined});
+                        view.model.append({'source': plugin.source,
+                            'locked': plugin.locked == true,
+                            'selected': plugin.loaded != undefined});
                     }
                 }
             }
@@ -156,6 +159,7 @@ Panel {
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
                 checked: model.selected
+                enabled: model.locked != true
                 width: 16
                 height: 16
 

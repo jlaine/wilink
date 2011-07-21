@@ -28,10 +28,10 @@ Item {
         id: pluginModel
 
         ListElement { source: 'DebugPlugin.qml' }
-        ListElement { source: 'DiagnosticPlugin.qml' }
+        ListElement { source: 'DiagnosticPlugin.qml'; locked: true }
         ListElement { source: 'PlayerPlugin.qml' }
         ListElement { source: 'RssPlugin.qml' }
-        ListElement { source: 'WifirstPlugin.qml' }
+        ListElement { source: 'WifirstPlugin.qml'; locked: true }
     }
 
     function loadPlugin(source) {
@@ -82,9 +82,26 @@ Item {
         }
     }
 
+    function storePreferences() {
+        // Store preference
+        var plugins = [];
+        for (var i = 0; i < pluginModel.count; i++) {
+            var plugin = pluginModel.get(i);
+            if (plugin.locked != true && plugin.loaded != undefined)
+                plugins.push(plugin.source);
+        }
+        application.settings.enabledPlugins = plugins;
+    }
+
     // FIXME : get / set preferences
     Component.onCompleted: {
-        loadPlugin('DiagnosticPlugin.qml');
-        loadPlugin('WifirstPlugin.qml');
+        for (var i = 0; i < pluginModel.count; i++) {
+            var plugin = pluginModel.get(i);
+            if (plugin.locked)
+                loadPlugin(plugin.source);
+        }
+        for (var i in application.settings.enabledPlugins) {
+            loadPlugin(application.settings.enabledPlugins[i]);
+        }
     }
 }
