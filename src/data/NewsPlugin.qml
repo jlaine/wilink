@@ -27,7 +27,7 @@ Plugin {
 
     onLoaded: {
         dock.model.append({
-            'iconSource': 'peer.png',
+            'iconSource': 'dock-peer.png',
             'iconPress': 'peer.png',
             'panelSource': 'NewsPanel.qml',
             'shortcut': Qt.ControlModifier + Qt.Key_N,
