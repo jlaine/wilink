@@ -124,6 +124,8 @@
     <file>PhotoDeleteDialog.qml</file>
     <file>PhotoPanel.qml</file>
     <file>PlayerPanel.qml</file>
+    <file>PlayerPlugin.qml</file>
+    <file>Plugin.qml</file>
     <file>PluginPreferencePanel.qml</file>
     <file>PreferenceDialog.qml</file>
     <file>ProgressBar.qml</file>
@@ -137,6 +139,7 @@
     <file>RoomPermissionDialog.qml</file>
     <file>RoomSubjectDialog.qml</file>
     <file>RosterView.qml</file>
+    <file>RssPlugin.qml</file>
     <file>ScrollBar.qml</file>
     <file>SharePanel.qml</file>
     <file>SharePreferencePanel.qml</file>

@@ -357,10 +357,6 @@ Acceptez-vous?</translation>
         <translation>Découverte de services</translation>
     </message>
     <message>
-        <source>Media</source>
-        <translation>Lecteur de musique</translation>
-    </message>
-    <message>
         <source>Phone</source>
         <translation>Téléphone</translation>
     </message>
@@ -379,6 +375,10 @@ Acceptez-vous?</translation>
     <message>
         <source>Preferences</source>
         <translation>Préférences</translation>
+    </message>
+    <message>
+        <source>Music</source>
+        <translation>Musique</translation>
     </message>
 </context>
 <context>
@@ -635,10 +635,6 @@ Acceptez-vous?</translation>
 <context>
     <name>PlayerPanel</name>
     <message>
-        <source>Media player</source>
-        <translation>Lecteur média</translation>
-    </message>
-    <message>
         <source>Stop</source>
         <translation>Arrêter</translation>
     </message>
@@ -661,6 +657,10 @@ Acceptez-vous?</translation>
     <message>
         <source>Close</source>
         <translation>Fermer</translation>
+    </message>
+    <message>
+        <source>Music player</source>
+        <translation>Lecteur de musique</translation>
     </message>
 </context>
 <context>

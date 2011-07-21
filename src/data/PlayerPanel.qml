@@ -130,7 +130,7 @@ Panel {
         anchors.left: parent.left
         anchors.right: parent.right
         iconSource: 'start.png'
-        title: qsTr('Media player')
+        title: qsTr('Music player')
         toolBar: ToolBar {
             ToolButton {
                 iconSource: 'add.png'

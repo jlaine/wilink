@@ -29,12 +29,8 @@ Panel {
     /* hard-coded models */
     ListModel {
         id: pluginModel
-        ListElement { installed: false; name: 'Pong'; summary: 'Basic pong game'; description: 'This is a pong game with 4 basic levels. Use left and right arrow keys to move.'; image: 'favorite-active.png'; }
-        ListElement { installed: true; name: 'Music'; summary: 'Play sounds and manage albums with wiLink !'; description: 'This plugin add a music manager to wiLink.'; image: 'start.png'; }
-        ListElement { installed: false; name: 'Go! Go fish !'; summary: 'Free a lovely fish in wiLink\'s window'; description: 'This application display a pink fish in wiLink\'s window. Yes this is useless, but it\'s really fun !'; image: 'tip.png'; }
-        ListElement { installed: false; name: 'H4ck3r'; summary: 'Show a fake hacking console'; description: 'This is a fun fake console, with abstract commands running inside.'; image: ''; }
-        ListElement { installed: true; name: 'Rss reader'; summary: 'Follow your friends over rss'; description: 'This plugin add a rss reader to wiLink.'; image: 'peer.png'; }
-        ListElement { installed: false; name: 'Storm'; summary: 'Destroy ! Destroy !'; description: 'Display a storm inside wiLink\'s window'; image: 'diagnostics.png'; }
+        ListElement { source: 'PlayerPlugin.qml'; installed: true; }
+        ListElement { source: 'RssPlugin.qml'; installed: false; }
     }
     /* end: hard-coded models */
 
@@ -78,9 +74,18 @@ Panel {
         id: pluginDelegate
 
         Item {
+            id: item
+
+            property alias plugin: loader.item
+
             height: 32
             width: parent.width - 1
             opacity: model.installed ? 1 : 0.5
+
+            Loader {
+                id: loader
+                source: model.source
+            }
 
             Rectangle {
                 anchors.fill: parent
@@ -94,7 +99,7 @@ Panel {
                 id: image
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
-                source: model.image !== '' ? model.image : 'plugin.png'
+                source: plugin.imageSource !== '' ? plugin.imageSource : 'plugin.png'
             }
 
             Column {
@@ -105,13 +110,15 @@ Panel {
                 Text {
                     elide: Text.ElideRight
                     font.bold: true
-                    text: model.name
+                    text: plugin.name
                     width: parent.width
                 }
 
                 Text {
+                    id: textLabel
+
                     elide: Text.ElideRight
-                    text: model.summary
+                    text: view.currentIndex == model.index ? plugin.description : plugin.summary
                     width: parent.width
                 }
             }
@@ -120,8 +127,7 @@ Panel {
                 anchors.fill: parent
 
                 onClicked: {
-                    details.model = model
-                    panel.state = 'detailed'
+                    view.currentIndex = model.index;
                  }
             }
 
@@ -136,73 +142,15 @@ Panel {
 
                 onClicked: model.installed = !model.installed
             }
-        }
-    }
 
-    Item {
-        id: details
-
-        property QtObject model: ListModel { }
-
-        anchors.fill: parent
-        opacity: 0
-
-        Row {
-            id: header
-
-            anchors.right: parent.right
-            anchors.top: parent.top
-            spacing: appStyle.spacing.horizontal
-
-            Button {
-                anchors.top: parent.top
-                iconSize: appStyle.icon.tinySize
-                iconSource: 'back.png'
-                text: qsTr('Back');
-
-                onClicked: panel.state = ''
-            }
-
-            Button {
-                anchors.top: parent.top
-                iconSize: appStyle.icon.tinySize
-                iconSource: details.model.installed ? 'checkbox-checked.png' : 'checkbox.png'
-                text: details.model.installed ? qsTr('Desactivate') : qsTr('Activate')
-
-                onClicked: details.model.installed = !details.model.installed
+            states: State {
+                name: 'details'
+                PropertyChanges {
+                    target: textLabel
+                    text: plugin.description
+                }
             }
         }
-
-        Image {
-            id: image
-            anchors.left: parent.left
-            anchors.top: header.bottom
-            source: details.model.image !== undefined && details.model.image !== '' ? details.model.image : 'plugin.png'
-        }
-
-        Column {
-            anchors.top: image.bottom
-            anchors.left: parent.left
-            anchors.right: parent.right
-
-            Text {
-                elide: Text.ElideRight
-                font.bold: true
-                text: details.model.name !== undefined ? details.model.name : ''
-                width: parent.width
-            }
-            Text {
-                text: details.model.description !== undefined ? details.model.description : ''
-                width: parent.width
-                wrapMode: Text.Wrap
-            }
-        }
-    }
-
-    states: State {
-        name: 'detailed'
-        PropertyChanges { target: list; opacity: 0 }
-        PropertyChanges { target: details; opacity: 1 }
     }
 }
 

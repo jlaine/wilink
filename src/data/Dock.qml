@@ -213,8 +213,8 @@ Rectangle {
                     'iconSource': 'dock-start.png',
                     'iconPress': 'start.png',
                     'panelSource': 'PlayerPanel.qml',
-                    'shortcut': Qt.ControlModifier + Qt.Key_E,
-                    'text': qsTr('Media'),
+                    'shortcut': Qt.ControlModifier + Qt.Key_U,
+                    'text': qsTr('Music'),
                     'visible': true});
                 pluginModel.append({
                     'iconSource': 'dock-peer.png',
