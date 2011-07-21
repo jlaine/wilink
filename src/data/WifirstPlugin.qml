@@ -22,7 +22,6 @@ import 'utils.js' as Utils
 
 Plugin {
     name: 'Wifirst'
-    summary: qsTr('Access Wifirst services.')
     description: qsTr('This plugin allows you to access Wifirst services.')
     imageSource: 'wiLink.png'
 

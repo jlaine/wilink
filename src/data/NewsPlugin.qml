@@ -21,8 +21,7 @@ import QtQuick 1.0
 
 Plugin {
     name: qsTr('News reader')
-    summary: 'Follow your friends over RSS'
-    description: 'This plugin adds an RSS reader to wiLink.'
+    description: qsTr('This plugin allows you to read RSS news feeds.')
     imageSource: 'rss.png'
 
     onLoaded: {

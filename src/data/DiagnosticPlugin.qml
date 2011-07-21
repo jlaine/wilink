@@ -21,7 +21,6 @@ import QtQuick 1.0
 
 Plugin {
     name: qsTr('Diagnostics')
-    summary: qsTr('Diagnostic network issues.')
     description: qsTr('This plugin allows you to run tests to diagnostic network issues.')
     imageSource: 'diagnostics.png'
 

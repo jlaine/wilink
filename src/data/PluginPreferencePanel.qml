@@ -92,7 +92,7 @@ Panel {
 
             property alias plugin: loader.item
 
-            height: 32
+            height: appStyle.icon.normalSize
             width: parent.width - 1
 
             Loader {
@@ -102,47 +102,31 @@ Panel {
 
             Image {
                 id: image
+                anchors.top: parent.top
                 anchors.left: parent.left
-                anchors.verticalCenter: parent.verticalCenter
                 source: plugin.imageSource
             }
 
-            Item {
-                anchors.top: parent.top
+            Text {
+                id: nameLabel
+
+                anchors.verticalCenter: image.verticalCenter
                 anchors.left: image.right
-                anchors.leftMargin: appStyle.spacing.horizontal
                 anchors.right: checkbox.left
+                elide: Text.ElideRight
+                font.bold: true
+                text: plugin.name
+            }
 
-                Text {
-                    id: nameLabel
-                    anchors.top: parent.top
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    elide: Text.ElideRight
-                    font.bold: true
-                    text: plugin.name
-                }
+            Text {
+                id: descriptionLabel
 
-                Text {
-                    id: summaryLabel
-
-                    anchors.top: nameLabel.bottom
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    elide: Text.ElideRight
-                    text: plugin.summary
-                }
-
-                Text {
-                    id: descriptionLabel
-
-                    anchors.top: summaryLabel.bottom
-                    anchors.topMargin: appStyle.spacing.vertical
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    visible: false
-                    wrapMode: Text.WordWrap
-                }
+                anchors.top: image.bottom
+                anchors.topMargin: appStyle.spacing.vertical
+                anchors.left: parent.left
+                anchors.right: parent.right
+                visible: false
+                wrapMode: Text.WordWrap
             }
 
             MouseArea {
@@ -157,7 +141,7 @@ Panel {
                 id: checkbox
 
                 anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
+                anchors.verticalCenter: image.verticalCenter
                 checked: model.selected
                 enabled: model.locked != true
                 width: 16
@@ -180,7 +164,7 @@ Panel {
 
                 PropertyChanges {
                     target: item
-                    height: 32 + appStyle.spacing.vertical + descriptionLabel.height
+                    height: appStyle.icon.normalSize + 2*appStyle.spacing.vertical + descriptionLabel.height
                 }
             }
         }

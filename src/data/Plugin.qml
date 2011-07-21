@@ -23,9 +23,6 @@ Item {
     // The plugin name.
     property string name
 
-    // A short description of the plugin.
-    property string summary
-
     // The full description of the plugin.
     property string description
 

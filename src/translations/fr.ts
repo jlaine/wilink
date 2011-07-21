@@ -303,6 +303,10 @@ Acceptez-vous?</translation>
         <source>Discovery</source>
         <translation>Découverte de services</translation>
     </message>
+    <message>
+        <source>This plugin allows you to run view debugging information.</source>
+        <translation>Ce greffon vous permet d'afficher des informations de déboggage.</translation>
+    </message>
 </context>
 <context>
     <name>DiagnosticPanel</name>
@@ -328,10 +332,6 @@ Acceptez-vous?</translation>
     <message>
         <source>Diagnostics</source>
         <translation>Diagnostics</translation>
-    </message>
-    <message>
-        <source>Diagnostic network issues.</source>
-        <translation>Diagnostiquez votre connexion.</translation>
     </message>
     <message>
         <source>This plugin allows you to run tests to diagnostic network issues.</source>
@@ -486,6 +486,10 @@ Acceptez-vous?</translation>
     <message>
         <source>News</source>
         <translation>Nouvelles</translation>
+    </message>
+    <message>
+        <source>This plugin allows you to read RSS news feeds.</source>
+        <translation>Ce greffon vous permet de lire des nouvelles aux format RSS.</translation>
     </message>
 </context>
 <context>
@@ -698,12 +702,8 @@ Acceptez-vous?</translation>
         <translation>Musique</translation>
     </message>
     <message>
-        <source>Play your favorite music!</source>
-        <translation>Ecoutez votre musique préférée !</translation>
-    </message>
-    <message>
-        <source>This plugin adds a music player to wiLink.</source>
-        <translation>Ce greffon ajoute un lecteur de musique à wiLink.</translation>
+        <source>This plugin allows you to play music.</source>
+        <translation>Ce greffon vous permet de lire de la musique.</translation>
     </message>
 </context>
 <context>
@@ -1054,10 +1054,6 @@ Acceptez-vous?</translation>
     <message>
         <source>This plugin allows you to access Wifirst services.</source>
         <translation>Ce greffon vous permet d&apos;accéder aux services Wifirst.</translation>
-    </message>
-    <message>
-        <source>Access Wifirst services.</source>
-        <translation>Accès aux services Wifirst.</translation>
     </message>
 </context>
 <context>

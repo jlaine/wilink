@@ -21,8 +21,7 @@ import QtQuick 1.0
 
 Plugin {
     name: qsTr('Debugging')
-    summary: 'Debugging console.'
-    description: 'This plugin allows you to run view debugging information.'
+    description: qsTr('This plugin allows you to run view debugging information.')
     imageSource: 'debug.png'
 
     onLoaded: {

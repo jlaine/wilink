@@ -21,8 +21,7 @@ import QtQuick 1.0
 
 Plugin {
     name: qsTr('Music')
-    summary: qsTr('Play your favorite music!')
-    description: qsTr('This plugin adds a music player to wiLink.')
+    description: qsTr('This plugin allows you to play music.')
     imageSource: 'start.png'
 
     onLoaded: {
