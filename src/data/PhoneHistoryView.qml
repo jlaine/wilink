@@ -150,7 +150,9 @@ Item {
             }
         }
 
-        highlight: Highlight {}
+        highlight: Highlight {
+            width: view.width
+        }
         highlightMoveDuration: 500
     }
 
