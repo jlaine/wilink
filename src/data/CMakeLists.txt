@@ -32,6 +32,7 @@ generate_png(png
     call-incoming.svg
     call-outgoing.svg
     camera.svg
+    camera-active.svg
     chat.svg
     clear.svg
     close.svg
