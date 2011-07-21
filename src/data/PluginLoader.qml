@@ -27,10 +27,10 @@ Item {
     ListModel {
         id: pluginModel
 
-        ListElement { source: 'DiagnosticPlugin.qml'; installed: true; }
-        ListElement { source: 'PlayerPlugin.qml'; installed: true; }
-        ListElement { source: 'RssPlugin.qml'; installed: false; }
-        ListElement { source: 'LogPlugin.qml'; installed: false; }
+        ListElement { source: 'DiagnosticPlugin.qml'; loaded: false }
+        ListElement { source: 'PlayerPlugin.qml'; loaded: false }
+        ListElement { source: 'RssPlugin.qml'; loaded: false; }
+        ListElement { source: 'LogPlugin.qml'; loaded: false; }
     }
 
     function loadPlugin(source) {
@@ -47,6 +47,14 @@ Item {
 
             var plugin = component.createObject(loader);
             plugin.loaded();
+
+            // update plugins
+            for (var i = 0; i < pluginModel.count; i++) {
+                if (pluginModel.get(i).source == source) {
+                    pluginModel.setProperty(i, 'loaded', true);
+                    break;
+                }
+            }
         }
     }
 }

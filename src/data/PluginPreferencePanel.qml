@@ -26,16 +26,6 @@ Panel {
 
     color: 'transparent'
 
-    /* hard-coded models */
-    ListModel {
-        id: pluginModel
-        ListElement { source: 'DiagnosticPlugin.qml'; installed: true; }
-        ListElement { source: 'PlayerPlugin.qml'; installed: true; }
-        ListElement { source: 'RssPlugin.qml'; installed: false; }
-        ListElement { source: 'LogPlugin.qml'; installed: false; }
-    }
-    /* end: hard-coded models */
-
     GroupBox {
         id: list
 
@@ -57,8 +47,15 @@ Panel {
                 anchors.right: scrollBar.left
                 clip: true
                 delegate: pluginDelegate
-                model: appPlugins.availablePlugins
+                model: ListModel {}
                 spacing: appStyle.spacing.vertical
+
+                Component.onCompleted: {
+                    for (var i = 0; i < appPlugins.availablePlugins.count; i++) {
+                        var plugin = appPlugins.availablePlugins.get(i);
+                        view.model.append({'source': plugin.source, 'installed': plugin.loaded}); 
+                    }
+                }
             }
 
             ScrollBar {
@@ -142,7 +139,9 @@ Panel {
                 width: 16
                 height: 16
 
-                onClicked: model.installed = !model.installed
+                onClicked: {
+                    view.model.setProperty(model.index, 'installed', !model.installed);
+                }
             }
 
             states: State {
