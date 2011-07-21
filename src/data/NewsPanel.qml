@@ -65,6 +65,7 @@ Panel {
                 anchors.leftMargin: appStyle.spacing.horizontal
                 anchors.right: parent.right
                 anchors.rightMargin: appStyle.spacing.horizontal
+                elide: Text.ElideRight
                 font.bold: true
                 text: model.title
             }
