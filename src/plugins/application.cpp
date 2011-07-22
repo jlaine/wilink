@@ -566,7 +566,7 @@ QStringList ApplicationSettings::enabledPlugins() const
 
 /** Sets the list of enabled plugins.
  *
- * @param plugins
+ * @param plugins
  */
 void ApplicationSettings::setEnabledPlugins(const QStringList &plugins)
 {
@@ -771,7 +771,7 @@ QString ApplicationSettings::sharesLocation() const
  */
 void ApplicationSettings::setSharesLocation(const QString &location)
 {
-    if (location != sharesLocation()) {
+    if (location != sharesLocation() && QFile(location).exists()) {
         d->settings->setValue("SharesLocation", location);
         emit sharesLocationChanged(sharesLocation());
     }
