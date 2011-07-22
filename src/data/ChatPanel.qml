@@ -56,6 +56,7 @@ Panel {
             anchors.top: parent.top
             currentJid: (window.isActiveWindow && swapper.currentItem == chatPanel && Qt.isQtObject(chatSwapper.currentItem) && chatSwapper.currentItem.jid != undefined) ? chatSwapper.currentItem.jid : ''
             enabled: appClient.mucServer != ''
+            iconSource: 'chat.png'
             model: RoomListModel {
                 id: roomListModel
                 client: appClient

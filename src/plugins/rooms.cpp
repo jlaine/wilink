@@ -160,7 +160,10 @@ RoomListModel::RoomListModel(QObject *parent)
     : ChatModel(parent),
     m_client(0)
 {
-    QHash<int, QByteArray> names = roleNames();
+    QHash<int, QByteArray> names;
+    names.insert(JidRole, "jid");
+    names.insert(MessagesRole, "messages");
+    names.insert(NameRole, "name");
     names.insert(ParticipantsRole, "participants");
     setRoleNames(names);
 }
@@ -171,9 +174,7 @@ QVariant RoomListModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || !item)
         return QVariant();
 
-    if (role == ChatModel::AvatarRole) {
-        return QUrl("qrc:/chat.png");
-    } else if (role == ChatModel::JidRole) {
+    if (role == ChatModel::JidRole) {
         return item->jid;
     } else if (role == ChatModel::MessagesRole) {
         return item->messages;
