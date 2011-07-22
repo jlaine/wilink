@@ -26,6 +26,7 @@ Item {
 
     property string currentJid
     property alias count: view.count
+    property url iconSource
     property alias model: view.model
     property alias title: titleText.text
 
@@ -126,7 +127,7 @@ Item {
                     width: appStyle.icon.smallSize
                     height: appStyle.icon.smallSize
                     smooth: true
-                    source: model.avatar
+                    source: block.iconSource != '' ? block.iconSource : model.avatar
                 }
 
                 Text {
