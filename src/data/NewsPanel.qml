@@ -38,6 +38,8 @@ Panel {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: scrollBar.left
+        anchors.margins: 2
+        spacing: appStyle.spacing.horizontal
         focus: true
 
         delegate: Item {
