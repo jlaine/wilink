@@ -264,22 +264,23 @@ Panel {
             Item {
                 anchors.left: parent.left
                 anchors.right: parent.right
-                height: sharesLocation.height
+                height: button.height
 
-                InputBar {
+                Text {
                     id: sharesLocation
 
-                    anchors.top: parent.top
+                    anchors.verticalCenter: parent.verticalCenter
                     anchors.left: parent.left
                     anchors.right: button.left
                     anchors.rightMargin: appStyle.spacing.horizontal
+                    elide: Text.ElideMiddle
                     text: application.settings.sharesLocation
                 }
 
                 Button {
                     id: button
 
-                    anchors.top: parent.top
+                    anchors.verticalCenter: parent.verticalCenter
                     anchors.right: parent.right
                     iconSource: 'album.png'
 

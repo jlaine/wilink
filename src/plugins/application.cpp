@@ -771,7 +771,7 @@ QString ApplicationSettings::sharesLocation() const
  */
 void ApplicationSettings::setSharesLocation(const QString &location)
 {
-    if (location != sharesLocation() && QFile(location).exists()) {
+    if (location != sharesLocation()) {
         d->settings->setValue("SharesLocation", location);
         emit sharesLocationChanged(sharesLocation());
     }
