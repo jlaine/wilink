@@ -694,6 +694,10 @@ Acceptez-vous?</translation>
         <source>Music player</source>
         <translation>Lecteur de musique</translation>
     </message>
+    <message>
+        <source>To add musics to player, simply drag and drop them to wiLink window.</source>
+        <translation>Pour ajouter des musiques au lecteur, il vous suffit de les faire glisser dans la fenêtre.</translation>
+    </message>
 </context>
 <context>
     <name>PlayerPlugin</name>

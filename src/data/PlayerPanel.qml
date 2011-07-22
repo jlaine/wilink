@@ -165,10 +165,20 @@ Panel {
         }
     }
 
+    PanelHelp {
+        id: help
+
+        anchors.top: header.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        text: qsTr('To add musics to player, simply drag and drop them to wiLink window.');
+        z: 1
+    }
+
     ListView {
         id: playerView
 
-        anchors.top: header.bottom
+        anchors.top: help.bottom
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: scrollBar.left
