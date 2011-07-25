@@ -20,12 +20,20 @@
 import QtQuick 1.0
 
 Item {
+    property alias animation: animationItem
     property alias font: fontItem
     property int highlightMoveDuration: 500
     property alias icon: iconItem
     property alias spacing: spacingItem
 
     opacity: 0
+
+    Item {
+        id: animationItem
+
+        property int normalDuration: 150
+        property int longDuration: 500
+    }
 
     Item {
         id: fontItem
