@@ -19,6 +19,7 @@
 
 import QtQuick 1.0
 import wiLink 2.0
+import 'utils.js' as Utils
 
 Item {
     id: block
@@ -82,7 +83,7 @@ Item {
                     } else {
                         for (var i in selection) {
                             var item = listHelper.get(selection[i]);
-                            text += '[ ' + item.from + ' - ' + Qt.formatDateTime(item.date, 'dd MMM hh:mm') + ' ]\n';
+                            text += '[ ' + item.from + ' - ' + Utils.formatDateTime(item.date) + ' ]\n';
                             text += item.body;
                             if (i < selection.length - 1)
                                 text += '\n\n';
@@ -186,7 +187,7 @@ Item {
                             font.pixelSize: appStyle.font.smallSize
                             // FIXME: this is a rough estimation of required width
                             opacity: fromText.width > 0.7 * (fromText.font.pixelSize * fromText.text.length + dateText.font.pixelSize * dateText.text.length) ? 1 : 0
-                            text: Qt.formatDateTime(model.date, 'dd MMM hh:mm')
+                            text: Utils.formatDateTime(model.date)
                         }
                     }
 

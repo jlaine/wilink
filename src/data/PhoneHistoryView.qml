@@ -20,6 +20,7 @@
 import QtQuick 1.0
 import QXmpp 0.4
 import wiLink 2.0
+import 'utils.js' as Utils
 
 Item {
     id: block
@@ -99,6 +100,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.left: image.right
                     anchors.right: date.left
+                    anchors.rightMargin: appStyle.spacing.horizontal
                     elide: Text.ElideRight
                     text: model.name
                 }
@@ -108,8 +110,9 @@ Item {
 
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: duration.left
-                    text: Qt.formatDateTime(model.date)
-                    width: 150
+                    anchors.rightMargin: appStyle.spacing.horizontal
+                    text: Utils.formatDateTime(model.date)
+                    width: appStyle.font.normalSize * 8
                 }
 
                 Text {
@@ -118,7 +121,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: parent.right
                     text: model.duration + 's'
-                    width: 60
+                    width: appStyle.font.normalSize * 3
                 }
             }
 

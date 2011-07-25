@@ -23,6 +23,10 @@ function escapeRegExp(text) {
     return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
 }
 
+function formatDateTime(dateTime) {
+    return Qt.formatDateTime(dateTime, 'dd MMM hh:mm');
+}
+
 function formatNumber(size) {
     var KILO = 1000;
     var MEGA = KILO * 1000;
