@@ -304,7 +304,7 @@ Acceptez-vous?</translation>
         <translation>Découverte de services</translation>
     </message>
     <message>
-        <source>This plugin allows you to run view debugging information.</source>
+        <source>This plugin allows you to view debugging information.</source>
         <translation>Ce greffon vous permet d&apos;afficher des informations de déboggage.</translation>
     </message>
 </context>
