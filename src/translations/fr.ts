@@ -450,10 +450,6 @@ Acceptez-vous?</translation>
         <translation>Console de débogage</translation>
     </message>
     <message>
-        <source>Close</source>
-        <translation>Fermer</translation>
-    </message>
-    <message>
         <source>Start</source>
         <translation>Démarrer</translation>
     </message>
