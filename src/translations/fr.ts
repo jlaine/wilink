@@ -687,10 +687,6 @@ Acceptez-vous?</translation>
         <translation>Ajouter des fichiers</translation>
     </message>
     <message>
-        <source>Close</source>
-        <translation>Fermer</translation>
-    </message>
-    <message>
         <source>Music player</source>
         <translation>Lecteur de musique</translation>
     </message>

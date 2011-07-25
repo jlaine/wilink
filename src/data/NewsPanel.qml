@@ -56,6 +56,8 @@ Panel {
                 anchors.leftMargin: appStyle.spacing.horizontal
                 height: appStyle.icon.normalSize
                 width: appStyle.icon.normalSize
+                fillMode: Image.PreserveAspectFit
+                smooth: true
                 source: model.imageSource
             }
 
