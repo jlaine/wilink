@@ -71,16 +71,10 @@ Panel {
             }
 
             ToolButton {
-                iconSource: 'refresh.png'
+                iconSource: 'clear.png'
                 text: qsTr('Clear')
 
                 onClicked: logModel.clear()
-            }
-
-            ToolButton {
-                iconSource: 'close.png'
-                text: qsTr('Close')
-                onClicked: panel.close()
             }
         }
     }
