@@ -156,12 +156,6 @@ Panel {
                 enabled: playerModel.playing
                 onClicked: playerModel.stop()
             }
-
-            ToolButton {
-                iconSource: 'close.png'
-                text: qsTr('Close')
-                onClicked: panel.close()
-            }
         }
     }
 
