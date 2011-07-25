@@ -266,14 +266,14 @@ Panel {
                 anchors.right: parent.right
                 height: button.height
 
-                Text {
+                InputBar {
                     id: sharesLocation
 
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.left: parent.left
                     anchors.right: button.left
                     anchors.rightMargin: appStyle.spacing.horizontal
-                    elide: Text.ElideMiddle
+                    readOnly: true
                     text: application.settings.sharesLocation
                 }
 
