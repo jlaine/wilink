@@ -107,10 +107,10 @@ Item {
             from: ''
             to: 'hovered'
             reversible: true
-            PropertyAnimation { target: button; properties: 'height,width'; duration: 150 }
-            PropertyAnimation { target: image; properties: 'height,width'; duration: 150 }
-            PropertyAnimation { target: label; properties: 'opacity'; duration: 150 }
-            PropertyAnimation { target: labelBackground; properties: 'opacity'; duration: 150 }
+            PropertyAnimation { target: button; properties: 'height,width'; duration: appStyle.animation.normalDuration }
+            PropertyAnimation { target: image; properties: 'height,width'; duration: appStyle.animation.normalDuration }
+            PropertyAnimation { target: label; properties: 'opacity'; duration: appStyle.animation.normalDuration }
+            PropertyAnimation { target: labelBackground; properties: 'opacity'; duration: appStyle.animation.normalDuration }
         }
 
     MouseArea {

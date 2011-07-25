@@ -201,7 +201,7 @@ Panel {
         ]
 
         transitions: Transition {
-            PropertyAnimation { target: progressBar; properties: 'height'; duration: 150 }
+            PropertyAnimation { target: progressBar; properties: 'height'; duration: appStyle.animation.normalDuration }
         }
     }
 

@@ -38,7 +38,7 @@ Rectangle {
     }
 
     transitions: Transition {
-        PropertyAnimation { target: highlight; properties: 'opacity'; duration: 150 }
+        PropertyAnimation { target: highlight; properties: 'opacity'; duration: appStyle.animation.normalDuration }
     }
 }
 

@@ -305,7 +305,7 @@ Panel {
     }
 
     transitions: Transition {
-        PropertyAnimation { target: display; properties: 'opacity'; duration: 150 }
-        PropertyAnimation { target: help; properties: 'height,opacity'; duration: 150 }
+        PropertyAnimation { target: display; properties: 'opacity'; duration: appStyle.animation.normalDuration }
+        PropertyAnimation { target: help; properties: 'height,opacity'; duration: appStyle.animation.normalDuration }
     }
 }
