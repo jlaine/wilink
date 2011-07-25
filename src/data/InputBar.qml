@@ -26,6 +26,7 @@ FocusScope {
     property alias cursorPosition: edit.cursorPosition
     property alias echoMode: edit.echoMode
     property alias hintText: label.text
+    property alias readOnly: edit.readOnly
     property alias text: edit.text
     property alias validator: edit.validator
 
@@ -47,7 +48,7 @@ FocusScope {
         anchors.fill: parent
         border.color: '#c3c3c3'
         border.width: 1
-        color: 'white'
+        color: readOnly ? '#dfdfdf' : 'white'
     }
 
     TextInput {
@@ -57,9 +58,9 @@ FocusScope {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.margins: (parent.height - height) / 2
-        focus: true
+        focus: !readOnly
         smooth: true
-        selectByMouse: true
+        selectByMouse: !readOnly
     }
 
     Text {
