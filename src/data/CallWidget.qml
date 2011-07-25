@@ -31,6 +31,7 @@ Item {
     anchors.right: parent ? parent.right : undefined
     clip: true
     height: video.openMode != CallVideoHelper.NotOpen ? 248 : 40
+    z: 5
 
     CallAudioHelper {
         id: audio
@@ -48,6 +49,7 @@ Item {
 
     Rectangle {
         id: background
+
         anchors.fill: parent
         border.color: '#93b9f2'
         border.width: 1
@@ -126,9 +128,26 @@ Item {
         }
 
         Button {
-            id: cameraButton
+            id: fullScreenButton
 
             anchors.right: hangupButton.left
+            anchors.top: parent.top
+            anchors.margins: 4
+            enabled: Qt.isQtObject(call) && call.state == QXmppCall.ActiveState
+            iconSource: 'options.png'
+
+            onClicked: {
+                if (callWidget.state == '')
+                    callWidget.state = 'fullscreen';
+                else if (callWidget.state == 'fullscreen')
+                    callWidget.state = '';
+            }
+        }
+
+        Button {
+            id: cameraButton
+
+            anchors.right: fullScreenButton.left
             anchors.top: parent.top
             anchors.margins: 4
             enabled: Qt.isQtObject(call) && call.state == QXmppCall.ActiveState
@@ -218,13 +237,56 @@ Item {
         }
     }
 
-    states: State {
-          name: 'inactive'
-          when: Qt.isQtObject(call) && call.state == QXmppCall.FinishedState
-          PropertyChanges { target: callWidget; opacity: 0 }
-    }
+    states: [
+        State {
+            name: 'inactive'
+            when: Qt.isQtObject(call) && call.state == QXmppCall.FinishedState
+            PropertyChanges { target: callWidget; opacity: 0 }
+        },
+        State {
+            name: 'fullscreen'
+
+            ParentChange {
+                target: callWidget
+                parent: root
+            }
+
+            PropertyChanges {
+                target: callWidget
+                x: 0
+                y: 0
+                height: root.height
+            }
+
+            PropertyChanges {
+                target: videoOutput
+
+                height: root.height - 8
+                width: (root.height - 8) * 4 / 3
+            }
+        }
+    ]
 
     transitions: Transition {
-        PropertyAnimation { target: callWidget; properties: 'opacity'; duration: 500 }
+        PropertyAnimation {
+            target: callWidget
+            properties: 'opacity'
+            duration: appStyle.animation.longDuration
+        }
+        PropertyAnimation {
+            target: callWidget
+            properties: 'x,y,height,width'
+            duration: appStyle.animation.normalDuration
+        }
+        PropertyAnimation {
+            target: videoOutput
+            properties: 'x,y,height,width'
+            duration: appStyle.animation.normalDuration
+        }
+        PropertyAnimation {
+            target: videoMonitor
+            properties: 'x,y,height,width'
+            duration: appStyle.animation.normalDuration
+        }
     }
 }
