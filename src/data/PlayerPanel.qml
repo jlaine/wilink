@@ -109,7 +109,7 @@ Panel {
                 }
 
                 transitions: Transition {
-                    PropertyAnimation { target: rect; properties: 'color,border.color'; duration: 300 }
+                    PropertyAnimation { target: rect; properties: 'color,border.color'; duration: appStyle.animation.normalDuration }
                 }
             }
         }

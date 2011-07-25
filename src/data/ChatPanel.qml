@@ -46,7 +46,7 @@ Panel {
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        width: 200
+        width: appStyle.animation.normalDuration
 
         RosterView {
             id: rooms
@@ -270,6 +270,6 @@ Panel {
     }
 
     transitions: Transition {
-        PropertyAnimation { target: sidebar; properties: 'width'; duration: 200 }
+        PropertyAnimation { target: sidebar; properties: 'width'; duration: appStyle.animation.normalDuration }
     }
 }

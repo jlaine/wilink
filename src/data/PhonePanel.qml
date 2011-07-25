@@ -355,6 +355,6 @@ Panel {
     }
 
     transitions: Transition {
-        PropertyAnimation { target: sidebar; properties: 'width'; duration: 200 }
+        PropertyAnimation { target: sidebar; properties: 'width'; duration: appStyle.animation.normalDuration }
     }
 }
