@@ -36,18 +36,6 @@ Item {
     width: 32
     state: mouseArea.pressed ? 'pressed' : (mouseArea.hovered ? 'hovered' : '')
 
-    Rectangle {
-        id: background
-
-        anchors.bottom: parent.bottom
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.leftMargin: 40 - button.x
-        color: '#aa597fbe'
-        opacity: 0
-    }
-
     Image {
         id: image
 
@@ -63,12 +51,12 @@ Item {
     Rectangle {
         id: labelBackground
 
-        anchors.bottom: label.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: label.top
+        anchors.left: image.right
+        anchors.verticalCenter: image.verticalCenter
         opacity: 0
         color: '#597fbe'
+        width: label.width + 2*appStyle.spacing.horizontal
+        height: label.height +2*appStyle.spacing.vertical
     }
 
     Text {
@@ -89,8 +77,9 @@ Item {
                 return '';
         }
 
-        anchors.top: image.bottom
-        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.left: image.right
+        anchors.leftMargin: appStyle.spacing.horizontal
+        anchors.verticalCenter: image.verticalCenter
         opacity: 0
         color: 'white'
         font.pixelSize: appStyle.font.smallSize
@@ -100,19 +89,17 @@ Item {
     states: [
         State {
             name: 'hovered'
-            PropertyChanges { target: label; opacity: 1 }
-            PropertyChanges { target: background; opacity: 1 }
-            PropertyChanges { target: labelBackground; opacity: 1 }
+            PropertyChanges { target: button; width: image.width + 16; height: image.height }
             PropertyChanges { target: image; height: 32; width: 32 }
-            PropertyChanges { target: button; height: 32 + label.paintedHeight; width: 32 + label.paintedWidth }
+            PropertyChanges { target: label; opacity: 1 }
+            PropertyChanges { target: labelBackground; opacity: 1 }
         },
         State {
             name: 'pressed'
-            PropertyChanges { target: label; opacity: 0.5 }
-            PropertyChanges { target: background; opacity: 1 }
-            PropertyChanges { target: labelBackground; opacity: 1 }
+            PropertyChanges { target: button; width: image.width + 16; height: image.height }
             PropertyChanges { target: image; height: 32; width: 32 }
-            PropertyChanges { target: button; height: 32 + label.paintedHeight; width: 32 + label.paintedWidth }
+            PropertyChanges { target: label; opacity: 0.5 }
+            PropertyChanges { target: labelBackground; opacity: 1 }
         }
     ]
 
@@ -120,9 +107,10 @@ Item {
             from: ''
             to: 'hovered'
             reversible: true
-            PropertyAnimation { target: label; properties: 'opacity'; duration: 150 }
-            PropertyAnimation { target: image; properties: 'height,width'; duration: 150 }
             PropertyAnimation { target: button; properties: 'height,width'; duration: 150 }
+            PropertyAnimation { target: image; properties: 'height,width'; duration: 150 }
+            PropertyAnimation { target: label; properties: 'opacity'; duration: 150 }
+            PropertyAnimation { target: labelBackground; properties: 'opacity'; duration: 150 }
         }
 
     MouseArea {

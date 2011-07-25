@@ -170,6 +170,8 @@ Item {
             Loader {
                 id: callButtonLoader
 
+                property QtObject model
+
                 anchors.right: parent.right
                 anchors.rightMargin: 6
                 anchors.verticalCenter: parent.verticalCenter
@@ -195,6 +197,7 @@ Item {
 
                 onEntered: {
                     callButtonLoader.sourceComponent = callButtonComponent;
+                    callButtonLoader.model = model;
                 }
 
                 onExited: {
@@ -232,7 +235,7 @@ Item {
             smooth: true
 
             onClicked: {
-                block.itemClicked(block.model);
+                block.itemClicked(parent.model);
             }
         }
     }

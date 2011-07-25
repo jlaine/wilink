@@ -100,6 +100,11 @@ Panel {
 
             anchors.fill: parent
             model: historyModel.contactsModel
+
+            onItemClicked: {
+                var address = buildAddress(model.phone, historyModel.client.domain);
+                historyModel.call(address);
+            }
         }
     }
 
