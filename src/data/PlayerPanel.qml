@@ -171,7 +171,7 @@ Panel {
         anchors.top: header.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        text: qsTr('To add musics to player, simply drag and drop them to wiLink window.');
+        text: qsTr('To add music to the player, simply drag and drop files to the playlist.');
         z: 1
     }
 

@@ -695,8 +695,8 @@ Acceptez-vous?</translation>
         <translation>Lecteur de musique</translation>
     </message>
     <message>
-        <source>To add musics to player, simply drag and drop them to wiLink window.</source>
-        <translation>Pour ajouter des musiques au lecteur, il vous suffit de les faire glisser dans la fenêtre.</translation>
+        <source>To add music to the player, simply drag and drop files to the playlist.</source>
+        <translation>Pour ajouter de la musique au lecteur, faites glisser des fichiers dans la fenêtre.</translation>
     </message>
 </context>
 <context>
