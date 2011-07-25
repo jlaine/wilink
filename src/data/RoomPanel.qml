@@ -38,7 +38,7 @@ Panel {
         // the room object was created
         jid: Qt.isQtObject(room) ? Utils.jidToBareJid(appClient.jid) : ''
 
-        onNameChanged: {
+        onNickNameChanged: {
             room.nickName = name;
             // send join request
             if (room.nickName.length > 0 && !room.isJoined) {
