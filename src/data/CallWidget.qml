@@ -125,6 +125,8 @@ Item {
             anchors.top: parent.top
             anchors.margins: 4
             iconSource: 'hangup.png'
+
+            onClicked: call.hangup()
         }
 
         Button {
@@ -152,6 +154,13 @@ Item {
             anchors.margins: 4
             enabled: Qt.isQtObject(call) && call.state == QXmppCall.ActiveState
             iconSource: 'camera.png'
+
+            onClicked: {
+                if (video.openMode & CallVideoHelper.WriteOnly)
+                    call.stopVideo();
+                else
+                    call.startVideo();
+            }
 
             states: State {
                 name: 'active'
@@ -201,21 +210,6 @@ Item {
             source: 'audio-output.png'
             height: appStyle.icon.tinySize
             width: appStyle.icon.tinySize
-        }
-    }
-
-    Connections {
-        target: hangupButton
-        onClicked: call.hangup()
-    }
-
-    Connections {
-        target: cameraButton
-        onClicked: {
-            if (video.openMode & CallVideoHelper.WriteOnly)
-                call.stopVideo();
-            else
-                call.startVideo();
         }
     }
 
