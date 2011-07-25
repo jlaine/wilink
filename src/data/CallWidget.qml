@@ -89,8 +89,8 @@ Item {
             border.width: 1
             border.color: '#2689d6'
             radius: 8
-            height: 240
-            width: 320
+            height: parent.height - 8
+            width: height * 4 / 3
             visible: video.openMode != CallVideoHelper.NotOpen
         }
 
@@ -256,13 +256,6 @@ Item {
                 x: 0
                 y: 0
                 height: root.height
-            }
-
-            PropertyChanges {
-                target: videoOutput
-
-                height: root.height - 8
-                width: (root.height - 8) * 4 / 3
             }
         }
     ]
