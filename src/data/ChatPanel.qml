@@ -46,7 +46,7 @@ Panel {
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        width: appStyle.animation.normalDuration
+        width: 200
 
         RosterView {
             id: rooms

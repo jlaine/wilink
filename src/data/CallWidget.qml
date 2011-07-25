@@ -134,7 +134,7 @@ Item {
             anchors.top: parent.top
             anchors.margins: 4
             enabled: Qt.isQtObject(call) && call.state == QXmppCall.ActiveState
-            iconSource: 'options.png'
+            iconSource: 'fullscreen.png'
 
             onClicked: {
                 if (callWidget.state == '')
