@@ -30,16 +30,18 @@ class QUrl;
 class Window : public QMainWindow
 {
     Q_OBJECT
-    Q_PROPERTY(bool isActiveWindow READ isActiveWindow NOTIFY isActiveWindowChanged)
+    Q_PROPERTY(bool isActiveWindow READ isActiveWindow NOTIFY windowStateChanged)
+    Q_PROPERTY(bool fullScreen READ isFullScreen WRITE setFullScreen NOTIFY windowStateChanged)
 
 public:
     Window(const QUrl &url, const QString &jid, QWidget *parent = 0);
+    void setFullScreen(bool fullScreen);
 
 signals:
-    void isActiveWindowChanged();
     void showAbout();
     void showHelp();
     void showPreferences();
+    void windowStateChanged();
 
 public slots:
     void alert();

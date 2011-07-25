@@ -257,6 +257,11 @@ Item {
                 y: 0
                 height: root.height
             }
+
+            PropertyChanges {
+                target: window
+                fullScreen: true
+            }
         }
     ]
 

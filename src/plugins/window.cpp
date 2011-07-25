@@ -132,13 +132,22 @@ void Window::alert()
 void Window::changeEvent(QEvent *event)
 {
     QWidget::changeEvent(event);
-    if (event->type() == QEvent::ActivationChange)
-        emit isActiveWindowChanged();
+    if (event->type() == QEvent::ActivationChange ||
+        event->type() == QEvent::WindowStateChange)
+        emit windowStateChanged();
 }
 
 QFileDialog *Window::fileDialog()
 {
     QFileDialog *dialog = new QDeclarativeFileDialog(this);
     return dialog;
+}
+
+void Window::setFullScreen(bool fullScreen)
+{
+    if (fullScreen)
+        setWindowState(windowState() | Qt::WindowFullScreen);
+    else
+        setWindowState(windowState() ^ Qt::WindowFullScreen);
 }
 
