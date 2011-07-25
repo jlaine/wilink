@@ -1,6 +1,9 @@
 wiLink 2.1.0 (UNRELEASED)
  * Application:
   - Add support for plugins.
+ * Calls:
+  - Add support for vp8 codec.
+  - Add full-screen mode.
  * Conversations:
   - Make it possible to clear chat history.
  * News:
