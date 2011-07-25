@@ -61,9 +61,10 @@ Item {
             for (var i = 0; i < pluginModel.count; i++) {
                 if (pluginModel.get(i).source == source) {
                     pluginModel.setProperty(i, 'loaded', plugin);
-                    break;
+                    return;
                 }
             }
+            pluginModel.append({'source': source, 'loaded': plugin});
         }
     }
 
