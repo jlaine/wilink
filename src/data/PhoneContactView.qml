@@ -195,6 +195,11 @@ Item {
                     }
                 }
 
+                onDoubleClicked: {
+                    view.currentIndex = model.index;
+                    block.itemClicked(model);
+                }
+
                 onEntered: {
                     callButtonLoader.sourceComponent = callButtonComponent;
                     callButtonLoader.model = model;
