@@ -49,6 +49,7 @@ public:
 public slots:
     bool addLocalFile(const QString &path);
     bool addUrl(const QUrl &url);
+    void clear();
     void play(const QModelIndex &index);
     void stop();
 

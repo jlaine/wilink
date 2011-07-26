@@ -381,6 +381,14 @@ void PlayerModel::dataReceived()
     d->processQueue();
 }
 
+void PlayerModel::clear()
+{
+    // clear model
+    int rows = rowCount(QModelIndex());
+    if (rows > 0)
+        removeRows(0, rows);
+}
+
 int PlayerModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);

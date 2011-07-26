@@ -694,6 +694,10 @@ Acceptez-vous?</translation>
         <source>To add music to the player, simply drag and drop files to the playlist.</source>
         <translation>Pour ajouter de la musique au lecteur, faites glisser des fichiers dans la fenêtre.</translation>
     </message>
+    <message>
+        <source>Clear</source>
+        <translation>Effacer</translation>
+    </message>
 </context>
 <context>
     <name>PlayerPlugin</name>

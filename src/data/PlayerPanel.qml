@@ -156,6 +156,12 @@ Panel {
                 enabled: playerModel.playing
                 onClicked: playerModel.stop()
             }
+
+            ToolButton {
+                iconSource: 'clear.png'
+                text: qsTr('Clear')
+                onClicked: playerModel.clear()
+            }
         }
     }
 
