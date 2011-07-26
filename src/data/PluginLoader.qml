@@ -45,14 +45,22 @@ Item {
 
         console.log("PluginLoader loading plugin " + source);
         var component = Qt.createComponent(source);
-        if (component.status == Component.Ready)
-            finishCreation();
-        else
+        if (component.status == Component.Loading)
             component.statusChanged.connect(finishCreation);
+        else
+            finishCreation();
 
         function finishCreation() {
-            if (component.status != Component.Ready)
+            switch (component.status) {
+            case Component.Error:
+                console.log("PluginLoader could not load plugin " + source);
+                console.log(component.errorString());
                 return;
+            case Component.Ready:
+                break;
+            default:
+                return;
+            }
 
             var plugin = component.createObject(loader);
             plugin.loaded();
