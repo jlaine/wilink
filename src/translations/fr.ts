@@ -305,7 +305,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>This plugin allows you to view debugging information.</source>
-        <translation>Ce greffon vous permet d&apos;afficher des informations de déboggage.</translation>
+        <translation>Ce module vous permet d&apos;afficher des informations de déboggage.</translation>
     </message>
 </context>
 <context>
@@ -335,7 +335,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>This plugin allows you to run tests to diagnostic network issues.</source>
-        <translation>Ce greffon vous permet de diagnostiquer d&apos;éventuels problèmes réseau.</translation>
+        <translation>Ce module vous permet de diagnostiquer d&apos;éventuels problèmes réseau.</translation>
     </message>
 </context>
 <context>
@@ -485,7 +485,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>This plugin allows you to read RSS news feeds.</source>
-        <translation>Ce greffon vous permet de lire des nouvelles aux format RSS.</translation>
+        <translation>Ce module vous permet de lire des nouvelles aux format RSS.</translation>
     </message>
 </context>
 <context>
@@ -699,7 +699,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>This plugin allows you to play music.</source>
-        <translation>Ce greffon vous permet de lire de la musique.</translation>
+        <translation>Ce module vous permet de lire de la musique.</translation>
     </message>
 </context>
 <context>
@@ -726,7 +726,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>Plugins</source>
-        <translation>Greffons</translation>
+        <translation>Modules</translation>
     </message>
 </context>
 <context>
@@ -1049,7 +1049,7 @@ Acceptez-vous?</translation>
     <name>WifirstPlugin</name>
     <message>
         <source>This plugin allows you to access Wifirst services.</source>
-        <translation>Ce greffon vous permet d&apos;accéder aux services Wifirst.</translation>
+        <translation>Ce module vous permet d&apos;accéder aux services Wifirst.</translation>
     </message>
 </context>
 <context>
