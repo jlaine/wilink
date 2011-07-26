@@ -89,10 +89,10 @@ FocusScope {
                 menuLoader.show(pos.x, pos.y);
             }
 
-            if (component.status == Component.Ready)
-                finishCreation();
-            else
+            if (component.status == Component.Loading)
                 component.statusChanged.connect(finishCreation);
+            else
+                finishCreation();
         }
     }
 

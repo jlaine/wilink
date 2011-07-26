@@ -77,8 +77,19 @@ Panel {
                     onCallStarted: {
                         if (Utils.jidToBareJid(call.jid) == conversation.jid) {
                             var component = Qt.createComponent('CallWidget.qml');
-                            var widget = component.createObject(widgetBar);
-                            widget.call = call;
+
+                            function finishCreation() {
+                                if (component.status != Component.Ready)
+                                    return;
+
+                                var widget = component.createObject(widgetBar);
+                                widget.call = call;
+                            }
+
+                            if (component.status == Component.Loading)
+                                component.statusChanged.connect(finishCreation);
+                            else
+                                finishCreation();
                         }
                     }
                 }
@@ -107,8 +118,19 @@ Panel {
                     onJobStarted: {
                         if (Utils.jidToBareJid(job.jid) == conversation.jid) {
                             var component = Qt.createComponent('TransferWidget.qml');
-                            var widget = component.createObject(widgetBar);
-                            widget.job = job;
+
+                            function finishCreation() {
+                                if (component.status != Component.Ready)
+                                    return;
+
+                                var widget = component.createObject(widgetBar);
+                                widget.job = job;
+                            }
+
+                            if (component.status == Component.Loading)
+                                component.statusChanged.connect(finishCreation);
+                            else
+                                finishCreation();
                         }
                     }
                 }
