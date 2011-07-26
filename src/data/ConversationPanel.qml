@@ -68,7 +68,7 @@ Panel {
                 visible: vcard.features & VCard.VoiceFeature
 
                 onClicked: {
-                    var fullJid = vcard.jidForFeature(VCard.AudioFeature);
+                    var fullJid = vcard.jidForFeature(VCard.VoiceFeature);
                     appClient.callManager.call(fullJid);
                 }
 
