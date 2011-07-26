@@ -30,6 +30,7 @@
 
 #include "QXmppClient.h"
 
+#include "application.h"
 #include "declarative.h"
 #include "photos.h"
 
@@ -138,7 +139,7 @@ QUrl PhotoCache::imageUrl(const QUrl &url, FileSystem::ImageSize type, FileSyste
             return cacheUrl;
         }
     }
-    return QUrl("qrc:/file-128.png");
+    return wApp->qmlUrl("file-128.png");
 }
 
 PhotoCache *PhotoCache::instance()
@@ -223,14 +224,14 @@ QVariant PhotoModel::data(const QModelIndex &index, int role) const
 
     if (role == AvatarRole) {
         if (item->isDir()) {
-            return QUrl("qrc:/album-128.png");
+            return wApp->qmlUrl("album-128.png");
         } else {
             return PhotoCache::instance()->imageUrl(item->url(), FileSystem::SmallSize, m_fs);
         }
     }
     else if (role == ImageRole) {
         if (item->isDir()) {
-            return QUrl("qrc:/album-128.png");
+            return wApp->qmlUrl("album-128.png");
         } else {
             return PhotoCache::instance()->imageUrl(item->url(), FileSystem::LargeSize, m_fs);
         }
@@ -459,7 +460,7 @@ QVariant PhotoQueueModel::data(const QModelIndex &index, int role) const
         // FIXME: using a thumbnail for large pictures
         // is a total performance killer
         //return QUrl::fromLocalFile(item->sourcePath);
-        return QUrl("qrc:/file.png");
+        return wApp->qmlUrl("file.png");
     } else if (role == NameRole) {
         return QFileInfo(item->sourcePath).fileName();
     } else if (role == SpeedRole) {

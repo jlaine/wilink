@@ -52,6 +52,7 @@ public:
 
     QList<QWidget*> chats;
     ApplicationSettings *appSettings;
+    QUrl qmlRoot;
     QSoundPlayer *soundPlayer;
     QThread *soundThread;
 #ifdef USE_LIBNOTIFY
@@ -66,7 +67,7 @@ public:
 };
 
 ApplicationPrivate::ApplicationPrivate()
-    :
+    : qmlRoot("qrc:/"),
 #ifdef USE_LIBNOTIFY
     libnotify_accepts_actions(0),
 #endif
@@ -87,6 +88,13 @@ Application::Application(int &argc, char **argv)
     Q_UNUSED(check);
 
     wApp = this;
+
+    // process command line argument
+    for (int i = 1; i < argc - 1; ++i) {
+        if (!strcmp(argv[i], "-qmlroot")) {
+            d->qmlRoot = QUrl(QString::fromLocal8Bit(argv[++i]));
+        }
+    }
 
     // set application properties
     setApplicationName("wiLink");
@@ -265,6 +273,11 @@ QString Application::osType() const
     return SystemInfo::osType();
 }
 
+QUrl Application::qmlUrl(const QString &name) const
+{
+    return d->qmlRoot.resolved(QUrl(name));
+}
+
 #if 0
 /** Open an XMPP URI using the appropriate account.
  *
@@ -298,7 +311,7 @@ void Application::resetWindows()
     /* check we have a valid account */
     if (d->appSettings->chatAccounts().isEmpty()) {
 
-        Window *window = new Window(QUrl("qrc:/setup.qml"), QString());
+        Window *window = new Window(qmlUrl("setup.qml"), QString());
 
         const QSize size = QApplication::desktop()->availableGeometry(window).size();
         window->move((size.width() - window->width()) / 2, (size.height() - window->height()) / 2);
@@ -313,7 +326,7 @@ void Application::resetWindows()
     int ypos = 20;
     const QStringList chatJids = d->appSettings->chatAccounts();
     foreach (const QString &jid, chatJids) {
-        Window *window = new Window(QUrl("qrc:/main.qml"), jid);
+        Window *window = new Window(qmlUrl("main.qml"), jid);
 
 #ifdef WILINK_EMBEDDED
         Q_UNUSED(xpos);

@@ -83,6 +83,7 @@ public:
 #endif
 
     QString executablePath() const;
+    QUrl qmlUrl(const QString &name) const;
 
     bool isInstalled();
     QString osType() const;
