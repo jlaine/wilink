@@ -716,21 +716,20 @@ Acceptez-vous?</translation>
         <source>Preferences</source>
         <translation>Préférences</translation>
     </message>
+</context>
+<context>
+    <name>PreferenceModel</name>
     <message>
         <source>General</source>
         <translation>Général</translation>
     </message>
     <message>
-        <source>Sound</source>
-        <translation>Son</translation>
-    </message>
-    <message>
-        <source>Shares</source>
-        <translation>Partages</translation>
-    </message>
-    <message>
         <source>Accounts</source>
         <translation>Comptes</translation>
+    </message>
+    <message>
+        <source>Sound</source>
+        <translation>Son</translation>
     </message>
     <message>
         <source>Plugins</source>

@@ -140,6 +140,7 @@
     <file>PluginLoader.qml</file>
     <file>PluginPreferencePanel.qml</file>
     <file>PreferenceDialog.qml</file>
+    <file>PreferenceModel.qml</file>
     <file>ProgressBar.qml</file>
     <file>RoomConfigurationDialog.qml</file>
     <file>RoomInviteDialog.qml</file>

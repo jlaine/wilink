@@ -136,6 +136,7 @@ if(RELOAD_TRANSLATIONS)
         ../data/PlayerPanel.qml
         ../data/PlayerPlugin.qml
         ../data/PreferenceDialog.qml
+        ../data/PreferenceModel.qml
         ../data/RoomInviteDialog.qml
         ../data/RoomInviteNotification.qml
         ../data/RoomJoinDialog.qml

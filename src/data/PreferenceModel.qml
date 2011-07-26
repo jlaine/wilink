@@ -19,34 +19,24 @@
 
 import QtQuick 1.0
 
-Plugin {
-    name: qsTr('Shares')
-    description: qsTr('This plugin allows you to share documents.')
-    imageSource: 'share.png'
+ListModel {
 
-    onLoaded: {
-        dock.model.append({
-            'iconSource': 'dock-share.png',
-            'iconPress': 'share.png',
-            'panelSource': 'SharePanel.qml',
-            'shortcut': Qt.ControlModifier + Qt.Key_S,
-            'text': qsTr('Shares'),
-            'visible': true});
-        appPreferences.append({
-            'iconSource': 'share.png',
-            'name': qsTr('Shares'),
-            'source': 'SharePreferencePanel.qml'});
-    }
-
-    onUnloaded: {
-        dock.model.removePanel('SharesPanel.qml');
-    }
-
-    Connections {
-        target: appClient
-
-        onConnected: {
-            swapper.addPanel('SharePanel.qml');
-        }
+    Component.onCompleted: {
+        append({
+            'iconSource': 'options.png',
+            'name': qsTr('General'),
+            'source': 'GeneralPreferencePanel.qml'});
+        append({
+            'iconSource': 'peer.png',
+            'name': qsTr('Accounts'),
+            'source': 'AccountPreferencePanel.qml'});
+        append({
+            'iconSource': 'audio-output.png',
+            'name': qsTr('Sound'),
+            'source': 'SoundPreferencePanel.qml'});
+        append({
+            'iconSource': 'plugin.png',
+            'name': qsTr('Plugins'),
+            'source': 'PluginPreferencePanel.qml'});
     }
 }

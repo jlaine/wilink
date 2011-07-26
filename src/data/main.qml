@@ -75,6 +75,10 @@ FocusScope {
         id: appPlugins
     }
 
+    PreferenceModel {
+        id: appPreferences
+    }
+
     Dock {
         id: dock
 

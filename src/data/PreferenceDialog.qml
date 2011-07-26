@@ -85,7 +85,7 @@ Dialog {
                 }
             }
             highlight: Highlight {}
-            model: ListModel {}
+            model: appPreferences
         }
 
         PanelSwapper {
@@ -109,27 +109,6 @@ Dialog {
         }
 
         Component.onCompleted: {
-            tabList.model.append({
-                'iconSource': 'options.png',
-                'name': qsTr('General'),
-                'source': 'GeneralPreferencePanel.qml'});
-            tabList.model.append({
-                'iconSource': 'peer.png',
-                'name': qsTr('Accounts'),
-                'source': 'AccountPreferencePanel.qml'});
-            tabList.model.append({
-                'iconSource': 'audio-output.png',
-                'name': qsTr('Sound'),
-                'source': 'SoundPreferencePanel.qml'});
-            tabList.model.append({
-                'iconSource': 'share.png',
-                'name': qsTr('Shares'),
-                'source': 'SharePreferencePanel.qml'});
-            tabList.model.append({
-                'iconSource': 'plugin.png',
-                'name': qsTr('Plugins'),
-                'source': 'PluginPreferencePanel.qml'});
-
             prefSwapper.showPanel(tabList.model.get(0).source);
         }
     }
