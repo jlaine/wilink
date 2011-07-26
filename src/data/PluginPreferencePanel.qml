@@ -67,7 +67,6 @@ Panel {
                     for (var i = 0; i < appPlugins.model.count; i++) {
                         var plugin = appPlugins.model.get(i);
                         view.model.append({'source': plugin.source,
-                            'locked': plugin.locked == true,
                             'selected': plugin.loaded != undefined});
                     }
                 }
@@ -145,7 +144,6 @@ Panel {
                 anchors.right: parent.right
                 anchors.verticalCenter: image.verticalCenter
                 checked: model.selected
-                enabled: model.locked != true
                 width: 16
                 height: 16
 

@@ -553,6 +553,25 @@ void ApplicationSettings::setChatAccounts(const QStringList &accounts)
     }
 }
 
+/** Returns the list of disabled plugins.
+ */
+QStringList ApplicationSettings::disabledPlugins() const
+{
+    return d->settings->value("DisabledPlugins").toStringList();
+}
+
+/** Sets the list of disabled plugins.
+ *
+ * @param plugins
+ */
+void ApplicationSettings::setDisabledPlugins(const QStringList &plugins)
+{
+    if (plugins != disabledPlugins()) {
+        d->settings->setValue("DisabledPlugins", plugins);
+        emit disabledPluginsChanged(plugins);
+    }
+}
+
 /** Returns the directory where downloaded files are stored.
  */
 QString ApplicationSettings::downloadsLocation() const

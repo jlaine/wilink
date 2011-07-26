@@ -28,12 +28,12 @@ Item {
         id: pluginModel
 
         ListElement { source: 'DebugPlugin.qml' }
-        ListElement { source: 'DiagnosticPlugin.qml'; locked: true }
-        ListElement { source: 'PhotoPlugin.qml'; locked: true }
+        ListElement { source: 'DiagnosticPlugin.qml'; autoload: true }
+        ListElement { source: 'PhotoPlugin.qml'; autoload: true }
         ListElement { source: 'PlayerPlugin.qml' }
         ListElement { source: 'NewsPlugin.qml' }
-        ListElement { source: 'SharePlugin.qml'; locked: true }
-        ListElement { source: 'WifirstPlugin.qml'; locked: true }
+        ListElement { source: 'SharePlugin.qml'; autoload: true }
+        ListElement { source: 'WifirstPlugin.qml'; autoload: true }
     }
 
     function loadPlugin(source) {
@@ -95,20 +95,24 @@ Item {
 
     function storePreferences() {
         // Store preference
-        var plugins = [];
+        var disabledPlugins = [];
+        var enabledPlugins = [];
         for (var i = 0; i < pluginModel.count; i++) {
             var plugin = pluginModel.get(i);
-            if (plugin.locked != true && plugin.loaded != undefined)
-                plugins.push(plugin.source);
+            if (plugin.autoload == true && plugin.loaded == undefined)
+                disabledPlugins.push(plugin.source);
+            else if (plugin.autoload != true && plugin.loaded != undefined)
+                enabledPlugins.push(plugin.source);
         }
-        application.settings.enabledPlugins = plugins;
+        application.settings.disabledPlugins = disabledPlugins;
+        application.settings.enabledPlugins = enabledPlugins;
     }
 
     // FIXME : get / set preferences
     Component.onCompleted: {
         for (var i = 0; i < pluginModel.count; i++) {
             var plugin = pluginModel.get(i);
-            if (plugin.locked)
+            if (plugin.autoload && application.settings.disabledPlugins.indexOf(plugin.source) < 0)
                 loadPlugin(plugin.source);
         }
         for (var i in application.settings.enabledPlugins) {
