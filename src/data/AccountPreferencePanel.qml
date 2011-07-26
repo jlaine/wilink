@@ -66,7 +66,10 @@ Panel {
 
             anchors.fill: accounts.contents
 
-            onAddClicked: panel.state = 'edit'
+            onAddClicked: {
+                panel.state = 'edit';
+                addPanel.forceActiveFocus();
+            }
         }
 
         AccountAddPanel {
