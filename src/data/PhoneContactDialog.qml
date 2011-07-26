@@ -102,7 +102,7 @@ Dialog {
                     anchors.left: phoneLabel.right
                     anchors.right: parent.right
                     validator: RegExpValidator {
-                        regExp: /[0-9]{1,30}/
+                        regExp: /.{1,30}/
                     }
                 }
             }
