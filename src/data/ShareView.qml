@@ -67,16 +67,15 @@ Item {
                 height: appStyle.icon.smallSize
                 smooth: true
                 source: model.isDir ? (model.node.length ? 'album.png' : 'peer.png') : 'file.png'
+            }
 
-/*
-                Bubble {
-                    anchors.top: parent.top
-                    anchors.left: parent.left
-                    anchors.margins: 4
-                    opacity: model.popularity > 0 ? 1 : 0
-                    text: model.popularity > 0 ? model.popularity : ''
-                }
-*/
+            Image {
+                id: fire
+
+                anchors.fill: thumbnail
+                source: 'fire.png'
+                smooth: true
+                visible: model.popularity > 10
             }
 
             Item {
