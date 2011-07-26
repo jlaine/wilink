@@ -71,6 +71,7 @@ RoomSubjectDialog 1.0 RoomSubjectDialog.qml
 RosterView 1.0 RosterView.qml
 ScrollBar 1.0 ScrollBar.qml
 SharePanel 1.0 SharePanel.qml
+SharePlugin 1.0 SharePlugin.qml
 SharePreferencePanel 1.0 SharePreferencePanel.qml
 ShareQueueView 1.0 ShareQueueView.qml
 ShareView 1.0 ShareView.qml

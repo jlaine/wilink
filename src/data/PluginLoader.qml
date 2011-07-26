@@ -32,6 +32,7 @@ Item {
         ListElement { source: 'PhotoPlugin.qml'; locked: true }
         ListElement { source: 'PlayerPlugin.qml' }
         ListElement { source: 'NewsPlugin.qml' }
+        ListElement { source: 'SharePlugin.qml'; locked: true }
         ListElement { source: 'WifirstPlugin.qml'; locked: true }
     }
 

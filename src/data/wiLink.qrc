@@ -153,6 +153,7 @@
     <file>RosterView.qml</file>
     <file>ScrollBar.qml</file>
     <file>SharePanel.qml</file>
+    <file>SharePlugin.qml</file>
     <file>SharePreferencePanel.qml</file>
     <file>ShareQueueView.qml</file>
     <file>ShareView.qml</file>

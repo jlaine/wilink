@@ -110,33 +110,6 @@ Rectangle {
             }
         }
 
-        DockButton {
-            id: shareButton
-
-            iconSource: 'dock-share.png'
-            iconPress: 'share.png'
-            panelSource: 'SharePanel.qml'
-            shortcut: Qt.ControlModifier + Qt.Key_S
-            text: qsTr('Shares')
-            visible: appClient.shareServer != ''
-
-            onClicked: {
-                if (visible) {
-                    swapper.showPanel(panelSource);
-                }
-            }
-
-            Connections {
-                target: appClient
-
-                onConnected: {
-                    if (visible) {
-                        swapper.addPanel(shareButton.panelSource);
-                    }
-                }
-            }
-        }
-
         Repeater {
             id: repeater
 

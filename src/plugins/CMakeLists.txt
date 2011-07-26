@@ -144,11 +144,12 @@ if(RELOAD_TRANSLATIONS)
         ../data/RoomParticipantView.qml
         ../data/RoomPermissionDialog.qml
         ../data/RoomSubjectDialog.qml
-        ../data/SharePreferencePanel.qml
-        ../data/SoundPreferencePanel.qml
         ../data/SharePanel.qml
+        ../data/SharePlugin.qml
+        ../data/SharePreferencePanel.qml
         ../data/ShareQueueView.qml
         ../data/ShareView.qml
+        ../data/SoundPreferencePanel.qml
         ../data/StatusBar.qml
         ../data/TransferNotification.qml
         ../data/TransferWidget.qml

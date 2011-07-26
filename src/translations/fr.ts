@@ -372,10 +372,6 @@ Acceptez-vous?</translation>
         <translation>Téléphone</translation>
     </message>
     <message>
-        <source>Shares</source>
-        <translation>Partages</translation>
-    </message>
-    <message>
         <source>Chat</source>
         <translation>Chat</translation>
     </message>
@@ -906,6 +902,17 @@ Acceptez-vous?</translation>
     <message>
         <source>Home</source>
         <translation>Accueil</translation>
+    </message>
+</context>
+<context>
+    <name>SharePlugin</name>
+    <message>
+        <source>Shares</source>
+        <translation>Partages</translation>
+    </message>
+    <message>
+        <source>This plugin allows you to share documents.</source>
+        <translation>Ce module vous permet de partager des documents.</translation>
     </message>
 </context>
 <context>
