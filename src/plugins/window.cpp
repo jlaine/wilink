@@ -148,6 +148,6 @@ void Window::setFullScreen(bool fullScreen)
     if (fullScreen)
         setWindowState(windowState() | Qt::WindowFullScreen);
     else
-        setWindowState(windowState() ^ Qt::WindowFullScreen);
+        setWindowState(windowState() & ~Qt::WindowFullScreen);
 }
 
