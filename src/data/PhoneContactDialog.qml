@@ -75,7 +75,7 @@ Dialog {
                     anchors.right: parent.right
                     focus: false
                     validator: RegExpValidator {
-                        regExp: /.+/
+                        regExp: /.{1,30}/
                     }
                 }
             }
@@ -102,7 +102,7 @@ Dialog {
                     anchors.left: phoneLabel.right
                     anchors.right: parent.right
                     validator: RegExpValidator {
-                        regExp: /.+/
+                        regExp: /[0-9]{1,30}/
                     }
                 }
             }
