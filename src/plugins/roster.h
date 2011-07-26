@@ -177,10 +177,10 @@ public slots:
     bool get(const QString &jid, QXmppVCardIq *iq = 0);
 
 private slots:
-    void clientDestroyed(QObject *object);
-    void discoveryInfoReceived(const QXmppDiscoveryIq &disco);
-    void presenceReceived(const QXmppPresence &presence);
-    void vCardReceived(const QXmppVCardIq&);
+    void _q_clientDestroyed(QObject *object);
+    void _q_discoveryInfoReceived(const QXmppDiscoveryIq &disco);
+    void _q_presenceReceived(const QXmppPresence &presence);
+    void _q_vCardReceived(const QXmppVCardIq&);
 
 private:
     VCardCache(QObject *parent = 0);

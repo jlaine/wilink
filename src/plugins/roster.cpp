@@ -665,7 +665,7 @@ void VCardCache::addClient(ChatClient *client)
         return;
 
     check = connect(client, SIGNAL(destroyed(QObject*)),
-                    this, SLOT(clientDestroyed(QObject*)));
+                    this, SLOT(_q_clientDestroyed(QObject*)));
     Q_ASSERT(check);
 
     check = connect(client, SIGNAL(disconnected()),
@@ -673,7 +673,7 @@ void VCardCache::addClient(ChatClient *client)
     Q_ASSERT(check);
 
     check = connect(client, SIGNAL(presenceReceived(QXmppPresence)),
-                    this, SLOT(presenceReceived(QXmppPresence)));
+                    this, SLOT(_q_presenceReceived(QXmppPresence)));
     Q_ASSERT(check);
 
     check = connect(client->rosterManager(), SIGNAL(itemAdded(QString)),
@@ -685,22 +685,48 @@ void VCardCache::addClient(ChatClient *client)
     Q_ASSERT(check);
 
     check = connect(&client->vCardManager(), SIGNAL(vCardReceived(QXmppVCardIq)),
-                    this, SLOT(vCardReceived(QXmppVCardIq)));
+                    this, SLOT(_q_vCardReceived(QXmppVCardIq)));
     Q_ASSERT(check);
 
     check = connect(client->discoveryManager(), SIGNAL(infoReceived(QXmppDiscoveryIq)),
-                    this, SLOT(discoveryInfoReceived(QXmppDiscoveryIq)));
+                    this, SLOT(_q_discoveryInfoReceived(QXmppDiscoveryIq)));
     Q_ASSERT(check);
 
     d->clients << client;
 }
 
-void VCardCache::clientDestroyed(QObject *object)
+QXmppPresence::Status::Type VCardCache::presenceStatus(const QString &jid) const
+{
+    QXmppPresence::Status::Type statusType = QXmppPresence::Status::Offline;
+
+    foreach (ChatClient *client, d->clients) {
+        // NOTE : we test the connection status, otherwise we encounter a race
+        // condition upon disconnection, because the roster has not yet been cleared
+        if (!client->isConnected())
+            continue;
+
+        foreach (const QXmppPresence &presence, client->rosterManager()->getAllPresencesForBareJid(jid)) {
+            QXmppPresence::Status::Type type = presence.status().type();
+            if (type == QXmppPresence::Status::Offline)
+                continue;
+            // FIXME : we should probably be using the priority rather than
+            // stop at the first available contact
+            else if (type == QXmppPresence::Status::Online ||
+                     type == QXmppPresence::Status::Chat)
+                return type;
+            else
+                statusType = type;
+        }
+    }
+    return statusType;
+}
+
+void VCardCache::_q_clientDestroyed(QObject *object)
 {
     d->clients.removeAll(static_cast<ChatClient*>(object));
 }
 
-void VCardCache::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
+void VCardCache::_q_discoveryInfoReceived(const QXmppDiscoveryIq &disco)
 {
     const QString jid = disco.from();
     if (!d->discoQueue.remove(jid) || disco.type() != QXmppIq::Result)
@@ -732,7 +758,7 @@ void VCardCache::discoveryInfoReceived(const QXmppDiscoveryIq &disco)
     emit discoChanged(jidToBareJid(jid));
 }
 
-void VCardCache::presenceReceived(const QXmppPresence &presence)
+void VCardCache::_q_presenceReceived(const QXmppPresence &presence)
 {
     const QString jid = presence.from();
     if (jidToResource(jid).isEmpty())
@@ -745,34 +771,7 @@ void VCardCache::presenceReceived(const QXmppPresence &presence)
     emit presenceChanged(jidToBareJid(jid));
 }
 
-QXmppPresence::Status::Type VCardCache::presenceStatus(const QString &jid) const
-{
-    QXmppPresence::Status::Type statusType = QXmppPresence::Status::Offline;
-
-    foreach (ChatClient *client, d->clients) {
-        // NOTE : we test the connection status, otherwise we encounter a race
-        // condition upon disconnection, because the roster has not yet been cleared
-        if (!client->isConnected())
-            continue;
-
-        foreach (const QXmppPresence &presence, client->rosterManager()->getAllPresencesForBareJid(jid)) {
-            QXmppPresence::Status::Type type = presence.status().type();
-            if (type == QXmppPresence::Status::Offline)
-                continue;
-            // FIXME : we should probably be using the priority rather than
-            // stop at the first available contact
-            else if (type == QXmppPresence::Status::Online ||
-                     type == QXmppPresence::Status::Chat)
-                return type;
-            else
-                statusType = type;
-        }
-    }
-    return statusType;
-}
-
-
-void VCardCache::vCardReceived(const QXmppVCardIq& vCard)
+void VCardCache::_q_vCardReceived(const QXmppVCardIq& vCard)
 {
     const QString jid = vCard.from();
     if (!d->vcardQueue.remove(jid))
