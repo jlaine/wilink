@@ -39,7 +39,7 @@ Plugin {
     }
 
     onUnloaded: {
-        dock.model.removePanel('SharesPanel.qml');
+        dock.model.removePanel('SharePanel.qml');
     }
 
     Connections {
