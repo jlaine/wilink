@@ -78,9 +78,21 @@ FocusScope {
 
         onPressed: {
             var pos = mapToItem(menuLoader.parent, mouse.x, mouse.y);
-            menuLoader.source = 'InputMenu.qml';
-            menuLoader.item.target = edit;
-            menuLoader.show(pos.x, pos.y);
+            var component = Qt.createComponent('InputMenu.qml');
+
+            function finishCreation() {
+                if (component.status != Component.Ready)
+                    return;
+
+                menuLoader.sourceComponent = component;
+                menuLoader.item.target = edit;
+                menuLoader.show(pos.x, pos.y);
+            }
+
+            if (component.status == Component.Ready)
+                finishCreation();
+            else
+                component.statusChanged.connect(finishCreation);
         }
     }
 
