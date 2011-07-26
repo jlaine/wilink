@@ -50,16 +50,14 @@ Window::Window(const QUrl &url, const QString &jid, QWidget *parent)
     // create declarative view
     QDeclarativeView *view = new QDeclarativeView;
     view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
+    check = connect(view, SIGNAL(statusChanged(QDeclarativeView::Status)),
+                    this, SLOT(_q_statusChanged()));
+    Q_ASSERT(check);
 
     // load plugin
     Plugin plugin;
     plugin.registerTypes("wiLink");
     plugin.initializeEngine(view->engine(), "wiLink");
-
-    view->setAttribute(Qt::WA_OpaquePaintEvent);
-    view->setAttribute(Qt::WA_NoSystemBackground);
-    view->viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
-    view->viewport()->setAttribute(Qt::WA_NoSystemBackground);
 
     QDeclarativeContext *context = view->rootContext();
     context->setContextProperty("application", wApp);
@@ -151,3 +149,14 @@ void Window::setFullScreen(bool fullScreen)
         setWindowState(windowState() & ~Qt::WindowFullScreen);
 }
 
+void Window::_q_statusChanged()
+{
+    QDeclarativeView *view = qobject_cast<QDeclarativeView*>(sender());
+    if (!view || view->status() != QDeclarativeView::Ready)
+        return;
+
+    view->setAttribute(Qt::WA_OpaquePaintEvent);
+    view->setAttribute(Qt::WA_NoSystemBackground);
+    view->viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
+    view->viewport()->setAttribute(Qt::WA_NoSystemBackground);
+}

@@ -47,6 +47,9 @@ public slots:
     void alert();
     QFileDialog *fileDialog();
 
+private slots:
+    void _q_statusChanged();
+
 protected:
     void changeEvent(QEvent *event);
 };
