@@ -443,16 +443,14 @@ QString VCard::jid() const
  */
 QString VCard::jidForFeature(Feature feature) const
 {
-    if (m_jid.isEmpty() || !m_cache)
-        return m_jid;
+    if (m_jid.isEmpty() || !m_cache || !jidToResource(m_jid).isEmpty())
+        return QString();
 
-    if (jidToResource(m_jid).isEmpty()) {
-        foreach (const QString &key, m_cache->d->features.keys()) {
-            if (jidToBareJid(key) == m_jid && (m_cache->d->features.value(key) & feature))
-                return key;
-        }
+    foreach (const QString &key, m_cache->d->features.keys()) {
+        if (jidToBareJid(key) == m_jid && (m_cache->d->features.value(key) & feature))
+            return key;
     }
-    return m_jid;
+    return QString();
 }
 
 void VCard::setJid(const QString &jid)
