@@ -4,6 +4,7 @@ wiLink 2.1.0 (UNRELEASED)
  * Calls:
   - Add support for vp8 codec.
   - Add full-screen mode.
+  - Handle ungraceful call termination.
  * Conversations:
   - Make it possible to clear chat history.
  * News:
