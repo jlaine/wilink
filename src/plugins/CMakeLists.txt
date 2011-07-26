@@ -132,6 +132,7 @@ if(RELOAD_TRANSLATIONS)
         ../data/PhotoAlbumDialog.qml
         ../data/PhotoDeleteDialog.qml
         ../data/PhotoPanel.qml
+        ../data/PhotoPlugin.qml
         ../data/PlayerPanel.qml
         ../data/PlayerPlugin.qml
         ../data/PreferenceDialog.qml

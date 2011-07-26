@@ -137,28 +137,12 @@ Rectangle {
             }
         }
 
-        DockButton {
-            property string domain: Utils.jidToDomain(appClient.jid)
-
-            iconSource: 'dock-photo.png'
-            iconPress: 'photos.png'
-            panelSource: 'PhotoPanel.qml'
-            shortcut: Qt.ControlModifier + Qt.Key_P
-            text: qsTr('Photos')
-            visible: domain == 'wifirst.net' || domain == 'gmail.com'
-
-            onClicked: {
-                if (domain == 'wifirst.net')
-                    swapper.showPanel(panelSource, {'url': 'wifirst://www.wifirst.net/w'});
-                else if (domain == 'gmail.com')
-                    swapper.showPanel(panelSource, {'url': 'picasa://default'});
-            }
-        }
-
         Repeater {
             id: repeater
 
             model: ListModel {
+                id: listModel
+
                 function removePanel(source) {
                     for (var i = 0; i < repeater.model.count; i++) {
                         if (repeater.model.get(i).panelSource == source) {
@@ -171,6 +155,8 @@ Rectangle {
             }
 
             delegate: DockButton {
+                id: button
+
                 iconSource: model.iconSource
                 iconPress: model.iconPress
                 panelSource: model.panelSource
@@ -180,7 +166,8 @@ Rectangle {
 
                 onClicked: {
                     visible = true;
-                    swapper.showPanel(panelSource);
+                    var model = listModel.get(index);
+                    swapper.showPanel(model.panelSource, model.panelProperties);
                 }
             }
         }

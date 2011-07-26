@@ -372,10 +372,6 @@ Acceptez-vous?</translation>
         <translation>Téléphone</translation>
     </message>
     <message>
-        <source>Photos</source>
-        <translation>Photos</translation>
-    </message>
-    <message>
         <source>Shares</source>
         <translation>Partages</translation>
     </message>
@@ -659,6 +655,17 @@ Acceptez-vous?</translation>
     <message>
         <source>All files</source>
         <translation>Tous les fichiers</translation>
+    </message>
+</context>
+<context>
+    <name>PhotoPlugin</name>
+    <message>
+        <source>Photos</source>
+        <translation>Photos</translation>
+    </message>
+    <message>
+        <source>This plugin allows you to access your photos.</source>
+        <translation>Ce module vous permet d&apos;accéder à vos photos.</translation>
     </message>
 </context>
 <context>

@@ -51,6 +51,7 @@ PhonePanel 1.0 PhonePanel.qml
 PhotoAlbumDialog 1.0 PhotoAlbumDialog.qml
 PhotoDeleteDialog 1.0 PhotoDeleteDialog.qml
 PhotoPanel 1.0 PhotoPanel.qml
+PhotoPlugin 1.0 PhotoPlugin.qml
 PlayerPanel 1.0 PlayerPanel.qml
 PlayerPlugin 1.0 PlayerPlugin.qml
 Plugin 1.0 Plugin.qml
