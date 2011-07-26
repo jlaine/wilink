@@ -147,6 +147,7 @@ signals:
 public slots:
     void addCall(SipCall *call);
     bool call(const QString &address);
+    void clear();
     void hangup();
     void removeCall(int id);
     void startTone(int tone);

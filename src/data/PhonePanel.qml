@@ -135,6 +135,15 @@ Panel {
                         historyModel.call(address);
                     }
                 }
+
+                ToolButton {
+                    iconSource: 'clear.png'
+                    text: qsTr('Clear')
+
+                    onClicked: {
+                        historyModel.clear();
+                    }
+                }
             }
         }
 

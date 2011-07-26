@@ -585,6 +585,12 @@ void PhoneHistoryModel::callTick()
         m_ticker->stop();
 }
 
+void PhoneHistoryModel::clear()
+{
+    foreach (PhoneHistoryItem *item, m_items)
+        removeCall(item->id);
+}
+
 /** Returns the underlying SIP client.
  *
  * \note Use with care as the SIP client lives in a different thread!

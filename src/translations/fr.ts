@@ -594,6 +594,10 @@ Acceptez-vous?</translation>
         <source>Voicemail</source>
         <translation>Messagerie</translation>
     </message>
+    <message>
+        <source>Clear</source>
+        <translation>Effacer</translation>
+    </message>
 </context>
 <context>
     <name>PhotoAlbumDialog</name>
