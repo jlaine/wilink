@@ -129,7 +129,7 @@ public:
 
 signals:
     void avatarChanged(const QUrl &avatar);
-    void featuresChanged(Features features);
+    void featuresChanged();
     void jidChanged(const QString &jid);
     void nameChanged(const QString &name);
     void nickNameChanged(const QString &nickName);

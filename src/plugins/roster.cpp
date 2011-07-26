@@ -412,8 +412,7 @@ public:
 
 VCard::VCard(QObject *parent)
     : QObject(parent),
-    m_cache(0),
-    m_features(0)
+    m_cache(0)
 {
 #ifdef DEBUG_ROSTER
     qDebug("creating vcard %s", qPrintable(jid));
@@ -427,9 +426,9 @@ QUrl VCard::avatar() const
 
 VCard::Features VCard::features() const
 {
-    if (!m_features && !m_jid.isEmpty() && m_cache)
+    if (!m_jid.isEmpty() && m_cache)
         return m_cache->features(m_jid);
-    return m_features;
+    return 0;
 }
 
 QString VCard::jid() const
@@ -462,8 +461,7 @@ void VCard::setJid(const QString &jid)
         update();
 
         // reset features
-        m_features = 0;
-        emit featuresChanged(m_features);
+        emit featuresChanged();
         emit statusChanged();
     }
 }
@@ -559,13 +557,8 @@ void VCard::_q_cardChanged(const QString &jid)
 
 void VCard::_q_discoChanged(const QString &jid)
 {
-    if (jid == m_jid && m_cache) {
-        Features newFeatures = m_cache->features(m_jid);
-        if (newFeatures != m_features) {
-            m_features = newFeatures;
-            emit featuresChanged(m_features);
-        }
-    }
+    if (jid == m_jid)
+        emit featuresChanged();
 }
 
 void VCard::_q_presenceChanged(const QString &jid)
