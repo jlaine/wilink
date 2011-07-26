@@ -54,6 +54,7 @@ generate_png(png
     favorite-active.svg
     favorite-inactive.svg
     file.svg
+    fire.svg
     forward.svg
     fullscreen.svg
     hangup.svg
