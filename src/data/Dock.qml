@@ -155,19 +155,6 @@ Rectangle {
             }
         }
 
-        DockButton {
-            id: preferenceButton
-
-            iconSource: 'dock-options.png'
-            iconPress: 'options.png'
-            panelSource: 'PreferenceDialog.qml'
-            text: qsTr('Preferences')
-            visible: true
-            onClicked: {
-                dialogSwapper.showPanel(panelSource);
-            }
-        }
-
         Repeater {
             id: repeater
 
@@ -195,6 +182,19 @@ Rectangle {
                     visible = true;
                     swapper.showPanel(panelSource);
                 }
+            }
+        }
+
+        DockButton {
+            id: preferenceButton
+
+            iconSource: 'dock-options.png'
+            iconPress: 'options.png'
+            panelSource: 'PreferenceDialog.qml'
+            text: qsTr('Preferences')
+            visible: true
+            onClicked: {
+                dialogSwapper.showPanel(panelSource);
             }
         }
     }
