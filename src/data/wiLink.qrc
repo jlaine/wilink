@@ -130,6 +130,7 @@
     <file>PhoneHistoryView.qml</file>
     <file>PhoneNotification.qml</file>
     <file>PhonePanel.qml</file>
+    <file>PhonePlugin.qml</file>
     <file>PhotoAlbumDialog.qml</file>
     <file>PhotoDeleteDialog.qml</file>
     <file>PhotoPanel.qml</file>

@@ -75,41 +75,6 @@ Rectangle {
             }
         }
 
-        DockButton {
-            id: phoneButton
-
-            iconSource: 'dock-phone.png'
-            iconPress: 'phone.png'
-            panelSource: 'PhonePanel.qml'
-            shortcut: Qt.ControlModifier + Qt.Key_T
-            text: qsTr('Phone')
-            visible: Utils.jidToDomain(appClient.jid) == 'wifirst.net'
-
-            onClicked: {
-                if (visible) {
-                    var panel = swapper.findPanel(panelSource);
-                    if (panel == swapper.currentItem) {
-                        if (panel.state == 'no-sidebar')
-                            panel.state = '';
-                        else
-                            panel.state = 'no-sidebar';
-                    } else {
-                        swapper.setCurrentItem(panel);
-                    }
-                }
-            }
-
-            Connections {
-                target: appClient
-
-                onConnected: {
-                    if (visible) {
-                        swapper.addPanel(phoneButton.panelSource);
-                    }
-                }
-            }
-        }
-
         Repeater {
             id: repeater
 
@@ -140,7 +105,15 @@ Rectangle {
                 onClicked: {
                     visible = true;
                     var model = listModel.get(index);
-                    swapper.showPanel(model.panelSource, model.panelProperties);
+                    var panel = swapper.findPanel(model.panelSource, model.panelProperties);
+                    if (panel == swapper.currentItem) {
+                        if (panel.state == 'no-sidebar')
+                            panel.state = '';
+                        else
+                            panel.state = 'no-sidebar';
+                    } else {
+                        swapper.showPanel(model.panelSource, model.panelProperties);
+                    }
                 }
             }
         }

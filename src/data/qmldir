@@ -48,6 +48,7 @@ PhoneContactView 1.0 PhoneContactView.qml
 PhoneHistoryView 1.0 PhoneHistoryView.qml
 PhoneNotification 1.0 PhoneNotification.qml
 PhonePanel 1.0 PhonePanel.qml
+PhonePlugin 1.0 PhonePlugin.qml
 PhotoAlbumDialog 1.0 PhotoAlbumDialog.qml
 PhotoDeleteDialog 1.0 PhotoDeleteDialog.qml
 PhotoPanel 1.0 PhotoPanel.qml

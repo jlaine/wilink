@@ -368,10 +368,6 @@ Acceptez-vous?</translation>
 <context>
     <name>Dock</name>
     <message>
-        <source>Phone</source>
-        <translation>Téléphone</translation>
-    </message>
-    <message>
         <source>Chat</source>
         <translation>Chat</translation>
     </message>
@@ -586,6 +582,17 @@ Acceptez-vous?</translation>
     <message>
         <source>Clear</source>
         <translation>Effacer</translation>
+    </message>
+</context>
+<context>
+    <name>PhonePlugin</name>
+    <message>
+        <source>Phone</source>
+        <translation>Téléphone</translation>
+    </message>
+    <message>
+        <source>This plugin allows you to make phone calls.</source>
+        <translation>Ce module vous permet de passer des appels téléphoniques.</translation>
     </message>
 </context>
 <context>

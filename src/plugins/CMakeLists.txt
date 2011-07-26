@@ -129,6 +129,7 @@ if(RELOAD_TRANSLATIONS)
         ../data/PhoneHistoryView.qml
         ../data/PhoneNotification.qml
         ../data/PhonePanel.qml
+        ../data/PhonePlugin.qml
         ../data/PhotoAlbumDialog.qml
         ../data/PhotoDeleteDialog.qml
         ../data/PhotoPanel.qml

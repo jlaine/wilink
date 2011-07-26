@@ -29,6 +29,7 @@ Item {
 
         ListElement { source: 'DebugPlugin.qml' }
         ListElement { source: 'DiagnosticPlugin.qml'; autoload: true }
+        ListElement { source: 'PhonePlugin.qml'; autoload: true }
         ListElement { source: 'PhotoPlugin.qml'; autoload: true }
         ListElement { source: 'PlayerPlugin.qml' }
         ListElement { source: 'NewsPlugin.qml' }
