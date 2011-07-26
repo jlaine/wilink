@@ -190,6 +190,18 @@ Acceptez-vous?</translation>
         <source>My contacts</source>
         <translation>Mes contacts</translation>
     </message>
+    <message>
+        <source>Show profile</source>
+        <translation>Accéder au profil</translation>
+    </message>
+    <message>
+        <source>Rename contact</source>
+        <translation>Renommer contact</translation>
+    </message>
+    <message>
+        <source>Remove contact</source>
+        <translation>Retirer contact</translation>
+    </message>
 </context>
 <context>
     <name>ContactAddDialog</name>
@@ -219,21 +231,6 @@ Acceptez-vous?</translation>
     <message>
         <source>Invitation from %1</source>
         <translation>Invitation de %1</translation>
-    </message>
-</context>
-<context>
-    <name>ContactMenu</name>
-    <message>
-        <source>Show profile</source>
-        <translation>Accéder au profil</translation>
-    </message>
-    <message>
-        <source>Rename contact</source>
-        <translation>Renommer contact</translation>
-    </message>
-    <message>
-        <source>Remove contact</source>
-        <translation>Retirer contact</translation>
     </message>
 </context>
 <context>

@@ -13,7 +13,6 @@ CheckBox 1.0 CheckBox.qml
 ComboBox 1.0 ComboBox.qml
 ContactAddDialog 1.0 ContactAddDialog.qml
 ContactAddNotification 1.0 ContactAddNotification.qml
-ContactMenu 1.0 ContactMenu.qml
 ContactRemoveDialog 1.0 ContactRemoveDialog.qml
 ContactRenameDialog 1.0 ContactRenameDialog.qml
 ConversationPanel 1.0 ConversationPanel.qml

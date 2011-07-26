@@ -108,7 +108,6 @@ if(RELOAD_TRANSLATIONS)
         ../data/ChatPanel.qml
         ../data/ContactAddDialog.qml
         ../data/ContactAddNotification.qml
-        ../data/ContactMenu.qml
         ../data/ContactRenameDialog.qml
         ../data/ContactRemoveDialog.qml
         ../data/ConversationPanel.qml

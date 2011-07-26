@@ -182,7 +182,7 @@ Panel {
 
             onItemContextMenu: {
                 var pos = mapToItem(menuLoader.parent, point.x, point.y);
-                menuLoader.source = 'ContactMenu.qml';
+                menuLoader.sourceComponent = contactMenu;
                 menuLoader.item.jid = model.jid;
                 menuLoader.show(pos.x, pos.y);
             }
@@ -271,5 +271,50 @@ Panel {
 
     transitions: Transition {
         PropertyAnimation { target: sidebar; properties: 'width'; duration: appStyle.animation.normalDuration }
+    }
+
+    Component {
+        id: contactMenu
+        Menu {
+            id: menu
+
+            property alias jid: vcard.jid
+            property bool profileEnabled: (vcard.url != undefined && vcard.url != '')
+
+            onProfileEnabledChanged: menu.model.setProperty(0, 'enabled', profileEnabled)
+
+            VCard {
+                id: vcard
+            }
+
+            onItemClicked: {
+                var item = menu.model.get(index);
+                if (item.action == 'profile') {
+                    Qt.openUrlExternally(vcard.url);
+                } else if (item.action == 'rename') {
+                    dialogSwapper.showPanel('ContactRenameDialog.qml', {'jid': jid});
+                } else if (item.action == 'remove') {
+                    dialogSwapper.showPanel('ContactRemoveDialog.qml', {'jid': jid});
+                }
+            }
+
+            Component.onCompleted: {
+                menu.model.append({
+                    'action': 'profile',
+                    'enabled': profileEnabled,
+                    'icon': 'information.png',
+                    'text': qsTr('Show profile')});
+                menu.model.append({
+                    'action': 'rename',
+                    'icon': 'options.png',
+                    'name': model.name,
+                    'text': qsTr('Rename contact')});
+                menu.model.append({
+                    'action': 'remove',
+                    'icon': 'remove.png',
+                    'name': model.name,
+                    'text': qsTr('Remove contact')});
+            }
+        }
     }
 }
