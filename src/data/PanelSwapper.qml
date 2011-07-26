@@ -45,14 +45,22 @@ FocusScope {
         // otherwise create the panel
         console.log("PanelSwapper creating panel " + source + " " + Utils.dumpProperties(properties));
         var component = Qt.createComponent(source);
-        if (component.status == Component.Ready)
-            finishCreation();
-        else
+        if (component.status == Component.Loading)
             component.statusChanged.connect(finishCreation);
+        else
+            finishCreation();
 
         function finishCreation() {
-            if (component.status != Component.Ready)
+            switch (component.status) {
+            case Component.Error:
+                console.log("PanelSwapper could not create panel " + source);
+                console.log(component.errorString());
                 return;
+            case Component.Ready:
+                break;
+            default:
+                return;
+            }
 
             // FIXME: when Qt Quick 1.1 becomes available,
             // let createObject assign the properties itself.
