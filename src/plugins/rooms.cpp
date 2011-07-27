@@ -223,6 +223,10 @@ void RoomListModel::setClient(ChatClient *client)
 
             check = connect(client->mucManager(), SIGNAL(roomAdded(QXmppMucRoom*)),
                             this, SLOT(_q_roomAdded(QXmppMucRoom*)));
+            Q_ASSERT(check);
+
+            if (bookmarkManager->areBookmarksReceived())
+                _q_bookmarksReceived();
         }
 
         emit clientChanged(m_client);
