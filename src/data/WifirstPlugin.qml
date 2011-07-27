@@ -18,6 +18,7 @@
  */
 
 import QtQuick 1.0
+import QXmpp 0.4
 import 'utils.js' as Utils
 
 Plugin {
@@ -70,9 +71,6 @@ Plugin {
 
         repeat: false
         onTriggered: {
-            if (Utils.jidToDomain(appClient.jid) != 'wifirst.net')
-                return;
-
             if (listModel.source == '') {
                 listModel.source = 'https://www.wifirst.net/wilink/menu/1';
             } else {
@@ -81,9 +79,17 @@ Plugin {
         }
     }
 
-    Connections {
-        target: appClient
-        onConnected: timer.triggered()
+    onLoaded: {
+        if (Utils.jidToDomain(appClient.jid) != 'wifirst.net')
+            return;
+
+        if (appClient.state == QXmppClient.ConnectedState) {
+            timer.triggered();
+        } else {
+            appClient.connected.connect(function() {
+                timer.triggered();
+            });
+        }
     }
 }
 
