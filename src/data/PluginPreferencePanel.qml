@@ -103,7 +103,7 @@ Panel {
                 id: image
                 anchors.top: parent.top
                 anchors.left: parent.left
-                source: plugin.imageSource
+                source: Qt.isQtObject(plugin) ? plugin.imageSource : 'plugin.png'
             }
 
             Text {
@@ -116,7 +116,7 @@ Panel {
                 anchors.rightMargin: appStyle.spacing.horizontal
                 elide: Text.ElideRight
                 font.bold: true
-                text: plugin.name
+                text: Qt.isQtObject(plugin) ? plugin.name : ''
             }
 
             Text {
@@ -158,7 +158,7 @@ Panel {
 
                 PropertyChanges {
                     target: descriptionLabel
-                    text: plugin.description
+                    text: Qt.isQtObject(plugin) ? plugin.description : ''
                     visible: true
                 }
 
