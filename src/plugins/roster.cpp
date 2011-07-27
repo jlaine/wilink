@@ -230,24 +230,27 @@ void RosterModel::setClient(ChatClient *client)
         Q_ASSERT(check);
 
         check = connect(d->client->rosterManager(), SIGNAL(itemAdded(QString)),
-                        this, SLOT(itemAdded(QString)));
+                        this, SLOT(_q_itemAdded(QString)));
         Q_ASSERT(check);
 
         check = connect(d->client->rosterManager(), SIGNAL(itemRemoved(QString)),
-                        this, SLOT(itemRemoved(QString)));
+                        this, SLOT(_q_itemRemoved(QString)));
         Q_ASSERT(check);
 
         check = connect(d->client->rosterManager(), SIGNAL(presenceChanged(QString,QString)),
-                        this, SLOT(itemChanged(QString)));
+                        this, SLOT(_q_itemChanged(QString)));
         Q_ASSERT(check);
 
         check = connect(VCardCache::instance(), SIGNAL(cardChanged(QString)),
-                        this, SLOT(itemChanged(QString)));
+                        this, SLOT(_q_itemChanged(QString)));
         Q_ASSERT(check);
 
         check = connect(d->client->rosterManager(), SIGNAL(rosterReceived()),
-                        this, SLOT(rosterReceived()));
+                        this, SLOT(_q_rosterReceived()));
         Q_ASSERT(check);
+
+        if (client->state() == QXmppClient::ConnectedState)
+            _q_rosterReceived();
 
         emit clientChanged(d->client);
     }
@@ -311,7 +314,7 @@ void RosterModel::_q_disconnected()
 
 /** Handles an item being added to the roster.
  */
-void RosterModel::itemAdded(const QString &jid)
+void RosterModel::_q_itemAdded(const QString &jid)
 {
     RosterItem *item = d->find(jid);
     if (item)
@@ -327,7 +330,7 @@ void RosterModel::itemAdded(const QString &jid)
 
 /** Handles an item being changed in the roster.
  */
-void RosterModel::itemChanged(const QString &jid)
+void RosterModel::_q_itemChanged(const QString &jid)
 {
     RosterItem *item = d->find(jid);
     if (item)
@@ -336,14 +339,14 @@ void RosterModel::itemChanged(const QString &jid)
 
 /** Handles an item being removed from the roster.
  */
-void RosterModel::itemRemoved(const QString &jid)
+void RosterModel::_q_itemRemoved(const QString &jid)
 {
     RosterItem *item = d->find(jid);
     if (item)
         removeItem(item);
 }
 
-void RosterModel::rosterReceived()
+void RosterModel::_q_rosterReceived()
 {
     // make a note of existing contacts
     QStringList oldJids;
@@ -354,7 +357,7 @@ void RosterModel::rosterReceived()
 
     // process received entries
     foreach (const QString &jid, d->client->rosterManager()->getRosterBareJids()) {
-        itemAdded(jid);
+        _q_itemAdded(jid);
         oldJids.removeAll(jid);
     }
 

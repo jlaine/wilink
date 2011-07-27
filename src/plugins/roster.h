@@ -84,10 +84,10 @@ public slots:
 private slots:
     void _q_connected();
     void _q_disconnected();
-    void itemAdded(const QString &jid);
-    void itemChanged(const QString &jid);
-    void itemRemoved(const QString &jid);
-    void rosterReceived();
+    void _q_itemAdded(const QString &jid);
+    void _q_itemChanged(const QString &jid);
+    void _q_itemRemoved(const QString &jid);
+    void _q_rosterReceived();
 
 private:
     friend class RosterModelPrivate;
