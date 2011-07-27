@@ -226,7 +226,7 @@ void RoomListModel::setClient(ChatClient *client)
             Q_ASSERT(check);
 
             if (bookmarkManager->areBookmarksReceived())
-                _q_bookmarksReceived();
+                QMetaObject::invokeMethod(this, "_q_bookmarksReceived", Qt::QueuedConnection);
         }
 
         emit clientChanged(m_client);

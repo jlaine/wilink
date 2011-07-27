@@ -253,7 +253,7 @@ void RosterModel::setClient(ChatClient *client)
             _q_connected();
 
         if (client->rosterManager()->isRosterReceived())
-            _q_rosterReceived();
+            QMetaObject::invokeMethod(this, "_q_rosterReceived", Qt::QueuedConnection);
 
         emit clientChanged(d->client);
     }
