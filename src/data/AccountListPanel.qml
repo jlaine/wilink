@@ -45,6 +45,7 @@ Item {
         anchors.bottomMargin: appStyle.spacing.vertical
         anchors.left: parent.left
         anchors.right: scrollBar.left
+        clip: true
         model: ListModel {
             Component.onCompleted: {
                 for (var i in application.settings.chatAccounts) {
