@@ -102,15 +102,18 @@ int ListHelper::count() const
 
 QVariant ListHelper::get(int row) const
 {
-    QVariantMap result;
     if (m_model) {
         QModelIndex index = m_model->index(row, 0);
-        const QHash<int, QByteArray> roleNames = m_model->roleNames();
-        foreach (int role, roleNames.keys())
-            result.insert(QString::fromAscii(roleNames[role]), index.data(role));
-        result.insert("index", row);
+        if (index.isValid()) {
+            QVariantMap result;
+            const QHash<int, QByteArray> roleNames = m_model->roleNames();
+            foreach (int role, roleNames.keys())
+                result.insert(QString::fromAscii(roleNames[role]), index.data(role));
+            result.insert("index", row);
+            return result;
+        }
     }
-    return result;
+    return QVariant();
 }
 
 QVariant ListHelper::getProperty(int row, const QString &name) const

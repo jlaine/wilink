@@ -184,7 +184,7 @@ Item {
                     view.model.call(callAddress)
                 } else if (item.action == 'contact') {
                     var contact = view.model.contactsModel.getContactByPhone(callPhone);
-                    if (contact != null) {
+                    if (contact) {
                         dialogSwapper.showPanel('PhoneContactDialog.qml', {
                             'contactId': contact.id,
                             'contactName': contact.name,
