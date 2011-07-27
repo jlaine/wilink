@@ -29,6 +29,7 @@ Plugin {
             'iconSource': 'dock-diagnostics.png',
             'iconPress': 'diagnostics.png',
             'panelSource': 'DiagnosticPanel.qml',
+            'priority': 6,
             'shortcut': Qt.ControlModifier + Qt.Key_I,
             'text': qsTr('Diagnostics'),
             'visible': true,

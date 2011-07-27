@@ -29,6 +29,7 @@ Plugin {
             'iconSource': 'dock-peer.png',
             'iconPress': 'peer.png',
             'panelSource': 'DiscoveryPanel.qml',
+            'priority': -1,
             'shortcut': Qt.ControlModifier + Qt.Key_B,
             'text': qsTr('Discovery'),
             'visible': true});
@@ -37,6 +38,7 @@ Plugin {
             'iconSource': 'dock-debug.png',
             'iconPress': 'debug.png',
             'panelSource': 'LogPanel.qml',
+            'priority': -1,
             'shortcut': Qt.ControlModifier + Qt.Key_L,
             'text': qsTr('Debugging'),
             'visible': true});
