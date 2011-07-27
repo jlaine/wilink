@@ -106,7 +106,7 @@ Rectangle {
                     visible = true;
                     var model = listModel.get(index);
                     var panel = swapper.findPanel(model.panelSource, model.panelProperties);
-                    if (panel == swapper.currentItem) {
+                    if (panel && panel == swapper.currentItem) {
                         if (panel.state == 'no-sidebar')
                             panel.state = '';
                         else
