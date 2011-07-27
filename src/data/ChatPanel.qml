@@ -116,13 +116,13 @@ Panel {
                 onExited: parent.state = ''
 
                 onPressed: {
-                    mousePressY = mapToItem(left, mouse.x, mouse.y).y
+                    mousePressY = mapToItem(sidebar, mouse.x, mouse.y).y
                     roomsPressHeight = rooms.height
                 }
 
                 onPositionChanged: {
                     if (mouse.buttons & Qt.LeftButton) {
-                        var position =  roomsPressHeight + mapToItem(left, mouse.x, mouse.y).y - mousePressY
+                        var position =  roomsPressHeight + mapToItem(sidebar, mouse.x, mouse.y).y - mousePressY
                         position = Math.max(position, 0)
                         position = Math.min(position, sidebar.height - splitter.height - statusBar.height)
                         rooms.height = position
