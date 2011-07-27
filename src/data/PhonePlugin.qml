@@ -38,28 +38,12 @@ Plugin {
             'panelSource': 'PhonePanel.qml',
             'shortcut': Qt.ControlModifier + Qt.Key_T,
             'text': qsTr('Phone'),
-            'visible': false});
-        plugin.isLoaded = true; 
+            'visible': true});
+        swapper.addPanel('PhonePanel.qml');
     }
 
     onUnloaded: {
         dock.model.removePanel('PhonePanel.qml');
-    }
-
-    Connections {
-        target: appClient
-
-        onConnected: {
-            if (!plugin.isLoaded)
-                return;
-            for (var i = 0; i < dock.model.count; i++) {
-                if (dock.model.get(i).panelSource == 'PhonePanel.qml') {
-                    dock.model.setProperty(i, 'visible', true);
-                    break;
-                }
-            }
-            swapper.addPanel('PhonePanel.qml');
-        }
     }
 }
 
