@@ -152,6 +152,7 @@
     <file>RoomParticipantView.qml</file>
     <file>RoomPermissionDialog.qml</file>
     <file>RoomSubjectDialog.qml</file>
+    <file>RosterHeader.qml</file>
     <file>RosterView.qml</file>
     <file>ScrollBar.qml</file>
     <file>SharePanel.qml</file>

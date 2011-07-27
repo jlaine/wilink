@@ -64,43 +64,16 @@ Item {
         }
     }
 
-    Rectangle {
+    RosterHeader {
         id: header
 
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        gradient: Gradient {
-            GradientStop { position:0.0; color: '#9fb7dd' }
-            GradientStop { position:0.5; color: '#597fbe' }
-            GradientStop { position:1.0; color: '#9fb7dd' }
-        }
-        border.color: '#88a4d1'
-        border.width: 1
-        height: 24
-        z: 1
+        title: qsTr('My contacts')
 
-        Text {
-            id: titleText
-
-            anchors.left: parent.left
-            anchors.leftMargin: 8
-            anchors.verticalCenter: parent.verticalCenter
-            color: '#ffffff'
-            font.bold: true
-            text: qsTr('My contacts')
-        }
-
-        Button {
-            anchors.right: parent.right
-            anchors.rightMargin: 2
-            anchors.verticalCenter: parent.verticalCenter
-            iconSize: appStyle.icon.tinySize
-            iconSource: 'add.png'
-
-            onClicked: {
-                dialogSwapper.showPanel('PhoneContactDialog.qml', {'model': block.model});
-            }
+        onAddClicked: {
+            dialogSwapper.showPanel('PhoneContactDialog.qml', {'model': block.model});
         }
     }
 

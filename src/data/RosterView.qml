@@ -28,7 +28,7 @@ Item {
     property alias count: view.count
     property url iconSource
     property alias model: view.model
-    property alias title: titleText.text
+    property alias title: header.title
 
     signal addClicked
     signal itemClicked(variant model)
@@ -60,41 +60,14 @@ Item {
         }
     }
 
-    Rectangle {
+    RosterHeader {
         id: header
 
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        gradient: Gradient {
-            GradientStop { position:0.0; color: '#9fb7dd' }
-            GradientStop { position:0.5; color: '#597fbe' }
-            GradientStop { position:1.0; color: '#9fb7dd' }
-        }
-        border.color: '#88a4d1'
-        border.width: 1
-        height: 24
-        z: 1
 
-        Text {
-            id: titleText
-
-            anchors.left: parent.left
-            anchors.leftMargin: 8
-            anchors.verticalCenter: parent.verticalCenter
-            color: '#ffffff'
-            font.bold: true
-        }
-
-        Button {
-            anchors.right: parent.right
-            anchors.rightMargin: 2
-            anchors.verticalCenter: parent.verticalCenter
-            iconSize: appStyle.icon.tinySize
-            iconSource: 'add.png'
-
-            onClicked: block.addClicked()
-        }
+        onAddClicked: block.addClicked()
     }
 
     ListView {
