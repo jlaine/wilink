@@ -913,12 +913,10 @@ void PhoneHistoryModel::_q_handleCreate()
 
     // find the item
     PhoneHistoryItem *item = 0;
-    int row = -1;
     for (int i = 0; i < m_items.size(); ++i) {
         if (m_items[i]->reply == reply) {
             item = m_items[i];
             item->reply = 0;
-            row = i;
             break;
         }
     }
