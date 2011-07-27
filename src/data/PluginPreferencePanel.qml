@@ -78,6 +78,7 @@ Panel {
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
                 anchors.right: parent.right
+                clip: true
                 flickableItem: view
             }
         }
