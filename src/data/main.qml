@@ -161,7 +161,6 @@ FocusScope {
 
         var password = appWallet.get(jid);
         appClient.connectToServer(jid, password);
-        swapper.showPanel('ChatPanel.qml');
     }
 
     Keys.forwardTo: dock

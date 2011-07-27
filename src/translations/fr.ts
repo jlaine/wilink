@@ -204,6 +204,17 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>ChatPlugin</name>
+    <message>
+        <source>Chat</source>
+        <translation>Chat</translation>
+    </message>
+    <message>
+        <source>This plugin allows you to chat with your friends.</source>
+        <translation>Ce module vous permet de chatter avec vos amis.</translation>
+    </message>
+</context>
+<context>
     <name>ContactAddDialog</name>
     <message>
         <source>Your wAmis are automatically added to your chat contacts, so the easiest way to add Wifirst contacts is to &lt;a href=&quot;%1&quot;&gt;add them as wAmis&lt;/a&gt;</source>
@@ -367,10 +378,6 @@ Acceptez-vous?</translation>
 </context>
 <context>
     <name>Dock</name>
-    <message>
-        <source>Chat</source>
-        <translation>Chat</translation>
-    </message>
     <message>
         <source>Preferences</source>
         <translation>Préférences</translation>

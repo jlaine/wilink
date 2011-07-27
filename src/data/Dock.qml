@@ -89,17 +89,6 @@ Rectangle {
                         }
                     }
                 }
-
-                Component.onCompleted: {
-                    add({
-                        'iconSource': 'dock-chat.png',
-                        'iconPress': 'chat.png',
-                        'notified': false,
-                        'panelSource': 'ChatPanel.qml',
-                        'priority': 10,
-                        'text': qsTr('Chat'),
-                        'visible': true});
-                }
             }
 
             delegate: DockButton {

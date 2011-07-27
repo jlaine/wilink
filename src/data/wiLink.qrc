@@ -92,6 +92,7 @@
     <file>CallWidget.qml</file>
     <file>ChatContactView.qml</file>
     <file>ChatPanel.qml</file>
+    <file>ChatPlugin.qml</file>
     <file>CheckBox.qml</file>
     <file>ComboBox.qml</file>
     <file>ContactAddDialog.qml</file>

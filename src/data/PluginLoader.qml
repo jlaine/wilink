@@ -27,6 +27,7 @@ Item {
     ListModel {
         id: pluginModel
 
+        ListElement { source: 'ChatPlugin.qml'; autoload: true }
         ListElement { source: 'DebugPlugin.qml' }
         ListElement { source: 'DiagnosticPlugin.qml'; autoload: true }
         ListElement { source: 'PlayerPlugin.qml' }
