@@ -37,13 +37,14 @@ Panel {
         anchors.top: header.bottom
         anchors.bottom: parent.bottom
         anchors.left: parent.left
+        title: qsTr('My news')
         width: 200
 
         delegate: Item {
             id: item
 
             height: appStyle.icon.normalSize
-            width: feedView.width - 1
+            width: view.width - 1
 
             Image {
                 id: image
@@ -69,6 +70,15 @@ Panel {
                 elide: Text.ElideRight
                 font.bold: true
                 text: model.title
+            }
+
+            MouseArea {
+                anchors.fill: parent
+
+                onClicked: {
+                    sidebar.currentIndex = model.index;
+                    mainView.model.source = model.link;
+                }
             }
         }
 
@@ -96,7 +106,7 @@ Panel {
         anchors.right: parent.right
 
         ListView {
-            id: view
+            id: mainView
 
             anchors.top: parent.top
             anchors.bottom: parent.bottom
@@ -109,7 +119,7 @@ Panel {
                 id: item
 
                 height: appStyle.icon.normalSize
-                width: view.width - 1
+                width: mainView.width - 1
 
                 Image {
                     id: image
@@ -140,7 +150,7 @@ Panel {
                 MouseArea {
                     anchors.fill: parent
 
-                    onClicked: view.currentIndex = model.index
+                    onClicked: mainView.currentIndex = model.index
                 }
 
                 Text {
@@ -160,7 +170,7 @@ Panel {
 
                 states: State {
                     name: 'details'
-                    when: view.currentIndex == model.index
+                    when: mainView.currentIndex == model.index
 
                     PropertyChanges {
                         target: descriptionLabel
@@ -176,7 +186,7 @@ Panel {
             }
 
             highlight: Highlight {
-                width: view.width
+                width: mainView.width
             }
             highlightMoveDuration: appStyle.highlightMoveDuration
 
@@ -184,7 +194,6 @@ Panel {
                 id: newsModel
 
                 query: '/rss/channel/item'
-                source: 'http://feeds.bbci.co.uk/news/rss.xml';
 
                 XmlRole { name: 'description'; query: 'description/string()' }
                 XmlRole { name: 'link'; query: 'link/string()' }
@@ -200,7 +209,7 @@ Panel {
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             anchors.right: parent.right
-            flickableItem: view
+            flickableItem: mainView
         }
     }
 
@@ -214,5 +223,8 @@ Panel {
         PropertyAnimation { target: sidebar; properties: 'width'; duration: appStyle.animation.normalDuration }
     }
 
+    Component.onCompleted: {
+        mainView.model.source = sidebar.model.get(0).link;
+    }
 }
 

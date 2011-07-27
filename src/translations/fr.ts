@@ -457,6 +457,10 @@ Acceptez-vous?</translation>
         <source>News reader</source>
         <translation>Nouvelles</translation>
     </message>
+    <message>
+        <source>My news</source>
+        <translation>Mes nouvelles</translation>
+    </message>
 </context>
 <context>
     <name>NewsPlugin</name>
