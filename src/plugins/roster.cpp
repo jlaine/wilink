@@ -250,6 +250,9 @@ void RosterModel::setClient(ChatClient *client)
         Q_ASSERT(check);
 
         if (client->state() == QXmppClient::ConnectedState)
+            _q_connected();
+
+        if (client->rosterManager()->isRosterReceived())
             _q_rosterReceived();
 
         emit clientChanged(d->client);
