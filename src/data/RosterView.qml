@@ -20,154 +20,86 @@
 import QtQuick 1.0
 import wiLink 2.0
 
-Item {
+ContactView {
     id: block
-    clip: true
 
     property string currentJid
-    property alias count: view.count
     property url iconSource
-    property alias model: view.model
-    property alias title: header.title
 
-    signal addClicked
     signal itemClicked(variant model)
     signal itemContextMenu(variant model, variant point)
 
-    ListHelper {
-        id: listHelper
-        model: view.model
-    }
+    delegate: Item {
+        id: item
 
-    Rectangle {
-        id: background
+        width: parent.width
+        height: 30
 
-        width: parent.height
-        height: parent.width
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.topMargin: -parent.width
+        Item {
+            anchors.fill: parent
+            anchors.margins: 2
 
-        gradient: Gradient {
-            GradientStop { id: backgroundStop1; position: 0.0; color: '#e7effd' }
-            GradientStop { id: backgroundStop2; position: 1.0; color: '#cbdaf1' }
-        }
+            Image {
+                id: avatar
 
-        transform: Rotation {
-            angle: 90
-            origin.x: 0
-            origin.y: background.height
-        }
-    }
+                anchors.left: parent.left
+                anchors.leftMargin: 6
+                anchors.verticalCenter: parent.verticalCenter
+                asynchronous: true
+                width: appStyle.icon.smallSize
+                height: appStyle.icon.smallSize
+                smooth: true
+                source: block.iconSource != '' ? block.iconSource : model.avatar
+            }
 
-    RosterHeader {
-        id: header
+            Text {
+                anchors.left: avatar.right
+                anchors.right: bubble.right
+                anchors.leftMargin: 3
+                anchors.verticalCenter: parent.verticalCenter
+                elide: Text.ElideRight
+                text: model.participants > 0 ? model.name + ' (' + model.participants + ')' : model.name
+            }
 
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
+            Bubble {
+                id: bubble
 
-        onAddClicked: block.addClicked()
-    }
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.right: status.left
+                anchors.margins: 3
+                opacity: model.messages > 0 ? 1 : 0
+                text: model.messages > 0 ? model.messages : ''
+            }
 
-    ListView {
-        id: view
+            StatusPill {
+                id: status
+                anchors.right: parent.right
+                anchors.rightMargin: 5
+                anchors.verticalCenter: parent.verticalCenter
+                presenceStatus: model.status
+                width: 10
+                height: 10
+            }
 
-        anchors.top: header.bottom
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.right: scrollBar.left
-        anchors.margins: 2
-        focus: true
-
-        delegate: Item {
-            id: item
-
-            width: parent.width
-            height: 30
-
-            Item {
+            MouseArea {
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
                 anchors.fill: parent
-                anchors.margins: 2
-
-                Image {
-                    id: avatar
-
-                    anchors.left: parent.left
-                    anchors.leftMargin: 6
-                    anchors.verticalCenter: parent.verticalCenter
-                    asynchronous: true
-                    width: appStyle.icon.smallSize
-                    height: appStyle.icon.smallSize
-                    smooth: true
-                    source: block.iconSource != '' ? block.iconSource : model.avatar
-                }
-
-                Text {
-                    anchors.left: avatar.right
-                    anchors.right: bubble.right
-                    anchors.leftMargin: 3
-                    anchors.verticalCenter: parent.verticalCenter
-                    elide: Text.ElideRight
-                    text: model.participants > 0 ? model.name + ' (' + model.participants + ')' : model.name
-                }
-
-                Bubble {
-                    id: bubble
-
-                    anchors.verticalCenter: parent.verticalCenter
-                    anchors.right: status.left
-                    anchors.margins: 3
-                    opacity: model.messages > 0 ? 1 : 0
-                    text: model.messages > 0 ? model.messages : ''
-                }
-
-                StatusPill {
-                    id: status
-                    anchors.right: parent.right
-                    anchors.rightMargin: 5
-                    anchors.verticalCenter: parent.verticalCenter
-                    presenceStatus: model.status
-                    width: 10
-                    height: 10
-                }
-
-                MouseArea {
-                    acceptedButtons: Qt.LeftButton | Qt.RightButton
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    onClicked: {
-                        if (mouse.button == Qt.LeftButton) {
-                            block.itemClicked(model);
-                        } else if (mouse.button == Qt.RightButton) {
-                            block.itemContextMenu(model, block.mapFromItem(item, mouse.x, mouse.y));
-                        }
+                hoverEnabled: true
+                onClicked: {
+                    if (mouse.button == Qt.LeftButton) {
+                        block.itemClicked(model);
+                    } else if (mouse.button == Qt.RightButton) {
+                        block.itemContextMenu(model, block.mapFromItem(item, mouse.x, mouse.y));
                     }
                 }
             }
         }
-
-        highlight: Highlight {}
-        highlightMoveDuration: appStyle.highlightMoveDuration
     }
+    onCurrentJidChanged: timer.restart()
 
-    Rectangle {
-        id: border
-
-        anchors.bottom: parent.bottom
-        anchors.right: parent.right
-        anchors.top: parent.top
-        color: '#597fbe'
-        width: 1
-    }
-
-    ScrollBar {
-        id: scrollBar
-
-        anchors.top: header.bottom
-        anchors.bottom: parent.bottom
-        anchors.right: parent.right
-        flickableItem: view
+    ListHelper {
+        id: listHelper
+        model: block.model
     }
 
     Timer {
@@ -179,21 +111,17 @@ Item {
             // Update the currently selected item after delay.
             for (var i = 0; i < listHelper.count; i++) {
                 if (listHelper.getProperty(i, 'jid') == currentJid) {
-                    view.currentIndex = i;
+                    block.currentIndex = i;
                     return;
                 }
             }
-            view.currentIndex = -1;
+            block.currentIndex = -1;
         }
     }
 
     Connections {
-        target: block
-        onCurrentJidChanged: timer.restart()
-    }
+        target: block.model
 
-    Connections {
-        target: view.model
         onDataChanged: timer.restart()
         onRowsInserted: timer.restart()
         onRowsRemoved: timer.restart()
