@@ -40,12 +40,7 @@ Plugin {
 
     onUnloaded: {
         dock.model.removePanel('SharePanel.qml');
-        for (var i = 0; i < appPreferences.count; i++) {
-            if (appPreferences.get(i).source == 'SharePreferencePanel.qml') {
-                appPreferences.remove(i);
-                break;
-            }
-        }
+        appPreferences.removePanel('SharePreferencePanel.qml');
     }
 
     Connections {

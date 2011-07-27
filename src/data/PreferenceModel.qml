@@ -20,6 +20,14 @@
 import QtQuick 1.0
 
 ListModel {
+    function removePanel(source) {
+        for (var i = 0; i < appPreferences.count; i++) {
+            if (appPreferences.get(i).source == source) {
+                appPreferences.remove(i);
+                break;
+            }
+        }
+    }
 
     Component.onCompleted: {
         append({
