@@ -40,6 +40,7 @@ Plugin {
             'iconPress': 'photos.png',
             'panelSource': 'PhotoPanel.qml',
             'panelProperties': {'url': url},
+            'priority': 7,
             'shortcut': Qt.ControlModifier + Qt.Key_P,
             'text': qsTr('Photos'),
             'visible': true});

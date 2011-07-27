@@ -82,7 +82,21 @@ Rectangle {
                 id: listModel
 
                 function add(properties) {
-                    append(properties);
+                    function priority(props) {
+                        if (props.priority == undefined)
+                            return 0;
+                        else
+                            return props.priority;
+                    }
+
+                    var row = count;
+                    for (var i = 0; i < count; i++) {
+                        if (priority(get(i)) < priority(properties)) {
+                            row = i;
+                            break;
+                        }
+                    }
+                    insert(row, properties);
                 }
 
                 function removePanel(source) {

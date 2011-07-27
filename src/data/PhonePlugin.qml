@@ -36,6 +36,7 @@ Plugin {
             'iconSource': 'dock-phone.png',
             'iconPress': 'phone.png',
             'panelSource': 'PhonePanel.qml',
+            'priority': 9,
             'shortcut': Qt.ControlModifier + Qt.Key_T,
             'text': qsTr('Phone'),
             'visible': true});
