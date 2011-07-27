@@ -56,25 +56,6 @@ Rectangle {
         anchors.left: parent.left
         spacing: 5
 
-        DockButton {
-            iconSource: 'dock-chat.png'
-            iconPress: 'chat.png'
-            notified: root.pendingMessages != 0
-            panelSource: 'ChatPanel.qml'
-            text: qsTr('Chat')
-            onClicked: {
-                var panel = swapper.findPanel(panelSource);
-                if (panel == swapper.currentItem) {
-                    if (panel.state == 'no-sidebar')
-                        panel.state = '';
-                    else
-                        panel.state = 'no-sidebar';
-                } else {
-                    swapper.setCurrentItem(panel);
-                }
-            }
-        }
-
         Repeater {
             id: repeater
 
@@ -108,6 +89,17 @@ Rectangle {
                         }
                     }
                 }
+
+                Component.onCompleted: {
+                    add({
+                        'iconSource': 'dock-chat.png',
+                        'iconPress': 'chat.png',
+                        'notified': false,
+                        'panelSource': 'ChatPanel.qml',
+                        'priority': 10,
+                        'text': qsTr('Chat'),
+                        'visible': true});
+                }
             }
 
             delegate: DockButton {
@@ -115,8 +107,9 @@ Rectangle {
 
                 iconSource: model.iconSource
                 iconPress: model.iconPress
+                notified: model.notified == true
                 panelSource: model.panelSource
-                shortcut: model.shortcut
+                shortcut: model.shortcut ? model.shortcut : 0
                 text: model.text
                 visible: model.visible
 

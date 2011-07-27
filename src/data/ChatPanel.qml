@@ -25,6 +25,7 @@ Panel {
     id: chatPanel
 
     property alias rooms: roomListModel
+    property bool pendingMessages: (roomListModel.pendingMessages + rosterModel.pendingMessages) > 0
 
     /** Convenience method to show a conversation panel.
      */
@@ -257,10 +258,13 @@ Panel {
         focus: true
     }
 
-    Binding {
-        target: root
-        property: 'pendingMessages'
-        value: roomListModel.pendingMessages + rosterModel.pendingMessages
+    onPendingMessagesChanged: {
+        for (var i = 0; i < dock.model.count; i++) {
+            if (dock.model.get(i).panelSource == 'ChatPanel.qml') {
+                dock.model.setProperty(i, 'notified', pendingMessages);
+                break;
+            }
+        }
     }
 
     states: State {
