@@ -90,6 +90,7 @@
     <file>ChatEdit.qml</file>
     <file>CallNotification.qml</file>
     <file>CallWidget.qml</file>
+    <file>ChatContactView.qml</file>
     <file>ChatPanel.qml</file>
     <file>CheckBox.qml</file>
     <file>ComboBox.qml</file>
@@ -153,7 +154,6 @@
     <file>RoomParticipantView.qml</file>
     <file>RoomPermissionDialog.qml</file>
     <file>RoomSubjectDialog.qml</file>
-    <file>RosterView.qml</file>
     <file>ScrollBar.qml</file>
     <file>SharePanel.qml</file>
     <file>SharePlugin.qml</file>

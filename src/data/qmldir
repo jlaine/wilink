@@ -7,6 +7,7 @@ Bubble 1.0 Bubble.qml
 Button 1.0 Button.qml
 CallNotification 1.0 CallNotification.qml
 CallWidget 1.0 CallWidget.qml
+ChatContactView 1.0 ChatContactView.qml
 ChatEdit 1.0 ChatEdit.qml
 ChatPanel 1.0 ChatPanel.qml
 CheckBox 1.0 CheckBox.qml
@@ -15,6 +16,7 @@ ContactAddDialog 1.0 ContactAddDialog.qml
 ContactAddNotification 1.0 ContactAddNotification.qml
 ContactRemoveDialog 1.0 ContactRemoveDialog.qml
 ContactRenameDialog 1.0 ContactRenameDialog.qml
+ContactView 1.0 ContactView.qml
 ConversationPanel 1.0 ConversationPanel.qml
 CrumbBar 1.0 CrumbBar.qml
 DebugPlugin 1.0 DebugPlugin.qml
@@ -70,7 +72,6 @@ RoomPanel 1.0 RoomPanel.qml
 RoomParticipantView 1.0 RoomParticipantView.qml
 RoomPermissionDialog 1.0 RoomPermissionDialog.qml
 RoomSubjectDialog 1.0 RoomSubjectDialog.qml
-RosterView 1.0 RosterView.qml
 ScrollBar 1.0 ScrollBar.qml
 SharePanel 1.0 SharePanel.qml
 SharePlugin 1.0 SharePlugin.qml

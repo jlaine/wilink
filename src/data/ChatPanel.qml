@@ -48,7 +48,7 @@ Panel {
         anchors.bottom: parent.bottom
         width: 200
 
-        RosterView {
+        ChatContactView {
             id: rooms
 
             anchors.left: parent.left
@@ -135,7 +135,7 @@ Panel {
             }
         }
 
-        RosterView {
+        ChatContactView {
             id: contacts
 
             SortFilterProxyModel {
