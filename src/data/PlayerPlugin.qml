@@ -25,7 +25,7 @@ Plugin {
     imageSource: 'start.png'
 
     onLoaded: {
-        dock.model.append({
+        dock.model.add({
             'iconSource': 'dock-start.png',
             'iconPress': 'start.png',
             'panelSource': 'PlayerPanel.qml',

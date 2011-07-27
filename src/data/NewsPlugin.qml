@@ -25,7 +25,7 @@ Plugin {
     imageSource: 'rss.png'
 
     onLoaded: {
-        dock.model.append({
+        dock.model.add({
             'iconSource': 'dock-rss.png',
             'iconPress': 'rss.png',
             'panelSource': 'NewsPanel.qml',

@@ -25,7 +25,7 @@ Plugin {
     imageSource: 'diagnostics.png'
 
     onLoaded: {
-        dock.model.append({
+        dock.model.add({
             'iconSource': 'dock-diagnostics.png',
             'iconPress': 'diagnostics.png',
             'panelSource': 'DiagnosticPanel.qml',

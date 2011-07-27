@@ -25,7 +25,7 @@ Plugin {
     imageSource: 'share.png'
 
     onLoaded: {
-        dock.model.append({
+        dock.model.add({
             'iconSource': 'dock-share.png',
             'iconPress': 'share.png',
             'panelSource': 'SharePanel.qml',

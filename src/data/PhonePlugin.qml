@@ -32,7 +32,7 @@ Plugin {
     onLoaded: {
         if (Utils.jidToDomain(appClient.jid) != 'wifirst.net')
             return;
-        dock.model.append({
+        dock.model.add({
             'iconSource': 'dock-phone.png',
             'iconPress': 'phone.png',
             'panelSource': 'PhonePanel.qml',

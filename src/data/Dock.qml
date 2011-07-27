@@ -81,6 +81,10 @@ Rectangle {
             model: ListModel {
                 id: listModel
 
+                function add(properties) {
+                    append(properties);
+                }
+
                 function removePanel(source) {
                     for (var i = 0; i < repeater.model.count; i++) {
                         if (repeater.model.get(i).panelSource == source) {

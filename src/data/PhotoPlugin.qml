@@ -35,7 +35,7 @@ Plugin {
         else
             return;
 
-        dock.model.append({
+        dock.model.add({
             'iconSource': 'dock-photo.png',
             'iconPress': 'photos.png',
             'panelSource': 'PhotoPanel.qml',

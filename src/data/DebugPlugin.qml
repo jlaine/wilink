@@ -25,7 +25,7 @@ Plugin {
     imageSource: 'debug.png'
 
     onLoaded: {
-        dock.model.append({
+        dock.model.add({
             'iconSource': 'dock-peer.png',
             'iconPress': 'peer.png',
             'panelSource': 'DiscoveryPanel.qml',
@@ -33,7 +33,7 @@ Plugin {
             'text': qsTr('Discovery'),
             'visible': true});
 
-        dock.model.append({
+        dock.model.add({
             'iconSource': 'dock-debug.png',
             'iconPress': 'debug.png',
             'panelSource': 'LogPanel.qml',
