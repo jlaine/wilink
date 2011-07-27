@@ -60,6 +60,7 @@ class Application : public QApplication
     Q_OBJECT
     Q_PROPERTY(QString applicationName READ applicationName CONSTANT)
     Q_PROPERTY(QString applicationVersion READ applicationVersion CONSTANT)
+    Q_PROPERTY(bool colorBlind READ colorBlind CONSTANT)
     Q_PROPERTY(QString organizationName READ organizationName CONSTANT)
     Q_PROPERTY(QString osType READ osType CONSTANT)
     Q_PROPERTY(bool isInstalled READ isInstalled CONSTANT)
@@ -73,6 +74,7 @@ public:
 
     static void alert(QWidget *widget);
     QString cacheDirectory() const;
+    bool colorBlind() const;
     static void platformInit();
     void createSystemTrayIcon();
     QSoundPlayer *soundPlayer();

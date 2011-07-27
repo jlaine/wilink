@@ -31,7 +31,10 @@ Item {
                 return 'available';
             case QXmppPresence.Away:
             case QXmppPresence.XA:
-                return 'away';
+                if (application.colorBlind)
+                    return 'away_colorblind';
+                else
+                    return 'away';
             case QXmppPresence.DND:
                 return 'busy';
             case QXmppPresence.Offline:
@@ -50,6 +53,11 @@ Item {
         id: awayGradient
         GradientStop { position: 0.0; color: '#ffc800' }
         GradientStop { position: 1.0; color: '#c16100' }
+    }
+    Gradient { // Away (colorblind)
+        id: awayGradient_colorblind
+        GradientStop { position: 0.0; color: '#ffff50' }
+        GradientStop { position: 1.0; color: '#ffca50' }
     }
     Gradient { // Busy
         id: busyGradient
@@ -87,6 +95,14 @@ Item {
                 target: status
                 gradient: awayGradient
                 border.color: '#904800'
+            }
+        },
+        State {
+            name: 'away_colorblind'
+            PropertyChanges {
+                target: status
+                gradient: awayGradient_colorblind
+                border.color: '#f5a550'
             }
         },
         State {
