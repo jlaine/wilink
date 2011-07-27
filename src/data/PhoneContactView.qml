@@ -20,11 +20,8 @@
 import QtQuick 1.0
 import wiLink 2.0
 
-Item {
+ContactView {
     id: block
-
-    property alias count: view.count
-    property QtObject model
 
     signal itemClicked(variant model)
 
@@ -37,171 +34,131 @@ Item {
         return null;
     }
 
+    title: qsTr('My contacts')
+
+/*
+    model: SortFilterProxyModel {
+        dynamicSortFilter: true
+        sortCaseSensitivity: Qt.CaseInsensitive
+        sortRole: PhoneContactModel.NameRole
+//        sourceModel: block.model
+        Component.onCompleted: sort(0)
+    }
+*/
+
+    delegate: Item {
+        id: item
+
+        height: 40
+        width: parent.width
+
+        Image {
+            id: avatar
+
+            anchors.left: parent.left
+            anchors.leftMargin: 6
+            anchors.verticalCenter: parent.verticalCenter
+            asynchronous: true
+            width: appStyle.icon.smallSize
+            height: appStyle.icon.smallSize
+            smooth: true
+            source: 'peer.png'
+        }
+
+        Column {
+            anchors.left: avatar.right
+            anchors.right: callButtonLoader.left
+            anchors.leftMargin: 3
+            anchors.verticalCenter: parent.verticalCenter
+
+            Text {
+                id: name
+
+                anchors.left: parent.left
+                anchors.right: parent.right
+                elide: Text.ElideRight
+                text: model.name
+            }
+
+            Text {
+                id: phone
+
+                anchors.left: parent.left
+                anchors.leftMargin: 6
+                anchors.right: parent.right
+                elide: Text.ElideRight
+                font.italic: true
+                text: model.phone
+                visible: false
+            }
+        }
+
+        Loader {
+            id: callButtonLoader
+
+            property QtObject model
+
+            anchors.right: parent.right
+            anchors.rightMargin: 6
+            anchors.verticalCenter: parent.verticalCenter
+            z: 1
+        }
+
+        MouseArea {
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            anchors.fill: parent
+            hoverEnabled: true
+
+            onClicked: {
+                if (mouse.button == Qt.LeftButton) {
+                    view.currentIndex = model.index;
+                } else if (mouse.button == Qt.RightButton) {
+                    // show context menu
+                    var pos = mapToItem(menuLoader.parent, mouse.x, mouse.y);
+                    menuLoader.sourceComponent = phoneContactMenu;
+                    menuLoader.item.contactId = model.id;
+                    menuLoader.show(pos.x, pos.y);
+                }
+            }
+
+            onDoubleClicked: {
+                view.currentIndex = model.index;
+                block.itemClicked(model);
+            }
+
+            onEntered: {
+                callButtonLoader.sourceComponent = callButtonComponent;
+                callButtonLoader.model = model;
+            }
+
+            onExited: {
+                callButtonLoader.sourceComponent = undefined;
+            }
+        }
+
+        states: [
+            State {
+                name: 'no-avatar'
+                when: view.width < 32
+                PropertyChanges { target: avatar; visible: false }
+            },
+            State {
+                name: 'expanded'
+                when: view.currentItem == item
+                PropertyChanges { target: name; font.bold: true }
+                PropertyChanges { target: phone; visible: true }
+            }
+        ]
+    }
+
     ListHelper {
         id: listHelper
 
         model: block.model
     }
 
-    Rectangle {
-        id: background
-
-        width: parent.height
-        height: parent.width
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.topMargin: -parent.width
-
-        gradient: Gradient {
-            GradientStop { id: backgroundStop1; position: 0.0; color: '#e7effd' }
-            GradientStop { id: backgroundStop2; position: 1.0; color: '#cbdaf1' }
-        }
-
-        transform: Rotation {
-            angle: 90
-            origin.x: 0
-            origin.y: background.height
-        }
-    }
-
-    RosterHeader {
-        id: header
-
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        title: qsTr('My contacts')
-
-        onAddClicked: {
-            dialogSwapper.showPanel('PhoneContactDialog.qml', {'model': block.model});
-        }
-    }
-
-    ListView {
-        id: view
-
-        anchors.top: header.bottom
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.margins: 2
-        model: SortFilterProxyModel {
-            dynamicSortFilter: true
-            sortCaseSensitivity: Qt.CaseInsensitive
-            sortRole: PhoneContactModel.NameRole
-            sourceModel: block.model
-            Component.onCompleted: sort(0)
-        }
-
-        delegate: Item {
-            id: item
-
-            height: 40
-            width: parent.width
-
-            Image {
-                id: avatar
-
-                anchors.left: parent.left
-                anchors.leftMargin: 6
-                anchors.verticalCenter: parent.verticalCenter
-                asynchronous: true
-                width: appStyle.icon.smallSize
-                height: appStyle.icon.smallSize
-                smooth: true
-                source: 'peer.png'
-            }
-
-            Column {
-                anchors.left: avatar.right
-                anchors.right: callButtonLoader.left
-                anchors.leftMargin: 3
-                anchors.verticalCenter: parent.verticalCenter
-
-                Text {
-                    id: name
-
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    elide: Text.ElideRight
-                    text: model.name
-                }
-
-                Text {
-                    id: phone
-
-                    anchors.left: parent.left
-                    anchors.leftMargin: 6
-                    anchors.right: parent.right
-                    elide: Text.ElideRight
-                    font.italic: true
-                    text: model.phone
-                    visible: false
-                }
-            }
-
-            Loader {
-                id: callButtonLoader
-
-                property QtObject model
-
-                anchors.right: parent.right
-                anchors.rightMargin: 6
-                anchors.verticalCenter: parent.verticalCenter
-                z: 1
-            }
-
-            MouseArea {
-                acceptedButtons: Qt.LeftButton | Qt.RightButton
-                anchors.fill: parent
-                hoverEnabled: true
-
-                onClicked: {
-                    if (mouse.button == Qt.LeftButton) {
-                        view.currentIndex = model.index;
-                    } else if (mouse.button == Qt.RightButton) {
-                        // show context menu
-                        var pos = mapToItem(menuLoader.parent, mouse.x, mouse.y);
-                        menuLoader.sourceComponent = phoneContactMenu;
-                        menuLoader.item.contactId = model.id;
-                        menuLoader.show(pos.x, pos.y);
-                    }
-                }
-
-                onDoubleClicked: {
-                    view.currentIndex = model.index;
-                    block.itemClicked(model);
-                }
-
-                onEntered: {
-                    callButtonLoader.sourceComponent = callButtonComponent;
-                    callButtonLoader.model = model;
-                }
-
-                onExited: {
-                    callButtonLoader.sourceComponent = undefined;
-                }
-            }
-
-            states: [
-                State {
-                    name: 'no-avatar'
-                    when: view.width < 32
-                    PropertyChanges { target: avatar; visible: false }
-                },
-                State {
-                    name: 'expanded'
-                    when: view.currentItem == item
-                    PropertyChanges { target: name; font.bold: true }
-                    PropertyChanges { target: phone; visible: true }
-                }
-            ]
-        }
-
-        highlight: Highlight {
-            width: view.width
-        }
-        highlightMoveDuration: appStyle.highlightMoveDuration
+    onAddClicked: {
+        dialogSwapper.showPanel('PhoneContactDialog.qml', {'model': block.model});
     }
 
     Component {

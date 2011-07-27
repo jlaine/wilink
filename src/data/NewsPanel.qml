@@ -31,7 +31,7 @@ Panel {
         title: qsTr('News reader')
     }
 
-    Item {
+    ContactView {
         id: sidebar
 
         anchors.top: header.bottom
@@ -39,68 +39,51 @@ Panel {
         anchors.left: parent.left
         width: 200
 
-        ListView {
-            id: feedView
+        delegate: Item {
+            id: item
 
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.left: parent.left
-            anchors.right: feedScroll.left
-            delegate: Item {
-                id: item
+            height: appStyle.icon.normalSize
+            width: feedView.width - 1
 
+            Image {
+                id: image
+
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.leftMargin: appStyle.spacing.horizontal
                 height: appStyle.icon.normalSize
-                width: feedView.width - 1
-
-                Image {
-                    id: image
-
-                    anchors.top: parent.top
-                    anchors.left: parent.left
-                    anchors.leftMargin: appStyle.spacing.horizontal
-                    height: appStyle.icon.normalSize
-                    width: appStyle.icon.normalSize
-                    fillMode: Image.PreserveAspectFit
-                    smooth: true
-                    source: model.imageSource
-                }
-
-                Text {
-                    id: titleLabel
-
-                    anchors.verticalCenter: image.verticalCenter
-                    anchors.left: image.right
-                    anchors.leftMargin: appStyle.spacing.horizontal
-                    anchors.right: parent.right
-                    anchors.rightMargin: appStyle.spacing.horizontal
-                    elide: Text.ElideRight
-                    font.bold: true
-                    text: model.title
-                }
+                width: appStyle.icon.normalSize
+                fillMode: Image.PreserveAspectFit
+                smooth: true
+                source: model.imageSource
             }
 
-            model: ListModel {
-                ListElement {
-                    title: 'BBC News - World'
-                    imageSource: 'rss.png'
-                    link: 'http://feeds.bbci.co.uk/news/world/rss.xml'
-                }
+            Text {
+                id: titleLabel
 
-                ListElement {
-                    title: 'BBC News - Technology'
-                    imageSource: 'rss.png'
-                    link: 'http://feeds.bbci.co.uk/news/technology/rss.xml'
-                }
+                anchors.verticalCenter: image.verticalCenter
+                anchors.left: image.right
+                anchors.leftMargin: appStyle.spacing.horizontal
+                anchors.right: parent.right
+                anchors.rightMargin: appStyle.spacing.horizontal
+                elide: Text.ElideRight
+                font.bold: true
+                text: model.title
             }
         }
 
-        ScrollBar {
-            id: feedScroll
+        model: ListModel {
+            ListElement {
+                title: 'BBC News - World'
+                imageSource: 'rss.png'
+                link: 'http://feeds.bbci.co.uk/news/world/rss.xml'
+            }
 
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.right: parent.right
-            flickableItem: feedView
+            ListElement {
+                title: 'BBC News - Technology'
+                imageSource: 'rss.png'
+                link: 'http://feeds.bbci.co.uk/news/technology/rss.xml'
+            }
         }
     }
 

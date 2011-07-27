@@ -97,6 +97,7 @@
     <file>ContactAddNotification.qml</file>
     <file>ContactRemoveDialog.qml</file>
     <file>ContactRenameDialog.qml</file>
+    <file>ContactView.qml</file>
     <file>CrumbBar.qml</file>
     <file>ConversationPanel.qml</file>
     <file>DiagnosticPanel.qml</file>
