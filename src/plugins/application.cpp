@@ -50,8 +50,8 @@ class ApplicationPrivate
 public:
     ApplicationPrivate();
 
-    QList<QWidget*> chats;
     ApplicationSettings *appSettings;
+    QList<QWidget*> chats;
     bool colorBlind;
     QUrl qmlRoot;
     QSoundPlayer *soundPlayer;
@@ -68,8 +68,9 @@ public:
 };
 
 ApplicationPrivate::ApplicationPrivate()
-    : qmlRoot("qrc:/"),
-      colorBlind(false),
+    : appSettings(0),
+    colorBlind(false),
+    qmlRoot("qrc:/"),
 #ifdef USE_LIBNOTIFY
     libnotify_accepts_actions(0),
 #endif
@@ -95,8 +96,7 @@ Application::Application(int &argc, char **argv)
     for (int i = 1; i < argc; ++i) {
         if (!strcmp(argv[i], "-qmlroot") && i < argc - 1) {
             d->qmlRoot = QUrl(QString::fromLocal8Bit(argv[++i]));
-        }
-        if (!strcmp(argv[i], "-colorblind")) {
+        } else if (!strcmp(argv[i], "-colorblind")) {
             d->colorBlind = true;
         }
     }
