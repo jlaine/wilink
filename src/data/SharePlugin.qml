@@ -31,23 +31,16 @@ Plugin {
             'panelSource': 'SharePanel.qml',
             'shortcut': Qt.ControlModifier + Qt.Key_S,
             'text': qsTr('Shares'),
-            'visible': true});
+            'visible': false});
         appPreferences.append({
             'iconSource': 'share.png',
             'name': qsTr('Shares'),
             'source': 'SharePreferencePanel.qml'});
+        swapper.addPanel('SharePanel.qml');
     }
 
     onUnloaded: {
         dock.model.removePanel('SharePanel.qml');
         appPreferences.removePanel('SharePreferencePanel.qml');
-    }
-
-    Connections {
-        target: appClient
-
-        onConnected: {
-            swapper.addPanel('SharePanel.qml');
-        }
     }
 }

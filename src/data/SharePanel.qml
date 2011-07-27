@@ -147,12 +147,21 @@ Panel {
 
             onConnectedChanged: {
                 if (connected) {
+                    // update breadcrumbs
                     if (!crumbBar.model.count) {
                         crumbBar.push({'name': qsTr('Home'), 'jid': view.model.shareServer, 'node': ''});
                     } else {
                         crumbBar.model.setProperty(0, 'jid', view.model.shareServer);
                         crumbBar.model.setProperty(0, 'node', '');
                         refresh();
+                    }
+
+                    // show dock icon
+                    for (var i = 0; i < dock.model.count; i++) {
+                        if (dock.model.get(i).panelSource == 'SharePanel.qml') {
+                            dock.model.setProperty(i, 'visible', true);
+                            break;
+                        }
                     }
                 }
             }
