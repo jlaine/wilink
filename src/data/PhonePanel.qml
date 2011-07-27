@@ -99,7 +99,7 @@ Panel {
             id: addressbook
 
             anchors.fill: parent
-            model: historyModel.contactsModel
+            contactsModel: historyModel.contactsModel
 
             onItemClicked: {
                 var address = buildAddress(model.phone, historyModel.client.domain);

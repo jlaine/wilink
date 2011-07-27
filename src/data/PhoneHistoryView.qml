@@ -183,7 +183,7 @@ Item {
                 if (item.action == 'call') {
                     view.model.call(callAddress)
                 } else if (item.action == 'contact') {
-                    var contact = addressbook.contactForPhone(callPhone);
+                    var contact = view.model.contactsModel.getContactByPhone(callPhone);
                     if (contact != null) {
                         dialogSwapper.showPanel('PhoneContactDialog.qml', {
                             'contactId': contact.id,

@@ -23,28 +23,19 @@ import wiLink 2.0
 ContactView {
     id: block
 
-    signal itemClicked(variant model)
+    property QtObject contactsModel
 
-    function contactForPhone(phone) {
-        for (var i = 0; i < listHelper.count; i++) {
-            if (listHelper.getProperty(i, 'phone') == phone) {
-                return listHelper.get(i);
-            }
-        }
-        return null;
-    }
+    signal itemClicked(variant model)
 
     title: qsTr('My contacts')
 
-/*
     model: SortFilterProxyModel {
         dynamicSortFilter: true
         sortCaseSensitivity: Qt.CaseInsensitive
         sortRole: PhoneContactModel.NameRole
-//        sourceModel: block.model
+        sourceModel: contactsModel
         Component.onCompleted: sort(0)
     }
-*/
 
     delegate: Item {
         id: item
@@ -151,14 +142,8 @@ ContactView {
         ]
     }
 
-    ListHelper {
-        id: listHelper
-
-        model: block.model
-    }
-
     onAddClicked: {
-        dialogSwapper.showPanel('PhoneContactDialog.qml', {'model': block.model});
+        dialogSwapper.showPanel('PhoneContactDialog.qml', {'model': contactsModel});
     }
 
     Component {
@@ -186,14 +171,14 @@ ContactView {
             onItemClicked: {
                 var item = menu.model.get(index);
                 if (item.action == 'edit') {
-                    var contact = block.model.getContact(contactId);
+                    var contact = contactsModel.getContact(contactId);
                     dialogSwapper.showPanel('PhoneContactDialog.qml', {
                         'contactId': contactId,
                         'contactName': contact.name,
                         'contactPhone': contact.phone,
-                        'model': block.model});
+                        'model': contactsModel});
                 } else if (item.action == 'remove') {
-                    block.model.removeContact(contactId);
+                    contactsModel.removeContact(contactId);
                 }
             }
 
