@@ -31,113 +31,205 @@ Panel {
         title: qsTr('News reader')
     }
 
-    ListView {
-        id: view
+    Item {
+        id: sidebar
 
         anchors.top: header.bottom
         anchors.bottom: parent.bottom
         anchors.left: parent.left
-        anchors.right: scrollBar.left
-        anchors.margins: 2
-        spacing: appStyle.spacing.horizontal
-        focus: true
+        width: 200
 
-        delegate: Item {
-            id: item
+        ListView {
+            id: feedView
 
-            height: appStyle.icon.normalSize
-            width: view.width - 1
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.right: feedScroll.left
+            delegate: Item {
+                id: item
 
-            Image {
-                id: image
-
-                anchors.top: parent.top
-                anchors.left: parent.left
-                anchors.leftMargin: appStyle.spacing.horizontal
                 height: appStyle.icon.normalSize
-                width: appStyle.icon.normalSize
-                fillMode: Image.PreserveAspectFit
-                smooth: true
-                source: model.imageSource
-            }
+                width: feedView.width - 1
 
-            Text {
-                id: titleLabel
+                Image {
+                    id: image
 
-                anchors.verticalCenter: image.verticalCenter
-                anchors.left: image.right
-                anchors.leftMargin: appStyle.spacing.horizontal
-                anchors.right: parent.right
-                anchors.rightMargin: appStyle.spacing.horizontal
-                elide: Text.ElideRight
-                font.bold: true
-                text: model.title
-            }
-
-            MouseArea {
-                anchors.fill: parent
-
-                onClicked: view.currentIndex = model.index
-            }
-
-            Text {
-                id: descriptionLabel
-
-                anchors.top: image.bottom
-                anchors.topMargin: appStyle.spacing.vertical
-                anchors.left: parent.left
-                anchors.leftMargin: appStyle.spacing.horizontal
-                anchors.right: parent.right
-                anchors.rightMargin: appStyle.spacing.horizontal
-                visible: false
-                wrapMode: Text.WordWrap
-
-                onLinkActivated: Qt.openUrlExternally(link)
-            }
-
-            states: State {
-                name: 'details'
-                when: view.currentIndex == model.index
-
-                PropertyChanges {
-                    target: descriptionLabel
-                    text: '<p>' + model.description + '</p><p><a href="' + model.link + '">' + model.link + '</a></p>'
-                    visible: true
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.leftMargin: appStyle.spacing.horizontal
+                    height: appStyle.icon.normalSize
+                    width: appStyle.icon.normalSize
+                    fillMode: Image.PreserveAspectFit
+                    smooth: true
+                    source: model.imageSource
                 }
 
-                PropertyChanges {
-                    target: item
-                    height: image.height + 2*appStyle.spacing.vertical + descriptionLabel.height
+                Text {
+                    id: titleLabel
+
+                    anchors.verticalCenter: image.verticalCenter
+                    anchors.left: image.right
+                    anchors.leftMargin: appStyle.spacing.horizontal
+                    anchors.right: parent.right
+                    anchors.rightMargin: appStyle.spacing.horizontal
+                    elide: Text.ElideRight
+                    font.bold: true
+                    text: model.title
+                }
+            }
+
+            model: ListModel {
+                ListElement {
+                    title: 'BBC News - World'
+                    imageSource: 'rss.png'
+                    link: 'http://feeds.bbci.co.uk/news/world/rss.xml'
+                }
+
+                ListElement {
+                    title: 'BBC News - Technology'
+                    imageSource: 'rss.png'
+                    link: 'http://feeds.bbci.co.uk/news/technology/rss.xml'
                 }
             }
         }
 
-        highlight: Highlight {
-            width: view.width
-        }
-        highlightMoveDuration: appStyle.highlightMoveDuration
+        ScrollBar {
+            id: feedScroll
 
-        model: XmlListModel {
-            id: newsModel
-
-            query: '/rss/channel/item'
-            source: 'http://feeds.bbci.co.uk/news/rss.xml';
-
-            XmlRole { name: 'description'; query: 'description/string()' }
-            XmlRole { name: 'link'; query: 'link/string()' }
-            XmlRole { name: 'pubDate'; query: 'pubDate/string()' }
-            XmlRole { name: 'imageSource'; query: '*:thumbnail[1]/@url/string()' }
-            XmlRole { name: 'title'; query: 'title/string()' }
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.right: parent.right
+            flickableItem: feedView
         }
     }
 
-    ScrollBar {
-        id: scrollBar
+    Item {
+        id: main
 
         anchors.top: header.bottom
         anchors.bottom: parent.bottom
+        anchors.left: sidebar.right
         anchors.right: parent.right
-        flickableItem: view
+
+        ListView {
+            id: view
+
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.right: scrollBar.left
+            anchors.margins: 2
+            spacing: appStyle.spacing.horizontal
+            focus: true
+            delegate: Item {
+                id: item
+
+                height: appStyle.icon.normalSize
+                width: view.width - 1
+
+                Image {
+                    id: image
+
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.leftMargin: appStyle.spacing.horizontal
+                    height: appStyle.icon.normalSize
+                    width: appStyle.icon.normalSize
+                    fillMode: Image.PreserveAspectFit
+                    smooth: true
+                    source: model.imageSource
+                }
+
+                Text {
+                    id: titleLabel
+
+                    anchors.verticalCenter: image.verticalCenter
+                    anchors.left: image.right
+                    anchors.leftMargin: appStyle.spacing.horizontal
+                    anchors.right: parent.right
+                    anchors.rightMargin: appStyle.spacing.horizontal
+                    elide: Text.ElideRight
+                    font.bold: true
+                    text: model.title
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+
+                    onClicked: view.currentIndex = model.index
+                }
+
+                Text {
+                    id: descriptionLabel
+
+                    anchors.top: image.bottom
+                    anchors.topMargin: appStyle.spacing.vertical
+                    anchors.left: parent.left
+                    anchors.leftMargin: appStyle.spacing.horizontal
+                    anchors.right: parent.right
+                    anchors.rightMargin: appStyle.spacing.horizontal
+                    visible: false
+                    wrapMode: Text.WordWrap
+
+                    onLinkActivated: Qt.openUrlExternally(link)
+                }
+
+                states: State {
+                    name: 'details'
+                    when: view.currentIndex == model.index
+
+                    PropertyChanges {
+                        target: descriptionLabel
+                        text: '<p>' + model.description + '</p><p><a href="' + model.link + '">' + model.link + '</a></p>'
+                        visible: true
+                    }
+
+                    PropertyChanges {
+                        target: item
+                        height: image.height + 2*appStyle.spacing.vertical + descriptionLabel.height
+                    }
+                }
+            }
+
+            highlight: Highlight {
+                width: view.width
+            }
+            highlightMoveDuration: appStyle.highlightMoveDuration
+
+            model: XmlListModel {
+                id: newsModel
+
+                query: '/rss/channel/item'
+                source: 'http://feeds.bbci.co.uk/news/rss.xml';
+
+                XmlRole { name: 'description'; query: 'description/string()' }
+                XmlRole { name: 'link'; query: 'link/string()' }
+                XmlRole { name: 'pubDate'; query: 'pubDate/string()' }
+                XmlRole { name: 'imageSource'; query: '*:thumbnail[1]/@url/string()' }
+                XmlRole { name: 'title'; query: 'title/string()' }
+            }
+        }
+
+        ScrollBar {
+            id: scrollBar
+
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.right: parent.right
+            flickableItem: view
+        }
     }
+
+    states: State {
+        name: 'no-sidebar'
+
+        PropertyChanges { target: sidebar; width: 0 }
+    }
+
+    transitions: Transition {
+        PropertyAnimation { target: sidebar; properties: 'width'; duration: appStyle.animation.normalDuration }
+    }
+
 }
 
