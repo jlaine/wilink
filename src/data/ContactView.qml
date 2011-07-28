@@ -100,7 +100,9 @@ Item {
         anchors.margins: 2
         focus: true
 
-        highlight: Highlight {}
+        highlight: Highlight {
+            width: view.width - 1
+        }
         highlightMoveDuration: appStyle.highlightMoveDuration
     }
 
