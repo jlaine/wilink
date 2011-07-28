@@ -102,7 +102,7 @@ Item {
             PropertyChanges {
                 target: status
                 gradient: awayGradient_colorblind
-                border.color: '#f5a550'
+                border.color: '#d98428'
             }
         },
         State {
