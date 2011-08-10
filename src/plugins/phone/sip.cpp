@@ -44,7 +44,7 @@ static const int RTCP_COMPONENT = 2;
 #define QXMPP_DEBUG_SIP
 #define QXMPP_DEBUG_STUN
 
-#define EXPIRE_SECONDS 3600
+#define EXPIRE_SECONDS 120
 
 #define STUN_RETRY_MS   500
 #define STUN_EXPIRE_MS  30000
