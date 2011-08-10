@@ -338,6 +338,12 @@ Panel {
         }
     }
 
+    Binding {
+        target: historyModel.client
+        property: 'logger'
+        value: appClient.logger
+    }
+
     Connections {
         target: historyModel.client
 

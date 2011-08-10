@@ -105,6 +105,7 @@ public:
     QString password;
     QString domain;
 
+    QXmppLogger *logger;
     SipClient::State state;
     QHostAddress serverAddress;
     quint16 serverPort;

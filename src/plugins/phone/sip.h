@@ -217,6 +217,7 @@ class SipClient : public QXmppLoggable
 {
     Q_OBJECT
     Q_ENUMS(State)
+    Q_PROPERTY(QXmppLogger* logger READ logger WRITE setLogger NOTIFY loggerChanged)
     Q_PROPERTY(State state READ state NOTIFY stateChanged)
     Q_PROPERTY(QString displayName READ displayName WRITE setDisplayName)
     Q_PROPERTY(QString domain READ domain WRITE setDomain)
@@ -243,6 +244,9 @@ public:
     QString domain() const;
     void setDomain(const QString &domain);
 
+    QXmppLogger *logger() const;
+    void setLogger(QXmppLogger *logger);
+
     QString password() const;
     void setPassword(const QString &password);
 
@@ -264,6 +268,9 @@ signals:
     /// To accept the call, invoke the call's SipCall::accept() method.
     /// To refuse the call, invoke the call's SipCall::hangup() method.
     void callReceived(SipCall *call);
+
+    /// This signal is emitted when the logger changes.
+    void loggerChanged(QXmppLogger *logger);
 
     /// This signal is emitted when the client state changes.
     void stateChanged(SipClient::State state);

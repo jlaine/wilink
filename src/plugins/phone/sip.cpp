@@ -790,6 +790,7 @@ void SipCall::hangup()
 
 SipClientPrivate::SipClientPrivate(SipClient *qq)
     : soundPlayer(0),
+    logger(0),
     state(SipClient::DisconnectedState),
     contactPort(0),
     stunCookie(0),
@@ -1369,6 +1370,29 @@ QString SipClient::domain() const
 void SipClient::setDomain(const QString &domain)
 {
     d->domain = domain;
+}
+
+QXmppLogger *SipClient::logger() const
+{
+    return d->logger;
+}
+
+void SipClient::setLogger(QXmppLogger *logger)
+{
+    if (logger != d->logger) {
+        if (d->logger) {
+            disconnect(this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
+                       d->logger, SLOT(log(QXmppLogger::MessageType,QString)));
+        }
+
+        d->logger = logger;
+        if (d->logger) {
+            connect(this, SIGNAL(logMessage(QXmppLogger::MessageType,QString)),
+                    d->logger, SLOT(log(QXmppLogger::MessageType,QString)));
+        }
+
+        emit loggerChanged(d->logger);
+    }
 }
 
 QString SipClient::password() const
