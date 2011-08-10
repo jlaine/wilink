@@ -50,8 +50,9 @@ class ApplicationPrivate
 public:
     ApplicationPrivate();
 
-    QList<QWidget*> chats;
     ApplicationSettings *appSettings;
+    QList<QWidget*> chats;
+    bool colorBlind;
     QUrl qmlRoot;
     QSoundPlayer *soundPlayer;
     QThread *soundThread;
@@ -67,7 +68,9 @@ public:
 };
 
 ApplicationPrivate::ApplicationPrivate()
-    : qmlRoot("qrc:/"),
+    : appSettings(0),
+    colorBlind(false),
+    qmlRoot("qrc:/"),
 #ifdef USE_LIBNOTIFY
     libnotify_accepts_actions(0),
 #endif
@@ -90,9 +93,11 @@ Application::Application(int &argc, char **argv)
     wApp = this;
 
     // process command line argument
-    for (int i = 1; i < argc - 1; ++i) {
-        if (!strcmp(argv[i], "-qmlroot")) {
+    for (int i = 1; i < argc; ++i) {
+        if (!strcmp(argv[i], "-qmlroot") && i < argc - 1) {
             d->qmlRoot = QUrl(QString::fromLocal8Bit(argv[++i]));
+        } else if (!strcmp(argv[i], "-colorblind")) {
+            d->colorBlind = true;
         }
     }
 
@@ -246,6 +251,11 @@ void Application::createSystemTrayIcon()
             this, SLOT(trayClicked()));
     d->trayIcon->show();
 #endif
+}
+
+bool Application::colorBlind() const
+{
+    return d->colorBlind;
 }
 
 QString Application::executablePath() const

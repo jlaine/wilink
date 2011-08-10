@@ -729,6 +729,13 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>PluginPreferencePanel</name>
+    <message>
+        <source>Plugins</source>
+        <translation>Modules</translation>
+    </message>
+</context>
+<context>
     <name>PreferenceDialog</name>
     <message>
         <source>Preferences</source>

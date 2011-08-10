@@ -142,40 +142,40 @@ QVariant PhoneContactModel::data(const QModelIndex &index, int role) const
  *
  * @param id
  */
-QVariantMap PhoneContactModel::getContact(int id)
+QVariant PhoneContactModel::getContact(int id)
 {
-    QVariantMap result;
     for (int row = 0; row < m_items.size(); ++row) {
         QModelIndex idx = index(row, 0);
         if (idx.data(IdRole).toInt() == id) {
+            QVariantMap result;
             const QHash<int, QByteArray> names = roleNames();
             foreach (int role, names.keys())
                 result.insert(QString::fromAscii(names[role]), idx.data(role));
             result.insert("index", row);
-            break;
+            return result;
         }
     }
-    return result;
+    return QVariant();
 }
 
 /** Returns the contact with the given \a phone.
  *
  * @param phone
  */
-QVariantMap PhoneContactModel::getContactByPhone(const QString &phone)
+QVariant PhoneContactModel::getContactByPhone(const QString &phone)
 {
-    QVariantMap result;
     for (int row = 0; row < m_items.size(); ++row) {
         QModelIndex idx = index(row, 0);
         if (idx.data(PhoneRole).toString() == phone) {
+            QVariantMap result;
             const QHash<int, QByteArray> names = roleNames();
             foreach (int role, names.keys())
                 result.insert(QString::fromAscii(names[role]), idx.data(role));
             result.insert("index", row);
-            break;
+            return result;
         }
     }
-    return result;
+    return QVariant();
 }
 
 /** Removes the contact with the given \a id.
@@ -913,12 +913,10 @@ void PhoneHistoryModel::_q_handleCreate()
 
     // find the item
     PhoneHistoryItem *item = 0;
-    int row = -1;
     for (int i = 0; i < m_items.size(); ++i) {
         if (m_items[i]->reply == reply) {
             item = m_items[i];
             item->reply = 0;
-            row = i;
             break;
         }
     }

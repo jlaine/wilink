@@ -137,6 +137,7 @@ if(RELOAD_TRANSLATIONS)
         ../data/PhotoPlugin.qml
         ../data/PlayerPanel.qml
         ../data/PlayerPlugin.qml
+        ../data/PluginPreferencePanel.qml
         ../data/PreferenceDialog.qml
         ../data/PreferenceModel.qml
         ../data/RoomInviteDialog.qml
