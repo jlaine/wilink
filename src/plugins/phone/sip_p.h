@@ -113,8 +113,6 @@ public:
 
     // sockets
     QHostAddress localAddress;
-    QHostAddress contactAddress;
-    quint16 contactPort;
     QUdpSocket *socket;
 
     // STUN

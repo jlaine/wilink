@@ -792,7 +792,6 @@ SipClientPrivate::SipClientPrivate(SipClient *qq)
     : soundPlayer(0),
     logger(0),
     state(SipClient::DisconnectedState),
-    contactPort(0),
     stunCookie(0),
     stunDone(false),
     stunReflexivePort(0),
@@ -899,16 +898,6 @@ SipMessage SipClientPrivate::buildRetry(const SipMessage &original, SipCallConte
 
 void SipClientPrivate::handleReply(const SipMessage &reply)
 {
-    // store information
-    const QList<QByteArray> vias = reply.headerFieldValues("Via");
-    if (!vias.isEmpty()) {
-        QMap<QByteArray, QByteArray> params = SipMessage::valueParameters(vias.first());
-        if (params.contains("received"))
-            contactAddress = QHostAddress(QString::fromLatin1(params.value("received")));
-        if (params.contains("rport"))
-            contactPort = params.value("rport").toUInt();
-    }
-
     // find transaction
     const QMap<QByteArray, QByteArray> viaParams = SipMessage::valueParameters(reply.headerField("Via"));
     foreach (SipTransaction *transaction, transactions) {
@@ -923,8 +912,8 @@ void SipClientPrivate::setContact(SipMessage &request)
 {
     request.setHeaderField("Contact", QString("<sip:%1@%2:%3>").arg(
         username,
-        contactAddress.toString(),
-        QString::number(contactPort)).toUtf8());
+        localAddress.toString(),
+        QString::number(socket->localPort())).toUtf8());
 }
 
 void SipClientPrivate::setState(SipClient::State newState)
@@ -1067,10 +1056,6 @@ void SipClient::datagramReceived()
             debug(QString("STUN reflexive address changed to %1 port %2").arg(
                 d->stunReflexiveAddress.toString(),
                 QString::number(d->stunReflexivePort)));
-
-            // update contact address
-            d->contactAddress = d->stunReflexiveAddress;
-            d->contactPort = d->stunReflexivePort;
 
             // update local address
             const QList<QHostAddress> addresses = QXmppIceComponent::discoverAddresses();
