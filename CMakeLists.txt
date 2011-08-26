@@ -93,6 +93,13 @@ else(APPLE)
         # in silent mode, automatically run installed program
         set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "  IfSilent 0 +2
   Exec \\\"$INSTDIR\\\\bin\\\\wiLink.exe\\\"")
+
+        # purge data on uninstall
+        set(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "  RMDir /r \\\"$LOCALAPPDATA\\\\Wifirst\\\\wiLink\\\"
+  RMDir \\\"$LOCALAPPDATA\\\\Wifirst\\\"
+  DeleteRegValue HKCU \\\"Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Run\\\" \\\"wiLink\\\"
+  DeleteRegKey HKCU \\\"Software\\\\Wifirst\\\\wiLink\\\"
+  DeleteRegKey /ifempty HKCU \\\"Software\\\\Wifirst\\\"")
     endif(WIN32)
     # Source package
     set(CPACK_SOURCE_GENERATOR "TBZ2")
