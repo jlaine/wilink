@@ -21,20 +21,10 @@ import QtQuick 1.0
 import 'utils.js' as Utils
 
 Panel {
-    PanelHeader {
-        id: header
-
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        iconSource: 'rss.png'
-        title: qsTr('News reader')
-    }
-
     ContactView {
         id: sidebar
 
-        anchors.top: header.bottom
+        anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         title: qsTr('My news')
@@ -100,15 +90,25 @@ Panel {
     Item {
         id: main
 
-        anchors.top: header.bottom
+        anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.left: sidebar.right
         anchors.right: parent.right
 
+        PanelHeader {
+            id: header
+
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            iconSource: 'rss.png'
+            title: qsTr('News reader')
+        }
+
         ListView {
             id: mainView
 
-            anchors.top: parent.top
+            anchors.top: header.bottom
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.right: scrollBar.left
