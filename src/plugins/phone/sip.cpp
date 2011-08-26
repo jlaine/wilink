@@ -1316,27 +1316,28 @@ void SipClient::transactionFinished()
 
                 QList<QByteArray> contacts = reply.headerFieldValues("Contact");
                 const QByteArray expectedContact = transaction->request().headerField("Contact");
+                int expireSeconds = 0;
                 foreach (const QByteArray &contact, contacts) {
                     if (contact.startsWith(expectedContact)) {
-                        // schedule next register
                         QMap<QByteArray, QByteArray> params = SipMessage::valueParameters(contact);
-                        const int marginSeconds = 10;
-                        const int registerSeconds = params.value("expires").toInt();
-                        if (registerSeconds > marginSeconds) {
-                            debug(QString("Re-registering in %1 seconds").arg(registerSeconds - marginSeconds));
-                            QTimer::singleShot((registerSeconds - marginSeconds) * 1000, this, SLOT(registerWithServer()));
-                        }
-                        break;
+                        expireSeconds = params.value("expires").toInt();
+                        if (expireSeconds > 0)
+                            break;
                     }
                 }
+                // if we could not find an "expires" parameter for our contact, fall back to "Expires" header
+                if (expireSeconds <= 0)
+                    expireSeconds = reply.headerField("Expires").toInt();
 
-#if 0
-                // send subscribe
-                const QByteArray uri = QString("sip:%1@%2").arg(username, domain).toUtf8();
-                SipMessage request = buildRequest("SUBSCRIBE", uri, this, cseq++);
-                request.setHeaderField("Expires", QByteArray::number(EXPIRE_SECONDS));
-                d->transactions << new SipTransaction(request, this, this);
-#endif
+                // schedule next register
+                const int marginSeconds = 10;
+                if (expireSeconds > marginSeconds) {
+                    debug(QString("Re-registering in %1 seconds").arg(expireSeconds - marginSeconds));
+                    QTimer::singleShot((expireSeconds - marginSeconds) * 1000, this, SLOT(registerWithServer()));
+                } else {
+                    warning(QString("Could not schedule next register, expires is too short: %1 seconds").arg(expireSeconds));
+                }
+
             }
         } else {
             warning("Register failed");
