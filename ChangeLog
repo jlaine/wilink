@@ -2,6 +2,7 @@ wiLink 2.1.0 (UNRELEASED)
  * Application:
   - Add support for plugins.
   - Remove all data when uninstalling on Windows.
+  - Fix compilation on Linux with linotify >= 0.7.0.
  * Calls:
   - Add support for vp8 codec.
   - Add full-screen mode.
