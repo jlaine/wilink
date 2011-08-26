@@ -87,24 +87,18 @@ Panel {
         }
     }
 
-    Item {
+    PhoneContactView {
         id: sidebar
 
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         width: 200
+        contactsModel: historyModel.contactsModel
 
-        PhoneContactView {
-            id: addressbook
-
-            anchors.fill: parent
-            contactsModel: historyModel.contactsModel
-
-            onItemClicked: {
-                var address = buildAddress(model.phone, historyModel.client.domain);
-                historyModel.call(address);
-            }
+        onItemClicked: {
+            var address = buildAddress(model.phone, historyModel.client.domain);
+            historyModel.call(address);
         }
     }
 
