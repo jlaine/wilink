@@ -19,6 +19,9 @@
 
 #ifdef USE_LIBNOTIFY
 #include <libnotify/notify.h>
+#ifndef NOTIFY_CHECK_VERSION
+#define NOTIFY_CHECK_VERSION(x,y,z) 0
+#endif
 #endif
 
 #include <QDesktopServices>
@@ -411,7 +414,9 @@ Notification *Application::showMessage(const QString &title, const QString &mess
 #if defined(USE_LIBNOTIFY)
     NotifyNotification *notification = notify_notification_new((const char *)title.toUtf8(),
                                                                (const char *)message.toUtf8(),
+#if !NOTIFY_CHECK_VERSION(0, 7, 0)
                                                                NULL,
+#endif
                                                                NULL);
 
     if( !notification ) {
