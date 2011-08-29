@@ -1,4 +1,4 @@
-wiLink 2.1.0 (UNRELEASED)
+wiLink 2.1.0 (2011-08-29)
  * Application:
   - Add support for plugins.
   - Remove all data when uninstalling on Windows.
