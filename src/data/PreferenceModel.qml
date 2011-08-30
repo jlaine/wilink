@@ -42,11 +42,9 @@ ListModel {
             'iconSource': 'audio-output.png',
             'name': qsTr('Sound'),
             'source': 'SoundPreferencePanel.qml'});
-/*
         append({
             'iconSource': 'plugin.png',
             'name': qsTr('Plugins'),
             'source': 'PluginPreferencePanel.qml'});
-*/
     }
 }
