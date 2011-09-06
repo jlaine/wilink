@@ -20,6 +20,7 @@
 import QtQuick 1.0
 import QXmpp 0.4
 import wiLink 2.0
+import 'utils.js' as Utils
 
 Panel {
     id: panel
@@ -66,7 +67,8 @@ Panel {
         anchors.top: header.bottom
 
         Component.onCompleted: {
-            crumbBar.push({'name': 'Wifirst', 'jid': 'wifirst.net', 'node': ''})
+            var domain = Utils.jidToDomain(appClient.jid);
+            crumbBar.push({'name': domain, 'jid': domain, 'node': ''})
         }
 
         onLocationChanged: {
