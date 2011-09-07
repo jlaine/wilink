@@ -111,7 +111,6 @@ public:
         XA = QXmppPresence::Status::XA,
         DND = QXmppPresence::Status::DND,
         Chat = QXmppPresence::Status::Chat,
-        Invisible = QXmppPresence::Status::Invisible,
     };
 };
 

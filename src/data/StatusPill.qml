@@ -38,7 +38,6 @@ Item {
             case QXmppPresence.DND:
                 return 'busy';
             case QXmppPresence.Offline:
-            case QXmppPresence.Invisible:
             default:
                 return 'offline';
         }
