@@ -44,9 +44,6 @@ Window::Window(const QUrl &url, const QString &jid, QWidget *parent)
     else
         setWindowTitle(QString("%1 - %2").arg(jid, qApp->applicationName()));
 
-    // FIXME: set logger
-    //logger->setLoggingType(QXmppLogger::SignalLogging);
-
     // create declarative view
     QDeclarativeView *view = new QDeclarativeView;
     view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
