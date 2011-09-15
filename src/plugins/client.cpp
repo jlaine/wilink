@@ -89,7 +89,6 @@ void ChatClient::connectToServer(const QString &jid, const QString &password)
         config.setStreamSecurityMode(QXmppConfiguration::TLSRequired);
         config.setIgnoreSslErrors(false);
     }
-    config.setKeepAliveTimeout(15);
     QXmppClient::connectToServer(config);
 }
 
