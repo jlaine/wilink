@@ -241,8 +241,9 @@ void RosterModel::setClient(ChatClient *client)
                         this, SLOT(_q_itemChanged(QString)));
         Q_ASSERT(check);
 
+        // use a queued connection so that the VCard gets updated first
         check = connect(VCardCache::instance(), SIGNAL(cardChanged(QString)),
-                        this, SLOT(_q_itemChanged(QString)));
+                        this, SLOT(_q_itemChanged(QString)), Qt::QueuedConnection);
         Q_ASSERT(check);
 
         check = connect(d->client->rosterManager(), SIGNAL(rosterReceived()),
