@@ -1,3 +1,7 @@
+wiLink 2.2.0 (UNRELEASED)
+ * Roster:
+  - Fix updating contact name after the contact is renamed.
+
 wiLink 2.1.0 (2011-08-29)
  * Application:
   - Add support for plugins.
