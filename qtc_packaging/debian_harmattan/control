@@ -1,0 +1,14 @@
+Source: wilink
+Section: net
+Priority: optional
+Maintainer: Jeremy Lainé <jeremy.laine@bolloretelecom.eu>
+Build-Depends: debhelper (>= 5), libqt4-dev
+Standards-Version: 3.7.3
+Homepage: http://opensource.wifirst.net/projects/wilink/
+
+Package: wilink
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Utilities for Wifirst services
+ This package provides a set of utilities to interact with the Wifirst
+XSBC-Maemo-Display-Name: wilink
