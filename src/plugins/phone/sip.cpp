@@ -1001,11 +1001,11 @@ void SipClient::connectToServer()
 
     // perform DNS SRV lookups
     debug(QString("Looking up STUN server for domain %1").arg(d->domain));
-    QXmppSrvInfo::lookupService("_stun._udp." + d->domain, this,
+    QXmppSrvInfo::lookupService("_stun._udp", d->domain, this,
                                 SLOT(setStunServer(QXmppSrvInfo)));
 
     debug(QString("Looking up SIP server for domain %1").arg(d->domain));
-    QXmppSrvInfo::lookupService("_sip._udp." + d->domain, this,
+    QXmppSrvInfo::lookupService("_sip._udp", d->domain, this,
                                 SLOT(setSipServer(QXmppSrvInfo)));
 }
 

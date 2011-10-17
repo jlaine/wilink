@@ -196,7 +196,7 @@ void ChatClient::slotConnected()
 
     // lookup TURN server
     debug(QString("Looking up STUN server for domain %1").arg(domain));
-    QXmppSrvInfo::lookupService("_turn._udp." + domain, this,
+    QXmppSrvInfo::lookupService("_turn._udp", domain, this,
                                 SLOT(setTurnServer(QXmppSrvInfo)));
 }
 
