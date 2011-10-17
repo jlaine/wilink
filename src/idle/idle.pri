@@ -6,7 +6,7 @@ IDLE_LIBRARY_DIR = $$PWD
 IDLE_LIBRARY_NAME = idle
 
 # Libraries used internal by idle
-android|symbian {
+android|symbian|contains(MEEGO_EDITION,harmattan) {
 
 } else:mac {
     IDLE_INTERNAL_LIBS = -framework Carbon

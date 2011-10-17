@@ -10,7 +10,7 @@ HEADERS = idle.h
 SOURCES = idle.cpp
 LIBS += $$IDLE_INTERNAL_LIBS
 
-android|symbian {
+android|symbian|contains(MEEGO_EDITION,harmattan) {
     SOURCES += idle_stub.cpp
 } else:mac {
     SOURCES += idle_mac.cpp
