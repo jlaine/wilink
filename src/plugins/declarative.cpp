@@ -168,11 +168,11 @@ QNetworkReply *NetworkAccessManager::createRequest(Operation op, const QNetworkR
 
 void NetworkAccessManager::onSslErrors(QNetworkReply *reply, const QList<QSslError> &errors)
 {
-    QList<QSslError>::const_iterator iter;
+    Q_UNUSED(reply);
 
     qWarning("SSL errors:");
-    for (iter = errors.constBegin(); iter != errors.constEnd(); iter++)
-        qWarning("* %s", qPrintable(iter->errorString()));
+    foreach (const QSslError &error, errors)
+        qWarning("* %s", qPrintable(error.errorString()));
 
     // uncomment for debugging purposes only
     //reply->ignoreSslErrors();
