@@ -1,6 +1,7 @@
 include(IconUtilities)
 generate_icns(icns wiLink.svg)
 generate_ico(ico wiLink.svg)
+generate_xpm(xpm wiLink.svg)
 
 # 10x10 images
 generate_png(png SIZE 11
@@ -91,5 +92,5 @@ generate_png(png SIZE 128 SUFFIX -128
     file.svg
     peer.svg)
 
-add_custom_target(icons DEPENDS ${icns} ${ico} ${png})
+add_custom_target(icons DEPENDS ${icns} ${ico} ${png} ${xpm})
 

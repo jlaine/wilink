@@ -1,2 +1,3 @@
 src/data/wiLink.desktop usr/share/applications
+src/data/wiLink.xpm usr/share/pixmaps
 src/data/wiLink.png usr/share/icons/hicolor/32x32/apps
