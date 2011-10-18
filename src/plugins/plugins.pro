@@ -95,10 +95,10 @@ isEmpty(PREFIX) {
 }
 desktop.path = $$PREFIX/share/applications
 desktop.files = ../data/wiLink.desktop
-pixmap.path = $$PREFIX/share/pixmaps
-pixmap.files = ../data/wiLink.xpm
+icon.path = $$PREFIX/share/icons/hicolor/32x32/apps
+icon.files = ../data/wiLink.png
 target.path = $$PREFIX/bin
-INSTALLS += desktop pixmap target
+INSTALLS += desktop icon target
 
 # Symbian packaging rules
 symbian {
