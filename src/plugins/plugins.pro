@@ -89,6 +89,17 @@ LIBS += \
     $$QXMPP_LIBS
 PRE_TARGETDEPS += $$QXMPP_LIBRARY_FILE
 
+# Installation
+isEmpty(PREFIX) {
+    PREFIX=/usr
+}
+desktop.path = $$PREFIX/share/applications
+desktop.files = ../data/wiLink.desktop
+pixmap.path = $$PREFIX/share/pixmaps
+pixmap.files = ../data/wiLink.xpm
+target.path = $$PREFIX/bin
+INSTALLS += desktop pixmap target
+
 # Symbian packaging rules
 symbian {
     vendorinfo = \
