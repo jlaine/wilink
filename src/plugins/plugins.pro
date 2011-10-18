@@ -99,8 +99,10 @@ icon.path = $$PREFIX/share/icons/hicolor/32x32/apps
 icon.files = ../data/wiLink.png
 pixmap.path = $$PREFIX/share/pixmaps
 pixmap.files = ../data/wiLink.xpm
+scalable.path = $$PREFIX/share/icons/hicolor/scalable/apps
+scalable.files = ../data/wiLink.svg
 target.path = $$PREFIX/bin
-INSTALLS += desktop icon target
+INSTALLS += desktop icon pixmap scalable target
 
 # Symbian packaging rules
 symbian {
