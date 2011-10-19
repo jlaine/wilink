@@ -110,7 +110,9 @@ target.path = $$PREFIX/bin
 INSTALLS += desktop icon pixmap scalable target
 
 # Symbian packaging rules
-symbian {
+mac {
+    ICON = ../data/wiLink.icns
+} else:symbian {
     vendorinfo = \
         "; Localised Vendor name" \
         "%{\"Wifirst\"}" \
