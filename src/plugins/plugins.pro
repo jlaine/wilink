@@ -113,10 +113,13 @@ INSTALLS += desktop icon pixmap scalable target
 mac {
     ICON = ../data/wiLink.icns
     QMAKE_INFO_PLIST = ../data/wiLink.plist
-    QMAKE_POST_LINK = $$[QT_INSTALL_BINS]/macdeployqt wiLink.app && ../../cmake/copyplugins wiLink.app $$QMAKE_QMAKE \
-        $$[QT_INSTALL_PLUGINS]/imageformats/libqgif.* \
-        $$[QT_INSTALL_PLUGINS]/imageformats/libqjpeg.* \
-        $$[QT_INSTALL_PLUGINS]/sqldrivers/libqsqlite.*
+    QMAKE_POST_LINK = \
+        sed -i -e \"s,@VERSION@,$$VERSION,g\" wiLink.app/Contents/Info.plist && \
+        $$[QT_INSTALL_BINS]/macdeployqt wiLink.app && \
+        ../../cmake/copyplugins wiLink.app $$QMAKE_QMAKE \
+            $$[QT_INSTALL_PLUGINS]/imageformats/libqgif.* \
+            $$[QT_INSTALL_PLUGINS]/imageformats/libqjpeg.* \
+            $$[QT_INSTALL_PLUGINS]/sqldrivers/libqsqlite.*
 } else:symbian {
     vendorinfo = \
         "; Localised Vendor name" \
