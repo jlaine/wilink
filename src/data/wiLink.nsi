@@ -3,9 +3,8 @@
 ;--------------------------------
 ; You must define these values
 
-  !define VERSION "2.1.901"
-  !define PATCH  "901"
-  !define INST_DIR "/tmp/wiLink-2.1.901-win32"
+  !define VERSION "@VERSION@"
+  !define INST_DIR "@INST_DIR@"
 
 ;--------------------------------
 ;Variables
@@ -28,7 +27,7 @@
 
   ;Name and file
   Name "wiLink"
-  OutFile "/tmp/wiLink-2.1.901-win32.exe"
+  OutFile "@OUTFILE@"
 
   ;Set compression
   SetCompressor lzma
@@ -164,7 +163,7 @@ Section "-Core installation"
   Push "wiLink"
   Call ConditionalAddToRegisty
   Push "DisplayVersion"
-  Push "2.1.901"
+  Push "@VERSION@"
   Call ConditionalAddToRegisty
   Push "Publisher"
   Push "Wifirst"
@@ -264,11 +263,11 @@ Section "Uninstall"
    "Software\Microsoft\Windows\CurrentVersion\Uninstall\wiLink" "StartMenu"
   ;MessageBox MB_OK "Start menu is in: $START_MENU"
 
+  ;Remove application data.
   RMDir /r "$LOCALAPPDATA\Wifirst\wiLink"
   RMDir "$LOCALAPPDATA\Wifirst"
 
   ;Remove files we installed.
-  ;Keep the list of directories here in sync with the File commands above.
   RMDir /r "$INSTDIR\bin"
 
   ;Remove the uninstaller itself.

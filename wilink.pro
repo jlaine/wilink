@@ -61,14 +61,16 @@ mac {
         $$QT_INSTALL_PLUGINS/sqldrivers/qsqlite4.dll
     sqldrivers.path = $$bin.path/sqldrivers
 
-    package.output = $$PACKAGE-$$VERSION
+    package.output = $$PACKAGE-$$VERSION-win32.exe
     package.commands = \
+        $(DEL_FILE) -r $$package.tmp; \
         $(MKDIR) $$package.tmp; \
         $(MKDIR) $$bin.path; \
         $(COPY_FILE) $$bin.files $$bin.path; \
         $(MKDIR) $$imageformats.path; \
         $(COPY_FILE) $$imageformats.files $$imageformats.path; \
         $(MKDIR) $$sqldrivers.path; \
-        $(COPY_FILE) $$sqldrivers.files $$sqldrivers.path
+        $(COPY_FILE) $$sqldrivers.files $$sqldrivers.path; \
+        sed -e \"s,@VERSION@,$$VERSION,g\" -e \"s,@INST_DIR@,$$package.tmp,g\" -e \"s,@OUTFILE@,$$package.output,g\" src/data/$${PACKAGE}.nsi > $${package.tmp}.nsi
     QMAKE_EXTRA_TARGETS = package
 }
