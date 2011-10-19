@@ -67,6 +67,9 @@ private:
                     withSampleBuffer:(QTSampleBuffer *)sampleBuffer
                     fromConnection:(QTCaptureConnection *)connection
 {
+    Q_UNUSED(captureOutput);
+    Q_UNUSED(sampleBuffer);
+    Q_UNUSED(connection);
     if (CVPixelBufferLockBaseAddress(videoFrame, 0) == kCVReturnSuccess) {
         const int length = CVPixelBufferGetDataSize(videoFrame);
         memcpy(currentFrame.bits(), CVPixelBufferGetBaseAddress(videoFrame), length);
@@ -124,12 +127,12 @@ private:
 };
 
 QVideoGrabberPrivate::QVideoGrabberPrivate(QVideoGrabber *qq)
-    : q(qq),
-    delegate(0),
+    : delegate(0),
     device(0),
     deviceInput(0),
     deviceOutput(0),
-    session(0)
+    session(0),
+    q(qq)
 {
 }
 
