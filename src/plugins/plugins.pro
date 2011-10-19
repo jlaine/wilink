@@ -9,7 +9,7 @@ QT += declarative network xml
 TARGET = wiLink
 VERSION = $$WILINK_VERSION
 
-DEFINES += QT_STATICPLUGIN WILINK_EMBEDDED
+DEFINES += QT_STATICPLUGIN
 
 # workaround for QTBUG-19232
 symbian {
@@ -21,6 +21,11 @@ symbian {
 # FIXME: this is a hack so that Q_OS_ANDROID is defined
 android {
     DEFINES += ANDROID
+}
+
+# embedded version
+android|symbian|contains(MEEGO_EDITION,harmattan) {
+    DEFINES += WILINK_EMBEDDED
 }
 
 SOURCES += \
