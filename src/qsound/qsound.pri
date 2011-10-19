@@ -20,6 +20,9 @@ android|symbian|contains(MEEGO_EDITION,harmattan) {
     mac {
         # qtkit support
         QSOUND_INTERNAL_LIBS += -framework QTKit -framework QuartzCore -framework Cocoa
+    } else:win32 {
+        # directshow support
+        QSOUND_INTERNAL_LIBS += -lole32 -loleaut32 -lwinmm -luuid
     }
 
     # mad support

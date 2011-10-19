@@ -39,6 +39,8 @@ SOURCES += \
 
 mac {
     SOURCES += QVideoGrabber_mac.mm
+} else:win32 {
+    SOURCES += QVideoGrabber_win.cpp
 } else {
     SOURCES += QVideoGrabber_dummy.cpp
 }
