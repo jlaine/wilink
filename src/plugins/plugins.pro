@@ -110,11 +110,13 @@ target.path = $$PREFIX/bin
 INSTALLS += desktop icon pixmap scalable target
 
 # Symbian packaging rules
+QMAKE_TARGET_COMPANY="Wifirst"
+QMAKE_TARGET_COPYRIGHT="Copyright (c) 2009-2011 Bollore telecom"
 mac {
     ICON = ../data/wiLink.icns
     QMAKE_INFO_PLIST = ../data/wiLink.plist
     QMAKE_POST_LINK = \
-        sed -i -e \"s,@VERSION@,$$VERSION,g\" wiLink.app/Contents/Info.plist && \
+        sed -i -e \"s,@VERSION@,$$VERSION,g\" -e \"s,@COPYRIGHT@,$$QMAKE_TARGET_COPYRIGHT,g\" wiLink.app/Contents/Info.plist && \
         $$[QT_INSTALL_BINS]/macdeployqt wiLink.app && \
         ../../cmake/copyplugins wiLink.app $$QMAKE_QMAKE \
             $$[QT_INSTALL_PLUGINS]/imageformats/libqgif.* \
@@ -123,10 +125,10 @@ mac {
 } else:symbian {
     vendorinfo = \
         "; Localised Vendor name" \
-        "%{\"Wifirst\"}" \
+        "%{\"$$QMAKE_TARGET_COMPANY\"}" \
         " " \
         "; Unique Vendor name" \
-        ":\"Wifirst\"" \
+        ":\"$$QMAKE_TARGET_COMPANY\"" \
         " "
 
     mobile_deployment.pkg_prerules += vendorinfo
