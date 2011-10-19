@@ -13,7 +13,20 @@ android {
     MOBILITY += multimedia
 }
 
-# Libraries for apps which use QNetIO
+# Libraries used internally by QSound
+android|symbian|contains(MEEGO_EDITION,harmattan) {
+
+} else {
+    # mad support
+    QSOUND_INTERNAL_DEFINES += USE_MAD
+    QSOUND_INTERNAL_LIBS += -lmad
+
+    # vorbisfile support
+    QSOUND_INTERNAL_DEFINES += USE_VORBISFILE
+    QSOUND_INTERNAL_LIBS += -lvorbisfile
+}
+
+# Libraries for apps which use QSound
 symbian {
     # Symbian needs a .lib extension to recognise the library as static
     QSOUND_LIBS = -L$$QSOUND_LIBRARY_DIR -l$${QSOUND_LIBRARY_NAME}.lib
@@ -21,3 +34,6 @@ symbian {
     QSOUND_LIBS = -L$$QSOUND_LIBRARY_DIR -l$${QSOUND_LIBRARY_NAME}
 }
 
+# FIXME: we should be able to use the link_prl option to automatically pull in
+# the extra libraries which our library needs, but this does not seem to work.
+QSOUND_LIBS += $$QSOUND_INTERNAL_LIBS
