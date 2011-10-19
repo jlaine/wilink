@@ -350,6 +350,8 @@ void QSoundFileMp3::rewind()
 
 qint64 QSoundFileMp3::writeData(const char *data, qint64 maxSize)
 {
+    Q_UNUSED(data);
+    Q_UNUSED(maxSize);
     return -1;
 }
 
@@ -499,6 +501,8 @@ void QSoundFileOgg::rewind()
 
 qint64 QSoundFileOgg::writeData(const char * data, qint64 maxSize)
 {
+    Q_UNUSED(data);
+    Q_UNUSED(maxSize);
     return -1;
 }
 #endif
