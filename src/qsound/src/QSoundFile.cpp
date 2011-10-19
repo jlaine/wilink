@@ -26,10 +26,10 @@
 
 #include "QSoundFile.h"
 #include "QSoundStream.h"
-#ifdef USE_MAD
+#ifdef QSOUND_USE_MAD
 #include <mad.h>
 #endif
-#ifdef USE_VORBISFILE
+#ifdef QSOUND_USE_VORBISFILE
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
 #endif
@@ -64,7 +64,7 @@ QSoundFilePrivate::QSoundFilePrivate()
 {
 }
 
-#ifdef USE_MAD
+#ifdef QSOUND_USE_MAD
 class QSoundFileMp3 : public QSoundFilePrivate
 {
 public:
@@ -385,7 +385,7 @@ bool QSoundFileMp3::writeHeader()
 
 #endif
 
-#ifdef USE_VORBISFILE
+#ifdef QSOUND_USE_VORBISFILE
 static size_t qfile_read_callback(void *ptr, size_t size, size_t nmemb, void *datasource)
 {
     QFile *file = static_cast<QFile*>(datasource);
@@ -743,11 +743,11 @@ static QSoundFilePrivate *factory(QIODevice *file, QSoundFile::FileType type, QS
     switch (type) {
     case QSoundFile::WavFile:
         return new QSoundFileWav(file, parent);
-#ifdef USE_MAD
+#ifdef QSOUND_USE_MAD
     case QSoundFile::Mp3File:
         return new QSoundFileMp3(file, parent);
 #endif
-#ifdef USE_VORBISFILE
+#ifdef QSOUND_USE_VORBISFILE
     case QSoundFile::OggFile:
         return new QSoundFileOgg(file, parent);
 #endif

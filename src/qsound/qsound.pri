@@ -18,11 +18,11 @@ android|symbian|contains(MEEGO_EDITION,harmattan) {
 
 } else {
     # mad support
-    QSOUND_INTERNAL_DEFINES += USE_MAD
+    QSOUND_INTERNAL_DEFINES += QSOUND_USE_MAD
     QSOUND_INTERNAL_LIBS += -lmad
 
     # vorbisfile support
-    QSOUND_INTERNAL_DEFINES += USE_VORBISFILE
+    QSOUND_INTERNAL_DEFINES += QSOUND_USE_VORBISFILE
     QSOUND_INTERNAL_LIBS += -lvorbisfile
 }
 
