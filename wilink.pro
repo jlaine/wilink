@@ -61,9 +61,11 @@ mac {
         $$QT_INSTALL_PLUGINS/sqldrivers/qsqlite4.dll
     sqldrivers.path = $$bin.path/sqldrivers
 
+    package.log = $${PACKAGE}.log
+    package.nsi = $${PACKAGE}.nsi
     package.output = $$PACKAGE-$$VERSION-win32.exe
     package.commands = \
-        $(DEL_FILE) -r $$package.tmp; \
+        $(DEL_FILE) -rf $$package.tmp; \
         $(MKDIR) $$package.tmp; \
         $(MKDIR) $$bin.path; \
         $(COPY_FILE) $$bin.files $$bin.path; \
@@ -71,6 +73,8 @@ mac {
         $(COPY_FILE) $$imageformats.files $$imageformats.path; \
         $(MKDIR) $$sqldrivers.path; \
         $(COPY_FILE) $$sqldrivers.files $$sqldrivers.path; \
-        sed -e \"s,@VERSION@,$$VERSION,g\" -e \"s,@INST_DIR@,$$package.tmp,g\" -e \"s,@OUTFILE@,$$package.output,g\" src/data/$${PACKAGE}.nsi > $${package.tmp}.nsi
+        sed -e \"s,@VERSION@,$$VERSION,g\" -e \"s,@INST_DIR@,$$package.tmp,g\" -e \"s,@OUTFILE@,$$package.output,g\" src/data/$${PACKAGE}.nsi > $$package.nsi; \
+        makensis -O$$package.log $$package.nsi; \
+        $(DEL_FILE) $$package.log $$package.nsi
     QMAKE_EXTRA_TARGETS = package
 }
