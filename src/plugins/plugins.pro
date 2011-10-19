@@ -116,7 +116,7 @@ mac {
     ICON = ../data/wiLink.icns
     QMAKE_INFO_PLIST = ../data/wiLink.plist
     QMAKE_POST_LINK = \
-        sed -i -e \"s,@VERSION@,$$VERSION,g\" -e \"s,@COPYRIGHT@,$$QMAKE_TARGET_COPYRIGHT,g\" wiLink.app/Contents/Info.plist && \
+        sed -i \"\" -e \"s,@VERSION@,$$VERSION,g\" -e \"s,@COPYRIGHT@,$$QMAKE_TARGET_COPYRIGHT,g\" wiLink.app/Contents/Info.plist && \
         $$[QT_INSTALL_BINS]/macdeployqt wiLink.app && \
         ../../cmake/copyplugins wiLink.app $$QMAKE_QMAKE \
             $$[QT_INSTALL_PLUGINS]/imageformats/libqgif.* \
