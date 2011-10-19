@@ -112,6 +112,7 @@ INSTALLS += desktop icon pixmap scalable target
 # Symbian packaging rules
 mac {
     ICON = ../data/wiLink.icns
+    QMAKE_INFO_PLIST = ../data/wiLink.plist
 } else:symbian {
     vendorinfo = \
         "; Localised Vendor name" \
