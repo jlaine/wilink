@@ -62,6 +62,7 @@ Window::Window(const QUrl &url, const QString &jid, QWidget *parent)
 
     setCentralWidget(view);
 
+#ifndef WILINK_EMBEDDED
     /* "File" menu */
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
 
@@ -96,6 +97,7 @@ Window::Window(const QUrl &url, const QString &jid, QWidget *parent)
     check = connect(action, SIGNAL(triggered(bool)),
                     this, SIGNAL(showAbout()));
     Q_ASSERT(check);
+#endif
 
     /* set up keyboard shortcuts */
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_W), this);
