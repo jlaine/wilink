@@ -17,6 +17,11 @@ android {
 android|symbian|contains(MEEGO_EDITION,harmattan) {
 
 } else {
+    mac {
+        # qtkit support
+        QSOUND_INTERNAL_LIBS += -framework QTKit -framework QuartzCore -framework Cocoa
+    }
+
     # mad support
     QSOUND_INTERNAL_DEFINES += QSOUND_USE_MAD
     QSOUND_INTERNAL_LIBS += -lmad

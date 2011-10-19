@@ -35,5 +35,10 @@ SOURCES += \
     QSoundPlayer.cpp \
     QSoundStream.cpp \
     QSoundTester.cpp \
-    QVideoGrabber.cpp \
-    QVideoGrabber_dummy.cpp
+    QVideoGrabber.cpp
+
+mac {
+    SOURCES += QVideoGrabber_mac.mm
+} else {
+    SOURCES += QVideoGrabber_dummy.cpp
+}
