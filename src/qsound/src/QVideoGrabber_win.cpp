@@ -99,10 +99,10 @@ public:
     bool open();
 
     QXmppVideoFrame currentFrame;
-    bool opened;
     ICaptureGraphBuilder2 *captureGraphBuilder;
     IGraphBuilder *filterGraph;
     bool flip;
+    bool opened;
     ISampleGrabber *sampleGrabber;
     IBaseFilter *sampleGrabberFilter;
     IBaseFilter *source;
