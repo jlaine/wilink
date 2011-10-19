@@ -33,6 +33,9 @@
  */
 - (BOOL)applicationShouldHandleReopen: (NSApplication *)app hasVisibleWindows: (BOOL) flag
 {
+    Q_UNUSED(app);
+    Q_UNUSED(flag);
+
     wApp->showWindows();
     return NO;
 }
@@ -41,6 +44,8 @@
  */
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
 {
+    Q_UNUSED(sender);
+
     return NSTerminateNow;
 }
 
@@ -48,6 +53,8 @@
 
 void Application::alert(QWidget *widget)
 {
+    Q_UNUSED(widget);
+
     NSApplicationLoad();
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     [[NSApplication sharedApplication] requestUserAttention:NSCriticalRequest];
