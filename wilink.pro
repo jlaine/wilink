@@ -25,6 +25,7 @@ mac {
         rm -rf $$package.tmp
     QMAKE_EXTRA_TARGETS = package
 } else:win32 {
+    DEL_TREE=rm -rf
     QT_INSTALL_BINS=/usr/i586-mingw32msvc/bin
     QT_INSTALL_PLUGINS=/usr/i586-mingw32msvc/lib/qt4
 
@@ -65,7 +66,7 @@ mac {
     package.nsi = $${PACKAGE}.nsi
     package.output = $$PACKAGE-$$VERSION-win32.exe
     package.commands = \
-        $(DEL_FILE) -rf $$package.tmp; \
+        $$DEL_TREE $$package.tmp; \
         $(MKDIR) $$package.tmp; \
         $(MKDIR) $$bin.path; \
         $(COPY_FILE) $$bin.files $$bin.path; \
@@ -75,6 +76,7 @@ mac {
         $(COPY_FILE) $$sqldrivers.files $$sqldrivers.path; \
         sed -e \"s,@VERSION@,$$VERSION,g\" -e \"s,@INST_DIR@,$$package.tmp,g\" -e \"s,@OUTFILE@,$$package.output,g\" src/data/$${PACKAGE}.nsi > $$package.nsi; \
         makensis -O$$package.log $$package.nsi; \
-        $(DEL_FILE) $$package.log $$package.nsi
+        $(DEL_FILE) $$package.log $$package.nsi; \
+        $$DEL_TREE $$package.tmp
     QMAKE_EXTRA_TARGETS = package
 }
