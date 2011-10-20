@@ -147,8 +147,8 @@ Panel {
             anchors.top: header.bottom
             anchors.left: parent.left
             anchors.right: parent.right
-            text: qsTr('You can subscribe to the phone service at the following address:') + ' <a href="' + historyModel.selfcareUrl + '">' + historyModel.selfcareUrl + '</a>';
-            visible: !historyModel.enabled
+            text: (historyModel.enabled ? qsTr('You can view your phone bills and your call history at the following address:') : qsTr('You can subscribe to the phone service at the following address:')) + ' <a href="' + historyModel.selfcareUrl + '">' + historyModel.selfcareUrl + '</a>';
+            visible: historyModel.selfcareUrl != ''
         }
 
         Item {
