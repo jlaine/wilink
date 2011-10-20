@@ -3,6 +3,9 @@ bundle=$1
 QMAKE=$2
 [ -n "$QMAKE" ] || exit 0
 
+# copy libraries
+macdeployqt $bundle -no-plugins
+
 # generate Qt config file
 mkdir -p $bundle/Contents/Resources
 ( echo "[Paths]"; echo "Plugins = PlugIns" ) > $bundle/Contents/Resources/qt.conf

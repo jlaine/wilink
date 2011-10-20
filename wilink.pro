@@ -9,6 +9,7 @@ PACKAGE = wiLink
 VERSION = $$WILINK_VERSION
 package.tmp = $${PACKAGE}.tmp
 mac {
+    package.depends = first
     package.output = $$PACKAGE-$$VERSION-mac-10.6.dmg
     package.bundle = $${PACKAGE}.app
     package.commands =  \
@@ -16,7 +17,6 @@ mac {
         $(MKDIR) $$package.tmp; \
         ln -s /Applications $$package.tmp/Applications; \
         cp -r src/plugins/$$package.bundle $$package.tmp; \
-        $$[QT_INSTALL_BINS]/macdeployqt $$package.tmp/$$package.bundle; \
         cmake/copyplugins $$package.tmp/$$package.bundle $$QMAKE_QMAKE \
             $$[QT_INSTALL_PLUGINS]/imageformats/libqgif.* \
             $$[QT_INSTALL_PLUGINS]/imageformats/libqjpeg.* \
@@ -62,6 +62,7 @@ mac {
         $$QT_INSTALL_PLUGINS/sqldrivers/qsqlite4.dll
     sqldrivers.path = $$bin.path/sqldrivers
 
+    package.depends = first
     package.log = $${PACKAGE}.log
     package.nsi = $${PACKAGE}.nsi
     package.output = $$PACKAGE-$$VERSION-win32.exe
