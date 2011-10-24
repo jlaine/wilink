@@ -5,6 +5,7 @@ TEMPLATE = lib
 CONFIG += staticlib
 
 # Target definition
+DESTDIR = $$OUT_PWD
 TARGET = $$QSOUND_LIBRARY_NAME
 VERSION = $$QSOUND_VERSION
 
