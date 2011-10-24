@@ -1,7 +1,6 @@
 # Common definitions
 
 QSOUND_INCLUDE_DIR = $$PWD/src
-QSOUND_LIBRARY_DIR = $$PWD/src
 QSOUND_LIBRARY_NAME = qsound
 
 android {
@@ -37,9 +36,9 @@ android|symbian|contains(MEEGO_EDITION,harmattan) {
 # Libraries for apps which use QSound
 symbian {
     # Symbian needs a .lib extension to recognise the library as static
-    QSOUND_LIBS = -L$$QSOUND_LIBRARY_DIR -l$${QSOUND_LIBRARY_NAME}.lib
+    QSOUND_LIBS = -l$${QSOUND_LIBRARY_NAME}.lib
 } else {
-    QSOUND_LIBS = -L$$QSOUND_LIBRARY_DIR -l$${QSOUND_LIBRARY_NAME}
+    QSOUND_LIBS = -l$${QSOUND_LIBRARY_NAME}
 }
 
 # FIXME: we should be able to use the link_prl option to automatically pull in

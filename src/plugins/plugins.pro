@@ -88,10 +88,10 @@ INCLUDEPATH += \
     $$QSOUND_INCLUDE_DIR \
     $$QXMPP_INCLUDE_DIR
 LIBS += \
-    $$IDLE_LIBS \
-    $$QNETIO_LIBS \
-    $$QSOUND_LIBS \
-    $$QXMPP_LIBS
+    -L../idle $$IDLE_LIBS \
+    -L../qnetio/src $$QNETIO_LIBS \
+    -L../qsound/src $$QSOUND_LIBS \
+    -L../qxmpp/src $$QXMPP_LIBS
 PRE_TARGETDEPS += $$QXMPP_LIBRARY_FILE
 
 # Installation
