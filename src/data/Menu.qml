@@ -59,20 +59,20 @@ Rectangle {
         z: -1
     }
 
-    ListView {
-        id: menuList
-
+    Column {
         anchors.fill: parent
         anchors.topMargin: 1
         anchors.leftMargin: 1
-        clip: true
-        model: menu.model
 
-        delegate: MenuDelegate {
-            id: menuItem
+        Repeater {
+            model: menu.model
 
-            iconDelegate: menu.iconDelegate
-            onClicked: itemClicked(index)
+            delegate: MenuDelegate {
+                id: menuItem
+
+                iconDelegate: menu.iconDelegate
+                onClicked: itemClicked(index)
+            }
         }
     }
 }
