@@ -17,7 +17,7 @@ mac {
         $(MKDIR) $$package.tmp; \
         ln -s /Applications $$package.tmp/Applications; \
         cp -r src/plugins/$$package.bundle $$package.tmp; \
-        cmake/copyplugins $$package.tmp/$$package.bundle $$QMAKE_QMAKE \
+        $$PWD/cmake/copyplugins $$package.tmp/$$package.bundle $$QMAKE_QMAKE \
             $$[QT_INSTALL_PLUGINS]/imageformats/libqgif.* \
             $$[QT_INSTALL_PLUGINS]/imageformats/libqjpeg.* \
             $$[QT_INSTALL_PLUGINS]/sqldrivers/libqsqlite.*; \
