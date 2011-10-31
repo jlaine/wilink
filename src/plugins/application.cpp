@@ -324,9 +324,9 @@ void Application::resetWindows()
     /* check we have a valid account */
     if (d->appSettings->chatAccounts().isEmpty()) {
 #ifdef MEEGO_EDITION_HARMATTAN
-        Window *window = new Window(qmlUrl("SetupWindow.qml"), QString());
+        Window *window = new Window(qmlUrl("MeegoSetup.qml"), QString());
 #else
-        Window *window = new Window(qmlUrl("MeegoSetup.qml"), jid);
+        Window *window = new Window(qmlUrl("SetupWindow.qml"), QString());
 #endif
 
         const QSize size = QApplication::desktop()->availableGeometry(window).size();
