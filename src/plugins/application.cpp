@@ -338,7 +338,11 @@ void Application::resetWindows()
     int ypos = 20;
     const QStringList chatJids = d->appSettings->chatAccounts();
     foreach (const QString &jid, chatJids) {
+#ifdef MEEGO_EDITION_HARMATTAN
+        Window *window = new Window(qmlUrl("MeegoMain.qml"), jid);
+#else
         Window *window = new Window(qmlUrl("MainWindow.qml"), jid);
+#endif
 
 #ifdef WILINK_EMBEDDED
         Q_UNUSED(xpos);
