@@ -323,8 +323,7 @@ void Application::resetWindows()
 
     /* check we have a valid account */
     if (d->appSettings->chatAccounts().isEmpty()) {
-
-        Window *window = new Window(qmlUrl("setup.qml"), QString());
+        Window *window = new Window(qmlUrl("SetupWindow.qml"), QString());
 
         const QSize size = QApplication::desktop()->availableGeometry(window).size();
         window->move((size.width() - window->width()) / 2, (size.height() - window->height()) / 2);
@@ -339,7 +338,7 @@ void Application::resetWindows()
     int ypos = 20;
     const QStringList chatJids = d->appSettings->chatAccounts();
     foreach (const QString &jid, chatJids) {
-        Window *window = new Window(qmlUrl("main.qml"), jid);
+        Window *window = new Window(qmlUrl("MainWindow.qml"), jid);
 
 #ifdef WILINK_EMBEDDED
         Q_UNUSED(xpos);

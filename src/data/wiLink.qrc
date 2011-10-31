@@ -78,8 +78,6 @@
     <file>wiLink-64.png</file>
     <!-- QML -->
     <file>utils.js</file>
-    <file>main.qml</file>
-    <file>setup.qml</file>
     <file>AboutDialog.qml</file>
     <file>AccountAddPanel.qml</file>
     <file>AccountListPanel.qml</file>
@@ -119,6 +117,7 @@
     <file>KeyPad.qml</file>
     <file>LogPanel.qml</file>
     <file>DebugPlugin.qml</file>
+    <file>MainWindow.qml</file>
     <file>Menu.qml</file>
     <file>MenuDelegate.qml</file>
     <file>NewsPanel.qml</file>
@@ -156,6 +155,7 @@
     <file>RoomPermissionDialog.qml</file>
     <file>RoomSubjectDialog.qml</file>
     <file>ScrollBar.qml</file>
+    <file>SetupWindow.qml</file>
     <file>SharePanel.qml</file>
     <file>SharePlugin.qml</file>
     <file>SharePreferencePanel.qml</file>
