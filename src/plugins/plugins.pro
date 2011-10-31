@@ -22,6 +22,9 @@ symbian {
 android {
     DEFINES += ANDROID
 }
+contains(MEEGO_EDITION,harmattan) {
+    DEFINES += MEEGO_EDITION_HARMATTAN
+}
 
 # embedded version
 android|symbian|contains(MEEGO_EDITION,harmattan) {

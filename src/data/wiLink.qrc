@@ -119,6 +119,7 @@
     <file>DebugPlugin.qml</file>
     <file>MainWindow.qml</file>
     <file>MeegoMain.qml</file>
+    <file>MeegoSetup.qml</file>
     <file>Menu.qml</file>
     <file>MenuDelegate.qml</file>
     <file>NewsPanel.qml</file>

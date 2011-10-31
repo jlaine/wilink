@@ -323,7 +323,11 @@ void Application::resetWindows()
 
     /* check we have a valid account */
     if (d->appSettings->chatAccounts().isEmpty()) {
+#ifdef MEEGO_EDITION_HARMATTAN
         Window *window = new Window(qmlUrl("SetupWindow.qml"), QString());
+#else
+        Window *window = new Window(qmlUrl("MeegoSetup.qml"), jid);
+#endif
 
         const QSize size = QApplication::desktop()->availableGeometry(window).size();
         window->move((size.width() - window->width()) / 2, (size.height() - window->height()) / 2);
