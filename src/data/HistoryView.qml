@@ -239,6 +239,12 @@ Item {
                         width: parent.width
                     }
                 }
+
+                ListView.onAdd: SequentialAnimation {
+                    PropertyAction { target: item; property: "opacity"; value: 0 }
+                    NumberAnimation { target: item; property: "opacity"; to: 1; duration: 250; easing.type: Easing.InOutQuad }
+                }
+
             }
         }
 
