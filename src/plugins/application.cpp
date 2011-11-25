@@ -357,6 +357,7 @@ void Application::resetWindows()
         const QByteArray geometry = d->appSettings->windowGeometry(jid);
         if (!geometry.isEmpty()) {
             window->restoreGeometry(geometry);
+            window->setWindowState(window->windowState() & ~Qt::WindowFullScreen);
         } else {
             QSize size = QApplication::desktop()->availableGeometry(window).size();
             size.setHeight(size.height() - 100);

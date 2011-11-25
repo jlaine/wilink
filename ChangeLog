@@ -1,4 +1,6 @@
 wiLink 2.2.0 (UNRELEASED)
+ * Application:
+  - Clear fullscreen flag when restoring window geometry.
  * Conversations:
   - Add an animation when a new message is sent/received.
  * Roster:
