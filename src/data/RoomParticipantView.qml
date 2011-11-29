@@ -42,6 +42,9 @@ Item {
 
         delegate: Item {
             id: item
+
+            property bool moderator: (model.affiliation >= QXmppMucItem.AdminAffiliation)
+
             width: 80
             height: 54
 
@@ -66,12 +69,24 @@ Item {
                 Text {
                     anchors.left: parent.left
                     anchors.right: parent.right
-                    color: '#2689d6'
+                    color: moderator ? '#ff6500' : '#2689d6'
                     elide: Text.ElideRight
                     horizontalAlignment: Text.AlignHCenter
                     font.pixelSize: appStyle.font.smallSize
                     text: model.name
                 }
+            }
+
+            Image {
+                anchors.top: parent.top
+                anchors.right: parent.right
+                asynchronous: true
+                anchors.rightMargin: 10
+                source: 'moderator.png'
+                smooth: true
+                height: appStyle.icon.smallSize
+                width: appStyle.icon.smallSize
+                visible: moderator
             }
 
             MouseArea {

@@ -395,6 +395,7 @@ class ChatRoomItem : public ChatModelItem
 public:
     QString jid;
     QXmppPresence::Status::Type status;
+    QXmppMucItem::Affiliation affiliation;
 };
 
 RoomModel::RoomModel(QObject *parent)
@@ -402,6 +403,10 @@ RoomModel::RoomModel(QObject *parent)
     m_room(0)
 {
     m_historyModel = new HistoryModel(this);
+
+    QHash<int, QByteArray> names = roleNames();
+    names.insert(RoomModel::AffiliationRole, "affiliation");
+    setRoleNames(names);
 
     connect(VCardCache::instance(), SIGNAL(cardChanged(QString)),
             this, SLOT(participantChanged(QString)));
@@ -419,6 +424,8 @@ QVariant RoomModel::data(const QModelIndex &index, int role) const
         return item->jid;
     } else if (role == ChatModel::NameRole) {
         return jidToResource(item->jid);
+    } else if (role == RoomModel::AffiliationRole) {
+        return item->affiliation;
     }
 
     return QVariant();
@@ -495,13 +502,15 @@ void RoomModel::participantAdded(const QString &jid)
     Q_ASSERT(m_room);
     //qDebug("participant added %s", qPrintable(jid));
 
+    const QXmppMucItem::Affiliation affiliation = m_room->participantPresence(jid).mucItem().affiliation();
     int row = rootItem->children.size();
     foreach (ChatModelItem *ptr, rootItem->children) {
         ChatRoomItem *item = static_cast<ChatRoomItem*>(ptr);
         if (item->jid == jid) {
             qWarning("participant added twice %s", qPrintable(jid));
             return;
-        } else if (item->jid.compare(jid, Qt::CaseInsensitive) > 0) {
+        } else if (affiliation > item->affiliation ||
+                   (affiliation == item->affiliation && item->jid.compare(jid, Qt::CaseInsensitive) > 0)) {
             row = item->row();
             break;
         }
@@ -509,6 +518,7 @@ void RoomModel::participantAdded(const QString &jid)
 
     ChatRoomItem *item = new ChatRoomItem;
     item->jid = jid;
+    item->affiliation = affiliation;
     addItem(item, rootItem, row);
 }
 
@@ -520,8 +530,13 @@ void RoomModel::participantChanged(const QString &jid)
     foreach (ChatModelItem *ptr, rootItem->children) {
         ChatRoomItem *item = static_cast<ChatRoomItem*>(ptr);
         if (item->jid == jid) {
-            item->status = m_room->participantPresence(jid).status().type();
-            emit dataChanged(createIndex(item), createIndex(item));
+            if (item->affiliation != m_room->participantPresence(jid).mucItem().affiliation()) {
+                removeRow(item->row());
+                participantAdded(jid);
+            } else {
+                item->status = m_room->participantPresence(jid).status().type();
+                emit dataChanged(createIndex(item), createIndex(item));
+            }
             break;
         }
     }

@@ -61,6 +61,7 @@ generate_png(png
     home.svg
     information.svg
     invite.svg
+    moderator.svg
     options.svg
     paste.svg
     peer.svg

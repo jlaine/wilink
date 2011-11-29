@@ -75,10 +75,6 @@ class RoomListModel : public ChatModel
     Q_PROPERTY(int pendingMessages READ pendingMessages NOTIFY pendingMessagesChanged)
 
 public:
-    enum Role {
-        ParticipantsRole = ChatModel::UserRole,
-    };
-
     RoomListModel(QObject *parent = 0);
 
     ChatClient *client() const;
@@ -106,18 +102,26 @@ private slots:
     void _q_roomAdded(QXmppMucRoom *room);
 
 private:
+    enum Role {
+        ParticipantsRole = ChatModel::UserRole,
+    };
     ChatClient *m_client;
 };
 
 class RoomModel : public ChatModel
 {
     Q_OBJECT
+    Q_ENUMS(Role)
     Q_PROPERTY(QString jid READ jid WRITE setJid NOTIFY jidChanged)
     Q_PROPERTY(QXmppMucManager* manager READ manager WRITE setManager NOTIFY managerChanged)
     Q_PROPERTY(QXmppMucRoom* room READ room NOTIFY roomChanged)
     Q_PROPERTY(HistoryModel* historyModel READ historyModel CONSTANT)
 
 public:
+    enum Role {
+        AffiliationRole = ChatModel::UserRole,
+    };
+
     RoomModel(QObject *parent = 0);
 
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
