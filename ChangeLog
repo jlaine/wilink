@@ -1,6 +1,7 @@
 wiLink 2.2.0 (UNRELEASED)
  * Application:
   - Clear fullscreen flag when restoring window geometry.
+  - Make "away" color pills friendlier for color-blind.
  * Conversations:
   - Add an animation when a new message is sent/received.
  * Rooms:
