@@ -108,7 +108,7 @@ Panel {
                 return 'white';
             }
 
-            Text {
+            Label {
                 id: date
 
                 anchors.left: parent.left
@@ -117,7 +117,7 @@ Panel {
                 width: 70
             }
 
-            Text {
+            Label {
                 id: content
 
                 anchors.top: parent.top

@@ -173,13 +173,12 @@ Panel {
                                     source: 'album.png'
                                 }
 
-                                Text {
+                                Label {
                                     anchors.left: icon.right
                                     anchors.leftMargin: appStyle.spacing.horizontal
                                     anchors.right: parent.right
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: model.name
-
                                 }
 
                                 MouseArea {

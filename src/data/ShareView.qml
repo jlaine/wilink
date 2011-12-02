@@ -84,18 +84,17 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 height: model.size > 0 ? text.height + sizeText.height : text.height
 
-                Text {
+                Label {
                     id: text
 
                     anchors.top: parent.top
                     anchors.left: parent.left
                     anchors.right: parent.right
                     elide: Text.ElideRight
-
                     text: model.name
                 }
 
-                Text {
+                Label {
                     id: sizeText
 
                     anchors.left: parent.left

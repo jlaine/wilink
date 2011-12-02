@@ -85,7 +85,7 @@ Item {
                     value: model.doneBytes
                 }
 
-                Text {
+                Label {
                     anchors.fill: parent
                     verticalAlignment: Text.AlignVCenter
                     horizontalAlignment: Text.AlignHCenter

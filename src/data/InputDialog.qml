@@ -33,7 +33,7 @@ Dialog {
     Item {
         anchors.fill: contents
 
-        Text {
+        Label {
             id: label
 
             anchors.top: parent.top

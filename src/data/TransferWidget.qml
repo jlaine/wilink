@@ -61,7 +61,7 @@ Item {
         anchors.rightMargin: 4
         anchors.verticalCenter: parent.verticalCenter
 
-        Text {
+        Label {
             anchors.fill: parent
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter

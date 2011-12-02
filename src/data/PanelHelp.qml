@@ -42,7 +42,7 @@ Rectangle {
         source: 'tip.png'
     }
 
-    Text {
+    Label {
         id: label
 
         anchors.left: icon.right

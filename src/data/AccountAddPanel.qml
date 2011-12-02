@@ -52,7 +52,7 @@ FocusScope {
         anchors.right: parent.right
         height: jidInput.height
 
-        Text {
+        Label {
             id: jidLabel
 
             anchors.left: parent.left
@@ -92,7 +92,7 @@ FocusScope {
         anchors.right: parent.right
         height: passwordInput.height
 
-        Text {
+        Label {
             id: passwordLabel
 
             anchors.left: parent.left
@@ -102,7 +102,6 @@ FocusScope {
             text: qsTr('Password')
             width: 100
         }
-
 
         InputBar {
             id: passwordInput
@@ -118,7 +117,7 @@ FocusScope {
         }
     }
 
-    Text {
+    Label {
         id: statusLabel
 
         property string dupeText: qsTr("You already have an account for '%1'.").replace('%1', Utils.jidToDomain(jidInput.text));

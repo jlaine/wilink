@@ -116,6 +116,7 @@
     <file>InputDialog.qml</file>
     <file>InputMenu.qml</file>
     <file>KeyPad.qml</file>
+    <file>Label.qml</file>
     <file>LogPanel.qml</file>
     <file>DebugPlugin.qml</file>
     <file>MainWindow.qml</file>

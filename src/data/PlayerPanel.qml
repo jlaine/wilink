@@ -92,11 +92,11 @@ Panel {
                     anchors.left: imageColumn.right
                     anchors.verticalCenter: parent.verticalCenter
                     /*width: item.width - imageColumn.width - 60 */
-                    Text { text: '<b>' + title + '</b>' }
-                    Text { text: (item.isSelected && album) ? artist + ' - ' + album : artist }
+                    Label { text: '<b>' + title + '</b>' }
+                    Label { text: (item.isSelected && album) ? artist + ' - ' + album : artist }
                 }
 
-                Text {
+                Label {
                     anchors.right: parent.right
                     anchors.rightMargin: 5
                     anchors.verticalCenter: parent.verticalCenter

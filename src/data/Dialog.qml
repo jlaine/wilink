@@ -109,12 +109,11 @@ FocusScope {
         radius: background.radius
         smooth: true
 
-        Text {
+        Label {
             id: label
 
             anchors.centerIn: parent
             font.bold: true
-            font.pixelSize: appStyle.font.normalSize
             color: '#ffffff'
         }
 

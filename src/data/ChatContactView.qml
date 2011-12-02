@@ -52,13 +52,12 @@ ContactView {
                 source: block.iconSource != '' ? block.iconSource : model.avatar
             }
 
-            Text {
+            Label {
                 anchors.left: avatar.right
                 anchors.right: bubble.right
                 anchors.leftMargin: 3
                 anchors.verticalCenter: parent.verticalCenter
                 elide: Text.ElideRight
-                font.pixelSize: appStyle.font.normalSize
                 text: model.participants > 0 ? model.name + ' (' + model.participants + ')' : model.name
             }
 

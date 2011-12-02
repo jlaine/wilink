@@ -38,7 +38,7 @@ Dialog {
             anchors.left: parent.left
         }
 
-        Text {
+        Label {
             id: label
 
             anchors.top: parent.top

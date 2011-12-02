@@ -58,7 +58,7 @@ Item {
             GradientStop { position: 1; color: '#cbdaf1' }
         }
 
-        Text {
+        Label {
             id: status
 
             anchors.left: parent.left

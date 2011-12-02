@@ -69,7 +69,7 @@ Dialog {
                 width: parent.width
                 height: combo.height
 
-                Text {
+                Label {
                     id: label
 
                     property int affiliation: model.affiliation

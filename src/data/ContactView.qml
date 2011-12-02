@@ -69,7 +69,7 @@ Item {
         height: 24
         z: 1
 
-        Text {
+        Label {
             id: titleText
 
             anchors.left: parent.left
@@ -77,7 +77,6 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             color: '#ffffff'
             font.bold: true
-            font.pixelSize: appStyle.font.normalSize
         }
 
         Button {

@@ -56,14 +56,13 @@ Item {
         height: textHeader.height
         z: 1
 
-        Text {
+        Label {
             id: textHeader
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
             anchors.margins: 4
             color: '#ffffff'
             font.bold: true
-            font.pixelSize: appStyle.font.normalSize
             text: qsTr('Call history')
         }
     }
@@ -97,33 +96,30 @@ Item {
                     source: model.direction == QXmppCall.OutgoingDirection ? 'call-outgoing.png' : 'call-incoming.png'
                 }
 
-                Text {
+                Label {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.left: image.right
                     anchors.right: date.left
                     anchors.rightMargin: appStyle.spacing.horizontal
                     elide: Text.ElideRight
-                    font.pixelSize: appStyle.font.normalSize
                     text: model.name
                 }
 
-                Text {
+                Label {
                     id: date
 
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: duration.left
                     anchors.rightMargin: appStyle.spacing.horizontal
-                    font.pixelSize: appStyle.font.normalSize
                     text: Utils.formatDateTime(model.date)
                     width: appStyle.font.normalSize * 8
                 }
 
-                Text {
+                Label {
                     id: duration
 
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: parent.right
-                    font.pixelSize: appStyle.font.normalSize
                     text: model.duration + 's'
                     width: appStyle.font.normalSize * 3
                 }

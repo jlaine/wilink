@@ -58,7 +58,7 @@ Panel {
         anchors.bottom: parent.bottom
         contentHeight: diagnostic.height
 
-        Text {
+        Label {
             id: diagnostic
 
             text: appClient.diagnosticManager.html
@@ -84,7 +84,7 @@ Panel {
         visible: appClient.diagnosticManager.running
         z: 10
 
-        Text {
+        Label {
             anchors.centerIn: parent
             font.pixelSize: appStyle.font.largeSize
             text: qsTr('Diagnostics in progress..')

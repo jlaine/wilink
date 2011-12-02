@@ -161,7 +161,7 @@ Item {
                         width: parent.width
                         visible: !model.action
 
-                        Text {
+                        Label {
                             id: fromText
 
                             anchors.left: parent.left
@@ -179,7 +179,7 @@ Item {
                             }
                         }
 
-                        Text {
+                        Label {
                             id: dateText
 
                             anchors.right: fromText.right
@@ -221,11 +221,10 @@ Item {
                             }
                         }
 
-                        Text {
+                        Label {
                             id: bodyText
 
                             anchors.centerIn: parent
-                            font.pixelSize: appStyle.font.normalSize
                             width: rect.width - 20
                             text: model.html
                             textFormat: Qt.RichText

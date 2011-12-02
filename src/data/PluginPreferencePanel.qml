@@ -107,7 +107,7 @@ Panel {
                 source: Qt.isQtObject(plugin) ? plugin.imageSource : 'plugin.png'
             }
 
-            Text {
+            Label {
                 id: nameLabel
 
                 anchors.verticalCenter: image.verticalCenter
@@ -120,7 +120,7 @@ Panel {
                 text: Qt.isQtObject(plugin) ? plugin.name : ''
             }
 
-            Text {
+            Label {
                 id: descriptionLabel
 
                 anchors.top: image.bottom

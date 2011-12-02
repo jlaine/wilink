@@ -67,7 +67,7 @@ Item {
         anchors.right: toolBarLoader.left
         anchors.verticalCenter: parent.verticalCenter
 
-        Text {
+        Label {
             id: titleText
 
             anchors.left: parent.left
@@ -75,17 +75,15 @@ Item {
             color: 'white'
             elide: Text.ElideRight
             font.bold: true
-            font.pixelSize: appStyle.font.normalSize
         }
 
-        Text {
+        Label {
             id: subTitleText
 
             anchors.left: parent.left
             anchors.right: parent.right
             color: 'white'
             elide: Text.ElideRight
-            font.pixelSize: appStyle.font.normalSize
             visible: text != ''
         }
     }

@@ -49,7 +49,7 @@ Panel {
                 source: model.imageSource
             }
 
-            Text {
+            Label {
                 id: titleLabel
 
                 anchors.verticalCenter: image.verticalCenter
@@ -134,7 +134,7 @@ Panel {
                     source: model.imageSource
                 }
 
-                Text {
+                Label {
                     id: titleLabel
 
                     anchors.verticalCenter: image.verticalCenter
@@ -153,7 +153,7 @@ Panel {
                     onClicked: mainView.currentIndex = model.index
                 }
 
-                Text {
+                Label {
                     id: descriptionLabel
 
                     anchors.top: image.bottom

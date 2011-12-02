@@ -58,7 +58,7 @@ Dialog {
                     anchors.fill: parent
                     visible: model.type == QXmppDataForm.TextSingleField
 
-                    Text {
+                    Label {
                         id: label
 
                         anchors.verticalCenter: parent.verticalCenter

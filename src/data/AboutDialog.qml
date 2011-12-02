@@ -98,7 +98,7 @@ Dialog {
                 source: 'wiLink-64.png'
             }
 
-            Text {
+            Label {
                 id: appName
 
                 anchors.top: parent.top
@@ -109,7 +109,7 @@ Dialog {
                 text: application.applicationName
             }
 
-            Text {
+            Label {
                 id: appVersion
 
                 anchors.left: appIcon.right

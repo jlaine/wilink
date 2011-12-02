@@ -66,7 +66,7 @@ Item {
                     width: 32
                  }
 
-                Text {
+                Label {
                     anchors.left: parent.left
                     anchors.right: parent.right
                     color: moderator ? '#ff6500' : '#2689d6'

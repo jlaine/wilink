@@ -103,7 +103,7 @@ Panel {
                 source: 'peer.png'
             }
 
-            Text {
+            Label {
                 anchors.left: image.right
                 anchors.top: parent.top
                 text: '<b>' + model.name + '</b><br/>' + model.jid + (model.node ? ' (' + model.node + ')' : '')

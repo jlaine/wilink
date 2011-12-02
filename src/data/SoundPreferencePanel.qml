@@ -78,7 +78,7 @@ Panel {
                     source: 'audio-output.png'
                 }
 
-                Text {
+                Label {
                     anchors.verticalCenter: parent.verticalCenter
                     text: qsTr('Audio playback device')
                 }
@@ -115,7 +115,7 @@ Panel {
                     source: 'audio-input.png'
                 }
 
-                Text {
+                Label {
                     anchors.verticalCenter: parent.verticalCenter
                     text: qsTr('Audio capture device')
                 }
@@ -157,7 +157,7 @@ Panel {
                 anchors.right: parent.right
                 height: 24
 
-                Text {
+                Label {
                     id: label
 
                     property string playingText: qsTr('You should now hear the sound you recorded.')

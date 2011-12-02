@@ -83,7 +83,7 @@ Dialog {
                     source: 'chat.png'
                 }
 
-                Text {
+                Label {
                     anchors.left: image.right
                     anchors.leftMargin: 4
                     anchors.right: parent.right

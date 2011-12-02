@@ -73,7 +73,7 @@ Item {
                     width: appStyle.icon.smallSize
                 }
 
-                Text {
+                Label {
                     anchors.left: image.right
                     anchors.leftMargin: appStyle.spacing.horizontal
                     anchors.right: parent.right

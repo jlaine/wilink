@@ -44,7 +44,7 @@ Dialog {
             anchors.right: parent.right
             height: passwordInput.height
 
-            Text {
+            Label {
                 id: passwordLabel
 
                 anchors.left: parent.left

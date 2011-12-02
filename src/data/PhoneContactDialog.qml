@@ -59,12 +59,11 @@ Dialog {
                 anchors.right: parent.right
                 height: nameInput.height
 
-                Text {
+                Label {
                     id: nameLabel
 
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.left: parent.left
-                    font.pixelSize: appStyle.font.normalSize
                     text: qsTr('Name')
                     width: 100
                 }
@@ -88,12 +87,11 @@ Dialog {
                 anchors.right: parent.right
                 height: phoneInput.height
 
-                Text {
+                Label {
                     id: phoneLabel
 
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.left: parent.left
-                    font.pixelSize: appStyle.font.normalSize
                     text: qsTr('Number')
                     width: 100
                 }

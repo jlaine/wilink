@@ -62,17 +62,16 @@ ContactView {
             anchors.leftMargin: 3
             anchors.verticalCenter: parent.verticalCenter
 
-            Text {
+            Label {
                 id: name
 
                 anchors.left: parent.left
                 anchors.right: parent.right
                 elide: Text.ElideRight
-                font.pixelSize: appStyle.font.normalSize
                 text: model.name
             }
 
-            Text {
+            Label {
                 id: phone
 
                 anchors.left: parent.left
@@ -80,7 +79,6 @@ ContactView {
                 anchors.right: parent.right
                 elide: Text.ElideRight
                 font.italic: true
-                font.pixelSize: appStyle.font.normalSize
                 text: model.phone
                 visible: false
             }

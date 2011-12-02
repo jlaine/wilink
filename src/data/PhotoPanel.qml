@@ -161,7 +161,7 @@ Panel {
                     smooth: true
                 }
 
-                Text {
+                Label {
                     id: text
 
                     anchors.left: parent.left

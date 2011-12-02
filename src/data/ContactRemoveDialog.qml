@@ -43,7 +43,7 @@ Dialog {
             source: vcard.avatar
         }
 
-        Text {
+        Label {
             anchors.top: parent.top
             anchors.left: image.right
             anchors.leftMargin: 8
