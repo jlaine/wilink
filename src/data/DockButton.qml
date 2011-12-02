@@ -59,7 +59,7 @@ Item {
         height: label.height +2*appStyle.spacing.vertical
     }
 
-    Text {
+    Label {
         id: label
 
         function shortcutText(shortcut) {

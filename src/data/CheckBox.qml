@@ -53,7 +53,7 @@ Item {
         source: checkBox.iconSource
     }
 
-    Text {
+    Label {
         id: textItem
 
         anchors.left: image.right

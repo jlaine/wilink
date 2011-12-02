@@ -53,7 +53,7 @@ Rectangle {
         smooth: true
     }
 
-    Text {
+    Label {
         id: label
 
         anchors.left: image.right
@@ -66,7 +66,7 @@ Rectangle {
         text: button.text
     }
 
-    Text {
+    Label {
         id: labelHelper
 
         opacity: 0

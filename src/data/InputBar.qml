@@ -59,11 +59,12 @@ FocusScope {
         anchors.right: parent.right
         anchors.margins: (parent.height - height) / 2
         focus: !readOnly
+        font.pixelSize: appStyle.font.normalSize
         smooth: true
         selectByMouse: !readOnly
     }
 
-    Text {
+    Label {
         id: label
 
         anchors.fill: edit

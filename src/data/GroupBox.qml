@@ -50,7 +50,7 @@ FocusScope {
         radius: 8
     }
 
-    Text {
+    Label {
         id: textItem
 
         anchors.top: parent.top

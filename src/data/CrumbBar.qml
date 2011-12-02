@@ -84,7 +84,7 @@ Item {
                     anchors.left: parent.left
                     width: name.width
 
-                    Text {
+                    Label {
                         id: name
 
                         anchors.top: parent.top
@@ -133,7 +133,7 @@ Item {
 
                 }
 
-                Text {
+                Label {
                     id: separator
 
                     anchors.left: crumb.right

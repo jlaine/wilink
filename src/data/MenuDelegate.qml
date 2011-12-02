@@ -45,7 +45,7 @@ Rectangle {
         onLoaded: icon.item.model = model
     }
 
-    Text {
+    Label {
         id: itemText
 
         anchors.left: icon.right

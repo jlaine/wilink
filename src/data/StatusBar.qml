@@ -124,7 +124,7 @@ Rectangle {
         }
     }
 
-    Text {
+    Label {
         id: connectionText
 
         anchors.left: statusArea.right

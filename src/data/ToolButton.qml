@@ -74,17 +74,17 @@ Item {
         height: appStyle.icon.smallSize
     }
 
-    Text {
+    Label {
         id: label
 
         anchors.top: image.bottom
         anchors.left: parent.left
         anchors.right: parent.right
+        color: 'white'
         elide: Text.ElideRight
+        font.pixelSize: appStyle.font.smallSize
         horizontalAlignment: Text.AlignHCenter
         opacity: button.enabled ? 1 : 0.5
-        color: 'white'
-        font.pixelSize: appStyle.font.smallSize
     }
 
     states: [
