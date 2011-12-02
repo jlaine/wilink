@@ -95,7 +95,7 @@ Dialog {
                 height: 48
                 width: 48
                 smooth: true
-                source: '64x64/wiLink.png'
+                source: '128x128/wiLink.png'
             }
 
             Label {

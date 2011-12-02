@@ -14,10 +14,10 @@
     <file>16x16/smiley-raspberry.png</file>
     <file>16x16/smiley-sad.png</file>
     <file>16x16/smiley-wink.png</file>
-    <file>64x64/wiLink.png</file>
     <file>128x128/album.png</file>
     <file>128x128/file.png</file>
     <file>128x128/peer.png</file>
+    <file>128x128/wiLink.png</file>
     <!-- QML -->
     <file>utils.js</file>
     <file>AboutDialog.qml</file>

@@ -83,7 +83,7 @@ set(ICONS
     scalable/wiLink-black.svg)
 
 # 32x32 icons
-generate_png(png ${ICONS})
+generate_png(png SIZE 32 DESTINATION 32x32 ${ICONS})
 
 # 64x64 icons
 generate_png(png SIZE 64 DESTINATION 64x64 ${ICONS})
@@ -92,7 +92,8 @@ generate_png(png SIZE 64 DESTINATION 64x64 ${ICONS})
 generate_png(png SIZE 128 DESTINATION 128x128
     scalable/album.svg
     scalable/file.svg
-    scalable/peer.svg)
+    scalable/peer.svg
+    scalable/wiLink.svg)
 
 add_custom_target(icons DEPENDS ${icns} ${ico} ${png} ${xpm})
 
