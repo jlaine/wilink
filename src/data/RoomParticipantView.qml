@@ -58,12 +58,15 @@ Item {
             Column {
                 anchors.fill: parent
                 anchors.margins: 5
+
                 Image {
                     anchors.horizontalCenter: parent.horizontalCenter
                     asynchronous: true
                     source: model.avatar
-                    height: 32
-                    width: 32
+                    sourceSize.height: appStyle.icon.normalSize
+                    sourceSize.width: appStyle.icon.normalSize
+                    height: appStyle.icon.normalSize
+                    width: appStyle.icon.normalSize
                  }
 
                 Label {

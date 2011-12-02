@@ -8,6 +8,7 @@ wiLink 2.2.0 (UNRELEASED)
   - Show moderators with a badge.
  * Roster:
   - Fix updating contact name after the contact is renamed.
+  - Speed up scrolling.
 
 wiLink 2.1.0 (2011-08-29)
  * Application:

@@ -46,10 +46,12 @@ ContactView {
                 anchors.leftMargin: 6
                 anchors.verticalCenter: parent.verticalCenter
                 asynchronous: true
-                width: appStyle.icon.smallSize
-                height: appStyle.icon.smallSize
                 smooth: true
                 source: block.iconSource != '' ? block.iconSource : model.avatar
+                sourceSize.width: appStyle.icon.smallSize
+                sourceSize.height: appStyle.icon.smallSize
+                width: appStyle.icon.smallSize
+                height: appStyle.icon.smallSize
             }
 
             Label {
