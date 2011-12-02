@@ -142,10 +142,10 @@ signals:
     void roomChanged(QXmppMucRoom *room);
 
 private slots:
-    void messageReceived(const QXmppMessage &msg);
-    void participantAdded(const QString &jid);
-    void participantChanged(const QString &jid);
-    void participantRemoved(const QString &jid);
+    void _q_messageReceived(const QXmppMessage &msg);
+    void _q_participantAdded(const QString &jid);
+    void _q_participantChanged(const QString &jid);
+    void _q_participantRemoved(const QString &jid);
 
 private:
     void setRoom(QXmppMucRoom *room);

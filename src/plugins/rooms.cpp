@@ -409,7 +409,7 @@ RoomModel::RoomModel(QObject *parent)
     setRoleNames(names);
 
     connect(VCardCache::instance(), SIGNAL(cardChanged(QString)),
-            this, SLOT(participantChanged(QString)));
+            this, SLOT(_q_participantChanged(QString)));
 }
 
 QVariant RoomModel::data(const QModelIndex &index, int role) const
@@ -474,7 +474,7 @@ void RoomModel::setManager(QXmppMucManager *manager)
     }
 }
 
-void RoomModel::messageReceived(const QXmppMessage &msg)
+void RoomModel::_q_messageReceived(const QXmppMessage &msg)
 {
     Q_ASSERT(m_room);
     if (msg.body().isEmpty())
@@ -497,7 +497,7 @@ void RoomModel::messageReceived(const QXmppMessage &msg)
     m_historyModel->addMessage(message);
 }
 
-void RoomModel::participantAdded(const QString &jid)
+void RoomModel::_q_participantAdded(const QString &jid)
 {
     Q_ASSERT(m_room);
     //qDebug("participant added %s", qPrintable(jid));
@@ -522,7 +522,7 @@ void RoomModel::participantAdded(const QString &jid)
     addItem(item, rootItem, row);
 }
 
-void RoomModel::participantChanged(const QString &jid)
+void RoomModel::_q_participantChanged(const QString &jid)
 {
     Q_ASSERT(m_room);
     //qDebug("participant changed %s", qPrintable(jid));
@@ -532,7 +532,7 @@ void RoomModel::participantChanged(const QString &jid)
         if (item->jid == jid) {
             if (item->affiliation != m_room->participantPresence(jid).mucItem().affiliation()) {
                 removeRow(item->row());
-                participantAdded(jid);
+                _q_participantAdded(jid);
             } else {
                 item->status = m_room->participantPresence(jid).status().type();
                 emit dataChanged(createIndex(item), createIndex(item));
@@ -542,7 +542,7 @@ void RoomModel::participantChanged(const QString &jid)
     }
 }
 
-void RoomModel::participantRemoved(const QString &jid)
+void RoomModel::_q_participantRemoved(const QString &jid)
 {
     Q_ASSERT(m_room);
     //qDebug("participant removed %s", qPrintable(jid));
@@ -578,19 +578,19 @@ void RoomModel::setRoom(QXmppMucRoom *room)
     // connect signals
     if (m_room) {
         check = connect(m_room, SIGNAL(messageReceived(QXmppMessage)),
-                        this, SLOT(messageReceived(QXmppMessage)));
+                        this, SLOT(_q_messageReceived(QXmppMessage)));
         Q_ASSERT(check);
 
         check = connect(m_room, SIGNAL(participantAdded(QString)),
-                        this, SLOT(participantAdded(QString)));
+                        this, SLOT(_q_participantAdded(QString)));
         Q_ASSERT(check);
 
         check = connect(m_room, SIGNAL(participantChanged(QString)),
-                        this, SLOT(participantChanged(QString)));
+                        this, SLOT(_q_participantChanged(QString)));
         Q_ASSERT(check);
 
         check = connect(m_room, SIGNAL(participantRemoved(QString)),
-                        this, SLOT(participantRemoved(QString)));
+                        this, SLOT(_q_participantRemoved(QString)));
         Q_ASSERT(check);
     }
 
