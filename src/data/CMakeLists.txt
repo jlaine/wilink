@@ -84,11 +84,11 @@ generate_png(png
     scalable/wiLink-black.svg)
 
 # 64x64 icons
-generate_png(png SIZE 64 SUFFIX -64
+generate_png(png SIZE 64 DESTINATION 64x64
     scalable/wiLink.svg)
 
 # 128x128 icons
-generate_png(png SIZE 128 SUFFIX -128
+generate_png(png SIZE 128 DESTINATION 128x128
     scalable/album.svg
     scalable/file.svg
     scalable/peer.svg)

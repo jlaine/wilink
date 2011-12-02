@@ -139,7 +139,7 @@ QUrl PhotoCache::imageUrl(const QUrl &url, FileSystem::ImageSize type, FileSyste
             return cacheUrl;
         }
     }
-    return wApp->qmlUrl("file-128.png");
+    return wApp->qmlUrl("128x128/file.png");
 }
 
 PhotoCache *PhotoCache::instance()
@@ -177,7 +177,7 @@ QImage PhotoImageProvider::requestImage(const QString &id, QSize *size, const QS
         image = *cached;
     } else {
         qWarning("Could not get photo for %s", qPrintable(id));
-        image = QImage(":/file-128.png");
+        image = QImage(":/128x128/file.png");
     }
 
     if (requestedSize.isValid())
@@ -224,14 +224,14 @@ QVariant PhotoModel::data(const QModelIndex &index, int role) const
 
     if (role == AvatarRole) {
         if (item->isDir()) {
-            return wApp->qmlUrl("album-128.png");
+            return wApp->qmlUrl("128x128/album.png");
         } else {
             return PhotoCache::instance()->imageUrl(item->url(), FileSystem::SmallSize, m_fs);
         }
     }
     else if (role == ImageRole) {
         if (item->isDir()) {
-            return wApp->qmlUrl("album-128.png");
+            return wApp->qmlUrl("128x128/album.png");
         } else {
             return PhotoCache::instance()->imageUrl(item->url(), FileSystem::LargeSize, m_fs);
         }

@@ -3,7 +3,6 @@
     <!-- Images -->
     <file>add.png</file>
     <file>album.png</file>
-    <file>album-128.png</file>
     <file>audio-input.png</file>
     <file>audio-output.png</file>
     <file>back.png</file>
@@ -37,7 +36,6 @@
     <file>favorite-active.png</file>
     <file>favorite-inactive.png</file>
     <file>file.png</file>
-    <file>file-128.png</file>
     <file>fire.png</file>
     <file>forward.png</file>
     <file>fullscreen.png</file>
@@ -49,7 +47,6 @@
     <file>options.png</file>
     <file>paste.png</file>
     <file>peer.png</file>
-    <file>peer-128.png</file>
     <file>permissions.png</file>
     <file>phone.png</file>
     <file>photos.png</file>
@@ -76,7 +73,10 @@
     <file>upload.png</file>
     <file>wiLink.png</file>
     <file>wiLink-black.png</file>
-    <file>wiLink-64.png</file>
+    <file>64x64/wiLink.png</file>
+    <file>128x128/album.png</file>
+    <file>128x128/file.png</file>
+    <file>128x128/peer.png</file>
     <!-- QML -->
     <file>utils.js</file>
     <file>AboutDialog.qml</file>
