@@ -10,7 +10,7 @@ generate_png(png SIZE 11
     scalable/up-arrow.svg)
 
 # 16x16 icons
-generate_png(png SIZE 16
+generate_png(png SIZE 16 DESTINATION 16x16
     scalable/checkbox.svg
     scalable/checkbox-checked.svg
     scalable/smiley-angry.svg

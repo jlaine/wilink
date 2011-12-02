@@ -35,7 +35,7 @@ Item {
 
         anchors.left:  parent.left
         anchors.verticalCenter: parent.verticalCenter
-        source: checked ? 'checkbox-checked.png' : 'checkbox.png'
+        source: checked ? '16x16/checkbox-checked.png' : '16x16/checkbox.png'
         width: 16
         height: 16
     }

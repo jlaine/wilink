@@ -12,8 +12,6 @@
     <file>camera.png</file>
     <file>camera-active.png</file>
     <file>chat.png</file>
-    <file>checkbox.png</file>
-    <file>checkbox-checked.png</file>
     <file>clear.png</file>
     <file>close.png</file>
     <file>copy.png</file>
@@ -58,13 +56,6 @@
     <file>search.png</file>
     <file>shadow.png</file>
     <file>share.png</file>
-    <file>smiley-angry.png</file>
-    <file>smiley-confused.png</file>
-    <file>smiley-happy.png</file>
-    <file>smiley-neutral.png</file>
-    <file>smiley-raspberry.png</file>
-    <file>smiley-sad.png</file>
-    <file>smiley-wink.png</file>
     <file>start.png</file>
     <file>stop.png</file>
     <file>tip.png</file>
@@ -73,6 +64,15 @@
     <file>upload.png</file>
     <file>wiLink.png</file>
     <file>wiLink-black.png</file>
+    <file>16x16/checkbox.png</file>
+    <file>16x16/checkbox-checked.png</file>
+    <file>16x16/smiley-angry.png</file>
+    <file>16x16/smiley-confused.png</file>
+    <file>16x16/smiley-happy.png</file>
+    <file>16x16/smiley-neutral.png</file>
+    <file>16x16/smiley-raspberry.png</file>
+    <file>16x16/smiley-sad.png</file>
+    <file>16x16/smiley-wink.png</file>
     <file>64x64/wiLink.png</file>
     <file>128x128/album.png</file>
     <file>128x128/file.png</file>
