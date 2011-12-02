@@ -64,6 +64,7 @@ Dialog {
 
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.left: parent.left
+                    font.pixelSize: appStyle.font.normalSize
                     text: qsTr('Name')
                     width: 100
                 }
@@ -92,6 +93,7 @@ Dialog {
 
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.left: parent.left
+                    font.pixelSize: appStyle.font.normalSize
                     text: qsTr('Number')
                     width: 100
                 }

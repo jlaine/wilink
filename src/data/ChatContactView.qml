@@ -58,6 +58,7 @@ ContactView {
                 anchors.leftMargin: 3
                 anchors.verticalCenter: parent.verticalCenter
                 elide: Text.ElideRight
+                font.pixelSize: appStyle.font.normalSize
                 text: model.participants > 0 ? model.name + ' (' + model.participants + ')' : model.name
             }
 

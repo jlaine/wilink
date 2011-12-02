@@ -63,6 +63,7 @@ Item {
             anchors.margins: 4
             color: '#ffffff'
             font.bold: true
+            font.pixelSize: appStyle.font.normalSize
             text: qsTr('Call history')
         }
     }
@@ -102,6 +103,7 @@ Item {
                     anchors.right: date.left
                     anchors.rightMargin: appStyle.spacing.horizontal
                     elide: Text.ElideRight
+                    font.pixelSize: appStyle.font.normalSize
                     text: model.name
                 }
 
@@ -111,6 +113,7 @@ Item {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: duration.left
                     anchors.rightMargin: appStyle.spacing.horizontal
+                    font.pixelSize: appStyle.font.normalSize
                     text: Utils.formatDateTime(model.date)
                     width: appStyle.font.normalSize * 8
                 }
@@ -120,6 +123,7 @@ Item {
 
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: parent.right
+                    font.pixelSize: appStyle.font.normalSize
                     text: model.duration + 's'
                     width: appStyle.font.normalSize * 3
                 }

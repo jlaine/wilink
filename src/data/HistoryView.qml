@@ -225,6 +225,7 @@ Item {
                             id: bodyText
 
                             anchors.centerIn: parent
+                            font.pixelSize: appStyle.font.normalSize
                             width: rect.width - 20
                             text: model.html
                             textFormat: Qt.RichText

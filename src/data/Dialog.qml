@@ -114,6 +114,7 @@ FocusScope {
 
             anchors.centerIn: parent
             font.bold: true
+            font.pixelSize: appStyle.font.normalSize
             color: '#ffffff'
         }
 

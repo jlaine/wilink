@@ -68,6 +68,7 @@ ContactView {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 elide: Text.ElideRight
+                font.pixelSize: appStyle.font.normalSize
                 text: model.name
             }
 
@@ -79,6 +80,7 @@ ContactView {
                 anchors.right: parent.right
                 elide: Text.ElideRight
                 font.italic: true
+                font.pixelSize: appStyle.font.normalSize
                 text: model.phone
                 visible: false
             }

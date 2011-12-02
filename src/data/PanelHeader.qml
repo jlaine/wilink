@@ -75,6 +75,7 @@ Item {
             color: 'white'
             elide: Text.ElideRight
             font.bold: true
+            font.pixelSize: appStyle.font.normalSize
         }
 
         Text {
@@ -84,6 +85,7 @@ Item {
             anchors.right: parent.right
             color: 'white'
             elide: Text.ElideRight
+            font.pixelSize: appStyle.font.normalSize
             visible: text != ''
         }
     }

@@ -77,6 +77,7 @@ Item {
             anchors.verticalCenter: parent.verticalCenter
             color: '#ffffff'
             font.bold: true
+            font.pixelSize: appStyle.font.normalSize
         }
 
         Button {
