@@ -33,7 +33,7 @@ ContactView {
         id: item
 
         width: parent.width
-        height: 30
+        height: appStyle.icon.smallSize + 6
 
         Item {
             anchors.fill: parent

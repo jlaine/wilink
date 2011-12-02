@@ -27,6 +27,7 @@ Rectangle {
     property bool autoAway: false
 
     color: '#567dbc'
+    height: appStyle.icon.tinySize + 12
 
     Component {
         id: pillDelegate

@@ -31,7 +31,7 @@ Rectangle {
     color: '#b0c4de'
     opacity: 0
     radius: 5
-    height: model.count * 20 + 1
+    height: model.count * (appStyle.icon.tinySize + 4) + 1
     width: 150
     z: 10
 

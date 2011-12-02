@@ -46,7 +46,7 @@ Item {
             property bool moderator: (model.affiliation >= QXmppMucItem.AdminAffiliation)
 
             width: 80
-            height: 54
+            height: appStyle.icon.normalSize + 22
 
             Highlight {
                 id: highlight

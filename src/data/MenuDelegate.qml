@@ -27,7 +27,7 @@ Rectangle {
     property Component iconDelegate
 
     color: 'transparent'
-    height: 20
+    height: appStyle.icon.tinySize + 4
     width: parent.width
     radius: 5
 
