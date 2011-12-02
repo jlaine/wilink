@@ -238,9 +238,11 @@ Item {
                             onLinkActivated: Qt.openUrlExternally(link)
                         }
 
+/*
                         Behavior on height {
                             NumberAnimation { duration: appStyle.animation.normalDuration }
                         }
+*/
                     }
 
                     Item {
