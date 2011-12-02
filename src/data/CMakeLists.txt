@@ -21,8 +21,7 @@ generate_png(png SIZE 16 DESTINATION 16x16
     scalable/smiley-sad.svg
     scalable/smiley-wink.svg)
 
-# 32x32 icons
-generate_png(png
+set(ICONS
     scalable/add.svg
     scalable/album.svg
     scalable/audio-input.svg
@@ -83,9 +82,11 @@ generate_png(png
     scalable/wiLink.svg
     scalable/wiLink-black.svg)
 
+# 32x32 icons
+generate_png(png ${ICONS})
+
 # 64x64 icons
-generate_png(png SIZE 64 DESTINATION 64x64
-    scalable/wiLink.svg)
+generate_png(png SIZE 64 DESTINATION 64x64 ${ICONS})
 
 # 128x128 icons
 generate_png(png SIZE 128 DESTINATION 128x128
