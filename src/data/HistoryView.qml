@@ -143,8 +143,10 @@ Item {
                     id: avatar
                     asynchronous: true
                     source: model.avatar
-                    height: 32
-                    width: 32
+                    sourceSize.height: appStyle.icon.normalSize
+                    sourceSize.width: appStyle.icon.normalSize
+                    height: appStyle.icon.normalSize
+                    width: appStyle.icon.normalSize
 
                     MouseArea {
                         anchors.fill: parent
