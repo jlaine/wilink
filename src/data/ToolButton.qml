@@ -27,7 +27,7 @@ Item {
     property bool enabled: true
     signal clicked
 
-    height: 40
+    height: appStyle.icon.smallSize + 16
     state: mouseArea.pressed ? 'pressed' : (mouseArea.hovered ? 'hovered' : '')
     width: visible ? 64 : 0
 

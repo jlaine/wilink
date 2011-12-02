@@ -79,8 +79,8 @@ ContactView {
                 anchors.rightMargin: 5
                 anchors.verticalCenter: parent.verticalCenter
                 presenceStatus: model.status
-                width: 10
-                height: 10
+                width: Math.round(appStyle.icon.tinySize * 0.6)
+                height: Math.round(appStyle.icon.tinySize * 0.6)
             }
 
             MouseArea {

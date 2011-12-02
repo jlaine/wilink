@@ -31,7 +31,7 @@ Item {
     signal itemClicked(int index)
 
     clip: true
-    height: 46
+    height: appStyle.icon.normalSize + 14
     z: 1
 
     Rectangle {

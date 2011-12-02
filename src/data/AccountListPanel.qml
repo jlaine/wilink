@@ -55,7 +55,7 @@ Item {
         }
         highlight: Highlight { height: 28; width: accountView.width - 1 }
         delegate: Item {
-            height: 28
+            height: appStyle.icon.smallSize + 4
             width: accountView.width - 1
 
             Item {
