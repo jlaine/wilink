@@ -32,8 +32,8 @@ Item {
     property int shortcut: 0
     signal clicked
 
-    height: 32
-    width: 32
+    height: appStyle.icon.normalSize
+    width: appStyle.icon.normalSize
     state: mouseArea.pressed ? 'pressed' : (mouseArea.hovered ? 'hovered' : '')
 
     Image {
@@ -90,14 +90,14 @@ Item {
         State {
             name: 'hovered'
             PropertyChanges { target: button; width: image.width + 16; height: image.height }
-            PropertyChanges { target: image; height: 32; width: 32 }
+            PropertyChanges { target: image; height: appStyle.icon.normalSize; width: appStyle.icon.normalSize }
             PropertyChanges { target: label; opacity: 1 }
             PropertyChanges { target: labelBackground; opacity: 1 }
         },
         State {
             name: 'pressed'
             PropertyChanges { target: button; width: image.width + 16; height: image.height }
-            PropertyChanges { target: image; height: 32; width: 32 }
+            PropertyChanges { target: image; height: appStyle.icon.normalSize; width: appStyle.icon.normalSize }
             PropertyChanges { target: label; opacity: 0.5 }
             PropertyChanges { target: labelBackground; opacity: 1 }
         }

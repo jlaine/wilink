@@ -23,7 +23,7 @@ import 'utils.js' as Utils
 
 Rectangle {
     id: dock
-    width: 44
+    width: appStyle.icon.normalSize + 12
 
     property alias model: repeater.model
 
