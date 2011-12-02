@@ -60,7 +60,6 @@ Item {
 
     Text {
         id: textItem
-        font.pointSize: 14
     }
 }
 
