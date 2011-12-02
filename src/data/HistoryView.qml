@@ -226,13 +226,20 @@ Item {
                         Label {
                             id: bodyText
 
-                            anchors.centerIn: parent
+                            anchors.top: parent.top
+                            anchors.topMargin: 5
+                            anchors.left: parent.left
+                            anchors.leftMargin: 10
                             width: rect.width - 20
                             text: model.html
                             textFormat: Qt.RichText
                             wrapMode: Text.Wrap
 
                             onLinkActivated: Qt.openUrlExternally(link)
+                        }
+
+                        Behavior on height {
+                            NumberAnimation { duration: appStyle.animation.normalDuration }
                         }
                     }
 
@@ -244,7 +251,7 @@ Item {
 
                 ListView.onAdd: SequentialAnimation {
                     PropertyAction { target: item; property: "opacity"; value: 0 }
-                    NumberAnimation { target: item; property: "opacity"; to: 1; duration: 250; easing.type: Easing.InOutQuad }
+                    NumberAnimation { target: item; property: "opacity"; to: 1; duration: appStyle.animation.normalDuration; easing.type: Easing.InOutQuad }
                 }
 
             }
