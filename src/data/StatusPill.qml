@@ -22,6 +22,7 @@ import QXmpp 0.4
 
 Item {
     property variant presenceStatus
+    property alias smooth: status.smooth
 
     opacity: (presenceStatus != undefined) ? 1 : 0
     state: {

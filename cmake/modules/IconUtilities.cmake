@@ -10,8 +10,7 @@ find_program(PNG2ICNS png2icns)
 
 macro(generate_name OUTPUT INPUT EXT)
 	get_filename_component(_svg_name ${INPUT} NAME_WE)
-	get_filename_component(_svg_path ${INPUT} PATH)
-	set(${OUTPUT} ${_svg_path}${_svg_name}${EXT})
+	set(${OUTPUT} ${_svg_name}${EXT})
 endmacro(generate_name)
 
 # GENERATE_ICNS(OUTPUT SVGS..)

@@ -27,7 +27,9 @@ Item {
     property alias count: view.count
     property alias currentIndex: view.currentIndex
     property alias delegate: view.delegate
+    property alias headerHeight: header.height
     property alias model: view.model
+    property alias moving: view.moving
     property alias title: titleText.text
 
     signal addClicked

@@ -46,7 +46,6 @@ ContactView {
                 anchors.leftMargin: 6
                 anchors.verticalCenter: parent.verticalCenter
                 asynchronous: true
-                smooth: true
                 source: block.iconSource != '' ? block.iconSource : model.avatar
                 sourceSize.width: appStyle.icon.smallSize
                 sourceSize.height: appStyle.icon.smallSize
@@ -79,6 +78,7 @@ ContactView {
                 anchors.rightMargin: 5
                 anchors.verticalCenter: parent.verticalCenter
                 presenceStatus: model.status
+                smooth: !block.moving
                 width: Math.round(appStyle.icon.tinySize * 0.6)
                 height: Math.round(appStyle.icon.tinySize * 0.6)
             }

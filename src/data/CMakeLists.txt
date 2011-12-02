@@ -1,97 +1,97 @@
 include(IconUtilities)
-generate_icns(icns wiLink.svg)
-generate_ico(ico wiLink.svg)
-generate_xpm(xpm wiLink.svg)
+generate_icns(icns scalable/wiLink.svg)
+generate_ico(ico scalable/wiLink.svg)
+generate_xpm(xpm scalable/wiLink.svg)
 
 # 10x10 images
 generate_png(png SIZE 11
-    down-arrow.svg
-    eject.svg
-    up-arrow.svg)
+    scalable/down-arrow.svg
+    scalable/eject.svg
+    scalable/up-arrow.svg)
 
 # 16x16 icons
 generate_png(png SIZE 16
-    checkbox.svg
-    checkbox-checked.svg
-    smiley-angry.svg
-    smiley-confused.svg
-    smiley-happy.svg
-    smiley-neutral.svg
-    smiley-raspberry.svg
-    smiley-sad.svg
-    smiley-wink.svg)
+    scalable/checkbox.svg
+    scalable/checkbox-checked.svg
+    scalable/smiley-angry.svg
+    scalable/smiley-confused.svg
+    scalable/smiley-happy.svg
+    scalable/smiley-neutral.svg
+    scalable/smiley-raspberry.svg
+    scalable/smiley-sad.svg
+    scalable/smiley-wink.svg)
 
 # 32x32 icons
 generate_png(png
-    add.svg
-    album.svg
-    audio-input.svg
-    audio-output.svg
-    back.svg
-    call.svg
-    call-incoming.svg
-    call-outgoing.svg
-    camera.svg
-    camera-active.svg
-    chat.svg
-    clear.svg
-    close.svg
-    copy.svg
-    cut.svg
-    debug.svg
-    diagnostics.svg
-    dock-chat.svg
-    dock-diagnostics.svg
-    dock-debug.svg
-    dock-options.svg
-    dock-peer.svg
-    dock-phone.svg
-    dock-photo.svg
-    dock-rss.svg
-    dock-share.svg
-    dock-start.svg
-    download.svg
-    favorite-active.svg
-    favorite-inactive.svg
-    file.svg
-    fire.svg
-    forward.svg
-    fullscreen.svg
-    hangup.svg
-    home.svg
-    information.svg
-    invite.svg
-    moderator.svg
-    options.svg
-    paste.svg
-    peer.svg
-    permissions.svg
-    phone.svg
-    photos.svg
-    plugin.svg
-    refresh.svg
-    remove.svg
-    resize.svg
-    rss.svg
-    search.svg
-    share.svg
-    start.svg
-    stop.svg
-    tip.svg
-    transfers.svg
-    upload.svg
-    wiLink.svg
-    wiLink-black.svg)
+    scalable/add.svg
+    scalable/album.svg
+    scalable/audio-input.svg
+    scalable/audio-output.svg
+    scalable/back.svg
+    scalable/call.svg
+    scalable/call-incoming.svg
+    scalable/call-outgoing.svg
+    scalable/camera.svg
+    scalable/camera-active.svg
+    scalable/chat.svg
+    scalable/clear.svg
+    scalable/close.svg
+    scalable/copy.svg
+    scalable/cut.svg
+    scalable/debug.svg
+    scalable/diagnostics.svg
+    scalable/dock-chat.svg
+    scalable/dock-diagnostics.svg
+    scalable/dock-debug.svg
+    scalable/dock-options.svg
+    scalable/dock-peer.svg
+    scalable/dock-phone.svg
+    scalable/dock-photo.svg
+    scalable/dock-rss.svg
+    scalable/dock-share.svg
+    scalable/dock-start.svg
+    scalable/download.svg
+    scalable/favorite-active.svg
+    scalable/favorite-inactive.svg
+    scalable/file.svg
+    scalable/fire.svg
+    scalable/forward.svg
+    scalable/fullscreen.svg
+    scalable/hangup.svg
+    scalable/home.svg
+    scalable/information.svg
+    scalable/invite.svg
+    scalable/moderator.svg
+    scalable/options.svg
+    scalable/paste.svg
+    scalable/peer.svg
+    scalable/permissions.svg
+    scalable/phone.svg
+    scalable/photos.svg
+    scalable/plugin.svg
+    scalable/refresh.svg
+    scalable/remove.svg
+    scalable/resize.svg
+    scalable/rss.svg
+    scalable/search.svg
+    scalable/share.svg
+    scalable/start.svg
+    scalable/stop.svg
+    scalable/tip.svg
+    scalable/transfers.svg
+    scalable/upload.svg
+    scalable/wiLink.svg
+    scalable/wiLink-black.svg)
 
 # 64x64 icons
 generate_png(png SIZE 64 SUFFIX -64
-    wiLink.svg)
+    scalable/wiLink.svg)
 
 # 128x128 icons
 generate_png(png SIZE 128 SUFFIX -128
-    album.svg
-    file.svg
-    peer.svg)
+    scalable/album.svg
+    scalable/file.svg
+    scalable/peer.svg)
 
 add_custom_target(icons DEPENDS ${icns} ${ico} ${png} ${xpm})
 
