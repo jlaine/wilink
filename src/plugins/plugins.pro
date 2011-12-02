@@ -82,7 +82,7 @@ mac {
     LIBS += -framework AppKit
 }
 
-RESOURCES += ../data/wiLink.qrc
+RESOURCES += ../data/wiLink.qrc ../data/64x64/64x64.qrc
 
 INCLUDEPATH += \
     $$WILINK_INCLUDE_DIR \
@@ -126,7 +126,7 @@ mac {
     desktop.path = $$PREFIX/share/applications
     desktop.files = ../data/wiLink.desktop
     icon.path = $$PREFIX/share/icons/hicolor/32x32/apps
-    icon.files = ../data/wiLink.png
+    icon.files = ../data/32x32/wiLink.png
     pixmap.path = $$PREFIX/share/pixmaps
     pixmap.files = ../data/wiLink.xpm
     scalable.path = $$PREFIX/share/icons/hicolor/scalable/apps
