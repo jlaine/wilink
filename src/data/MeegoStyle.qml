@@ -46,9 +46,9 @@ Item {
     Item {
         id: iconItem
 
-        property int tinySize: 24
-        property int smallSize: 32
-        property int normalSize: 48
+        property int tinySize: 32
+        property int smallSize: 48
+        property int normalSize: 64
     }
 
     Item {
@@ -60,7 +60,7 @@ Item {
 
     Text {
         id: textItem
-        font.pixelSize: 16
+        font.pixelSize: 18
     }
 }
 
