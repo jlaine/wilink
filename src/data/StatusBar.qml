@@ -68,7 +68,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.margins: 2
-        width: 48
+        width: appStyle.icon.tinySize + 32
 
         Rectangle {
             id: highlight
