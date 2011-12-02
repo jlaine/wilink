@@ -24,6 +24,7 @@ import 'utils.js' as Utils
 Panel {
     id: chatPanel
 
+    property bool singlePanel: width < 500
     property alias rooms: roomListModel
     property bool pendingMessages: (roomListModel.pendingMessages + rosterModel.pendingMessages) > 0
 
@@ -32,6 +33,8 @@ Panel {
     function showConversation(jid) {
         swapper.showPanel('ChatPanel.qml');
         chatSwapper.showPanel('ConversationPanel.qml', {'jid': Utils.jidToBareJid(jid)});
+        if (chatPanel.singlePanel)
+            chatPanel.state = 'no-sidebar';
     }
 
     /** Convenience method to show a chat room panel.
@@ -39,6 +42,8 @@ Panel {
     function showRoom(jid) {
         swapper.showPanel('ChatPanel.qml');
         chatSwapper.showPanel('RoomPanel.qml', {'jid': jid})
+        if (chatPanel.singlePanel)
+            chatPanel.state = 'no-sidebar';
     }
 
     Item {
@@ -47,7 +52,7 @@ Panel {
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        width: 200
+        width: chatPanel.singlePanel ? parent.width : 200
 
         ChatContactView {
             id: rooms
@@ -73,7 +78,7 @@ Panel {
                 }
             }
             title: qsTr('My rooms')
-            height: 24 + (count > 0 ? 4 : 0) + 30 * Math.min(count, 8);
+            height: headerHeight + (count > 0 ? 4 : 0) + 30 * Math.min(count, 8);
 
             onAddClicked: {
                 dialogSwapper.showPanel('RoomJoinDialog.qml');
