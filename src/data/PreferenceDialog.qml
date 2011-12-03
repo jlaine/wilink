@@ -53,7 +53,7 @@ Dialog {
             interactive: false
             width: 100
             delegate: Item {
-                height: 32
+                height: appStyle.icon.smallSize + 8
                 width: tabList.width - 1
 
                 Image {

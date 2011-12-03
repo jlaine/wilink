@@ -83,8 +83,8 @@ mac {
 }
 
 RESOURCES += \
-    ../data/16x16/16x16.qrc \
-    ../data/64x64/64x64.qrc \
+    ../data/32x32/tiny.qrc \
+    ../data/64x64/normal.qrc \
     ../data/wiLink.qrc
 
 INCLUDEPATH += \

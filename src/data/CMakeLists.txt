@@ -81,24 +81,23 @@ set(ICONS
     scalable/wiLink.svg
     scalable/wiLink-black.svg)
 
+set(LARGE_ICONS
+    scalable/album.svg
+    scalable/file.svg
+    scalable/peer.svg
+    scalable/wiLink.svg)
+
 # 16x16 icons
 generate_png(png SIZE 16 DESTINATION 16x16 ${SMALL_ICONS})
 
-# 24x24 icons
-generate_png(png SIZE 24 DESTINATION 24x24 ${SMALL_ICONS})
-
 # 32x32 icons
-generate_png(png SIZE 32 DESTINATION 32x32 ${ICONS})
+generate_png(png SIZE 32 DESTINATION 32x32 ${ICONS} ${SMALL_ICONS})
 
 # 64x64 icons
 generate_png(png SIZE 64 DESTINATION 64x64 ${ICONS})
 
 # 128x128 icons
-generate_png(png SIZE 128 DESTINATION 128x128
-    scalable/album.svg
-    scalable/file.svg
-    scalable/peer.svg
-    scalable/wiLink.svg)
+generate_png(png SIZE 128 DESTINATION 128x128 ${LARGE_ICONS})
 
 add_custom_target(icons DEPENDS ${icns} ${ico} ${png} ${xpm})
 
