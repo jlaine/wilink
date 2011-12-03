@@ -108,7 +108,7 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        height: 32
+        height: appStyle.icon.smallSize + 8
 
         Button {
             iconSource: 'add.png'

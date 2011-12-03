@@ -145,8 +145,7 @@ Panel {
                 anchors.right: parent.right
                 anchors.verticalCenter: image.verticalCenter
                 checked: model.selected
-                width: 16
-                height: 16
+                width: appStyle.icon.tinySize
 
                 onClicked: {
                     view.model.setProperty(model.index, 'selected', !model.selected);
