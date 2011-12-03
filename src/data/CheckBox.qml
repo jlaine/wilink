@@ -28,16 +28,16 @@ Item {
     property string iconSource
     property string text
 
-    height: Math.max(16, textItem.paintedHeight)
+    height: Math.max(appStyle.icon.tinySize, textItem.paintedHeight)
 
     Image {
         id: rect
 
         anchors.left:  parent.left
         anchors.verticalCenter: parent.verticalCenter
-        source: checked ? '16x16/checkbox-checked.png' : '16x16/checkbox.png'
-        width: 16
-        height: 16
+        source: checked ? 'checkbox-checked.png' : 'checkbox.png'
+        width: appStyle.icon.tinySize
+        height: appStyle.icon.tinySize
     }
 
     Image {

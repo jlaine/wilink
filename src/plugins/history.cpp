@@ -86,24 +86,24 @@ bool HistoryMessage::groupWith(const HistoryMessage &other) const
 static QString transformToken(const QString &token)
 {
     QMap<QString, QString> smileys;
-    smileys.insert(":@", ":/16x16/smiley-angry.png");
-    smileys.insert(":-@", ":/16x16/smiley-angry.png");
-    smileys.insert(":s", ":/16x16/smiley-confused.png");
-    smileys.insert(":-s", ":/16x16/smiley-confused.png");
-    smileys.insert(":S", ":/16x16/smiley-confused.png");
-    smileys.insert(":-S", ":/16x16/smiley-confused.png");
-    smileys.insert(":)", ":/16x16/smiley-happy.png");
-    smileys.insert(":-)", ":/16x16/smiley-happy.png");
-    smileys.insert(":|", ":/16x16/smiley-neutral.png");
-    smileys.insert(":-|", ":/16x16/smiley-neutral.png");
-    smileys.insert(":p", ":/16x16/smiley-raspberry.png");
-    smileys.insert(":-p", ":/16x16/smiley-raspberry.png");
-    smileys.insert(":P", ":/16x16/smiley-raspberry.png");
-    smileys.insert(":-P", ":/16x16/smiley-raspberry.png");
-    smileys.insert(":(", ":/16x16/smiley-sad.png");
-    smileys.insert(":-(", ":/16x16/smiley-sad.png");
-    smileys.insert(";)", ":/16x16/smiley-wink.png");
-    smileys.insert(";-)", ":/16x16/smiley-wink.png");
+    smileys.insert(":@", ":/smiley-angry.png");
+    smileys.insert(":-@", ":/smiley-angry.png");
+    smileys.insert(":s", ":/smiley-confused.png");
+    smileys.insert(":-s", ":/smiley-confused.png");
+    smileys.insert(":S", ":/smiley-confused.png");
+    smileys.insert(":-S", ":/smiley-confused.png");
+    smileys.insert(":)", ":/smiley-happy.png");
+    smileys.insert(":-)", ":/smiley-happy.png");
+    smileys.insert(":|", ":/smiley-neutral.png");
+    smileys.insert(":-|", ":/smiley-neutral.png");
+    smileys.insert(":p", ":/smiley-raspberry.png");
+    smileys.insert(":-p", ":/smiley-raspberry.png");
+    smileys.insert(":P", ":/smiley-raspberry.png");
+    smileys.insert(":-P", ":/smiley-raspberry.png");
+    smileys.insert(":(", ":/smiley-sad.png");
+    smileys.insert(":-(", ":/smiley-sad.png");
+    smileys.insert(";)", ":/smiley-wink.png");
+    smileys.insert(";-)", ":/smiley-wink.png");
 
     const QRegExp linkRegex("(ftp|http|https)://.+");
 
