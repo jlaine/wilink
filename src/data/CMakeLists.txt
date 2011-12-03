@@ -9,8 +9,7 @@ generate_png(png SIZE 11
     scalable/eject.svg
     scalable/up-arrow.svg)
 
-# 16x16 icons
-generate_png(png SIZE 16 DESTINATION 16x16
+set(SMALL_ICONS
     scalable/checkbox.svg
     scalable/checkbox-checked.svg
     scalable/smiley-angry.svg
@@ -81,6 +80,12 @@ set(ICONS
     scalable/upload.svg
     scalable/wiLink.svg
     scalable/wiLink-black.svg)
+
+# 16x16 icons
+generate_png(png SIZE 16 DESTINATION 16x16 ${SMALL_ICONS})
+
+# 24x24 icons
+generate_png(png SIZE 24 DESTINATION 24x24 ${SMALL_ICONS})
 
 # 32x32 icons
 generate_png(png SIZE 32 DESTINATION 32x32 ${ICONS})

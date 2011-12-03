@@ -82,7 +82,10 @@ mac {
     LIBS += -framework AppKit
 }
 
-RESOURCES += ../data/wiLink.qrc ../data/64x64/64x64.qrc
+RESOURCES += \
+    ../data/16x16/16x16.qrc \
+    ../data/64x64/64x64.qrc \
+    ../data/wiLink.qrc
 
 INCLUDEPATH += \
     $$WILINK_INCLUDE_DIR \
