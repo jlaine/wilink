@@ -596,7 +596,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>You can view your phone bills and your call history at the following address:</source>
-        <translation>Suivez votre consommation et accédez à l'historique de vos appels à l'addresse:</translation>
+        <translation>Suivez votre consommation et accédez à l'historique de vos appels à l'adresse:</translation>
     </message>
 </context>
 <context>
