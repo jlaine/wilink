@@ -67,13 +67,14 @@ Rectangle {
     Rectangle {
         id: wrapper
 
+        anchors.margins: 4
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: sendButton.left
         border.color: '#c3c3c3'
         border.width: 1
         color: 'white'
-        x: 4
-        y: 4
         height: input.paintedHeight + 16
-        width: parent.width - sendButton.width - 12
 
         ListHelper {
             id: listHelper
@@ -206,16 +207,11 @@ Rectangle {
     Button {
         id: sendButton
 
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.margins: 4
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
         anchors.right: parent.right
-        anchors.rightMargin: 4
         text: qsTr('Send')
         onClicked: chatEdit.returnPressed()
-
-        Component.onCompleted: {
-            var oldHeight = sendButton.height;
-            sendButton.height = wrapper.height
-            sendButton.width = sendButton.width + (wrapper.height - oldHeight);
-        }
     }
 }
