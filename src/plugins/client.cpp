@@ -76,6 +76,9 @@ ChatClient::ChatClient(QObject *parent)
 
     // multimedia calls
     callManager();
+
+    // diagnostics
+    diagnosticManager();
 }
 
 void ChatClient::connectToServer(const QString &jid, const QString &password)
