@@ -382,10 +382,13 @@ DiagnosticManager::DiagnosticManager()
 void DiagnosticManager::setClient(QXmppClient *client)
 {
     bool check;
+    Q_UNUSED(check);
+
+    QXmppClientExtension::setClient(client);
+
     check = connect(client, SIGNAL(diagnosticServerChanged(QString)),
                     this, SLOT(diagnosticServerChanged(QString)));
     Q_ASSERT(check);
-    Q_UNUSED(check);
 }
 
 void DiagnosticManager::diagnosticServerChanged(const QString &diagServer)
