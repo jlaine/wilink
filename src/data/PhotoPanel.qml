@@ -246,14 +246,42 @@ Panel {
             orientation: Qt.Horizontal
             snapMode: ListView.SnapToItem
 
-            delegate: Component {
+            delegate: Item {
+                width: displayView.width
+                height: displayView.height
+
+                Image {
+                    id: preview
+
+                    width: displayView.width
+                    height: displayView.height
+                    source: model.avatar
+                    fillMode: Image.PreserveAspectFit
+                }
+
                 Image {
                     id: image
 
+                    asynchronous: true
                     width: displayView.width
                     height: displayView.height
                     source: model.image
                     fillMode: Image.PreserveAspectFit
+                    opacity: 0
+                }
+
+                states: State {
+                    name: 'ready'
+                    when: model.imageReady
+                    PropertyChanges { target: image; opacity: 1 }
+                }
+
+                transitions: Transition {
+                    NumberAnimation {
+                        target: image
+                        properties: 'opacity'
+                        duration: appStyle.animation.normalDuration
+                    }
                 }
             }
 

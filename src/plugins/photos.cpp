@@ -59,6 +59,7 @@ public:
 enum PhotoRole
 {
     ImageRole = ChatModel::UserRole,
+    ImageReadyRole,
     IsDirRole,
     SizeRole,
     UrlRole,
@@ -102,6 +103,12 @@ void PhotoCache::_q_jobFinished()
     m_downloadItem = 0;
 
     processQueue();
+}
+
+bool PhotoCache::imageReady(const QUrl &url, FileSystem::ImageSize type) const
+{
+    const QString key = QString::number(type) + url.toString();
+    return photoImageCache.contains(key);
 }
 
 QUrl PhotoCache::imageUrl(const QUrl &url, FileSystem::ImageSize type, FileSystem *fs)
@@ -203,6 +210,7 @@ PhotoModel::PhotoModel(QObject *parent)
 
     QHash<int, QByteArray> names = roleNames();
     names.insert(ImageRole, "image");
+    names.insert(ImageReadyRole, "imageReady");
     names.insert(IsDirRole, "isDir");
     names.insert(SizeRole, "size");
     names.insert(UrlRole, "url");
@@ -236,6 +244,8 @@ QVariant PhotoModel::data(const QModelIndex &index, int role) const
             return PhotoCache::instance()->imageUrl(item->url(), FileSystem::LargeSize, m_fs);
         }
     }
+    else if (role == ImageReadyRole)
+        return PhotoCache::instance()->imageReady(item->url(), FileSystem::LargeSize);
     else if (role == IsDirRole)
         return item->isDir();
     else if (role == NameRole)

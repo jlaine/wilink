@@ -43,6 +43,7 @@ class PhotoCache : public QObject
 
 public:
     static PhotoCache *instance();
+    bool imageReady(const QUrl &url, FileSystem::ImageSize size) const;
     QUrl imageUrl(const QUrl &url, FileSystem::ImageSize size, FileSystem *fs);
 
 signals:
