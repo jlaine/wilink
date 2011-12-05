@@ -206,7 +206,7 @@ Panel {
         ScrollBar {
             id: scrollBar
 
-            anchors.top: parent.top
+            anchors.top: header.bottom
             anchors.bottom: parent.bottom
             anchors.right: parent.right
             flickableItem: mainView
