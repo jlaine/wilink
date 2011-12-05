@@ -6,6 +6,8 @@ wiLink 2.2.0 (UNRELEASED)
   - Add an animation when a new message is sent/received.
  * Diagnostics:
   - Fix DiagnosticsManager crash during remote queries.
+ * Photos:
+  - Use a smooth transition between preview and full-res photos.
  * Rooms:
   - Show moderators with a badge.
  * Roster:
