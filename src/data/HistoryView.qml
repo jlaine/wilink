@@ -193,13 +193,9 @@ Item {
                         }
                     }
 
-                    Rectangle {
+                    Item {
                         id: rect
                         height: bodyText.height + 10
-                        border.color: model.received ? '#84bde8': '#ababab'
-                        border.width: model.action ? 0 : 1
-                        color: model.selected ? '#aa86abd9' : (model.action ? 'transparent' : (model.received ? '#e7f4fe' : '#fafafa'))
-                        radius: 8
                         width: parent.width
 
                         MouseArea {
@@ -223,6 +219,20 @@ Item {
                             }
                         }
 
+                        Rectangle {
+                            anchors.left: parent.left
+                            anchors.right: parent.right
+                            height: parent.height
+                            border.color: model.received ? '#84bde8': '#ababab'
+                            border.width: model.action ? 0 : 1
+                            color: model.selected ? '#aa86abd9' : (model.action ? 'transparent' : (model.received ? '#e7f4fe' : '#fafafa'))
+                            radius: 8
+
+                            Behavior on height {
+                                NumberAnimation { duration: appStyle.animation.normalDuration }
+                            }
+                        }
+
                         Label {
                             id: bodyText
 
@@ -237,12 +247,6 @@ Item {
 
                             onLinkActivated: Qt.openUrlExternally(link)
                         }
-
-/*
-                        Behavior on height {
-                            NumberAnimation { duration: appStyle.animation.normalDuration }
-                        }
-*/
                     }
 
                     Item {
