@@ -101,3 +101,10 @@ generate_png(png SIZE 128 DESTINATION 128x128 ${LARGE_ICONS})
 
 add_custom_target(icons DEPENDS ${icns} ${ico} ${png} ${xpm})
 
+if (UNIX AND NOT APPLE)
+install(FILES wiLink.desktop DESTINATION share/applications)
+install(FILES 32x32/wiLink.png DESTINATION share/icons/hicolor/32x32/apps)
+install(FILES 64x64/wiLink.png DESTINATION share/icons/hicolor/64x64/apps)
+install(FILES scalable/wiLink.svg DESTINATION share/icons/hicolor/scalable/apps)
+install(FILES wiLink.xpm DESTINATION share/pixmaps)
+endif()
