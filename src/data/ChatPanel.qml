@@ -78,7 +78,7 @@ Panel {
                 }
             }
             title: qsTr('My rooms')
-            height: headerHeight + (count > 0 ? 4 : 0) + 30 * Math.min(count, 8);
+            height: headerHeight + (count > 0 ? 4 : 0) + rowHeight * Math.min(count, 8);
 
             onAddClicked: {
                 dialogSwapper.showPanel('RoomJoinDialog.qml');

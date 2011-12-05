@@ -25,6 +25,7 @@ ContactView {
 
     property string currentJid
     property url iconSource
+    property int rowHeight: appStyle.icon.smallSize + 6
 
     signal itemClicked(variant model)
     signal itemContextMenu(variant model, variant point)
@@ -33,7 +34,7 @@ ContactView {
         id: item
 
         width: parent.width
-        height: appStyle.icon.smallSize + 6
+        height: block.rowHeight
 
         Item {
             anchors.fill: parent
