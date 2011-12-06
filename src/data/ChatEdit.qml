@@ -106,7 +106,7 @@ Rectangle {
         TextEdit {
             id: input
 
-            focus: true
+            focus: appStyle.autoFocusInput
             x: 8
             y: 8
             selectByMouse: true
