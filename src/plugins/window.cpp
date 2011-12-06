@@ -60,6 +60,8 @@ Window::Window(const QUrl &url, const QString &jid, QWidget *parent)
     context->setContextProperty("application", wApp);
 #ifdef WILINK_EMBEDDED
     context->setContextProperty("style", "mobile");
+#else
+    context->setContextProperty("style", "desktop");
 #endif
     context->setContextProperty("window", this);
 
