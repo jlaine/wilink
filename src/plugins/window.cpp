@@ -58,6 +58,9 @@ Window::Window(const QUrl &url, const QString &jid, QWidget *parent)
 
     QDeclarativeContext *context = view->rootContext();
     context->setContextProperty("application", wApp);
+#ifdef WILINK_EMBEDDED
+    context->setContextProperty("style", "mobile");
+#endif
     context->setContextProperty("window", this);
 
     setCentralWidget(view);

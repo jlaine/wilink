@@ -39,16 +39,16 @@ Item {
         id: fontItem
 
         property int largeSize: Math.ceil(normalSize * 1.5)
-        property int normalSize: textItem.font.pixelSize
+        property int normalSize: (style == 'mobile') ? 18 : textItem.font.pixelSize
         property int smallSize: Math.ceil(normalSize * 0.9)
     }
 
     Item {
         id: iconItem
 
-        property int tinySize: 16
-        property int smallSize: 24
-        property int normalSize: 32
+        property int tinySize: (style == 'mobile') ? 32 : 16
+        property int smallSize: (style == 'mobile') ? 48 : 24
+        property int normalSize: (style == 'mobile') ? 64 : 32
     }
 
     Item {
