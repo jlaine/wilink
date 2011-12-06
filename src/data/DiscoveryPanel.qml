@@ -93,19 +93,20 @@ Panel {
 
         delegate: Rectangle {
             width: view.width - 1
-            height: 34
+            height: appStyle.icon.normalSize + 2
 
             Image {
                 id: image
 
-                anchors.top: parent.top
                 anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
                 source: 'peer.png'
             }
 
             Label {
                 anchors.left: image.right
-                anchors.top: parent.top
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
                 text: '<b>' + model.name + '</b><br/>' + model.jid + (model.node ? ' (' + model.node + ')' : '')
             }
 
