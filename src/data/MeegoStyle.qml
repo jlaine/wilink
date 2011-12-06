@@ -31,7 +31,7 @@ Item {
     Item {
         id: animationItem
 
-        property int normalDuration: 150
+        property int normalDuration: 200
         property int longDuration: 500
     }
 
