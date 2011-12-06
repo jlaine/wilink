@@ -80,7 +80,7 @@ Item {
         delegate: Item {
             id: item
             width: view.width
-            height: 32
+            height: appStyle.icon.smallSize + 8
 
             Rectangle {
                 id: itemBackground
@@ -93,6 +93,9 @@ Item {
 
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.left: parent.left
+                    width: appStyle.icon.smallSize
+                    height: appStyle.icon.smallSize
+                    smooth: true
                     source: model.direction == QXmppCall.OutgoingDirection ? 'call-outgoing.png' : 'call-incoming.png'
                 }
 

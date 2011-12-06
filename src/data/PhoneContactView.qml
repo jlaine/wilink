@@ -40,7 +40,7 @@ ContactView {
     delegate: Item {
         id: item
 
-        height: 40
+        height: appStyle.icon.smallSize + 16
         width: parent.width
 
         Image {
