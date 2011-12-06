@@ -84,6 +84,7 @@ Panel {
                 }
             }
         }
+        z: 3
     }
 
     CrumbBar {
@@ -113,7 +114,7 @@ Panel {
         anchors.left: parent.left
         anchors.right: parent.right
         text: panel.canUpload ? qsTr('To upload your photos to wifirst.net, simply drag and drop them to an album.') : ''
-        z: 1
+        z: 2
     }
 
     GridView {
@@ -229,7 +230,7 @@ Panel {
     Rectangle {
         id: display
 
-        anchors.top: crumbBar.bottom
+        anchors.top: help.bottom
         anchors.bottom: footer.top
         anchors.left: parent.left
         anchors.right: parent.right
@@ -329,11 +330,37 @@ Panel {
         PropertyChanges { target: display; opacity: 1 }
         PropertyChanges { target: displayView; focus: true }
         PropertyChanges { target: view; opacity: 0; focus: false }
-        PropertyChanges { target: help; height: 0; opacity: 0 }
+        PropertyChanges { target: crumbBar; anchors.topMargin: -help.height; opacity: 0 }
+        PropertyChanges { target: help; anchors.topMargin: -help.height; opacity: 0 }
     }
 
     transitions: Transition {
-        PropertyAnimation { target: display; properties: 'opacity'; duration: appStyle.animation.normalDuration }
-        PropertyAnimation { target: help; properties: 'height,opacity'; duration: appStyle.animation.normalDuration }
+        // slide the top bars up while fading out
+        PropertyAnimation {
+            target: help
+            properties: 'anchors.topMargin,opacity'
+            duration: appStyle.animation.longDuration
+            easing.type: Easing.InOutQuad
+        }
+        PropertyAnimation {
+            target: crumbBar
+            properties: 'anchors.topMargin,opacity'
+            duration: appStyle.animation.longDuration
+            easing.type: Easing.InOutQuad
+        }
+
+        // replace the list view by the selected picture
+        PropertyAnimation {
+            target: display
+            properties: 'opacity'
+            duration: appStyle.animation.longDuration
+            easing.type: Easing.InOutQuad
+        }
+        PropertyAnimation {
+            target: view
+            properties: 'opacity'
+            duration: appStyle.animation.longDuration
+            easing.type: Easing.InOutQuad
+        }
     }
 }
