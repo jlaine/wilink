@@ -31,7 +31,6 @@
 #include <QGraphicsObject>
 #include <QMenu>
 #include <QNetworkDiskCache>
-#include <QProcess>
 #include <QSettings>
 #include <QSslSocket>
 #include <QSystemTrayIcon>
@@ -45,6 +44,10 @@
 #include "systeminfo.h"
 #include "updater.h"
 #include "window.h"
+
+#ifdef Q_OS_MAC
+extern bool qt_mac_execute_apple_script(const QString &script, AEDesc *ret);
+#endif
 
 Application *wApp = 0;
 
@@ -696,11 +699,7 @@ void ApplicationSettings::setOpenAtLogin(bool run)
         QString("tell application \"System Events\"\n"
             "\tdelete login item \"%1\"\n"
             "end tell\n").arg(appName);
-    QProcess process;
-    process.start("osascript");
-    process.write(script.toAscii());
-    process.closeWriteChannel();
-    process.waitForFinished();
+    qt_mac_execute_apple_script(script, 0);
 #elif defined(Q_OS_WIN)
     QSettings registry("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
     if (run)
