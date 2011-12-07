@@ -6,6 +6,14 @@ QMAKE=$2
 # copy libraries
 macdeployqt $bundle -no-plugins
 
+# copy Growl
+src="/Library/Frameworks/Growl.framework"
+dst="$bundle/Contents/Frameworks/Growl.framework"
+if [ -e $src -a ! -e $dst ]; then
+    echo "Copying library $src"
+    cp -a $src $dst
+fi
+
 # generate Qt config file
 mkdir -p $bundle/Contents/Resources
 ( echo "[Paths]"; echo "Plugins = PlugIns" ) > $bundle/Contents/Resources/qt.conf
