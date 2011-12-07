@@ -22,6 +22,8 @@
 
 #include "application.h"
 
+extern bool qt_mac_execute_apple_script(const QString &script, AEDesc *ret);
+
 @interface AppController : NSObject <NSApplicationDelegate>
 - (BOOL)applicationShouldHandleReopen: (NSApplication *)app hasVisibleWindows: (BOOL) flag;
 - (NSApplicationTerminateReply)applicationShouldTerminate: (NSApplication *)sender;
