@@ -21,10 +21,11 @@ import QtQuick 1.0
 
 Item {
     property alias animation: animationItem
-    property bool autoFocusInput: (style == 'mobile') ? false : true
+    property bool autoFocusInput: isMobile ? false : true
     property alias font: fontItem
     property int highlightMoveDuration: 500
     property alias icon: iconItem
+    property bool isMobile: application.isMobile
     property alias spacing: spacingItem
 
     opacity: 0
@@ -40,16 +41,16 @@ Item {
         id: fontItem
 
         property int largeSize: Math.ceil(normalSize * 1.5)
-        property int normalSize: (style == 'mobile') ? 18 : textItem.font.pixelSize
+        property int normalSize: isMobile ? 18 : textItem.font.pixelSize
         property int smallSize: Math.ceil(normalSize * 0.9)
     }
 
     Item {
         id: iconItem
 
-        property int tinySize: (style == 'mobile') ? 32 : 16
-        property int smallSize: (style == 'mobile') ? 48 : 24
-        property int normalSize: (style == 'mobile') ? 64 : 32
+        property int tinySize: isMobile ? 32 : 16
+        property int smallSize: isMobile ? 48 : 24
+        property int normalSize: isMobile ? 64 : 32
     }
 
     Item {

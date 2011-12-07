@@ -63,6 +63,7 @@ class Application : public QApplication
     Q_PROPERTY(QString organizationName READ organizationName CONSTANT)
     Q_PROPERTY(QString osType READ osType CONSTANT)
     Q_PROPERTY(bool isInstalled READ isInstalled CONSTANT)
+    Q_PROPERTY(bool isMobile READ isMobile CONSTANT)
     Q_PROPERTY(ApplicationSettings* settings READ settings CONSTANT)
     Q_PROPERTY(QSoundPlayer* soundPlayer READ soundPlayer CONSTANT)
     Q_PROPERTY(Updater* updater READ updater CONSTANT)
@@ -85,7 +86,8 @@ public:
     QString executablePath() const;
     QUrl qmlUrl(const QString &name) const;
 
-    bool isInstalled();
+    bool isInstalled() const;
+    bool isMobile() const;
     QString osType() const;
 
     // preferences

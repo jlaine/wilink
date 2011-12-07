@@ -266,10 +266,19 @@ QString Application::executablePath() const
     return applicationFilePath();
 }
 
-bool Application::isInstalled()
+bool Application::isInstalled() const
 {
     QDir dir = QFileInfo(executablePath()).dir();
     return !dir.exists("CMakeFiles");
+}
+
+bool Application::isMobile() const
+{
+#ifdef WILINK_EMBEDDED
+    return true;
+#else
+    return false;
+#endif
 }
 
 QString Application::osType() const
