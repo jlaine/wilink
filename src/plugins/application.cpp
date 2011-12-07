@@ -236,7 +236,11 @@ void Application::createSystemTrayIcon()
 {
 #ifdef USE_SYSTRAY
     d->trayIcon = new QSystemTrayIcon;
+#ifdef Q_OS_MAC
+    d->trayIcon->setIcon(QIcon(":/wiLink-black.png"));
+#else
     d->trayIcon->setIcon(QIcon(":/wiLink.png"));
+#endif
 
     d->trayMenu = new QMenu;
     QAction *action = d->trayMenu->addAction(QIcon(":/close.png"), tr("&Quit"));
