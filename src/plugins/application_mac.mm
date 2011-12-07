@@ -70,3 +70,43 @@ void Application::platformInit()
     [autoreleasepool release];
 }
 
+Notification *Application::showMessage(const QString &title, const QString &message, const QString &action)
+{
+    // Make sure that we have Growl installed on the machine we are running on.
+    CFURLRef cfurl = 0;
+    OSStatus status = LSGetApplicationForInfo(kLSUnknownType, kLSUnknownCreator,
+                                              CFSTR("growlTicket"), kLSRolesAll, 0, &cfurl);
+    if (status == kLSApplicationNotFoundErr)
+        return 0;
+
+    CFBundleRef bundle = CFBundleCreate(0, cfurl);
+    if (CFStringCompare(CFBundleGetIdentifier(bundle), CFSTR("com.Growl.GrowlHelperApp"),
+                kCFCompareCaseInsensitive |  kCFCompareBackwards) != kCFCompareEqualTo) {
+        CFRelease(cfurl);
+        return 0;
+    }
+
+    QString notificationType(QLatin1String("Notification"));
+    const QString script(QLatin1String(
+        "tell application \"GrowlHelperApp\"\n"
+        "-- Make a list of all the notification types (all)\n"
+        "set the allNotificationsList to {\"") + notificationType + QLatin1String("\"}\n"
+
+        "-- Make a list of the notifications (enabled)\n"
+        "set the enabledNotificationsList to {\"") + notificationType + QLatin1String("\"}\n"
+
+        "-- Register our script with growl.\n"
+        "register as application \"") + applicationName() + QLatin1String("\" all notifications allNotificationsList default notifications enabledNotificationsList\n"
+
+        "--	Send a Notification...\n") +
+        QLatin1String("notify with name \"") + notificationType +
+        QLatin1String("\" title \"") + title +
+        QLatin1String("\" description \"") + message +
+        QLatin1String("\" application name \"") + applicationName() +
+        QLatin1String("\"\nend tell"));
+    qt_mac_execute_apple_script(script, 0);
+
+    CFRelease(cfurl);
+    CFRelease(bundle);
+    return 0;
+}
