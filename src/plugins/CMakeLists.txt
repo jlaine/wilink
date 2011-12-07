@@ -14,6 +14,9 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp/src/core)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp/src/diagnostics)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp/src/shares)
 
+# Libraries
+set(wilink_LIBRARIES ${QT_QTGUI_LIBRARY} ${QT_QTDECLARATIVE_LIBRARY})
+
 # Needed for Qt >= 4.7 on Debian/Ubuntu
 find_library(QTMULTIMEDIAKIT_LIBRARY QtMultimediaKit)
 if(QTMULTIMEDIAKIT_LIBRARY)
@@ -22,14 +25,17 @@ if(QTMULTIMEDIAKIT_LIBRARY)
     include_directories(/usr/include/QtMultimediaKit)
 endif()
 
-# For libnotify support
-if (UNIX)
+if (APPLE)
+    list(APPEND wilink_LIBRARIES "-framework AppKit")
+elseif (UNIX)
+    # libnotify support
     find_package(PkgConfig)
     pkg_check_modules(LIBNOTIFY "libnotify")
     if(LIBNOTIFY_FOUND)
         message(STATUS "Found libnotify library")
         include_directories(${LIBNOTIFY_INCLUDE_DIRS})
         add_definitions(-DUSE_LIBNOTIFY)
+        list(APPEND wilink_LIBRARIES ${LIBNOTIFY_LIBRARIES})
     endif()
 endif()
 
@@ -181,18 +187,6 @@ if(WIN32)
 endif(WIN32)
 
 add_executable(wiLink ${wiLink_SOURCES} ${wiLink_MOC_SOURCES} ${wiLink_RCC_SOURCES} ${WILINK_RESOURCE})
-
-# libraries
-set(wilink_LIBRARIES ${QT_QTGUI_LIBRARY} ${QT_QTDECLARATIVE_LIBRARY})
-if(APPLE)
-    list(APPEND wilink_LIBRARIES "-framework AppKit")
-endif(APPLE)
-
-# For libnotify support
-if(LIBNOTIFY_FOUND)
-    list(APPEND wilink_LIBRARIES ${LIBNOTIFY_LIBRARIES})
-endif()
-
 target_link_libraries(wiLink idle qnetio qxmpp qxmpp-diagnostics qxmpp-shares qdjango qsound ${wilink_LIBRARIES})
 
 if(APPLE)
