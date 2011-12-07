@@ -27,6 +27,14 @@ endif()
 
 if (APPLE)
     list(APPEND wilink_LIBRARIES "-framework AppKit")
+
+    # Growl support
+    find_library(GROWL_LIBRARY Growl)
+    if(GROWL_LIBRARY)
+        message(STATUS "Found Growl library")
+        add_definitions(-DUSE_GROWL)
+        list(APPEND wilink_LIBRARIES ${GROWL_LIBRARY})
+    endif()
 elseif (UNIX)
     # libnotify support
     find_package(PkgConfig)
@@ -202,6 +210,7 @@ if(APPLE)
         COMMAND mkdir -p ${BUNDLE_LOCATION}/Contents/Resources/
         COMMAND touch ${BUNDLE_LOCATION}/Contents/Resources/empty.lproj
         COMMAND cp ${CPACK_BUNDLE_ICON} ${BUNDLE_LOCATION}/Contents/Resources/
+        COMMAND cp -r ${GROWL_LIBRARY} ${BUNDLE_LOCATION}/Contents/Frameworks/
         COMMAND ${CMAKE_SOURCE_DIR}/cmake/copyplugins ${BUNDLE_LOCATION} ${QT_QMAKE_EXECUTABLE} ${WILINK_EXTRA_PLUGINS}
         DEPENDS wiLink)
 endif(APPLE)
