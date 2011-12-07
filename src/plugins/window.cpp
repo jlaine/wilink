@@ -148,6 +148,13 @@ void Window::setFullScreen(bool fullScreen)
         setWindowState(windowState() & ~Qt::WindowFullScreen);
 }
 
+void Window::showAndRaise()
+{
+    show();
+    raise();
+    activateWindow();
+}
+
 void Window::_q_statusChanged()
 {
     QDeclarativeView *view = qobject_cast<QDeclarativeView*>(sender());

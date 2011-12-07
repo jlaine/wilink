@@ -46,6 +46,7 @@ signals:
 public slots:
     void alert();
     QFileDialog *fileDialog();
+    void showAndRaise();
 
 private slots:
     void _q_statusChanged();

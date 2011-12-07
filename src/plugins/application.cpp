@@ -57,7 +57,7 @@ public:
     ApplicationPrivate();
 
     ApplicationSettings *appSettings;
-    QList<QWidget*> chats;
+    QList<Window*> chats;
     QUrl qmlRoot;
     QSoundPlayer *soundPlayer;
     QThread *soundThread;
@@ -338,8 +338,7 @@ void Application::resetWindows()
 
         const QSize size = QApplication::desktop()->availableGeometry(window).size();
         window->move((size.width() - window->width()) / 2, (size.height() - window->height()) / 2);
-        window->show();
-        window->raise();
+        window->showAndRaise();
         d->chats << window;
         return;
     }
@@ -358,13 +357,13 @@ void Application::resetWindows()
 #ifdef WILINK_EMBEDDED
         Q_UNUSED(xpos);
         Q_UNUSED(ypos);
-        window->showFullScreen();
+        window->setFullScreen(true);
 #else
         // restore window geometry
         const QByteArray geometry = d->appSettings->windowGeometry(jid);
         if (!geometry.isEmpty()) {
             window->restoreGeometry(geometry);
-            window->setWindowState(window->windowState() & ~Qt::WindowFullScreen);
+            window->setFullScreen(false);
         } else {
             QSize size = QApplication::desktop()->availableGeometry(window).size();
             size.setHeight(size.height() - 100);
@@ -372,10 +371,8 @@ void Application::resetWindows()
             window->resize(size);
             window->move(xpos, ypos);
         }
-        window->show();
 #endif
-        window->raise();
-        window->activateWindow();
+        window->showAndRaise();
 
         d->chats << window;
         xpos += 100;
@@ -384,11 +381,9 @@ void Application::resetWindows()
 
 void Application::showWindows()
 {
-    foreach (QWidget *chat, d->chats) {
+    foreach (Window *chat, d->chats) {
         chat->setWindowState(chat->windowState() & ~Qt::WindowMinimized);
-        chat->show();
-        chat->raise();
-        chat->activateWindow();
+        chat->showAndRaise();
     }
 }
 
