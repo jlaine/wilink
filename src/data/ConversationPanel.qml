@@ -187,7 +187,10 @@ Panel {
                     // show notification
                     var handle = application.showMessage(vcard.name, text, qsTranslate('ConversationPanel', 'Show this conversation'));
                     if (handle) {
-                        handle.clicked.connect(function() { showConversation(jid); });
+                        handle.clicked.connect(function() {
+                            window.showAndRaise();
+                            showConversation(jid);
+                        });
                     }
 
                     // alert window

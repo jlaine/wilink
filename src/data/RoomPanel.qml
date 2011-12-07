@@ -137,7 +137,10 @@ Panel {
                         // show notification
                         var handle = application.showMessage(Utils.jidToResource(jid), text, qsTranslate('RoomPanel', 'Show this room'));
                         if (handle) {
-                            handle.clicked.connect(function() { showRoom(jid); });
+                            handle.clicked.connect(function() {
+                                window.showAndRaise();
+                                showRoom(jid);
+                            });
                         }
 
                         // alert window
