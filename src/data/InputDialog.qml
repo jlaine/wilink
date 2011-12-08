@@ -24,6 +24,7 @@ Dialog {
 
     property alias acceptableInput: bar.acceptableInput
     property alias labelText: label.text
+    property alias textCursorPosition: bar.cursorPosition
     property alias textValue: bar.text
     property alias validator: bar.validator
 

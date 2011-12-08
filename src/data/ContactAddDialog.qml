@@ -42,5 +42,9 @@ InputDialog {
         appClient.rosterManager.subscribe(jid);
         dialog.close();
     }
+
+    Component.onCompleted: {
+        textCursorPosition = 0;
+    }
 }
 
