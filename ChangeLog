@@ -16,6 +16,7 @@ wiLink 2.2.0 (UNRELEASED)
  * Roster:
   - Fix updating contact name after the contact is renamed.
   - Speed up scrolling.
+  - When adding a contact, position cursor at start.
 
 wiLink 2.1.0 (2011-08-29)
  * Application:
