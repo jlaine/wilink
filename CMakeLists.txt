@@ -87,18 +87,27 @@ if(APPLE)
 else(APPLE)
     if(WIN32)
         set(CPACK_NSIS_PAGE_COMPONENTS "!define MUI_FINISHPAGE_RUN \\\"$INSTDIR\\\\bin\\\\wiLink.exe\\\";")
-
-        # make sure wiLink is closed before installing
-        set(CPACK_NSIS_FULL_INSTALL "ExecWait '\\\"taskkill.exe\\\" /F /IM wiLink.exe' \\\$0
+        set(CPACK_NSIS_FULL_INSTALL "
+  ;Make sure program is closed
+  ExecWait '\\\"taskkill.exe\\\" /F /IM wiLink.exe' \\\$0
   Sleep 1000
+
+  ;Remove old registry keys
+  DeleteRegKey SHCTX \\\"Software\\\\Humanity\\\\wiLink 1.1.0\\\"
+  DeleteRegKey SHCTX \\\"Software\\\\Humanity\\\\wiLink 2.0.1\\\"
+  DeleteRegKey SHCTX \\\"Software\\\\Humanity\\\\wiLink 2.1.0\\\"
+  DeleteRegKey SHCTX \\\"Software\\\\Wifirst\\\\wiLink 2.1.901\\\"
+  DeleteRegKey SHCTX \\\"Software\\\\Wifirst\\\\wiLink 2.1.902\\\"
+
+  ;Remove old files
   File /r \\\"\\\${INST_DIR}\\\\*.*\\\"")
-
-        # in silent mode, automatically run installed program
-        set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "  IfSilent 0 +2
+        set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "
+  ;In silent mode, automatically run program
+  IfSilent 0 +2
   Exec \\\"$INSTDIR\\\\bin\\\\wiLink.exe\\\"")
-
-        # purge data on uninstall
-        set(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "  RMDir /r \\\"$LOCALAPPDATA\\\\Wifirst\\\\wiLink\\\"
+        set(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "
+  ;Purge program data
+  RMDir /r \\\"$LOCALAPPDATA\\\\Wifirst\\\\wiLink\\\"
   RMDir \\\"$LOCALAPPDATA\\\\Wifirst\\\"
   DeleteRegValue HKCU \\\"Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Run\\\" \\\"wiLink\\\"
   DeleteRegKey HKCU \\\"Software\\\\Wifirst\\\\wiLink\\\"
