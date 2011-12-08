@@ -210,7 +210,6 @@ if(APPLE)
         COMMAND mkdir -p ${BUNDLE_LOCATION}/Contents/Resources/
         COMMAND touch ${BUNDLE_LOCATION}/Contents/Resources/empty.lproj
         COMMAND cp ${CPACK_BUNDLE_ICON} ${BUNDLE_LOCATION}/Contents/Resources/
-        COMMAND cp -r ${GROWL_LIBRARY} ${BUNDLE_LOCATION}/Contents/Frameworks/
         COMMAND ${CMAKE_SOURCE_DIR}/cmake/copyplugins ${BUNDLE_LOCATION} ${QT_QMAKE_EXECUTABLE} ${WILINK_EXTRA_PLUGINS}
         DEPENDS wiLink)
 endif(APPLE)
