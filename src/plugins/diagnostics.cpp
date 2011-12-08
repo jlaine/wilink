@@ -79,6 +79,9 @@ void DiagnosticsAgent::handle(const DiagnosticsIq &request)
     softwares << app;
     iq.setSoftwares(softwares);
 
+    /* get DNS servers */
+    iq.setNameServers(NetworkInfo::nameServers());
+
     /* discover interfaces */
     QList<Interface> interfaceResults;
     foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
@@ -338,14 +341,34 @@ static QString dumpPings(const QList<Ping> &pings)
     return table.render();
 }
 
+static QString dumpTransfers(const QList<Transfer> &transfers)
+{
+    TextTable table;
+    TextRow titles(true);
+    titles << "Direction" << "URL" << "Time" << "Speed";
+    table << titles;
+
+    foreach (const Transfer &transfer, transfers) {
+        const int speed = (transfer.time() > 0) ? (transfer.size()*1000*8)/(transfer.time()*1024) : 0;
+
+        TextRow row;
+        row.setColor(transfer.error() == 0 ? "green" : "red");
+        row << (transfer.direction() == Transfer::Upload ? "upload" : "download");
+        row << transfer.url().toString();
+        row << QString("%1 ms").arg(transfer.time());
+        row << QString("%1 kbps").arg(speed);
+        table << row;
+    }
+    return table.render();
+}
+
 static QString dumpResults(const DiagnosticsIq &iq)
 {
     QString text = makeSection("System diagnostics");
 
     // show software
     TextList list;
-    foreach (const Software &software, iq.softwares())
-    {
+    foreach (const Software &software, iq.softwares()) {
         QString title;
         if (software.type() == QLatin1String("os"))
             title = QLatin1String("Operating system");
@@ -356,6 +379,14 @@ static QString dumpResults(const DiagnosticsIq &iq)
         list << QString("%1: %2 %3").arg(title, software.name(), software.version());
     }
     text += makeItem("Software", list.render());
+
+    // show network info
+    if (!iq.nameServers().isEmpty()) {
+        TextList networkList;
+        foreach (const QHostAddress &server, iq.nameServers())
+            networkList << QString("DNS server: %1").arg(server.toString());
+        text += makeItem("Network", networkList.render());
+    }
 
     // show interfaces
     foreach (const Interface &interface, iq.interfaces())
@@ -369,6 +400,7 @@ static QString dumpResults(const DiagnosticsIq &iq)
         text += makeItem(
             QString("Traceroute to %1").arg(traceroute.hostAddress().toString()),
             dumpPings(traceroute));
+    text += makeItem("Transfer", dumpTransfers(iq.transfers()));
 
     return text;
 }
