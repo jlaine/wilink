@@ -366,7 +366,9 @@ static QString dumpResults(const DiagnosticsIq &iq)
     text += dumpLookup(iq.lookups());
     text += makeItem("Ping", dumpPings(iq.pings()));
     foreach (const Traceroute &traceroute, iq.traceroutes())
-        text += makeItem("Traceroute", dumpPings(traceroute));
+        text += makeItem(
+            QString("Traceroute to %1").arg(traceroute.hostAddress().toString()),
+            dumpPings(traceroute));
 
     return text;
 }
