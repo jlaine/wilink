@@ -24,6 +24,7 @@ FocusScope {
 
     signal close
     property alias color: background.color
+    property bool singlePanel: width < 500
 
     anchors.fill: parent
     opacity: 0

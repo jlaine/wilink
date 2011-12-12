@@ -24,7 +24,6 @@ import 'utils.js' as Utils
 Panel {
     id: chatPanel
 
-    property bool singlePanel: width < 500
     property alias rooms: roomListModel
     property bool pendingMessages: (roomListModel.pendingMessages + rosterModel.pendingMessages) > 0
 
@@ -262,6 +261,7 @@ Panel {
         anchors.left: sidebar.right
         anchors.right: parent.right
         focus: true
+        visible: width > 0
     }
 
     onPendingMessagesChanged: {

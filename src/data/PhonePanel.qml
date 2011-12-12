@@ -93,7 +93,7 @@ Panel {
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.left: parent.left
-        width: 200
+        width: panel.singlePanel ? parent.width : 200
         contactsModel: historyModel.contactsModel
 
         onItemClicked: {
@@ -108,6 +108,7 @@ Panel {
         anchors.bottom: parent.bottom
         anchors.left: sidebar.right
         anchors.right: parent.right
+        visible: width > 0
 
         PanelHeader {
             id: header

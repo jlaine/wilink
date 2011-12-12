@@ -23,8 +23,6 @@ import 'utils.js' as Utils
 Panel {
     id: newsPanel
 
-    property bool singlePanel: width < 500
-
     ContactView {
         id: sidebar
 
