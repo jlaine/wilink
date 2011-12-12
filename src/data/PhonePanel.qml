@@ -99,6 +99,8 @@ Panel {
         onItemClicked: {
             var address = buildAddress(model.phone, historyModel.client.domain);
             historyModel.call(address);
+            if (panel.singlePanel)
+                panel.state = 'no-sidebar';
         }
     }
 
@@ -128,6 +130,8 @@ Panel {
                     onClicked: {
                         var address = buildAddress(historyModel.voicemailNumber, historyModel.client.domain);
                         historyModel.call(address);
+                        if (panel.singlePanel)
+                            panel.state = 'no-sidebar';
                     }
                 }
 
@@ -215,6 +219,8 @@ Panel {
                         var address = buildAddress(recipient, historyModel.client.domain);
                         if (historyModel.call(address))
                             numberEdit.text = '';
+                        if (panel.singlePanel)
+                            panel.state = 'no-sidebar';
                     }
                 }
 
