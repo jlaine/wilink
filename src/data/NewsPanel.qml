@@ -21,6 +21,10 @@ import QtQuick 1.0
 import 'utils.js' as Utils
 
 Panel {
+    id: newsPanel
+
+    property bool singlePanel: width < 500
+
     ContactView {
         id: sidebar
 
@@ -28,7 +32,7 @@ Panel {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         title: qsTr('My news')
-        width: 200
+        width: newsPanel.singlePanel ? parent.width : 200
 
         delegate: Item {
             id: item
@@ -68,6 +72,8 @@ Panel {
                 onClicked: {
                     sidebar.currentIndex = model.index;
                     mainView.model.source = model.link;
+                    if (newsPanel.singlePanel)
+                        newsPanel.state = 'no-sidebar';
                 }
             }
         }
@@ -94,6 +100,7 @@ Panel {
         anchors.bottom: parent.bottom
         anchors.left: sidebar.right
         anchors.right: parent.right
+        visible: width > 0
 
         PanelHeader {
             id: header
