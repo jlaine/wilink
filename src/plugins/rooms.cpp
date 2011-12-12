@@ -209,15 +209,8 @@ void RoomListModel::setClient(ChatClient *client)
             bool check;
             Q_UNUSED(check);
 
-            // add extension
-            QXmppBookmarkManager *bookmarkManager = client->findExtension<QXmppBookmarkManager>();
-            if (!bookmarkManager) {
-                bookmarkManager = new QXmppBookmarkManager(client);
-                client->addExtension(bookmarkManager);
-            }
-
             // connect signals
-            check = connect(bookmarkManager, SIGNAL(bookmarksReceived(QXmppBookmarkSet)),
+            check = connect(client->bookmarkManager(), SIGNAL(bookmarksReceived(QXmppBookmarkSet)),
                             this, SLOT(_q_bookmarksReceived()));
             Q_ASSERT(check);
 
@@ -225,7 +218,7 @@ void RoomListModel::setClient(ChatClient *client)
                             this, SLOT(_q_roomAdded(QXmppMucRoom*)));
             Q_ASSERT(check);
 
-            if (bookmarkManager->areBookmarksReceived())
+            if (client->bookmarkManager()->areBookmarksReceived())
                 QMetaObject::invokeMethod(this, "_q_bookmarksReceived", Qt::QueuedConnection);
         }
 
@@ -296,11 +289,8 @@ void RoomListModel::addRoom(const QString &jid)
 
     // update bookmarks
     if (m_client) {
-        QXmppBookmarkManager *bookmarkManager = m_client->findExtension<QXmppBookmarkManager>();
-        Q_ASSERT(bookmarkManager);
-
         // find bookmark
-        QXmppBookmarkSet bookmarks = bookmarkManager->bookmarks();
+        QXmppBookmarkSet bookmarks = m_client->bookmarkManager()->bookmarks();
         QList<QXmppBookmarkConference> conferences = bookmarks.conferences();
         foreach (const QXmppBookmarkConference &conference, conferences) {
             if (conference.jid() == jid)
@@ -313,7 +303,7 @@ void RoomListModel::addRoom(const QString &jid)
         conference.setJid(jid);
         conferences << conference;
         bookmarks.setConferences(conferences);
-        bookmarkManager->setBookmarks(bookmarks);
+        m_client->bookmarkManager()->setBookmarks(bookmarks);
     }
 }
 
@@ -333,18 +323,15 @@ void RoomListModel::removeRoom(const QString &jid)
 
     // update bookmarks
     if (m_client) {
-        QXmppBookmarkManager *bookmarkManager = m_client->findExtension<QXmppBookmarkManager>();
-        Q_ASSERT(bookmarkManager);
-
         // find bookmark
-        QXmppBookmarkSet bookmarks = bookmarkManager->bookmarks();
+        QXmppBookmarkSet bookmarks = m_client->bookmarkManager()->bookmarks();
         QList<QXmppBookmarkConference> conferences = bookmarks.conferences();
         for (int i = 0; i < conferences.size(); ++i) {
             if (conferences.at(i).jid() == jid) {
                 // remove bookmark
                 conferences.removeAt(i);
                 bookmarks.setConferences(conferences);
-                bookmarkManager->setBookmarks(bookmarks);
+                m_client->bookmarkManager()->setBookmarks(bookmarks);
                 break;
             }
         }
@@ -355,11 +342,8 @@ void RoomListModel::_q_bookmarksReceived()
 {
     Q_ASSERT(m_client);
 
-    QXmppBookmarkManager *bookmarkManager = m_client->findExtension<QXmppBookmarkManager>();
-    Q_ASSERT(bookmarkManager);
-
     // join rooms marked as "autojoin"
-    const QXmppBookmarkSet &bookmarks = bookmarkManager->bookmarks();
+    const QXmppBookmarkSet &bookmarks = m_client->bookmarkManager()->bookmarks();
     foreach (const QXmppBookmarkConference &conference, bookmarks.conferences()) {
         if (conference.autoJoin())
             addRoom(conference.jid());
