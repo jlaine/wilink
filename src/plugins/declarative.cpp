@@ -49,6 +49,7 @@
 #include "diagnostics.h"
 #include "discovery.h"
 #include "history.h"
+#include "news.h"
 #include "phone.h"
 #include "phone/sip.h"
 #include "photos.h"
@@ -307,6 +308,7 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterType<Idle>(uri, 2, 0, "Idle");
     qmlRegisterType<ListHelper>(uri, 2, 0, "ListHelper");
     qmlRegisterType<LogModel>(uri, 2, 0, "LogModel");
+    qmlRegisterType<NewsListModel>(uri, 2, 0, "NewsListModel");
     qmlRegisterUncreatableType<Notification>(uri, 2, 0, "Notification", "");
     qmlRegisterType<PhoneContactModel>(uri, 2, 0, "PhoneContactModel");
     qmlRegisterType<PhoneHistoryModel>(uri, 2, 0, "PhoneHistoryModel");

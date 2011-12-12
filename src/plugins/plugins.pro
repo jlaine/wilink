@@ -43,6 +43,7 @@ SOURCES += \
     history.cpp \
     main.cpp \
     model.cpp \
+    news.cpp \
     phone.cpp \
     phone/sip.cpp \
     photos.cpp \
@@ -65,6 +66,7 @@ HEADERS += \
     discovery.h \
     history.h \
     model.h \
+    news.h \
     photos.h \
     phone.h \
     player.h \

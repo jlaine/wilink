@@ -66,6 +66,7 @@ set(wiLink_SOURCES
     history.cpp
     main.cpp
     model.cpp
+    news.cpp
     photos.cpp
     phone.cpp
     phone/sip.cpp
@@ -93,6 +94,7 @@ set(wiLink_MOC_HEADERS
     discovery.h
     history.h
     model.h
+    news.h
     photos.h
     phone.h
     phone/sip.h
