@@ -18,6 +18,7 @@
  */
 
 import QtQuick 1.0
+import wiLink 2.0
 import 'utils.js' as Utils
 
 Panel {
@@ -48,7 +49,7 @@ Panel {
                 width: appStyle.icon.normalSize
                 fillMode: Image.PreserveAspectFit
                 smooth: true
-                source: model.imageSource
+                source: model.avatar
             }
 
             Label {
@@ -61,7 +62,7 @@ Panel {
                 anchors.rightMargin: appStyle.spacing.horizontal
                 elide: Text.ElideRight
                 font.bold: true
-                text: model.title
+                text: model.name
             }
 
             MouseArea {
@@ -69,25 +70,16 @@ Panel {
 
                 onClicked: {
                     sidebar.currentIndex = model.index;
-                    mainView.model.source = model.link;
+                    mainView.model.source = model.url;
                     if (newsPanel.singlePanel)
                         newsPanel.state = 'no-sidebar';
                 }
             }
         }
 
-        model: ListModel {
-            ListElement {
-                title: 'BBC News - World'
-                imageSource: 'rss.png'
-                link: 'http://feeds.bbci.co.uk/news/world/rss.xml'
-            }
-
-            ListElement {
-                title: 'BBC News - Technology'
-                imageSource: 'rss.png'
-                link: 'http://feeds.bbci.co.uk/news/technology/rss.xml'
-            }
+        model: NewsListModel {
+            id: newsListModel
+            client: appClient
         }
     }
 
@@ -229,7 +221,7 @@ Panel {
     }
 
     Component.onCompleted: {
-        mainView.model.source = sidebar.model.get(0).link;
+        mainView.model.source = sidebar.model.get(0).url;
     }
 }
 

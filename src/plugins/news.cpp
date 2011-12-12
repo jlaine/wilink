@@ -20,6 +20,7 @@
 #include "QXmppBookmarkManager.h"
 #include "QXmppBookmarkSet.h"
 
+#include "application.h"
 #include "client.h"
 #include "news.h"
 
@@ -34,9 +35,20 @@ NewsListModel::NewsListModel(QObject *parent)
     : ChatModel(parent)
 {
     QHash<int, QByteArray> names;
+    names.insert(AvatarRole, "avatar");
     names.insert(NameRole, "name");
     names.insert(UrlRole, "url");
     setRoleNames(names);
+
+    NewsListItem *item = new NewsListItem;
+    item->name = "BBC News - World";
+    item->url = "http://feeds.bbci.co.uk/news/world/rss.xml";
+    addItem(item, rootItem, 0);
+
+    NewsListItem *item2 = new NewsListItem;
+    item2->name = "BBC News - Technology";
+    item2->url = "http://feeds.bbci.co.uk/news/technology/rss.xml";
+    addItem(item2, rootItem, 1);
 }
 
 ChatClient *NewsListModel::client() const
@@ -73,10 +85,12 @@ QVariant NewsListModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || !item)
         return QVariant();
 
-    if (role == UrlRole) {
-        return item->url;
-    } else if (role == ChatModel::NameRole) {
+    if (role == AvatarRole) {
+        return wApp->qmlUrl("rss.png");
+    } else if (role == NameRole) {
         return item->name;
+    } else if (role == UrlRole) {
+        return item->url;
     }
 
     return QVariant();
