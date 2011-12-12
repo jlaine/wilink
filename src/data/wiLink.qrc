@@ -56,6 +56,7 @@
     <file>MeegoSetup.qml</file>
     <file>Menu.qml</file>
     <file>MenuDelegate.qml</file>
+    <file>NewsDialog.qml</file>
     <file>NewsPanel.qml</file>
     <file>NewsPlugin.qml</file>
     <file>NotificationDialog.qml</file>

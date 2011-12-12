@@ -24,6 +24,16 @@ import 'utils.js' as Utils
 Panel {
     id: newsPanel
 
+    NewsListModel {
+        id: newsListModel
+        client: appClient
+    }
+
+    ListHelper {
+        id: newsListHelper
+        model: newsListModel
+    }
+
     ContactView {
         id: sidebar
 
@@ -77,9 +87,9 @@ Panel {
             }
         }
 
-        model: NewsListModel {
-            id: newsListModel
-            client: appClient
+        model: newsListModel
+        onAddClicked: {
+            dialogSwapper.showPanel('NewsDialog.qml', {'model': newsListModel});
         }
     }
 
@@ -221,7 +231,7 @@ Panel {
     }
 
     Component.onCompleted: {
-        mainView.model.source = sidebar.model.get(0).url;
+        mainView.model.source = newsListHelper.get(0).url;
     }
 }
 

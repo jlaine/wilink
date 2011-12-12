@@ -79,6 +79,61 @@ void NewsListModel::setClient(ChatClient *client)
     }
 }
 
+void NewsListModel::addBookmark(const QUrl &url, const QString &name)
+{
+    if (url.isEmpty())
+        return;
+
+    // add room to list
+    NewsListItem *item = 0;
+    int row = rootItem->children.size();
+    foreach (ChatModelItem *ptr, rootItem->children) {
+        NewsListItem *n = static_cast<NewsListItem*>(ptr);
+        if (n->url == url) {
+            break;
+        } else if (n->name.compare(name) > 0) {
+            row = n->row();
+            break;
+        }
+    }
+    if (!item) {
+        item = new NewsListItem;
+        item->name = name;
+        item->url = url;
+        addItem(item, rootItem, row);
+    }
+
+    // update bookmarks
+    if (m_client) {
+        // add or update bookmark
+        bool found = false;
+        QXmppBookmarkSet bookmarks = m_client->bookmarkManager()->bookmarks();
+        QList<QXmppBookmarkUrl> sources;
+        QXmppBookmarkUrl source;
+        foreach (source, bookmarks.urls()) {
+            if (source.url() == url && !found) {
+                source.setName(name);
+                found = true;
+            }
+            sources << source;
+        }
+        if (!found) {
+            source.setUrl(url);
+            source.setName(name);
+            sources << source;
+        }
+
+        // update bookmarks
+        bookmarks.setUrls(sources);
+        m_client->bookmarkManager()->setBookmarks(bookmarks);
+    }
+}
+
+void NewsListModel::removeBookmark(const QUrl &url)
+{
+
+}
+
 QVariant NewsListModel::data(const QModelIndex &index, int role) const
 {
     NewsListItem *item = static_cast<NewsListItem*>(index.internalPointer());
