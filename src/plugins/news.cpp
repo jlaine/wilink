@@ -137,24 +137,29 @@ void NewsListModel::_q_bookmarksReceived()
     if (rootItem->children.size())
         removeRows(0, rootItem->children.size(), createIndex(rootItem));
 
-    const QList<QXmppBookmarkUrl> sources = m_client->bookmarkManager()->bookmarks().urls();
+    // initialise bookmarks if needed
+    QXmppBookmarkSet bookmarks = m_client->bookmarkManager()->bookmarks();
+    QList<QXmppBookmarkUrl> sources = bookmarks.urls();
     if (sources.isEmpty()) {
-        NewsListItem *item = new NewsListItem;
-        item->name = "BBC News - World";
-        item->url = "http://feeds.bbci.co.uk/news/world/rss.xml";
-        addItem(item, rootItem, 0);
+        QXmppBookmarkUrl source;
+        source.setName("BBC News - World");
+        source.setUrl(QUrl("http://feeds.bbci.co.uk/news/world/rss.xml"));
+        sources << source;
 
-        NewsListItem *item2 = new NewsListItem;
-        item2->name = "BBC News - Technology";
-        item2->url = "http://feeds.bbci.co.uk/news/technology/rss.xml";
-        addItem(item2, rootItem, 1);
-    } else {
-        foreach (const QXmppBookmarkUrl &source, sources) {
-            NewsListItem *item = new NewsListItem;
-            item->name = source.name();
-            item->url = source.url();
-            addItem(item, rootItem, rootItem->children.size());
-        }
+        source.setName("BBC News - Technology");
+        source.setUrl(QUrl("http://feeds.bbci.co.uk/news/technology/rss.xml"));
+        sources << source;
+
+        bookmarks.setUrls(sources);
+        m_client->bookmarkManager()->setBookmarks(bookmarks);
+        return;
+    }
+
+    foreach (const QXmppBookmarkUrl &source, sources) {
+        NewsListItem *item = new NewsListItem;
+        item->name = source.name();
+        item->url = source.url();
+        addItem(item, rootItem, rootItem->children.size());
     }
 }
 
