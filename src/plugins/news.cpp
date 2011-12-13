@@ -81,7 +81,6 @@ void NewsListModel::addBookmark(const QUrl &url, const QString &name)
     QList<QXmppBookmarkUrl> sources;
     foreach (source, bookmarks.urls()) {
         if (!found && source.url() == url) {
-            qDebug("found URL %s", qPrintable(url.toString()));
             source.setName(name);
             found = true;
         }

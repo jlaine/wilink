@@ -101,7 +101,7 @@ Dialog {
                     anchors.left: urlLabel.right
                     anchors.right: parent.right
                     validator: RegExpValidator {
-                        regExp: /.{1,30}/
+                        regExp: /http:\/\/.+/
                     }
                 }
             }
