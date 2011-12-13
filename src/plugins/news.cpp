@@ -39,16 +39,6 @@ NewsListModel::NewsListModel(QObject *parent)
     names.insert(NameRole, "name");
     names.insert(UrlRole, "url");
     setRoleNames(names);
-
-    NewsListItem *item = new NewsListItem;
-    item->name = "BBC News - World";
-    item->url = "http://feeds.bbci.co.uk/news/world/rss.xml";
-    addItem(item, rootItem, 0);
-
-    NewsListItem *item2 = new NewsListItem;
-    item2->name = "BBC News - Technology";
-    item2->url = "http://feeds.bbci.co.uk/news/technology/rss.xml";
-    addItem(item2, rootItem, 1);
 }
 
 ChatClient *NewsListModel::client() const
@@ -84,46 +74,26 @@ void NewsListModel::addBookmark(const QUrl &url, const QString &name)
     if (url.isEmpty())
         return;
 
-    // add room to list
-    NewsListItem *item = 0;
-    int row = rootItem->children.size();
-    foreach (ChatModelItem *ptr, rootItem->children) {
-        NewsListItem *n = static_cast<NewsListItem*>(ptr);
-        if (n->url == url) {
-            break;
-        } else if (n->name.compare(name) > 0) {
-            row = n->row();
-            break;
-        }
-    }
-    if (!item) {
-        item = new NewsListItem;
-        item->name = name;
-        item->url = url;
-        addItem(item, rootItem, row);
-    }
-
     // update bookmarks
     if (m_client) {
-        // add or update bookmark
-        bool found = false;
         QXmppBookmarkSet bookmarks = m_client->bookmarkManager()->bookmarks();
-        QList<QXmppBookmarkUrl> sources;
+        bool found = false;
         QXmppBookmarkUrl source;
+        QList<QXmppBookmarkUrl> sources;
         foreach (source, bookmarks.urls()) {
-            if (source.url() == url && !found) {
+            if (!found && source.url() == url) {
+                qDebug("found URL %s", qPrintable(url.toString()));
                 source.setName(name);
                 found = true;
             }
             sources << source;
         }
         if (!found) {
-            source.setUrl(url);
             source.setName(name);
+            source.setUrl(url);
             sources << source;
         }
 
-        // update bookmarks
         bookmarks.setUrls(sources);
         m_client->bookmarkManager()->setBookmarks(bookmarks);
     }
@@ -155,8 +125,28 @@ void NewsListModel::_q_bookmarksReceived()
 {
     Q_ASSERT(m_client);
 
-    const QXmppBookmarkSet &bookmarks = m_client->bookmarkManager()->bookmarks();
-    foreach (const QXmppBookmarkUrl &bookmark, bookmarks.urls()) {
+    if (rootItem->children.size())
+        removeRows(0, rootItem->children.size(), createIndex(rootItem));
+
+    const QList<QXmppBookmarkUrl> sources = m_client->bookmarkManager()->bookmarks().urls();
+    if (sources.isEmpty()) {
+        NewsListItem *item = new NewsListItem;
+        item->name = "BBC News - World";
+        item->url = "http://feeds.bbci.co.uk/news/world/rss.xml";
+        addItem(item, rootItem, 0);
+
+        NewsListItem *item2 = new NewsListItem;
+        item2->name = "BBC News - Technology";
+        item2->url = "http://feeds.bbci.co.uk/news/technology/rss.xml";
+        addItem(item2, rootItem, 1);
+    } else {
+        foreach (const QXmppBookmarkUrl &source, sources) {
+            qDebug("adding %s", qPrintable(source.name()));
+            NewsListItem *item = new NewsListItem;
+            item->name = source.name();
+            item->url = source.url();
+            addItem(item, rootItem, rootItem->children.size());
+        }
     }
 }
 

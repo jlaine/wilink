@@ -116,7 +116,7 @@ Dialog {
         if (!nameInput.acceptableInput || !urlInput.acceptableInput)
             return;
 
-        dialog.model.addBookmark(nameInput.text, urlInput.text);
+        dialog.model.addBookmark(urlInput.text, nameInput.text);
         dialog.close();
     }
 
