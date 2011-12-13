@@ -76,20 +76,58 @@ Panel {
             }
 
             MouseArea {
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
                 anchors.fill: parent
 
                 onClicked: {
-                    sidebar.currentIndex = model.index;
-                    mainView.model.source = model.url;
-                    if (newsPanel.singlePanel)
-                        newsPanel.state = 'no-sidebar';
+                    if (mouse.button == Qt.LeftButton) {
+                        sidebar.currentIndex = model.index;
+                        mainView.model.source = model.url;
+                        if (newsPanel.singlePanel)
+                            newsPanel.state = 'no-sidebar';
+                    } else if (mouse.button == Qt.RightButton) {
+                        // show context menu
+                        var pos = mapToItem(menuLoader.parent, mouse.x, mouse.y);
+                        menuLoader.sourceComponent = newsListMenu;
+                        menuLoader.item.bookmarkUrl = model.url;
+                        menuLoader.show(pos.x, pos.y);
+                    }
                 }
             }
         }
 
         model: newsListModel
+
         onAddClicked: {
             dialogSwapper.showPanel('NewsDialog.qml', {'model': newsListModel});
+        }
+
+        Component {
+            id: newsListMenu
+
+            Menu {
+                id: menu
+
+                property url bookmarkUrl
+
+                onItemClicked: {
+                    var item = menu.model.get(index);
+                    if (item.action == 'remove') {
+                        newsListModel.removeBookmark(bookmarkUrl);
+                    }
+                }
+
+                Component.onCompleted: {
+                    menu.model.append({
+                        'action': 'edit',
+                        'icon': 'options.png',
+                        'text': qsTr('Modify')});
+                    menu.model.append({
+                        'action': 'remove',
+                        'icon': 'remove.png',
+                        'text': qsTr('Remove')});
+                }
+            }
         }
     }
 

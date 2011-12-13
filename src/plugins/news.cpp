@@ -71,37 +71,47 @@ void NewsListModel::setClient(ChatClient *client)
 
 void NewsListModel::addBookmark(const QUrl &url, const QString &name)
 {
-    if (url.isEmpty())
+    if (url.isEmpty() || !m_client)
         return;
 
     // update bookmarks
-    if (m_client) {
-        QXmppBookmarkSet bookmarks = m_client->bookmarkManager()->bookmarks();
-        bool found = false;
-        QXmppBookmarkUrl source;
-        QList<QXmppBookmarkUrl> sources;
-        foreach (source, bookmarks.urls()) {
-            if (!found && source.url() == url) {
-                qDebug("found URL %s", qPrintable(url.toString()));
-                source.setName(name);
-                found = true;
-            }
-            sources << source;
-        }
-        if (!found) {
+    QXmppBookmarkSet bookmarks = m_client->bookmarkManager()->bookmarks();
+    bool found = false;
+    QXmppBookmarkUrl source;
+    QList<QXmppBookmarkUrl> sources;
+    foreach (source, bookmarks.urls()) {
+        if (!found && source.url() == url) {
+            qDebug("found URL %s", qPrintable(url.toString()));
             source.setName(name);
-            source.setUrl(url);
-            sources << source;
+            found = true;
         }
-
-        bookmarks.setUrls(sources);
-        m_client->bookmarkManager()->setBookmarks(bookmarks);
+        sources << source;
     }
+    if (!found) {
+        source.setName(name);
+        source.setUrl(url);
+        sources << source;
+    }
+
+    bookmarks.setUrls(sources);
+    m_client->bookmarkManager()->setBookmarks(bookmarks);
 }
 
 void NewsListModel::removeBookmark(const QUrl &url)
 {
+    if (url.isEmpty() || !m_client)
+        return;
 
+    // update bookmarks
+    QXmppBookmarkSet bookmarks = m_client->bookmarkManager()->bookmarks();
+    QList<QXmppBookmarkUrl> sources;
+    foreach (const QXmppBookmarkUrl source, bookmarks.urls()) {
+        if (source.url() != url)
+            sources << source;
+    }
+
+    bookmarks.setUrls(sources);
+    m_client->bookmarkManager()->setBookmarks(bookmarks);
 }
 
 QVariant NewsListModel::data(const QModelIndex &index, int role) const
@@ -141,7 +151,6 @@ void NewsListModel::_q_bookmarksReceived()
         addItem(item2, rootItem, 1);
     } else {
         foreach (const QXmppBookmarkUrl &source, sources) {
-            qDebug("adding %s", qPrintable(source.name()));
             NewsListItem *item = new NewsListItem;
             item->name = source.name();
             item->url = source.url();
