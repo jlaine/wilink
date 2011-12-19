@@ -28,13 +28,6 @@ Item {
         id: listHelper
     }
 
-    Rectangle {
-        id: background
-
-        anchors.fill: parent
-        color: 'black'
-    }
-
     Repeater {
         id: view
 
@@ -43,6 +36,7 @@ Item {
             Image {
                 id: rect
 
+                asynchronous: true
                 width: 128 * z
                 height: 128 * z
                 source: model.image
@@ -58,7 +52,7 @@ Item {
 
                     SequentialAnimation {
                         NumberAnimation {
-                            duration: 30000 / z
+                            duration: 30000 / Math.sqrt(z)
                             target: rect
                             properties: 'y'
                         }

@@ -195,7 +195,10 @@ Panel {
         },
         State {
             name: 'slide'
+            PropertyChanges { target: gridView; opacity: 0; focus: false }
             PropertyChanges { target: slideView; opacity: 1 }
+            PropertyChanges { target: crumbBar; anchors.topMargin: -help.height; opacity: 0 }
+            PropertyChanges { target: help; anchors.topMargin: -help.height; opacity: 0 }
         }
     ]
 
