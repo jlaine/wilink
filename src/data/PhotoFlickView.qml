@@ -23,12 +23,12 @@ import wiLink 2.0
 FocusScope {
     id: display
 
-    property alias currentIndex: displayView.currentIndex
-    property alias model: displayView.model
+    property alias currentIndex: view.currentIndex
+    property alias model: view.model
     signal currentIndexChanged
 
     function positionViewAtIndex(index, pos) {
-        displayView.positionViewAtIndex(index, pos);
+        view.positionViewAtIndex(index, pos);
     }
 
     Rectangle {
@@ -38,7 +38,7 @@ FocusScope {
     }
 
     ListView {
-        id: displayView
+        id: view
 
         anchors.fill: parent
         focus: true
@@ -48,14 +48,14 @@ FocusScope {
         snapMode: ListView.SnapToItem
 
         delegate: Item {
-            width: displayView.width
-            height: displayView.height
+            width: view.width
+            height: view.height
 
             Image {
                 id: preview
 
-                width: displayView.width
-                height: displayView.height
+                width: view.width
+                height: view.height
                 source: model.avatar
                 fillMode: Image.PreserveAspectFit
             }
@@ -64,8 +64,8 @@ FocusScope {
                 id: image
 
                 asynchronous: true
-                width: displayView.width
-                height: displayView.height
+                width: view.width
+                height: view.height
                 source: model.image
                 fillMode: Image.PreserveAspectFit
                 opacity: 0
@@ -98,7 +98,7 @@ FocusScope {
             else if (event.key == Qt.Key_Enter ||
                      event.key == Qt.Key_Return ||
                      event.key == Qt.Key_Space) {
-                displayView.incrementCurrentIndex();
+                view.incrementCurrentIndex();
             }
         }
     }
