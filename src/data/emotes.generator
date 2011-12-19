@@ -1,0 +1,42 @@
+#!/usr/bin/env python
+
+import os
+import re
+from xml.etree.ElementTree import ElementTree
+
+EMOTES = {
+    'face-angry': 'smiley-angry',
+    'face-plain': 'smiley-neutral',
+    'face-raspberry': 'smiley-raspberry',
+    'face-sad': 'smiley-sad',
+    'face-smile': 'smiley-happy',
+    'face-uncertain': 'smiley-confused',
+    'face-wink': 'smiley-wink',
+}
+
+svg_path = os.path.join("scalable", "emotes.svg")
+tree = ElementTree(file=svg_path)
+group = tree.find('{http://www.w3.org/2000/svg}g')
+
+root = tree.getroot()
+page_height = int(root.attrib['height'])
+page_width = int(root.attrib['width'])
+
+# handle transform
+translate_x = 0
+translate_y = 0
+m = re.match(r'translate\(([0-9]+),([0-9]+)\)', group.attrib['transform'])
+if m:
+    translate_x = int(m.group(1))
+    translate_y = int(m.group(2))
+
+for rect in group.findall('{http://www.w3.org/2000/svg}rect'):
+    id = rect.attrib['id']
+    for size in [16, 32]:
+        if id in EMOTES:
+            png_path = os.path.join("%ix%i" % (size, size), "%s.png" % EMOTES[id])
+            width = int(rect.attrib['width'])
+            height = int(rect.attrib['height'])
+            x = int(rect.attrib['x']) + translate_x
+            y = page_height - (int(rect.attrib['y']) + height + translate_y)
+            os.system("inkscape -z --file %s --export-png %s --export-area %i:%i:%i:%i --export-width %i --export-height %i" % (svg_path, png_path, x, y, x+width, y+height, size, size))
