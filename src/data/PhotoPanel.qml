@@ -100,8 +100,8 @@ Panel {
                 photoModel.rootUrl = location.url;
                 panel.state = '';
             } else {
-                displayView.currentIndex = view.currentIndex;
-                displayView.positionViewAtIndex(displayView.currentIndex, ListView.Beginning);
+                display.currentIndex = view.currentIndex;
+                display.positionViewAtIndex(display.currentIndex, ListView.Beginning);
                 panel.state = 'details';
             }
         }
@@ -117,200 +117,31 @@ Panel {
         z: 2
     }
 
-    GridView {
+    PhotoModel {
+        id: photoModel
+    }
+
+    PhotoGridView {
         id: view
 
         anchors.top: help.bottom
         anchors.bottom: footer.top
         anchors.left: parent.left
-        anchors.right: scrollBar.left
-        cellWidth: 130
-        cellHeight: 150
-        focus: true
-
-        highlight: Highlight {}
-
-        model:  PhotoModel {
-            id: photoModel
-        }
-
-        delegate: Item {
-            id: item
-
-            width: view.cellWidth
-            height: view.cellHeight
-
-            function clicked() {
-                crumbBar.push({'name': model.name, 'isDir': model.isDir, 'url': model.url});
-            }
-
-            function data() {
-                return model;
-            }
-
-            Column {
-                anchors.fill: parent
-
-                Image {
-                    id: thumbnail
-
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    fillMode: Image.PreserveAspectFit
-                    width: 128
-                    height: 128
-                    source: model.avatar
-                    smooth: true
-                }
-
-                Label {
-                    id: text
-
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    elide: Text.ElideRight
-                    horizontalAlignment: Text.AlignHCenter
-                    text: model.name
-                }
-            }
-
-            MouseArea {
-                anchors.fill: parent
-
-                onClicked: {
-                    view.currentIndex = model.index;
-                    item.clicked();
-                }
-            }
-        }
-
-        DropArea {
-            anchors.fill: parent
-            enabled: panel.canUpload
-
-            onFilesDropped: {
-                for (var i in files) {
-                    photoModel.upload(files[i]);
-                }
-            }
-
-            // This force DropArea to ignore mouse event when disabled
-            visible: enabled
-        }
-
-        Keys.onPressed: {
-            if (event.key == Qt.Key_Delete ||
-               (event.key == Qt.Key_Backspace && event.modifiers == Qt.ControlModifier)) {
-                // FIXME: handle delete
-                if (view.currentIndex >= 0) {
-                    dialogSwapper.showPanel('PhotoDeleteDialog.qml', {'model': photoModel, 'index': view.currentIndex});
-                }
-            }
-            else if (event.key == Qt.Key_Back ||
-                     event.key == Qt.Key_Backspace) {
-                if (crumbBar.model.count > 1) {
-                    crumbBar.pop();
-                }
-            }
-            else if (event.key == Qt.Key_Enter ||
-                     event.key == Qt.Key_Return) {
-                view.currentItem.clicked();
-            }
-        }
-    }
-
-    ScrollBar {
-        id: scrollBar
-
-        anchors.top: help.bottom
-        anchors.bottom: footer.top
         anchors.right: parent.right
-        flickableItem: view
+        focus: true
+        model:  photoModel
     }
 
-    Rectangle {
+    PhotoFlickView {
         id: display
 
         anchors.top: help.bottom
         anchors.bottom: footer.top
         anchors.left: parent.left
         anchors.right: parent.right
+        model: photoModel
         opacity: 0
         z: 1
-
-        ListView {
-            id: displayView
-
-            anchors.fill: parent
-            highlightMoveDuration: appStyle.highlightMoveDuration
-            highlightRangeMode: ListView.StrictlyEnforceRange
-            model: view.model
-            orientation: Qt.Horizontal
-            snapMode: ListView.SnapToItem
-
-            delegate: Item {
-                width: displayView.width
-                height: displayView.height
-
-                Image {
-                    id: preview
-
-                    width: displayView.width
-                    height: displayView.height
-                    source: model.avatar
-                    fillMode: Image.PreserveAspectFit
-                }
-
-                Image {
-                    id: image
-
-                    asynchronous: true
-                    width: displayView.width
-                    height: displayView.height
-                    source: model.image
-                    fillMode: Image.PreserveAspectFit
-                    opacity: 0
-                }
-
-                states: State {
-                    name: 'ready'
-                    when: model.imageReady
-                    PropertyChanges { target: image; opacity: 1 }
-                }
-
-                transitions: Transition {
-                    NumberAnimation {
-                        target: image
-                        properties: 'opacity'
-                        duration: appStyle.animation.normalDuration
-                    }
-                }
-            }
-
-            onCurrentIndexChanged: {
-                if (panel.state == 'details') {
-                    view.currentIndex = displayView.currentIndex;
-                    var crumb = crumbBar.model.count - 1;
-                    var model = view.currentItem.data();
-                    crumbBar.model.setProperty(crumb, 'name', model.name);
-                    crumbBar.model.setProperty(crumb, 'isDir', model.isDir);
-                    crumbBar.model.setProperty(crumb, 'url', model.url);
-                }
-            }
-
-            Keys.onPressed: {
-                if (event.key == Qt.Key_Back ||
-                    event.key == Qt.Key_Backspace) {
-                    if (crumbBar.model.count > 1) {
-                        crumbBar.pop();
-                    }
-                }
-                else if (event.key == Qt.Key_Enter ||
-                         event.key == Qt.Key_Return ||
-                         event.key == Qt.Key_Space) {
-                    displayView.incrementCurrentIndex();
-                }
-            }
-        }
     }
 
     ShareQueueView {
@@ -328,7 +159,7 @@ Panel {
     states: State {
         name: 'details'
         PropertyChanges { target: display; opacity: 1 }
-        PropertyChanges { target: displayView; focus: true }
+        PropertyChanges { target: display; focus: true }
         PropertyChanges { target: view; opacity: 0; focus: false }
         PropertyChanges { target: crumbBar; anchors.topMargin: -help.height; opacity: 0 }
         PropertyChanges { target: help; anchors.topMargin: -help.height; opacity: 0 }
