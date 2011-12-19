@@ -26,6 +26,7 @@ Item {
     property int highlightMoveDuration: 500
     property alias icon: iconItem
     property bool isMobile: application.isMobile
+    property alias margin: marginItem
     property alias spacing: spacingItem
 
     opacity: 0
@@ -51,6 +52,13 @@ Item {
         property int tinySize: isMobile ? 32 : 16
         property int smallSize: isMobile ? 48 : 24
         property int normalSize: isMobile ? 64 : 32
+    }
+
+    Item {
+        id: marginItem
+
+        property int normal: isMobile ? 8 : 4
+        property int large: isMobile ? 16 : 8
     }
 
     Item {
