@@ -68,7 +68,7 @@ Item {
         }
         border.color: '#88a4d1'
         border.width: 1
-        height: appStyle.icon.tinySize + 8
+        height: appStyle.icon.tinySize + 2 * appStyle.margin.normal
         z: 1
 
         Label {

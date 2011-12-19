@@ -39,7 +39,7 @@ Rectangle {
         GradientStop { id: stop1; position: 0.0; color: '#ffffff' }
         GradientStop { id: stop2; position: 1.0; color: '#beceeb' }
     }
-    radius: 4
+    radius: margins
     smooth: true
 
     Image {
