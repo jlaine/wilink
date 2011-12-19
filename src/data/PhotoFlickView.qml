@@ -25,7 +25,8 @@ FocusScope {
 
     property alias currentIndex: displayView.currentIndex
     property alias model: displayView.model
-    
+    signal currentIndexChanged
+
     function positionViewAtIndex(index, pos) {
         displayView.positionViewAtIndex(index, pos);
     }
@@ -85,16 +86,7 @@ FocusScope {
             }
         }
 
-        onCurrentIndexChanged: {
-            if (panel.state == 'details') {
-                view.currentIndex = displayView.currentIndex;
-                var crumb = crumbBar.model.count - 1;
-                var model = view.currentItem.data();
-                crumbBar.model.setProperty(crumb, 'name', model.name);
-                crumbBar.model.setProperty(crumb, 'isDir', model.isDir);
-                crumbBar.model.setProperty(crumb, 'url', model.url);
-            }
-        }
+        onCurrentIndexChanged: display.currentIndexChanged()
 
         Keys.onPressed: {
             if (event.key == Qt.Key_Back ||

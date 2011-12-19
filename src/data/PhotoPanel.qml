@@ -142,6 +142,17 @@ Panel {
         model: photoModel
         opacity: 0
         z: 1
+
+        onCurrentIndexChanged: {
+            if (panel.state == 'details') {
+                view.currentIndex = display.currentIndex;
+                var crumb = crumbBar.model.count - 1;
+                var model = view.currentItem.data();
+                crumbBar.model.setProperty(crumb, 'name', model.name);
+                crumbBar.model.setProperty(crumb, 'isDir', model.isDir);
+                crumbBar.model.setProperty(crumb, 'url', model.url);
+            }
+        }
     }
 
     ShareQueueView {
