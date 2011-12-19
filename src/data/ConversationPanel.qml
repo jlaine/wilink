@@ -148,10 +148,12 @@ Panel {
         }
 
         StatusPill {
+            property int iconOffset: header.iconMargin + header.iconSize - width * 0.75
+
             anchors.left: parent.left
-            anchors.leftMargin: header.iconSize - 3
+            anchors.leftMargin: iconOffset
             anchors.top: parent.top
-            anchors.topMargin: header.iconSize - 3
+            anchors.topMargin: iconOffset
             height: appStyle.icon.tinySize
             width: appStyle.icon.tinySize
             opacity: header.iconSize > 0 ? 1: 0
