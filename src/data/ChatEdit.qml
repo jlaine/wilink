@@ -183,6 +183,25 @@ Rectangle {
         }
 
         MouseArea {
+            function showMenu(mouse) {
+                var pos = mapToItem(menuLoader.parent, mouse.x, mouse.y);
+                var component = Qt.createComponent('InputMenu.qml');
+
+                function finishCreation() {
+                    if (component.status != Component.Ready)
+                        return;
+
+                    menuLoader.sourceComponent = component;
+                    menuLoader.item.target = input;
+                    menuLoader.show(pos.x, pos.y - menuLoader.item.height);
+                }
+
+                if (component.status == Component.Loading)
+                    component.statusChanged.connect(finishCreation);
+                else
+                    finishCreation();
+            }
+
             anchors.fill: parent
             acceptedButtons: Qt.LeftButton | Qt.RightButton
             onPressed: {
@@ -191,22 +210,7 @@ Rectangle {
                         input.forceActiveFocus();
                     mouse.accepted = false;
                 } else if (mouse.button == Qt.RightButton) {
-                    var pos = mapToItem(menuLoader.parent, mouse.x, mouse.y);
-                    var component = Qt.createComponent('InputMenu.qml');
-
-                    function finishCreation() {
-                        if (component.status != Component.Ready)
-                            return;
-
-                        menuLoader.sourceComponent = component;
-                        menuLoader.item.target = input;
-                        menuLoader.show(pos.x, pos.y - menuLoader.item.height);
-                    }
-
-                    if (component.status == Component.Loading)
-                        component.statusChanged.connect(finishCreation);
-                    else
-                        finishCreation();
+                    showMenu(mouse);
                 }
             }
         }
