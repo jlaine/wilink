@@ -23,6 +23,7 @@ Item {
     id: header
 
     property alias toolBar: toolBarLoader.sourceComponent
+    property int iconMargin: 8
     property alias iconSize: iconImage.width
     property alias iconSource: iconImage.source
     property alias title: titleText.text
@@ -31,7 +32,7 @@ Item {
     signal itemClicked(int index)
 
     clip: true
-    height: appStyle.icon.normalSize + 14
+    height: appStyle.icon.normalSize + 2 * iconMargin
     z: 1
 
     Rectangle {
@@ -48,7 +49,7 @@ Item {
         id: iconImage
 
         anchors.left: parent.left
-        anchors.leftMargin: 8
+        anchors.leftMargin: iconMargin
         anchors.verticalCenter: parent.verticalCenter
         smooth: true
         height: appStyle.icon.normalSize
@@ -63,7 +64,7 @@ Item {
 
     Column {
         anchors.left: iconImage.right
-        anchors.leftMargin: 8
+        anchors.leftMargin: iconMargin
         anchors.right: toolBarLoader.left
         anchors.verticalCenter: parent.verticalCenter
 
