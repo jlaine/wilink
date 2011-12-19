@@ -60,8 +60,8 @@ Item {
         anchors.left: parent.left
         anchors.top:  parent.top
         anchors.bottom:  parent.bottom
-        anchors.margins: 4
-        spacing: 4
+        anchors.margins: appStyle.margin.normal
+        spacing: appStyle.margin.normal
 
         Repeater {
             id: crumbView
@@ -90,7 +90,7 @@ Item {
                         anchors.top: parent.top
                         anchors.bottom: parent.bottom
                         color: '#000000'
-                        font.bold: !isLast
+                        font.bold: isLast
                         text: model.name
                         verticalAlignment: Text.AlignVCenter
                     }
