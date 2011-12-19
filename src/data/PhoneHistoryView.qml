@@ -74,13 +74,13 @@ Item {
         anchors.left: parent.left
         anchors.right: scrollBar.left
         anchors.top: header.bottom
-        anchors.margins: 4
+        anchors.margins: appStyle.margin.normal
         clip: true
 
         delegate: Item {
             id: item
             width: view.width
-            height: appStyle.icon.smallSize + 8
+            height: appStyle.icon.smallSize + 2 * appStyle.margin.normal
 
             Rectangle {
                 id: itemBackground
