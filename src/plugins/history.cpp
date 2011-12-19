@@ -85,32 +85,25 @@ bool HistoryMessage::groupWith(const HistoryMessage &other) const
 
 static QString transformToken(const QString &token)
 {
-    QMap<QString, QString> smileys;
-    smileys.insert(":@", ":/face-angry.png");
-    smileys.insert(":-@", ":/face-angry.png");
-    smileys.insert(":s", ":/face-uncertain.png");
-    smileys.insert(":-s", ":/face-uncertain.png");
-    smileys.insert(":S", ":/face-uncertain.png");
-    smileys.insert(":-S", ":/face-uncertain.png");
-    smileys.insert(":)", ":/face-smile.png");
-    smileys.insert(":-)", ":/face-smile.png");
-    smileys.insert(":|", ":/face-plain.png");
-    smileys.insert(":-|", ":/face-plain.png");
-    smileys.insert(":p", ":/face-raspberry.png");
-    smileys.insert(":-p", ":/face-raspberry.png");
-    smileys.insert(":P", ":/face-raspberry.png");
-    smileys.insert(":-P", ":/face-raspberry.png");
-    smileys.insert(":(", ":/face-sad.png");
-    smileys.insert(":-(", ":/face-sad.png");
-    smileys.insert(";)", ":/face-wink.png");
-    smileys.insert(";-)", ":/face-wink.png");
+    QMap<QString, QStringList> smileys;
+    smileys[":/face-angry.png"] = QStringList() << ":@" << ":-@";
+    //smileys[":/face-cool.png"] = QStringList() << "8-)" << "B-)";
+    //smileys[":/face-crying.png"] = QStringList() << ";(" << ";-(" << ";'-(" << ":'(" << ":'-(";
+    smileys[":/face-plain.png"] = QStringList() << ":|" << ":-|";
+    //smileys[":/face-laugh.png"] = QStringList() << ":D" << ":-D";
+    smileys[":/face-raspberry.png"] = QStringList() << ":p" << ":-p" << ":P" << ":-P";
+    smileys[":/face-sad.png"] = QStringList() << ":(" << ":-(";
+    smileys[":/face-smile.png"] = QStringList() << ":)" << ":-)";
+    //smileys[":/face-suprised.png"] = QStringList() << ":o" << ":-o" << ":O" << ":-O";
+    smileys[":/face-uncertain.png"] = QStringList() << ":s" << ":-s" << ":S" << ":-S" << ":/" << ":-/";
+    smileys[":/face-wink.png"] = QStringList() << ";)" << ";-)";
 
     const QRegExp linkRegex("(ftp|http|https)://.+");
 
     // handle smileys
-    foreach (const QString &key, smileys.keys()) {
-        if (token == key)
-            return QString("<img alt=\"%1\" src=\"%2\" />").arg(key, smileys.value(token));
+    foreach (const QString &smiley, smileys.keys()) {
+        if (smileys.value(smiley).contains(token))
+            return QString("<img alt=\"%1\" src=\"%2\" />").arg(token, smiley);
     }
 
     // handle links
