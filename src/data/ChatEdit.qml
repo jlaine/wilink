@@ -184,24 +184,30 @@ Rectangle {
 
         MouseArea {
             anchors.fill: parent
-            acceptedButtons: Qt.RightButton
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
             onPressed: {
-                var pos = mapToItem(menuLoader.parent, mouse.x, mouse.y);
-                var component = Qt.createComponent('InputMenu.qml');
+                if (mouse.button == Qt.LeftButton) {
+                    if (!input.activeFocus)
+                        input.forceActiveFocus();
+                    mouse.accepted = false;
+                } else if (mouse.button == Qt.RightButton) {
+                    var pos = mapToItem(menuLoader.parent, mouse.x, mouse.y);
+                    var component = Qt.createComponent('InputMenu.qml');
 
-                function finishCreation() {
-                    if (component.status != Component.Ready)
-                        return;
+                    function finishCreation() {
+                        if (component.status != Component.Ready)
+                            return;
 
-                    menuLoader.sourceComponent = component;
-                    menuLoader.item.target = input;
-                    menuLoader.show(pos.x, pos.y - menuLoader.item.height);
+                        menuLoader.sourceComponent = component;
+                        menuLoader.item.target = input;
+                        menuLoader.show(pos.x, pos.y - menuLoader.item.height);
+                    }
+
+                    if (component.status == Component.Loading)
+                        component.statusChanged.connect(finishCreation);
+                    else
+                        finishCreation();
                 }
-
-                if (component.status == Component.Loading)
-                    component.statusChanged.connect(finishCreation);
-                else
-                    finishCreation();
             }
         }
     }
