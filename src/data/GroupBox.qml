@@ -30,12 +30,11 @@ FocusScope {
         id: frame
 
         anchors.fill: parent
-        anchors.rightMargin: 1
-        anchors.bottomMargin: 1
         border.width: 1
         border.color: '#7091c8'
         color: '#cbd9f0'
-        radius: 8
+        radius: appStyle.margin.large
+        smooth: true
     }
 
     Rectangle {
@@ -44,10 +43,12 @@ FocusScope {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        anchors.margins: 1
+        border.color: '#7091c8'
+        border.width: 1
         color: '#9fb7dd'
         height: textItem.paintedHeight
-        radius: 8
+        radius: appStyle.margin.large
+        smooth: true
     }
 
     Label {
@@ -68,6 +69,6 @@ FocusScope {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.margins: 8
+        anchors.margins: appStyle.margin.large
     }
 }
