@@ -49,6 +49,9 @@ endif()
 
 # wiLink
 add_definitions(-DWILINK_VERSION="${WILINK_VERSION}")
+if(WILINK_EMBEDDED)
+    add_definitions(-DWILINK_EMBEDDED)
+endif()
 add_definitions(-DQT_STATICPLUGIN)
 if(NOT APPLE)
     add_definitions(-DUSE_SYSTRAY)
@@ -182,9 +185,16 @@ qt4_add_translation(QM_FILES ../translations/qt_fr.ts)
 
 set(wiLink_RCCS
     ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/../data/wiLink.qrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/../data/16x16/tiny.qrc
-    ${CMAKE_CURRENT_SOURCE_DIR}/../data/32x32/normal.qrc)
+    ${CMAKE_CURRENT_SOURCE_DIR}/../data/wiLink.qrc)
+if(WILINK_EMBEDDED)
+    list(APPEND wiLink_RCCS
+        ${CMAKE_CURRENT_SOURCE_DIR}/../data/32x32/tiny.qrc
+        ${CMAKE_CURRENT_SOURCE_DIR}/../data/64x64/normal.qrc)
+else()
+    list(APPEND wiLink_RCCS
+        ${CMAKE_CURRENT_SOURCE_DIR}/../data/16x16/tiny.qrc
+        ${CMAKE_CURRENT_SOURCE_DIR}/../data/32x32/normal.qrc)
+endif()
 
 qt4_add_resources(wiLink_RCC_SOURCES ${wiLink_RCCS})
 qt4_wrap_cpp(wiLink_MOC_SOURCES ${wiLink_MOC_HEADERS})
