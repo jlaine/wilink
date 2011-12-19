@@ -6,10 +6,14 @@ from xml.etree.ElementTree import ElementTree
 
 EMOTES = [
     'face-angry',
+    'face-cool',
+    'face-crying',
+    'face-laughing',
     'face-plain',
     'face-raspberry',
     'face-sad',
     'face-smile',
+    'face-surprise',
     'face-uncertain',
     'face-wink',
 ]
@@ -35,6 +39,8 @@ for rect in group.findall('{http://www.w3.org/2000/svg}rect'):
     for size in [16, 32]:
         if id in EMOTES:
             png_path = os.path.join("%ix%i" % (size, size), "%s.png" % id)
+            if os.path.exists(png_path):
+                continue
             width = int(rect.attrib['width'])
             height = int(rect.attrib['height'])
             x = int(rect.attrib['x']) + translate_x

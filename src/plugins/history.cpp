@@ -87,14 +87,14 @@ static QString transformToken(const QString &token)
 {
     QMap<QString, QStringList> smileys;
     smileys[":/face-angry.png"] = QStringList() << ":@" << ":-@";
-    //smileys[":/face-cool.png"] = QStringList() << "8-)" << "B-)";
-    //smileys[":/face-crying.png"] = QStringList() << ";(" << ";-(" << ";'-(" << ":'(" << ":'-(";
+    smileys[":/face-cool.png"] = QStringList() << "8-)" << "B-)";
+    smileys[":/face-crying.png"] = QStringList() << ";(" << ";-(" << ";'-(" << ":'(" << ":'-(";
+    smileys[":/face-laughing.png"] = QStringList() << ":D" << ":-D";
     smileys[":/face-plain.png"] = QStringList() << ":|" << ":-|";
-    //smileys[":/face-laugh.png"] = QStringList() << ":D" << ":-D";
     smileys[":/face-raspberry.png"] = QStringList() << ":p" << ":-p" << ":P" << ":-P";
     smileys[":/face-sad.png"] = QStringList() << ":(" << ":-(";
     smileys[":/face-smile.png"] = QStringList() << ":)" << ":-)";
-    //smileys[":/face-suprised.png"] = QStringList() << ":o" << ":-o" << ":O" << ":-O";
+    smileys[":/face-surprise.png"] = QStringList() << ":o" << ":-o" << ":O" << ":-O";
     smileys[":/face-uncertain.png"] = QStringList() << ":s" << ":-s" << ":S" << ":-S" << ":/" << ":-/";
     smileys[":/face-wink.png"] = QStringList() << ";)" << ";-)";
 

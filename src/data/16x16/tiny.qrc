@@ -3,11 +3,15 @@
     <file>checkbox.png</file>
     <file>checkbox-checked.png</file>
     <file>face-angry.png</file>
-    <file>face-uncertain.png</file>
-    <file>face-smile.png</file>
+    <file>face-cool.png</file>
+    <file>face-crying.png</file>
+    <file>face-laughing.png</file>
     <file>face-plain.png</file>
     <file>face-raspberry.png</file>
     <file>face-sad.png</file>
+    <file>face-smile.png</file>
+    <file>face-surprise.png</file>
+    <file>face-uncertain.png</file>
     <file>face-wink.png</file>
 </qresource>
 </RCC>
