@@ -51,7 +51,7 @@ Dialog {
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             interactive: false
-            width: 100
+            width: appStyle.icon.smallSize * 4
             delegate: Item {
                 height: appStyle.icon.smallSize + 8
                 width: tabList.width - 1
