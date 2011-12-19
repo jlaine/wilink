@@ -166,6 +166,7 @@ Panel {
             id: slideView
 
             anchors.fill: parent
+            model: photoModel
             opacity: 0
             z: 1
         }

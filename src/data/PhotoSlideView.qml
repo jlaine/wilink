@@ -21,16 +21,11 @@ import QtQuick 1.0
 import wiLink 2.0
 
 Item {
+    property alias model: listHelper.model
     property variant url
 
-    ListModel {
-        id: photoModel
-
-        ListElement { imageColor: 'blue'; imageSource: 'blue.png' }
-        ListElement { imageColor: 'green'; imageSource: 'green.png' }
-        ListElement { imageColor: 'red'; imageSource: 'red.png' }
-        ListElement { imageColor: 'pink'; imageSource: 'pink.png' }
-        ListElement { imageColor: 'yellow'; imageSource: 'yellow.png' }
+    ListHelper {
+        id: listHelper
     }
 
     Rectangle {
@@ -45,12 +40,13 @@ Item {
 
         anchors.fill: parent
         delegate: Component {
-            Rectangle {
+            Image {
                 id: rect
 
-                width: 100 * z
-                height: 75 * z
-                color: model.imageColor
+                width: 128 * z
+                height: 128 * z
+                source: model.image
+                fillMode: Image.PreserveAspectFit
                 y: view.height + height
                 z: 1
                 states: State {
@@ -89,8 +85,10 @@ Item {
         running: true
 
         onTriggered: {
-            view.model.append(photoModel.get(modelIndex));
-            modelIndex = (modelIndex + 1) % photoModel.count;
+            var item = listHelper.get(modelIndex);
+            if (item)
+                view.model.append(item);
+            modelIndex = (modelIndex + 1) % listHelper.count;
         }
 
         Component.onCompleted: timer.triggered()
