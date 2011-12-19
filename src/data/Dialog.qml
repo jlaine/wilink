@@ -53,7 +53,7 @@ FocusScope {
         id: dialogFooter
 
         Row {
-            spacing: 8
+            spacing: appStyle.margin.large
 
             Button {
                 id: acceptButton
@@ -168,10 +168,10 @@ FocusScope {
     Loader {
         id: footer
 
-        anchors.margins: 8
+        anchors.margins: appStyle.margin.large
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
-        height: 32
+        height: appStyle.icon.tinySize + 2 * appStyle.margin.normal
         sourceComponent: footerComponent
     }
 
