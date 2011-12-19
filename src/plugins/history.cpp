@@ -89,6 +89,7 @@ static QString transformToken(const QString &token)
     smileys[":/face-angry.png"] = QStringList() << ":@" << ":-@";
     smileys[":/face-cool.png"] = QStringList() << "8-)" << "B-)";
     smileys[":/face-crying.png"] = QStringList() << ";(" << ";-(" << ";'-(" << ":'(" << ":'-(";
+    smileys[":/face-embarrassed.png"] = QStringList() << ":$";
     smileys[":/face-laughing.png"] = QStringList() << ":D" << ":-D";
     smileys[":/face-plain.png"] = QStringList() << ":|" << ":-|";
     smileys[":/face-raspberry.png"] = QStringList() << ":p" << ":-p" << ":P" << ":-P";

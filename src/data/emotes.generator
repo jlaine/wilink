@@ -8,6 +8,7 @@ EMOTES = [
     'face-angry',
     'face-cool',
     'face-crying',
+    'face-embarrassed',
     'face-laughing',
     'face-plain',
     'face-raspberry',
