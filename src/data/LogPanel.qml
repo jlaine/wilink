@@ -114,7 +114,7 @@ Panel {
                 anchors.left: parent.left
                 anchors.top: parent.top
                 text: '<b>' + Qt.formatDateTime(model.date, 'hh:mm:ss') + '</b>'
-                width: 70
+                width: appStyle.font.normalSize * 6
             }
 
             Label {
