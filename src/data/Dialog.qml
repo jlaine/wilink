@@ -45,33 +45,38 @@ FocusScope {
             GradientStop { id: backgroundStop1; position: 1.0; color: '#e7effd' }
             GradientStop { id: backgroundStop2; position: 0.0; color: '#cbdaf1' }
         }
-        radius: 10
+        radius: appStyle.margin.large
         smooth: true
     }
 
     Component {
         id: dialogFooter
 
-        Row {
-            spacing: appStyle.margin.large
+        Item {
+            anchors.fill: parent
 
-            Button {
-                id: acceptButton
+            Row {
+                anchors.centerIn: parent
+                spacing: appStyle.margin.large
 
-                text: qsTr('OK')
-                onClicked: dialog.accepted()
+                Button {
+                    id: acceptButton
+
+                    text: qsTr('OK')
+                    onClicked: dialog.accepted()
+                }
+
+                Button {
+                    id: rejectButton
+
+                    text: qsTr('Cancel')
+                    onClicked: dialog.rejected()
+                }
+
+                Keys.onEnterPressed: acceptButton.clicked()
+                Keys.onEscapePressed: rejectButton.clicked()
+                Keys.onReturnPressed: acceptButton.clicked()
             }
-
-            Button {
-                id: rejectButton
-
-                text: qsTr('Cancel')
-                onClicked: dialog.rejected()
-            }
-
-            Keys.onEnterPressed: acceptButton.clicked()
-            Keys.onEscapePressed: rejectButton.clicked()
-            Keys.onReturnPressed: acceptButton.clicked()
         }
     }
 
@@ -105,7 +110,7 @@ FocusScope {
             GradientStop { position:0.5; color: '#597fbe' }
             GradientStop { position:1.0; color: '#9fb7dd' }
         }
-        height: 20
+        height: appStyle.font.normalSize + 2 * appStyle.margin.normal
         radius: background.radius
         smooth: true
 
@@ -150,7 +155,7 @@ FocusScope {
         anchors.top: header.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.margins: 8
+        anchors.margins: appStyle.margin.large
         iconSize: 32
         opacity: text.length > 0 ? 1 : 0
     }
@@ -162,14 +167,15 @@ FocusScope {
         anchors.bottom: footer.top
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.margins: 8
+        anchors.margins: appStyle.margin.large
     }
 
     Loader {
         id: footer
 
         anchors.margins: appStyle.margin.large
-        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.left: parent.left
+        anchors.right: parent.right
         anchors.bottom: parent.bottom
         height: appStyle.icon.tinySize + 2 * appStyle.margin.normal
         sourceComponent: footerComponent
@@ -182,8 +188,9 @@ FocusScope {
         anchors.margins: 2
         opacity: 0.5
         source: 'resize.png'
-        height: 16
-        width: 16
+        height: appStyle.icon.tinySize
+        width: appStyle.icon.tinySize
+        visible: !appStyle.isMobile
 
         MouseArea {
             property variant mousePress
@@ -221,8 +228,8 @@ FocusScope {
     }
 
     Component.onCompleted: {
-        height = minimumHeight;
-        width = minimumWidth;
+        height = appStyle.isMobile ? root.height : minimumHeight;
+        width = appStyle.isMobile ? root.width : minimumWidth;
     }
 
     onRejected: dialog.close()
