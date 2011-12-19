@@ -20,6 +20,10 @@
 import QtQuick 1.0
 
 Item {
+    id: delegate
+
+    property bool imageNeeded: width > 128
+
     Image {
         id: preview
 
@@ -33,14 +37,14 @@ Item {
 
         anchors.fill: parent
         asynchronous: true
-        source: model.image
+        source: imageNeeded ? model.image : ''
         fillMode: Image.PreserveAspectFit
         opacity: 0
     }
 
     states: State {
         name: 'ready'
-        when: model.imageReady
+        when: imageNeeded && model.imageReady
         PropertyChanges { target: image; opacity: 1 }
     }
 
