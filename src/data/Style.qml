@@ -42,7 +42,7 @@ Item {
         id: fontItem
 
         property int largeSize: Math.ceil(normalSize * 1.5)
-        property int normalSize: isMobile ? 18 : textItem.font.pixelSize
+        property int normalSize: isMobile ? 22 : textItem.font.pixelSize
         property int smallSize: Math.ceil(normalSize * 0.9)
     }
 
