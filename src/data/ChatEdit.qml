@@ -56,7 +56,7 @@ Rectangle {
     }
 
     color: '#dfdfdf'
-    height: wrapper.height + 8
+    height: wrapper.height + 2 * wrapper.anchors.margins
 
     // This mousearea prevents hover effects on items behind ChatEdit
     MouseArea {
@@ -67,14 +67,14 @@ Rectangle {
     Rectangle {
         id: wrapper
 
-        anchors.margins: 4
+        anchors.margins: appStyle.margin.normal
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: sendButton.left
         border.color: '#c3c3c3'
         border.width: 1
         color: 'white'
-        height: input.paintedHeight + 16
+        height: input.paintedHeight + 2 * input.anchors.margins
 
         ListHelper {
             id: listHelper
@@ -106,13 +106,15 @@ Rectangle {
         TextEdit {
             id: input
 
+            anchors.margins: appStyle.margin.large
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
             focus: appStyle.autoFocusInput
-            x: 8
-            y: 8
+            font.pixelSize: appStyle.font.normalSize
             selectByMouse: true
             smooth: true
             textFormat: TextEdit.PlainText
-            width: parent.width - 16
             wrapMode: TextEdit.WordWrap
 
             onActiveFocusChanged: {
@@ -207,7 +209,7 @@ Rectangle {
     Button {
         id: sendButton
 
-        anchors.margins: 4
+        anchors.margins: appStyle.margin.normal
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.right: parent.right
