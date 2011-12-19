@@ -13,6 +13,7 @@ EMOTES = [
     'face-plain',
     'face-raspberry',
     'face-sad',
+    'face-sleeping',
     'face-smile',
     'face-surprise',
     'face-uncertain',
