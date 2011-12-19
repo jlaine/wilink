@@ -12,13 +12,13 @@ generate_png(png SIZE 11
 set(SMALL_ICONS
     scalable/checkbox.svg
     scalable/checkbox-checked.svg
-    scalable/smiley-angry.svg
-    scalable/smiley-confused.svg
-    scalable/smiley-happy.svg
-    scalable/smiley-neutral.svg
-    scalable/smiley-raspberry.svg
-    scalable/smiley-sad.svg
-    scalable/smiley-wink.svg)
+    scalable/face-angry.svg
+    scalable/face-uncertain.svg
+    scalable/face-smile.svg
+    scalable/face-plain.svg
+    scalable/face-raspberry.svg
+    scalable/face-sad.svg
+    scalable/face-wink.svg)
 
 set(ICONS
     scalable/add.svg

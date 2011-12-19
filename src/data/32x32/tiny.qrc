@@ -2,12 +2,12 @@
 <qresource>
     <file>checkbox.png</file>
     <file>checkbox-checked.png</file>
-    <file>smiley-angry.png</file>
-    <file>smiley-confused.png</file>
-    <file>smiley-happy.png</file>
-    <file>smiley-neutral.png</file>
-    <file>smiley-raspberry.png</file>
-    <file>smiley-sad.png</file>
-    <file>smiley-wink.png</file>
+    <file>face-angry.png</file>
+    <file>face-uncertain.png</file>
+    <file>face-smile.png</file>
+    <file>face-plain.png</file>
+    <file>face-raspberry.png</file>
+    <file>face-sad.png</file>
+    <file>face-wink.png</file>
 </qresource>
 </RCC>

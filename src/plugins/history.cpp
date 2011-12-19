@@ -86,24 +86,24 @@ bool HistoryMessage::groupWith(const HistoryMessage &other) const
 static QString transformToken(const QString &token)
 {
     QMap<QString, QString> smileys;
-    smileys.insert(":@", ":/smiley-angry.png");
-    smileys.insert(":-@", ":/smiley-angry.png");
-    smileys.insert(":s", ":/smiley-confused.png");
-    smileys.insert(":-s", ":/smiley-confused.png");
-    smileys.insert(":S", ":/smiley-confused.png");
-    smileys.insert(":-S", ":/smiley-confused.png");
-    smileys.insert(":)", ":/smiley-happy.png");
-    smileys.insert(":-)", ":/smiley-happy.png");
-    smileys.insert(":|", ":/smiley-neutral.png");
-    smileys.insert(":-|", ":/smiley-neutral.png");
-    smileys.insert(":p", ":/smiley-raspberry.png");
-    smileys.insert(":-p", ":/smiley-raspberry.png");
-    smileys.insert(":P", ":/smiley-raspberry.png");
-    smileys.insert(":-P", ":/smiley-raspberry.png");
-    smileys.insert(":(", ":/smiley-sad.png");
-    smileys.insert(":-(", ":/smiley-sad.png");
-    smileys.insert(";)", ":/smiley-wink.png");
-    smileys.insert(";-)", ":/smiley-wink.png");
+    smileys.insert(":@", ":/face-angry.png");
+    smileys.insert(":-@", ":/face-angry.png");
+    smileys.insert(":s", ":/face-uncertain.png");
+    smileys.insert(":-s", ":/face-uncertain.png");
+    smileys.insert(":S", ":/face-uncertain.png");
+    smileys.insert(":-S", ":/face-uncertain.png");
+    smileys.insert(":)", ":/face-smile.png");
+    smileys.insert(":-)", ":/face-smile.png");
+    smileys.insert(":|", ":/face-plain.png");
+    smileys.insert(":-|", ":/face-plain.png");
+    smileys.insert(":p", ":/face-raspberry.png");
+    smileys.insert(":-p", ":/face-raspberry.png");
+    smileys.insert(":P", ":/face-raspberry.png");
+    smileys.insert(":-P", ":/face-raspberry.png");
+    smileys.insert(":(", ":/face-sad.png");
+    smileys.insert(":-(", ":/face-sad.png");
+    smileys.insert(";)", ":/face-wink.png");
+    smileys.insert(";-)", ":/face-wink.png");
 
     const QRegExp linkRegex("(ftp|http|https)://.+");
 

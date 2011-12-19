@@ -4,15 +4,15 @@ import os
 import re
 from xml.etree.ElementTree import ElementTree
 
-EMOTES = {
-    'face-angry': 'smiley-angry',
-    'face-plain': 'smiley-neutral',
-    'face-raspberry': 'smiley-raspberry',
-    'face-sad': 'smiley-sad',
-    'face-smile': 'smiley-happy',
-    'face-uncertain': 'smiley-confused',
-    'face-wink': 'smiley-wink',
-}
+EMOTES = [
+    'face-angry',
+    'face-plain',
+    'face-raspberry',
+    'face-sad',
+    'face-smile',
+    'face-uncertain',
+    'face-wink',
+]
 
 svg_path = os.path.join("scalable", "emotes.svg")
 tree = ElementTree(file=svg_path)
@@ -34,7 +34,7 @@ for rect in group.findall('{http://www.w3.org/2000/svg}rect'):
     id = rect.attrib['id']
     for size in [16, 32]:
         if id in EMOTES:
-            png_path = os.path.join("%ix%i" % (size, size), "%s.png" % EMOTES[id])
+            png_path = os.path.join("%ix%i" % (size, size), "%s.png" % id)
             width = int(rect.attrib['width'])
             height = int(rect.attrib['height'])
             x = int(rect.attrib['x']) + translate_x
