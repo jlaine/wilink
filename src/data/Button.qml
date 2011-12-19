@@ -25,7 +25,7 @@ Rectangle {
     property bool enabled: true
     property int iconSize: iconSource != '' ? appStyle.icon.smallSize : 0
     property alias iconSource: image.source
-    property int margins: 4
+    property int margins: appStyle.margin.normal
     property string text: ''
 
     signal clicked
