@@ -69,6 +69,12 @@ Panel {
             }
 
             ToolButton {
+                iconSource: 'start.png'
+                text: qsTr('Slideshow')
+                onClicked: panel.state = 'slide'
+            }
+
+            ToolButton {
                 iconSource: 'stop.png'
                 text: qsTr('Cancel')
                 visible: false
@@ -100,8 +106,8 @@ Panel {
                 photoModel.rootUrl = location.url;
                 panel.state = '';
             } else {
-                display.currentIndex = view.currentIndex;
-                display.positionViewAtIndex(display.currentIndex, ListView.Beginning);
+                flickView.currentIndex = gridView.currentIndex;
+                flickView.positionViewAtIndex(flickView.currentIndex, ListView.Beginning);
                 panel.state = 'details';
             }
         }
@@ -121,37 +127,47 @@ Panel {
         id: photoModel
     }
 
-    PhotoGridView {
-        id: view
-
+    FocusScope {
         anchors.top: help.bottom
         anchors.bottom: footer.top
         anchors.left: parent.left
         anchors.right: parent.right
         focus: true
-        model:  photoModel
-    }
 
-    PhotoFlickView {
-        id: display
+        PhotoGridView {
+            id: gridView
 
-        anchors.top: help.bottom
-        anchors.bottom: footer.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        model: photoModel
-        opacity: 0
-        z: 1
+            anchors.fill: parent
+            focus: true
+            model:  photoModel
+        }
 
-        onCurrentIndexChanged: {
-            if (panel.state == 'details') {
-                view.currentIndex = display.currentIndex;
-                var crumb = crumbBar.model.count - 1;
-                var model = view.currentItem.data();
-                crumbBar.model.setProperty(crumb, 'name', model.name);
-                crumbBar.model.setProperty(crumb, 'isDir', model.isDir);
-                crumbBar.model.setProperty(crumb, 'url', model.url);
+        PhotoFlickView {
+            id: flickView
+
+            anchors.fill: parent
+            model: photoModel
+            opacity: 0
+            z: 1
+
+            onCurrentIndexChanged: {
+                if (panel.state == 'details') {
+                    gridView.currentIndex = flickView.currentIndex;
+                    var crumb = crumbBar.model.count - 1;
+                    var model = gridView.currentItem.data();
+                    crumbBar.model.setProperty(crumb, 'name', model.name);
+                    crumbBar.model.setProperty(crumb, 'isDir', model.isDir);
+                    crumbBar.model.setProperty(crumb, 'url', model.url);
+                }
             }
+        }
+
+        PhotoSlideView {
+            id: slideView
+
+            anchors.fill: parent
+            opacity: 0
+            z: 1
         }
     }
 
@@ -167,14 +183,20 @@ Panel {
         z: 1
     }
 
-    states: State {
-        name: 'details'
-        PropertyChanges { target: display; opacity: 1 }
-        PropertyChanges { target: display; focus: true }
-        PropertyChanges { target: view; opacity: 0; focus: false }
-        PropertyChanges { target: crumbBar; anchors.topMargin: -help.height; opacity: 0 }
-        PropertyChanges { target: help; anchors.topMargin: -help.height; opacity: 0 }
-    }
+    states: [
+        State {
+            name: 'details'
+            PropertyChanges { target: flickView; opacity: 1 }
+            PropertyChanges { target: flickView; focus: true }
+            PropertyChanges { target: gridView; opacity: 0; focus: false }
+            PropertyChanges { target: crumbBar; anchors.topMargin: -help.height; opacity: 0 }
+            PropertyChanges { target: help; anchors.topMargin: -help.height; opacity: 0 }
+        },
+        State {
+            name: 'slide'
+            PropertyChanges { target: slideView; opacity: 1 }
+        }
+    ]
 
     transitions: Transition {
         // slide the top bars up while fading out
@@ -193,13 +215,13 @@ Panel {
 
         // replace the list view by the selected picture
         PropertyAnimation {
-            target: display
+            target: flickView
             properties: 'opacity'
             duration: appStyle.animation.longDuration
             easing.type: Easing.InOutQuad
         }
         PropertyAnimation {
-            target: view
+            target: gridView
             properties: 'opacity'
             duration: appStyle.animation.longDuration
             easing.type: Easing.InOutQuad

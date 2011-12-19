@@ -20,7 +20,7 @@
 import QtQuick 1.0
 import wiLink 2.0
 
-Panel {
+Item {
     property variant url
 
     ListModel {
@@ -34,6 +34,8 @@ Panel {
     }
 
     Rectangle {
+        id: background
+
         anchors.fill: parent
         color: 'black'
     }
