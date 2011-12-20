@@ -31,12 +31,6 @@ FocusScope {
         view.positionViewAtIndex(index, pos);
     }
 
-    Rectangle {
-        id: background
-
-        anchors.fill: parent
-    }
-
     ListView {
         id: view
 
