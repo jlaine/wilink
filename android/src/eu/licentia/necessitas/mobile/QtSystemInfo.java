@@ -37,7 +37,7 @@ import java.util.Map;
 
 import android.app.KeyguardManager;
 //@ANDROID-5
-//QtCreator import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothAdapter;
 //@ANDROID-5
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -61,17 +61,17 @@ import android.telephony.CellLocation;
 import android.telephony.PhoneStateListener;
 import android.telephony.ServiceState;
 //@ANDROID-5
-//QtCreator import android.telephony.SignalStrength;
+import android.telephony.SignalStrength;
 //@ANDROID-5
 import android.telephony.TelephonyManager;
 import android.telephony.gsm.GsmCellLocation;
 import android.util.DisplayMetrics;
 //@ANDROID-5
-//QtCreator import android.util.Log;
+import android.util.Log;
 //@ANDROID-5
 import android.view.Display;
 //@ANDROID-5
-//QtCreator import android.view.Surface;
+import android.view.Surface;
 //@ANDROID-5
 import eu.licentia.necessitas.industrius.QtApplication;
 
@@ -119,7 +119,7 @@ public class QtSystemInfo
     private WakeLock m_wakeLock;
 
 //@ANDROID-5
-//QtCreator     private  BluetoothAdapter m_bluetoothAdapter;
+    private  BluetoothAdapter m_bluetoothAdapter;
 //@ANDROID-5
     private TelephonyManager m_telephonyManager;
     private BroadcastReceiver m_deviceInfoBroadcastReceiver;
@@ -149,7 +149,7 @@ public class QtSystemInfo
 
             public void run() {
 //@ANDROID-5
-//QtCreator                 m_bluetoothAdapter=BluetoothAdapter.getDefaultAdapter();
+                m_bluetoothAdapter=BluetoothAdapter.getDefaultAdapter();
 //@ANDROID-5
             }
         });
@@ -213,62 +213,62 @@ public class QtSystemInfo
     private void createBatteryBroadcastReceiver ()
     {
 //@ANDROID-5
-//QtCreator         m_batteryInfoBroadcastReceiver=new BroadcastReceiver() {
-//QtCreator             @Override
-//QtCreator             public void onReceive(Context context, Intent intent)
-//QtCreator             {
-//QtCreator 
-//QtCreator                 if((intent.getAction().equals(Intent.ACTION_BATTERY_CHANGED)))
-//QtCreator                 {
-//QtCreator                     char batteryStatus;
-//QtCreator                     int level=intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
-//QtCreator                     int maxLevel=intent.getIntExtra(BatteryManager.EXTRA_SCALE, 0);
-//QtCreator                     float batteryStatusPercentage;
-//QtCreator 
-//QtCreator                         batteryStatusPercentage=(maxLevel ==0)?-1:(level*100)/maxLevel;//check whether is there a scale
-//QtCreator                         if(batteryStatusPercentage==-1)
-//QtCreator                         {
-//QtCreator                             batteryStatus='?';
-//QtCreator                         }
-//QtCreator                         if (batteryStatusPercentage ==0)
-//QtCreator                         {
-//QtCreator                             batteryStatus=0;
-//QtCreator                         }
-//QtCreator                         else if (batteryStatusPercentage <= 3)
-//QtCreator                         {
-//QtCreator                             batteryStatus=1;
-//QtCreator                         }
-//QtCreator                         else if (batteryStatusPercentage <=10)
-//QtCreator                         {
-//QtCreator                             batteryStatus=2;
-//QtCreator                         }
-//QtCreator                         else if (batteryStatusPercentage <40)
-//QtCreator                         {
-//QtCreator                             batteryStatus=3;
-//QtCreator                         }
-//QtCreator                         else if (batteryStatusPercentage <100)
-//QtCreator                         {
-//QtCreator                             batteryStatus=4;
-//QtCreator                         }
-//QtCreator                         else
-//QtCreator                         {
-//QtCreator                             batteryStatus=5;
-//QtCreator                         }
-//QtCreator 
-//QtCreator                         int chargerType=m_chargerType.get(intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0));
-//QtCreator                         int chargingState=m_Chargingstatus.get(intent.getIntExtra(BatteryManager.EXTRA_STATUS,-1));//check battery charging status
-//QtCreator                         int maxBars=maxLevel;
-//QtCreator                         int remainingCapacityBars=maxBars-level;
-//QtCreator                         int remainingCapacityPercent=(int)batteryStatusPercentage;
-//QtCreator                         int voltage=intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, 0);
-//QtCreator                         BatteryInfo batteryInfo=new BatteryInfo(batteryStatus, chargerType,
-//QtCreator                                 chargingState, maxBars, remainingCapacityBars,
-//QtCreator                                 remainingCapacityPercent, voltage);
-//QtCreator                         BatteryDataUpdated(batteryInfo);
-//QtCreator                 }
-//QtCreator 
-//QtCreator             }
-//QtCreator         };
+        m_batteryInfoBroadcastReceiver=new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent)
+            {
+
+                if((intent.getAction().equals(Intent.ACTION_BATTERY_CHANGED)))
+                {
+                    char batteryStatus;
+                    int level=intent.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
+                    int maxLevel=intent.getIntExtra(BatteryManager.EXTRA_SCALE, 0);
+                    float batteryStatusPercentage;
+
+                        batteryStatusPercentage=(maxLevel ==0)?-1:(level*100)/maxLevel;//check whether is there a scale
+                        if(batteryStatusPercentage==-1)
+                        {
+                            batteryStatus='?';
+                        }
+                        if (batteryStatusPercentage ==0)
+                        {
+                            batteryStatus=0;
+                        }
+                        else if (batteryStatusPercentage <= 3)
+                        {
+                            batteryStatus=1;
+                        }
+                        else if (batteryStatusPercentage <=10)
+                        {
+                            batteryStatus=2;
+                        }
+                        else if (batteryStatusPercentage <40)
+                        {
+                            batteryStatus=3;
+                        }
+                        else if (batteryStatusPercentage <100)
+                        {
+                            batteryStatus=4;
+                        }
+                        else
+                        {
+                            batteryStatus=5;
+                        }
+
+                        int chargerType=m_chargerType.get(intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0));
+                        int chargingState=m_Chargingstatus.get(intent.getIntExtra(BatteryManager.EXTRA_STATUS,-1));//check battery charging status
+                        int maxBars=maxLevel;
+                        int remainingCapacityBars=maxBars-level;
+                        int remainingCapacityPercent=(int)batteryStatusPercentage;
+                        int voltage=intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, 0);
+                        BatteryInfo batteryInfo=new BatteryInfo(batteryStatus, chargerType,
+                                chargingState, maxBars, remainingCapacityBars,
+                                remainingCapacityPercent, voltage);
+                        BatteryDataUpdated(batteryInfo);
+                }
+
+            }
+        };
 //@ANDROID-5
     }
     public void initDevice ()
@@ -276,7 +276,7 @@ public class QtSystemInfo
         createDeviceInfoBroadcastReceiver ();
         QtApplication.mainActivity().registerReceiver(m_deviceInfoBroadcastReceiver,new IntentFilter(AudioManager.RINGER_MODE_CHANGED_ACTION));
 //@ANDROID-5
-//QtCreator         QtApplication.mainActivity().registerReceiver(m_deviceInfoBroadcastReceiver,new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
+        QtApplication.mainActivity().registerReceiver(m_deviceInfoBroadcastReceiver,new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED));
 //@ANDROID-5
         QtApplication.mainActivity().registerReceiver(m_deviceInfoBroadcastReceiver,new IntentFilter(Intent.ACTION_SCREEN_OFF));
         QtApplication.mainActivity().registerReceiver(m_deviceInfoBroadcastReceiver,new IntentFilter(Intent.ACTION_SCREEN_ON));
@@ -303,23 +303,23 @@ public class QtSystemInfo
             public void onReceive(Context context, Intent intent)
             {
 //@ANDROID-5
-//QtCreator                 if((intent.getAction().equals(BluetoothAdapter.ACTION_STATE_CHANGED)))
-//QtCreator                 {
-//QtCreator                     boolean state=false;
-//QtCreator                     switch(intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR))
-//QtCreator                     {
-//QtCreator                         case BluetoothAdapter.STATE_OFF:
-//QtCreator                             state=false;
-//QtCreator                             break;
-//QtCreator                         case BluetoothAdapter.STATE_ON:
-//QtCreator                             state=true;
-//QtCreator                             break;
-//QtCreator                         default:
-//QtCreator                             return;
-//QtCreator 
-//QtCreator                     }
-//QtCreator                     bluetoothStateChanged(state);
-//QtCreator                 }
+                if((intent.getAction().equals(BluetoothAdapter.ACTION_STATE_CHANGED)))
+                {
+                    boolean state=false;
+                    switch(intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR))
+                    {
+                        case BluetoothAdapter.STATE_OFF:
+                            state=false;
+                            break;
+                        case BluetoothAdapter.STATE_ON:
+                            state=true;
+                            break;
+                        default:
+                            return;
+
+                    }
+                    bluetoothStateChanged(state);
+                }
 //@ANDROID-5
 
                 if((intent.getAction().equals(AudioManager.RINGER_MODE_CHANGED_ACTION)))
@@ -342,46 +342,46 @@ public class QtSystemInfo
     }
 
 //@ANDROID-5
-//QtCreator     public boolean bluetoothPowerState ()
-//QtCreator     {
-//QtCreator         boolean state;
-//QtCreator 
-//QtCreator         switch(m_bluetoothAdapter.getState())
-//QtCreator         {
-//QtCreator             case BluetoothAdapter.STATE_OFF:
-//QtCreator                 state=false;
-//QtCreator                 break;
-//QtCreator             case BluetoothAdapter.STATE_ON:
-//QtCreator                 state=true;
-//QtCreator                 break;
-//QtCreator             default:
-//QtCreator                 state=false;
-//QtCreator         }
-//QtCreator         return state;
-//QtCreator     }
-//QtCreator 
-//QtCreator     public int lockStatus ()
-//QtCreator     {
-//QtCreator         if(m_powerManager.isScreenOn())
-//QtCreator         {
-//QtCreator             return 1;
-//QtCreator         }
-//QtCreator         else
-//QtCreator         {
-//QtCreator             return 3;
-//QtCreator         }
-//QtCreator     }
-//QtCreator     public boolean isDeviceLocked ()
-//QtCreator     {
-//QtCreator         if(m_powerManager.isScreenOn())
-//QtCreator         {
-//QtCreator             return false;
-//QtCreator         }
-//QtCreator         else
-//QtCreator         {
-//QtCreator             return true;
-//QtCreator         }
-//QtCreator     }
+    public boolean bluetoothPowerState ()
+    {
+        boolean state;
+
+        switch(m_bluetoothAdapter.getState())
+        {
+            case BluetoothAdapter.STATE_OFF:
+                state=false;
+                break;
+            case BluetoothAdapter.STATE_ON:
+                state=true;
+                break;
+            default:
+                state=false;
+        }
+        return state;
+    }
+
+    public int lockStatus ()
+    {
+        if(m_powerManager.isScreenOn())
+        {
+            return 1;
+        }
+        else
+        {
+            return 3;
+        }
+    }
+    public boolean isDeviceLocked ()
+    {
+        if(m_powerManager.isScreenOn())
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
 //@ANDROID-5
 
     public String imei ()
@@ -648,7 +648,7 @@ public class QtSystemInfo
     {
         createGeneralSystemInfo ();
 //@ANDROID-5
-//QtCreator         QtApplication.mainActivity().registerReceiver(m_generalSystemInfo,new IntentFilter(Intent.ACTION_LOCALE_CHANGED));
+        QtApplication.mainActivity().registerReceiver(m_generalSystemInfo,new IntentFilter(Intent.ACTION_LOCALE_CHANGED));
 //@ANDROID-5
     }
 
@@ -702,11 +702,11 @@ public class QtSystemInfo
     {
         int[] features=new int[14];
 //@ANDROID-5
-//QtCreator         PackageManager pm=QtApplication.mainActivity().getPackageManager();
-//QtCreator         if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA))
-//QtCreator         {
-//QtCreator             features[1]=1;
-//QtCreator         }
+        PackageManager pm=QtApplication.mainActivity().getPackageManager();
+        if(pm.hasSystemFeature(PackageManager.FEATURE_CAMERA))
+        {
+            features[1]=1;
+        }
 //@ANDROID-5
 //@ANDROID-8
 //QtCreator         if(pm.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH))
@@ -883,21 +883,21 @@ public class QtSystemInfo
                     }
 
 //@ANDROID-5
-//QtCreator                     @Override
-//QtCreator                     public void  onSignalStrengthsChanged (SignalStrength signalStrength)
-//QtCreator                     {
-//QtCreator                         int strength=0;
-//QtCreator                         if(signalStrength.isGsm())
-//QtCreator                         {
-//QtCreator                             strength=signalStrength.getGsmSignalStrength();
-//QtCreator                             strength=(strength*100)/30;
-//QtCreator                             if(strength>100)
-//QtCreator                             {
-//QtCreator                                 strength=0;
-//QtCreator                             }
-//QtCreator                         }
-//QtCreator                         QtSystemInfo.phoneSignalStrengthChanged(strength);
-//QtCreator                     }
+                    @Override
+                    public void  onSignalStrengthsChanged (SignalStrength signalStrength)
+                    {
+                        int strength=0;
+                        if(signalStrength.isGsm())
+                        {
+                            strength=signalStrength.getGsmSignalStrength();
+                            strength=(strength*100)/30;
+                            if(strength>100)
+                            {
+                                strength=0;
+                            }
+                        }
+                        QtSystemInfo.phoneSignalStrengthChanged(strength);
+                    }
 //@ANDROID-5
 
                     @Override
@@ -940,44 +940,44 @@ public class QtSystemInfo
                     }
 
 //@ANDROID-5
-//QtCreator                     @Override
-//QtCreator                     public void  onDataConnectionStateChanged  (int state, int networkType)
-//QtCreator                     {
-//QtCreator                         switch(networkType)
-//QtCreator                         {
-//QtCreator                             case TelephonyManager.NETWORK_TYPE_EDGE:
-//QtCreator                                     networkType=9;
-//QtCreator                                     break;
-//QtCreator                             case TelephonyManager.NETWORK_TYPE_GPRS:
-//QtCreator                                     networkType=8;
-//QtCreator                                     break;
-//QtCreator                             case TelephonyManager.NETWORK_TYPE_HSPA:
-//QtCreator                                     networkType=10;
-//QtCreator                                     break;
-//QtCreator                             default:
-//QtCreator                                     networkType=0;
-//QtCreator                         }
-//QtCreator                         switch(state)
-//QtCreator                         {
-//QtCreator                             case TelephonyManager.DATA_CONNECTED:
-//QtCreator                                     state=5;
-//QtCreator                                     break;
-//QtCreator                             case TelephonyManager.DATA_DISCONNECTED:
-//QtCreator                                     state=1;
-//QtCreator                                     break;
-//QtCreator                             case TelephonyManager.DATA_SUSPENDED:
-//QtCreator                                     state=7;
-//QtCreator                                     break;
-//QtCreator                             case TelephonyManager.DATA_CONNECTING:
-//QtCreator                                     state=3;
-//QtCreator                                     break;
-//QtCreator                             default:
-//QtCreator                                     state=0;
-//QtCreator                                     break;
-//QtCreator                         }
-//QtCreator 
-//QtCreator                         QtSystemInfo.networkStatusChanged(state, networkType);
-//QtCreator                     }
+                    @Override
+                    public void  onDataConnectionStateChanged  (int state, int networkType)
+                    {
+                        switch(networkType)
+                        {
+                            case TelephonyManager.NETWORK_TYPE_EDGE:
+                                    networkType=9;
+                                    break;
+                            case TelephonyManager.NETWORK_TYPE_GPRS:
+                                    networkType=8;
+                                    break;
+                            case TelephonyManager.NETWORK_TYPE_HSPA:
+                                    networkType=10;
+                                    break;
+                            default:
+                                    networkType=0;
+                        }
+                        switch(state)
+                        {
+                            case TelephonyManager.DATA_CONNECTED:
+                                    state=5;
+                                    break;
+                            case TelephonyManager.DATA_DISCONNECTED:
+                                    state=1;
+                                    break;
+                            case TelephonyManager.DATA_SUSPENDED:
+                                    state=7;
+                                    break;
+                            case TelephonyManager.DATA_CONNECTING:
+                                    state=3;
+                                    break;
+                            default:
+                                    state=0;
+                                    break;
+                        }
+
+                        QtSystemInfo.networkStatusChanged(state, networkType);
+                    }
 //@ANDROID-5
                 };
 
@@ -989,7 +989,7 @@ public class QtSystemInfo
         QtApplication.mainActivity().registerReceiver(m_networkBroadcastReceiver,new IntentFilter(WifiManager.WIFI_STATE_CHANGED_ACTION));
         int events=
 //@ANDROID-5
-//QtCreator             PhoneStateListener.LISTEN_SIGNAL_STRENGTHS|
+            PhoneStateListener.LISTEN_SIGNAL_STRENGTHS|
 //@ANDROID-5
             PhoneStateListener.LISTEN_SERVICE_STATE
                 |PhoneStateListener.LISTEN_DATA_CONNECTION_STATE
@@ -1078,9 +1078,9 @@ public class QtSystemInfo
             networkName="";
             break;
 //@ANDROID-5
-//QtCreator         case 6:
-//QtCreator             networkName=m_bluetoothAdapter.getName();
-//QtCreator             break;
+        case 6:
+            networkName=m_bluetoothAdapter.getName();
+            break;
 //@ANDROID-5
         case 7:
             break;
@@ -1097,12 +1097,12 @@ public class QtSystemInfo
             }
             break;
 //@ANDROID-5
-//QtCreator         case 10:
-//QtCreator             if(m_telephonyManager.getNetworkType()==TelephonyManager.NETWORK_TYPE_HSPA)
-//QtCreator             {
-//QtCreator                 networkName=m_telephonyManager.getNetworkOperatorName();
-//QtCreator             }
-//QtCreator             break;
+        case 10:
+            if(m_telephonyManager.getNetworkType()==TelephonyManager.NETWORK_TYPE_HSPA)
+            {
+                networkName=m_telephonyManager.getNetworkOperatorName();
+            }
+            break;
 //@ANDROID-5
         default:
             networkName="";
@@ -1126,15 +1126,15 @@ public class QtSystemInfo
     public int bluetoothStatus()
     {
 //@ANDROID-5
-//QtCreator         if(m_bluetoothAdapter.isDiscovering())
-//QtCreator         {
-//QtCreator             return 3;
-//QtCreator         }
-//QtCreator         else if(bluetoothPowerState())
-//QtCreator         {
-//QtCreator             return 5;
-//QtCreator         }
-//QtCreator         else
+        if(m_bluetoothAdapter.isDiscovering())
+        {
+            return 3;
+        }
+        else if(bluetoothPowerState())
+        {
+            return 5;
+        }
+        else
 //@ANDROID-5
         {
             return 0;
@@ -1217,7 +1217,7 @@ public class QtSystemInfo
     public int currentMode ()
     {
 //@ANDROID-5
-//QtCreator     PackageManager pm=QtApplication.mainActivity().getPackageManager();
+    PackageManager pm=QtApplication.mainActivity().getPackageManager();
 //@ANDROID-5
         if(m_telephonyManager.getPhoneType()==TelephonyManager.PHONE_TYPE_GSM)
         {
