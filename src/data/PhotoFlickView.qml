@@ -47,45 +47,10 @@ FocusScope {
         orientation: Qt.Horizontal
         snapMode: ListView.SnapToItem
 
-        delegate: Item {
+        delegate: PhotoDelegate {
             width: view.width
             height: view.height
-
-            Image {
-                id: preview
-
-                width: view.width
-                height: view.height
-                source: model.avatar
-                fillMode: Image.PreserveAspectFit
-            }
-
-            Image {
-                id: image
-
-                asynchronous: true
-                width: view.width
-                height: view.height
-                source: model.image
-                fillMode: Image.PreserveAspectFit
-                opacity: 0
-            }
-
-            states: State {
-                name: 'ready'
-                when: model.imageReady
-                PropertyChanges { target: image; opacity: 1 }
-            }
-
-            transitions: Transition {
-                NumberAnimation {
-                    target: image
-                    properties: 'opacity'
-                    duration: appStyle.animation.normalDuration
-                }
-            }
         }
-
         onCurrentIndexChanged: display.currentIndexChanged()
 
         Keys.onPressed: {

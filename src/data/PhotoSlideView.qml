@@ -33,14 +33,11 @@ Item {
 
         anchors.fill: parent
         delegate: Component {
-            Image {
+            PhotoDelegate {
                 id: rect
 
-                asynchronous: true
                 width: 128 * z
                 height: 128 * z
-                source: model.image
-                fillMode: Image.PreserveAspectFit
                 y: view.height + height
                 z: 1
                 states: State {
@@ -52,9 +49,12 @@ Item {
 
                     SequentialAnimation {
                         NumberAnimation {
-                            duration: 30000 / Math.sqrt(z)
+                            duration: Math.ceil(30000.0 / Math.sqrt(z))
                             target: rect
                             properties: 'y'
+                        }
+                        ScriptAction {
+                            script: view.model.remove(index)
                         }
                     }
                 }

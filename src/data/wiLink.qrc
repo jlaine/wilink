@@ -72,6 +72,7 @@
     <file>PhonePlugin.qml</file>
     <file>PhotoAlbumDialog.qml</file>
     <file>PhotoDeleteDialog.qml</file>
+    <file>PhotoDelegate.qml</file>
     <file>PhotoGridView.qml</file>
     <file>PhotoFlickView.qml</file>
     <file>PhotoPanel.qml</file>

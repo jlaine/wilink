@@ -56,15 +56,12 @@ FocusScope {
             Column {
                 anchors.fill: parent
 
-                Image {
+                PhotoDelegate {
                     id: thumbnail
 
                     anchors.horizontalCenter: parent.horizontalCenter
-                    fillMode: Image.PreserveAspectFit
                     width: 128
                     height: 128
-                    source: model.avatar
-                    smooth: true
                 }
 
                 Label {
