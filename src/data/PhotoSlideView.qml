@@ -39,31 +39,27 @@ Item {
 
                 width: 128 * z
                 height: 128 * z
-                y: view.height + height
+                y: view.height
                 z: 1
-                states: State {
-                    name: 'finished'
-                    PropertyChanges { target: rect; y: -rect.height }
-                }
-                transitions: Transition {
-                    to: 'finished'
-
-                    SequentialAnimation {
-                        NumberAnimation {
-                            duration: Math.ceil(30000.0 / Math.sqrt(z))
-                            target: rect
-                            properties: 'y'
-                        }
-                        ScriptAction {
-                            script: view.model.remove(index)
-                        }
-                    }
-                }
 
                 Component.onCompleted: {
                     z = 1 + Math.floor(Math.random() * 3);
-                    x = Math.floor(Math.random() * view.width - 0.5 * rect.width);
-                    state = 'finished';
+                    x = Math.floor(Math.random() * (view.width - rect.width));
+                    animation.running = true;
+                }
+
+                SequentialAnimation {
+                    id: animation
+
+                    NumberAnimation {
+                        duration: Math.ceil(30000.0 / Math.sqrt(z))
+                        target: rect
+                        property: 'y'
+                        to: -rect.height
+                    }
+                    ScriptAction {
+                        script: view.model.remove(index)
+                    }
                 }
             }
         }
@@ -75,8 +71,9 @@ Item {
 
         property int modelIndex: 0
 
-        interval: 2000
+        interval: 4000
         repeat: true
+        triggeredOnStart: true
 
         onTriggered: {
             var item = listHelper.get(modelIndex);
