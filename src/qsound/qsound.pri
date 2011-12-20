@@ -4,7 +4,7 @@ QSOUND_INCLUDE_DIR = $$PWD/src
 QSOUND_LIBRARY_NAME = qsound
 
 android {
-    QSOUND_INCLUDE_DIR += $$PWD/fake
+    QSOUND_INCLUDE_DIR += $$PWD/src/fake
 } else:win32 {
     QT += multimedia
 } else {
