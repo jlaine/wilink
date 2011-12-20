@@ -22,6 +22,7 @@ import wiLink 2.0
 
 Item {
     property alias model: listHelper.model
+    property alias running: timer.running
     property variant url
 
     ListHelper {
@@ -76,7 +77,6 @@ Item {
 
         interval: 2000
         repeat: true
-        running: true
 
         onTriggered: {
             var item = listHelper.get(modelIndex);
@@ -84,7 +84,5 @@ Item {
                 view.model.append(item);
             modelIndex = (modelIndex + 1) % listHelper.count;
         }
-
-        Component.onCompleted: timer.triggered()
     }
 }

@@ -52,6 +52,7 @@ Panel {
                 iconSource: 'upload.png'
                 text: qsTr('Upload')
                 enabled: photoModel.canUpload
+                visible: panel.state == ''
 
                 onClicked: {
                     var dialog = window.fileDialog();
@@ -83,6 +84,7 @@ Panel {
                 iconSource: 'add.png'
                 text: qsTr('Create')
                 enabled: photoModel.canCreateAlbum
+                visible: panel.state == ''
 
                 onClicked: {
                     dialogSwapper.showPanel('PhotoAlbumDialog.qml', {'model': photoModel});
@@ -195,7 +197,7 @@ Panel {
         State {
             name: 'slide'
             PropertyChanges { target: gridView; opacity: 0; focus: false }
-            PropertyChanges { target: slideView; opacity: 1 }
+            PropertyChanges { target: slideView; opacity: 1; running: true }
             PropertyChanges { target: crumbBar; anchors.topMargin: -help.height; opacity: 0 }
             PropertyChanges { target: help; anchors.topMargin: -help.height; opacity: 0 }
         }
