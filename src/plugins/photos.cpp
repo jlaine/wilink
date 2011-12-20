@@ -203,7 +203,8 @@ public:
 
 PhotoModel::PhotoModel(QObject *parent)
     : ChatModel(parent),
-    m_fs(0)
+    m_fs(0),
+    m_permissions(FileSystemJob::None)
 {
     bool check;
     Q_UNUSED(check);
@@ -255,6 +256,16 @@ QVariant PhotoModel::data(const QModelIndex &index, int role) const
     else if (role == UrlRole)
         return item->url();
     return QVariant();
+}
+
+bool PhotoModel::canCreateAlbum() const
+{
+    return m_permissions & FileSystemJob::Mkdir;
+}
+
+bool PhotoModel::canUpload() const
+{
+    return m_permissions & FileSystemJob::Put;
 }
 
 void PhotoModel::createAlbum(const QString &name)
@@ -354,6 +365,9 @@ void PhotoModel::_q_jobFinished(FileSystemJob *job)
         refresh();
         break;
     case FileSystemJob::List:
+        m_permissions = job->allowedOperations();
+        emit permissionsChanged();
+
         removeRows(0, rootItem->children.size());
         foreach (const FileInfo& info, job->results()) {
             if (info.isDir() || isImage(info.name())) {

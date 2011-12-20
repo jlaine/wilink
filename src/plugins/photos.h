@@ -72,6 +72,8 @@ public:
 class PhotoModel : public ChatModel
 {
     Q_OBJECT
+    Q_PROPERTY(bool canCreateAlbum READ canCreateAlbum NOTIFY permissionsChanged)
+    Q_PROPERTY(bool canUpload READ canUpload NOTIFY permissionsChanged)
     Q_PROPERTY(QUrl rootUrl READ rootUrl WRITE setRootUrl NOTIFY rootUrlChanged)
     Q_PROPERTY(PhotoQueueModel* uploads READ uploads CONSTANT)
 
@@ -81,12 +83,15 @@ public:
     QUrl rootUrl() const;
     void setRootUrl(const QUrl &rootUrl);
 
+    bool canCreateAlbum() const;
+    bool canUpload() const;
     PhotoQueueModel *uploads() const;
 
     // QAbstractItemModel
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
 signals:
+    void permissionsChanged();
     void rootUrlChanged(const QUrl &rootUrl);
 
 public slots:
@@ -101,6 +106,7 @@ private slots:
 
 private:
     FileSystem *m_fs;
+    FileSystemJob::Operations m_permissions;
     QUrl m_rootUrl;
     PhotoQueueModel *m_uploads;
 };

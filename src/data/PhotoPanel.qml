@@ -23,7 +23,6 @@ import wiLink 2.0
 Panel {
     id: panel
 
-    property bool canUpload: crumbBar.model.count > 1
     property variant url
 
     onUrlChanged: {
@@ -52,7 +51,7 @@ Panel {
             ToolButton {
                 iconSource: 'upload.png'
                 text: qsTr('Upload')
-                enabled: panel.canUpload
+                enabled: photoModel.canUpload
 
                 onClicked: {
                     var dialog = window.fileDialog();
@@ -83,7 +82,7 @@ Panel {
             ToolButton {
                 iconSource: 'add.png'
                 text: qsTr('Create')
-                enabled: crumbBar.model.count == 1
+                enabled: photoModel.canCreateAlbum
 
                 onClicked: {
                     dialogSwapper.showPanel('PhotoAlbumDialog.qml', {'model': photoModel});
@@ -119,7 +118,7 @@ Panel {
         anchors.top: crumbBar.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        text: panel.canUpload ? qsTr('To upload your photos to wifirst.net, simply drag and drop them to an album.') : ''
+        text: photoModel.canUpload ? qsTr('To upload your photos to wifirst.net, simply drag and drop them to an album.') : ''
         z: 2
     }
 
