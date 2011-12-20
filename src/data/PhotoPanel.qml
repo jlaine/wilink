@@ -107,6 +107,10 @@ Panel {
                 photoModel.rootUrl = location.url;
                 panel.state = '';
             } else {
+                flickView.x = gridView.currentItem.x;
+                flickView.y = gridView.currentItem.y;
+                flickView.width = gridView.currentItem.width;
+                flickView.height = gridView.currentItem.height;
                 flickView.currentIndex = gridView.currentIndex;
                 flickView.positionViewAtIndex(flickView.currentIndex, ListView.Beginning);
                 panel.state = 'details';
@@ -129,6 +133,8 @@ Panel {
     }
 
     FocusScope {
+        id: wrapper
+
         anchors.top: help.bottom
         anchors.bottom: footer.top
         anchors.left: parent.left
@@ -146,7 +152,8 @@ Panel {
         PhotoFlickView {
             id: flickView
 
-            anchors.fill: parent
+            height: parent.height
+            width: parent.width
             model: photoModel
             opacity: 0
             z: 1
@@ -188,8 +195,14 @@ Panel {
     states: [
         State {
             name: 'details'
-            PropertyChanges { target: flickView; opacity: 1 }
-            PropertyChanges { target: flickView; focus: true }
+            PropertyChanges { target: flickView
+                x: 0
+                y: 0
+                width: wrapper.width
+                height: wrapper.height
+                focus: true
+                opacity: 1
+            }
             PropertyChanges { target: gridView; opacity: 0; focus: false }
             PropertyChanges { target: crumbBar; anchors.topMargin: -help.height; opacity: 0 }
             PropertyChanges { target: help; anchors.topMargin: -help.height; opacity: 0 }
@@ -221,7 +234,7 @@ Panel {
         // replace the list view by the selected picture
         PropertyAnimation {
             target: flickView
-            properties: 'opacity'
+            properties: 'opacity,x,y,height,width'
             duration: appStyle.animation.longDuration
             easing.type: Easing.InOutQuad
         }
