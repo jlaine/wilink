@@ -107,10 +107,6 @@ Panel {
                 photoModel.rootUrl = location.url;
                 panel.state = '';
             } else {
-                flickView.x = gridView.currentItem.x;
-                flickView.y = gridView.currentItem.y;
-                flickView.width = gridView.currentItem.width;
-                flickView.height = gridView.currentItem.height;
                 flickView.currentIndex = gridView.currentIndex;
                 flickView.positionViewAtIndex(flickView.currentIndex, ListView.Beginning);
                 panel.state = 'details';
@@ -152,8 +148,10 @@ Panel {
         PhotoFlickView {
             id: flickView
 
-            height: parent.height
-            width: parent.width
+            x: gridView.currentItem ? gridView.currentItem.x : 0
+            y: gridView.currentItem ? gridView.currentItem.y : 0
+            height: 128
+            width: 128
             model: photoModel
             opacity: 0
             z: 1
@@ -195,7 +193,8 @@ Panel {
     states: [
         State {
             name: 'details'
-            PropertyChanges { target: flickView
+            PropertyChanges {
+                target: flickView
                 x: 0
                 y: 0
                 width: wrapper.width
