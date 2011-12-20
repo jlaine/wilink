@@ -87,7 +87,7 @@ FocusScope {
 
         DropArea {
             anchors.fill: parent
-            enabled: panel.canUpload
+            enabled: photoModel.canUpload
 
             onFilesDropped: {
                 for (var i in files) {
