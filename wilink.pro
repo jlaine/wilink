@@ -83,36 +83,23 @@ mac {
 }
 
 OTHER_FILES += \
-    android/src/eu/licentia/necessitas/mobile/QtCamera.java \
-    android/src/eu/licentia/necessitas/mobile/QtLocation.java \
-    android/src/eu/licentia/necessitas/mobile/QtSensors.java \
-    android/src/eu/licentia/necessitas/mobile/QtAndroidContacts.java \
-    android/src/eu/licentia/necessitas/mobile/QtFeedback.java \
-    android/src/eu/licentia/necessitas/mobile/QtSystemInfo.java \
-    android/src/eu/licentia/necessitas/mobile/QtMediaPlayer.java \
-    android/src/eu/licentia/necessitas/industrius/QtLayout.java \
-    android/src/eu/licentia/necessitas/industrius/QtActivity.java \
-    android/src/eu/licentia/necessitas/industrius/QtSurface.java \
-    android/src/eu/licentia/necessitas/industrius/QtApplication.java \
-    android/src/eu/licentia/necessitas/ministro/IMinistro.aidl \
-    android/src/eu/licentia/necessitas/ministro/IMinistroCallback.aidl \
     android/AndroidManifest.xml \
+    android/res/drawable/icon.png \
+    android/res/drawable/logo.png \
     android/res/drawable-ldpi/icon.png \
-    android/res/values/libs.xml \
-    android/res/values/strings.xml \
     android/res/drawable-hdpi/icon.png \
     android/res/drawable-mdpi/icon.png \
+    android/res/layout/splash.xml \
+    android/res/values/libs.xml \
+    android/res/values/strings.xml \
     android/res/values-de/strings.xml \
     android/res/values-et/strings.xml \
     android/res/values-ru/strings.xml \
     android/res/values-pt-rBR/strings.xml \
-    android/res/drawable/icon.png \
-    android/res/drawable/logo.png \
     android/res/values-id/strings.xml \
     android/res/values-nb/strings.xml \
     android/res/values-ja/strings.xml \
     android/res/values-es/strings.xml \
-    android/res/layout/splash.xml \
     android/res/values-nl/strings.xml \
     android/res/values-rs/strings.xml \
     android/res/values-ms/strings.xml \
