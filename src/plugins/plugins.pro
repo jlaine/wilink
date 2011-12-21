@@ -105,7 +105,8 @@ PRE_TARGETDEPS += $$QXMPP_LIBRARY_FILE
 # Installation
 QMAKE_TARGET_COMPANY="Wifirst"
 QMAKE_TARGET_COPYRIGHT="Copyright (c) 2009-2011 Bollore telecom"
-mac {
+android {
+} else:mac {
     ICON = ../data/wiLink.icns
     QMAKE_INFO_PLIST = ../data/wiLink.plist
     QMAKE_POST_LINK = sed -i \"\" -e \"s,@VERSION@,$$VERSION,g\" -e \"s,@COPYRIGHT@,$$QMAKE_TARGET_COPYRIGHT,g\" wiLink.app/Contents/Info.plist
