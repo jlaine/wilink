@@ -23,6 +23,8 @@ import wiLink 2.0
 FocusScope {
     id: wrapper
 
+    property alias contentX: view.contentX
+    property alias contentY: view.contentY
     property alias currentIndex: view.currentIndex
     property alias currentItem: view.currentItem
     property alias model: view.model

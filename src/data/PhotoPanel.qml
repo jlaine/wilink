@@ -72,6 +72,7 @@ Panel {
                 iconSource: 'start.png'
                 text: qsTr('Slideshow')
                 onClicked: panel.state = 'slide'
+                visible: false
             }
 
             ToolButton {
@@ -148,8 +149,8 @@ Panel {
         PhotoFlickView {
             id: flickView
 
-            x: gridView.currentItem ? gridView.currentItem.x : 0
-            y: gridView.currentItem ? gridView.currentItem.y : 0
+            x: gridView.currentItem ? (gridView.currentItem.x - gridView.contentX) : 0
+            y: gridView.currentItem ? (gridView.currentItem.y - gridView.contentY) : 0
             height: 128
             width: 128
             model: photoModel
