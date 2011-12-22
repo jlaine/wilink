@@ -229,6 +229,12 @@ FocusScope {
         }
     }
 
+    TextInput {
+        id: fakeInput
+        opacity: 0
+    }
+
+    onClose: fakeInput.closeSoftwareInputPanel()
     onRejected: dialog.close()
 
     Keys.forwardTo: footer.item
