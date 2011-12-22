@@ -51,7 +51,9 @@ Panel {
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
+        visible: width > 0
         width: chatPanel.singlePanel ? parent.width : 200
+        z: 1
 
         ChatContactView {
             id: rooms
@@ -258,7 +260,7 @@ Panel {
 
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        anchors.left: sidebar.right
+        anchors.left: chatPanel.singlePanel ? parent.left : sidebar.right
         anchors.right: parent.right
         focus: true
         visible: width > 0
