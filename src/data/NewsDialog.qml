@@ -72,7 +72,6 @@ Dialog {
 
                     anchors.left: nameLabel.right
                     anchors.right: parent.right
-                    focus: false
                     validator: RegExpValidator {
                         regExp: /.{1,30}/
                     }
@@ -109,7 +108,7 @@ Dialog {
     }
 
     Component.onCompleted: {
-        nameInput.focus = true;
+        nameInput.forceActiveFocus();
     }
 
     onAccepted: {
@@ -122,9 +121,9 @@ Dialog {
 
     Keys.onTabPressed: {
         if (nameInput.activeFocus)
-            urlInput.focus = true;
+            urlInput.forceActiveFocus();
         else
-            nameInput.focus = true;
+            nameInput.forceActiveFocus();
     }
 }
 
