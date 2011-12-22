@@ -28,6 +28,8 @@ FocusScope {
     property alias title: label.text
     property int minimumWidth: 360
     property int minimumHeight: 240
+    height: appStyle.isMobile ? root.height : minimumHeight
+    width: appStyle.isMobile ? root.width : minimumWidth
 
     signal accepted
     signal close
@@ -225,11 +227,6 @@ FocusScope {
                 }
             }
         }
-    }
-
-    Component.onCompleted: {
-        height = appStyle.isMobile ? root.height : minimumHeight;
-        width = appStyle.isMobile ? root.width : minimumWidth;
     }
 
     onRejected: dialog.close()
