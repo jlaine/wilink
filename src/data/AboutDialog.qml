@@ -26,50 +26,55 @@ Dialog {
     property QtObject appUpdater: application.updater
     property bool prompting: Qt.isQtObject(appUpdater) && appUpdater.state == Updater.PromptState
 
-    footerComponent: Row {
-        spacing: 8
+    footerComponent: Item {
+        anchors.fill: parent
 
-        Button {
-            id: refreshButton
+        Row {
+            anchors.centerIn: parent
+            spacing: appStyle.margin.large
 
-            enabled: Qt.isQtObject(appUpdater) && appUpdater.state == Updater.IdleState
-            iconSource: 'refresh.png'
-            text: qsTr('Check for updates')
-            visible: !prompting
-            onClicked: appUpdater.check()
-        }
+            Button {
+                id: refreshButton
 
-        Button {
-            id: installButton
-
-            iconSource: 'start.png'
-            text: qsTr('Install')
-            visible: prompting
-            onClicked: appUpdater.install()
-        }
-
-        Button {
-            id: rejectButton
-
-            iconSource: 'close.png'
-            text: prompting ? qsTr('Cancel') : qsTr('Close')
-            onClicked: {
-                if (prompting)
-                    appUpdater.refuse();
-                dialog.rejected();
+                enabled: Qt.isQtObject(appUpdater) && appUpdater.state == Updater.IdleState
+                iconSource: 'refresh.png'
+                text: qsTr('Check for updates')
+                visible: !prompting
+                onClicked: appUpdater.check()
             }
-        }
 
-        Keys.onPressed: {
-            if (event.key == Qt.Key_Enter ||
-                event.key == Qt.Key_Return) {
-                if (installButton.visible && installButton.enabled)
-                    installButton.clicked();
-                else if (refreshButton.visible && refreshButton.enabled)
-                    refreshButton.clicked();
+            Button {
+                id: installButton
+
+                iconSource: 'start.png'
+                text: qsTr('Install')
+                visible: prompting
+                onClicked: appUpdater.install()
             }
-            else if (event.key == Qt.Key_Escape) {
-                rejectButton.clicked()
+
+            Button {
+                id: rejectButton
+
+                iconSource: 'close.png'
+                text: prompting ? qsTr('Cancel') : qsTr('Close')
+                onClicked: {
+                    if (prompting)
+                        appUpdater.refuse();
+                    dialog.rejected();
+                }
+            }
+
+            Keys.onPressed: {
+                if (event.key == Qt.Key_Enter ||
+                    event.key == Qt.Key_Return) {
+                    if (installButton.visible && installButton.enabled)
+                        installButton.clicked();
+                    else if (refreshButton.visible && refreshButton.enabled)
+                        refreshButton.clicked();
+                }
+                else if (event.key == Qt.Key_Escape) {
+                    rejectButton.clicked()
+                }
             }
         }
     }

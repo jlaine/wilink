@@ -179,7 +179,7 @@ FocusScope {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        height: appStyle.icon.tinySize + 2 * appStyle.margin.normal
+        height: appStyle.icon.smallSize + 2 * appStyle.margin.normal
         sourceComponent: footerComponent
     }
 
