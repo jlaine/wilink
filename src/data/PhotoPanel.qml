@@ -69,13 +69,6 @@ Panel {
             }
 
             ToolButton {
-                iconSource: 'start.png'
-                text: qsTr('Slideshow')
-                onClicked: panel.state = 'slide'
-                visible: false
-            }
-
-            ToolButton {
                 iconSource: 'stop.png'
                 text: qsTr('Cancel')
                 visible: false
