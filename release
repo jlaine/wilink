@@ -2,6 +2,18 @@
 
 set -e
 
+# determine target
+target=$1
+if [ -z "$target" ]; then
+    if [ -n "`which sw_vers`" ]; then
+        target="mac"
+    else
+        target="windows"
+    fi
+fi
+echo "Target: $target"
+
+# check code is up to date
 if [ -n "`git diff`" ]; then
     echo "working copy is dirty!"
     exit 1
@@ -9,16 +21,28 @@ fi
 git pull
 git submodule update --init
 
-if [ -n "`which sw_vers`" ]; then
+# build release
+case "$target" in
+android)
+    cd android
+    ant release
+    ;;
+mac)
     rm -rf release-mac
     mkdir release-mac
     cd release-mac
     cmake .. -DCMAKE_CXX_FLAGS="-arch i386"
     make package
-else
+    ;;
+windows)
     rm -rf release-win32
     mkdir release-win32
     cd release-win32
     cmake .. -DCMAKE_TOOLCHAIN_FILE=../cmake/mingw32.toolchain
     make package
-fi
+    ;;
+*)
+    echo "Unsupported target: $target"
+    exit 1
+    ;;
+esac
