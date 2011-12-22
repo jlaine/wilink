@@ -26,16 +26,6 @@ Item {
 
     ListModel {
         id: pluginModel
-
-        ListElement { source: 'ChatPlugin.qml'; autoload: true }
-        ListElement { source: 'DebugPlugin.qml' }
-        ListElement { source: 'DiagnosticPlugin.qml'; autoload: true }
-        ListElement { source: 'PlayerPlugin.qml' }
-        ListElement { source: 'NewsPlugin.qml' }
-        ListElement { source: 'PhonePlugin.qml'; autoload: true }
-        ListElement { source: 'PhotoPlugin.qml'; autoload: true }
-        ListElement { source: 'SharePlugin.qml'; autoload: true }
-        ListElement { source: 'WifirstPlugin.qml'; autoload: true }
     }
 
     function loadPlugin(source) {
@@ -112,6 +102,19 @@ Item {
 
     // FIXME : get / set preferences
     Component.onCompleted: {
+        pluginModel.append({ source: 'ChatPlugin.qml', autoload: true });
+        pluginModel.append({ source: 'DebugPlugin.qml' });
+        pluginModel.append({ source: 'DiagnosticPlugin.qml', autoload: true });
+        if (!application.isMobile)
+            pluginModel.append({ source: 'PlayerPlugin.qml' });
+        pluginModel.append({ source: 'NewsPlugin.qml' });
+        if (!application.isMobile)
+            pluginModel.append({ source: 'PhonePlugin.qml', autoload: true });
+        pluginModel.append({ source: 'PhotoPlugin.qml', autoload: true });
+        if (!application.isMobile)
+            pluginModel.append({ source: 'SharePlugin.qml', autoload: true });
+        pluginModel.append({ source: 'WifirstPlugin.qml', autoload: true });
+
         for (var i = 0; i < pluginModel.count; i++) {
             var plugin = pluginModel.get(i);
             if (plugin.autoload && application.settings.disabledPlugins.indexOf(plugin.source) < 0)
