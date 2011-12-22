@@ -145,7 +145,7 @@ FocusScope {
         anchors.top: statusLabel.bottom
         anchors.topMargin: appStyle.spacing.vertical
         anchors.horizontalCenter: parent.horizontalCenter
-        height: 32
+        height: appStyle.icon.smallSize + 2 * appStyle.margin.normal
         spacing: appStyle.spacing.horizontal
 
         Button {
