@@ -39,6 +39,14 @@ FocusScope {
         edit.cursorPosition = oldPos - 1;
     }
 
+    function closeSoftwareInputPanel() {
+        edit.closeSoftwareInputPanel();
+    }
+
+    function openSoftwareInputPanel() {
+        edit.openSoftwareInputPanel();
+    }
+
     width: 100
     height: edit.height + 8
 

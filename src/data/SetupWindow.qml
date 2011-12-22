@@ -81,5 +81,6 @@ FocusScope {
         window.minimumWidth = 360;
         window.minimumHeight = 240;
         window.size = window.minimumSize;
+        panel.forceActiveFocus();
     }
 }

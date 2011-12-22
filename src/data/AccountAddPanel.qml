@@ -25,7 +25,6 @@ import 'utils.js' as Utils
 FocusScope {
     id: panel
 
-    property bool acceptableInput: (jidInput.acceptableInput && passwordInput.acceptableInput)
     property string domain: ''
     property ListModel model
     property string testJid
@@ -33,6 +32,10 @@ FocusScope {
 
     signal accepted(string jid, string password)
     signal close
+
+    function forceActiveFocus() {
+        jidInput.forceActiveFocus();
+    }
 
     PanelHelp {
         id: help
@@ -70,13 +73,12 @@ FocusScope {
             anchors.left: jidLabel.right
             anchors.leftMargin: appStyle.spacing.horizontal
             anchors.right: parent.right
-            focus: false
             validator: RegExpValidator {
                 regExp: panel.domain != '' ? /^[^@/ ]+$/ : /^[^@/ ]+@[^@/ ]+$/
             }
 
             onTextChanged: {
-                if (panel.state == 'dupe') {
+                if (panel.state == 'badJid' || panel.state == 'dupe') {
                     panel.state = '';
                 }
             }
@@ -114,12 +116,20 @@ FocusScope {
             validator: RegExpValidator {
                 regExp: /.+/
             }
+
+            onTextChanged: {
+                if (panel.state == 'badPassword') {
+                    panel.state = '';
+                }
+            }
         }
     }
 
     Label {
         id: statusLabel
 
+        property string badJidText: panel.domain != '' ? qsTr('Please enter a valid username.') : qsTr('Please enter a valid address.')
+        property string badPasswordText: qsTr('Please enter your password.')
         property string dupeText: qsTr("You already have an account for '%1'.").replace('%1', Utils.jidToDomain(jidInput.text));
         property string failedText: qsTr('Could not connect, please check your username and password.')
         property string testingText: qsTr('Checking your username and password..')
@@ -145,8 +155,13 @@ FocusScope {
             text: qsTr('Add')
 
             onClicked: {
-                if (!jidInput.acceptableInput || !passwordInput.acceptableInput)
+                if (!jidInput.acceptableInput) {
+                    panel.state = 'badJid';
                     return;
+                } else if (!passwordInput.acceptableInput) {
+                    panel.state = 'badPassword';
+                    return;
+                }
 
                 var jid = jidInput.text;
                 if (panel.domain != '')
@@ -174,6 +189,7 @@ FocusScope {
                 panel.state = '';
                 jidInput.text = '';
                 passwordInput.Text = '';
+                passwordInput.closeSoftwareInputPanel();
                 testClient.disconnectFromServer();
                 panel.close();
             }
@@ -186,6 +202,7 @@ FocusScope {
         onConnected: {
             if (panel.state == 'testing') {
                 panel.state = '';
+                passwordInput.closeSoftwareInputPanel();
                 panel.accepted(panel.testJid, panel.testPassword);
             }
         }
@@ -198,6 +215,16 @@ FocusScope {
     }
 
     states: [
+        State {
+            name: 'badJid'
+            PropertyChanges { target: statusLabel; color: 'red'; text: statusLabel.badJidText }
+            StateChangeScript { script: jidInput.forceActiveFocus() }
+        },
+        State {
+            name: 'badPassword'
+            PropertyChanges { target: statusLabel; color: 'red'; text: statusLabel.badPasswordText }
+            StateChangeScript { script: passwordInput.forceActiveFocus() }
+        },
         State {
             name: 'dupe'
             PropertyChanges { target: statusLabel; color: 'red'; text: statusLabel.dupeText }
@@ -215,10 +242,6 @@ FocusScope {
         }
     ]
 
-    Component.onCompleted: {
-        jidInput.focus = true;
-    }
-
     Keys.onReturnPressed: {
         if (addButton.enabled) {
             addButton.clicked();
@@ -227,9 +250,9 @@ FocusScope {
 
     Keys.onTabPressed: {
         if (jidInput.activeFocus)
-            passwordInput.focus = true;
+            passwordInput.forceActiveFocus();
         else
-            jidInput.focus = true;
+            jidInput.forceActiveFocus();
     }
 }
 

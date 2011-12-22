@@ -95,6 +95,7 @@ Panel {
         name: 'edit'
         PropertyChanges { target: listPanel; opacity: 0 }
         PropertyChanges { target: addPanel; opacity: 1 }
+        StateChangeScript { script: addPanel.forceActiveFocus() }
     }
 }
 
