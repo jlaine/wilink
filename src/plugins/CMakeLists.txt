@@ -114,8 +114,6 @@ if(RELOAD_TRANSLATIONS)
     qt4_create_translation(QM_FILES
         application.cpp
         window.cpp
-        ../data/main.qml
-        ../data/setup.qml
         ../data/AboutDialog.qml
         ../data/AccountAddPanel.qml
         ../data/AccountListPanel.qml
@@ -142,6 +140,7 @@ if(RELOAD_TRANSLATIONS)
         ../data/HistoryView.qml
         ../data/InputMenu.qml
         ../data/LogPanel.qml
+        ../data/MainWindow.qml
         ../data/NewsPanel.qml
         ../data/NewsPlugin.qml
         ../data/PhoneContactDialog.qml
@@ -167,6 +166,7 @@ if(RELOAD_TRANSLATIONS)
         ../data/RoomParticipantView.qml
         ../data/RoomPermissionDialog.qml
         ../data/RoomSubjectDialog.qml
+        ../data/SetupWindow.qml
         ../data/SharePanel.qml
         ../data/SharePlugin.qml
         ../data/SharePreferencePanel.qml
