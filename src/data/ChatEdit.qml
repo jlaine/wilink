@@ -110,7 +110,7 @@ Rectangle {
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
-            focus: appStyle.autoFocusInput
+            focus: appStyle.isMobile ? false : true
             font.pixelSize: appStyle.font.normalSize
             selectByMouse: true
             smooth: true

@@ -21,7 +21,6 @@ import QtQuick 1.0
 
 Item {
     property alias animation: animationItem
-    property bool autoFocusInput: isMobile ? false : true
     property alias font: fontItem
     property int highlightMoveDuration: 500
     property alias icon: iconItem
