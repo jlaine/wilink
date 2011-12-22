@@ -357,7 +357,9 @@ void Application::resetWindows()
 #ifdef WILINK_EMBEDDED
         Q_UNUSED(xpos);
         Q_UNUSED(ypos);
+#ifndef Q_OS_ANDROID
         window->setFullScreen(true);
+#endif
 #else
         // restore window geometry
         const QByteArray geometry = d->appSettings->windowGeometry(jid);
