@@ -28,7 +28,7 @@ Item {
 
     anchors.left: parent ? parent.left : undefined
     anchors.right: parent ? parent.right : undefined
-    height: 40
+    height: appStyle.icon.smallSize + 4 * appStyle.margin.normal
 
     Rectangle {
         id: background
@@ -47,7 +47,7 @@ Item {
         width: appStyle.icon.smallSize
         height: appStyle.icon.smallSize
         anchors.left: parent.left
-        anchors.leftMargin: 4
+        anchors.leftMargin: appStyle.margin.normal
         anchors.verticalCenter: parent.verticalCenter
         source: (Qt.isQtObject(job) && job.direction == QXmppTransferJob.OutgoingDirection) ? 'upload.png' : 'download.png'
     }
@@ -55,10 +55,9 @@ Item {
     ProgressBar {
         id: progressBar
 
+        anchors.margins: appStyle.margin.normal
         anchors.left: icon.right
-        anchors.leftMargin: 4
         anchors.right: openButton.left
-        anchors.rightMargin: 4
         anchors.verticalCenter: parent.verticalCenter
 
         Label {
@@ -102,7 +101,7 @@ Item {
         id: cancelButton
 
         anchors.right: closeButton.left
-        anchors.rightMargin: 4
+        anchors.rightMargin: appStyle.margin.normal
         anchors.verticalCenter: parent.verticalCenter
         iconSource: 'remove.png'
         text: qsTr('Cancel')
@@ -115,7 +114,7 @@ Item {
         id: closeButton
 
         anchors.right: parent.right
-        anchors.rightMargin: 4
+        anchors.rightMargin: appStyle.margin.normal
         anchors.verticalCenter: parent.verticalCenter
         iconSource: 'close.png'
         text: qsTr('Close')
