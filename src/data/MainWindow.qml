@@ -150,7 +150,7 @@ FocusScope {
     }
 
     Component.onCompleted: {
-        window.minimumWidth = 360;
+        window.minimumWidth = 240;
         window.minimumHeight = 360;
 
         var jid = window.objectName;
