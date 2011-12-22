@@ -41,7 +41,9 @@ Panel {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         title: qsTr('My news')
+        visible: width > 0
         width: newsPanel.singlePanel ? parent.width : 200
+        z: 1
 
         delegate: Item {
             id: item
@@ -136,7 +138,7 @@ Panel {
 
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        anchors.left: sidebar.right
+        anchors.left: newsPanel.singlePanel ? parent.left : sidebar.right
         anchors.right: parent.right
         visible: width > 0
 

@@ -93,8 +93,10 @@ Panel {
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.left: parent.left
-        width: panel.singlePanel ? parent.width : 200
         contactsModel: historyModel.contactsModel
+        visible: width > 0
+        width: panel.singlePanel ? parent.width : 200
+        z: 1
 
         onItemClicked: {
             var address = buildAddress(model.phone, historyModel.client.domain);
@@ -108,7 +110,7 @@ Panel {
 
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        anchors.left: sidebar.right
+        anchors.left: panel.singlePanel ? parent.left : sidebar.right
         anchors.right: parent.right
         visible: width > 0
 
