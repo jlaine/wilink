@@ -98,6 +98,18 @@
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
+    <message>
+        <source>Please enter a valid username.</source>
+        <translation>Veuillez saisir un identifiant valide.</translation>
+    </message>
+    <message>
+        <source>Please enter a valid address.</source>
+        <translation>Veuillez saisir une adresse valide.</translation>
+    </message>
+    <message>
+        <source>Please enter your password.</source>
+        <translation>Veuillez saisir votre mot de passe.</translation>
+    </message>
 </context>
 <context>
     <name>AccountListPanel</name>
@@ -468,6 +480,14 @@ Acceptez-vous?</translation>
         <source>My news</source>
         <translation>Mes nouvelles</translation>
     </message>
+    <message>
+        <source>Modify</source>
+        <translation>Modifier</translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation>Retirer</translation>
+    </message>
 </context>
 <context>
     <name>NewsPlugin</name>
@@ -596,7 +616,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>You can view your phone bills and your call history at the following address:</source>
-        <translation>Suivez votre consommation et accédez à l'historique de vos appels à l'adresse:</translation>
+        <translation>Suivez votre consommation et accédez à l&apos;historique de vos appels à l&apos;adresse:</translation>
     </message>
 </context>
 <context>
@@ -902,6 +922,13 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>SetupWindow</name>
+    <message>
+        <source>If you need help, please refer to the &lt;a href=&quot;%1&quot;&gt;%2 FAQ&lt;/a&gt;.</source>
+        <translation>Si vous avez besoin d&apos;aide, merci de consulter la &lt;a href=&quot;%1&quot;&gt;FAQ %2&lt;/a&gt;.</translation>
+    </message>
+</context>
+<context>
     <name>SharePanel</name>
     <message>
         <source>Shares</source>
@@ -1124,13 +1151,6 @@ Acceptez-vous?</translation>
     <message>
         <source>&amp;Preferences</source>
         <translation>&amp;Préférences</translation>
-    </message>
-</context>
-<context>
-    <name>setup</name>
-    <message>
-        <source>If you need help, please refer to the &lt;a href=&quot;%1&quot;&gt;%2 FAQ&lt;/a&gt;.</source>
-        <translation>Si vous avez besoin d&apos;aide, merci de consulter la &lt;a href=&quot;%1&quot;&gt;FAQ %2&lt;/a&gt;.</translation>
     </message>
 </context>
 </TS>
