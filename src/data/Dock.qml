@@ -130,6 +130,17 @@ Rectangle {
                 dialogSwapper.showPanel(panelSource);
             }
         }
+
+        DockButton {
+            id: quitButton
+            iconSource: 'dock-close.png'
+            iconPress: 'close.png'
+            text: qsTr('Quit')
+            visible: application.isMobile
+            onClicked: {
+                application.quit();
+            }
+        }
     }
 
     Connections {

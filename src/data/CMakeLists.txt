@@ -32,6 +32,7 @@ set(ICONS
     scalable/debug.svg
     scalable/diagnostics.svg
     scalable/dock-chat.svg
+    scalable/dock-close.svg
     scalable/dock-diagnostics.svg
     scalable/dock-debug.svg
     scalable/dock-options.svg

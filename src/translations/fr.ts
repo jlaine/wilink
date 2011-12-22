@@ -394,6 +394,10 @@ Acceptez-vous?</translation>
         <source>Preferences</source>
         <translation>Préférences</translation>
     </message>
+    <message>
+        <source>Quit</source>
+        <translation>Quitter</translation>
+    </message>
 </context>
 <context>
     <name>ErrorNotification</name>
