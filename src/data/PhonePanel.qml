@@ -95,7 +95,7 @@ Panel {
         anchors.left: parent.left
         contactsModel: historyModel.contactsModel
         visible: width > 0
-        width: panel.singlePanel ? parent.width : 200
+        width: panel.singlePanel ? parent.width : appStyle.sidebarWidth
         z: 1
 
         onItemClicked: {

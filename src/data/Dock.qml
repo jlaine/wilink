@@ -54,7 +54,7 @@ Rectangle {
         anchors.topMargin: 4
         anchors.top: parent.top
         anchors.left: parent.left
-        spacing: 5
+        spacing: appStyle.isMobile ? 10 : 5
 
         Repeater {
             id: repeater

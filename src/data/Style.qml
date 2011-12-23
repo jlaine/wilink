@@ -26,6 +26,7 @@ Item {
     property alias icon: iconItem
     property bool isMobile: application.isMobile
     property alias margin: marginItem
+    property int sidebarWidth: isMobile ? 250 : 200
     property alias spacing: spacingItem
 
     opacity: 0

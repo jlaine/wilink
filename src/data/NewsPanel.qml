@@ -42,7 +42,7 @@ Panel {
         anchors.left: parent.left
         title: qsTr('My news')
         visible: width > 0
-        width: newsPanel.singlePanel ? parent.width : 200
+        width: newsPanel.singlePanel ? parent.width : appStyle.sidebarWidth
         z: 1
 
         delegate: Item {

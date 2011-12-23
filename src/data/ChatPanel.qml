@@ -52,7 +52,7 @@ Panel {
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         visible: width > 0
-        width: chatPanel.singlePanel ? parent.width : 200
+        width: chatPanel.singlePanel ? parent.width : appStyle.sidebarWidth
         z: 1
 
         ChatContactView {
