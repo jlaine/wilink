@@ -81,7 +81,7 @@ Panel {
             title: qsTr('My rooms')
             // FIXME: in Qt 4.7.4, making height depend on count gives a buggy behaviour
             // height: headerHeight + (count > 0 ? 4 : 0) + rowHeight * Math.min(count, 8);
-            height: headerHeight + 4 + rowHeight * 4
+            height: headerHeight + 4 + rowHeight * (appStyle.isMobile ? 2 : 4)
 
             onAddClicked: {
                 dialogSwapper.showPanel('RoomJoinDialog.qml');
