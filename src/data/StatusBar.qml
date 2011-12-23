@@ -27,7 +27,7 @@ Rectangle {
     property bool autoAway: false
 
     color: '#567dbc'
-    height: appStyle.icon.tinySize + 12
+    height: appStyle.icon.tinySize + 3 * appStyle.margin.normal
 
     Component {
         id: pillDelegate
@@ -68,7 +68,7 @@ Rectangle {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.margins: 2
-        width: appStyle.icon.tinySize + 32
+        width: appStyle.icon.tinySize + 11 + 3 * appStyle.margin.normal
 
         Rectangle {
             id: highlight
@@ -85,8 +85,8 @@ Rectangle {
             id: statusPill
 
             anchors.left:  parent.left
+            anchors.leftMargin: appStyle.margin.normal
             anchors.verticalCenter: parent.verticalCenter
-            anchors.margins: 5
             height: appStyle.icon.tinySize
             width: appStyle.icon.tinySize
             presenceStatus: appClient.statusType
@@ -96,7 +96,7 @@ Rectangle {
             id: eject
 
             anchors.right: parent.right
-            anchors.rightMargin: 8
+            anchors.rightMargin: appStyle.margin.normal
             anchors.verticalCenter: parent.verticalCenter
             source: 'eject.png'
             z: 1
@@ -129,9 +129,10 @@ Rectangle {
         id: connectionText
 
         anchors.left: statusArea.right
+        anchors.leftMargin: appStyle.spacing.horizontal
         anchors.right: parent.right
+        anchors.rightMargin: appStyle.margin.normal
         anchors.verticalCenter: parent.verticalCenter
-        anchors.margins: 5
         color: 'white'
         text: {
             switch (appClient.state) {
