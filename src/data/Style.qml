@@ -63,8 +63,8 @@ Item {
     Item {
         id: spacingItem
 
-        property int horizontal: 6
-        property int vertical: 4
+        property int horizontal: isMobile ? 12 : 6
+        property int vertical: isMobile ? 8 : 4
     }
 
     Text {
