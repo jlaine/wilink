@@ -41,7 +41,7 @@ Item {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: scrollBar.left
-        spacing: 1
+        anchors.margins: 2
 
         delegate: Item {
             id: item

@@ -51,7 +51,7 @@ Item {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: scrollBar.left
-        spacing: 4
+        spacing: appStyle.spacing.vertical
 
         delegate: Item {
             width: view.width - 1

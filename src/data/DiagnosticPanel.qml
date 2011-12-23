@@ -52,6 +52,7 @@ Panel {
     Flickable {
         id: flickable
 
+        anchors.margins: appStyle.margin.normal
         anchors.left: parent.left
         anchors.right: scrollBar.left
         anchors.top: header.bottom
@@ -67,6 +68,7 @@ Panel {
 
     ScrollBar {
         id: scrollBar
+
         anchors.top: header.bottom
         anchors.bottom: parent.bottom
         anchors.right: parent.right

@@ -74,7 +74,7 @@ Item {
         anchors.left: parent.left
         anchors.right: scrollBar.left
         anchors.top: header.bottom
-        anchors.margins: appStyle.margin.normal
+        anchors.margins: 2
         clip: true
 
         delegate: Item {
@@ -91,8 +91,9 @@ Item {
                 Image {
                     id: image
 
-                    anchors.verticalCenter: parent.verticalCenter
                     anchors.left: parent.left
+                    anchors.leftMargin: appStyle.margin.normal
+                    anchors.verticalCenter: parent.verticalCenter
                     width: appStyle.icon.smallSize
                     height: appStyle.icon.smallSize
                     smooth: true
@@ -100,10 +101,11 @@ Item {
                 }
 
                 Label {
-                    anchors.verticalCenter: parent.verticalCenter
                     anchors.left: image.right
+                    anchors.leftMargin: appStyle.spacing.horizontal
                     anchors.right: date.left
                     anchors.rightMargin: appStyle.spacing.horizontal
+                    anchors.verticalCenter: parent.verticalCenter
                     elide: Text.ElideRight
                     text: model.name
                 }
@@ -111,9 +113,9 @@ Item {
                 Label {
                     id: date
 
-                    anchors.verticalCenter: parent.verticalCenter
                     anchors.right: duration.left
                     anchors.rightMargin: appStyle.spacing.horizontal
+                    anchors.verticalCenter: parent.verticalCenter
                     text: Utils.formatDateTime(model.date)
                     width: appStyle.font.normalSize * 8
                 }

@@ -28,6 +28,7 @@ FocusScope {
     property alias currentIndex: view.currentIndex
     property alias currentItem: view.currentItem
     property alias model: view.model
+    property int iconSize: 128
 
     GridView {
         id: view
@@ -36,8 +37,9 @@ FocusScope {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: scrollBar.left
-        cellWidth: 130
-        cellHeight: 150
+        anchors.margins: 2
+        cellWidth: iconSize + appStyle.margin.normal
+        cellHeight: iconSize + appStyle.font.normalSize * 1.4 + appStyle.spacing.vertical
         focus: true
         highlight: Highlight {}
 
@@ -57,13 +59,14 @@ FocusScope {
 
             Column {
                 anchors.fill: parent
+                spacing: appStyle.spacing.vertical
 
                 PhotoDelegate {
                     id: thumbnail
 
                     anchors.horizontalCenter: parent.horizontalCenter
-                    width: 128
-                    height: 128
+                    width: iconSize
+                    height: iconSize
                 }
 
                 Label {

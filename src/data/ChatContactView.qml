@@ -38,13 +38,12 @@ ContactView {
 
         Item {
             anchors.fill: parent
-            anchors.margins: 2
 
             Image {
                 id: avatar
 
                 anchors.left: parent.left
-                anchors.leftMargin: 6
+                anchors.leftMargin: appStyle.margin.normal
                 anchors.verticalCenter: parent.verticalCenter
                 asynchronous: true
                 source: block.iconSource != '' ? block.iconSource : model.avatar
@@ -56,8 +55,8 @@ ContactView {
 
             Label {
                 anchors.left: avatar.right
-                anchors.right: bubble.right
                 anchors.leftMargin: 3
+                anchors.right: bubble.right
                 anchors.verticalCenter: parent.verticalCenter
                 elide: Text.ElideRight
                 text: model.participants > 0 ? model.name + ' (' + model.participants + ')' : model.name
@@ -66,8 +65,8 @@ ContactView {
             Bubble {
                 id: bubble
 
-                anchors.verticalCenter: parent.verticalCenter
                 anchors.right: status.left
+                anchors.verticalCenter: parent.verticalCenter
                 anchors.margins: 3
                 opacity: model.messages > 0 ? 1 : 0
                 text: model.messages > 0 ? model.messages : ''
@@ -76,7 +75,7 @@ ContactView {
             StatusPill {
                 id: status
                 anchors.right: parent.right
-                anchors.rightMargin: 5
+                anchors.rightMargin: appStyle.margin.normal
                 anchors.verticalCenter: parent.verticalCenter
                 presenceStatus: model.status
                 smooth: !block.moving
