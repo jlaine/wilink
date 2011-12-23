@@ -111,8 +111,7 @@ Item {
         if (!application.isMobile)
             pluginModel.append({ source: 'PhonePlugin.qml', autoload: true });
         pluginModel.append({ source: 'PhotoPlugin.qml', autoload: true });
-        if (!application.isMobile)
-            pluginModel.append({ source: 'SharePlugin.qml', autoload: true });
+        pluginModel.append({ source: 'SharePlugin.qml', autoload: true });
         pluginModel.append({ source: 'WifirstPlugin.qml', autoload: true });
 
         for (var i = 0; i < pluginModel.count; i++) {
