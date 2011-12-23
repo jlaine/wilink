@@ -25,8 +25,8 @@ Rectangle {
     property real maximumValue: 100
     property real value: 0
 
-    width: orientation == Qt.Horizontal ? 100 : 16
-    height: orientation == Qt.Horizontal ? 16 : 100
+    width: orientation == Qt.Horizontal ? 100 : appStyle.icon.tinySize
+    height: orientation == Qt.Horizontal ? appStyle.icon.tinySize : 100
     border.color: '#4a9ddd'
     color: '#e7f4fe'
     radius: 4
