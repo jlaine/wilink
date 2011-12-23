@@ -48,7 +48,7 @@ Item {
 
             anchors.left: parent.left
             anchors.right: parent.right
-            height: thumbnail.height + 8
+            height: thumbnail.height + 2 * appStyle.margin.normal
 
             Highlight {
                 id: highlight
@@ -61,8 +61,8 @@ Item {
                 id: thumbnail
 
                 anchors.left: parent.left
-                anchors.top: parent.top
-                anchors.margins: 4
+                anchors.leftMargin: appStyle.margin.normal
+                anchors.verticalCenter: parent.verticalCenter
                 width: appStyle.icon.smallSize
                 height: appStyle.icon.smallSize
                 smooth: true
@@ -80,7 +80,9 @@ Item {
 
             Item {
                 anchors.left: thumbnail.right
+                anchors.leftMargin: appStyle.spacing.horizontal
                 anchors.right: downloadButton.left
+                anchors.rightMargin: appStyle.spacing.horizontal
                 anchors.verticalCenter: parent.verticalCenter
                 height: model.size > 0 ? text.height + sizeText.height : text.height
 
@@ -130,8 +132,8 @@ Item {
             Button {
                 id: downloadButton
 
-                anchors.margins: 4
                 anchors.right: parent.right
+                anchors.rightMargin: appStyle.margin.normal
                 anchors.verticalCenter: parent.verticalCenter
                 iconSize: appStyle.icon.tinySize
                 iconSource: 'download.png'

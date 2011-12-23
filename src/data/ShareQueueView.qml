@@ -61,7 +61,7 @@ Item {
                 id: thumbnail
 
                 anchors.left: parent.left
-                anchors.leftMargin: 4
+                anchors.leftMargin: appStyle.margin.normal
                 anchors.verticalCenter: parent.verticalCenter
                 fillMode: Image.PreserveAspectFit
                 width: appStyle.icon.smallSize
@@ -70,20 +70,19 @@ Item {
                 source: block.style == 'shares' ? (model.isDir ? (model.node.length ? 'album.png' : 'peer.png') : 'file.png') : model.avatar
             }
 
-            Item {
-                id: main
+            ProgressBar {
+                id: progress
 
                 anchors.left: thumbnail.right
+                anchors.leftMargin: appStyle.spacing.horizontal
                 anchors.right: cancelButton.left
+                anchors.rightMargin: appStyle.spacing.horizontal
                 anchors.top: parent.top
+                anchors.topMargin: appStyle.margin.normal
                 anchors.bottom: parent.bottom
-                anchors.margins: 4
-
-                ProgressBar {
-                    anchors.fill: parent
-                    maximumValue: model.totalBytes
-                    value: model.doneBytes
-                }
+                anchors.bottomMargin: appStyle.margin.normal
+                maximumValue: model.totalBytes
+                value: model.doneBytes
 
                 Label {
                     anchors.fill: parent
@@ -107,7 +106,7 @@ Item {
                 id: cancelButton
 
                 anchors.right: parent.right
-                anchors.rightMargin: 4
+                anchors.rightMargin: appStyle.margin.normal
                 anchors.verticalCenter: parent.verticalCenter
                 iconSize: appStyle.icon.tinySize
                 iconSource: 'close.png'
