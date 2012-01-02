@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 Requirements
 ============
 
-wiLink requires cmake >= 2.8.2 and Qt >= 4.7 to build.
+wiLink requires cmake >= 2.8.2 and Qt >= 4.7.4 to build.
 
 On Debian/Ubuntu
 ----------------

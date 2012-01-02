@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import QtQuick 1.0
+import QtQuick 1.1
 import QXmpp 0.4
 import wiLink 2.0
 
