@@ -1,6 +1,7 @@
 wilink (2.1.907-1) unstable; urgency=low
 
   * New upstream beta.
+  * Require Qt 4.7.4 or better to build.
 
  -- Jeremy Lainé <jeremy.laine@bolloretelecom.eu>  Wed, 19 Dec 2011 16:25:06 +0200
 
