@@ -30,7 +30,7 @@ Item {
     anchors.left: parent ? parent.left : undefined
     anchors.right: parent ? parent.right : undefined
     clip: true
-    height: video.openMode != CallVideoHelper.NotOpen ? 248 : frame.height
+    height: video.openMode != CallVideoHelper.NotOpen ? (240 + 2 * appStyle.margin.normal) : frame.height
     z: 5
 
     CallAudioHelper {
@@ -62,11 +62,12 @@ Item {
             id: status
 
             anchors.left: parent.left
-            anchors.leftMargin: 4
+            anchors.leftMargin: appStyle.margin.normal
             anchors.top: parent.top
-            anchors.topMargin: 12
             anchors.right: inputIcon.left
             elide: Text.ElideRight
+            height: frame.height
+            verticalAlignment: Text.AlignVCenter
             text: {
                 if (!call || call.state == QXmppCall.ConnectingState) {
                     return qsTr('Connecting..');
@@ -89,7 +90,7 @@ Item {
             border.width: 1
             border.color: '#2689d6'
             radius: 8
-            height: parent.height - 8
+            height: parent.height - (2 * appStyle.margin.normal)
             width: height * 4 / 3
             visible: video.openMode != CallVideoHelper.NotOpen
         }
