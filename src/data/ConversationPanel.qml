@@ -187,12 +187,14 @@ Panel {
             onMessageReceived: {
                 if (contacts.currentJid != jid) {
                     // show notification
-                    var handle = application.showMessage(vcard.name, text, qsTranslate('ConversationPanel', 'Show this conversation'));
-                    if (handle) {
-                        handle.clicked.connect(function() {
-                            window.showAndRaise();
-                            showConversation(jid);
-                        });
+                    if (application.settings.incomingMessageNotification) {
+                        var handle = application.showMessage(vcard.name, text, qsTranslate('ConversationPanel', 'Show this conversation'));
+                        if (handle) {
+                            handle.clicked.connect(function() {
+                                window.showAndRaise();
+                                showConversation(jid);
+                            });
+                        }
                     }
 
                     // alert window

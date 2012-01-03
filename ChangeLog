@@ -4,6 +4,7 @@ wiLink 2.2.0 (UNRELEASED)
   - Make "away" color pills friendlier for color-blind.
   - Add support for Growl notifications on Mac OS.
   - Set correct package vendor on Windows.
+  - Make it possible to disable message notifications.
  * Conversations:
   - Add an animation when a new message is sent/received.
   - Add support for additional smileys.

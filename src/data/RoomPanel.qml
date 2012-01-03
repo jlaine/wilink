@@ -135,12 +135,14 @@ Panel {
                     var re = new RegExp('@' + Utils.escapeRegExp(room.nickName) + '[,:]');
                     if (text.match(re) && rooms.currentJid != jid) {
                         // show notification
-                        var handle = application.showMessage(Utils.jidToResource(jid), text, qsTranslate('RoomPanel', 'Show this room'));
-                        if (handle) {
-                            handle.clicked.connect(function() {
-                                window.showAndRaise();
-                                showRoom(jid);
-                            });
+                        if (application.settings.incomingMessageNotification) {
+                            var handle = application.showMessage(Utils.jidToResource(jid), text, qsTranslate('RoomPanel', 'Show this room'));
+                            if (handle) {
+                                handle.clicked.connect(function() {
+                                    window.showAndRaise();
+                                    showRoom(jid);
+                                });
+                            }
                         }
 
                         // alert window

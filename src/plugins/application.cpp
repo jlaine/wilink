@@ -637,6 +637,25 @@ void ApplicationSettings::setEnabledPlugins(const QStringList &plugins)
     }
 }
 
+/** Returns whether a notification should be shown for incoming messages.
+ */
+bool ApplicationSettings::incomingMessageNotification() const
+{
+    return d->settings->value("IncomingMessageNotification", true).toBool();
+}
+
+/** Sets whether a notification should be shown for incoming messages.
+ *
+ * @param notification
+ */
+void ApplicationSettings::setIncomingMessageNotification(bool notification)
+{
+    if (notification != incomingMessageNotification()) {
+        d->settings->setValue("IncomingMessageNotification", notification);
+        emit incomingMessageNotificationChanged(notification);
+    }
+}
+
 /** Returns the sound to play for incoming messages.
  */
 QString ApplicationSettings::incomingMessageSound() const

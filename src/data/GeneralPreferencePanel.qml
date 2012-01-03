@@ -25,6 +25,7 @@ Panel {
     function save() {
         if (openAtLogin.enabled)
             application.settings.openAtLogin = openAtLogin.checked;
+        application.settings.incomingMessageNotification = incomingMessageNotification.checked;
         application.settings.showOfflineContacts = showOfflineContacts.checked;
         application.settings.sortContactsByStatus = sortContactsByStatus.checked;
     }
@@ -69,6 +70,16 @@ Panel {
                 anchors.right:  parent.right
                 checked: application.settings.sortContactsByStatus
                 text: qsTr('Sort contacts by status')
+                onClicked: checked = !checked
+            }
+
+            CheckBox {
+                id: incomingMessageNotification
+
+                anchors.left: parent.left
+                anchors.right:  parent.right
+                checked: application.settings.incomingMessageNotification
+                text: qsTr('Display a notification for incoming messages')
                 onClicked: checked = !checked
             }
         }

@@ -120,6 +120,7 @@ class ApplicationSettings : public QObject
     Q_PROPERTY(QStringList disabledPlugins READ disabledPlugins WRITE setDisabledPlugins NOTIFY disabledPluginsChanged)
     Q_PROPERTY(QString downloadsLocation READ downloadsLocation CONSTANT)
     Q_PROPERTY(QStringList enabledPlugins READ enabledPlugins WRITE setEnabledPlugins NOTIFY enabledPluginsChanged)
+    Q_PROPERTY(bool incomingMessageNotification READ incomingMessageNotification WRITE setIncomingMessageNotification NOTIFY incomingMessageNotificationChanged)
     Q_PROPERTY(QString incomingMessageSound READ incomingMessageSound WRITE setIncomingMessageSound NOTIFY incomingMessageSoundChanged)
     Q_PROPERTY(QString lastRunVersion READ lastRunVersion WRITE setLastRunVersion NOTIFY lastRunVersionChanged)
     Q_PROPERTY(bool openAtLogin READ openAtLogin WRITE setOpenAtLogin NOTIFY openAtLoginChanged)
@@ -150,6 +151,9 @@ public:
 
     QStringList enabledPlugins() const;
     void setEnabledPlugins(const QStringList &plugins);
+
+    bool incomingMessageNotification() const;
+    void setIncomingMessageNotification(bool notification);
 
     QString incomingMessageSound() const;
     void setIncomingMessageSound(const QString &soundFile);
@@ -191,6 +195,7 @@ signals:
     void chatAccountsChanged(const QStringList &accounts);
     void disabledPluginsChanged(const QStringList &plugins);
     void enabledPluginsChanged(const QStringList &plugins);
+    void incomingMessageNotificationChanged(bool notification);
     void incomingMessageSoundChanged(const QString &sound);
     void lastRunVersionChanged(const QString &version);
     void openAtLoginChanged(bool run);
