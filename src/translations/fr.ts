@@ -424,6 +424,10 @@ Acceptez-vous?</translation>
         <source>General options</source>
         <translation>Options générales</translation>
     </message>
+    <message>
+        <source>Show incoming message popup</source>
+        <translation>Popup à la réception d'un message</translation>
+    </message>
 </context>
 <context>
     <name>HistoryView</name>

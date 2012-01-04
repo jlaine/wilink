@@ -79,7 +79,7 @@ Panel {
                 anchors.left: parent.left
                 anchors.right:  parent.right
                 checked: application.settings.incomingMessageNotification
-                text: qsTr('Display a notification for incoming messages')
+                text: qsTr('Show incoming message popup')
                 onClicked: checked = !checked
             }
         }
