@@ -14,6 +14,8 @@ wiLink 2.2.0 (UNRELEASED)
   - Display DNS servers.
   - Display transfer results.
   - Do not resolve hosts when running traceroute on Windows.
+ * News:
+  - Make it possible to open link with return key.
  * Photos:
   - Use a smooth transition between preview and full-res photos.
  * Rooms:

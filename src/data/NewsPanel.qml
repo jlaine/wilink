@@ -260,6 +260,11 @@ Panel {
                 XmlRole { name: 'imageSource'; query: '*:thumbnail[1]/@url/string()' }
                 XmlRole { name: 'title'; query: 'title/string()' }
             }
+
+            Keys.onReturnPressed: {
+                var item = model.get(currentIndex);
+                Qt.openUrlExternally(item.link);
+            }
         }
 
         ScrollBar {
