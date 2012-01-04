@@ -426,7 +426,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>Show incoming message popup</source>
-        <translation>Popup à la réception d'un message</translation>
+        <translation>Popup à la réception d&apos;un message</translation>
     </message>
 </context>
 <context>
