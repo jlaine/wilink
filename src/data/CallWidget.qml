@@ -64,7 +64,7 @@ Item {
             anchors.left: parent.left
             anchors.leftMargin: appStyle.margin.normal
             anchors.top: parent.top
-            anchors.right: inputIcon.left
+            anchors.right: controls.left
             elide: Text.ElideRight
             height: frame.height
             verticalAlignment: Text.AlignVCenter
@@ -112,108 +112,97 @@ Item {
         Rectangle {
             id: frame
 
-            anchors.top: parent.top
-            anchors.right: parent.right
-            anchors.left: inputIcon.left
-            anchors.leftMargin: -appStyle.margin.normal
+            anchors.fill: controls
+            anchors.margins: -appStyle.margin.normal
             height: appStyle.icon.smallSize + 4 * appStyle.margin.normal
             border.color: background.border.color
             border.width: background.border.width
             gradient: background.gradient
         }
 
-        Button {
-            id: hangupButton
+        Row {
+            id: controls
 
+            anchors.top: parent.top
             anchors.right: parent.right
-            anchors.top: parent.top
             anchors.margins: appStyle.margin.normal
-            iconSource: 'hangup.png'
+            height: appStyle.icon.smallSize + 2 * appStyle.margin.normal
+            spacing: appStyle.margin.normal
 
-            onClicked: call.hangup()
-        }
+            Column {
+                Image {
+                    id: inputIcon
 
-        Button {
-            id: fullScreenButton
+                    source: 'audio-input.png'
+                    height: appStyle.icon.tinySize
+                    width: appStyle.icon.tinySize
+                }
 
-            anchors.right: hangupButton.left
-            anchors.top: parent.top
-            anchors.margins: appStyle.margin.normal
-            enabled: Qt.isQtObject(call) && call.state == QXmppCall.ActiveState
-            iconSource: 'fullscreen.png'
+                Image {
+                    id: outputIcon
 
-            onClicked: {
-                if (callWidget.state == '')
-                    callWidget.state = 'fullscreen';
-                else if (callWidget.state == 'fullscreen')
-                    callWidget.state = '';
-            }
-        }
-
-        Button {
-            id: cameraButton
-
-            anchors.right: fullScreenButton.left
-            anchors.top: parent.top
-            anchors.margins: appStyle.margin.normal
-            enabled: Qt.isQtObject(call) && call.state == QXmppCall.ActiveState
-            iconSource: 'camera.png'
-
-            onClicked: {
-                if (video.openMode & CallVideoHelper.WriteOnly)
-                    call.stopVideo();
-                else
-                    call.startVideo();
+                    source: 'audio-output.png'
+                    height: appStyle.icon.tinySize
+                    width: appStyle.icon.tinySize
+                }
             }
 
-            states: State {
-                name: 'active'
-                when: (video.openMode & CallVideoHelper.WriteOnly) != 0
-                PropertyChanges { target: cameraButton; iconSource: 'camera-active.png' }
+            Column {
+                ProgressBar {
+                    id: inputVolume
+
+                    maximumValue: audio.maximumVolume
+                    value: audio.inputVolume
+                }
+
+                ProgressBar {
+                    id: outputVolume
+
+                    maximumValue: audio.maximumVolume
+                    value: audio.outputVolume
+                }
             }
-        }
 
-        ProgressBar {
-            id: inputVolume
+            Button {
+                id: cameraButton
 
-            anchors.top: parent.top
-            anchors.right: cameraButton.left
-            anchors.margins: appStyle.margin.normal
-            maximumValue: audio.maximumVolume
-            value: audio.inputVolume
-        }
+                enabled: Qt.isQtObject(call) && call.state == QXmppCall.ActiveState
+                iconSource: 'camera.png'
 
-        ProgressBar {
-            id: outputVolume
+                onClicked: {
+                    if (video.openMode & CallVideoHelper.WriteOnly)
+                        call.stopVideo();
+                    else
+                        call.startVideo();
+                }
 
-            anchors.top: inputVolume.bottom
-            anchors.right: cameraButton.left
-            anchors.leftMargin: appStyle.margin.normal
-            anchors.rightMargin: appStyle.margin.normal
-            maximumValue: audio.maximumVolume
-            value: audio.outputVolume
-        }
+                states: State {
+                    name: 'active'
+                    when: (video.openMode & CallVideoHelper.WriteOnly) != 0
+                    PropertyChanges { target: cameraButton; iconSource: 'camera-active.png' }
+                }
+            }
 
-        Image {
-            id: inputIcon
+            Button {
+                id: fullScreenButton
 
-            anchors.top: inputVolume.top
-            anchors.right: inputVolume.left
-            anchors.rightMargin: 5
-            source: 'audio-input.png'
-            height: appStyle.icon.tinySize
-            width: appStyle.icon.tinySize
-        }
+                enabled: Qt.isQtObject(call) && call.state == QXmppCall.ActiveState
+                iconSource: 'fullscreen.png'
 
-        Image {
-            id: outputIcon
+                onClicked: {
+                    if (callWidget.state == '')
+                        callWidget.state = 'fullscreen';
+                    else if (callWidget.state == 'fullscreen')
+                        callWidget.state = '';
+                }
+            }
 
-            anchors.top: outputVolume.top
-            anchors.right: outputVolume.left
-            anchors.rightMargin: 5
-            source: 'audio-output.png'
-            height: appStyle.icon.tinySize
-            width: appStyle.icon.tinySize
+            Button {
+                id: hangupButton
+
+                iconSource: 'hangup.png'
+                onClicked: call.hangup()
+            }
         }
     }
 
