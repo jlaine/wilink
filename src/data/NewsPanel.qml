@@ -84,7 +84,6 @@ Panel {
                 onClicked: {
                     if (mouse.button == Qt.LeftButton) {
                         sidebar.currentIndex = model.index;
-                        mainView.model.source = model.url;
                         if (newsPanel.singlePanel)
                             newsPanel.state = 'no-sidebar';
                     } else if (mouse.button == Qt.RightButton) {
@@ -102,6 +101,10 @@ Panel {
 
         onAddClicked: {
             dialogSwapper.showPanel('NewsDialog.qml', {'model': newsListModel});
+        }
+
+        onCurrentIndexChanged: {
+            mainView.model.source = newsListHelper.get(currentIndex).url;
         }
 
         Component {
@@ -268,10 +271,6 @@ Panel {
 
     transitions: Transition {
         PropertyAnimation { target: sidebar; properties: 'width'; duration: appStyle.animation.normalDuration }
-    }
-
-    Component.onCompleted: {
-        mainView.model.source = newsListHelper.get(0).url;
     }
 }
 
