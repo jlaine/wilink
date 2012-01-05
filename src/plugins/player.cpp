@@ -473,6 +473,7 @@ void PlayerModel::play(const QModelIndex &index)
     }
 
     d->playId = d->player->play(item->url);
+    setCursor(index);
 }
 
 bool PlayerModel::playing() const
