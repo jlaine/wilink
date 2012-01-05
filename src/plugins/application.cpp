@@ -41,6 +41,7 @@
 #include "QSoundPlayer.h"
 
 #include "application.h"
+#include "declarative.h"
 #include "systeminfo.h"
 #include "updater.h"
 #include "window.h"
@@ -145,6 +146,7 @@ Application::Application(int &argc, char **argv)
     check = connect(d->appSettings, SIGNAL(audioOutputDeviceNameChanged(QString)),
                     d->soundPlayer, SLOT(setOutputDeviceName(QString)));
     Q_ASSERT(check);
+    d->soundPlayer->setNetworkAccessManager(new NetworkAccessManager(d->soundPlayer));
     d->soundPlayer->moveToThread(d->soundThread);
 
 #ifdef USE_LIBNOTIFY

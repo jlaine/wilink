@@ -21,15 +21,11 @@
 #define __WILINK_SOUND_PLAYER_H__
 
 #include <QAudioDeviceInfo>
-#include <QAudioOutput>
-#include <QIODevice>
-#include <QMap>
-#include <QPair>
 #include <QStringList>
 
-class QFile;
+class QNetworkAccessManager;
 class QSoundFile;
-class QSoundFilePrivate;
+class QSoundPlayerPrivate;
 
 class QSoundPlayer : public QObject
 {
@@ -39,12 +35,15 @@ class QSoundPlayer : public QObject
 
 public:
     QSoundPlayer(QObject *parent = 0);
+    ~QSoundPlayer();
 
     QAudioDeviceInfo inputDevice() const;
     QStringList inputDeviceNames() const;
 
     QAudioDeviceInfo outputDevice() const;
     QStringList outputDeviceNames() const;
+
+    void setNetworkAccessManager(QNetworkAccessManager *manager);
 
     int play(QSoundFile *reader);
 
@@ -58,16 +57,13 @@ public slots:
     void stop(int id);
 
 private slots:
+    void _q_networkFinished();
     void _q_start(int id);
     void _q_stop(int id);
     void _q_stateChanged(QAudio::State state);
 
 private:
-    int m_readerId;
-    QString m_inputName;
-    QString m_outputName;
-    QMap<int, QAudioOutput*> m_outputs;
-    QMap<int, QSoundFile*> m_readers;
+    QSoundPlayerPrivate *d;
 };
 
 #endif

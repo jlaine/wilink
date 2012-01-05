@@ -18,22 +18,69 @@
  */
 
 #include <QAudioOutput>
+#include <QIODevice>
+#include <QMap>
+#include <QPair>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
+#include <QUrl>
 #include <QVariant>
 
 #include "QSoundFile.h"
 #include "QSoundPlayer.h"
 
+class QSoundPlayerPrivate
+{
+public:
+    QSoundPlayerPrivate();
+    QString inputName;
+    QString outputName;
+    QMap<int, QAudioOutput*> outputs;
+    QMap<int, QSoundFile*> readers;
+    QNetworkAccessManager *network;
+    int readerId;
+};
+
+QSoundPlayerPrivate::QSoundPlayerPrivate()
+    : network(0),
+    readerId(0)
+{
+}
+
 QSoundPlayer::QSoundPlayer(QObject *parent)
-    : QObject(parent),
-    m_readerId(0)
+    : QObject(parent)
 {
     qRegisterMetaType<QAudioDeviceInfo>();
+    d = new QSoundPlayerPrivate;
+}
+
+QSoundPlayer::~QSoundPlayer()
+{
+    delete d;
 }
 
 int QSoundPlayer::play(const QString &name, bool repeat)
 {
+    bool check;
+    Q_UNUSED(check);
+
     if (name.isEmpty())
         return 0;
+
+    QUrl url(name);
+    if (url.scheme() == "http" || url.scheme() == "ftp") {
+        qWarning("requested network play: %s", qPrintable(name));
+        if (d->network) {
+            QNetworkReply *reply = d->network->get(QNetworkRequest(url));
+            reply->setProperty("_request_url", url);
+            check = connect(reply, SIGNAL(finished()),
+                            this, SLOT(_q_networkFinished()));
+            Q_ASSERT(check);
+        }
+        return 0;
+    }
+
     QSoundFile *reader = new QSoundFile(name);
     reader->setRepeat(repeat);
     return play(reader);
@@ -47,8 +94,8 @@ int QSoundPlayer::play(QSoundFile *reader)
     }
 
     // register reader
-    const int id = ++m_readerId;
-    m_readers[id] = reader;
+    const int id = ++d->readerId;
+    d->readers[id] = reader;
 
     // move reader to audio thread
     reader->setParent(0);
@@ -64,7 +111,7 @@ int QSoundPlayer::play(QSoundFile *reader)
 QAudioDeviceInfo QSoundPlayer::inputDevice() const
 {
     foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioInput)) {
-        if (info.deviceName() == m_inputName)
+        if (info.deviceName() == d->inputName)
             return info;
     }
     return QAudioDeviceInfo::defaultInputDevice();
@@ -72,7 +119,7 @@ QAudioDeviceInfo QSoundPlayer::inputDevice() const
 
 void QSoundPlayer::setInputDeviceName(const QString &name)
 {
-    m_inputName = name;
+    d->inputName = name;
 }
 
 QStringList QSoundPlayer::inputDeviceNames() const
@@ -86,7 +133,7 @@ QStringList QSoundPlayer::inputDeviceNames() const
 QAudioDeviceInfo QSoundPlayer::outputDevice() const
 {
     foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioOutput)) {
-        if (info.deviceName() == m_outputName)
+        if (info.deviceName() == d->outputName)
             return info;
     }
     return QAudioDeviceInfo::defaultOutputDevice();
@@ -94,7 +141,7 @@ QAudioDeviceInfo QSoundPlayer::outputDevice() const
 
 void QSoundPlayer::setOutputDeviceName(const QString &name)
 {
-    m_outputName = name;
+    d->outputName = name;
 }
 
 QStringList QSoundPlayer::outputDeviceNames() const
@@ -105,28 +152,38 @@ QStringList QSoundPlayer::outputDeviceNames() const
     return names;
 }
 
+void QSoundPlayer::setNetworkAccessManager(QNetworkAccessManager *network)
+{
+    d->network = network;
+}
+
 void QSoundPlayer::stop(int id)
 {
     // schedule stop
     QMetaObject::invokeMethod(this, "_q_stop", Q_ARG(int, id));
 }
 
+void QSoundPlayer::_q_networkFinished()
+{
+    qDebug("network request finished");
+}
+
 void QSoundPlayer::_q_start(int id)
 {
-    QSoundFile *reader = m_readers.value(id);
+    QSoundFile *reader = d->readers.value(id);
     if (!reader)
         return;
 
     QAudioOutput *output = new QAudioOutput(outputDevice(), reader->format(), this);
     connect(output, SIGNAL(stateChanged(QAudio::State)),
             this, SLOT(_q_stateChanged(QAudio::State)));
-    m_outputs.insert(id, output);
+    d->outputs.insert(id, output);
     output->start(reader);
 }
 
 void QSoundPlayer::_q_stop(int id)
 {
-    QAudioOutput *output = m_outputs.value(id);
+    QAudioOutput *output = d->outputs.value(id);
     if (!output)
         return;
 
@@ -140,12 +197,12 @@ void QSoundPlayer::_q_stateChanged(QAudio::State state)
         return;
 
     // delete output
-    int id = m_outputs.key(output);
-    m_outputs.take(id);
+    int id = d->outputs.key(output);
+    d->outputs.take(id);
     output->deleteLater();
 
     // delete reader
-    QSoundFile *reader = m_readers.take(id);
+    QSoundFile *reader = d->readers.take(id);
     if (reader)
         reader->deleteLater();
 
