@@ -106,7 +106,9 @@ Panel {
 
         onCurrentIndexChanged: {
             if (currentIndex >= 0) {
-                mainView.model.source = newsListHelper.get(currentIndex).url;
+                var item = newsListHelper.get(currentIndex);
+                main.subTitle = item.name;
+                mainView.model.source = item.url;
             }
         }
 
@@ -149,6 +151,8 @@ Panel {
 
     Item {
         id: main
+
+        property alias subTitle: header.subTitle
 
         anchors.top: parent.top
         anchors.bottom: parent.bottom
