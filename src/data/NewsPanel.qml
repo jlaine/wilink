@@ -278,7 +278,7 @@ Panel {
                                 if (mainView.soundId)
                                     application.soundPlayer.stop(mainView.soundId);
                                 mainView.soundUrl = model.audioSource;
-                                mainView.soundId = application.soundPlayer.play(model.audioSource);
+                                mainView.soundId = application.soundPlayer.play(decodeURIComponent(model.audioSource));
                             }
                         }
 
