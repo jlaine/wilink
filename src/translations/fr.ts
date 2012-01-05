@@ -479,6 +479,25 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>NewsDialog</name>
+    <message>
+        <source>Add a bookmark</source>
+        <translation>Ajouter un signet</translation>
+    </message>
+    <message>
+        <source>Edit bookmark</source>
+        <translation>Modifier le signet</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Nom</translation>
+    </message>
+    <message>
+        <source>URL</source>
+        <translation>Adresse</translation>
+    </message>
+</context>
+<context>
     <name>NewsPanel</name>
     <message>
         <source>News reader</source>

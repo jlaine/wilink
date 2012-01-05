@@ -90,6 +90,7 @@ Panel {
                         // show context menu
                         var pos = mapToItem(menuLoader.parent, mouse.x, mouse.y);
                         menuLoader.sourceComponent = newsListMenu;
+                        menuLoader.item.bookmarkName = model.name;
                         menuLoader.item.bookmarkUrl = model.url;
                         menuLoader.show(pos.x, pos.y);
                     }
@@ -113,11 +114,19 @@ Panel {
             Menu {
                 id: menu
 
+                property string bookmarkName
                 property url bookmarkUrl
 
                 onItemClicked: {
                     var item = menu.model.get(index);
-                    if (item.action == 'remove') {
+                    if (item.action == 'edit') {
+                        dialogSwapper.showPanel('NewsDialog.qml', {
+                            'model': newsListModel,
+                            'name': bookmarkName,
+                            'url': bookmarkUrl,
+                            'state': 'edit'
+                        });
+                    } else if (item.action == 'remove') {
                         newsListModel.removeBookmark(bookmarkUrl);
                     }
                 }

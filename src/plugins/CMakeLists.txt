@@ -141,6 +141,7 @@ if(RELOAD_TRANSLATIONS)
         ../data/InputMenu.qml
         ../data/LogPanel.qml
         ../data/MainWindow.qml
+        ../data/NewsDialog.qml
         ../data/NewsPanel.qml
         ../data/NewsPlugin.qml
         ../data/PhoneContactDialog.qml

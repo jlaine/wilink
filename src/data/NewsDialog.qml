@@ -27,8 +27,11 @@ Dialog {
     property alias url: urlInput.text
     property QtObject model
 
+    property string addTitle: qsTr('Add a bookmark')
+    property string editTitle: qsTr('Edit bookmark')
+
     minimumHeight: 150
-    title: qsTr('Add a bookmark')
+    title: addTitle
 
     Item {
         anchors.fill: contents
@@ -124,6 +127,12 @@ Dialog {
             urlInput.forceActiveFocus();
         else
             nameInput.forceActiveFocus();
+    }
+
+    states: State {
+        name: 'edit'
+
+        PropertyChanges { target: dialog; title: dialog.editTitle }
     }
 }
 
