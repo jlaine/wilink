@@ -95,6 +95,7 @@ public:
 
 public slots:
     void resetWindows();
+    QUrl resolvedUrl(const QUrl &url, const QUrl &base);
     Notification *showMessage(const QString &title, const QString &message, const QString &action);
     void showWindows();
 

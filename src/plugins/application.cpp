@@ -381,6 +381,11 @@ void Application::resetWindows()
     }
 }
 
+QUrl Application::resolvedUrl(const QUrl &url, const QUrl &base)
+{
+    return base.resolved(url);
+}
+
 void Application::showWindows()
 {
     foreach (Window *chat, d->chats) {

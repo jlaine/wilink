@@ -183,9 +183,9 @@ Panel {
                     smooth: true
                     source: {
                         if (model.thumbnailSource)
-                            return model.thumbnailSource;
+                            return application.resolvedUrl(model.thumbnailSource, mainView.model.source);
                         else if (model.imageSource)
-                            return model.imageSource;
+                            return application.resolvedUrl(model.imageSource, mainView.model.source);
                         else
                             return 'rss.png';
                     }
@@ -232,14 +232,12 @@ Panel {
                     PropertyChanges {
                         target: descriptionLabel
                         text: {
-                            // get base url
-                            var base = '' + mainView.model.source;
-                            base = base.replace(/((ftp|http|https):\/\/[^\/]+)\/.*/, '$1');
-
                             // resolve urls to absolute urls
-                            var text = model.description;
-                            text = text.replace(/src=['"](\/[^'"]+)['"]/, "src='" + base + "$1'");
-                            '<p>' + text + '</p><p><a href="' + model.link + '">' + model.link + '</a></p>';
+                            var text = model.description.replace(/src=(['"])([^'"]+)(['"])/, function(match, quote, url) {
+                                return 'src=' + quote + application.resolvedUrl(url, mainView.model.source) + quote;
+                            });
+
+                            return '<p>' + text + '</p><p><a href="' + model.link + '">' + model.link + '</a></p>';
                         }
                         visible: true
                     }
