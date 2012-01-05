@@ -25,7 +25,33 @@
 
 class QNetworkAccessManager;
 class QSoundFile;
+class QSoundPlayer;
 class QSoundPlayerPrivate;
+class QSoundPlayerJobPrivate;
+
+class QSoundPlayerJob : public QObject
+{
+    Q_OBJECT
+
+public:
+    int id() const;
+
+signals:
+    void finished();
+
+private slots:
+    void _q_download();
+    void _q_downloadFinished();
+    void _q_start();
+    void _q_stateChanged(QAudio::State state);
+
+private:
+    QSoundPlayerJob(QSoundPlayer *player, int id);
+    ~QSoundPlayerJob();
+
+    QSoundPlayerJobPrivate *d;
+    friend class QSoundPlayer;
+};
 
 class QSoundPlayer : public QObject
 {
@@ -43,6 +69,7 @@ public:
     QAudioDeviceInfo outputDevice() const;
     QStringList outputDeviceNames() const;
 
+    QNetworkAccessManager *networkAccessManager() const;
     void setNetworkAccessManager(QNetworkAccessManager *manager);
 
     int play(QSoundFile *reader);
@@ -57,11 +84,7 @@ public slots:
     void stop(int id);
 
 private slots:
-    void _q_download(int id);
-    void _q_downloadFinished();
-    void _q_start(int id);
     void _q_stop(int id);
-    void _q_stateChanged(QAudio::State state);
 
 private:
     QSoundPlayerPrivate *d;
