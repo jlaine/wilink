@@ -53,6 +53,8 @@ private:
     QSoundPlayerJob(QSoundPlayer *player, int id);
     ~QSoundPlayerJob();
 
+    void setFile(QSoundFile *soundFile);
+
     QSoundPlayerJobPrivate *d;
     friend class QSoundPlayer;
 };

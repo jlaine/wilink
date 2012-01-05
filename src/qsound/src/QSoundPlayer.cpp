@@ -81,6 +81,22 @@ int QSoundPlayerJob::id() const
     return d->id;
 }
 
+void QSoundPlayerJob::setFile(QSoundFile *soundFile)
+{
+    d->reader = soundFile;
+    d->reader->setRepeat(d->repeat);
+
+    // move reader to audio thread
+    d->reader->setParent(0);
+    d->reader->moveToThread(thread());
+    d->reader->setParent(this);
+
+    if (d->reader->open(QIODevice::Unbuffered | QIODevice::ReadOnly))
+        QMetaObject::invokeMethod(this, "_q_start");
+    else
+        emit finished();
+}
+
 void QSoundPlayerJob::stop()
 {
     if (d->networkReply)
@@ -200,51 +216,30 @@ int QSoundPlayer::play(const QUrl &url, bool repeat)
     if (!url.isValid())
         return 0;
 
+    QSoundPlayerJob *job = new QSoundPlayerJob(this, ++d->readerId);
+    job->d->repeat = repeat;
+    job->d->url = url;
+    d->jobs[job->id()] = job;
+
     if (url.scheme() == "file") {
-        QSoundFile *reader = new QSoundFile(url.toLocalFile());
-        reader->setRepeat(repeat);
-        return play(reader);
-    }
-    else if (url.scheme() == "qrc" || url.scheme() == "") {
+        job->setFile(new QSoundFile(url.toLocalFile()));
+    } else if (url.scheme() == "qrc" || url.scheme() == "") {
         const QString path = QLatin1String(":") + (url.path().startsWith("/") ? "" : "/") + url.path();
-        QSoundFile *reader = new QSoundFile(path);
-        reader->setRepeat(repeat);
-        return play(reader);
-    }
-    else if (d->network) {
-        const int id = ++d->readerId;
-        QSoundPlayerJob *job = new QSoundPlayerJob(this, id);
-        job->d->repeat = repeat;
-        job->d->url = url;
-        d->jobs[id] = job;
+        job->setFile(new QSoundFile(path));
+    } else if (d->network) {
         QMetaObject::invokeMethod(job, "_q_download");
-        return id;
+    } else {
+        QMetaObject::invokeMethod(job, "finished", Qt::QueuedConnection);
     }
-    return 0;
+    return job->id();
 }
 
 int QSoundPlayer::play(QSoundFile *reader)
 {
-    if (!reader->open(QIODevice::Unbuffered | QIODevice::ReadOnly)) {
-        delete reader;
-        return 0;
-    }
-
-    // register reader
-    const int id = ++d->readerId;
-    QSoundPlayerJob *job = new QSoundPlayerJob(this, id);
-    job->d->reader = reader;
-    d->jobs[id] = job;
-
-    // move reader to audio thread
-    reader->setParent(0);
-    reader->moveToThread(thread());
-    reader->setParent(this);
-
-    // schedule play
-    QMetaObject::invokeMethod(job, "_q_start");
-
-    return id;
+    QSoundPlayerJob *job = new QSoundPlayerJob(this, ++d->readerId);
+    d->jobs[job->id()] = job;
+    job->setFile(reader);
+    return job->id();
 }
 
 QAudioDeviceInfo QSoundPlayer::inputDevice() const
