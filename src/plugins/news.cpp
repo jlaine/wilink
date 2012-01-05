@@ -138,12 +138,16 @@ void NewsListModel::_q_bookmarksReceived()
     QList<QXmppBookmarkUrl> sources = bookmarks.urls();
     if (sources.isEmpty()) {
         QXmppBookmarkUrl source;
-        source.setName("BBC News - World");
+        source.setName("BBC World News");
         source.setUrl(QUrl("http://feeds.bbci.co.uk/news/world/rss.xml"));
         sources << source;
 
-        source.setName("BBC News - Technology");
-        source.setUrl(QUrl("http://feeds.bbci.co.uk/news/technology/rss.xml"));
+        source.setName(QString::fromUtf8("L'Équipe"));
+        source.setUrl(QUrl("http://www.lequipe.fr/Xml/actu_rss.xml"));
+        sources << source;
+
+        source.setName("Le Monde.fr");
+        source.setUrl(QUrl("http://www.lemonde.fr/rss/une.xml"));
         sources << source;
 
         bookmarks.setUrls(sources);
