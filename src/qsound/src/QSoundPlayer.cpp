@@ -98,7 +98,6 @@ int QSoundPlayer::play(const QString &name, bool repeat)
 
     QUrl url(name);
     if (url.scheme() == "http" || url.scheme() == "ftp") {
-        qWarning("requested network play: %s", qPrintable(name));
         if (d->network) {
             const int id = ++d->readerId;
             d->jobs[id] = new QSoundPlayerJob;
@@ -216,11 +215,9 @@ void QSoundPlayer::_q_downloadFinished()
     if (!reply)
         return;
 
-    qDebug("network request finished");
     foreach (QSoundPlayerJob *job, d->jobs.values()) {
         if (job->networkReply == reply) {
             const int id = d->jobs.key(job);
-            qDebug("found job %i", id);
 
             QIODevice *iodevice = d->network->cache()->data(reply->url());
             job->reader = new QSoundFile(iodevice, QSoundFile::Mp3File, this);
