@@ -269,6 +269,8 @@ Panel {
                     }
 
                     Row {
+                        spacing: appStyle.margin.normal
+
                         Button {
                             iconSource: 'start.png'
                             text: qsTr('Play sound')
@@ -295,8 +297,9 @@ Panel {
                         }
 
                         Label {
+                            anchors.verticalCenter: parent.verticalCenter
                             text: {
-                                if (mainView.soundJob) {
+                                if (mainView.soundJob && mainView.soundUrl == model.audioSource) {
                                     switch (mainView.soundJob.state)
                                     {
                                     case SoundPlayerJob.DownloadingState:
