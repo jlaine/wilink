@@ -33,12 +33,22 @@ class QSoundPlayerJob : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(int id READ id CONSTANT)
+    Q_PROPERTY(State state READ state NOTIFY stateChanged)
+    Q_ENUMS(State)
 
 public:
+    enum State {
+        IdleState = 0,
+        DownloadingState = 1,
+        PlayingState = 2,
+    };
+
     int id() const;
+    State state() const;
 
 signals:
     void finished();
+    void stateChanged(State state);
 
 public slots:
     void stop();

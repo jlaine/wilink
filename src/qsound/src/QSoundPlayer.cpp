@@ -42,6 +42,7 @@ public:
     QSoundPlayer *player;
     QSoundFile *reader;
     bool repeat;
+    QSoundPlayerJob::State state;
     QUrl url;
 };
 
@@ -51,7 +52,8 @@ QSoundPlayerJobPrivate::QSoundPlayerJobPrivate()
     networkReply(0),
     player(0),
     reader(0),
-    repeat(false)
+    repeat(false),
+    state(QSoundPlayerJob::IdleState)
 {
 }
 
@@ -81,6 +83,11 @@ int QSoundPlayerJob::id() const
     return d->id;
 }
 
+QSoundPlayerJob::State QSoundPlayerJob::state() const
+{
+    return d->state;
+}
+
 void QSoundPlayerJob::setFile(QSoundFile *soundFile)
 {
     d->reader = soundFile;
@@ -93,8 +100,11 @@ void QSoundPlayerJob::setFile(QSoundFile *soundFile)
 
     if (d->reader->open(QIODevice::Unbuffered | QIODevice::ReadOnly))
         QMetaObject::invokeMethod(this, "_q_start");
-    else
+    else {
+        d->state = IdleState;
+        emit stateChanged(d->state);
         emit finished();
+    }
 }
 
 void QSoundPlayerJob::stop()
@@ -115,6 +125,9 @@ void QSoundPlayerJob::_q_download()
     check = connect(d->networkReply, SIGNAL(finished()),
                     this, SLOT(_q_downloadFinished()));
     Q_ASSERT(check);
+
+    d->state = DownloadingState;
+    emit stateChanged(d->state);
 }
 
 void QSoundPlayerJob::_q_downloadFinished()
@@ -142,19 +155,15 @@ void QSoundPlayerJob::_q_downloadFinished()
     // check reply
     if (reply->error() != QNetworkReply::NoError) {
         qWarning("QSoundPlayer(%i) failed to retrieve file: %s", d->id, qPrintable(reply->errorString()));
+        d->state = IdleState;
+        emit stateChanged(d->state);
         emit finished();
         return;
     }
 
     // read file
     QIODevice *iodevice = d->player->networkAccessManager()->cache()->data(reply->url());
-    d->reader = new QSoundFile(iodevice, QSoundFile::Mp3File, this);
-    d->reader->setRepeat(d->repeat);
-
-    if (d->reader->open(QIODevice::Unbuffered | QIODevice::ReadOnly))
-        _q_start();
-    else
-        emit finished();
+    setFile(new QSoundFile(iodevice, QSoundFile::Mp3File));
 }
 
 void QSoundPlayerJob::_q_start()
@@ -178,6 +187,8 @@ void QSoundPlayerJob::_q_stateChanged(QAudio::State state)
 {
     if (state != QAudio::ActiveState) {
         qDebug("QSoundPlayer(%i) audio stopped", d->id);
+        d->state = IdleState;
+        emit stateChanged(d->state);
         emit finished();
     }
 }
