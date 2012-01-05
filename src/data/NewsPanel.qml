@@ -191,17 +191,32 @@ Panel {
                     }
                 }
 
-                Label {
-                    id: titleLabel
-
+                Column {
                     anchors.verticalCenter: image.verticalCenter
+
                     anchors.left: image.right
                     anchors.leftMargin: appStyle.spacing.horizontal
                     anchors.right: parent.right
                     anchors.rightMargin: appStyle.spacing.horizontal
-                    elide: Text.ElideRight
-                    font.bold: true
-                    text: model.title
+
+                    Label {
+                        id: titleLabel
+
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        elide: Text.ElideRight
+                        font.bold: true
+                        text: model.title
+                    }
+
+                    Label {
+                        id: dateLabel
+
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        elide: Text.ElideRight
+                        text: Utils.formatDateTime(new Date(model.pubDate))
+                    }
                 }
 
                 MouseArea {
