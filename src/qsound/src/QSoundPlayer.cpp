@@ -30,14 +30,34 @@
 #include "QSoundFile.h"
 #include "QSoundPlayer.h"
 
+class QSoundPlayerJob
+{
+public:
+    QSoundPlayerJob() : audioOutput(0), networkReply(0), reader(0) {}
+    ~QSoundPlayerJob() 
+    {
+        // delete output
+        if (audioOutput)
+            audioOutput->deleteLater();
+
+        // delete reader
+        if (reader)
+            reader->deleteLater();
+    }
+
+    QAudioOutput *audioOutput;
+    QNetworkReply *networkReply;
+    QSoundFile *reader;
+    QUrl url;
+};
+
 class QSoundPlayerPrivate
 {
 public:
     QSoundPlayerPrivate();
     QString inputName;
     QString outputName;
-    QMap<int, QAudioOutput*> outputs;
-    QMap<int, QSoundFile*> readers;
+    QMap<int, QSoundPlayerJob*> jobs;
     QNetworkAccessManager *network;
     int readerId;
 };
@@ -95,7 +115,8 @@ int QSoundPlayer::play(QSoundFile *reader)
 
     // register reader
     const int id = ++d->readerId;
-    d->readers[id] = reader;
+    d->jobs[id] = new QSoundPlayerJob;
+    d->jobs[id]->reader = reader;
 
     // move reader to audio thread
     reader->setParent(0);
@@ -170,24 +191,23 @@ void QSoundPlayer::_q_networkFinished()
 
 void QSoundPlayer::_q_start(int id)
 {
-    QSoundFile *reader = d->readers.value(id);
-    if (!reader)
+    QSoundPlayerJob *job = d->jobs.value(id);
+    if (!job || !job->reader)
         return;
 
-    QAudioOutput *output = new QAudioOutput(outputDevice(), reader->format(), this);
-    connect(output, SIGNAL(stateChanged(QAudio::State)),
+    job->audioOutput = new QAudioOutput(outputDevice(), job->reader->format(), this);
+    connect(job->audioOutput, SIGNAL(stateChanged(QAudio::State)),
             this, SLOT(_q_stateChanged(QAudio::State)));
-    d->outputs.insert(id, output);
-    output->start(reader);
+    job->audioOutput->start(job->reader);
 }
 
 void QSoundPlayer::_q_stop(int id)
 {
-    QAudioOutput *output = d->outputs.value(id);
-    if (!output)
+    QSoundPlayerJob *job = d->jobs.value(id);
+    if (!job || !job->audioOutput)
         return;
 
-    output->stop();
+    job->audioOutput->stop();
 }
 
 void QSoundPlayer::_q_stateChanged(QAudio::State state)
@@ -196,16 +216,15 @@ void QSoundPlayer::_q_stateChanged(QAudio::State state)
     if (!output || state == QAudio::ActiveState)
         return;
 
-    // delete output
-    int id = d->outputs.key(output);
-    d->outputs.take(id);
-    output->deleteLater();
+    foreach (int id, d->jobs.keys()) {
+        QSoundPlayerJob *job = d->jobs.value(id);
+        if (output == job->audioOutput) {
+            d->jobs.remove(id);
+            delete job;
 
-    // delete reader
-    QSoundFile *reader = d->readers.take(id);
-    if (reader)
-        reader->deleteLater();
-
-    emit finished(id);
+            emit finished(id);
+            break;
+        }
+    }
 }
 
