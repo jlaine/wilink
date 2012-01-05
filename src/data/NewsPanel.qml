@@ -270,7 +270,6 @@ Panel {
 
                     Row {
                         Button {
-                            anchors.left: parent.left
                             iconSource: 'start.png'
                             text: qsTr('Play sound')
                             visible: model.audioSource ? (mainView.soundUrl != model.audioSource) : false

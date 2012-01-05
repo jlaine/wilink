@@ -91,29 +91,31 @@ QSoundPlayer::~QSoundPlayer()
     delete d;
 }
 
-int QSoundPlayer::play(const QString &name, bool repeat)
+int QSoundPlayer::play(const QUrl &url, bool repeat)
 {
-    if (name.isEmpty())
+    if (!url.isValid())
         return 0;
 
-    QUrl url(name);
-    if (url.scheme() == "http" || url.scheme() == "ftp") {
-        if (d->network) {
-            const int id = ++d->readerId;
-            d->jobs[id] = new QSoundPlayerJob;
-            d->jobs[id]->repeat = repeat;
-            d->jobs[id]->url = url;
-            QMetaObject::invokeMethod(this, "_q_download", Q_ARG(int, id));
-            return id;
-        } else {
-            qWarning("No network access manager to download sound file.");
-            return 0;
-        }
+    if (url.scheme() == "file") {
+        QSoundFile *reader = new QSoundFile(url.toLocalFile());
+        reader->setRepeat(repeat);
+        return play(reader);
     }
-
-    QSoundFile *reader = new QSoundFile(name);
-    reader->setRepeat(repeat);
-    return play(reader);
+    else if (url.scheme() == "qrc" || url.scheme() == "") {
+        const QString path = QLatin1String(":") + (url.path().startsWith("/") ? "" : "/") + url.path();
+        QSoundFile *reader = new QSoundFile(path);
+        reader->setRepeat(repeat);
+        return play(reader);
+    }
+    else if (d->network) {
+        const int id = ++d->readerId;
+        d->jobs[id] = new QSoundPlayerJob;
+        d->jobs[id]->repeat = repeat;
+        d->jobs[id]->url = url;
+        QMetaObject::invokeMethod(this, "_q_download", Q_ARG(int, id));
+        return id;
+    }
+    return 0;
 }
 
 int QSoundPlayer::play(QSoundFile *reader)
@@ -215,10 +217,36 @@ void QSoundPlayer::_q_downloadFinished()
     if (!reply)
         return;
 
+    reply->deleteLater();
     foreach (QSoundPlayerJob *job, d->jobs.values()) {
         if (job->networkReply == reply) {
             const int id = d->jobs.key(job);
+            job->networkReply = 0;
 
+            // follow redirect
+            QUrl redirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
+            if (redirectUrl.isValid()) {
+                redirectUrl = reply->url().resolved(redirectUrl);
+
+                qDebug("QSoundPlayer following redirect to %s", qPrintable(redirectUrl.toString()));
+                job->networkReply = d->network->get(QNetworkRequest(redirectUrl));
+                connect(job->networkReply, SIGNAL(finished()),
+                        this, SLOT(_q_downloadFinished()));
+                return;
+            }
+
+            // check reply
+            if (reply->error() != QNetworkReply::NoError) {
+                qWarning("QSoundPlayer failed to retrieve file for job %i: %s", id, qPrintable(reply->errorString()));
+
+                d->jobs.remove(id);
+                delete job;
+
+                emit finished(id);
+                return;
+            }
+
+            // read file
             QIODevice *iodevice = d->network->cache()->data(reply->url());
             job->reader = new QSoundFile(iodevice, QSoundFile::Mp3File, this);
             job->reader->setRepeat(job->repeat);
@@ -236,7 +264,7 @@ void QSoundPlayer::_q_start(int id)
     if (!job || !job->reader)
         return;
 
-    qDebug("starting audio for job %i", id);
+    qDebug("QSoundPlayer starting audio for job %i", id);
     job->audioOutput = new QAudioOutput(outputDevice(), job->reader->format(), this);
     connect(job->audioOutput, SIGNAL(stateChanged(QAudio::State)),
             this, SLOT(_q_stateChanged(QAudio::State)));
@@ -261,7 +289,7 @@ void QSoundPlayer::_q_stateChanged(QAudio::State state)
     foreach (QSoundPlayerJob *job, d->jobs.values()) {
         if (job->audioOutput == output) {
             const int id = d->jobs.key(job);
-            qDebug("audio stopped for job %i", id);
+            qDebug("QSoundPlayer audio stopped for job %i", id);
 
             d->jobs.remove(id);
             delete job;

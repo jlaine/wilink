@@ -472,14 +472,7 @@ void PlayerModel::play(const QModelIndex &index)
         return;
     }
 
-    QSoundFile *file = d->soundFile(item);
-    if (file) {
-        d->playId = d->player->play(file);
-        setCursor(index);
-    } else {
-        QModelIndex nextIndex = index.sibling(index.row() + 1, index.column());
-        play(nextIndex);
-    }
+    d->playId = d->player->play(item->url);
 }
 
 bool PlayerModel::playing() const

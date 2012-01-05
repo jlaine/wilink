@@ -51,7 +51,7 @@ signals:
     void finished(int id);
 
 public slots:
-    int play(const QString &name, bool repeat = false);
+    int play(const QUrl &url, bool repeat = false);
     void setInputDeviceName(const QString &name);
     void setOutputDeviceName(const QString &name);
     void stop(int id);
