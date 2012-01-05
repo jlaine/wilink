@@ -327,6 +327,7 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterType<SharePlaceModel>(uri, 2, 0, "SharePlaceModel");
     qmlRegisterType<ShareQueueModel>(uri, 2, 0, "ShareQueueModel");
     qmlRegisterUncreatableType<QSoundPlayer>(uri, 2, 0, "SoundPlayer", "");
+    qmlRegisterUncreatableType<QSoundPlayerJob>(uri, 2, 0, "SoundPlayerJob", "");
     qmlRegisterType<QSoundTester>(uri, 2, 0, "SoundTester");
     qmlRegisterUncreatableType<Updater>(uri, 2, 0, "Updater", "");
     qmlRegisterType<VCard>(uri, 2, 0, "VCard");

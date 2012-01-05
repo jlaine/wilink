@@ -174,7 +174,7 @@ Panel {
             id: mainView
 
             property string soundUrl
-            property int soundId: 0
+            property QtObject soundJob
 
             anchors.top: header.bottom
             anchors.bottom: parent.bottom
@@ -275,10 +275,10 @@ Panel {
                             visible: model.audioSource ? (mainView.soundUrl != model.audioSource) : false
 
                             onClicked: {
-                                if (mainView.soundId)
-                                    application.soundPlayer.stop(mainView.soundId);
+                                if (mainView.soundJob)
+                                    mainView.soundJob.stop();
                                 mainView.soundUrl = model.audioSource;
-                                mainView.soundId = application.soundPlayer.play(decodeURIComponent(model.audioSource));
+                                mainView.soundJob = application.soundPlayer.play(decodeURIComponent(model.audioSource));
                             }
                         }
 
@@ -288,9 +288,25 @@ Panel {
                             visible: model.audioSource ? (mainView.soundUrl == model.audioSource) : false
 
                             onClicked: {
-                                application.soundPlayer.stop(mainView.soundId);
+                                mainView.soundJob.stop();
                                 mainView.soundUrl = '';
-                                mainView.soundId = 0;
+                                mainView.soundJob = null;
+                            }
+                        }
+
+                        Label {
+                            text: {
+                                if (mainView.soundJob) {
+                                    switch (mainView.soundJob.state)
+                                    {
+                                    case SoundPlayerJob.DownloadingState:
+                                        return 'Downloading';
+                                    case SoundPlayerJob.PlayingState:
+                                        return 'Playing';
+                                    }
+                                }
+                                return '';
+
                             }
                         }
                     }

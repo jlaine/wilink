@@ -22,6 +22,7 @@
 
 #include <QAudioDeviceInfo>
 #include <QStringList>
+#include <QUrl>
 
 class QNetworkAccessManager;
 class QSoundFile;
@@ -32,9 +33,10 @@ class QSoundPlayerJobPrivate;
 class QSoundPlayerJob : public QObject
 {
     Q_OBJECT
+    Q_ENUMS(State)
     Q_PROPERTY(int id READ id CONSTANT)
     Q_PROPERTY(State state READ state NOTIFY stateChanged)
-    Q_ENUMS(State)
+    Q_PROPERTY(QUrl url READ url CONSTANT)
 
 public:
     enum State {
@@ -44,11 +46,12 @@ public:
     };
 
     int id() const;
-    State state() const;
+    QSoundPlayerJob::State state() const;
+    QUrl url() const;
 
 signals:
     void finished();
-    void stateChanged(State state);
+    void stateChanged();
 
 public slots:
     void stop();
@@ -94,7 +97,7 @@ signals:
     void finished(int id);
 
 public slots:
-    int play(const QUrl &url, bool repeat = false);
+    QSoundPlayerJob *play(const QUrl &url, bool repeat = false);
     void setInputDeviceName(const QString &name);
     void setOutputDeviceName(const QString &name);
     void stop(int id);

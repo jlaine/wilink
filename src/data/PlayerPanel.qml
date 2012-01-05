@@ -23,6 +23,8 @@ import wiLink 2.0
 Panel {
     id: panel
 
+    property QtObject playingJob
+
     Component {
         id: playerDelegate
         Item {
@@ -59,8 +61,12 @@ Panel {
                     var row = visualModel.modelIndex(index);
                     if (playerModel.rowCount(row))
                         visualModel.rootIndex = row;
-                    else
-                        playerModel.play(row);
+                    else {
+                        if (panel.playingJob)
+                            panel.playingJob.stop();
+                        panel.playingJob = application.soundPlayer.play(model.url);
+                        //playerModel.play(row);
+                    }
                 }
             }
 
@@ -84,7 +90,7 @@ Panel {
                     fillMode: Image.PreserveAspectFit
                     width: 32
                     height: 32
-                    source: model.playing ? "start.png" : (model.downloading ? "download.png" : model.imageUrl)
+                    source: (Qt.isQtObject(panel.playingJob) && panel.playingJob.url == model.url) ? "start.png" : (model.downloading ? "download.png" : model.imageUrl)
                 }
 
                 Column {
@@ -153,8 +159,8 @@ Panel {
             ToolButton {
                 iconSource: 'stop.png'
                 text: qsTr('Stop')
-                enabled: playerModel.playing
-                onClicked: playerModel.stop()
+                enabled: Qt.isQtObject(panel.playingJob)
+                onClicked: panel.playingJob.stop()
             }
 
             ToolButton {
@@ -210,8 +216,11 @@ Panel {
                 var row = visualModel.modelIndex(currentIndex);
                 if (playerModel.rowCount(row))
                     visualModel.rootIndex = row;
-                else
-                    playerModel.play(row);
+                else {
+                    if (panel.playingJob)
+                        panel.playingJob.stop();
+                    panel.playingJob = application.soundPlayer.play(model.url);
+                }
             }
         }
     }

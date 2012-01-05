@@ -472,7 +472,7 @@ void PlayerModel::play(const QModelIndex &index)
         return;
     }
 
-    d->playId = d->player->play(item->url);
+    d->playId = d->player->play(item->url)->id();
     setCursor(index);
 }
 

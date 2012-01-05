@@ -488,7 +488,7 @@ void PhoneHistoryModel::addCall(SipCall *call)
     connect(item->call, SIGNAL(stateChanged(QXmppCall::State)),
             this, SLOT(callStateChanged(QXmppCall::State)));
     if (item->call->direction() == QXmppCall::IncomingDirection)
-        item->soundId = wApp->soundPlayer()->play(QUrl(":/call-incoming.ogg"), true);
+        item->soundId = wApp->soundPlayer()->play(QUrl(":/call-incoming.ogg"), true)->id();
     else
         connect(item->call, SIGNAL(ringing()), this, SLOT(callRinging()));
 
@@ -530,7 +530,7 @@ void PhoneHistoryModel::callRinging()
     // find the call
     foreach (PhoneHistoryItem *item, m_items) {
         if (item->call == call && !item->soundId) {
-            item->soundId = wApp->soundPlayer()->play(QUrl(":/call-outgoing.ogg"), true);
+            item->soundId = wApp->soundPlayer()->play(QUrl(":/call-outgoing.ogg"), true)->id();
             break;
         }
     }

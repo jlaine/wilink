@@ -88,6 +88,11 @@ QSoundPlayerJob::State QSoundPlayerJob::state() const
     return d->state;
 }
 
+QUrl QSoundPlayerJob::url() const
+{
+    return d->url;
+}
+
 void QSoundPlayerJob::setFile(QSoundFile *soundFile)
 {
     d->reader = soundFile;
@@ -102,8 +107,8 @@ void QSoundPlayerJob::setFile(QSoundFile *soundFile)
         QMetaObject::invokeMethod(this, "_q_start");
     else {
         d->state = IdleState;
-        emit stateChanged(d->state);
-        emit finished();
+        QMetaObject::invokeMethod(this, "stateChanged");
+        QMetaObject::invokeMethod(this, "finished");
     }
 }
 
@@ -127,7 +132,7 @@ void QSoundPlayerJob::_q_download()
     Q_ASSERT(check);
 
     d->state = DownloadingState;
-    emit stateChanged(d->state);
+    emit stateChanged();
 }
 
 void QSoundPlayerJob::_q_downloadFinished()
@@ -156,7 +161,7 @@ void QSoundPlayerJob::_q_downloadFinished()
     if (reply->error() != QNetworkReply::NoError) {
         qWarning("QSoundPlayer(%i) failed to retrieve file: %s", d->id, qPrintable(reply->errorString()));
         d->state = IdleState;
-        emit stateChanged(d->state);
+        emit stateChanged();
         emit finished();
         return;
     }
@@ -181,6 +186,9 @@ void QSoundPlayerJob::_q_start()
     Q_ASSERT(check);
 
     d->audioOutput->start(d->reader);
+
+    d->state = PlayingState;
+    emit stateChanged();
 }
 
 void QSoundPlayerJob::_q_stateChanged(QAudio::State state)
@@ -188,7 +196,7 @@ void QSoundPlayerJob::_q_stateChanged(QAudio::State state)
     if (state != QAudio::ActiveState) {
         qDebug("QSoundPlayer(%i) audio stopped", d->id);
         d->state = IdleState;
-        emit stateChanged(d->state);
+        emit stateChanged();
         emit finished();
     }
 }
@@ -222,7 +230,7 @@ QSoundPlayer::~QSoundPlayer()
     delete d;
 }
 
-int QSoundPlayer::play(const QUrl &url, bool repeat)
+QSoundPlayerJob *QSoundPlayer::play(const QUrl &url, bool repeat)
 {
     if (!url.isValid())
         return 0;
@@ -242,7 +250,7 @@ int QSoundPlayer::play(const QUrl &url, bool repeat)
     } else {
         QMetaObject::invokeMethod(job, "finished", Qt::QueuedConnection);
     }
-    return job->id();
+    return job;
 }
 
 int QSoundPlayer::play(QSoundFile *reader)
