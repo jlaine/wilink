@@ -76,6 +76,19 @@ QSoundPlayerJob::~QSoundPlayerJob()
     delete d;
 }
 
+int QSoundPlayerJob::id() const
+{
+    return d->id;
+}
+
+void QSoundPlayerJob::stop()
+{
+    if (d->networkReply)
+        d->networkReply->abort();
+    if (d->audioOutput)
+        d->audioOutput->stop();
+}
+
 void QSoundPlayerJob::_q_download()
 {
     bool check;
@@ -92,7 +105,10 @@ void QSoundPlayerJob::_q_downloadFinished()
 {
     bool check;
     Q_UNUSED(check);
+
     QNetworkReply *reply = d->networkReply;
+    reply->deleteLater();
+    d->networkReply = 0;
 
     // follow redirect
     QUrl redirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
@@ -121,6 +137,8 @@ void QSoundPlayerJob::_q_downloadFinished()
 
     if (d->reader->open(QIODevice::Unbuffered | QIODevice::ReadOnly))
         _q_start();
+    else
+        emit finished();
 }
 
 void QSoundPlayerJob::_q_start()
@@ -285,17 +303,19 @@ void QSoundPlayer::setNetworkAccessManager(QNetworkAccessManager *network)
 
 void QSoundPlayer::stop(int id)
 {
-    // schedule stop
-    QMetaObject::invokeMethod(this, "_q_stop", Q_ARG(int, id));
+    QSoundPlayerJob *job = d->jobs.value(id);
+    if (job)
+        QMetaObject::invokeMethod(job, "stop");
 }
 
-void QSoundPlayer::_q_stop(int id)
+void QSoundPlayer::_q_finished()
 {
-    QSoundPlayerJob *job = d->jobs.value(id);
-    if (!job || !job->d->audioOutput)
+    QSoundPlayerJob *job = qobject_cast<QSoundPlayerJob*>(sender());
+    if (!job)
         return;
 
-    job->d->audioOutput->stop();
+    d->jobs.take(job->id());
+    job->deleteLater();
+    emit finished(job->id());
 }
-
 

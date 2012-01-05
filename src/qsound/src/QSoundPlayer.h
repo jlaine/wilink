@@ -32,12 +32,16 @@ class QSoundPlayerJobPrivate;
 class QSoundPlayerJob : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(int id READ id CONSTANT)
 
 public:
     int id() const;
 
 signals:
     void finished();
+
+public slots:
+    void stop();
 
 private slots:
     void _q_download();
@@ -84,7 +88,7 @@ public slots:
     void stop(int id);
 
 private slots:
-    void _q_stop(int id);
+    void _q_finished();
 
 private:
     QSoundPlayerPrivate *d;
