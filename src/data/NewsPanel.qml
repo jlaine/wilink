@@ -224,7 +224,16 @@ Panel {
 
                     PropertyChanges {
                         target: descriptionLabel
-                        text: '<p>' + model.description + '</p><p><a href="' + model.link + '">' + model.link + '</a></p>'
+                        text: {
+                            // get base url
+                            var base = '' + mainView.model.source;
+                            base = base.replace(/((ftp|http|https):\/\/[^\/]+)\/.*/, '$1');
+
+                            // resolve urls to absolute urls
+                            var text = model.description;
+                            text = text.replace(/src=['"](\/[^'"]+)['"]/, "src='" + base + "$1'");
+                            '<p>' + text + '</p><p><a href="' + model.link + '">' + model.link + '</a></p>';
+                        }
                         visible: true
                     }
 
@@ -250,6 +259,11 @@ Panel {
                 XmlRole { name: 'pubDate'; query: 'pubDate/string()' }
                 XmlRole { name: 'imageSource'; query: '*:thumbnail[1]/@url/string()' }
                 XmlRole { name: 'title'; query: 'title/string()' }
+            }
+
+            Keys.onReturnPressed: {
+                var item = model.get(currentIndex);
+                Qt.openUrlExternally(item.link);
             }
         }
 
