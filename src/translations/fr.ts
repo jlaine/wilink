@@ -519,6 +519,10 @@ Acceptez-vous?</translation>
         <source>Play sound</source>
         <translation>Lire le son</translation>
     </message>
+    <message>
+        <source>Stop sound</source>
+        <translation>Arrêter le son</translation>
+    </message>
 </context>
 <context>
     <name>NewsPlugin</name>

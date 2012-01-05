@@ -173,6 +173,9 @@ Panel {
         ListView {
             id: mainView
 
+            property string soundUrl
+            property int soundId: 0
+
             anchors.top: header.bottom
             anchors.bottom: parent.bottom
             anchors.left: parent.left
@@ -253,25 +256,44 @@ Panel {
                     anchors.left: parent.left
                     anchors.right: parent.right
                     spacing: appStyle.margin.normal
+                    visible: false
 
                     Label {
                         id: descriptionLabel
 
                         anchors.left: parent.left
                         anchors.right: parent.right
-                        visible: false
                         wrapMode: Text.WordWrap
 
                         onLinkActivated: Qt.openUrlExternally(link)
                     }
 
-                    Button {
-                        id: playButton
+                    Row {
+                        Button {
+                            anchors.left: parent.left
+                            iconSource: 'start.png'
+                            text: qsTr('Play sound')
+                            visible: model.audioSource ? (mainView.soundUrl != model.audioSource) : false
 
-                        anchors.left: parent.left
-                        iconSource: 'start.png'
-                        text: qsTr('Play sound')
-                        visible: false
+                            onClicked: {
+                                if (mainView.soundId)
+                                    application.soundPlayer.stop(mainView.soundId);
+                                mainView.soundUrl = model.audioSource;
+                                mainView.soundId = application.soundPlayer.play(model.audioSource);
+                            }
+                        }
+
+                        Button {
+                            iconSource: 'stop.png'
+                            text: qsTr('Stop sound')
+                            visible: model.audioSource ? (mainView.soundUrl == model.audioSource) : false
+
+                            onClicked: {
+                                application.soundPlayer.stop(mainView.soundId);
+                                mainView.soundUrl = '';
+                                mainView.soundId = 0;
+                            }
+                        }
                     }
                 }
 
@@ -289,12 +311,11 @@ Panel {
 
                             return '<p>' + text + '</p>';
                         }
-                        visible: true
                     }
 
                     PropertyChanges {
-                        target: playButton
-                        visible: model.audioSource ? true : false
+                        target: descriptionColumn
+                        visible: true
                     }
 
                     PropertyChanges {

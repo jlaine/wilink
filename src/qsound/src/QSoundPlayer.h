@@ -57,7 +57,8 @@ public slots:
     void stop(int id);
 
 private slots:
-    void _q_networkFinished();
+    void _q_download(int id);
+    void _q_downloadFinished();
     void _q_start(int id);
     void _q_stop(int id);
     void _q_stateChanged(QAudio::State state);

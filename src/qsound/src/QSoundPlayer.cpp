@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QAbstractNetworkCache>
 #include <QAudioOutput>
 #include <QIODevice>
 #include <QMap>
@@ -33,23 +34,33 @@
 class QSoundPlayerJob
 {
 public:
-    QSoundPlayerJob() : audioOutput(0), networkReply(0), reader(0) {}
-    ~QSoundPlayerJob() 
-    {
-        // delete output
-        if (audioOutput)
-            audioOutput->deleteLater();
-
-        // delete reader
-        if (reader)
-            reader->deleteLater();
-    }
+    QSoundPlayerJob();
+    ~QSoundPlayerJob();
 
     QAudioOutput *audioOutput;
     QNetworkReply *networkReply;
     QSoundFile *reader;
+    bool repeat;
     QUrl url;
 };
+
+QSoundPlayerJob::QSoundPlayerJob()
+    : audioOutput(0),
+    networkReply(0),
+    reader(0),
+    repeat(false)
+{
+}
+
+QSoundPlayerJob::~QSoundPlayerJob() 
+{
+    if (networkReply)
+        networkReply->deleteLater();
+    if (audioOutput)
+        audioOutput->deleteLater();
+    if (reader)
+        reader->deleteLater();
+}
 
 class QSoundPlayerPrivate
 {
@@ -82,9 +93,6 @@ QSoundPlayer::~QSoundPlayer()
 
 int QSoundPlayer::play(const QString &name, bool repeat)
 {
-    bool check;
-    Q_UNUSED(check);
-
     if (name.isEmpty())
         return 0;
 
@@ -92,13 +100,16 @@ int QSoundPlayer::play(const QString &name, bool repeat)
     if (url.scheme() == "http" || url.scheme() == "ftp") {
         qWarning("requested network play: %s", qPrintable(name));
         if (d->network) {
-            QNetworkReply *reply = d->network->get(QNetworkRequest(url));
-            reply->setProperty("_request_url", url);
-            check = connect(reply, SIGNAL(finished()),
-                            this, SLOT(_q_networkFinished()));
-            Q_ASSERT(check);
+            const int id = ++d->readerId;
+            d->jobs[id] = new QSoundPlayerJob;
+            d->jobs[id]->repeat = repeat;
+            d->jobs[id]->url = url;
+            QMetaObject::invokeMethod(this, "_q_download", Q_ARG(int, id));
+            return id;
+        } else {
+            qWarning("No network access manager to download sound file.");
+            return 0;
         }
-        return 0;
     }
 
     QSoundFile *reader = new QSoundFile(name);
@@ -184,9 +195,42 @@ void QSoundPlayer::stop(int id)
     QMetaObject::invokeMethod(this, "_q_stop", Q_ARG(int, id));
 }
 
-void QSoundPlayer::_q_networkFinished()
+void QSoundPlayer::_q_download(int id)
 {
+    bool check;
+    Q_UNUSED(check);
+
+    QSoundPlayerJob *job = d->jobs.value(id);
+    if (!job)
+        return;
+
+    job->networkReply = d->network->get(QNetworkRequest(job->url));
+    check = connect(job->networkReply, SIGNAL(finished()),
+                    this, SLOT(_q_downloadFinished()));
+    Q_ASSERT(check);
+}
+
+void QSoundPlayer::_q_downloadFinished()
+{
+    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
+    if (!reply)
+        return;
+
     qDebug("network request finished");
+    foreach (QSoundPlayerJob *job, d->jobs.values()) {
+        if (job->networkReply == reply) {
+            const int id = d->jobs.key(job);
+            qDebug("found job %i", id);
+
+            QIODevice *iodevice = d->network->cache()->data(reply->url());
+            job->reader = new QSoundFile(iodevice, QSoundFile::Mp3File, this);
+            job->reader->setRepeat(job->repeat);
+
+            if (job->reader->open(QIODevice::Unbuffered | QIODevice::ReadOnly))
+                _q_start(id);
+            break;
+        }
+    }
 }
 
 void QSoundPlayer::_q_start(int id)
@@ -195,6 +239,7 @@ void QSoundPlayer::_q_start(int id)
     if (!job || !job->reader)
         return;
 
+    qDebug("starting audio for job %i", id);
     job->audioOutput = new QAudioOutput(outputDevice(), job->reader->format(), this);
     connect(job->audioOutput, SIGNAL(stateChanged(QAudio::State)),
             this, SLOT(_q_stateChanged(QAudio::State)));
@@ -216,9 +261,11 @@ void QSoundPlayer::_q_stateChanged(QAudio::State state)
     if (!output || state == QAudio::ActiveState)
         return;
 
-    foreach (int id, d->jobs.keys()) {
-        QSoundPlayerJob *job = d->jobs.value(id);
-        if (output == job->audioOutput) {
+    foreach (QSoundPlayerJob *job, d->jobs.values()) {
+        if (job->audioOutput == output) {
+            const int id = d->jobs.key(job);
+            qDebug("audio stopped for job %i", id);
+
             d->jobs.remove(id);
             delete job;
 
