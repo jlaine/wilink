@@ -181,7 +181,14 @@ Panel {
                     width: appStyle.icon.normalSize
                     fillMode: Image.PreserveAspectFit
                     smooth: true
-                    source: model.imageSource
+                    source: {
+                        if (model.thumbnailSource)
+                            return model.thumbnailSource;
+                        else if (model.imageSource)
+                            return model.imageSource;
+                        else
+                            return 'rss.png';
+                    }
                 }
 
                 Label {
@@ -257,7 +264,8 @@ Panel {
                 XmlRole { name: 'description'; query: 'description/string()' }
                 XmlRole { name: 'link'; query: 'link/string()' }
                 XmlRole { name: 'pubDate'; query: 'pubDate/string()' }
-                XmlRole { name: 'imageSource'; query: '*:thumbnail[1]/@url/string()' }
+                XmlRole { name: 'imageSource'; query: 'enclosure[@type="image/jpeg"]/@url/string()' }
+                XmlRole { name: 'thumbnailSource'; query: '*:thumbnail[1]/@url/string()' }
                 XmlRole { name: 'title'; query: 'title/string()' }
             }
 
