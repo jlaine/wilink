@@ -261,14 +261,6 @@ QSoundPlayerJob *QSoundPlayer::play(const QUrl &url, bool repeat)
     return job;
 }
 
-int QSoundPlayer::play(QSoundFile *reader)
-{
-    QSoundPlayerJob *job = new QSoundPlayerJob(this, ++d->readerId);
-    d->jobs[job->id()] = job;
-    job->setFile(reader);
-    return job->id();
-}
-
 QAudioDeviceInfo QSoundPlayer::inputDevice() const
 {
     foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioInput)) {

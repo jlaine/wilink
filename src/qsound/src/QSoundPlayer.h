@@ -91,8 +91,6 @@ public:
     QNetworkAccessManager *networkAccessManager() const;
     void setNetworkAccessManager(QNetworkAccessManager *manager);
 
-    int play(QSoundFile *reader);
-
 signals:
     void finished(int id);
 
