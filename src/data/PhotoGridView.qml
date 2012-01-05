@@ -113,7 +113,8 @@ FocusScope {
                 }
             }
             else if (event.key == Qt.Key_Back ||
-                     event.key == Qt.Key_Backspace) {
+                     event.key == Qt.Key_Backspace ||
+                     event.key == Qt.Key_Escape) {
                 if (crumbBar.model.count > 1) {
                     crumbBar.pop();
                 }
