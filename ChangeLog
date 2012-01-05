@@ -15,6 +15,7 @@ wiLink 2.2.0 (UNRELEASED)
   - Display transfer results.
   - Do not resolve hosts when running traceroute on Windows.
  * News:
+  - Make it possible to add / modify / remove news feeds.
   - Make it possible to open link with return key.
   - Don't display link URL, a click opens the link.
  * Photos:
