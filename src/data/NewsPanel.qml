@@ -245,19 +245,34 @@ Panel {
                     }
                 }
 
-                Label {
-                    id: descriptionLabel
+                Column {
+                    id: descriptionColumn
 
+                    anchors.margins: appStyle.margin.normal
                     anchors.top: image.bottom
-                    anchors.topMargin: appStyle.spacing.vertical
                     anchors.left: parent.left
-                    anchors.leftMargin: appStyle.spacing.horizontal
                     anchors.right: parent.right
-                    anchors.rightMargin: appStyle.spacing.horizontal
-                    visible: false
-                    wrapMode: Text.WordWrap
+                    spacing: appStyle.margin.normal
 
-                    onLinkActivated: Qt.openUrlExternally(link)
+                    Label {
+                        id: descriptionLabel
+
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        visible: false
+                        wrapMode: Text.WordWrap
+
+                        onLinkActivated: Qt.openUrlExternally(link)
+                    }
+
+                    Button {
+                        id: playButton
+
+                        anchors.left: parent.left
+                        iconSource: 'start.png'
+                        text: qsTr('Play sound')
+                        visible: false
+                    }
                 }
 
                 states: State {
@@ -278,8 +293,13 @@ Panel {
                     }
 
                     PropertyChanges {
+                        target: playButton
+                        visible: model.audioSource ? true : false
+                    }
+
+                    PropertyChanges {
                         target: item
-                        height: image.height + 2*appStyle.spacing.vertical + descriptionLabel.height
+                        height: image.height + 2*appStyle.margin.normal + descriptionColumn.height
                     }
                 }
             }
@@ -297,6 +317,7 @@ Panel {
                 XmlRole { name: 'description'; query: 'description/string()' }
                 XmlRole { name: 'link'; query: 'link/string()' }
                 XmlRole { name: 'pubDate'; query: 'pubDate/string()' }
+                XmlRole { name: 'audioSource'; query: 'enclosure[@type="audio/mpeg"]/@url/string()' }
                 XmlRole { name: 'imageSource'; query: 'enclosure[@type="image/jpeg"]/@url/string()' }
                 XmlRole { name: 'thumbnailSource'; query: '*:thumbnail[1]/@url/string()' }
                 XmlRole { name: 'title'; query: 'title/string()' }

@@ -515,6 +515,10 @@ Acceptez-vous?</translation>
         <source>Remove</source>
         <translation>Retirer</translation>
     </message>
+    <message>
+        <source>Play sound</source>
+        <translation>Lire le son</translation>
+    </message>
 </context>
 <context>
     <name>NewsPlugin</name>
