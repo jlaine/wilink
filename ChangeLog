@@ -16,6 +16,7 @@ wiLink 2.2.0 (UNRELEASED)
   - Do not resolve hosts when running traceroute on Windows.
  * News:
   - Make it possible to open link with return key.
+  - Don't display link URL, a click opens the link.
  * Photos:
   - Use a smooth transition between preview and full-res photos.
  * Rooms:

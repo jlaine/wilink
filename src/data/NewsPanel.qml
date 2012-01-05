@@ -207,7 +207,12 @@ Panel {
                 MouseArea {
                     anchors.fill: parent
 
-                    onClicked: mainView.currentIndex = model.index
+                    onClicked: {
+                        if (item.state == 'details')
+                            Qt.openUrlExternally(model.link);
+                        else
+                            mainView.currentIndex = model.index;
+                    }
                 }
 
                 Label {
@@ -237,7 +242,7 @@ Panel {
                                 return 'src=' + quote + application.resolvedUrl(url, mainView.model.source) + quote;
                             });
 
-                            return '<p>' + text + '</p><p><a href="' + model.link + '">' + model.link + '</a></p>';
+                            return '<p>' + text + '</p>';
                         }
                         visible: true
                     }
