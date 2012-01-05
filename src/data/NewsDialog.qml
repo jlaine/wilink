@@ -23,6 +23,7 @@ import wiLink 2.0
 Dialog {
     id: dialog
 
+    property url editUrl
     property alias name: nameInput.text
     property alias url: urlInput.text
     property QtObject model
@@ -118,7 +119,7 @@ Dialog {
         if (!nameInput.acceptableInput || !urlInput.acceptableInput)
             return;
 
-        dialog.model.addBookmark(urlInput.text, nameInput.text);
+        dialog.model.addBookmark(urlInput.text, nameInput.text, dialog.editUrl);
         dialog.close();
     }
 
@@ -131,6 +132,7 @@ Dialog {
 
     states: State {
         name: 'edit'
+        when: dialog.editUrl
 
         PropertyChanges { target: dialog; title: dialog.editTitle }
     }

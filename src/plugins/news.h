@@ -20,6 +20,8 @@
 #ifndef __WILINK_NEWS_H__
 #define __WILINK_NEWS_H__
 
+#include <QUrl>
+
 #include "model.h"
 
 class ChatClient;
@@ -42,7 +44,7 @@ signals:
     void clientChanged(ChatClient *client);
 
 public slots:
-    void addBookmark(const QUrl &url, const QString &name);
+    void addBookmark(const QUrl &url, const QString &name, const QUrl &oldUrl = QUrl());
     void removeBookmark(const QUrl &url);
 
 private slots:

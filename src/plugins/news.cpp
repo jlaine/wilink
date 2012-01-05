@@ -69,28 +69,24 @@ void NewsListModel::setClient(ChatClient *client)
     }
 }
 
-void NewsListModel::addBookmark(const QUrl &url, const QString &name)
+void NewsListModel::addBookmark(const QUrl &url, const QString &name, const QUrl &oldUrl)
 {
     if (url.isEmpty() || !m_client)
         return;
 
     // update bookmarks
     QXmppBookmarkSet bookmarks = m_client->bookmarkManager()->bookmarks();
-    bool found = false;
-    QXmppBookmarkUrl source;
     QList<QXmppBookmarkUrl> sources;
-    foreach (source, bookmarks.urls()) {
-        if (!found && source.url() == url) {
-            source.setName(name);
-            found = true;
-        }
+    foreach (const QXmppBookmarkUrl &source, bookmarks.urls()) {
+        if (source.url() == url || source.url() == oldUrl)
+            continue;
         sources << source;
     }
-    if (!found) {
-        source.setName(name);
-        source.setUrl(url);
-        sources << source;
-    }
+
+    QXmppBookmarkUrl source;
+    source.setName(name);
+    source.setUrl(url);
+    sources << source;
 
     bookmarks.setUrls(sources);
     m_client->bookmarkManager()->setBookmarks(bookmarks);

@@ -105,7 +105,9 @@ Panel {
         }
 
         onCurrentIndexChanged: {
-            mainView.model.source = newsListHelper.get(currentIndex).url;
+            if (currentIndex >= 0) {
+                mainView.model.source = newsListHelper.get(currentIndex).url;
+            }
         }
 
         Component {
@@ -121,10 +123,10 @@ Panel {
                     var item = menu.model.get(index);
                     if (item.action == 'edit') {
                         dialogSwapper.showPanel('NewsDialog.qml', {
+                            'editUrl': bookmarkUrl,
                             'model': newsListModel,
                             'name': bookmarkName,
-                            'url': bookmarkUrl,
-                            'state': 'edit'
+                            'url': bookmarkUrl
                         });
                     } else if (item.action == 'remove') {
                         newsListModel.removeBookmark(bookmarkUrl);
