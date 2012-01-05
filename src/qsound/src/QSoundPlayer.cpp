@@ -167,8 +167,16 @@ void QSoundPlayerJob::_q_downloadFinished()
     }
 
     // read file
+    QSoundFile::FileType fileType = QSoundFile::UnknownFile;
+    QAbstractNetworkCache *cache = d->player->networkAccessManager()->cache();
+    const QNetworkCacheMetaData::RawHeaderList headers = cache->metaData(reply->url()).rawHeaders();
+    foreach (const QNetworkCacheMetaData::RawHeader &header, headers) {
+        if (header.first.toLower() == "content-type")
+            fileType = QSoundFile::typeFromMimeType(header.second);
+    }
+
     QIODevice *iodevice = d->player->networkAccessManager()->cache()->data(reply->url());
-    setFile(new QSoundFile(iodevice, QSoundFile::Mp3File));
+    setFile(new QSoundFile(iodevice, fileType));
 }
 
 void QSoundPlayerJob::_q_start()
