@@ -23,7 +23,7 @@ import wiLink 2.0
 Panel {
     id: panel
 
-    property QtObject playingJob
+    property QtObject soundJob
 
     Component {
         id: playerDelegate
@@ -62,9 +62,9 @@ Panel {
                     if (playerModel.rowCount(row))
                         visualModel.rootIndex = row;
                     else {
-                        if (panel.playingJob)
-                            panel.playingJob.stop();
-                        panel.playingJob = application.soundPlayer.play(model.url);
+                        if (panel.soundJob)
+                            panel.soundJob.stop();
+                        panel.soundJob = application.soundPlayer.play(model.url);
                         //playerModel.play(row);
                     }
                 }
@@ -90,7 +90,7 @@ Panel {
                     fillMode: Image.PreserveAspectFit
                     width: 32
                     height: 32
-                    source: (Qt.isQtObject(panel.playingJob) && panel.playingJob.url == model.url) ? "start.png" : (model.downloading ? "download.png" : model.imageUrl)
+                    source: (Qt.isQtObject(panel.soundJob) && panel.soundJob.url == model.url) ? "start.png" : (model.downloading ? "download.png" : model.imageUrl)
                 }
 
                 Column {
@@ -159,8 +159,8 @@ Panel {
             ToolButton {
                 iconSource: 'stop.png'
                 text: qsTr('Stop')
-                enabled: Qt.isQtObject(panel.playingJob)
-                onClicked: panel.playingJob.stop()
+                enabled: Qt.isQtObject(panel.soundJob)
+                onClicked: panel.soundJob.stop()
             }
 
             ToolButton {
@@ -217,9 +217,9 @@ Panel {
                 if (playerModel.rowCount(row))
                     visualModel.rootIndex = row;
                 else {
-                    if (panel.playingJob)
-                        panel.playingJob.stop();
-                    panel.playingJob = application.soundPlayer.play(model.url);
+                    if (panel.soundJob)
+                        panel.soundJob.stop();
+                    panel.soundJob = application.soundPlayer.play(model.url);
                 }
             }
         }

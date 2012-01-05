@@ -23,7 +23,7 @@ Dialog {
     id: dialog
 
     property alias iconSource: image.source
-    property int soundId: 0
+    property QtObject soundJob
     property alias text: label.text
 
     minimumHeight: 150
@@ -51,7 +51,7 @@ Dialog {
 
     onClose: {
         // stop sound
-        application.soundPlayer.stop(dialog.soundId);
+        dialog.soundJob.stop();
     }
 
     Component.onCompleted: {

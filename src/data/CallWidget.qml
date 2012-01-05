@@ -25,7 +25,7 @@ Item {
     id: callWidget
 
     property QtObject call: null
-    property int soundId: 0
+    property QtObject soundJob: 0
 
     anchors.left: parent ? parent.left : undefined
     anchors.right: parent ? parent.right : undefined
@@ -209,9 +209,9 @@ Item {
     Connections {
         target: call
         onStateChanged: {
-            if (callWidget.soundId > 0) {
-                application.soundPlayer.stop(callWidget.soundId);
-                callWidget.soundId = 0;
+            if (callWidget.soundJob) {
+                callWidget.soundJob.stop();
+                callWidget.soundJob = null;
             }
         }
     }
@@ -220,7 +220,7 @@ Item {
         // play a sound
         if (callWidget.call.direction == QXmppCall.OutgoingDirection &&
             callWidget.call.state == QXmppCall.ConnectingState) {
-            callWidget.soundId = application.soundPlayer.play(":/call-outgoing.ogg", true);
+            callWidget.soundJob = application.soundPlayer.play(":/call-outgoing.ogg", true);
         }
     }
 
