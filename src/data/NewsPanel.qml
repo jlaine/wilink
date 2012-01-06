@@ -22,7 +22,31 @@ import wiLink 2.0
 import 'utils.js' as Utils
 
 Panel {
-    id: newsPanel
+    id: panel
+
+    property QtObject soundJob
+    property string soundUrl
+
+    function finished() {
+        console.log("track finished");
+        panel.soundJob = null;
+    }
+
+    function play(model) {
+        stop();
+        panel.soundUrl = model.audioSource;
+        panel.soundJob = application.soundPlayer.play(decodeURIComponent(model.audioSource));
+        panel.soundJob.finished.connect(panel.finished);
+    }
+
+    function stop() {
+        if (panel.soundJob) {
+            panel.soundJob.finished.disconnect(panel.finished);
+            panel.soundJob.stop();
+            panel.soundJob = null;
+            panel.soundUrl = '';
+        }
+    }
 
     NewsListModel {
         id: newsListModel
@@ -42,7 +66,7 @@ Panel {
         anchors.left: parent.left
         title: qsTr('My news')
         visible: width > 0
-        width: newsPanel.singlePanel ? parent.width : appStyle.sidebarWidth
+        width: panel.singlePanel ? parent.width : appStyle.sidebarWidth
         z: 1
 
         delegate: Item {
@@ -84,8 +108,8 @@ Panel {
                 onClicked: {
                     if (mouse.button == Qt.LeftButton) {
                         sidebar.currentIndex = model.index;
-                        if (newsPanel.singlePanel)
-                            newsPanel.state = 'no-sidebar';
+                        if (panel.singlePanel)
+                            panel.state = 'no-sidebar';
                     } else if (mouse.button == Qt.RightButton) {
                         // show context menu
                         var pos = mapToItem(menuLoader.parent, mouse.x, mouse.y);
@@ -156,7 +180,7 @@ Panel {
 
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        anchors.left: newsPanel.singlePanel ? parent.left : sidebar.right
+        anchors.left: panel.singlePanel ? parent.left : sidebar.right
         anchors.right: parent.right
         visible: width > 0
 
@@ -173,7 +197,6 @@ Panel {
         ScrollView {
             id: mainView
 
-            property string soundUrl
             property QtObject soundJob
 
             anchors.top: header.bottom
@@ -273,33 +296,24 @@ Panel {
                         Button {
                             iconSource: 'start.png'
                             text: qsTr('Play sound')
-                            visible: model.audioSource ? (mainView.soundUrl != model.audioSource) : false
+                            visible: model.audioSource ? (panel.soundUrl != model.audioSource) : false
 
-                            onClicked: {
-                                if (mainView.soundJob)
-                                    mainView.soundJob.stop();
-                                mainView.soundUrl = model.audioSource;
-                                mainView.soundJob = application.soundPlayer.play(decodeURIComponent(model.audioSource));
-                            }
+                            onClicked: panel.play(model)
                         }
 
                         Button {
                             iconSource: 'stop.png'
                             text: qsTr('Stop sound')
-                            visible: model.audioSource ? (mainView.soundUrl == model.audioSource) : false
+                            visible: model.audioSource ? (panel.soundUrl == model.audioSource) : false
 
-                            onClicked: {
-                                mainView.soundJob.stop();
-                                mainView.soundUrl = '';
-                                mainView.soundJob = null;
-                            }
+                            onClicked: panel.stop();
                         }
 
                         Label {
                             anchors.verticalCenter: parent.verticalCenter
                             text: {
-                                if (mainView.soundJob && mainView.soundUrl == model.audioSource) {
-                                    switch (mainView.soundJob.state)
+                                if (panel.soundJob && panel.soundUrl == model.audioSource) {
+                                    switch (panel.soundJob.state)
                                     {
                                     case SoundPlayerJob.DownloadingState:
                                         return 'Downloading';
