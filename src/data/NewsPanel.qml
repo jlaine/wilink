@@ -28,15 +28,15 @@ Panel {
     property string soundUrl
 
     function finished() {
-        console.log("track finished");
         panel.soundJob = null;
+        panel.soundUrl = '';
     }
 
     function play(model) {
         stop();
-        panel.soundUrl = model.audioSource;
         panel.soundJob = application.soundPlayer.play(decodeURIComponent(model.audioSource));
         panel.soundJob.finished.connect(panel.finished);
+        panel.soundUrl = model.audioSource;
     }
 
     function stop() {

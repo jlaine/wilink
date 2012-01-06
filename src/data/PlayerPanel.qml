@@ -26,7 +26,6 @@ Panel {
     property QtObject soundJob
 
     function finished() {
-        console.log("track finished");
         panel.soundJob = null;
     }
 
