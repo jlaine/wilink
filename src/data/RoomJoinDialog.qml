@@ -23,7 +23,7 @@ import wiLink 2.0
 Dialog {
     id: dialog
 
-    property alias model: view.model
+    property alias model: roomView.model
 
     helpText: qsTr('Enter the name of the chat room you want to join. If the chat room does not exist yet, it will be created for you.')
     title: qsTr('Join or create a chat room')
@@ -34,7 +34,7 @@ Dialog {
         if (roomEdit.text.length) {
             var jid = roomEdit.text;
             if (jid.indexOf('@') < 0)
-                jid += '@' + view.model.rootJid;
+                jid += '@' + roomView.model.rootJid;
             var panel = swapper.findPanel('ChatPanel.qml');
             panel.showRoom(jid);
             dialog.close();
@@ -52,14 +52,14 @@ Dialog {
             anchors.right: parent.right
         }
 
-        ListView {
-            id: view
+        ScrollView {
+            id: roomView
 
             anchors.top: roomEdit.bottom
             anchors.topMargin: 8
             anchors.bottom: parent.bottom
             anchors.left: parent.left
-            anchors.right: scrollBar.left
+            anchors.right: parent.right
             clip: true
             model: DiscoveryModel {
                 details: false
@@ -99,17 +99,6 @@ Dialog {
                     }
                 }
             }
-        }
-
-        ScrollBar {
-            id: scrollBar
-
-            anchors.top: roomEdit.bottom
-            anchors.topMargin: 8
-            anchors.bottom: parent.bottom
-            anchors.right: parent.right
-            clip: true
-            flickableItem: view
         }
     }
 }
