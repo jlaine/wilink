@@ -50,15 +50,16 @@ Dialog {
     Item {
         anchors.fill: contents
 
-        ListView {
+        ScrollView {
             id: view
 
             anchors.top: parent.top
             anchors.bottom: addRow.top
             anchors.bottomMargin: appStyle.spacing.vertical
             anchors.left: parent.left
-            anchors.right: scrollBar.left
+            anchors.right: parent.right
             clip: true
+            highlight: Item {}
 
             model: permissionModel
             delegate: Item {
@@ -120,16 +121,6 @@ Dialog {
                     }
                 }
             }
-        }
-
-        ScrollBar {
-            id: scrollBar
-
-            anchors.top: parent.top
-            anchors.bottom: addRow.top
-            anchors.bottomMargin: appStyle.spacing.vertical
-            anchors.right: parent.right
-            flickableItem: view
         }
 
         Item {

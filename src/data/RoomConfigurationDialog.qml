@@ -34,74 +34,56 @@ Dialog {
         id: configurationModel
     }
 
-    Item {
+    ListView {
+        id: view
+
         anchors.fill: contents
+        clip: true
+        model: configurationModel
+        delegate: Item {
+            id: item
 
-        ListView {
-            id: view
+            width: parent.width
+            height: 24
 
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: appStyle.spacing.vertical
-            anchors.left: parent.left
-            anchors.right: scrollBar.left
-            clip: true
+            Item {
+                anchors.fill: parent
+                visible: model.type == QXmppDataForm.TextSingleField
 
-            model: configurationModel
-            delegate: Item {
-                id: item
+                Label {
+                    id: label
 
-                width: parent.width
-                height: 24
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: parent.left
+                    text: model.label
+                }
 
-                Item {
-                    anchors.fill: parent
-                    visible: model.type == QXmppDataForm.TextSingleField
+                InputBar {
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.left: label.right
+                    anchors.leftMargin: appStyle.spacing.horizontal
+                    anchors.right: parent.right
+                    anchors.rightMargin: appStyle.spacing.horizontal
+                    text: model.value
 
-                    Label {
-                        id: label
-
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.left: parent.left
-                        text: model.label
-                    }
-
-                    InputBar {
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.left: label.right
-                        anchors.leftMargin: appStyle.spacing.horizontal
-                        anchors.right: parent.right
-                        anchors.rightMargin: appStyle.spacing.horizontal
-                        text: model.value
-
-                        onTextChanged: {
-                            if (model.type == QXmppDataForm.TextSingleField) {
-                                configurationModel.setValue(model.index, text);
-                            }
+                    onTextChanged: {
+                        if (model.type == QXmppDataForm.TextSingleField) {
+                            configurationModel.setValue(model.index, text);
                         }
                     }
                 }
-
-                CheckBox {
-                    anchors.top: parent.top
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    checked: model.value == true
-                    text: model.label
-                    visible: model.type == QXmppDataForm.BooleanField
-
-                    onClicked: configurationModel.setValue(model.index, !checked)
-                }
             }
-        }
 
-        ScrollBar {
-            id: scrollBar
+            CheckBox {
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.right: parent.right
+                checked: model.value == true
+                text: model.label
+                visible: model.type == QXmppDataForm.BooleanField
 
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.right: parent.right
-            flickableItem: view
+                onClicked: configurationModel.setValue(model.index, !checked)
+            }
         }
     }
 
