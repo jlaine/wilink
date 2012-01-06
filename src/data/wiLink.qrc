@@ -96,6 +96,7 @@
     <file>RoomPermissionDialog.qml</file>
     <file>RoomSubjectDialog.qml</file>
     <file>ScrollBar.qml</file>
+    <file>ScrollView.qml</file>
     <file>SetupWindow.qml</file>
     <file>SharePanel.qml</file>
     <file>SharePlugin.qml</file>

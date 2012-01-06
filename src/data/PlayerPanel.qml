@@ -192,23 +192,18 @@ Panel {
         z: 1
     }
 
-    ListView {
+    ScrollView {
         id: playerView
 
-        anchors.margins: appStyle.margin.small
         anchors.top: help.bottom
         anchors.bottom: parent.bottom
         anchors.left: parent.left
-        anchors.right: scrollBar.left
+        anchors.right: parent.right
         model: PlayerModel {
             id: playerModel
         }
         delegate: playerDelegate
         focus: true
-        highlight: Highlight {
-            width: playerView.width
-        }
-        highlightMoveDuration: appStyle.highlightMoveDuration
 
         DropArea {
             anchors.fill:  parent
@@ -232,14 +227,5 @@ Panel {
                     panel.play(listHelper.get(currentIndex));
             }
         }
-    }
-
-    ScrollBar {
-        id: scrollBar
-
-        anchors.top: header.bottom
-        anchors.bottom: parent.bottom
-        anchors.right: parent.right
-        flickableItem: playerView
     }
 }
