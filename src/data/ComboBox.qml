@@ -25,7 +25,7 @@ Item {
     property variant model
     property int currentIndex: -1
 
-    height: 21
+    height: appStyle.icon.smallSize
 
     Component {
         id: comboMenu
