@@ -34,14 +34,11 @@ Item {
         color: '#ffffff'
     }
 
-    ListView {
+    ScrollView {
         id: view
 
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.right: scrollBar.left
-        anchors.margins: appStyle.margin.small
+        anchors.fill: parent
+        highlight: Item {}
 
         delegate: Item {
             id: item
@@ -151,15 +148,6 @@ Item {
                 }
             }
         }
-    }
-
-    ScrollBar {
-        id: scrollBar
-
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-        anchors.right: parent.right
-        flickableItem: view
     }
 }
 

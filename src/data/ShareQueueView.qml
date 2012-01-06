@@ -44,13 +44,13 @@ Item {
         height: 1
     }
 
-    ListView {
+    ScrollView {
         id: view
 
         anchors.top: border.bottom
         anchors.bottom: parent.bottom
         anchors.left: parent.left
-        anchors.right: scrollBar.left
+        anchors.right: parent.right
         spacing: appStyle.spacing.vertical
 
         delegate: Item {
@@ -115,15 +115,6 @@ Item {
                 onClicked: view.model.cancel(model.index)
             }
         }
-    }
-
-    ScrollBar {
-        id: scrollBar
-
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-        anchors.right: parent.right
-        flickableItem: view
     }
 }
 
