@@ -37,7 +37,7 @@ FocusScope {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: scrollBar.left
-        anchors.margins: 2
+        anchors.margins: appStyle.margin.small
         cellWidth: iconSize + appStyle.margin.normal
         cellHeight: iconSize + appStyle.font.normalSize * 1.4 + appStyle.spacing.vertical
         focus: true

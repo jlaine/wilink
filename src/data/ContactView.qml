@@ -99,7 +99,7 @@ Item {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: scrollBar.left
-        anchors.margins: 2
+        anchors.margins: appStyle.margin.small
         focus: true
 
         highlight: Highlight {

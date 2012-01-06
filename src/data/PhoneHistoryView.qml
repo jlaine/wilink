@@ -74,7 +74,7 @@ Item {
         anchors.left: parent.left
         anchors.right: scrollBar.left
         anchors.top: header.bottom
-        anchors.margins: 2
+        anchors.margins: appStyle.margin.small
         clip: true
 
         delegate: Item {

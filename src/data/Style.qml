@@ -57,6 +57,7 @@ Item {
     Item {
         id: marginItem
 
+        property int small: isMobile ? 4 : 2
         property int normal: isMobile ? 8 : 4
         property int large: isMobile ? 16 : 8
     }

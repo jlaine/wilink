@@ -88,17 +88,13 @@ Panel {
                 }
             }
 
-            Rectangle {
+            Item {
                 id: rect
                 anchors.fill: parent
                 anchors.topMargin: 2
                 anchors.bottomMargin: 2
                 anchors.leftMargin: 3
                 anchors.rightMargin: 3
-                border.color: 'lightgray'
-                border.width: 1
-                radius: 5
-                state: item.isSelected ? 'selected' : ''
 
                 Image {
                     id: imageColumn
@@ -132,15 +128,6 @@ Panel {
                     anchors.rightMargin: 5
                     anchors.verticalCenter: parent.verticalCenter
                     text: formatDuration(duration)
-                }
-
-                states: State {
-                    name: "selected"
-                    PropertyChanges { target: rect; color: 'lightsteelblue'; border.color: 'darkgray' }
-                }
-
-                transitions: Transition {
-                    PropertyAnimation { target: rect; properties: 'color,border.color'; duration: appStyle.animation.normalDuration }
                 }
             }
         }
@@ -208,6 +195,7 @@ Panel {
     ListView {
         id: playerView
 
+        anchors.margins: appStyle.margin.small
         anchors.top: help.bottom
         anchors.bottom: parent.bottom
         anchors.left: parent.left
@@ -217,6 +205,10 @@ Panel {
         }
         delegate: playerDelegate
         focus: true
+        highlight: Highlight {
+            width: playerView.width
+        }
+        highlightMoveDuration: appStyle.highlightMoveDuration
 
         DropArea {
             anchors.fill:  parent
