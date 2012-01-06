@@ -36,7 +36,7 @@ Item {
         text: qsTr('In addition to your %1 account, %2 can connect to additional chat accounts such as Google Talk and Facebook.').replace('%1', application.organizationName).replace('%2', application.applicationName)
     }
 
-    ListView {
+    ScrollView {
         id: accountView
 
         anchors.top: help.bottom
@@ -44,7 +44,7 @@ Item {
         anchors.bottom: footer.top
         anchors.bottomMargin: appStyle.spacing.vertical
         anchors.left: parent.left
-        anchors.right: scrollBar.left
+        anchors.right: parent.right
         clip: true
         model: ListModel {
             Component.onCompleted: {
@@ -53,10 +53,9 @@ Item {
                 }
             }
         }
-        highlight: Highlight { height: 28; width: accountView.width - 1 }
         delegate: Item {
             height: appStyle.icon.smallSize + 4
-            width: accountView.width - 1
+            width: parent.width
 
             Item {
                 anchors.fill: parent
@@ -90,17 +89,6 @@ Item {
                 }
             }
         }
-    }
-
-    ScrollBar {
-        id: scrollBar
-
-        anchors.top: help.bottom
-        anchors.topMargin: appStyle.spacing.vertical
-        anchors.bottom: footer.top
-        anchors.bottomMargin: appStyle.spacing.vertical
-        anchors.right: parent.right
-        flickableItem: accountView
     }
 
     Row {
