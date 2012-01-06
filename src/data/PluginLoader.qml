@@ -107,7 +107,7 @@ Item {
         pluginModel.append({ source: 'DiagnosticPlugin.qml', autoload: true });
         if (!application.isMobile)
             pluginModel.append({ source: 'PlayerPlugin.qml' });
-        pluginModel.append({ source: 'NewsPlugin.qml' });
+        pluginModel.append({ source: 'NewsPlugin.qml', autolib: true });
         if (!application.isMobile)
             pluginModel.append({ source: 'PhonePlugin.qml', autoload: true });
         pluginModel.append({ source: 'PhotoPlugin.qml', autoload: true });
