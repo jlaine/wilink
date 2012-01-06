@@ -14,7 +14,9 @@ android {
 
 # Libraries used internally by QSound
 android|symbian|contains(MEEGO_EDITION,harmattan) {
-
+    QSOUND_INTERNAL_DEFINES += QSOUND_USE_MAD
+    QSOUND_INCLUDE_DIR += $$PWD/../3rdparty/libmad
+    QSOUND_INTERNAL_LIBS += -L$$PWD/../3rdparty/libmad -lmad
 } else {
     mac {
         # qtkit support
