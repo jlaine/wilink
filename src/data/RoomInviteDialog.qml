@@ -50,15 +50,14 @@ Dialog {
             text: "Let's talk"
         }
 
-        ListView {
-            id: view
-
+        ScrollView {
             anchors.top: reasonEdit.bottom
             anchors.topMargin: 8
             anchors.bottom: parent.bottom
             anchors.left: parent.left
-            anchors.right: scrollBar.left
+            anchors.right: parent.right
             clip: true
+            highlight: Item {}
             model: sortedContacts
             delegate: Item {
                 id: rect
@@ -132,17 +131,6 @@ Dialog {
                     onExited: highlight.state = 'inactive'
                 }
             }
-        }
-
-        ScrollBar {
-            id: scrollBar
-
-            anchors.top: reasonEdit.bottom
-            anchors.topMargin: 8
-            anchors.bottom: parent.bottom
-            anchors.right: parent.right
-            clip: true
-            flickableItem: view
         }
     }
 
