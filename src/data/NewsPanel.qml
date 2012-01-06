@@ -170,7 +170,7 @@ Panel {
             title: qsTr('News reader')
         }
 
-        ListView {
+        ScrollView {
             id: mainView
 
             property string soundUrl
@@ -179,15 +179,14 @@ Panel {
             anchors.top: header.bottom
             anchors.bottom: parent.bottom
             anchors.left: parent.left
-            anchors.right: scrollBar.left
-            anchors.margins: appStyle.margin.small
+            anchors.right: parent.right
             spacing: appStyle.spacing.horizontal
             focus: true
             delegate: Item {
                 id: item
 
                 height: appStyle.icon.normalSize
-                width: mainView.width - 1
+                width: view.width - 1
 
                 Image {
                     id: image
@@ -343,11 +342,6 @@ Panel {
                 }
             }
 
-            highlight: Highlight {
-                width: mainView.width
-            }
-            highlightMoveDuration: appStyle.highlightMoveDuration
-
             model: XmlListModel {
                 id: newsModel
 
@@ -366,15 +360,6 @@ Panel {
                 var item = model.get(currentIndex);
                 Qt.openUrlExternally(item.link);
             }
-        }
-
-        ScrollBar {
-            id: scrollBar
-
-            anchors.top: header.bottom
-            anchors.bottom: parent.bottom
-            anchors.right: parent.right
-            flickableItem: mainView
         }
     }
 

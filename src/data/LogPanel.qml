@@ -26,7 +26,7 @@ Panel {
 
     ListHelper {
         id: listHelper
-        model: view.model
+        model: logView.model
     }
 
     PanelHeader {
@@ -79,13 +79,13 @@ Panel {
         }
     }
 
-    ListView {
-        id: view
+    ScrollView {
+        id: logView
 
-        anchors.left: parent.left
-        anchors.right: scrollBar.left
         anchors.top: header.bottom
         anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
 
         model: LogModel {
             id: logModel
@@ -128,15 +128,6 @@ Panel {
                 wrapMode: Text.WordWrap
             }
         }
-    }
-
-    ScrollBar {
-        id: scrollBar
-
-        anchors.top: header.bottom
-        anchors.bottom: parent.bottom
-        anchors.right: parent.right
-        flickableItem: view
     }
 }
 

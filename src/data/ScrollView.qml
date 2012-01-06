@@ -25,6 +25,7 @@ FocusScope {
     property alias delegate: view.delegate
     property alias model: view.model
     property alias moving: view.moving
+    property alias spacing: view.spacing
 
     ListView {
         id: view
