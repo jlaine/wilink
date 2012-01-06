@@ -21,104 +21,73 @@ import QtQuick 1.1
 import QXmpp 0.4
 import wiLink 2.0
 
-Item {
+ScrollView {
     id: block
 
-    property alias model: view.model
     signal participantClicked(string participant)
 
-    // FIXME: a non-static width crashes the program if chat room is empty
-    // width: view.cellWidth + scrollBar.width
     width: 95
 
-    ListView {
-        id: view
+    delegate: Item {
+        id: item
 
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.right: scrollBar.left
-        anchors.margins: appStyle.margin.small
+        property bool moderator: (model.affiliation >= QXmppMucItem.AdminAffiliation)
 
-        delegate: Item {
-            id: item
+        width: 80
+        height: appStyle.icon.normalSize + 22
 
-            property bool moderator: (model.affiliation >= QXmppMucItem.AdminAffiliation)
-
-            width: 80
-            height: appStyle.icon.normalSize + 22
-
-            Highlight {
-                id: highlight
-
-                anchors.fill: parent
-                state: 'inactive'
-            }
-
-            Column {
-                anchors.fill: parent
-                anchors.margins: 5
-
-                Image {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    asynchronous: true
-                    source: model.avatar
-                    sourceSize.height: appStyle.icon.normalSize
-                    sourceSize.width: appStyle.icon.normalSize
-                    height: appStyle.icon.normalSize
-                    width: appStyle.icon.normalSize
-                 }
-
-                Label {
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    color: moderator ? '#ff6500' : '#2689d6'
-                    elide: Text.ElideRight
-                    horizontalAlignment: Text.AlignHCenter
-                    font.pixelSize: appStyle.font.smallSize
-                    text: model.name
-                }
-            }
+        Column {
+            anchors.fill: parent
+            anchors.margins: 5
 
             Image {
-                anchors.top: parent.top
-                anchors.right: parent.right
+                anchors.horizontalCenter: parent.horizontalCenter
                 asynchronous: true
-                anchors.rightMargin: 10
-                source: 'moderator.png'
-                smooth: true
-                height: appStyle.icon.smallSize
-                width: appStyle.icon.smallSize
-                visible: moderator
-            }
+                source: model.avatar
+                sourceSize.height: appStyle.icon.normalSize
+                sourceSize.width: appStyle.icon.normalSize
+                height: appStyle.icon.normalSize
+                width: appStyle.icon.normalSize
+             }
 
-            MouseArea {
-                acceptedButtons: Qt.LeftButton | Qt.RightButton
-                anchors.fill: parent
-                hoverEnabled: true
-                onClicked: {
-                    if (mouse.button == Qt.LeftButton) {
-                        block.participantClicked(model.name);
-                    } else if (mouse.button == Qt.RightButton) {
-                        var pos = mapToItem(menuLoader.parent, mouse.x, mouse.y);
-                        menuLoader.sourceComponent = participantMenu;
-                        menuLoader.item.jid = model.jid;
-                        menuLoader.show(pos.x - menuLoader.item.width, pos.y);
-                    }
-                }
-                onEntered: highlight.state = ''
-                onExited: highlight.state = 'inactive'
+            Label {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                color: moderator ? '#ff6500' : '#2689d6'
+                elide: Text.ElideRight
+                horizontalAlignment: Text.AlignHCenter
+                font.pixelSize: appStyle.font.smallSize
+                text: model.name
             }
         }
-    }
 
-    ScrollBar {
-        id: scrollBar
+        Image {
+            anchors.top: parent.top
+            anchors.right: parent.right
+            asynchronous: true
+            anchors.rightMargin: 10
+            source: 'moderator.png'
+            smooth: true
+            height: appStyle.icon.smallSize
+            width: appStyle.icon.smallSize
+            visible: moderator
+        }
 
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-        anchors.right: parent.right
-        flickableItem: view
+        MouseArea {
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            anchors.fill: parent
+            onClicked: {
+                block.currentIndex = model.index;
+                if (mouse.button == Qt.LeftButton) {
+                    block.participantClicked(model.name);
+                } else if (mouse.button == Qt.RightButton) {
+                    var pos = mapToItem(menuLoader.parent, mouse.x, mouse.y);
+                    menuLoader.sourceComponent = participantMenu;
+                    menuLoader.item.jid = model.jid;
+                    menuLoader.show(pos.x - menuLoader.item.width, pos.y);
+                }
+            }
+        }
     }
 
     Component {
