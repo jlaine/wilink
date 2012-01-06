@@ -50,9 +50,9 @@ Dialog {
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             anchors.left: parent.left
-            width: appStyle.icon.smallSize * 5
+            width: appStyle.icon.smallSize + 3*appStyle.margin.normal + appStyle.font.normalSize * 6
             delegate: Item {
-                height: appStyle.icon.smallSize + 8
+                height: appStyle.icon.smallSize + 2*appStyle.margin.normal
                 width: parent.width
 
                 Image {

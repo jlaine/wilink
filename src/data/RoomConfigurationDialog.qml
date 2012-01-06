@@ -34,7 +34,7 @@ Dialog {
         id: configurationModel
     }
 
-    ListView {
+    ScrollView {
         id: view
 
         anchors.fill: contents
@@ -44,7 +44,7 @@ Dialog {
             id: item
 
             width: parent.width
-            height: 24
+            height: model.type == QXmppDataForm.HiddenField ? 0 : appStyle.icon.smallSize
 
             Item {
                 anchors.fill: parent
