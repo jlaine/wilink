@@ -44,6 +44,11 @@ Panel {
         }
     }
 
+    ListHelper {
+        id: listHelper
+        model: playerView.model
+    }
+
     Component {
         id: playerDelegate
         Item {
@@ -232,7 +237,7 @@ Panel {
             else if (event.key == Qt.Key_Enter ||
                      event.key == Qt.Key_Return) {
                 if (currentIndex >= 0)
-                    panel.play(model);
+                    panel.play(listHelper.get(currentIndex));
             }
         }
     }
