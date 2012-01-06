@@ -22,7 +22,7 @@ import QXmpp 0.4
 import wiLink 2.0
 import 'utils.js' as Utils
 
-Item {
+FocusScope {
     id: block
 
     property alias model: historyView.model
@@ -75,6 +75,7 @@ Item {
         anchors.right: parent.right
         anchors.top: header.bottom
         clip: true
+        focus: true
 
         delegate: Item {
             id: item
@@ -134,6 +135,7 @@ Item {
                 anchors.fill: parent
                 hoverEnabled: true
                 onClicked: {
+                    historyView.forceActiveFocus();
                     historyView.currentIndex = model.index;
                     if (mouse.button == Qt.LeftButton) {
                         block.addressClicked(model.address);

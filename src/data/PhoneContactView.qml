@@ -92,15 +92,16 @@ ContactView {
             anchors.right: parent.right
             anchors.rightMargin: 6
             anchors.verticalCenter: parent.verticalCenter
+            sourceComponent: view.currentItem == item ? callButtonComponent : undefined
             z: 1
         }
 
         MouseArea {
             acceptedButtons: Qt.LeftButton | Qt.RightButton
             anchors.fill: parent
-            hoverEnabled: true
 
             onClicked: {
+                view.forceActiveFocus();
                 if (mouse.button == Qt.LeftButton) {
                     view.currentIndex = model.index;
                 } else if (mouse.button == Qt.RightButton) {
@@ -115,15 +116,6 @@ ContactView {
             onDoubleClicked: {
                 view.currentIndex = model.index;
                 block.itemClicked(model);
-            }
-
-            onEntered: {
-                callButtonLoader.sourceComponent = callButtonComponent;
-                callButtonLoader.model = model;
-            }
-
-            onExited: {
-                callButtonLoader.sourceComponent = undefined;
             }
         }
 
