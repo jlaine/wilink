@@ -78,41 +78,21 @@ Panel {
                 anchors.rightMargin: appStyle.spacing.horizontal
                 clip: true
 
-                Item {
-                    id: placePanel
+                ScrollView {
+                    id: placeView
 
                     anchors.fill: parent
+                    model: placeModel
+                    delegate: CheckBox {
+                        height: appStyle.icon.smallSize
+                        width: parent.width
+                        checked: model.checkState == 2
+                        iconSource: 'album.png'
+                        text: model.name
 
-                    ListView {
-                        id: placeView
-
-                        anchors.top: parent.top
-                        anchors.bottom: parent.bottom
-                        anchors.left: parent.left
-                        anchors.right: placeBar.left
-                        model: placeModel
-
-                        delegate: CheckBox {
-                            height: appStyle.icon.smallSize
-                            width: placeView.width - 1
-                            checked: model.checkState == 2
-                            iconSource: 'album.png'
-                            text: model.name
-                            onClicked: {
-                                folderModel.setCheckState(model.path, checked ? 0 : 2);
-                            }
+                        onClicked: {
+                            folderModel.setCheckState(model.path, checked ? 0 : 2);
                         }
-
-                        highlight: Highlight{}
-                    }
-
-                    ScrollBar {
-                        id: placeBar
-
-                        anchors.top: parent.top
-                        anchors.bottom: parent.bottom
-                        anchors.right: parent.right
-                        flickableItem: placeView
                     }
                 }
 
@@ -135,13 +115,13 @@ Panel {
                         }
                     }
 
-                    ListView {
+                    ScrollView {
                         id: folderView
 
                         anchors.top: crumbs.bottom
                         anchors.bottom: parent.bottom
                         anchors.left: parent.left
-                        anchors.right: folderBar.left
+                        anchors.right: parent.right
 
                         model: VisualDataModel {
                             id: visualModel
@@ -205,15 +185,6 @@ Panel {
                             }
                         }
                     }
-
-                    ScrollBar {
-                        id: folderBar
-
-                        anchors.top: crumbs.bottom
-                        anchors.bottom: parent.bottom
-                        anchors.right: parent.right
-                        flickableItem: folderView
-                    }
                 }
             }
 
@@ -236,7 +207,7 @@ Panel {
         states: State {
             name: 'folders'
             PropertyChanges { target: folderPanel; opacity: 1 }
-            PropertyChanges { target: placePanel; opacity: 0 }
+            PropertyChanges { target: placeView; opacity: 0 }
             PropertyChanges { target: placeButton; text: placeButton.lessString }
         }
     }
