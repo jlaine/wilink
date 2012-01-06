@@ -46,29 +46,26 @@ FocusScope {
         border.color: '#7091c8'
         border.width: 1
         color: '#9fb7dd'
-        height: textItem.paintedHeight
+        height: appStyle.icon.tinySize
         radius: appStyle.margin.large
         smooth: true
-    }
 
-    Label {
-        id: textItem
+        Label {
+            id: textItem
 
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        font.bold: true
-        horizontalAlignment: Text.AlignHCenter
-        text: box.title    
+            anchors.centerIn: parent
+            font.bold: true
+            text: box.title
+        }
     }
 
     Item {
         id: item
 
-        anchors.top: textItem.bottom
+        anchors.top: header.bottom
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.margins: appStyle.margin.large
+        anchors.margins: appStyle.margin.normal
     }
 }
