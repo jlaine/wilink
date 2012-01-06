@@ -50,7 +50,7 @@ Dialog {
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             anchors.left: parent.left
-            width: appStyle.icon.smallSize + 3*appStyle.margin.normal + appStyle.font.normalSize * 6
+            width: appStyle.icon.smallSize + 3*appStyle.margin.normal + appStyle.font.normalSize * 5
             delegate: Item {
                 height: appStyle.icon.smallSize + 2*appStyle.margin.normal
                 width: parent.width
