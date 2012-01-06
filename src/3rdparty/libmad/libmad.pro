@@ -1,4 +1,5 @@
 TEMPLATE = lib
+TARGET = mad
 CONFIG += staticlib
 DEFINES += FPM_DEFAULT
 HEADERS = \
