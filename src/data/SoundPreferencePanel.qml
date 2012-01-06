@@ -68,18 +68,26 @@ Panel {
             anchors.fill: devices.contents
             spacing: appStyle.spacing.vertical
 
-            Row {
+            Item {
                 anchors.left: parent.left
                 anchors.right: parent.right
-                spacing: appStyle.spacing.horizontal
+                height: appStyle.icon.smallSize
 
                 Image {
+                    id: outputImage
+                    anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
+                    height: appStyle.icon.smallSize
+                    width: appStyle.icon.smallSize
                     source: 'audio-output.png'
                 }
 
                 Label {
+                    anchors.left: outputImage.right
+                    anchors.leftMargin: appStyle.spacing.horizontal
+                    anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
+                    elide: Text.ElideRight
                     text: qsTr('Audio playback device')
                 }
             }
@@ -105,18 +113,26 @@ Panel {
                 }
             }
 
-            Row {
+            Item {
                 anchors.left: parent.left
                 anchors.right: parent.right
-                spacing: appStyle.spacing.horizontal
+                height: appStyle.icon.smallSize
 
                 Image {
+                    id: inputImage
+                    anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
+                    height: appStyle.icon.smallSize
+                    width: appStyle.icon.smallSize
                     source: 'audio-input.png'
                 }
 
                 Label {
+                    anchors.left: inputImage.right
+                    anchors.leftMargin: appStyle.spacing.horizontal
+                    anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
+                    elide: Text.ElideRight
                     text: qsTr('Audio capture device')
                 }
             }
