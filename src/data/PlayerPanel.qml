@@ -25,6 +25,25 @@ Panel {
 
     property QtObject soundJob
 
+    function finished() {
+        console.log("track finished");
+        panel.soundJob = null;
+    }
+
+    function play(model) {
+        stop();
+        panel.soundJob = application.soundPlayer.play(model.url);
+        panel.soundJob.finished.connect(panel.finished);
+    }
+
+    function stop() {
+        if (panel.soundJob) {
+            panel.soundJob.finished.disconnect(panel.finished);
+            panel.soundJob.stop();
+            panel.soundJob = null;
+        }
+    }
+
     Component {
         id: playerDelegate
         Item {
@@ -62,10 +81,7 @@ Panel {
                     if (playerModel.rowCount(row))
                         visualModel.rootIndex = row;
                     else {
-                        if (panel.soundJob)
-                            panel.soundJob.stop();
-                        panel.soundJob = application.soundPlayer.play(model.url);
-                        //playerModel.play(row);
+                        panel.play(model);
                     }
                 }
             }
@@ -160,7 +176,7 @@ Panel {
                 iconSource: 'stop.png'
                 text: qsTr('Stop')
                 enabled: Qt.isQtObject(panel.soundJob)
-                onClicked: panel.soundJob.stop()
+                onClicked: panel.stop()
             }
 
             ToolButton {
@@ -217,9 +233,7 @@ Panel {
                 if (playerModel.rowCount(row))
                     visualModel.rootIndex = row;
                 else {
-                    if (panel.soundJob)
-                        panel.soundJob.stop();
-                    panel.soundJob = application.soundPlayer.play(model.url);
+                    panel.play(model);
                 }
             }
         }

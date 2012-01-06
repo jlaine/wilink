@@ -31,15 +31,10 @@ class PlayerModelPrivate;
 class PlayerModel : public ChatModel
 {
     Q_OBJECT
-    Q_PROPERTY(bool playing READ playing NOTIFY playingChanged)
 
 public:
     PlayerModel(QObject *parent = 0);
     ~PlayerModel();
-
-    QModelIndex cursor() const;
-    void setCursor(const QModelIndex &index);
-    bool playing() const;
 
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
@@ -50,8 +45,6 @@ public slots:
     bool addLocalFile(const QString &path);
     bool addUrl(const QUrl &url);
     void clear();
-    void play(const QModelIndex &index);
-    void stop();
 
 signals:
     void cursorChanged(const QModelIndex &index);
@@ -59,7 +52,6 @@ signals:
 
 private slots:
     void dataReceived();
-    void finished(int id);
 
 private:
     PlayerModelPrivate *d;

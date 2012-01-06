@@ -42,7 +42,6 @@ enum PlayerRole {
     DownloadingRole,
     DurationRole,
     ImageUrlRole,
-    PlayingRole,
     TitleRole,
     UrlRole,
 };
@@ -110,19 +109,13 @@ public:
 
     QMap<QUrl, QUrl> dataCache;
     QNetworkReply *dataReply;
-    Item *cursorItem;
     QNetworkAccessManager *network;
     QSoundPlayer *player;
-    int playId;
-    bool playStop;
     PlayerModel *q;
 };
 
 PlayerModelPrivate::PlayerModelPrivate(PlayerModel *qq)
     : dataReply(0),
-    cursorItem(0),
-    playId(-1),
-    playStop(false),
     q(qq)
 {
 }
@@ -260,18 +253,12 @@ void PlayerModelPrivate::save()
 PlayerModel::PlayerModel(QObject *parent)
     : ChatModel(parent)
 {
-    bool check;
-    Q_UNUSED(check);
-
     d = new PlayerModelPrivate(this);
 
     d->network = new NetworkAccessManager(this);
 
     // init player
     d->player = wApp->soundPlayer();
-    check = connect(d->player, SIGNAL(finished(int)),
-                    this, SLOT(finished(int)));
-    Q_ASSERT(check);
 
     // set role names
     QHash<int, QByteArray> roleNames;
@@ -280,7 +267,6 @@ PlayerModel::PlayerModel(QObject *parent)
     roleNames.insert(DownloadingRole, "downloading");
     roleNames.insert(DurationRole, "duration");
     roleNames.insert(ImageUrlRole, "imageUrl");
-    roleNames.insert(PlayingRole, "playing");
     roleNames.insert(TitleRole, "title");
     roleNames.insert(UrlRole, "url");
     setRoleNames(roleNames);
@@ -395,27 +381,6 @@ int PlayerModel::columnCount(const QModelIndex &parent) const
     return 1;
 }
 
-QModelIndex PlayerModel::cursor() const
-{
-    return createIndex(d->cursorItem);
-}
-
-void PlayerModel::setCursor(const QModelIndex &index)
-{
-    Item *item = static_cast<Item*>(index.internalPointer());
-
-    if (item != d->cursorItem) {
-        Item *oldItem = d->cursorItem;
-        d->cursorItem = item;
-        if (oldItem)
-            emit dataChanged(createIndex(oldItem), createIndex(oldItem));
-        if (item)
-            emit dataChanged(createIndex(item), createIndex(item));
-        emit cursorChanged(index);
-        emit playingChanged(d->cursorItem != 0);
-    }
-}
-
 QVariant PlayerModel::data(const QModelIndex &index, int role) const
 {
     Item *item = static_cast<Item*>(index.internalPointer());
@@ -432,53 +397,12 @@ QVariant PlayerModel::data(const QModelIndex &index, int role) const
         return item->duration;
     else if (role == ImageUrlRole)
         return item->imageUrl;
-    else if (role == PlayingRole)
-        return (item == d->cursorItem);
     else if (role == TitleRole)
         return item->title;
     else if (role == UrlRole)
         return item->url;
 
     return QVariant();
-}
-
-void PlayerModel::finished(int id)
-{
-    if (id != d->playId)
-        return;
-    d->playId = -1;
-    if (d->playStop) {
-        setCursor(QModelIndex());
-        d->playStop = false;
-    } else {
-        const QModelIndex index = cursor();
-        QModelIndex nextIndex = index.sibling(index.row() + 1, index.column());
-        play(nextIndex);
-    }
-}
-
-void PlayerModel::play(const QModelIndex &index)
-{
-    // stop previous audio
-    if (d->playId >= 0) {
-        d->player->stop(d->playId);
-        d->playId = -1;
-    }
-
-    // start new audio output
-    Item *item = static_cast<Item*>(index.internalPointer());
-    if (!index.isValid() || !item) {
-        setCursor(QModelIndex());
-        return;
-    }
-
-    d->playId = d->player->play(item->url)->id();
-    setCursor(index);
-}
-
-bool PlayerModel::playing() const
-{
-    return d->cursorItem != 0;
 }
 
 bool PlayerModel::removeRow(int row, const QModelIndex &parent)
@@ -494,14 +418,6 @@ bool PlayerModel::removeRows(int row, int count, const QModelIndex &parent)
         return true;
     }
     return false;
-}
-
-void PlayerModel::stop()
-{
-    if (d->playId >= 0) {
-        d->player->stop(d->playId);
-        d->playStop = true;
-    }
 }
 
 #if 0

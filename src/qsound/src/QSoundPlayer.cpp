@@ -34,7 +34,8 @@
 class QSoundPlayerJobPrivate
 {
 public:
-    QSoundPlayerJobPrivate();
+    QSoundPlayerJobPrivate(QSoundPlayerJob *qq);
+    void finish();
 
     int id;
     QAudioOutput *audioOutput;
@@ -44,22 +45,33 @@ public:
     bool repeat;
     QSoundPlayerJob::State state;
     QUrl url;
+
+private:
+    QSoundPlayerJob *q;
 };
 
-QSoundPlayerJobPrivate::QSoundPlayerJobPrivate()
+QSoundPlayerJobPrivate::QSoundPlayerJobPrivate(QSoundPlayerJob *qq)
     : id(0),
     audioOutput(0),
     networkReply(0),
     player(0),
     reader(0),
     repeat(false),
-    state(QSoundPlayerJob::IdleState)
+    state(QSoundPlayerJob::IdleState),
+    q(qq)
 {
+}
+
+void QSoundPlayerJobPrivate::finish()
+{
+    state = QSoundPlayerJob::IdleState;
+    QMetaObject::invokeMethod(q, "stateChanged");
+    QMetaObject::invokeMethod(q, "finished");
 }
 
 QSoundPlayerJob::QSoundPlayerJob(QSoundPlayer *player, int id)
 {
-    d = new QSoundPlayerJobPrivate;
+    d = new QSoundPlayerJobPrivate(this);
     d->id = id;
     d->player = player;
 
@@ -106,9 +118,8 @@ void QSoundPlayerJob::setFile(QSoundFile *soundFile)
     if (d->reader->open(QIODevice::Unbuffered | QIODevice::ReadOnly))
         QMetaObject::invokeMethod(this, "_q_start");
     else {
-        d->state = IdleState;
-        QMetaObject::invokeMethod(this, "stateChanged");
-        QMetaObject::invokeMethod(this, "finished");
+        qWarning("QSoundPlayer(%i) could not open sound file", d->id);
+        d->finish();
     }
 }
 
@@ -160,9 +171,7 @@ void QSoundPlayerJob::_q_downloadFinished()
     // check reply
     if (reply->error() != QNetworkReply::NoError) {
         qWarning("QSoundPlayer(%i) failed to retrieve file: %s", d->id, qPrintable(reply->errorString()));
-        d->state = IdleState;
-        emit stateChanged();
-        emit finished();
+        d->finish();
         return;
     }
 
@@ -203,9 +212,7 @@ void QSoundPlayerJob::_q_stateChanged(QAudio::State state)
 {
     if (state != QAudio::ActiveState) {
         qDebug("QSoundPlayer(%i) audio stopped", d->id);
-        d->state = IdleState;
-        emit stateChanged();
-        emit finished();
+        d->finish();
     }
 }
 
