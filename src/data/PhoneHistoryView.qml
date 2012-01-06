@@ -25,12 +25,12 @@ import 'utils.js' as Utils
 Item {
     id: block
 
-    property alias model: view.model
+    property alias model: historyView.model
     signal addressClicked(string address)
 
     ListHelper {
         id: listHelper
-        model: view.model
+        model: historyView.model
     }
 
     Rectangle {
@@ -67,19 +67,18 @@ Item {
         }
     }
 
-    ListView {
-        id: view
+    ScrollView {
+        id: historyView
 
         anchors.bottom: parent.bottom
         anchors.left: parent.left
-        anchors.right: scrollBar.left
+        anchors.right: parent.right
         anchors.top: header.bottom
-        anchors.margins: appStyle.margin.small
         clip: true
 
         delegate: Item {
             id: item
-            width: view.width
+            width: parent.width
             height: appStyle.icon.smallSize + 2 * appStyle.margin.normal
 
             Rectangle {
@@ -135,7 +134,7 @@ Item {
                 anchors.fill: parent
                 hoverEnabled: true
                 onClicked: {
-                    view.currentIndex = model.index;
+                    historyView.currentIndex = model.index;
                     if (mouse.button == Qt.LeftButton) {
                         block.addressClicked(model.address);
                     } else if (mouse.button == Qt.RightButton) {
@@ -152,25 +151,11 @@ Item {
                 }
                 onDoubleClicked: {
                     if (mouse.button == Qt.LeftButton) {
-                        view.model.call(address);
+                        historyView.model.call(address);
                     }
                 }
             }
         }
-
-        highlight: Highlight {
-            width: view.width
-        }
-        highlightMoveDuration: appStyle.highlightMoveDuration
-    }
-
-    ScrollBar {
-        id: scrollBar
-
-        anchors.top: header.bottom
-        anchors.bottom: parent.bottom
-        anchors.right: parent.right
-        flickableItem: view
     }
 
     Component {
@@ -186,22 +171,22 @@ Item {
             onItemClicked: {
                 var item = menu.model.get(index);
                 if (item.action == 'call') {
-                    view.model.call(callAddress)
+                    historyView.model.call(callAddress)
                 } else if (item.action == 'contact') {
-                    var contact = view.model.contactsModel.getContactByPhone(callPhone);
+                    var contact = historyView.model.contactsModel.getContactByPhone(callPhone);
                     if (contact) {
                         dialogSwapper.showPanel('PhoneContactDialog.qml', {
                             'contactId': contact.id,
                             'contactName': contact.name,
                             'contactPhone': contact.phone,
-                            'model': view.model.contactsModel});
+                            'model': historyView.model.contactsModel});
                     } else {
                         dialogSwapper.showPanel('PhoneContactDialog.qml', {
                             'contactPhone': callPhone,
-                            'model': view.model.contactsModel});
+                            'model': historyView.model.contactsModel});
                     }
                 } else if (item.action == 'remove') {
-                    view.model.removeCall(callId);
+                    historyView.model.removeCall(callId);
                 }
             }
 

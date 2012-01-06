@@ -91,8 +91,9 @@ Panel {
             manager: appClient.discoveryManager
         }
 
-        delegate: Rectangle {
-            width: view.width - 1
+        delegate: Item {
+            anchors.left: parent.left
+            anchors.right: parent.right
             height: appStyle.icon.normalSize + 2
 
             Image {

@@ -51,7 +51,7 @@ Dialog {
             delegate: Item {
                 id: item
 
-                width: view.width - 1
+                width: parent.width
                 height: 24
 
                 Item {

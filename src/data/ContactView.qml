@@ -103,7 +103,7 @@ Item {
         focus: true
 
         highlight: Highlight {
-            width: view.width - 1
+            width: view.width
         }
         highlightMoveDuration: appStyle.highlightMoveDuration
     }

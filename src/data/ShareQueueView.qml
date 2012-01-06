@@ -54,7 +54,7 @@ Item {
         spacing: appStyle.spacing.vertical
 
         delegate: Item {
-            width: view.width - 1
+            width: parent.width
             height: appStyle.icon.smallSize
 
             Image {
