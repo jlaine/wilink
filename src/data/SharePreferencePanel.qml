@@ -73,25 +73,32 @@ Panel {
                 anchors.bottom: placeButton.top
                 anchors.bottomMargin: appStyle.spacing.vertical
                 anchors.left: parent.left
-                anchors.leftMargin: appStyle.spacing.horizontal
                 anchors.right: parent.right
-                anchors.rightMargin: appStyle.spacing.horizontal
                 clip: true
 
                 ScrollView {
                     id: placeView
 
                     anchors.fill: parent
+                    highlight: Item {}
                     model: placeModel
-                    delegate: CheckBox {
+                    delegate: Item {
                         height: appStyle.icon.smallSize
                         width: parent.width
-                        checked: model.checkState == 2
-                        iconSource: 'album.png'
-                        text: model.name
 
-                        onClicked: {
-                            folderModel.setCheckState(model.path, checked ? 0 : 2);
+                        CheckBox {
+                            anchors.left: parent.left
+                            anchors.leftMargin: appStyle.margin.normal
+                            anchors.right: parent.right
+                            anchors.rightMargin: appStyle.margin.normal
+                            anchors.verticalCenter: parent.verticalCenter
+                            checked: model.checkState == 2
+                            iconSource: 'album.png'
+                            text: model.name
+
+                            onClicked: {
+                                folderModel.setCheckState(model.path, checked ? 0 : 2);
+                            }
                         }
                     }
                 }
@@ -122,21 +129,21 @@ Panel {
                         anchors.bottom: parent.bottom
                         anchors.left: parent.left
                         anchors.right: parent.right
-
+                        highlight: Item {}
                         model: VisualDataModel {
                             id: visualModel
 
                             model: folderModel
                             delegate: Item {
                                 height: appStyle.icon.smallSize
-                                width: folderView.width - 1
+                                width: parent.width
 
                                 CheckBox {
                                     id: check
 
                                     anchors.left: parent.left
-                                    anchors.top: parent.top
-                                    anchors.bottom: parent.bottom
+                                    anchors.leftMargin: appStyle.margin.normal
+                                    anchors.verticalCenter: parent.verticalCenter
                                     checked: model.checkState == 2
                                     width: 12
                                     onClicked: {
@@ -151,6 +158,8 @@ Panel {
                                     anchors.leftMargin: appStyle.spacing.horizontal
                                     anchors.verticalCenter: parent.verticalCenter
                                     source: 'album.png'
+                                    width: appStyle.icon.smallSize
+                                    height: appStyle.icon.smallSize
                                 }
 
                                 Label {

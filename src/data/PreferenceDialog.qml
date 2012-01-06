@@ -44,21 +44,21 @@ Dialog {
     Item {
         anchors.fill: contents
 
-        ListView {
+        ScrollView {
             id: tabList
 
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             anchors.left: parent.left
-            interactive: false
-            width: appStyle.icon.smallSize * 4
+            width: appStyle.icon.smallSize * 5
             delegate: Item {
                 height: appStyle.icon.smallSize + 8
-                width: tabList.width - 1
+                width: parent.width
 
                 Image {
                     id: image
                     anchors.left: parent.left
+                    anchors.leftMargin: appStyle.margin.normal
                     anchors.verticalCenter: parent.verticalCenter
                     smooth: true
                     source: model.iconSource
@@ -70,6 +70,7 @@ Dialog {
                     anchors.left: image.right
                     anchors.leftMargin: appStyle.spacing.horizontal
                     anchors.right: parent.right
+                    anchors.rightMargin: appStyle.margin.normal
                     anchors.verticalCenter: parent.verticalCenter
                     elide: Text.ElideRight
                     text: model.name
@@ -84,7 +85,6 @@ Dialog {
                     }
                 }
             }
-            highlight: Highlight {}
             model: appPreferences
         }
 
@@ -94,8 +94,9 @@ Dialog {
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             anchors.left: tabList.right
-            anchors.leftMargin: 8
+            anchors.leftMargin: appStyle.spacing.horizontal
             anchors.right: parent.right 
+            anchors.rightMargin: appStyle.margin.small
 
             onCurrentSourceChanged: {
                 for (var i = 0; i < tabList.model.count; i++) {

@@ -169,13 +169,13 @@ FocusScope {
         anchors.bottom: footer.top
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.margins: appStyle.margin.large
+        anchors.margins: appStyle.margin.normal
     }
 
     Loader {
         id: footer
 
-        anchors.margins: appStyle.margin.large
+        anchors.margins: appStyle.margin.normal
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom

@@ -47,7 +47,7 @@ Item {
 
         anchors.left: rect.right
         anchors.leftMargin: collapsed ? 0 : appStyle.spacing.horizontal
-        anchors.top: parent.top
+        anchors.verticalCenter: parent.verticalCenter
         height: collapsed ? 0 : appStyle.icon.smallSize
         width: collapsed ? 0 : appStyle.icon.smallSize
         source: checkBox.iconSource

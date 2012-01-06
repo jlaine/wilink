@@ -209,7 +209,7 @@ Panel {
                 id: item
 
                 height: appStyle.icon.normalSize
-                width: view.width - 1
+                width: parent.width
 
                 Image {
                     id: image
