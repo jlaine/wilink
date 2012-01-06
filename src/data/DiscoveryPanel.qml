@@ -47,7 +47,7 @@ Panel {
                 text: qsTr('Refresh')
 
                 onClicked: {
-                    view.model.refresh();
+                    discoView.model.refresh();
                 }
             }
 
@@ -72,17 +72,17 @@ Panel {
         }
 
         onLocationChanged: {
-            view.model.rootJid = location.jid;
-            view.model.rootNode = location.node;
+            discoView.model.rootJid = location.jid;
+            discoView.model.rootNode = location.node;
         }
         z: 1
     }
 
-    ListView {
-        id: view
+    ScrollView {
+        id: discoView
 
         anchors.left: parent.left
-        anchors.right: scrollBar.left
+        anchors.right: parent.right
         anchors.top: crumbBar.bottom
         anchors.bottom: parent.bottom
 
@@ -118,15 +118,6 @@ Panel {
                 }
             }
         }
-    }
-
-    ScrollBar {
-        id: scrollBar
-
-        anchors.top: view.top
-        anchors.bottom: parent.bottom
-        anchors.right: parent.right
-        flickableItem: view
     }
 }
 
