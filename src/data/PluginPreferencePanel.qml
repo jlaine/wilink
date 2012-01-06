@@ -44,42 +44,21 @@ Panel {
         anchors.bottom: parent.bottom
         title: qsTr('Plugins')
 
-        Item {
+        ScrollView {
+            id: view
+
             anchors.fill: parent.contents
+            clip: true
+            delegate: pluginDelegate
+            model: ListModel {}
+            spacing: appStyle.spacing.vertical
 
-            ListView {
-                id: view
-
-                anchors.left: parent.left
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                anchors.right: scrollBar.left
-                clip: true
-                delegate: pluginDelegate
-                highlight: Highlight {
-                    width: view.width
+            Component.onCompleted: {
+                for (var i = 0; i < appPlugins.model.count; i++) {
+                    var plugin = appPlugins.model.get(i);
+                    view.model.append({'source': plugin.source,
+                        'selected': plugin.loaded != undefined});
                 }
-                highlightMoveDuration: appStyle.highlightMoveDuration
-                model: ListModel {}
-                spacing: appStyle.spacing.vertical
-
-                Component.onCompleted: {
-                    for (var i = 0; i < appPlugins.model.count; i++) {
-                        var plugin = appPlugins.model.get(i);
-                        view.model.append({'source': plugin.source,
-                            'selected': plugin.loaded != undefined});
-                    }
-                }
-            }
-
-            ScrollBar {
-                id: scrollBar
-
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-                anchors.right: parent.right
-                clip: true
-                flickableItem: view
             }
         }
     }
