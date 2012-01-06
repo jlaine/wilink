@@ -73,16 +73,13 @@ Panel {
 
             MouseArea {
                 anchors.fill: parent
+
                 onClicked: {
                     playerView.currentIndex = index;
                 }
+
                 onDoubleClicked: {
-                    var row = visualModel.modelIndex(index);
-                    if (playerModel.rowCount(row))
-                        visualModel.rootIndex = row;
-                    else {
-                        panel.play(model);
-                    }
+                    panel.play(model);
                 }
             }
 
@@ -106,14 +103,21 @@ Panel {
                     fillMode: Image.PreserveAspectFit
                     width: 32
                     height: 32
-                    source: (Qt.isQtObject(panel.soundJob) && panel.soundJob.url == model.url) ? "start.png" : (model.downloading ? "download.png" : model.imageUrl)
+                    source: {
+                        if (!Qt.isQtObject(panel.soundJob) || panel.soundJob.url != model.url)
+                            return model.imageUrl;
+                        if (panel.soundJob.state == SoundPlayerJob.DownloadingState)
+                            return "download.png";
+                        else
+                            return "start.png";
+                    }
                 }
 
                 Column {
                     id: textColumn
                     anchors.left: imageColumn.right
                     anchors.verticalCenter: parent.verticalCenter
-                    /*width: item.width - imageColumn.width - 60 */
+
                     Label { text: '<b>' + title + '</b>' }
                     Label { text: (item.isSelected && album) ? artist + ' - ' + album : artist }
                 }
@@ -135,14 +139,6 @@ Panel {
                 }
             }
         }
-    }
-
-    VisualDataModel {
-        id: visualModel
-        model: PlayerModel {
-            id: playerModel
-        }
-        delegate: playerDelegate
     }
 
     PanelHeader {
@@ -176,13 +172,20 @@ Panel {
                 iconSource: 'stop.png'
                 text: qsTr('Stop')
                 enabled: Qt.isQtObject(panel.soundJob)
-                onClicked: panel.stop()
+
+                onClicked: {
+                    panel.stop();
+                }
             }
 
             ToolButton {
                 iconSource: 'clear.png'
                 text: qsTr('Clear')
-                onClicked: playerModel.clear()
+
+                onClicked: {
+                    panel.stop();
+                    playerModel.clear();
+                }
             }
         }
     }
@@ -204,7 +207,9 @@ Panel {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: scrollBar.left
-        model: visualModel
+        model: PlayerModel {
+            id: playerModel
+        }
         delegate: playerDelegate
         focus: true
 
@@ -219,22 +224,15 @@ Panel {
         }
 
         Keys.onPressed: {
-            if (event.key == Qt.Key_Backspace && event.modifiers == Qt.NoModifier) {
-                visualModel.rootIndex = visualModel.parentModelIndex();
-            }
-            else if (event.key == Qt.Key_Delete ||
-                    (event.key == Qt.Key_Backspace && event.modifiers == Qt.ControlModifier)) {
+            if (event.key == Qt.Key_Delete ||
+               (event.key == Qt.Key_Backspace && event.modifiers == Qt.ControlModifier)) {
                 if (currentIndex >= 0)
-                    playerModel.removeRow(currentIndex, visualModel.rootIndex);
+                    playerModel.removeRow(currentIndex);
             }
             else if (event.key == Qt.Key_Enter ||
                      event.key == Qt.Key_Return) {
-                var row = visualModel.modelIndex(currentIndex);
-                if (playerModel.rowCount(row))
-                    visualModel.rootIndex = row;
-                else {
+                if (currentIndex >= 0)
                     panel.play(model);
-                }
             }
         }
     }
