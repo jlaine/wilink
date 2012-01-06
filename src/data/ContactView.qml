@@ -92,20 +92,14 @@ Item {
         }
     }
 
-    ListView {
+    ScrollView {
         id: view
 
         anchors.top: header.bottom
         anchors.bottom: parent.bottom
         anchors.left: parent.left
-        anchors.right: scrollBar.left
-        anchors.margins: appStyle.margin.small
+        anchors.right: parent.right
         focus: true
-
-        highlight: Highlight {
-            width: view.width
-        }
-        highlightMoveDuration: appStyle.highlightMoveDuration
     }
 
     Rectangle {
@@ -116,14 +110,5 @@ Item {
         anchors.top: parent.top
         color: '#597fbe'
         width: 1
-    }
-
-    ScrollBar {
-        id: scrollBar
-
-        anchors.top: header.bottom
-        anchors.bottom: parent.bottom
-        anchors.right: parent.right
-        flickableItem: view
     }
 }
