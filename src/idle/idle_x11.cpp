@@ -29,7 +29,7 @@ int IdlePlatform::secondsIdle() { return 0; }
 
 #else
 
-#include <qapplication.h>
+#include <QApplication>
 #include <QDesktopWidget>
 #include <QX11Info>
 
