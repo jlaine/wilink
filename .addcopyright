@@ -4,7 +4,6 @@
     'src/data',
     'src/plugins',
     'src/plugins/phone',
-    'src/plugins/shares',
     'src/qsound',
     'src/tests',
 ],
