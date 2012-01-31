@@ -37,9 +37,27 @@
 #include "client.h"
 #include "diagnostics.h"
 
+class ChatClientPrivate
+{
+public:
+    ChatClientPrivate() : timeOffset(0)
+    {}
+
+    QString diagnosticServer;
+    QStringList discoQueue;
+    QXmppDiscoveryManager *discoManager;
+    QXmppMessage lastMessage;
+    QString mucServer;
+    QString shareServer;
+    int timeOffset;
+    QString timeQueue;
+    QXmppEntityTimeManager *timeManager;
+    quint16 turnPort;
+};
+
 ChatClient::ChatClient(QObject *parent)
-    : QXmppClient(parent),
-    timeOffset(0)
+    : QXmppClient(parent)
+    , d(new ChatClientPrivate)
 {
     bool check;
     Q_UNUSED(check);
@@ -57,18 +75,18 @@ ChatClient::ChatClient(QObject *parent)
     Q_ASSERT(check);
 
     // service discovery
-    discoManager = findExtension<QXmppDiscoveryManager>();
-    check = connect(discoManager, SIGNAL(infoReceived(QXmppDiscoveryIq)),
+    d->discoManager = findExtension<QXmppDiscoveryManager>();
+    check = connect(d->discoManager, SIGNAL(infoReceived(QXmppDiscoveryIq)),
                     this, SLOT(slotDiscoveryInfoReceived(QXmppDiscoveryIq)));
     Q_ASSERT(check);
 
-    check = connect(discoManager, SIGNAL(itemsReceived(QXmppDiscoveryIq)),
+    check = connect(d->discoManager, SIGNAL(itemsReceived(QXmppDiscoveryIq)),
                     this, SLOT(slotDiscoveryItemsReceived(QXmppDiscoveryIq)));
     Q_ASSERT(check);
 
     // server time
-    timeManager = findExtension<QXmppEntityTimeManager>();
-    check = connect(timeManager, SIGNAL(timeReceived(QXmppEntityTimeIq)),
+    d->timeManager = findExtension<QXmppEntityTimeManager>();
+    check = connect(d->timeManager, SIGNAL(timeReceived(QXmppEntityTimeIq)),
                     this, SLOT(slotTimeReceived(QXmppEntityTimeIq)));
     Q_ASSERT(check);
 
@@ -80,6 +98,11 @@ ChatClient::ChatClient(QObject *parent)
 
     // diagnostics
     diagnosticManager();
+}
+
+ChatClient::~ChatClient()
+{
+    delete d;
 }
 
 void ChatClient::connectToServer(const QString &jid, const QString &password)
@@ -104,7 +127,7 @@ QString ChatClient::jid() const
 
 QDateTime ChatClient::serverTime() const
 {
-    return QDateTime::currentDateTime().addSecs(timeOffset);
+    return QDateTime::currentDateTime().addSecs(d->timeOffset);
 }
 
 int ChatClient::statusType() const
@@ -150,7 +173,7 @@ DiagnosticManager *ChatClient::diagnosticManager()
 
 QString ChatClient::diagnosticServer() const
 {
-    return m_diagnosticServer;
+    return d->diagnosticServer;
 }
 
 QXmppDiscoveryManager *ChatClient::discoveryManager()
@@ -165,7 +188,7 @@ QXmppMucManager *ChatClient::mucManager()
 
 QString ChatClient::mucServer() const
 {
-    return m_mucServer;
+    return d->mucServer;
 }
 
 QXmppRosterManager *ChatClient::rosterManager()
@@ -175,7 +198,7 @@ QXmppRosterManager *ChatClient::rosterManager()
 
 QString ChatClient::shareServer() const
 {
-    return m_shareServer;
+    return d->shareServer;
 }
 
 QXmppTransferManager *ChatClient::transferManager()
@@ -185,7 +208,7 @@ QXmppTransferManager *ChatClient::transferManager()
 
 void ChatClient::replayMessage()
 {
-    emit QXmppClient::messageReceived(m_lastMessage);
+    emit QXmppClient::messageReceived(d->lastMessage);
 }
 
 void ChatClient::slotConnected()
@@ -196,12 +219,12 @@ void ChatClient::slotConnected()
     emit jidChanged(jid());
 
     // get server time
-    timeQueue = timeManager->requestTime(domain);
+    d->timeQueue = d->timeManager->requestTime(domain);
 
     // get info for root item
-    const QString id = discoManager->requestInfo(domain);
+    const QString id = d->discoManager->requestInfo(domain);
     if (!id.isEmpty())
-        discoQueue.append(id);
+        d->discoQueue.append(id);
 
     // lookup TURN server
     debug(QString("Looking up STUN server for domain %1").arg(domain));
@@ -212,10 +235,10 @@ void ChatClient::slotConnected()
 void ChatClient::setTurnServer(const QXmppSrvInfo &serviceInfo)
 {
     QString serverName = "turn." + configuration().domain();
-    m_turnPort = 3478;
+    d->turnPort = 3478;
     if (!serviceInfo.records().isEmpty()) {
         serverName = serviceInfo.records().first().target();
-        m_turnPort = serviceInfo.records().first().port();
+        d->turnPort = serviceInfo.records().first().port();
     }
 
     // lookup TURN host name
@@ -231,7 +254,7 @@ void ChatClient::setTurnServer(const QHostInfo &hostInfo)
 
     QXmppCallManager *callManager = findExtension<QXmppCallManager>();
     if (callManager) {
-        callManager->setTurnServer(hostInfo.addresses().first(), m_turnPort);
+        callManager->setTurnServer(hostInfo.addresses().first(), d->turnPort);
         callManager->setTurnUser(configuration().user());
         callManager->setTurnPassword(configuration().password());
     }
@@ -240,41 +263,37 @@ void ChatClient::setTurnServer(const QHostInfo &hostInfo)
 void ChatClient::slotDiscoveryInfoReceived(const QXmppDiscoveryIq &disco)
 {
     // we only want results
-    if (!discoQueue.removeAll(disco.id()) || disco.type() != QXmppIq::Result)
+    if (!d->discoQueue.removeAll(disco.id()) ||
+        disco.type() != QXmppIq::Result)
         return;
 
-    foreach (const QXmppDiscoveryIq::Identity &id, disco.identities())
-    {
+    foreach (const QXmppDiscoveryIq::Identity &id, disco.identities()) {
         // check if it's a conference server
         if (id.category() == QLatin1String("conference") &&
-            id.type() == QLatin1String("text"))
-        {
-            m_mucServer = disco.from();
-            info("Found chat room server " + m_mucServer);
-            emit mucServerChanged(m_mucServer);
+            id.type() == QLatin1String("text")) {
+            d->mucServer = disco.from();
+            info("Found chat room server " + d->mucServer);
+            emit mucServerChanged(d->mucServer);
         }
         // check if it's a diagnostics server
         else if (id.category() == QLatin1String("diagnostics") &&
-                 id.type() == QLatin1String("server"))
-        {
-            m_diagnosticServer = disco.from();
-            info("Found diagnostics server " + m_diagnosticServer);
-            emit diagnosticServerChanged(m_diagnosticServer);
+                 id.type() == QLatin1String("server")) {
+            d->diagnosticServer = disco.from();
+            info("Found diagnostics server " + d->diagnosticServer);
+            emit diagnosticServerChanged(d->diagnosticServer);
         }
 #if 0
         // check if it's a publish-subscribe server
         else if (id.category() == QLatin1String("pubsub") &&
-                 id.type() == QLatin1String("service"))
-        {
-            m_pubSubServer = disco.from();
-            info("Found pubsub server " + m_pubSubServer);
-            emit pubSubServerChanged(m_pubSubServer);
+                 id.type() == QLatin1String("service")) {
+            d->pubSubServer = disco.from();
+            info("Found pubsub server " + d->pubSubServer);
+            emit pubSubServerChanged(d->pubSubServer);
         }
 #endif
         // check if it's a SOCKS5 proxy server
         else if (id.category() == QLatin1String("proxy") &&
-                 id.type() == QLatin1String("bytestreams"))
-        {
+                 id.type() == QLatin1String("bytestreams")) {
             info("Found bytestream proxy " + disco.from());
             QXmppTransferManager *transferManager = findExtension<QXmppTransferManager>();
             if (transferManager)
@@ -282,41 +301,37 @@ void ChatClient::slotDiscoveryInfoReceived(const QXmppDiscoveryIq &disco)
         }
         // check if it's a file sharing server
         else if (id.category() == QLatin1String("store") &&
-                 id.type() == QLatin1String("file"))
-        {
-            m_shareServer = disco.from();
-            info("Found share server " + m_shareServer);
-            emit shareServerChanged(m_shareServer);
+                 id.type() == QLatin1String("file")) {
+            d->shareServer = disco.from();
+            info("Found share server " + d->shareServer);
+            emit shareServerChanged(d->shareServer);
         }
     }
 
     // if it's the root server, ask for items
-    if (disco.from() == configuration().domain() && disco.queryNode().isEmpty())
-    {
-        const QString id = discoManager->requestItems(disco.from(), disco.queryNode());
+    if (disco.from() == configuration().domain() && disco.queryNode().isEmpty()) {
+        const QString id = d->discoManager->requestItems(disco.from(), disco.queryNode());
         if (!id.isEmpty())
-            discoQueue.append(id);
+            d->discoQueue.append(id);
     }
 }
 
 void ChatClient::slotDiscoveryItemsReceived(const QXmppDiscoveryIq &disco)
 {
     // we only want results
-    if (!discoQueue.removeAll(disco.id()) || disco.type() != QXmppIq::Result)
+    if (!d->discoQueue.removeAll(disco.id()) ||
+        disco.type() != QXmppIq::Result)
         return;
 
     if (disco.from() == configuration().domain() &&
-        disco.queryNode().isEmpty())
-    {
+        disco.queryNode().isEmpty()) {
         // root items
-        foreach (const QXmppDiscoveryIq::Item &item, disco.items())
-        {
-            if (!item.jid().isEmpty() && item.node().isEmpty())
-            {
+        foreach (const QXmppDiscoveryIq::Item &item, disco.items()) {
+            if (!item.jid().isEmpty() && item.node().isEmpty()) {
                 // get info for item
-                const QString id = discoManager->requestInfo(item.jid(), item.node());
+                const QString id = d->discoManager->requestInfo(item.jid(), item.node());
                 if (!id.isEmpty())
-                    discoQueue.append(id);
+                    d->discoQueue.append(id);
             }
         }
     }
@@ -336,18 +351,18 @@ void ChatClient::slotError(QXmppClient::Error error)
 void ChatClient::slotMessageReceived(const QXmppMessage &message)
 {
     if (message.type() == QXmppMessage::Chat && !message.body().isEmpty()) {
-        m_lastMessage = message;
+        d->lastMessage = message;
         emit messageReceived(message.from());
     }
 }
 
 void ChatClient::slotTimeReceived(const QXmppEntityTimeIq &time)
 {
-    if (time.id() != timeQueue)
+    if (time.id() != d->timeQueue)
         return;
-    timeQueue = QString();
+    d->timeQueue = QString();
 
     if (time.type() == QXmppIq::Result && time.utc().isValid())
-        timeOffset = QDateTime::currentDateTime().secsTo(time.utc());
+        d->timeOffset = QDateTime::currentDateTime().secsTo(time.utc());
 }
 

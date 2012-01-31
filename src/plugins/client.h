@@ -23,6 +23,7 @@
 #include "QXmppClient.h"
 #include "QXmppMessage.h"
 
+class ChatClientPrivate;
 class DiagnosticManager;
 class QDateTime;
 class QHostInfo;
@@ -32,7 +33,6 @@ class QXmppCallManager;
 class QXmppDiscoveryIq;
 class QXmppDiscoveryManager;
 class QXmppEntityTimeIq;
-class QXmppEntityTimeManager;
 class QXmppMucManager;
 class QXmppSrvInfo;
 class QXmppTransferManager;
@@ -56,6 +56,7 @@ class ChatClient : public QXmppClient
 
 public:
     ChatClient(QObject *parent = 0);
+    ~ChatClient();
     QString jid() const;
     QDateTime serverTime() const;
 
@@ -109,16 +110,7 @@ private:
         return manager;
     }
 
-    QString m_diagnosticServer;
-    QStringList discoQueue;
-    QXmppDiscoveryManager *discoManager;
-    QXmppMessage m_lastMessage;
-    QString m_mucServer;
-    QString m_shareServer;
-    int timeOffset;
-    QString timeQueue;
-    QXmppEntityTimeManager *timeManager;
-    quint16 m_turnPort;
+    ChatClientPrivate *d;
 };
 
 #endif
