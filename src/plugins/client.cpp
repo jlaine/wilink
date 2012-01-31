@@ -63,31 +63,31 @@ ChatClient::ChatClient(QObject *parent)
     Q_UNUSED(check);
 
     check = connect(this, SIGNAL(connected()),
-                    this, SLOT(slotConnected()));
+                    this, SLOT(_q_connected()));
     Q_ASSERT(check);
 
     check = connect(this, SIGNAL(error(QXmppClient::Error)),
-            this, SLOT(slotError(QXmppClient::Error)));
+            this, SLOT(_q_error(QXmppClient::Error)));
     Q_ASSERT(check);
 
     check = connect(this, SIGNAL(messageReceived(QXmppMessage)),
-            this, SLOT(slotMessageReceived(QXmppMessage)));
+            this, SLOT(_q_messageReceived(QXmppMessage)));
     Q_ASSERT(check);
 
     // service discovery
     d->discoManager = findExtension<QXmppDiscoveryManager>();
     check = connect(d->discoManager, SIGNAL(infoReceived(QXmppDiscoveryIq)),
-                    this, SLOT(slotDiscoveryInfoReceived(QXmppDiscoveryIq)));
+                    this, SLOT(_q_discoveryInfoReceived(QXmppDiscoveryIq)));
     Q_ASSERT(check);
 
     check = connect(d->discoManager, SIGNAL(itemsReceived(QXmppDiscoveryIq)),
-                    this, SLOT(slotDiscoveryItemsReceived(QXmppDiscoveryIq)));
+                    this, SLOT(_q_discoveryItemsReceived(QXmppDiscoveryIq)));
     Q_ASSERT(check);
 
     // server time
     d->timeManager = findExtension<QXmppEntityTimeManager>();
     check = connect(d->timeManager, SIGNAL(timeReceived(QXmppEntityTimeIq)),
-                    this, SLOT(slotTimeReceived(QXmppEntityTimeIq)));
+                    this, SLOT(_q_timeReceived(QXmppEntityTimeIq)));
     Q_ASSERT(check);
 
     // file transfers
@@ -211,7 +211,7 @@ void ChatClient::replayMessage()
     emit QXmppClient::messageReceived(d->lastMessage);
 }
 
-void ChatClient::slotConnected()
+void ChatClient::_q_connected()
 {
     const QString domain = configuration().domain();
 
@@ -260,7 +260,7 @@ void ChatClient::setTurnServer(const QHostInfo &hostInfo)
     }
 }
 
-void ChatClient::slotDiscoveryInfoReceived(const QXmppDiscoveryIq &disco)
+void ChatClient::_q_discoveryInfoReceived(const QXmppDiscoveryIq &disco)
 {
     // we only want results
     if (!d->discoQueue.removeAll(disco.id()) ||
@@ -316,7 +316,7 @@ void ChatClient::slotDiscoveryInfoReceived(const QXmppDiscoveryIq &disco)
     }
 }
 
-void ChatClient::slotDiscoveryItemsReceived(const QXmppDiscoveryIq &disco)
+void ChatClient::_q_discoveryItemsReceived(const QXmppDiscoveryIq &disco)
 {
     // we only want results
     if (!d->discoQueue.removeAll(disco.id()) ||
@@ -337,7 +337,7 @@ void ChatClient::slotDiscoveryItemsReceived(const QXmppDiscoveryIq &disco)
     }
 }
 
-void ChatClient::slotError(QXmppClient::Error error)
+void ChatClient::_q_error(QXmppClient::Error error)
 {
     if (error == QXmppClient::XmppStreamError) {
         if (xmppStreamError() == QXmppStanza::Error::Conflict) {
@@ -348,7 +348,7 @@ void ChatClient::slotError(QXmppClient::Error error)
     }
 }
 
-void ChatClient::slotMessageReceived(const QXmppMessage &message)
+void ChatClient::_q_messageReceived(const QXmppMessage &message)
 {
     if (message.type() == QXmppMessage::Chat && !message.body().isEmpty()) {
         d->lastMessage = message;
@@ -356,7 +356,7 @@ void ChatClient::slotMessageReceived(const QXmppMessage &message)
     }
 }
 
-void ChatClient::slotTimeReceived(const QXmppEntityTimeIq &time)
+void ChatClient::_q_timeReceived(const QXmppEntityTimeIq &time)
 {
     if (time.id() != d->timeQueue)
         return;

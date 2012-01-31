@@ -30,7 +30,6 @@
 #include "QXmppClient.h"
 #include "QXmppJingleIq.h"
 #include "QXmppRtpChannel.h"
-#include "QXmppSrvInfo.h"
 #include "QXmppUtils.h"
 
 #include "QSoundStream.h"

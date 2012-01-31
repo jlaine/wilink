@@ -90,12 +90,12 @@ public slots:
     void replayMessage();
 
 private slots:
-    void slotConnected();
-    void slotDiscoveryInfoReceived(const QXmppDiscoveryIq &disco);
-    void slotDiscoveryItemsReceived(const QXmppDiscoveryIq &disco);
-    void slotError(QXmppClient::Error error);
-    void slotMessageReceived(const QXmppMessage &message);
-    void slotTimeReceived(const QXmppEntityTimeIq &time);
+    void _q_connected();
+    void _q_discoveryInfoReceived(const QXmppDiscoveryIq &disco);
+    void _q_discoveryItemsReceived(const QXmppDiscoveryIq &disco);
+    void _q_error(QXmppClient::Error error);
+    void _q_messageReceived(const QXmppMessage &message);
+    void _q_timeReceived(const QXmppEntityTimeIq &time);
     void setTurnServer(const QXmppSrvInfo &serviceInfo);
     void setTurnServer(const QHostInfo &hostInfo);
 
