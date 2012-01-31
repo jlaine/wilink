@@ -32,7 +32,6 @@
 
 #include "QXmppRtpChannel.h"
 #include "QXmppSaslAuth.h"
-#include "QXmppSrvInfo.h"
 #include "QXmppStun.h"
 #include "QXmppUtils.h"
 
@@ -933,22 +932,37 @@ void SipClientPrivate::setState(SipClient::State newState)
 SipClient::SipClient(QObject *parent)
     : QXmppLoggable(parent)
 {
+    bool check;
+    Q_UNUSED(check);
+
     qRegisterMetaType<SipClient::State>("SipClient::State");
     qRegisterMetaType<SipMessage>("SipMessage");
 
     d = new SipClientPrivate(this);
     d->socket = new QUdpSocket(this);
-    connect(d->socket, SIGNAL(readyRead()),
-            this, SLOT(datagramReceived()));
+    check = connect(d->socket, SIGNAL(readyRead()),
+                    this, SLOT(datagramReceived()));
+    Q_ASSERT(check);
 
     d->connectTimer = new QTimer(this);
-    connect(d->connectTimer, SIGNAL(timeout()),
-            this, SLOT(connectToServer()));
+    check = connect(d->connectTimer, SIGNAL(timeout()),
+                    this, SLOT(connectToServer()));
+    Q_ASSERT(check);
 
     d->stunTimer = new QTimer(this);
     d->stunTimer->setSingleShot(true);
-    connect(d->stunTimer, SIGNAL(timeout()),
-            this, SLOT(sendStun()));
+    check = connect(d->stunTimer, SIGNAL(timeout()),
+                    this, SLOT(sendStun()));
+    Q_ASSERT(check);
+
+    // DNS lookups
+    check = connect(&d->sipDns, SIGNAL(finished()),
+                    this, SLOT(_q_sipDnsLookupFinished()));
+    Q_ASSERT(check);
+
+    check = connect(&d->stunDns, SIGNAL(finished()),
+                    this, SLOT(_q_stunDnsLookupFinished()));
+    Q_ASSERT(check);
 }
 
 SipClient::~SipClient()
@@ -1001,12 +1015,14 @@ void SipClient::connectToServer()
 
     // perform DNS SRV lookups
     debug(QString("Looking up STUN server for domain %1").arg(d->domain));
-    QXmppSrvInfo::lookupService("_stun._udp", d->domain, this,
-                                SLOT(setStunServer(QXmppSrvInfo)));
+    d->stunDns.setType(QDnsLookup::SRV);
+    d->stunDns.setName("_stun._udp." + d->domain);
+    d->stunDns.lookup();
 
     debug(QString("Looking up SIP server for domain %1").arg(d->domain));
-    QXmppSrvInfo::lookupService("_sip._udp", d->domain, this,
-                                SLOT(setSipServer(QXmppSrvInfo)));
+    d->sipDns.setType(QDnsLookup::SRV);
+    d->sipDns.setName("_sip._udp." + d->domain);
+    d->sipDns.lookup();
 }
 
 void SipClient::datagramReceived()
@@ -1218,7 +1234,24 @@ void SipClient::sendStun()
     d->stunTimer->start(STUN_RETRY_MS);
 }
 
-void SipClient::setSipServer(const QHostInfo &hostInfo)
+void SipClient::_q_sipDnsLookupFinished()
+{
+    QString serverName;
+
+    if (d->sipDns.error() == QDnsLookup::NoError &&
+        !d->sipDns.serviceRecords().isEmpty()) {
+        serverName = d->sipDns.serviceRecords().first().target();
+        d->serverPort = d->sipDns.serviceRecords().first().port();
+    } else {
+        serverName = "sip." + d->domain;
+        d->serverPort = 5060;
+    }
+
+    // lookup SIP host name
+    QHostInfo::lookupHost(serverName, this, SLOT(_q_sipHostInfoFinished(QHostInfo)));
+}
+
+void SipClient::_q_sipHostInfoFinished(const QHostInfo &hostInfo)
 {
     if (hostInfo.addresses().isEmpty()) {
         warning(QString("Could not lookup SIP server %1").arg(hostInfo.hostName()));
@@ -1230,20 +1263,25 @@ void SipClient::setSipServer(const QHostInfo &hostInfo)
         registerWithServer();
 }
 
-void SipClient::setSipServer(const QXmppSrvInfo &serviceInfo)
+
+void SipClient::_q_stunDnsLookupFinished()
 {
-    QString serverName = "sip." + d->domain;
-    d->serverPort = 5060;
-    if (!serviceInfo.records().isEmpty()) {
-        serverName = serviceInfo.records().first().target();
-        d->serverPort = serviceInfo.records().first().port();
+    QString serverName;
+
+    if (d->stunDns.error() == QDnsLookup::NoError &&
+        !d->stunDns.serviceRecords().isEmpty()) {
+        serverName = d->stunDns.serviceRecords().first().target();
+        d->stunServerPort = d->stunDns.serviceRecords().first().port();
+    } else {
+        serverName = "stun." + d->domain;
+        d->stunServerPort = 3478;
     }
 
-    // lookup SIP host name
-    QHostInfo::lookupHost(serverName, this, SLOT(setSipServer(QHostInfo)));
+    // lookup STUN host name
+    QHostInfo::lookupHost(serverName, this, SLOT(_q_stunHostInfoFinished(QHostInfo)));
 }
 
-void SipClient::setStunServer(const QHostInfo &hostInfo)
+void SipClient::_q_stunHostInfoFinished(const QHostInfo &hostInfo)
 {
     if (hostInfo.addresses().isEmpty()) {
         warning(QString("Could not lookup STUN server %1").arg(hostInfo.hostName()));
@@ -1253,19 +1291,6 @@ void SipClient::setStunServer(const QHostInfo &hostInfo)
 
     // send STUN binding request
     sendStun();
-}
-
-void SipClient::setStunServer(const QXmppSrvInfo &serviceInfo)
-{
-    QString serverName = "stun." + d->domain;
-    d->stunServerPort = 3478;
-    if (!serviceInfo.records().isEmpty()) {
-        serverName = serviceInfo.records().first().target();
-        d->stunServerPort = serviceInfo.records().first().port();
-    }
-
-    // lookup STUN host name
-    QHostInfo::lookupHost(serverName, this, SLOT(setStunServer(QHostInfo)));
 }
 
 SipClient::State SipClient::state() const

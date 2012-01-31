@@ -23,6 +23,7 @@
 #include <QHostAddress>
 #include <QMap>
 #include <QObject>
+#include "qdnslookup.h"
 
 #include "sip.h"
 
@@ -112,11 +113,13 @@ public:
     QList<SipCall*> calls;
 
     // sockets
+    QDnsLookup sipDns;
     QHostAddress localAddress;
     QUdpSocket *socket;
 
     // STUN
     quint32 stunCookie;
+    QDnsLookup stunDns;
     bool stunDone;
     QByteArray stunId;
     QHostAddress stunReflexiveAddress;

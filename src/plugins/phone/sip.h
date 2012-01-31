@@ -32,7 +32,6 @@ class QUdpSocket;
 class QSoundPlayer;
 class QTimer;
 class QXmppRtpAudioChannel;
-class QXmppSrvInfo;
 
 class SipCallContext;
 class SipCallPrivate;
@@ -286,10 +285,10 @@ private slots:
     void datagramReceived();
     void registerWithServer();
     void sendStun();
-    void setSipServer(const QHostInfo &info);
-    void setSipServer(const QXmppSrvInfo &info);
-    void setStunServer(const QHostInfo &info);
-    void setStunServer(const QXmppSrvInfo &info);
+    void _q_sipDnsLookupFinished();
+    void _q_sipHostInfoFinished(const QHostInfo &info);
+    void _q_stunDnsLookupFinished();
+    void _q_stunHostInfoFinished(const QHostInfo &info);
     void transactionFinished();
 
 private:
