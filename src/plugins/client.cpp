@@ -19,6 +19,7 @@
 
 #include <QCoreApplication>
 #include <QHostInfo>
+#include "qdnslookup.h"
 
 #include "QXmppArchiveManager.h"
 #include "QXmppBookmarkManager.h"
@@ -31,7 +32,6 @@
 #include "QXmppMessage.h"
 #include "QXmppMucManager.h"
 #include "QXmppRosterManager.h"
-#include "QXmppSrvInfo.h"
 #include "QXmppTransferManager.h"
 
 #include "client.h"
@@ -46,6 +46,7 @@ public:
     QString diagnosticServer;
     QStringList discoQueue;
     QXmppDiscoveryManager *discoManager;
+    QDnsLookup dns;
     QXmppMessage lastMessage;
     QString mucServer;
     QString shareServer;
@@ -72,6 +73,11 @@ ChatClient::ChatClient(QObject *parent)
 
     check = connect(this, SIGNAL(messageReceived(QXmppMessage)),
             this, SLOT(_q_messageReceived(QXmppMessage)));
+    Q_ASSERT(check);
+
+    // DNS lookups
+    check = connect(&d->dns, SIGNAL(finished()),
+                    this, SLOT(_q_dnsLookupFinished()));
     Q_ASSERT(check);
 
     // service discovery
@@ -228,24 +234,29 @@ void ChatClient::_q_connected()
 
     // lookup TURN server
     debug(QString("Looking up STUN server for domain %1").arg(domain));
-    QXmppSrvInfo::lookupService("_turn._udp", domain, this,
-                                SLOT(setTurnServer(QXmppSrvInfo)));
+    d->dns.setType(QDnsLookup::SRV);
+    d->dns.setName("_turn._udp." + domain);
+    d->dns.lookup();
 }
 
-void ChatClient::setTurnServer(const QXmppSrvInfo &serviceInfo)
+void ChatClient::_q_dnsLookupFinished()
 {
-    QString serverName = "turn." + configuration().domain();
-    d->turnPort = 3478;
-    if (!serviceInfo.records().isEmpty()) {
-        serverName = serviceInfo.records().first().target();
-        d->turnPort = serviceInfo.records().first().port();
+    QString serverName;
+
+    if (d->dns.error() == QDnsLookup::NoError &&
+        !d->dns.serviceRecords().isEmpty()) {
+        serverName = d->dns.serviceRecords().first().target();
+        d->turnPort = d->dns.serviceRecords().first().port();
+    } else {
+        serverName = "turn." + configuration().domain();
+        d->turnPort = 3478;
     }
 
     // lookup TURN host name
-    QHostInfo::lookupHost(serverName, this, SLOT(setTurnServer(QHostInfo)));
+    QHostInfo::lookupHost(serverName, this, SLOT(_q_hostInfoFinished(QHostInfo)));
 }
 
-void ChatClient::setTurnServer(const QHostInfo &hostInfo)
+void ChatClient::_q_hostInfoFinished(const QHostInfo &hostInfo)
 {
     if (hostInfo.addresses().isEmpty()) {
         warning(QString("Could not lookup TURN server %1").arg(hostInfo.hostName()));

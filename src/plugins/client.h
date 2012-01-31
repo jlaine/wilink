@@ -34,7 +34,6 @@ class QXmppDiscoveryIq;
 class QXmppDiscoveryManager;
 class QXmppEntityTimeIq;
 class QXmppMucManager;
-class QXmppSrvInfo;
 class QXmppTransferManager;
 
 class ChatClient : public QXmppClient
@@ -93,11 +92,11 @@ private slots:
     void _q_connected();
     void _q_discoveryInfoReceived(const QXmppDiscoveryIq &disco);
     void _q_discoveryItemsReceived(const QXmppDiscoveryIq &disco);
+    void _q_dnsLookupFinished();
     void _q_error(QXmppClient::Error error);
+    void _q_hostInfoFinished(const QHostInfo &hostInfo);
     void _q_messageReceived(const QXmppMessage &message);
     void _q_timeReceived(const QXmppEntityTimeIq &time);
-    void setTurnServer(const QXmppSrvInfo &serviceInfo);
-    void setTurnServer(const QHostInfo &hostInfo);
 
 private:
     template<class T>
