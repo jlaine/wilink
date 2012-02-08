@@ -4,7 +4,7 @@ set(QT_USE_QTXML 1)
 include(${QT_USE_FILE})
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qsound/src)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp/src/core)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp/src/base)
 add_definitions(-DWILINK_VERSION="${WILINK_VERSION}")
 
 # tests
@@ -25,7 +25,7 @@ add_definitions(-DWILINK_VERSION="${WILINK_VERSION}")
 #target_link_libraries(tests qnetio qsound qxmpp diagnostics ${QT_LIBRARIES} ${QT_QTTEST_LIBRARY})
 
 add_executable(codec codec.cpp)
-target_link_libraries(codec qxmpp ${QT_LIBRARIES})
+target_link_libraries(codec qxmpp-base ${QT_LIBRARIES})
 
 #qt4_wrap_cpp(phone_MOC_SOURCES
 #    phone.h
@@ -40,7 +40,7 @@ target_link_libraries(codec qxmpp ${QT_LIBRARIES})
 
 qt4_wrap_cpp(stun_MOC_SOURCES stun.h)
 add_executable(stun stun.cpp ${stun_MOC_SOURCES})
-target_link_libraries(stun qxmpp ${QT_LIBRARIES})
+target_link_libraries(stun qxmpp-base ${QT_LIBRARIES})
 
 add_executable(hasher hasher.cpp)
-target_link_libraries(hasher qxmpp ${QT_LIBRARIES})
+target_link_libraries(hasher qxmpp-base ${QT_LIBRARIES})
