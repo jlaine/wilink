@@ -4,7 +4,7 @@ include(../qnetio/qnetio.pri)
 include(../qsound/qsound.pri)
 include(../qxmpp/qxmpp.pri)
 
-QT += declarative network xml
+QT += declarative network sql xml
 
 TARGET = wiLink
 VERSION = $$WILINK_VERSION
@@ -92,9 +92,10 @@ RESOURCES += \
 INCLUDEPATH += \
     $$WILINK_INCLUDE_DIR \
     $$IDLE_INCLUDE_DIR \
+    ../qdjango/src/db \
     $$QNETIO_INCLUDE_DIR \
     $$QSOUND_INCLUDE_DIR \
-    $$QXMPP_INCLUDE_DIR
+    $$QXMPP_INCLUDEPATH
 LIBS += \
     -L../idle $$IDLE_LIBS \
     -L../qnetio/src $$QNETIO_LIBS \

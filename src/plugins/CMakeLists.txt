@@ -10,7 +10,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qdjango/src/db)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qnetio/src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qsound/src)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp/src/core)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp/src/base)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp/src/client)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp/src/diagnostics)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp/src/shares)
 
@@ -208,7 +209,7 @@ if(WIN32)
 endif(WIN32)
 
 add_executable(wiLink ${wiLink_SOURCES} ${wiLink_MOC_SOURCES} ${wiLink_RCC_SOURCES} ${WILINK_RESOURCE})
-target_link_libraries(wiLink idle qnetio qxmpp qxmpp-diagnostics qxmpp-shares qdjango-db qsound ${wilink_LIBRARIES})
+target_link_libraries(wiLink idle qnetio qxmpp-client qxmpp-diagnostics qxmpp-shares qdjango-db qsound ${wilink_LIBRARIES})
 
 if(APPLE)
     get_filename_component(BUNDLE_ICON_NAME ${CPACK_BUNDLE_ICON} NAME_WE)
