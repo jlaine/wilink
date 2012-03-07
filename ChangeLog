@@ -1,4 +1,4 @@
-wiLink 2.2.0 (UNRELEASED)
+wiLink 2.2.0 (2012-03-07)
  * Application:
   - Clear fullscreen flag when restoring window geometry.
   - Make "away" color pills friendlier for color-blind.
