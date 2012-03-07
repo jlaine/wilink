@@ -51,7 +51,7 @@ Dialog {
 
     onClose: {
         // stop sound
-        if (Qt.isQtObjec(dialog.soundJob))
+        if (Qt.isQtObject(dialog.soundJob))
             dialog.soundJob.stop();
     }
 
