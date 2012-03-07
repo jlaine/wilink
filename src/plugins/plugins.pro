@@ -100,7 +100,8 @@ LIBS += \
     -L../idle $$IDLE_LIBS \
     -L../qnetio/src $$QNETIO_LIBS \
     -L../qsound/src $$QSOUND_LIBS \
-    -L../qxmpp/src $$QXMPP_LIBS
+    -L../qxmpp/src $$QXMPP_LIBS \
+    -L../qdjango/src/db -lqdjango-db
 PRE_TARGETDEPS += $$QXMPP_LIBRARY_FILE
 
 # Installation
