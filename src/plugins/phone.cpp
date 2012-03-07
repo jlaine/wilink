@@ -487,9 +487,7 @@ void PhoneHistoryModel::addCall(SipCall *call)
     item->call = call;
     connect(item->call, SIGNAL(stateChanged(QXmppCall::State)),
             this, SLOT(callStateChanged(QXmppCall::State)));
-    if (item->call->direction() == QXmppCall::IncomingDirection)
-        item->soundId = wApp->soundPlayer()->play(QUrl(":/call-incoming.ogg"), true)->id();
-    else
+    if (item->call->direction() == QXmppCall::OutgoingDirection)
         connect(item->call, SIGNAL(ringing()), this, SLOT(callRinging()));
 
     QNetworkRequest request(m_url);
