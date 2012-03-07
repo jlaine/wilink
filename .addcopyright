@@ -8,7 +8,6 @@
     'src/qsound/tests',
     'src/tests',
 ],
-'exclude': 'src/flickcharm',
 'license': """wiLink
 Copyright (C) 2009-2012 Wifirst
 See AUTHORS file for a full list of contributors.
