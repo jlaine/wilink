@@ -1,3 +1,7 @@
+wiLink 2.2.2 (2012-03-08)
+ * Calls:
+  - Fix call widget creation.
+
 wiLink 2.2.1 (2012-03-08)
  * Application:
   - Make notification sound stop when dialog is closed.
