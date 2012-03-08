@@ -25,7 +25,7 @@ Item {
     id: callWidget
 
     property QtObject call: null
-    property QtObject soundJob: 0
+    property QtObject soundJob
 
     anchors.left: parent ? parent.left : undefined
     anchors.right: parent ? parent.right : undefined
