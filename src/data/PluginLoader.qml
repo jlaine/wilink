@@ -112,6 +112,7 @@ Item {
             pluginModel.append({ source: 'PhonePlugin.qml', autoload: true });
         pluginModel.append({ source: 'PhotoPlugin.qml', autoload: true });
         pluginModel.append({ source: 'SharePlugin.qml', autoload: true });
+        pluginModel.append({ source: 'WebPlugin.qml' });
         pluginModel.append({ source: 'WifirstPlugin.qml', autoload: true });
 
         for (var i = 0; i < pluginModel.count; i++) {
