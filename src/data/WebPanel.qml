@@ -33,37 +33,29 @@ Panel {
         anchors.right: parent.right
         anchors.top: parent.top
         iconSource: 'photos.png'
-        title: qsTr('Web')
+        title: qsTr('Web') + ' - ' + webView.title
+        subTitle: webView.url
+        toolBar: ToolBar {
+            ToolButton {
+                iconSource: 'back.png'
+                text: qsTr('Go back')
+
+                onClicked: {
+                    webView.back.trigger();
+                }
+            }
+        }
         z: 3
     }
 
-    CrumbBar {
-        id: crumbBar
+    WebView {
+        id: webView
 
         anchors.top: header.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        z: 1
-
-        onLocationChanged: {
-            if (location.isDir) {
-                photoModel.rootUrl = location.url;
-                panel.state = '';
-            } else {
-                flickView.currentIndex = gridView.currentIndex;
-                flickView.positionViewAtIndex(flickView.currentIndex, ListView.Beginning);
-                panel.state = 'details';
-            }
-        }
-    }
-
-    WebView {
-        id: view
-
-        anchors.top: crumbBar.bottom
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
         focus: true
+        url: 'http://www.wifirst.net/'
     }
 }
