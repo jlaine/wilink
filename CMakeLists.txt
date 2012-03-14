@@ -29,9 +29,11 @@ if(WIN32)
         ${CMAKE_FIND_ROOT_PATH}/bin/QtNetwork4.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/QtScript4.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/QtSql4.dll
+        ${CMAKE_FIND_ROOT_PATH}/bin/QtWebKit4.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/QtXml4.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/QtXmlPatterns4.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/mingwm10.dll
+        ${CMAKE_FIND_ROOT_PATH}/bin/phonon4.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/libeay32.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/libgcc_s_dw2-1.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/libogg-0.dll
@@ -47,9 +49,12 @@ if(WIN32)
         ${QT_PLUGINS_DIR}/imageformats/qjpeg4.dll)
     set(WILINK_SQL_PLUGINS
         ${QT_PLUGINS_DIR}/sqldrivers/qsqlite4.dll)
+    set(WILINK_QML_PLUGINS
+        ${QT_IMPORTS_DIR}/QtWebKit/qmlwebkitplugin.dll)
     install(FILES ${WILINK_EXTRA_RUNTIME} DESTINATION bin)
     install(FILES ${WILINK_IMAGE_PLUGINS} DESTINATION bin/imageformats)
     install(FILES ${WILINK_SQL_PLUGINS} DESTINATION bin/sqldrivers)
+    install(FILES ${WILINK_QML_PLUGINS} DESTINATION bin/imports/QtWebKit)
 endif(WIN32)
 
 # Packaging
