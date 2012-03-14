@@ -26,6 +26,10 @@ case "$target" in
 android)
     cd android
     ant release
+    cp bin/wiLink-release-unsigned.apk bin/wiLink-release-unaligned.apk
+    jarsigner -verbose bin/wiLink-release-unaligned.apk wifirst
+    zipalign -v 4 bin/wiLink-release-unaligned.apk bin/wiLink-release-signed.apk
+    rm bin/wiLink-release-unaligned.apk
     ;;
 mac)
     rm -rf release-mac
