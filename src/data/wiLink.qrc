@@ -111,6 +111,8 @@
     <file>ToolButton.qml</file>
     <file>TransferNotification.qml</file>
     <file>TransferWidget.qml</file>
+    <file>WebPanel.qml</file>
+    <file>WebPlugin.qml</file>
     <file>WifirstPlugin.qml</file>
     <!-- Sounds -->
     <file>call-incoming.ogg</file>
