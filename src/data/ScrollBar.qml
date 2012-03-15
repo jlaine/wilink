@@ -28,8 +28,10 @@ Item {
     property int moveQuantity: defaultQuantity
     property bool moveRepeat: false
     property variant orientation: Qt.Vertical
-    property real position: flickableItem.visibleArea.yPosition
-    property real pageSize: flickableItem.visibleArea.heightRatio
+
+    property real contentPos: orientation == Qt.Horizontal ? flickableItem.contentX : flickableItem.contentY
+    property real position: orientation == Qt.Horizontal ? flickableItem.visibleArea.xPosition : flickableItem.visibleArea.yPosition
+    property real pageSize: orientation == Qt.Horizontal ? flickableItem.visibleArea.widthRatio : flickableItem.visibleArea.heightRatio
 
     state: pageSize == 1 ? 'collapsed' : ''
     height: orientation == Qt.Horizontal ? 11 : 100
@@ -82,6 +84,8 @@ Item {
                 GradientStop {position: 0.0; color: '#ffffff'}
                 GradientStop {position: 1.0; color: '#d0d0d0'}
             }
+            z: -1
+
             Rectangle {
                 id: handle
 
@@ -125,7 +129,7 @@ Item {
             MouseArea {
                 id: clickableArea
 
-                property real pressContentY
+                property real pressContentPos
                 property real pressMouseX
                 property real pressPageSize
 
@@ -145,7 +149,7 @@ Item {
                         handle.state = 'pressed';
                         moveAction = 'drag';
                         moveQuantity = 0;
-                        pressContentY = flickableItem.contentY;
+                        pressContentPos = scrollBar.contentPos;
                         pressMouseX = mouse.x;
                         pressPageSize = scrollBar.pageSize;
                     }
@@ -159,7 +163,7 @@ Item {
 
                 onPositionChanged: {
                     if (moveAction == 'drag') {
-                        scrollBar.moveBy((pressContentY - flickableItem.contentY) + (mouse.x - pressMouseX) / pressPageSize);
+                        scrollBar.moveBy((pressContentPos - scrollBar.contentPos) + (mouse.x - pressMouseX) / pressPageSize);
                     }
                 }
             }
@@ -210,14 +214,19 @@ Item {
     }
 
     function moveBy(delta) {
+        var contentSize = (orientation == Qt.Horizontal) ? flickableItem.contentWidth : flickableItem.contentHeight;
+
         // do not exceed bottom
-        delta = Math.min((1 - position - pageSize) * flickableItem.contentHeight, delta);
+        delta = Math.min((1 - position - pageSize) * contentSize, delta);
 
         // do not exceed top
-        delta = Math.max(-position * flickableItem.contentHeight, delta);
+        delta = Math.max(-position * contentSize, delta);
 
         // move
-        flickableItem.contentY = Math.round(flickableItem.contentY + delta);
+        if (orientation == Qt.Horizontal)
+            flickableItem.contentX = Math.round(flickableItem.contentX + delta);
+        else
+            flickableItem.contentY = Math.round(flickableItem.contentY + delta);
     }
 
     states: State {
