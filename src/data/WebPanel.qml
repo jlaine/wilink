@@ -37,12 +37,12 @@ Panel {
         subTitle: webView.url
         toolBar: ToolBar {
             ToolButton {
+                action: webView.back
                 iconSource: 'back.png'
-                text: qsTr('Go back')
-
-                onClicked: {
-                    webView.back.trigger();
-                }
+            }
+            ToolButton {
+                action: webView.forward
+                iconSource: 'forward.png'
             }
         }
         z: 3

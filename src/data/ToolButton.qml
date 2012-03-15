@@ -22,14 +22,21 @@ import QtQuick 1.1
 Item {
     id: button
 
+    property variant action
     property alias iconSource: image.source
     property alias text: label.text
-    property bool enabled: true
+    property bool enabled: action ? action.enabled : true
     signal clicked
 
     height: appStyle.icon.smallSize + 16
     state: mouseArea.pressed ? 'pressed' : (mouseArea.hovered ? 'hovered' : '')
     width: visible ? 64 : 0
+
+    onClicked: {
+        if (button.action) {
+            button.action.trigger();
+        }
+    }
 
     Gradient {
         id: hoverGradient
@@ -85,20 +92,8 @@ Item {
         font.pixelSize: appStyle.font.smallSize
         horizontalAlignment: Text.AlignHCenter
         opacity: button.enabled ? 1 : 0.5
+        text: button.action ? button.action.text : undefined
     }
-
-    states: [
-        State {
-            name: 'hovered'
-            PropertyChanges { target: hoverStop2; color: 'white' }
-            PropertyChanges { target: background; opacity: 0.4 }
-        },
-        State {
-            name: 'pressed'
-            PropertyChanges { target: hoverStop2; color: 'white' }
-            PropertyChanges { target: background; opacity: 0.8 }
-        }
-    ]
 
     MouseArea {
         id: mouseArea
@@ -129,4 +124,17 @@ Item {
         }
         onExited: hovered = false
     }
+
+    states: [
+        State {
+            name: 'hovered'
+            PropertyChanges { target: hoverStop2; color: 'white' }
+            PropertyChanges { target: background; opacity: 0.4 }
+        },
+        State {
+            name: 'pressed'
+            PropertyChanges { target: hoverStop2; color: 'white' }
+            PropertyChanges { target: background; opacity: 0.8 }
+        }
+    ]
 }
