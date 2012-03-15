@@ -224,7 +224,7 @@ if(APPLE)
         COMMAND mkdir -p ${BUNDLE_LOCATION}/Contents/Resources/
         COMMAND touch ${BUNDLE_LOCATION}/Contents/Resources/empty.lproj
         COMMAND cp ${CPACK_BUNDLE_ICON} ${BUNDLE_LOCATION}/Contents/Resources/
-        COMMAND ${CMAKE_SOURCE_DIR}/cmake/copyplugins ${BUNDLE_LOCATION} ${QT_QMAKE_EXECUTABLE} ${WILINK_EXTRA_PLUGINS}
+        COMMAND ${CMAKE_SOURCE_DIR}/cmake/copyplugins -b ${BUNDLE_LOCATION} -q ${QT_QMAKE_EXECUTABLE} -f "${WILINK_EXTRA_FRAMEWORKS}" -i "${WILINK_EXTRA_IMPORTS}" ${WILINK_EXTRA_PLUGINS}
         DEPENDS wiLink)
 endif(APPLE)
 if(WIN32)

@@ -15,10 +15,12 @@ find_package(Qt4 REQUIRED)
 
 # Extra runtime dependencies
 if(APPLE)
+    set(WILINK_EXTRA_FRAMEWORKS Growl)
+    set(WILINK_EXTRA_IMPORTS QtWebKit)
     set(WILINK_EXTRA_PLUGINS
-        ${QT_PLUGINS_DIR}/imageformats/libqgif.*
-        ${QT_PLUGINS_DIR}/imageformats/libqjpeg.*
-        ${QT_PLUGINS_DIR}/sqldrivers/libqsqlite.*)
+        imageformats/libqgif.dylib
+        imageformats/libqjpeg.dylib
+        sqldrivers/libqsqlite.dylib)
 endif(APPLE)
 if(WIN32)
     set(WILINK_EXTRA_RUNTIME

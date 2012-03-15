@@ -1,49 +1,78 @@
-#!/bin/sh
-bundle=$1
-QMAKE=$2
-[ -n "$QMAKE" ] || exit 0
+#!/bin/sh -e
+BUNDLE=
+FRAMEWORKS=
+IMPORTS=
+PLUGINS=
+QMAKE=
 
-# copy libraries
-macdeployqt $bundle -no-plugins
+# parse arguments
+args=`getopt b:f:i:p:q: $*`
+set -- $args
+for i; do
+    case "$i" in
+    -b) shift; BUNDLE=$1; shift;;
+    -f) shift; FRAMEWORKS="$FRAMEWORKS $1"; shift;;
+    -i) shift; IMPORTS="$IMPORTS $1"; shift;;
+    -q) shift; QMAKE=$1; shift;;
+    --) shift; break;;
+    esac
+done
+PLUGINS=$*
 
-# copy Growl
-src="/Library/Frameworks/Growl.framework"
-dst="$bundle/Contents/Frameworks/Growl.framework"
-if [ -e $src -a ! -e $dst ]; then
-    echo "Copying library $src"
-    cp -a $src $dst
+if [ -z "$BUNDLE" ]; then
+    echo "You need to specify bundle"
+    exit 1
 fi
 
-# generate Qt config file
-mkdir -p $bundle/Contents/Resources
-( echo "[Paths]"; echo "Plugins = PlugIns" ) > $bundle/Contents/Resources/qt.conf
-
-# copy resources
+# query qmake
+if [ -z "$QMAKE" ]; then
+    echo "You need to specify qmake"
+    exit 1
+fi
 QT_INSTALL_LIBS=`$QMAKE -query QT_INSTALL_LIBS`
-cp -R $QT_INSTALL_LIBS/Resources/qt_menu.nib $bundle/Contents/Resources/
+QT_INSTALL_IMPORTS=`$QMAKE -query QT_INSTALL_IMPORTS`
+QT_INSTALL_PLUGINS=`$QMAKE -query QT_INSTALL_PLUGINS`
+DEPLOY_LIBS=$BUNDLE/Contents/Frameworks
+DEPLOY_PLUGINS=$BUNDLE/Contents/PlugIns
+DEPLOY_RESOURCES=$BUNDLE/Contents/Resources
 
-skipped="0"
-for input in "$@"; do
-    if [ "$skipped" = "0" ]; then
-        skipped="1"
-        continue
-    fi
-    if [ "$skipped" = "1" ]; then
-        skipped="2"
-        continue
-    fi
-    inputdir=`dirname $input`
-    name=`basename $inputdir`/`basename $input`
-    plugin=$bundle/Contents/PlugIns/$name
+# copy Qt libraries
+macdeployqt $BUNDLE -no-plugins
+
+# generate Qt config file
+mkdir -p $DEPLOY_RESOURCES
+( echo "[Paths]"; echo "Plugins = PlugIns"; echo "Imports = Imports" ) > $DEPLOY_RESOURCES/qt.conf
+
+# copy Qt resources
+cp -R $QT_INSTALL_LIBS/Resources/qt_menu.nib $DEPLOY_RESOURCES/
+
+# copy frameworks
+for framework in $FRAMEWORKS; do
+    src="/Library/Frameworks/$framework.framework"
+    dst="$DEPLOY_LIBS/$framework.framework"
+    echo "Copying framework $framework"
+    rm -rf $dst
+    cp -a $src $dst
+done
+
+# copy imports
+for import in $IMPORTS; do
+    echo "Copying import $import"
+done
+
+# copy plugins
+for name in $PLUGINS; do
+    src=$QT_INSTALL_PLUGINS/$name
+    dst=$DEPLOY_PLUGINS/$name
     echo "Copying plugin $name"
-    mkdir -p `dirname $plugin`
-    cp $input $plugin
-    filter=`basename $input`
-    for dep in `otool -L $plugin | grep -v $filter | grep -v /usr/lib | grep -v /System/Library | cut -d" " -f1`; do
+    mkdir -p `dirname $dst`
+    cp $src $dst
+    filter=`basename $src`
+    for dep in `otool -L $dst | grep -v $filter | grep -v /usr/lib | grep -v /System/Library | cut -d" " -f1`; do
         dep_name=`echo $dep | sed -e 's/.*\/lib\///'`
         dep_id="@executable_path/../Frameworks/$dep_name"
-        install_name_tool -change $dep $dep_id $plugin
-        dep_inst="$bundle/Contents/Frameworks/$dep_name"
+        install_name_tool -change $dep $dep_id $dst
+        dep_inst="$DEPLOY_LIBS/$dep_name"
         if [ ! -e $dep_inst ]; then
             echo "Copying library $dep"
             mkdir -p `dirname $dep_inst`
@@ -55,7 +84,7 @@ done
 
 # Strip QT Framework to keep only "i386" part in case of a universal binary
 # (if QT was installed as a binary from qt.nokia.com, it contains both i386 and ppc parts. WiLink is only supported and tested for i386)
-for framework in `find $bundle/Contents/Frameworks -type f -name 'Qt*'`; do
+for framework in `find $DEPLOY_LIBS -type f -name 'Qt*'`; do
     if file "$framework" | grep -q "universal"; then
         lipo -thin i386 -output "$framework.thin" "$framework" && mv "$framework.thin" "$framework"
     fi
