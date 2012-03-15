@@ -58,9 +58,9 @@ Panel {
             id: webFlickable
 
             anchors.top: parent.top
-            anchors.bottom: parent.bottom
+            anchors.bottom: horizontalScrollBar.top
             anchors.left: parent.left
-            anchors.right: scrollBar.left
+            anchors.right: verticalScrollBar.left
             anchors.margins: appStyle.margin.small
             contentWidth: webView.width
             contentHeight: webView.height
@@ -76,12 +76,22 @@ Panel {
         }
 
         ScrollBar {
-            id: scrollBar
+            id: verticalScrollBar
 
             anchors.top: parent.top
-            anchors.bottom: parent.bottom
+            anchors.bottom: horizontalScrollBar.top
             anchors.right: parent.right
             flickableItem: webFlickable
+        }
+
+        ScrollBar {
+            id: horizontalScrollBar
+
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.right: verticalScrollBar.left
+            flickableItem: webFlickable
+            orientation: Qt.Horizontal
         }
     }
 }
