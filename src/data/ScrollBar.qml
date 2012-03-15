@@ -33,6 +33,7 @@ Item {
     property real position: orientation == Qt.Horizontal ? flickableItem.visibleArea.xPosition : flickableItem.visibleArea.yPosition
     property real pageSize: orientation == Qt.Horizontal ? flickableItem.visibleArea.widthRatio : flickableItem.visibleArea.heightRatio
 
+    clip: true
     state: pageSize == 1 ? 'collapsed' : ''
     height: orientation == Qt.Horizontal ? 11 : 100
     width: orientation == Qt.Horizontal ? 100 : 11
