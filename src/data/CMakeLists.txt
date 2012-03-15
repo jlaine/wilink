@@ -72,6 +72,7 @@ set(ICONS
     scalable/tip.svg
     scalable/transfers.svg
     scalable/upload.svg
+    scalable/web.svg
     scalable/wiLink.svg
     scalable/wiLink-black.svg)
 

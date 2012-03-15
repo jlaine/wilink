@@ -23,12 +23,12 @@ import 'utils.js' as Utils
 Plugin {
     name: qsTr('Web')
     description: qsTr('This plugin allows you to access the web.')
-    imageSource: 'photos.png'
+    imageSource: 'web.png'
 
     onLoaded: {
         dock.model.add({
             'iconSource': 'dock-diagnostics.png',
-            'iconPress': 'diagnostics.png',
+            'iconPress': 'web.png',
             'panelSource': 'WebPanel.qml',
             'priority': 7,
             'text': qsTr('Web'),

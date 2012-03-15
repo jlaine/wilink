@@ -32,7 +32,7 @@ Panel {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        iconSource: 'photos.png'
+        iconSource: 'web.png'
         title: qsTr('Web') + ' - ' + webView.title
         subTitle: webView.url
         toolBar: ToolBar {
