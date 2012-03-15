@@ -28,19 +28,22 @@ ListView {
     height: appStyle.icon.smallSize
     model: panelSwapper.model
     orientation: ListView.Horizontal
-    spacing: 2
-
-    delegate: Rectangle {
+    spacing: -8
+    z: 1
+    delegate: BorderImage {
         id: rect
 
+        border { left: 32; right: 32 }
         height: tabView.height
         width: 200
-        color: '#9fc4f3'
+        source: 'tab.png'
+        z: model.panel.z
 
         Image {
             id: icon
 
             anchors.left: parent.left
+            anchors.leftMargin: 12
             anchors.verticalCenter: parent.verticalCenter
             height: appStyle.icon.tinySize
             width: appStyle.icon.tinySize
@@ -64,13 +67,15 @@ ListView {
             }
         }
 
-        Button {
+        ToolButton {
             id: closeButton
 
             anchors.right: parent.right
+            anchors.rightMargin: 12
             anchors.verticalCenter: parent.verticalCenter
             iconSize: appStyle.icon.tinySize
             iconSource: 'close.png'
+            width: iconSize
             visible: tabView.model.count > 1
 
             onClicked: model.panel.close()
@@ -82,8 +87,23 @@ ListView {
 
             PropertyChanges {
                 target: rect
-                color: '#dfdfdf'
+                source: 'tab-active.png'
             }
         }
+    }
+
+    Rectangle {
+        id: background
+
+        anchors.margins: -1
+        anchors.bottomMargin: 0.5
+        anchors.fill: parent
+        border.color: '#7e7e7e'
+        border.width: 1
+        gradient: Gradient {
+            GradientStop { position: 0; color: '#9bbdf4' }
+            GradientStop { position: 1; color: '#90acd8' }
+        }
+        z: -2
     }
 }

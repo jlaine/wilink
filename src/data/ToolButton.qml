@@ -96,7 +96,7 @@ Item {
             font.pixelSize: appStyle.font.smallSize
             horizontalAlignment: Text.AlignHCenter
             opacity: button.enabled ? 1 : 0.5
-            text: button.action ? button.action.text : undefined
+            text: button.action ? button.action.text : ''
             visible: button.text
         }
     }

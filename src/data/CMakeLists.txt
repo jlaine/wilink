@@ -9,6 +9,8 @@ generate_png(png SIZE 11
     scalable/eject.svg
     scalable/up-arrow.svg)
 
+generate_png(png WIDTH 96 HEIGHT 32 scalable/tab.svg scalable/tab-active.svg)
+
 set(SMALL_ICONS
     scalable/checkbox.svg
     scalable/checkbox-checked.svg)

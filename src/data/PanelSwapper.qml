@@ -135,15 +135,18 @@ FocusScope {
         if (panel) {
             panel.opacity = 1;
             panel.focus = true;
+            panel.z = 1;
         } else {
             background.opacity = 1;
         }
 
         // hide old item
-        if (currentItem)
+        if (currentItem) {
             currentItem.opacity = 0;
-        else
+            currentItem.z = -1;
+        } else {
             background.opacity = 0;
+        }
 
         currentItem = panel;
         for (var i = 0; i < panels.count; i += 1) {
