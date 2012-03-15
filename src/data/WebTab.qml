@@ -41,6 +41,7 @@ Panel {
         ToolBar {
             id: toolBar
 
+            anchors.margins: appStyle.margin.normal
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             anchors.left: parent.left
@@ -48,10 +49,15 @@ Panel {
             ToolButton {
                 action: webView.back
                 iconSource: 'back.png'
+                width: appStyle.icon.smallSize
+                text: ''
             }
+
             ToolButton {
                 action: webView.forward
                 iconSource: 'forward.png'
+                width: appStyle.icon.normalSize
+                text: ''
             }
         }
 
