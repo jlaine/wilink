@@ -18,7 +18,6 @@
  */
 
 import QtQuick 1.1
-import QtWebKit 1.0
 import wiLink 2.0
 
 Panel {
@@ -37,73 +36,14 @@ Panel {
         z: 3
     }
 
-    ListView {
+    TabView {
         id: tabView
 
         anchors.top: header.bottom
         anchors.left: parent.left
         anchors.right: parent.right
         height: appStyle.icon.smallSize
-        model: tabSwapper.model
-        orientation: ListView.Horizontal
-        spacing: 2
-
-        delegate: Rectangle {
-            id: rect
-
-            height: tabView.height
-            width: 200
-            color: '#9fc4f3'
-
-            Image {
-                id: icon
-
-                anchors.left: parent.left
-                anchors.verticalCenter: parent.verticalCenter
-                height: appStyle.icon.tinySize
-                width: appStyle.icon.tinySize
-                smooth: true
-                source: 'web.png'
-            }
-
-            Label {
-                anchors.margins: appStyle.margin.normal
-                anchors.left: icon.right
-                anchors.right: closeButton.left
-                anchors.verticalCenter: parent.verticalCenter
-                elide: Text.ElideRight
-                text: model.panel.title
-            }
-
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    tabSwapper.setCurrentItem(model.panel);
-                }
-            }
-
-            Button {
-                id: closeButton
-
-                anchors.right: parent.right
-                anchors.verticalCenter: parent.verticalCenter
-                iconSize: appStyle.icon.tinySize
-                iconSource: 'close.png'
-                visible: tabView.model.count > 1
- 
-                onClicked: model.panel.close()
-            }
-
-            states: State {
-                name: 'current'
-                when: (model.panel == tabSwapper.currentItem)
-
-                PropertyChanges {
-                    target: rect
-                    color: '#dfdfdf'
-                }
-            }
-        }
+        panelSwapper: tabSwapper
     }
 
     PanelSwapper {
