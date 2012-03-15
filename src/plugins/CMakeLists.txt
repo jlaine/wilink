@@ -2,6 +2,7 @@ set(QT_USE_QTDECLARATIVE 1)
 set(QT_USE_QTNETWORK 1)
 set(QT_USE_QTMULTIMEDIA 1)
 set(QT_USE_QTSQL 1)
+set(QT_USE_QTWEBKIT 1)
 set(QT_USE_QTXML 1)
 include(${QT_USE_FILE})
 
@@ -16,7 +17,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp/src/diagnostics)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp/src/shares)
 
 # Libraries
-set(wilink_LIBRARIES ${QT_QTGUI_LIBRARY} ${QT_QTDECLARATIVE_LIBRARY})
+set(wilink_LIBRARIES ${QT_QTGUI_LIBRARY} ${QT_QTDECLARATIVE_LIBRARY} ${QT_QTWEBKIT_LIBRARY})
 
 # Needed for Qt >= 4.7 on Debian/Ubuntu
 find_library(QTMULTIMEDIAKIT_LIBRARY QtMultimediaKit)
