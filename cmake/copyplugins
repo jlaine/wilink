@@ -33,8 +33,26 @@ QT_INSTALL_LIBS=`$QMAKE -query QT_INSTALL_LIBS`
 QT_INSTALL_IMPORTS=`$QMAKE -query QT_INSTALL_IMPORTS`
 QT_INSTALL_PLUGINS=`$QMAKE -query QT_INSTALL_PLUGINS`
 DEPLOY_LIBS=$BUNDLE/Contents/Frameworks
+DEPLOY_IMPORTS=$BUNDLE/Contents/Imports
 DEPLOY_PLUGINS=$BUNDLE/Contents/PlugIns
 DEPLOY_RESOURCES=$BUNDLE/Contents/Resources
+
+fix_deps() {
+    dst=$1
+    filter=`basename $dst`
+    for dep in `otool -L $dst | grep -v $filter | grep -v /usr/lib | grep -v /System/Library | cut -d" " -f1`; do
+        dep_name=`echo $dep | sed -e 's/.*\/lib\///'`
+        dep_id="@executable_path/../Frameworks/$dep_name"
+        install_name_tool -change $dep $dep_id $dst
+        dep_inst="$DEPLOY_LIBS/$dep_name"
+        if [ ! -e $dep_inst ]; then
+            echo "Copying library $dep"
+            mkdir -p `dirname $dep_inst`
+            cp $dep $dep_inst
+            install_name_tool -id $dep_id $dep_inst
+        fi
+    done
+}
 
 # copy Qt libraries
 macdeployqt $BUNDLE -no-plugins
@@ -56,8 +74,14 @@ for framework in $FRAMEWORKS; do
 done
 
 # copy imports
+mkdir -p $DEPLOY_IMPORTS
 for import in $IMPORTS; do
+    src=$QT_INSTALL_IMPORTS/$import
+    dst=$DEPLOY_IMPORTS/$import
     echo "Copying import $import"
+    rm -rf $dst
+    cp -a $src $dst
+    fix_deps $dst/*.dylib
 done
 
 # copy plugins
@@ -67,19 +91,7 @@ for name in $PLUGINS; do
     echo "Copying plugin $name"
     mkdir -p `dirname $dst`
     cp $src $dst
-    filter=`basename $src`
-    for dep in `otool -L $dst | grep -v $filter | grep -v /usr/lib | grep -v /System/Library | cut -d" " -f1`; do
-        dep_name=`echo $dep | sed -e 's/.*\/lib\///'`
-        dep_id="@executable_path/../Frameworks/$dep_name"
-        install_name_tool -change $dep $dep_id $dst
-        dep_inst="$DEPLOY_LIBS/$dep_name"
-        if [ ! -e $dep_inst ]; then
-            echo "Copying library $dep"
-            mkdir -p `dirname $dep_inst`
-            cp $dep $dep_inst
-            install_name_tool -id $dep_id $dep_inst
-        fi
-    done
+    fix_deps $dst
 done
 
 # Strip QT Framework to keep only "i386" part in case of a universal binary
