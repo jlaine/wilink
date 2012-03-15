@@ -30,6 +30,8 @@ FocusScope {
     property alias text: edit.text
     property alias validator: edit.validator
 
+    signal accepted
+
     focus: true
 
     function backspacePressed() {
@@ -70,6 +72,8 @@ FocusScope {
         font.pixelSize: appStyle.font.normalSize
         smooth: true
         selectByMouse: !readOnly
+
+        onAccepted: bar.accepted()
     }
 
     Label {
