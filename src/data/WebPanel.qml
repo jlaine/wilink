@@ -25,21 +25,10 @@ Panel {
 
     property variant url
 
-    PanelHeader {
-        id: header
-
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
-        iconSource: 'web.png'
-        title: (tabSwapper.currentItem && tabSwapper.currentItem.title) ? tabSwapper.currentItem.title : qsTr('Web')
-        z: 3
-    }
-
     TabView {
         id: tabView
 
-        anchors.top: header.bottom
+        anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
         height: appStyle.icon.smallSize

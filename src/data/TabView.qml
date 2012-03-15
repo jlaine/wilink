@@ -26,7 +26,7 @@ ListView {
     property QtObject panelSwapper
 
     height: appStyle.icon.smallSize
-    model: tabSwapper.model
+    model: panelSwapper.model
     orientation: ListView.Horizontal
     spacing: 2
 
@@ -45,7 +45,7 @@ ListView {
             height: appStyle.icon.tinySize
             width: appStyle.icon.tinySize
             smooth: true
-            source: 'web.png'
+            source: model.panel.iconSource
         }
 
         Label {
@@ -60,7 +60,7 @@ ListView {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                tabSwapper.setCurrentItem(model.panel);
+                panelSwapper.setCurrentItem(model.panel);
             }
         }
 
@@ -78,7 +78,7 @@ ListView {
 
         states: State {
             name: 'current'
-            when: (model.panel == tabSwapper.currentItem)
+            when: (model.panel == panelSwapper.currentItem)
 
             PropertyChanges {
                 target: rect

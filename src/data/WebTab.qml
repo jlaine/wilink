@@ -24,6 +24,7 @@ import wiLink 2.0
 Panel {
     id: panel
 
+    property string iconSource: 'web.png'
     property alias title: webView.title
     property alias url: webView.url
 
