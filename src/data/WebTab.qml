@@ -93,7 +93,6 @@ Panel {
                 focus: true
                 preferredHeight: webFlickable.height
                 preferredWidth: webFlickable.width
-                url: 'http://www.wifirst.net/'
             }
         }
 

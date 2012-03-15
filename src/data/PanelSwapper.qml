@@ -23,6 +23,7 @@ import 'utils.js' as Utils
 FocusScope {
     id: panelSwapper
 
+    property alias model: panels
     property Item currentItem
     property string currentSource
 

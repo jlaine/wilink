@@ -33,20 +33,90 @@ Panel {
         anchors.right: parent.right
         anchors.top: parent.top
         iconSource: 'web.png'
-        title: qsTr('Web') // + (webTab.title ? ' - ' + webTab.title : '')
+        title: (tabSwapper.currentItem && tabSwapper.currentItem.title) ? tabSwapper.currentItem.title : qsTr('Web')
         z: 3
+    }
+
+    ListView {
+        id: tabView
+
+        anchors.top: header.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: appStyle.icon.smallSize
+        model: tabSwapper.model
+        orientation: ListView.Horizontal
+        spacing: 2
+
+        delegate: Rectangle {
+            id: rect
+
+            height: tabView.height
+            width: 200
+            color: '#9fc4f3'
+
+            Image {
+                id: icon
+
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+                height: appStyle.icon.tinySize
+                width: appStyle.icon.tinySize
+                smooth: true
+                source: 'web.png'
+            }
+
+            Label {
+                anchors.margins: appStyle.margin.normal
+                anchors.left: icon.right
+                anchors.right: closeButton.left
+                anchors.verticalCenter: parent.verticalCenter
+                elide: Text.ElideRight
+                text: model.panel.title
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    tabSwapper.setCurrentItem(model.panel);
+                }
+            }
+
+            Button {
+                id: closeButton
+
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                iconSize: appStyle.icon.tinySize
+                iconSource: 'close.png'
+                visible: tabView.model.count > 1
+ 
+                onClicked: model.panel.close()
+            }
+
+            states: State {
+                name: 'current'
+                when: (model.panel == tabSwapper.currentItem)
+
+                PropertyChanges {
+                    target: rect
+                    color: '#dfdfdf'
+                }
+            }
+        }
     }
 
     PanelSwapper {
         id: tabSwapper
 
-        anchors.top: header.bottom
+        anchors.top: tabView.bottom
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
     }
 
     Component.onCompleted: {
+        tabSwapper.showPanel('WebTab.qml', {'url': 'http://www.google.com/'})
         tabSwapper.showPanel('WebTab.qml', {'url': 'https://www.wifirst.net/'})
     }
 }
