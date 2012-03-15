@@ -48,14 +48,40 @@ Panel {
         z: 3
     }
 
-    WebView {
-        id: webView
-
+    FocusScope {
         anchors.top: header.bottom
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        focus: true
-        url: 'http://www.wifirst.net/'
+
+        Flickable {
+            id: webFlickable
+
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.right: scrollBar.left
+            anchors.margins: appStyle.margin.small
+            contentWidth: webView.width
+            contentHeight: webView.height
+
+            WebView {
+                id: webView
+
+                focus: true
+                preferredHeight: webFlickable.height
+                preferredWidth: webFlickable.width
+                url: 'http://www.wifirst.net/'
+            }
+        }
+
+        ScrollBar {
+            id: scrollBar
+
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.right: parent.right
+            flickableItem: webFlickable
+        }
     }
 }
