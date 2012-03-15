@@ -42,6 +42,7 @@ set(ICONS
     scalable/dock-rss.svg
     scalable/dock-share.svg
     scalable/dock-start.svg
+    scalable/dock-web.svg
     scalable/download.svg
     scalable/favorite-active.svg
     scalable/favorite-inactive.svg

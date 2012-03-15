@@ -27,7 +27,7 @@ Plugin {
 
     onLoaded: {
         dock.model.add({
-            'iconSource': 'dock-diagnostics.png',
+            'iconSource': 'dock-web.png',
             'iconPress': 'web.png',
             'panelSource': 'WebPanel.qml',
             'priority': 7,
