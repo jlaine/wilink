@@ -33,89 +33,20 @@ Panel {
         anchors.right: parent.right
         anchors.top: parent.top
         iconSource: 'web.png'
-        title: qsTr('Web') + ' - ' + webView.title
-        toolBar: ToolBar {
-            ToolButton {
-                action: webView.back
-                iconSource: 'back.png'
-            }
-            ToolButton {
-                action: webView.forward
-                iconSource: 'forward.png'
-            }
-        }
+        title: qsTr('Web') // + (webTab.title ? ' - ' + webTab.title : '')
         z: 3
     }
 
-    Rectangle {
-        id: topBar
+    PanelSwapper {
+        id: tabSwapper
 
         anchors.top: header.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        color: '#dfdfdf'
-        height: urlInput.height + 2 * appStyle.margin.normal + 1
-
-        InputBar {
-            id: urlInput
-
-            anchors.margins: appStyle.margin.normal
-            anchors.top: parent.top
-            anchors.left: parent.left
-            anchors.right: parent.right
-            text: webView.url
-
-            onAccepted: {
-                webView.url = urlInput.text;
-            }
-        }
-    }
-
-    FocusScope {
-        anchors.top: topBar.bottom
-        anchors.topMargin: appStyle.margin.normal
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
+    }
 
-        Flickable {
-            id: webFlickable
-
-            anchors.top: parent.top
-            anchors.bottom: horizontalScrollBar.top
-            anchors.left: parent.left
-            anchors.right: verticalScrollBar.left
-            anchors.margins: appStyle.margin.small
-            contentWidth: webView.width
-            contentHeight: webView.height
-
-            WebView {
-                id: webView
-
-                focus: true
-                preferredHeight: webFlickable.height
-                preferredWidth: webFlickable.width
-                url: 'http://www.wifirst.net/'
-            }
-        }
-
-        ScrollBar {
-            id: verticalScrollBar
-
-            anchors.top: parent.top
-            anchors.bottom: horizontalScrollBar.top
-            anchors.right: parent.right
-            flickableItem: webFlickable
-        }
-
-        ScrollBar {
-            id: horizontalScrollBar
-
-            anchors.bottom: parent.bottom
-            anchors.left: parent.left
-            anchors.right: verticalScrollBar.left
-            flickableItem: webFlickable
-            orientation: Qt.Horizontal
-        }
+    Component.onCompleted: {
+        tabSwapper.showPanel('WebTab.qml', {'url': 'https://www.wifirst.net/'})
     }
 }

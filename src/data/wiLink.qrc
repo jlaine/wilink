@@ -115,6 +115,7 @@
     <file>TransferWidget.qml</file>
     <file>WebPanel.qml</file>
     <file>WebPlugin.qml</file>
+    <file>WebTab.qml</file>
     <file>WifirstPlugin.qml</file>
     <!-- Sounds -->
     <file>call-incoming.ogg</file>

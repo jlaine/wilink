@@ -100,4 +100,5 @@ TransferNotification 1.0 TransferNotification.qml
 TransferWidget 1.0 TransferWidget.qml
 WebPanel 1.0 WebPanel.qml
 WebPlugin 1.0 WebPlugin.qml
+WebTab 1.0 WebTab.qml
 WifirstPlugin 1.0 WifirstPlugin.qml
