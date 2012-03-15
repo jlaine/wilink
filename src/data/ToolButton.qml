@@ -23,12 +23,13 @@ Item {
     id: button
 
     property variant action
+    property int iconSize: iconSource != '' ? appStyle.icon.smallSize : 0
     property alias iconSource: image.source
     property alias text: label.text
     property bool enabled: action ? action.enabled : true
     signal clicked
 
-    height: appStyle.icon.smallSize + 16
+    height: iconSize + (label.text ? 16 : 0)
     state: mouseArea.pressed ? 'pressed' : (mouseArea.hovered ? 'hovered' : '')
     width: visible ? 64 : 0
 
@@ -70,29 +71,34 @@ Item {
         width: 1
     }
 
-    Image {
-        id: image
-
-        anchors.top: parent.top
-        anchors.horizontalCenter: parent.horizontalCenter
-        opacity: button.enabled ? 1 : 0.5
-        smooth: true
-        width: appStyle.icon.smallSize
-        height: appStyle.icon.smallSize
-    }
-
-    Label {
-        id: label
-
-        anchors.top: image.bottom
+    Column {
         anchors.left: parent.left
         anchors.right: parent.right
-        color: 'white'
-        elide: Text.ElideRight
-        font.pixelSize: appStyle.font.smallSize
-        horizontalAlignment: Text.AlignHCenter
-        opacity: button.enabled ? 1 : 0.5
-        text: button.action ? button.action.text : undefined
+        anchors.verticalCenter: parent.verticalCenter
+
+        Image {
+            id: image
+
+            anchors.horizontalCenter: parent.horizontalCenter
+            opacity: button.enabled ? 1 : 0.5
+            smooth: true
+            width: iconSize
+            height: iconSize
+        }
+
+        Label {
+            id: label
+
+            anchors.left: parent.left
+            anchors.right: parent.right
+            color: 'white'
+            elide: Text.ElideRight
+            font.pixelSize: appStyle.font.smallSize
+            horizontalAlignment: Text.AlignHCenter
+            opacity: button.enabled ? 1 : 0.5
+            text: button.action ? button.action.text : undefined
+            visible: button.text
+        }
     }
 
     MouseArea {
