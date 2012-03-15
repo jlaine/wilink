@@ -27,160 +27,167 @@ Item {
     property string moveAction: ''
     property int moveQuantity: defaultQuantity
     property bool moveRepeat: false
+    property variant orientation: Qt.Vertical
     property real position: flickableItem.visibleArea.yPosition
     property real pageSize: flickableItem.visibleArea.heightRatio
 
     state: pageSize == 1 ? 'collapsed' : ''
-    width: 11
+    height: orientation == Qt.Horizontal ? 11 : 100
+    width: orientation == Qt.Horizontal ? 100 : 11
 
-    Rectangle {
-        id: track
+    Item {
+        id: container
 
-        anchors.top: scrollBar.top
-        anchors.left: scrollBar.left
-        anchors.topMargin: -1
-        border.color: '#c5c5c5'
-        border.width: 1
-        gradient: Gradient {
-            GradientStop {position: 0.0; color: '#ffffff'}
-            GradientStop {position: 1.0; color: '#d0d0d0'}
-        }
-        height: parent.width
-        width: parent.height - 2 * ( scrollBar.width - 1 )
+        x: orientation == Qt.Horizontal ? 0 : 11
+        width: orientation == Qt.Horizontal ? parent.width : parent.height
+        height: orientation == Qt.Horizontal ? parent.height : parent.width
+
         transform: Rotation {
-            angle: 90
-            origin.x: 0
-            origin.y: track.height
+            angle: orientation == Qt.Horizontal ? 0: 90
+        }
+
+        Image {
+            id: buttonLeft
+
+            anchors.left: parent.left
+            anchors.verticalCenter: parent.verticalCenter
+            source: 'left-arrow.png'
+
+            MouseArea {
+                anchors.fill: parent
+
+                onPressed: {
+                    moveAction = 'up';
+                    moveQuantity = -defaultQuantity;
+                    scrollBar.moveBy(moveQuantity);
+                }
+
+                onReleased: {
+                    moveAction = '';
+                    moveRepeat = false;
+                }
+            }
         }
 
         Rectangle {
-            id: handle
+            id: track
 
-            property int desiredHeight: Math.ceil(scrollBar.pageSize * (track.width - 2))
-
-            Rectangle {
-                id: handleReflect
-
-                anchors.left: parent.left
-                anchors.leftMargin: 3
-                anchors.right: parent.right
-                anchors.rightMargin: 3
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: 1
-                color: '#9cc6ec'
-                height: Math.round(parent.height / 2 - 2)
-                radius: parent.radius
-                smooth: parent.smooth
-            }
-
-            border.color: '#2A85d9'
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.left: buttonLeft.right
+            anchors.right: buttonRight.left
+            border.color: '#c5c5c5'
             border.width: 1
             gradient: Gradient {
-                GradientStop { position: 1.0; color: '#2061c0' }
-                GradientStop { position: 0.2; color: '#afebff' }
+                GradientStop {position: 0.0; color: '#ffffff'}
+                GradientStop {position: 1.0; color: '#d0d0d0'}
             }
-            radius: 10
-            smooth: true
+            Rectangle {
+                id: handle
 
-            height: parent.height
-            width: Math.max(desiredHeight, 20)
-            x: Math.floor(scrollBar.position * (track.width + desiredHeight - width - 2)) + 1
-            y: 0
+                property int desiredWidth: Math.ceil(scrollBar.pageSize * (track.width - 2))
 
-            states: State {
-                name: 'pressed'
-                PropertyChanges { target: handle; border.color: '#4e9de6' }
-            }
-        }
-    }
+                Rectangle {
+                    id: handleReflect
 
-    Image {
-        id: buttonUp
+                    anchors.left: parent.left
+                    anchors.leftMargin: 3
+                    anchors.right: parent.right
+                    anchors.rightMargin: 3
+                    anchors.bottom: parent.bottom
+                    anchors.bottomMargin: 1
+                    color: '#9cc6ec'
+                    height: Math.round(parent.height / 2 - 2)
+                    radius: parent.radius
+                    smooth: parent.smooth
+                }
 
-        anchors.top: parent.top
-        source: 'up-arrow.png'
+                border.color: '#2A85d9'
+                border.width: 1
+                gradient: Gradient {
+                    GradientStop { position: 1.0; color: '#2061c0' }
+                    GradientStop { position: 0.2; color: '#afebff' }
+                }
+                radius: 10
+                smooth: true
 
-        MouseArea {
-            anchors.fill: parent
+                height: parent.height
+                width: Math.max(desiredWidth, 20)
+                x: Math.floor(scrollBar.position * (track.width + desiredWidth - width - 2)) + 1
+                y: 0
 
-            onPressed: {
-                moveAction = 'up';
-                moveQuantity = -defaultQuantity;
-                scrollBar.moveBy(moveQuantity);
-            }
-
-            onReleased: {
-                moveAction = '';
-                moveRepeat = false;
-            }
-        }
-    }
-
-    Image {
-        id: buttonDown
-
-        anchors.bottom: parent.bottom
-        source: 'down-arrow.png'
-
-        MouseArea {
-            anchors.fill: parent
-
-            onPressed: {
-                moveAction = 'down';
-                moveQuantity = defaultQuantity;
-                scrollBar.moveBy(moveQuantity);
+                states: State {
+                    name: 'pressed'
+                    PropertyChanges { target: handle; border.color: '#4e9de6' }
+                }
             }
 
-            onReleased: {
-                moveAction = '';
-                moveRepeat = false;
-            }
-        }
-    }
+            MouseArea {
+                id: clickableArea
 
-    MouseArea {
-        id: clickableArea
+                property real pressContentY
+                property real pressMouseX
+                property real pressPageSize
 
-        property real pressContentY
-        property real pressMouseY
-        property real pressPageSize
+                anchors.fill: parent
+                drag.axis: Drag.YAxis
 
-        anchors.top: buttonUp.bottom
-        anchors.bottom: buttonDown.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        drag.axis: Drag.YAxis
+                onPressed: {
+                    if (mouse.x < handle.x) {
+                        moveAction = 'up';
+                        moveQuantity = -flickableItem.height;
+                        scrollBar.moveBy(moveQuantity);
+                    } else if (mouse.x > handle.x + handle.width) {
+                        moveAction = 'down';
+                        moveQuantity = flickableItem.height;
+                        scrollBar.moveBy(moveQuantity);
+                    } else {
+                        handle.state = 'pressed';
+                        moveAction = 'drag';
+                        moveQuantity = 0;
+                        pressContentY = flickableItem.contentY;
+                        pressMouseX = mouse.x;
+                        pressPageSize = scrollBar.pageSize;
+                    }
+                }
 
-        onPressed: {
-            if (mouse.y < handle.x) {
-                moveAction = 'up';
-                moveQuantity = -flickableItem.height;
-                scrollBar.moveBy(moveQuantity);
-            } else if (mouse.y > handle.x + handle.width) {
-                moveAction = 'down';
-                moveQuantity = flickableItem.height;
-                scrollBar.moveBy(moveQuantity);
-            } else {
-                handle.state = 'pressed';
-                moveAction = 'drag';
-                moveQuantity = 0;
-                pressContentY = flickableItem.contentY;
-                pressMouseY = mouse.y;
-                pressPageSize = scrollBar.pageSize;
+                onReleased: {
+                    handle.state = '';
+                    moveAction = '';
+                    moveRepeat = false;
+                }
+
+                onPositionChanged: {
+                    if (moveAction == 'drag') {
+                        scrollBar.moveBy((pressContentY - flickableItem.contentY) + (mouse.x - pressMouseX) / pressPageSize);
+                    }
+                }
             }
         }
 
-        onReleased: {
-            handle.state = '';
-            moveAction = '';
-            moveRepeat = false;
-        }
+        Image {
+            id: buttonRight
 
-        onPositionChanged: {
-            if (moveAction == 'drag') {
-                scrollBar.moveBy((pressContentY - flickableItem.contentY) + (mouse.y - pressMouseY) / pressPageSize);
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            source: 'right-arrow.png'
+
+            MouseArea {
+                anchors.fill: parent
+
+                onPressed: {
+                    moveAction = 'down';
+                    moveQuantity = defaultQuantity;
+                    scrollBar.moveBy(moveQuantity);
+                }
+
+                onReleased: {
+                    moveAction = '';
+                    moveRepeat = false;
+                }
             }
         }
+
     }
 
     Timer {

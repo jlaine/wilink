@@ -3,6 +3,8 @@
     <!-- Images -->
     <file>down-arrow.png</file>
     <file>eject.png</file>
+    <file>left-arrow.png</file>
+    <file>right-arrow.png</file>
     <file>shadow.png</file>
     <file>up-arrow.png</file>
     <file>128x128/album.png</file>
