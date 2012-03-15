@@ -34,7 +34,6 @@ Panel {
         anchors.top: parent.top
         iconSource: 'web.png'
         title: qsTr('Web') + ' - ' + webView.title
-        subTitle: webView.url
         toolBar: ToolBar {
             ToolButton {
                 action: webView.back
@@ -48,8 +47,33 @@ Panel {
         z: 3
     }
 
-    FocusScope {
+    Rectangle {
+        id: topBar
+
         anchors.top: header.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        color: '#dfdfdf'
+        height: urlInput.height + 2 * appStyle.margin.normal + 1
+
+        InputBar {
+            id: urlInput
+
+            anchors.margins: appStyle.margin.normal
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            text: webView.url
+
+            onAccepted: {
+                webView.url = urlInput.text;
+            }
+        }
+    }
+
+    FocusScope {
+        anchors.top: topBar.bottom
+        anchors.topMargin: appStyle.margin.normal
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
