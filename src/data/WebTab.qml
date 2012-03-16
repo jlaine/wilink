@@ -87,6 +87,7 @@ Panel {
             anchors.top: parent.top
             anchors.left: toolBar.right
             anchors.right: parent.right
+            focus: true
             text: webView.url
 
             onAccepted: {
@@ -98,11 +99,12 @@ Panel {
                 } else {
                     webView.url = 'http://www.google.com/search?q=' + encodeURIComponent(url);
                 }
+                webView.forceActiveFocus()
             }
         }
     }
 
-    FocusScope {
+    Item {
         anchors.top: topBar.bottom
         anchors.bottom: parent.bottom
         anchors.left: parent.left
@@ -121,7 +123,6 @@ Panel {
             WebView {
                 id: webView
 
-                focus: true
                 preferredHeight: webFlickable.height
                 preferredWidth: webFlickable.width
             }

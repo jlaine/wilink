@@ -52,6 +52,7 @@ Panel {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
+        focus: true
     }
 
     Component.onCompleted: {
