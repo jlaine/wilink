@@ -35,6 +35,8 @@ Panel {
         panelSwapper: tabSwapper
 
         footer: ToolButton {
+            id: addButton
+
             anchors.verticalCenter: parent.verticalCenter
             iconSize: appStyle.icon.tinySize
             iconSource: 'add.png'
@@ -42,7 +44,6 @@ Panel {
 
             onClicked: tabSwapper.addPanel('WebTab.qml', {}, true);
         }
-
     }
 
     PanelSwapper {
@@ -57,5 +58,11 @@ Panel {
 
     Component.onCompleted: {
         tabSwapper.addPanel('WebTab.qml', {'url': 'https://www.wifirst.net/'}, true)
+    }
+
+    Keys.onPressed: {
+        if (event.modifiers == Qt.ControlModifier && event.key == Qt.Key_T) {
+            tabSwapper.addPanel('WebTab.qml', {}, true);
+        }
     }
 }
