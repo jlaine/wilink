@@ -22,22 +22,15 @@ import QtQuick 1.1
 Item {
     id: button
 
-    property variant action
     property int iconSize: iconSource != '' ? appStyle.icon.smallSize : 0
     property alias iconSource: image.source
     property alias text: label.text
-    property bool enabled: action ? action.enabled : true
+    property bool enabled: true
     signal clicked
 
     height: iconSize + (label.text ? 16 : 0)
     state: mouseArea.pressed ? 'pressed' : (mouseArea.hovered ? 'hovered' : '')
     width: visible ? 64 : 0
-
-    onClicked: {
-        if (button.action) {
-            button.action.trigger();
-        }
-    }
 
     Gradient {
         id: hoverGradient
@@ -96,7 +89,6 @@ Item {
             font.pixelSize: appStyle.font.smallSize
             horizontalAlignment: Text.AlignHCenter
             opacity: button.enabled ? 1 : 0.5
-            text: button.action ? button.action.text : ''
             visible: button.text
         }
     }
