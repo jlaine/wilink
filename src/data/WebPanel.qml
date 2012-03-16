@@ -33,6 +33,16 @@ Panel {
         anchors.right: parent.right
         height: appStyle.icon.smallSize
         panelSwapper: tabSwapper
+
+        footer: ToolButton {
+            anchors.verticalCenter: parent.verticalCenter
+            iconSize: appStyle.icon.tinySize
+            iconSource: 'add.png'
+            width: iconSize
+
+            onClicked: tabSwapper.showPanel('WebTab.qml')
+        }
+
     }
 
     PanelSwapper {
@@ -45,7 +55,6 @@ Panel {
     }
 
     Component.onCompleted: {
-        tabSwapper.showPanel('WebTab.qml', {'url': 'http://www.google.com/'})
         tabSwapper.showPanel('WebTab.qml', {'url': 'https://www.wifirst.net/'})
     }
 }
