@@ -63,7 +63,6 @@ FocusScope {
             }
 
             panels.append({'source': source, 'properties': properties, 'panel': panel});
-            var savedProperties = panels.get(panels.count-1).properties;
             panel.close.connect(function() {
                 panelSwapper.removePanel(panel);
             });
