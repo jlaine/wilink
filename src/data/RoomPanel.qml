@@ -100,16 +100,6 @@ Panel {
                     dialogSwapper.showPanel('RoomPermissionDialog.qml', {'room': room});
                 }
             }
-
-            ToolButton {
-                iconSource: 'close.png'
-                text: qsTr('Close')
-                onClicked: {
-                    room.leave();
-                    roomListModel.removeRoom(room.jid);
-                    panel.close();
-                }
-            }
         }
     }
 
@@ -221,6 +211,11 @@ Panel {
                 room.join();
             }
         }
+    }
+
+    onClose: {
+        room.leave();
+        roomListModel.removeRoom(room.jid);
     }
 
     Keys.forwardTo: historyView
