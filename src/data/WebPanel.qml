@@ -40,7 +40,7 @@ Panel {
             iconSource: 'add.png'
             width: iconSize
 
-            onClicked: tabSwapper.showPanel('WebTab.qml')
+            onClicked: tabSwapper.addPanel('WebTab.qml', {}, true);
         }
 
     }
@@ -55,6 +55,6 @@ Panel {
     }
 
     Component.onCompleted: {
-        tabSwapper.showPanel('WebTab.qml', {'url': 'https://www.wifirst.net/'})
+        tabSwapper.addPanel('WebTab.qml', {'url': 'https://www.wifirst.net/'}, true)
     }
 }

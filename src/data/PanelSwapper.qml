@@ -35,15 +35,7 @@ FocusScope {
         if (properties == undefined)
             properties = {};
 
-        // if the panel already exists, return it
-        var panel = findPanel(source, properties);
-        if (panel) {
-            if (show)
-                panelSwapper.setCurrentItem(panel);
-            return;
-        }
-
-        // otherwise create the panel
+        // create the panel
         console.log("PanelSwapper creating panel " + source + " " + Utils.dumpProperties(properties));
         var component = Qt.createComponent(source);
         if (component.status == Component.Loading)
@@ -124,7 +116,14 @@ FocusScope {
     }
 
     function showPanel(source, properties) {
-        addPanel(source, properties, true);
+        var panel = findPanel(source, properties);
+        if (panel) {
+            // if the panel already exists, show it
+            panelSwapper.setCurrentItem(panel);
+        } else {
+            // otherwise create and show it
+            addPanel(source, properties, true);
+        }
     }
 
     function setCurrentItem(panel) {
