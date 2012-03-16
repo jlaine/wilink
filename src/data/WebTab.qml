@@ -47,17 +47,36 @@ Panel {
             anchors.left: parent.left
 
             ToolButton {
-                action: webView.back
+                enabled: webView.back.enabled
                 iconSource: 'back.png'
                 width: appStyle.icon.smallSize
-                text: ''
+
+                onClicked: webView.back.triggered()
             }
 
             ToolButton {
-                action: webView.forward
+                enabled: webView.forward.enabled
                 iconSource: 'forward.png'
                 width: appStyle.icon.normalSize
-                text: ''
+
+                onClicked: webView.forward.triggered()
+            }
+
+            ToolButton {
+                enabled: webView.url != '' && webView.reload.enabled
+                iconSource: 'refresh.png'
+                visible: !webView.stop.enabled
+                width: appStyle.icon.normalSize
+
+                onClicked: webView.reload.triggered()
+            }
+
+            ToolButton {
+                iconSource: 'stop.png'
+                visible: webView.stop.enabled
+                width: appStyle.icon.normalSize
+
+                onClicked: webView.stop.triggered()
             }
         }
 
@@ -71,7 +90,14 @@ Panel {
             text: webView.url
 
             onAccepted: {
-                webView.url = urlInput.text;
+                var url = urlInput.text.trim();
+                if (url.match(/^(ftp|http|https):\/\//)) {
+                    webView.url = urlInput.text;
+                } else if ((url.search(/\s/) == -1) && url.match(/\.[a-z]{2,}$/)) {
+                    webView.url = 'http://' + url;
+                } else {
+                    webView.url = 'http://www.google.com/search?q=' + encodeURIComponent(url);
+                }
             }
         }
     }
