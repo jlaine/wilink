@@ -78,7 +78,6 @@ Panel {
 
     FocusScope {
         anchors.top: topBar.bottom
-        anchors.topMargin: appStyle.margin.normal
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
@@ -90,7 +89,6 @@ Panel {
             anchors.bottom: horizontalScrollBar.top
             anchors.left: parent.left
             anchors.right: verticalScrollBar.left
-            anchors.margins: appStyle.margin.small
             contentWidth: webView.width
             contentHeight: webView.height
 
