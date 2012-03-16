@@ -65,7 +65,7 @@ FocusScope {
             panels.append({'source': source, 'properties': properties, 'panel': panel});
             var savedProperties = panels.get(panels.count-1).properties;
             panel.close.connect(function() {
-                panelSwapper.removePanel(source, savedProperties);
+                panelSwapper.removePanel(panel);
             });
 
             if (show)
@@ -86,16 +86,10 @@ FocusScope {
         return null;
     }
 
-    function removePanel(source, properties) {
-        if (properties == undefined)
-            properties = {};
-
+    function removePanel(panel) {
         for (var i = 0; i < panels.count; i++) {
-            if (panels.get(i).source == source &&
-                Utils.equalProperties(panels.get(i).properties, properties)) {
-                var panel = panels.get(i).panel;
-
-                console.log("PanelSwapper removing panel " + source + " " + Utils.dumpProperties(properties));
+            if (panels.get(i).panel == panel) {
+                console.log("PanelSwapper removing panel " + panels.get(i).source + " " + Utils.dumpProperties(panels.get(i).properties));
 
                 // if the panel was visible, show last remaining panel
                 if (panelSwapper.currentItem == panel) {

@@ -83,8 +83,9 @@ Rectangle {
                 function removePanel(source) {
                     for (var i = 0; i < repeater.model.count; i++) {
                         if (repeater.model.get(i).panelSource == source) {
-                            swapper.removePanel(source);
                             repeater.model.remove(i);
+                            var panel = swapper.findPanel(source);
+                            if (panel) panel.close();
                             break;
                         }
                     }
