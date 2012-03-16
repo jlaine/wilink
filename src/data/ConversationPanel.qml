@@ -25,7 +25,9 @@ import 'utils.js' as Utils
 Panel {
     id: panel
 
+    property alias iconSource: vcard.avatar
     property alias jid: conversation.jid
+    property alias title: vcard.name
 
     Conversation {
         id: conversation

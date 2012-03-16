@@ -255,10 +255,19 @@ Panel {
         }
     }
 
+    TabView {
+        id: chatTabs
+
+        anchors.top: parent.top
+        anchors.left: chatPanel.singlePanel ? parent.left : sidebar.right
+        anchors.right: parent.right
+        panelSwapper: chatSwapper
+    }
+
     PanelSwapper {
         id: chatSwapper
 
-        anchors.top: parent.top
+        anchors.top: chatTabs.bottom
         anchors.bottom: parent.bottom
         anchors.left: chatPanel.singlePanel ? parent.left : sidebar.right
         anchors.right: parent.right

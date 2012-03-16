@@ -25,8 +25,10 @@ import 'utils.js' as Utils
 Panel {
     id: panel
 
+    property string iconSource: 'chat.png'
     property alias jid: participantModel.jid
     property alias room: participantModel.room
+    property string title: Utils.jidToUser(jid)
 
     RoomModel {
         id: participantModel
