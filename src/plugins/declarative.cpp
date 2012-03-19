@@ -39,6 +39,7 @@
 
 #include "wallet.h"
 
+#include "accounts.h"
 #include "application.h"
 #include "idle/idle.h"
 #include "calls.h"
@@ -305,6 +306,7 @@ void Plugin::registerTypes(const char *uri)
     qRegisterMetaType<QXmppVideoFrame>("QXmppVideoFrame");
 
     // wiLink
+    qmlRegisterType<AccountModel>(uri, 2, 0, "AccountModel");
     qmlRegisterUncreatableType<ApplicationSettings>(uri, 2, 0, "ApplicationSettings", "");
     qmlRegisterType<CallAudioHelper>(uri, 2, 0, "CallAudioHelper");
     qmlRegisterType<CallVideoHelper>(uri, 2, 0, "CallVideoHelper");

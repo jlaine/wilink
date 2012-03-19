@@ -18,6 +18,7 @@
  */
 
 import QtQuick 1.1
+import QtWebKit 1.0
 import wiLink 2.0
 
 Panel {
@@ -56,8 +57,62 @@ Panel {
         focus: true
     }
 
-    Component.onCompleted: {
-        tabSwapper.addPanel('WebTab.qml', {'url': 'https://www.wifirst.net/'}, true)
+    WebView {
+        id: loginView
+        opacity: 0
+
+        property int accountIndex: 0
+
+        function doLogin() {
+            var account = accountHelper.get(accountIndex);
+            if (!account)
+                return;
+
+            console.log("Exmining account: " + account.type);
+            if (account.type = 'wifirst') {
+                loginView.url = 'https://www.wifirst.net/';
+            }
+        }
+
+        function doXhr(method, url, data) {
+            if (data)
+                data = "'" + data + "'";
+            else
+                data = 'null';
+
+            console.log('Request ' + method + ' ' + url);
+            var js = "var xhr = new XMLHttpRequest();";
+            js += "xhr.open('" + method + "', '" + url + "', false);";
+            if (method == 'POST')
+                js += "xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');";
+            js += "xhr.send(" + data + ");";
+            js += "xhr.status";
+            console.log(js);
+            return loginView.evaluateJavaScript(js);
+        }
+
+        ListHelper {
+            id: accountHelper
+            model: AccountModel {}
+
+            Component.onCompleted: loginView.doLogin()
+        }
+
+        onLoadFinished: {
+            var account = accountHelper.get(accountIndex);
+            if (account.type = 'wifirst') {
+                var data = "login=" + account.username + "&password=" + account.password;
+                var status = doXhr('POST', 'https://www.wifirst.net/sessions', data);
+                if (status == "200") {
+                    console.log("Logged into wifirst account: " + account.username);
+                    tabSwapper.addPanel('WebTab.qml', {'url': 'https://www.wifirst.net/'}, true)
+                } else {
+                    console.log("Could not log into wifirst account: " + status);
+                }
+            }
+            accountIndex += 1;
+            doLogin();
+        }
     }
 
     Keys.onPressed: {
