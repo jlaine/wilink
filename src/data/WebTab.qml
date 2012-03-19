@@ -49,7 +49,7 @@ Panel {
             ToolButton {
                 enabled: webView.back.enabled
                 iconSource: 'back.png'
-                width: appStyle.icon.smallSize
+                width: iconSize
 
                 onClicked: webView.back.triggered()
             }
@@ -57,7 +57,7 @@ Panel {
             ToolButton {
                 enabled: webView.forward.enabled
                 iconSource: 'forward.png'
-                width: appStyle.icon.normalSize
+                width: iconSize
 
                 onClicked: webView.forward.triggered()
             }
@@ -66,7 +66,7 @@ Panel {
                 enabled: webView.url != '' && webView.reload.enabled
                 iconSource: 'refresh.png'
                 visible: !webView.stop.enabled
-                width: appStyle.icon.normalSize
+                width: iconSize
 
                 onClicked: webView.reload.triggered()
             }
@@ -74,7 +74,7 @@ Panel {
             ToolButton {
                 iconSource: 'stop.png'
                 visible: webView.stop.enabled
-                width: appStyle.icon.normalSize
+                width: iconSize
 
                 onClicked: webView.stop.triggered()
             }
