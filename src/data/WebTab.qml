@@ -133,6 +133,10 @@ Panel {
 
                 preferredHeight: webFlickable.height
                 preferredWidth: webFlickable.width
+
+                onLoadFailed: {
+                    webView.html = '<html><head><title>Error loading page</title></head><body>There was an error loading the page.</body></html>';
+                }
             }
         }
 
