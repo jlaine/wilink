@@ -61,9 +61,10 @@ Panel {
         id: loginView
         opacity: 0
 
-        property int accountIndex: 0
+        property int accountIndex: -1
 
         function doLogin() {
+            accountIndex += 1;
             var account = accountHelper.get(accountIndex);
             if (!account)
                 return;
@@ -71,6 +72,8 @@ Panel {
             console.log("Exmining account: " + account.type);
             if (account.type == 'wifirst') {
                 loginView.url = 'https://www.wifirst.net/';
+            } else {
+                doLogin();
             }
         }
 
@@ -109,7 +112,6 @@ Panel {
                     console.log("Could not log into wifirst account: " + status);
                 }
             }
-            accountIndex += 1;
             doLogin();
         }
     }
