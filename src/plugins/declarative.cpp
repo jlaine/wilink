@@ -184,6 +184,16 @@ DeclarativeWallet::DeclarativeWallet(QObject *parent)
 {
 }
 
+QString DeclarativeWallet::find(const QString &realm) const
+{
+    QString tmpJid;
+    QString tmpPassword;
+
+    if (QNetIO::Wallet::instance()->getCredentials(realm, tmpJid, tmpPassword))
+        return tmpJid;
+    return QString();
+}
+
 QString DeclarativeWallet::get(const QString &jid) const
 {
     const QString key = realm(jid);

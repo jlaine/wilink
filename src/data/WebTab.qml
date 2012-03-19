@@ -134,8 +134,29 @@ Panel {
                 preferredHeight: webFlickable.height
                 preferredWidth: webFlickable.width
 
+
+                onAlert: {
+                    console.log("Alert: " + message);
+                }
+
                 onLoadFailed: {
                     webView.html = '<html><head><title>Error loading page</title></head><body>There was an error loading the page.</body></html>';
+                }
+
+                onLoadFinished: {
+                    if (webView.url == 'https://www.wifirst.net/corporate/offers_resident') {
+                        var username = appWallet.find('www.wifirst.net');
+                        var password = appWallet.get(username);
+                        var data = "login=" + username + "&password=" + password;
+                        var status = webView.evaluateJavaScript("var xhr = new XMLHttpRequest();"
+                            + "xhr.open('POST', 'https://www.wifirst.net/sessions', false);"
+                            + "xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');"
+                            + "xhr.send('" + data + "');"
+                            + "xhr.status"
+                        );
+                        if (status == "200")
+                            webView.url = "https://www.wifirst.net/";
+                    }
                 }
             }
         }
