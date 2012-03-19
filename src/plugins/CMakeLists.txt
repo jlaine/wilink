@@ -60,6 +60,7 @@ if(NOT APPLE)
 endif(NOT APPLE)
 
 set(wiLink_SOURCES
+    accounts.cpp
     application.cpp
     calls.cpp
     client.cpp
@@ -90,6 +91,7 @@ endif(APPLE)
 
 set(wiLink_MOC_HEADERS
     application.h
+    accounts.h
     calls.h
     client.h
     console.h
