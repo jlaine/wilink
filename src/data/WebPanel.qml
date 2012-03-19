@@ -87,7 +87,6 @@ Panel {
                 js += "xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');";
             js += "xhr.send(" + data + ");";
             js += "xhr.status";
-            console.log(js);
             return loginView.evaluateJavaScript(js);
         }
 
