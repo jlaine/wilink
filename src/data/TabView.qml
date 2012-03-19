@@ -29,7 +29,6 @@ ListView {
     model: panelSwapper.model
     orientation: ListView.Horizontal
     spacing: -8
-    z: 1
     delegate: BorderImage {
         id: rect
 
@@ -98,12 +97,12 @@ ListView {
         anchors.margins: -1
         anchors.bottomMargin: 0.5
         anchors.fill: parent
-        border.color: '#7e7e7e'
+        border.color: '#8499bd'
         border.width: 1
         gradient: Gradient {
             GradientStop { position: 0; color: '#9bbdf4' }
             GradientStop { position: 1; color: '#90acd8' }
         }
-        z: -2
+        z: -1
     }
 }

@@ -27,16 +27,24 @@ Panel {
     property string iconSource: 'web.png'
     property alias title: webView.title
     property alias url: webView.url
+    clip: true
 
-    Rectangle {
+    Item {
         id: topBar
 
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        color: '#dfdfdf'
         height: urlInput.height + 2 * appStyle.margin.normal + 1
         z: 2
+
+        Rectangle {
+            anchors.fill: parent
+            anchors.topMargin: -1
+            anchors.leftMargin: -1
+            border.color: '#acb4c4'
+            color: '#dfdfdf'
+        }
 
         ToolBar {
             id: toolBar
