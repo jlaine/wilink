@@ -69,7 +69,7 @@ Panel {
                 return;
 
             console.log("Exmining account: " + account.type);
-            if (account.type = 'wifirst') {
+            if (account.type == 'wifirst') {
                 loginView.url = 'https://www.wifirst.net/';
             }
         }
@@ -100,7 +100,7 @@ Panel {
 
         onLoadFinished: {
             var account = accountHelper.get(accountIndex);
-            if (account.type = 'wifirst') {
+            if (account.type == 'wifirst') {
                 var data = "login=" + account.username + "&password=" + account.password;
                 var status = doXhr('POST', 'https://www.wifirst.net/sessions', data);
                 if (status == "200") {
