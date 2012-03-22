@@ -64,7 +64,7 @@ FocusScope {
 
             panels.append({'source': source, 'properties': properties, 'panel': panel});
             panel.close.connect(function() {
-                panelSwapper.removePanel(panel);
+                d.removePanel(panel);
             });
 
             if (show)
@@ -83,35 +83,6 @@ FocusScope {
             }
         }
         return null;
-    }
-
-    function findPanelIndex(panel) {
-        for (var i = 0; i < panels.count; i++) {
-            if (panels.get(i).panel == panel)
-                return i;
-        }
-        return -1;
-    }
-
-    function removePanel(panel) {
-        var i = findPanelIndex(panel);
-        if (i < 0) return;
-
-        console.log("PanelSwapper removing panel " + panels.get(i).source + " " + Utils.dumpProperties(panels.get(i).properties));
-
-        // if the panel was visible, show last remaining panel
-        if (panelSwapper.currentItem == panel) {
-            if (panels.count == 1)
-                panelSwapper.setCurrentItem(null);
-            else if (i == panels.count - 1)
-                panelSwapper.setCurrentItem(panels.get(i - 1).panel);
-            else
-                panelSwapper.setCurrentItem(panels.get(i + 1).panel);
-        }
-
-        // destroy panel
-        panels.remove(i);
-        panel.destroy();
     }
 
     function showPanel(source, properties) {
@@ -157,7 +128,7 @@ FocusScope {
     }
 
     function decrementCurrentIndex() {
-        var currentIndex = findPanelIndex(panelSwapper.currentItem);
+        var currentIndex = d.findPanelIndex(panelSwapper.currentItem);
         if (currentIndex >= 0 && panels.count > 1) {
             var newIndex = (currentIndex == 0) ? (panels.count - 1) : (currentIndex - 1);
             panelSwapper.setCurrentItem(panels.get(newIndex).panel);
@@ -165,7 +136,7 @@ FocusScope {
     }
 
     function incrementCurrentIndex() {
-        var currentIndex = findPanelIndex(panelSwapper.currentItem);
+        var currentIndex = d.findPanelIndex(panelSwapper.currentItem);
         if (currentIndex >= 0 && panels.count > 1) {
             var newIndex = (currentIndex == panels.count - 1) ? 0 : (currentIndex + 1);
             panelSwapper.setCurrentItem(panels.get(newIndex).panel);
@@ -175,6 +146,40 @@ FocusScope {
     Rectangle {
         id: background
         anchors.fill: parent
+    }
+
+    // private implementation
+    Item {
+        id: d
+
+        function findPanelIndex(panel) {
+            for (var i = 0; i < panels.count; i++) {
+                if (panels.get(i).panel == panel)
+                    return i;
+            }
+            return -1;
+        }
+
+        function removePanel(panel) {
+            var i = d.findPanelIndex(panel);
+            if (i < 0) return;
+
+            console.log("PanelSwapper removing panel " + panels.get(i).source + " " + Utils.dumpProperties(panels.get(i).properties));
+
+            // if the panel was visible, show last remaining panel
+            if (panelSwapper.currentItem == panel) {
+                if (panels.count == 1)
+                    panelSwapper.setCurrentItem(null);
+                else if (i == panels.count - 1)
+                    panelSwapper.setCurrentItem(panels.get(i - 1).panel);
+                else
+                    panelSwapper.setCurrentItem(panels.get(i + 1).panel);
+            }
+
+            // destroy panel
+            panels.remove(i);
+            panel.destroy();
+        }
     }
 }
 
