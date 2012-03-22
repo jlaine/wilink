@@ -338,4 +338,12 @@ Panel {
             }
         }
     }
+
+    Keys.onPressed: {
+        if ((event.modifiers  & Qt.ControlModifier) && (event.modifiers & Qt.AltModifier) && event.key == Qt.Key_Left) {
+            chatSwapper.decrementCurrentIndex();
+        } else if ((event.modifiers  & Qt.ControlModifier) && (event.modifiers & Qt.AltModifier) && event.key == Qt.Key_Right) {
+            chatSwapper.incrementCurrentIndex();
+        }
+    }
 }

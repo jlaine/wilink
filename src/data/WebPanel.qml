@@ -119,6 +119,10 @@ Panel {
     Keys.onPressed: {
         if (event.modifiers == Qt.ControlModifier && event.key == Qt.Key_T) {
             tabSwapper.addPanel('WebTab.qml', {}, true);
+        } else if ((event.modifiers  & Qt.ControlModifier) && (event.modifiers & Qt.AltModifier) && event.key == Qt.Key_Left) {
+            tabSwapper.decrementCurrentIndex();
+        } else if ((event.modifiers  & Qt.ControlModifier) && (event.modifiers & Qt.AltModifier) && event.key == Qt.Key_Right) {
+            tabSwapper.incrementCurrentIndex();
         }
     }
 }
