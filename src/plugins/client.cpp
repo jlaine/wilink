@@ -157,6 +157,15 @@ void ChatClient::setStatusType(int statusType)
     }
 }
 
+/** Returns the current subscription type for the given contact.
+ *
+ * @param bareJid
+ */
+int ChatClient::subscriptionType(const QString &bareJid)
+{
+    return rosterManager()->getRosterEntry(bareJid).subscriptionType();
+}
+
 QXmppArchiveManager *ChatClient::archiveManager()
 {
     return getManager<QXmppArchiveManager>();

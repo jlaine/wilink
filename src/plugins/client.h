@@ -87,6 +87,7 @@ signals:
 public slots:
     void connectToServer(const QString &jid, const QString &password);
     void replayMessage();
+    int subscriptionType(const QString &bareJid);
 
 private slots:
     void _q_connected();

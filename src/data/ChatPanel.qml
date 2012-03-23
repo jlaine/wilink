@@ -203,7 +203,7 @@ Panel {
                     // reciprocal subscription.
                     //
                     // FIXME: use QXmppRosterIq::Item::To and QXmppRosterIq::Item::Both
-                    var subscription = appClient.rosterManager.subscriptionType(bareJid);
+                    var subscription = appClient.subscriptionType(bareJid);
                     if (subscription == 2 || subscription == 3) {
                         // accept subscription
                         appClient.rosterManager.acceptSubscription(bareJid);
