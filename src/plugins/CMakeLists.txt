@@ -13,8 +13,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qnetio/src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qsound/src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp/src/base)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp/src/client)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp/src/diagnostics)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp/src/shares)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp-extra/diagnostics)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp-extra/shares)
 
 # Libraries
 set(wilink_LIBRARIES ${QT_QTGUI_LIBRARY} ${QT_QTDECLARATIVE_LIBRARY} ${QT_QTWEBKIT_LIBRARY})
