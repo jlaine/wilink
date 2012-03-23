@@ -6,4 +6,4 @@
 	url = git://git.bolloretelecom.eu/qxmpp.git
 [submodule "src/qdjango"]
 	path = src/qdjango
-	url = git://git.bolloretelecom.eu/qdjango.git
+	url = https://code.google.com/p/qdjango/
