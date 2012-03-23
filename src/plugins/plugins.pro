@@ -33,6 +33,7 @@ android|symbian|contains(MEEGO_EDITION,harmattan) {
 }
 
 SOURCES += \
+    accounts.cpp \
     application.cpp \
     calls.cpp \
     client.cpp \
@@ -57,6 +58,7 @@ SOURCES += \
     window.cpp
 
 HEADERS += \
+    accounts.h \
     application.h \
     calls.h \
     client.h \
@@ -132,6 +134,7 @@ android {
 
     TARGET.CAPABILITY = "NetworkServices ReadUserData WriteUserData UserEnvironment"
 } else:unix {
+    QT += dbus
     isEmpty(PREFIX) {
         PREFIX=/usr/local
     }
