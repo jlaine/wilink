@@ -7,3 +7,6 @@
 [submodule "src/qxmpp-extra"]
 	path = src/qxmpp-extra
 	url = git://git.bolloretelecom.eu/qxmpp-extra.git
+[submodule "src/qdjango"]
+	path = src/qdjango
+	url = https://code.google.com/p/qdjango/
