@@ -14,7 +14,11 @@ add_subdirectory(qdjango)
 add_subdirectory(qnetio)
 add_subdirectory(qsound)
 add_subdirectory(qxmpp)
-add_subdirectory(plugins)
 
-# tests
+# FIXME: remove hard-coded paths
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/qdjango/src/db)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/qxmpp/src/base)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/qxmpp/src/client)
+add_subdirectory(qxmpp-extra)
+add_subdirectory(plugins)
 add_subdirectory(tests)
