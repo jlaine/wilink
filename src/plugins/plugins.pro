@@ -93,17 +93,20 @@ RESOURCES += \
 INCLUDEPATH += \
     $$WILINK_INCLUDE_DIR \
     $$IDLE_INCLUDE_DIR \
-    ../qdjango/src/db \
     $$QNETIO_INCLUDE_DIR \
     $$QSOUND_INCLUDE_DIR \
-    $$QXMPP_INCLUDEPATH
+    $$QXMPP_INCLUDEPATH \
+    ../qdjango/src/db \
+    ../qxmpp-extra/diagnostics \
+    ../qxmpp-extra/shares
+
 LIBS += \
     -L../idle $$IDLE_LIBS \
     -L../qnetio/src $$QNETIO_LIBS \
     -L../qsound/src $$QSOUND_LIBS \
     -L../qxmpp/src $$QXMPP_LIBS \
-    -L../qdjango/src/db -lqdjango-db
-PRE_TARGETDEPS += $$QXMPP_LIBRARY_FILE
+    -L../qdjango/src/db -lqdjango-db \
+    -L../qxmpp-extra -lqxmpp-extra
 
 # Installation
 QMAKE_TARGET_COMPANY="Wifirst"

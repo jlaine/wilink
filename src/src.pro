@@ -6,7 +6,8 @@ SUBDIRS = \
     qdjango \
     qnetio \
     qsound \
-    qxmpp
+    qxmpp \
+    qxmpp-extra
 
 SUBDIRS += plugins
 CONFIG += ordered
