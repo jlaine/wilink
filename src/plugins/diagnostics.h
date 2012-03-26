@@ -21,8 +21,7 @@
 #define __WILINK_DIAGNOSTICS_H__
 
 #include "QXmppClientExtension.h"
-
-#include "iq.h"
+#include "QXmppDiagnosticIq.h"
 
 class DiagnosticManager;
 class QTimer;
@@ -58,10 +57,10 @@ public slots:
 
 private slots:
     void diagnosticServerChanged(const QString &diagServer);
-    void handleResults(const DiagnosticsIq &results);
+    void handleResults(const QXmppDiagnosticIq &results);
 
 private:
-    void run(const DiagnosticsIq &request);
+    void run(const QXmppDiagnosticIq &request);
 
     QString m_diagnosticsServer;
     QString m_html;
@@ -76,14 +75,14 @@ public:
     DiagnosticsAgent(QObject *parent = 0) : QObject(parent) {};
 
 private slots:
-    void handle(const DiagnosticsIq &request);
+    void handle(const QXmppDiagnosticIq &request);
     void transfersFinished(const QList<Transfer> &transfers);
 
 signals:
-    void finished(const DiagnosticsIq &results);
+    void finished(const QXmppDiagnosticIq &results);
 
 private:
-    DiagnosticsIq iq;
+    QXmppDiagnosticIq iq;
 };
 
 #endif

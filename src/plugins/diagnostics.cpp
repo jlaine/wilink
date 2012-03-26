@@ -54,7 +54,7 @@ static int id4 = qRegisterMetaType< Interface >();
 
 /* NETWORK */
 
-void DiagnosticsAgent::handle(const DiagnosticsIq &request)
+void DiagnosticsAgent::handle(const QXmppDiagnosticIq &request)
 {
     iq.setId(request.id());
     iq.setFrom(request.to());
@@ -362,7 +362,7 @@ static QString dumpTransfers(const QList<Transfer> &transfers)
     return table.render();
 }
 
-static QString dumpResults(const DiagnosticsIq &iq)
+static QString dumpResults(const QXmppDiagnosticIq &iq)
 {
     QString text = makeSection("System diagnostics");
 
@@ -410,7 +410,7 @@ static QString dumpResults(const DiagnosticsIq &iq)
 DiagnosticManager::DiagnosticManager()
     : m_thread(0)
 {
-    qRegisterMetaType<DiagnosticsIq>("DiagnosticsIq");
+    qRegisterMetaType<QXmppDiagnosticIq>("QXmppDiagnosticIq");
 }
 
 void DiagnosticManager::setClient(QXmppClient *client)
@@ -435,7 +435,7 @@ QStringList DiagnosticManager::discoveryFeatures() const
     return QStringList() << ns_diagnostics;
 }
 
-void DiagnosticManager::handleResults(const DiagnosticsIq &results)
+void DiagnosticManager::handleResults(const QXmppDiagnosticIq &results)
 {
     m_html = dumpResults(results);
     emit htmlChanged(m_html);
@@ -454,13 +454,13 @@ void DiagnosticManager::handleResults(const DiagnosticsIq &results)
 
 bool DiagnosticManager::handleStanza(const QDomElement &stanza)
 {
-    if (stanza.tagName() == QLatin1String("iq") && DiagnosticsIq::isDiagnosticsIq(stanza)) {
-        DiagnosticsIq iq;
+    if (stanza.tagName() == QLatin1String("iq") && QXmppDiagnosticIq::isDiagnosticIq(stanza)) {
+        QXmppDiagnosticIq iq;
         iq.parse(stanza);
 
         if (iq.type() == QXmppIq::Get) {
             if (m_thread) {
-                DiagnosticsIq response;
+                QXmppDiagnosticIq response;
                 response.setType(QXmppIq::Error);
                 response.setError(
                     QXmppStanza::Error(QXmppStanza::Error::Cancel, QXmppStanza::Error::ServiceUnavailable));
@@ -469,7 +469,7 @@ bool DiagnosticManager::handleStanza(const QDomElement &stanza)
                 client()->sendPacket(response);
             }
             else if (iq.from() != m_diagnosticsServer) {
-                DiagnosticsIq response;
+                QXmppDiagnosticIq response;
                 response.setType(QXmppIq::Error);
                 response.setError(
                     QXmppStanza::Error(QXmppStanza::Error::Cancel, QXmppStanza::Error::Forbidden));
@@ -493,10 +493,10 @@ QString DiagnosticManager::html() const
 
 void DiagnosticManager::refresh()
 {
-    run(DiagnosticsIq());
+    run(QXmppDiagnosticIq());
 }
 
-void DiagnosticManager::run(const DiagnosticsIq &request)
+void DiagnosticManager::run(const QXmppDiagnosticIq &request)
 {
     bool check;
     Q_UNUSED(check);
@@ -508,16 +508,16 @@ void DiagnosticManager::run(const DiagnosticsIq &request)
 
     DiagnosticsAgent *agent = new DiagnosticsAgent;
     agent->moveToThread(m_thread);
-    check = connect(agent, SIGNAL(finished(DiagnosticsIq)),
-                    this, SLOT(handleResults(DiagnosticsIq)));
+    check = connect(agent, SIGNAL(finished(QXmppDiagnosticIq)),
+                    this, SLOT(handleResults(QXmppDiagnosticIq)));
     Q_ASSERT(check);
 
-    check = connect(agent, SIGNAL(finished(DiagnosticsIq)),
+    check = connect(agent, SIGNAL(finished(QXmppDiagnosticIq)),
                     agent, SLOT(deleteLater()));
     Q_ASSERT(check);
 
     QMetaObject::invokeMethod(agent, "handle", Qt::QueuedConnection,
-        Q_ARG(DiagnosticsIq, request));
+        Q_ARG(QXmppDiagnosticIq, request));
 
     m_thread->start();
     emit runningChanged(true);
