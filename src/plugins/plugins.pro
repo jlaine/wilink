@@ -30,6 +30,15 @@ contains(MEEGO_EDITION,harmattan) {
 # embedded version
 android|symbian|contains(MEEGO_EDITION,harmattan) {
     DEFINES += WILINK_EMBEDDED
+    RESOURCES += \
+        ../data/32x32/tiny.qrc \
+        ../data/64x64/normal.qrc \
+        ../data/wiLink.qrc
+} else {
+    RESOURCES += \
+        ../data/16x16/tiny.qrc \
+        ../data/32x32/normal.qrc \
+        ../data/wiLink.qrc
 }
 
 SOURCES += \
@@ -86,11 +95,6 @@ mac {
     SOURCES += application_mac.mm
     LIBS += -framework AppKit
 }
-
-RESOURCES += \
-    ../data/32x32/tiny.qrc \
-    ../data/64x64/normal.qrc \
-    ../data/wiLink.qrc
 
 INCLUDEPATH += \
     $$WILINK_INCLUDE_DIR \
