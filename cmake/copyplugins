@@ -93,11 +93,3 @@ for name in $PLUGINS; do
     cp $src $dst
     fix_deps $dst
 done
-
-# Strip QT Framework to keep only "i386" part in case of a universal binary
-# (if QT was installed as a binary from qt.nokia.com, it contains both i386 and ppc parts. WiLink is only supported and tested for i386)
-for framework in `find $DEPLOY_LIBS -type f -name 'Qt*'`; do
-    if file "$framework" | grep -q "universal"; then
-        lipo -thin i386 -output "$framework.thin" "$framework" && mv "$framework.thin" "$framework"
-    fi
-done

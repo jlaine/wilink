@@ -35,7 +35,7 @@ mac)
     rm -rf release-mac
     mkdir release-mac
     cd release-mac
-    cmake .. -DCMAKE_CXX_FLAGS="-arch i386"
+    cmake ..
     make package
     ;;
 windows)
