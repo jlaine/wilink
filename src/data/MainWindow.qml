@@ -64,6 +64,7 @@ FocusScope {
 
     Style {
         id: appStyle
+        isMobile: application.isMobile
     }
 
     Wallet {

@@ -24,7 +24,7 @@ Item {
     property alias font: fontItem
     property int highlightMoveDuration: 500
     property alias icon: iconItem
-    property bool isMobile: application.isMobile
+    property bool isMobile: false
     property alias margin: marginItem
     property int sidebarWidth: isMobile ? 250 : 200
     property alias spacing: spacingItem
