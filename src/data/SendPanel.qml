@@ -39,18 +39,16 @@ Item {
         spacing: appStyle.icon.normalSize
 
         ToolButton {
-            iconSize: 64
-            iconSource: '64x64/file.png'
-            height: appStyle.icon.normalSize
-            width: 96
+            iconSize: appStyle.icon.largeSize
+            iconSource: '128x128/file.png'
+            width: appStyle.icon.largeSize * 1.5
             text: qsTr('Send a file')
         }
 
         ToolButton {
-            iconSize: 64
-            iconSource: '64x64/photos.png'
-            height: appStyle.icon.normalSize
-            width: 96
+            iconSize: appStyle.icon.largeSize
+            iconSource: '128x128/photos.png'
+            width: appStyle.icon.largeSize * 1.5
             text: qsTr('Send a photo')
         }
     }
