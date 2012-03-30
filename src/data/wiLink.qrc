@@ -12,6 +12,7 @@
     <file>128x128/album.png</file>
     <file>128x128/file.png</file>
     <file>128x128/peer.png</file>
+    <file>128x128/photos.png</file>
     <file>128x128/wiLink.png</file>
     <!-- QML -->
     <file>utils.js</file>
