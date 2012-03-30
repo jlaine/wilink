@@ -52,6 +52,7 @@ Item {
         property int tinySize: isMobile ? 32 : 16
         property int smallSize: isMobile ? 48 : 24
         property int normalSize: isMobile ? 64 : 32
+        property int largeSize: isMobile ? 128 : 64
     }
 
     Item {
