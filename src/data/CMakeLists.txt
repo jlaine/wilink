@@ -83,6 +83,7 @@ set(LARGE_ICONS
     scalable/album.svg
     scalable/file.svg
     scalable/peer.svg
+    scalable/photos.svg
     scalable/wiLink.svg)
 
 # 16x16 icons
