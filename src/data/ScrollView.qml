@@ -22,6 +22,7 @@ import QtQuick 1.1
 FocusScope {
     property alias count: view.count
     property alias currentIndex: view.currentIndex
+    property alias currentItem: view.currentItem
     property alias delegate: view.delegate
     property alias highlight: view.highlight
     property alias model: view.model
