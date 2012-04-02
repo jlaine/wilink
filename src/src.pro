@@ -9,5 +9,5 @@ SUBDIRS = \
     qxmpp \
     qxmpp-extra
 
-SUBDIRS += plugins
+SUBDIRS += app
 CONFIG += ordered
