@@ -80,7 +80,7 @@ if(APPLE)
     execute_process(COMMAND sw_vers -productVersion COMMAND cut -d. -f1,2
         OUTPUT_VARIABLE OSX_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
     set(BUNDLE_DMG ${PROJECT_NAME}-${WILINK_VERSION}-mac-${OSX_VERSION}.dmg)
-    set(BUNDLE_LOCATION ${CMAKE_BINARY_DIR}/src/plugins/wiLink.app)
+    set(BUNDLE_LOCATION ${CMAKE_BINARY_DIR}/src/app/wiLink.app)
     set(_dmg_temp ${BUNDLE_DMG}.temp)
     add_custom_command(OUTPUT ${BUNDLE_DMG}
         COMMAND rm -rf ${_dmg_temp} ${BUNDLE_DMG}
