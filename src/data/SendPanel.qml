@@ -44,6 +44,13 @@ Panel {
         anchors.left: parent.left
         anchors.right: parent.right
         z: 1
+
+        onLocationChanged: {
+            if (location.isDir) {
+                folderModel.rootUrl = location.url;
+                panel.state = 'browsing';
+            }
+        }
     }
 
     ToolBar {
@@ -59,9 +66,7 @@ Panel {
             text: qsTr('Send a file')
 
             onClicked: {
-                folderModel.rootUrl = 'file:///';
-                panel.state = 'browsing';
-                folderView.forceActiveFocus();
+                crumbBar.push({'name': 'Files', 'isDir': true, 'url': 'file:///'});
             }
         }
 
@@ -72,9 +77,7 @@ Panel {
             text: qsTr('Send a photo')
 
             onClicked: {
-                folderModel.rootUrl = 'wifirst://www.wifirst.net/w';
-                panel.state = 'browsing';
-                folderView.forceActiveFocus();
+                crumbBar.push({'name': 'Photos', 'isDir': true, 'url': 'wifirst://www.wifirst.net/w'});
             }
         }
     }
@@ -95,6 +98,7 @@ Panel {
             function clicked() {
                 crumbBar.push({'name': model.name, 'isDir': model.isDir, 'url': model.url});
                 folderModel.rootUrl = model.url;
+                folderView.forceActiveFocus();
             }
 
             Image {
