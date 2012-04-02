@@ -48,7 +48,6 @@ Panel {
         onLocationChanged: {
             if (location.isDir) {
                 folderModel.rootUrl = location.url;
-                panel.state = 'browsing';
             }
         }
     }
@@ -130,6 +129,9 @@ Panel {
         opacity: 0
     }
 
+    Component.onCompleted: {
+        crumbBar.push({'name': 'Send', 'isDir': true, url: ''});
+    }
     Keys.onPressed: {
         if (event.key == Qt.Key_Back ||
                  event.key == Qt.Key_Backspace ||
@@ -146,6 +148,7 @@ Panel {
 
     states: State {
         name: 'browsing'
+        when: (folderModel.rootUrl != '')
         PropertyChanges { target: folderView; opacity: 1 }
         PropertyChanges { target: rootView; opacity: 0 }
     }
