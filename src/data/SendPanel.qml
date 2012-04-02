@@ -18,8 +18,11 @@
  */
 
 import QtQuick 1.1
+import wiLink 2.0
 
-Item {
+Panel {
+    id: panel
+
     width: 600
     height: 100
 
@@ -34,7 +37,18 @@ Item {
         color: '#888'
     }
 
+    CrumbBar {
+        id: crumbBar
+
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        z: 1
+    }
+
     ToolBar {
+        id: rootView
+
         anchors.centerIn: parent
         spacing: appStyle.icon.normalSize
 
@@ -43,6 +57,12 @@ Item {
             iconSource: '128x128/file.png'
             width: appStyle.icon.largeSize * 1.5
             text: qsTr('Send a file')
+
+            onClicked: {
+                folderModel.rootUrl = 'file:///';
+                panel.state = 'browsing';
+                folderView.forceActiveFocus();
+            }
         }
 
         ToolButton {
@@ -50,6 +70,79 @@ Item {
             iconSource: '128x128/photos.png'
             width: appStyle.icon.largeSize * 1.5
             text: qsTr('Send a photo')
+
+            onClicked: {
+                folderModel.rootUrl = 'wifirst://www.wifirst.net/w';
+                panel.state = 'browsing';
+                folderView.forceActiveFocus();
+            }
         }
+    }
+
+    ScrollView {
+        id: folderView
+
+        anchors.top: crumbBar.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        delegate: Item {
+            id: item
+
+            width: view.width
+            height: 64
+
+            function clicked() {
+                crumbBar.push({'name': model.name, 'isDir': model.isDir, 'url': model.url});
+                folderModel.rootUrl = model.url;
+            }
+
+            Image {
+                id: icon
+
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+                source: model.isDir ? '128x128/album.png' : '128x128/file.png'
+                width: appStyle.icon.smallSize
+                height: appStyle.icon.smallSize
+            }
+
+            Label {
+                anchors.left: icon.right
+                anchors.leftMargin: appStyle.spacing.horizontal
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                text: model.name
+            }
+
+            MouseArea {
+                anchors.fill: parent
+                onClicked: item.clicked()
+            }
+        }
+        model: PhotoModel {
+            id: folderModel
+        }
+        opacity: 0
+    }
+
+    Keys.onPressed: {
+        if (event.key == Qt.Key_Back ||
+                 event.key == Qt.Key_Backspace ||
+                 event.key == Qt.Key_Escape) {
+            if (crumbBar.model.count > 1) {
+                crumbBar.pop();
+            }
+        }
+        else if (event.key == Qt.Key_Enter ||
+                 event.key == Qt.Key_Return) {
+            folderView.currentItem.clicked();
+        }
+    }
+
+    states: State {
+        name: 'browsing'
+        PropertyChanges { target: folderView; opacity: 1 }
+        PropertyChanges { target: rootView; opacity: 0 }
     }
 }
