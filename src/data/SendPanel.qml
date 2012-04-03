@@ -93,7 +93,9 @@ Item {
                 id: icon
 
                 anchors.left: parent.left
+                anchors.leftMargin: appStyle.margin.normal
                 anchors.verticalCenter: parent.verticalCenter
+                fillMode: Image.PreserveAspectFit
                 source: model.avatar
                 width: appStyle.icon.smallSize
                 height: appStyle.icon.smallSize
@@ -103,6 +105,7 @@ Item {
                 anchors.left: icon.right
                 anchors.leftMargin: appStyle.spacing.horizontal
                 anchors.right: parent.right
+                anchors.rightMargin: appStyle.margin.normal
                 anchors.verticalCenter: parent.verticalCenter
                 text: model.name
             }
