@@ -109,6 +109,8 @@ QUrl PhotoCache::imageUrl(const FileInfo &info, FileSystem::ImageSize type, File
     const QString mimeType = info.mimeType();
     if (mimeType.startsWith("audio/"))
         return wApp->qmlUrl("128x128/audio-x-generic.png");
+    else if (mimeType.startsWith("text/"))
+        return wApp->qmlUrl("128x128/text-x-generic.png");
     else if (mimeType.startsWith("video/"))
         return wApp->qmlUrl("128x128/video-x-generic.png");
     else if (!mimeType.startsWith("image/"))

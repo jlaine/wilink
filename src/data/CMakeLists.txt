@@ -86,6 +86,7 @@ set(LARGE_ICONS
     scalable/image-x-generic.svgz
     scalable/peer.svg
     scalable/photos.svg
+    scalable/text-x-generic.svgz
     scalable/video-x-generic.svgz
     scalable/wiLink.svg)
 
