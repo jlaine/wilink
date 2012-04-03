@@ -40,6 +40,7 @@ Item {
         Component.onCompleted: {
             placeModel.append({'avatar': '128x128/file.png', 'name': 'Files', 'isDir': true, 'url': application.homeUrl});
             placeModel.append({'avatar': '128x128/photos.png', 'name': 'Photos', 'isDir': true, 'url': 'wifirst://default'});
+            placeModel.append({'avatar': 'share.png', 'name': 'Shares', 'isDir': true, 'url': 'share:'})
         }
     }
 
