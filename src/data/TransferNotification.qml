@@ -47,5 +47,10 @@ NotificationDialog {
     }
 
     onRejected: job.abort()
+
+    Connections {
+        target: job
+        onStateChanged: dialog.close()
+    }
 }
 
