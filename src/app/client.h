@@ -74,6 +74,8 @@ public:
     QString shareServer() const;
     QXmppTransferManager* transferManager();
 
+    static QList<ChatClient*> instances();
+
 signals:
     void authenticationFailed();
     void conflictReceived();

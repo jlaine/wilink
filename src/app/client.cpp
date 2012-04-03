@@ -37,6 +37,8 @@
 #include "client.h"
 #include "diagnostics.h"
 
+static QList<ChatClient*> chatClients;
+
 class ChatClientPrivate
 {
 public:
@@ -104,10 +106,13 @@ ChatClient::ChatClient(QObject *parent)
 
     // diagnostics
     diagnosticManager();
+
+    chatClients.append(this);
 }
 
 ChatClient::~ChatClient()
 {
+    chatClients.removeAll(this);
     delete d;
 }
 
@@ -123,6 +128,11 @@ void ChatClient::connectToServer(const QString &jid, const QString &password)
         config.setIgnoreSslErrors(false);
     }
     QXmppClient::connectToServer(config);
+}
+
+QList<ChatClient*> ChatClient::instances()
+{
+    return chatClients;
 }
 
 QString ChatClient::jid() const
