@@ -1028,22 +1028,134 @@ int SharePlaceModel::rowCount(const QModelIndex &parent) const
         return m_paths.size();
 }
 
+ShareFileSystemGet::ShareFileSystemGet(ShareFileSystem *fs, const QXmppShareLocation &location)
+    : FileSystemJob(FileSystemJob::Get, fs)
+    , m_job(0)
+{
+    bool check;
+    Q_UNUSED(check);
+
+    if (location.jid().isEmpty() || location.node().isEmpty()) {
+        setErrorString("Invalid location requested");
+        finishLater(FileSystemJob::UrlError);
+        return;
+    }
+
+    // request file
+    foreach (ChatClient *client, ChatClient::instances()) {
+        QXmppShareManager *shareManager = client->findExtension<QXmppShareManager>();
+        QXmppTransferManager *transferManager = client->findExtension<QXmppTransferManager>();
+        if (!shareManager || !transferManager)
+            continue;
+
+        check = connect(shareManager, SIGNAL(shareGetIqReceived(QXmppShareGetIq)),
+                        this, SLOT(_q_shareGetIqReceived(QXmppShareGetIq)));
+        Q_ASSERT(check);
+
+        check = connect(transferManager, SIGNAL(fileReceived(QXmppTransferJob*)),
+                        this, SLOT(_q_transferReceived(QXmppTransferJob*)));
+        Q_ASSERT(check);
+
+        QXmppShareGetIq iq;
+        iq.setTo(location.jid());
+        iq.setType(QXmppIq::Get);
+        iq.setNode(location.node());
+        if (client->sendPacket(iq)) {
+            m_packetId = iq.id();
+
+#if 0
+            // allow hashing speeds as low as 10MB/s
+            const int maxSeconds = qMax(60, int(item.fileSize() / 10000000));
+            QTimer::singleShot(maxSeconds * 1000, this, SLOT(_q_timeout()));
+#endif
+            return;
+        }
+    }
+
+    // failed to request file
+    finishLater(FileSystemJob::UnknownError);
+}
+
+void ShareFileSystemGet::_q_shareGetIqReceived(const QXmppShareGetIq &iq)
+{
+    if (iq.id() != m_packetId)
+        return;
+
+    if (iq.type() == QXmppIq::Result) {
+        m_sid = iq.sid();
+    } else if (iq.type() == QXmppIq::Error) {
+        setError(UnknownError);
+        setErrorString("Error for file request " + m_packetId);
+        emit finished();
+    }
+}
+
+void ShareFileSystemGet::_q_transferFinished()
+{
+    if (m_job->error() == QXmppTransferJob::NoError) {
+        QFile *fp = new QFile("/tmp/shares");
+        fp->open(QIODevice::ReadOnly);
+        setData(fp);
+    } else {
+        setErrorString("Transfer failed");
+        setError(UnknownError);
+    }
+    m_job->deleteLater();
+    emit finished();
+}
+
+void ShareFileSystemGet::_q_transferReceived(QXmppTransferJob *job)
+{
+    bool check;
+    Q_UNUSED(check);
+
+    if (m_job || job->direction() != QXmppTransferJob::IncomingDirection || job->sid() != m_sid)
+        return;
+
+    job->accept("/tmp/shares");
+    m_job = job;
+
+    check = connect(m_job, SIGNAL(progress(qint64,qint64)),
+                    this, SIGNAL(downloadProgress(qint64,qint64)));
+    Q_ASSERT(check);
+
+    check = connect(m_job, SIGNAL(finished()),
+                    this, SLOT(_q_transferFinished()));
+    Q_ASSERT(check);
+}
+
 class ShareFileSystemPrivate
 {
 public:
+    ShareFileSystemPrivate(ShareFileSystem *qq);
     QList<FileSystemJob*> jobs;
     QSet<QXmppShareManager*> managers;
+
+private:
+    ShareFileSystem *q;
 };
+
+ShareFileSystemPrivate::ShareFileSystemPrivate(ShareFileSystem *qq)
+    : q(qq)
+{
+}
 
 ShareFileSystem::ShareFileSystem(QObject *parent)
     : FileSystem(parent)
 {
-    d = new ShareFileSystemPrivate;
+    d = new ShareFileSystemPrivate(this);
 }
 
 ShareFileSystem::~ShareFileSystem()
 {
     delete d;
+}
+
+FileSystemJob* ShareFileSystem::get(const QUrl &fileUrl, ImageSize type)
+{
+    Q_UNUSED(type);
+
+    return new ShareFileSystemGet(this, urlToLocation(fileUrl));
 }
 
 FileSystemJob* ShareFileSystem::list(const QUrl &dirUrl)
@@ -1053,8 +1165,8 @@ FileSystemJob* ShareFileSystem::list(const QUrl &dirUrl)
     Q_UNUSED(dirUrl);
 
     QXmppShareLocation dirLocation = urlToLocation(dirUrl);
-    qDebug("list for jid %s", qPrintable(dirLocation.jid()));
-    qDebug("list for node %s", qPrintable(dirLocation.node()));
+    //qDebug("list for jid %s", qPrintable(dirLocation.jid()));
+    //qDebug("list for node %s", qPrintable(dirLocation.node()));
 
     FileSystemJob *job = new FileSystemJob(FileSystemJob::List, this);
     foreach (ChatClient *shareClient, ChatClient::instances()) {
@@ -1068,8 +1180,10 @@ FileSystemJob* ShareFileSystem::list(const QUrl &dirUrl)
             }
 
             // FIXME: hack
-            if (dirLocation.jid().isEmpty())
-                dirLocation.setJid(shareClient->jid());
+            if (dirLocation.jid().isEmpty()) {
+                dirLocation.setJid(shareClient->shareServer());
+                dirLocation.setNode(QString());
+            }
 
             const QString requestId = shareManager->search(dirLocation, 1, "");
             job->setProperty("_request_id", requestId);

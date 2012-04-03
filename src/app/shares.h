@@ -35,6 +35,7 @@ class ChatClient;
 class QXmppPresence;
 class QXmppShareDatabase;
 class QXmppShareManager;
+class QXmppTransferJob;
 class ShareFileSystemPrivate;
 class ShareModelPrivate;
 class ShareQueueModel;
@@ -172,6 +173,7 @@ public:
     ShareFileSystem(QObject *parent = 0);
     ~ShareFileSystem();
 
+    FileSystemJob* get(const QUrl &fileUrl, ImageSize type);
     FileSystemJob* list(const QUrl &dirUrl);
 
 private slots:
@@ -179,6 +181,24 @@ private slots:
 
 private:
     ShareFileSystemPrivate *d;
+};
+
+class ShareFileSystemGet : public QNetIO::FileSystemJob
+{
+    Q_OBJECT
+
+public:
+    ShareFileSystemGet(ShareFileSystem *fs, const QXmppShareLocation &location);
+
+private slots:
+    void _q_shareGetIqReceived(const QXmppShareGetIq &iq);
+    void _q_transferFinished();
+    void _q_transferReceived(QXmppTransferJob *job);
+
+private:
+    QXmppTransferJob* m_job;
+    QString m_packetId;
+    QString m_sid;
 };
 
 class SharePlaceModel : public QAbstractListModel
