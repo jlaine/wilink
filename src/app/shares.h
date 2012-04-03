@@ -26,12 +26,16 @@
 
 #include "QXmppShareIq.h"
 
+#include "filesystem.h"
 #include "model.h"
+
+using namespace QNetIO;
 
 class ChatClient;
 class QXmppPresence;
 class QXmppShareDatabase;
 class QXmppShareManager;
+class ShareFileSystemPrivate;
 class ShareModelPrivate;
 class ShareQueueModel;
 class ShareQueueModelPrivate;
@@ -158,6 +162,23 @@ private slots:
 private:
     ShareQueueModelPrivate *d;
     friend class ShareQueueModelPrivate;
+};
+
+class ShareFileSystem : public QNetIO::FileSystem
+{
+    Q_OBJECT
+
+public:
+    ShareFileSystem(QObject *parent = 0);
+    ~ShareFileSystem();
+
+    FileSystemJob* list(const QUrl &dirUrl);
+
+private slots:
+    void _q_searchReceived(const QXmppShareSearchIq &shareIq);
+
+private:
+    ShareFileSystemPrivate *d;
 };
 
 class SharePlaceModel : public QAbstractListModel
