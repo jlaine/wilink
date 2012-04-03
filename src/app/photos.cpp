@@ -66,17 +66,6 @@ enum PhotoRole
     UrlRole,
 };
 
-static bool isImage(const QString &fileName)
-{
-    if (fileName.isEmpty())
-        return false;
-    const QString extension = fileName.split(".").last().toLower();
-    return (extension == QLatin1String("gif") ||
-            extension == QLatin1String("jpg") ||
-            extension == QLatin1String("jpeg") ||
-            extension == QLatin1String("png"));
-}
-
 PhotoCache::PhotoCache()
     : m_downloadItem(0),
     m_downloadJob(0)
@@ -112,8 +101,20 @@ bool PhotoCache::imageReady(const QUrl &url, FileSystem::ImageSize type) const
     return photoImageCache.contains(key);
 }
 
-QUrl PhotoCache::imageUrl(const QUrl &url, FileSystem::ImageSize type, FileSystem *fs)
+QUrl PhotoCache::imageUrl(const FileInfo &info, FileSystem::ImageSize type, FileSystem *fs)
 {
+    if (info.isDir())
+        return wApp->qmlUrl("128x128/album.png");
+
+    const QString mimeType = info.mimeType();
+    if (mimeType.startsWith("audio/"))
+        return wApp->qmlUrl("128x128/audio-x-generic.png");
+    else if (mimeType.startsWith("video/"))
+        return wApp->qmlUrl("128x128/video-x-generic.png");
+    else if (!mimeType.startsWith("image/"))
+        return wApp->qmlUrl("128x128/file.png");
+
+    const QUrl url = info.url();
     const QString key = QString::number(type) + url.toString();
     if (photoImageCache.contains(key)) {
         QUrl cacheUrl("image://photo");
@@ -147,7 +148,7 @@ QUrl PhotoCache::imageUrl(const QUrl &url, FileSystem::ImageSize type, FileSyste
             return cacheUrl;
         }
     }
-    return wApp->qmlUrl("128x128/file.png");
+    return wApp->qmlUrl("128x128/image-x-generic.png");
 }
 
 PhotoCache *PhotoCache::instance()
@@ -233,18 +234,10 @@ QVariant PhotoModel::data(const QModelIndex &index, int role) const
         return QVariant();
 
     if (role == AvatarRole) {
-        if (item->isDir()) {
-            return wApp->qmlUrl("128x128/album.png");
-        } else {
-            return PhotoCache::instance()->imageUrl(item->url(), FileSystem::SmallSize, m_fs);
-        }
+        return PhotoCache::instance()->imageUrl(*item, FileSystem::SmallSize, m_fs);
     }
     else if (role == ImageRole) {
-        if (item->isDir()) {
-            return wApp->qmlUrl("128x128/album.png");
-        } else {
-            return PhotoCache::instance()->imageUrl(item->url(), FileSystem::LargeSize, m_fs);
-        }
+        return PhotoCache::instance()->imageUrl(*item, FileSystem::LargeSize, m_fs);
     }
     else if (role == ImageReadyRole)
         return PhotoCache::instance()->imageReady(item->url(), FileSystem::LargeSize);
@@ -380,10 +373,8 @@ void PhotoModel::_q_jobFinished(FileSystemJob *job)
 
         removeRows(0, rootItem->children.size());
         foreach (const FileInfo& info, job->results()) {
-            if (info.isDir() || isImage(info.name())) {
-                PhotoItem *item = new PhotoItem(info);
-                addItem(item, rootItem);
-            }
+            PhotoItem *item = new PhotoItem(info);
+            addItem(item, rootItem);
         }
         break;
     default:
