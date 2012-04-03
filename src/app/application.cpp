@@ -826,19 +826,25 @@ void ApplicationSettings::setSharesConfigured(bool configured)
 
 /** Returns the list of shared directories.
  */
-QStringList ApplicationSettings::sharesDirectories() const
+QVariantList ApplicationSettings::sharesDirectories() const
 {
-    return d->settings->value("SharesDirectories").toStringList();
+    QVariantList urls;
+    foreach (const QString &path, d->settings->value("SharesDirectories").toStringList())
+        urls << QUrl::fromLocalFile(path);
+    return urls;
 }
 
 /** Sets the list of shared directories.
  *
  * @param directories
  */
-void ApplicationSettings::setSharesDirectories(const QStringList &directories)
+void ApplicationSettings::setSharesDirectories(const QVariantList &directories)
 {
     if (directories != sharesDirectories()) {
-        d->settings->setValue("SharesDirectories", directories);
+        QStringList dirs;
+        foreach (const QVariant &var, directories)
+            dirs << var.toUrl().toLocalFile();
+        d->settings->setValue("SharesDirectories", dirs);
         emit sharesDirectoriesChanged(sharesDirectories());
     }
 }

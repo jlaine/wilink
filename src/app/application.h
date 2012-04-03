@@ -24,6 +24,7 @@
 #include <QString>
 #include <QStringList>
 #include <QUrl>
+#include <QVariant>
 
 #ifdef USE_SYSTRAY
 #include <QSystemTrayIcon>
@@ -130,7 +131,7 @@ class ApplicationSettings : public QObject
     Q_PROPERTY(QString outgoingMessageSound READ outgoingMessageSound WRITE setOutgoingMessageSound NOTIFY outgoingMessageSoundChanged)
     Q_PROPERTY(QStringList playerUrls READ playerUrls WRITE setPlayerUrls NOTIFY playerUrlsChanged)
     Q_PROPERTY(bool sharesConfigured READ sharesConfigured WRITE setSharesConfigured NOTIFY sharesConfiguredChanged)
-    Q_PROPERTY(QStringList sharesDirectories READ sharesDirectories WRITE setSharesDirectories NOTIFY sharesDirectoriesChanged)
+    Q_PROPERTY(QVariantList sharesDirectories READ sharesDirectories WRITE setSharesDirectories NOTIFY sharesDirectoriesChanged)
     Q_PROPERTY(QString sharesLocation READ sharesLocation WRITE setSharesLocation NOTIFY sharesLocationChanged)
     Q_PROPERTY(bool showOfflineContacts READ showOfflineContacts WRITE setShowOfflineContacts NOTIFY showOfflineContactsChanged)
     Q_PROPERTY(bool sortContactsByStatus READ sortContactsByStatus WRITE setSortContactsByStatus NOTIFY sortContactsByStatusChanged)
@@ -176,8 +177,8 @@ public:
     bool sharesConfigured() const;
     void setSharesConfigured(bool configured);
 
-    QStringList sharesDirectories() const;
-    void setSharesDirectories(const QStringList &directories);
+    QVariantList sharesDirectories() const;
+    void setSharesDirectories(const QVariantList &directories);
 
     QString sharesLocation() const;
     void setSharesLocation(const QString &location);
@@ -205,7 +206,7 @@ signals:
     void outgoingMessageSoundChanged(const QString &sound);
     void playerUrlsChanged(const QStringList &urls);
     void sharesConfiguredChanged(bool configured);
-    void sharesDirectoriesChanged(const QStringList &directories);
+    void sharesDirectoriesChanged(const QVariantList &directories);
     void sharesLocationChanged(const QString &location);
     void showOfflineContactsChanged(bool show);
     void sortContactsByStatusChanged(bool sort);

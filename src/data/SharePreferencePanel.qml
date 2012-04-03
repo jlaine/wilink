@@ -24,8 +24,13 @@ Panel {
     id: panel
 
     function save() {
+        var urls = [];
+        for (var i = 0; i < selectionModel.count; ++i) {
+            urls[i] = selectionModel.get(i).url;
+        }
+
         application.settings.sharesLocation = sharesLocation.text;
-        application.settings.sharesDirectories = folderModel.selectedFolders;
+        application.settings.sharesDirectories = urls;
     }
 
     color: 'transparent'
@@ -40,17 +45,33 @@ Panel {
         anchors.right: parent.right
         title: qsTr('Shared folders')
 
-        ShareFolderModel {
-            id: folderModel
+        ListModel {
+            id: selectionModel
 
-            forcedFolder: application.settings.sharesLocation
-            selectedFolders: application.settings.sharesDirectories
-        }
+            function checkState(url) {
+                for (var i = 0; i < selectionModel.count; ++i) {
+                    if (selectionModel.get(i).url == url)
+                        return true;
+                }
+                return false;
+            }
 
-        SharePlaceModel {
-            id: placeModel
+            function toggleState(url) {
+                for (var i = 0; i < selectionModel.count; ++i) {
+                    if (selectionModel.get(i).url == url) {
+                        selectionModel.remove(i);
+                        return;
+                    }
+                }
+                selectionModel.append({'url': url});
+            }
 
-            sourceModel: folderModel
+            Component.onCompleted: {
+                var urls = application.settings.sharesDirectories;
+                for (var i in urls) {
+                    selectionModel.append({'url': urls[i]});
+                }
+            }
         }
 
         Item {
@@ -81,7 +102,7 @@ Panel {
 
                     anchors.fill: parent
                     highlight: Item {}
-                    model: placeModel
+                    model: SharePlaceModel {}
                     delegate: Item {
                         height: appStyle.icon.smallSize
                         width: parent.width
@@ -92,13 +113,11 @@ Panel {
                             anchors.right: parent.right
                             anchors.rightMargin: appStyle.margin.normal
                             anchors.verticalCenter: parent.verticalCenter
-                            checked: model.checkState == 2
-                            iconSource: 'album.png'
+                            checked: selectionModel.checkState(model.url)
+                            iconSource: model.avatar
                             text: model.name
 
-                            onClicked: {
-                                folderModel.setCheckState(model.path, checked ? 0 : 2);
-                            }
+                            onClicked: selectionModel.toggleState(model.url)
                         }
                     }
                 }
@@ -117,8 +136,8 @@ Panel {
                         anchors.right: parent.right
                         z: 1
 
-                        onLocationPopped: {
-                            visualModel.rootIndex = visualModel.parentModelIndex();
+                        onLocationChanged: {
+                            folderView.model.rootUrl = location.url;
                         }
                     }
 
@@ -130,69 +149,56 @@ Panel {
                         anchors.left: parent.left
                         anchors.right: parent.right
                         highlight: Item {}
-                        model: VisualDataModel {
-                            id: visualModel
+                        model: PhotoModel {}
+                        delegate: Item {
+                            height: appStyle.icon.smallSize
+                            width: parent.width
 
-                            model: folderModel
-                            delegate: Item {
-                                height: appStyle.icon.smallSize
-                                width: parent.width
+                            CheckBox {
+                                id: check
 
-                                CheckBox {
-                                    id: check
-
-                                    anchors.left: parent.left
-                                    anchors.leftMargin: appStyle.margin.normal
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    checked: model.checkState == 2
-                                    width: 12
-                                    onClicked: {
-                                        folderModel.setCheckState(model.path, checked ? 0 : 2);
-                                    }
-                                }
-
-                                Image {
-                                    id: icon
-
-                                    anchors.left: check.right
-                                    anchors.leftMargin: appStyle.spacing.horizontal
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    source: 'album.png'
-                                    width: appStyle.icon.smallSize
-                                    height: appStyle.icon.smallSize
-                                }
-
-                                Label {
-                                    anchors.left: icon.right
-                                    anchors.leftMargin: appStyle.spacing.horizontal
-                                    anchors.right: parent.right
-                                    anchors.verticalCenter: parent.verticalCenter
-                                    text: model.name
-                                }
-
-                                MouseArea {
-                                    anchors.top: parent.top
-                                    anchors.bottom: parent.bottom
-                                    anchors.left: check.right
-                                    anchors.right: parent.right
-
-                                    onClicked: {
-                                        crumbs.push({'name': model.name, 'path': model.path});
-                                        visualModel.rootIndex = visualModel.modelIndex(model.index);
-                                    }
-                                }
-
+                                anchors.left: parent.left
+                                anchors.leftMargin: appStyle.margin.normal
+                                anchors.verticalCenter: parent.verticalCenter
+                                checked: selectionModel.checkState(model.url)
+                                width: 12
+                                onClicked: selectionModel.toggleState(model.url)
                             }
 
-                            Component.onCompleted: {
-                                crumbs.push({'name': qsTr('My computer')});
+                            Image {
+                                id: icon
 
-                                // navigate into '/' on *nix
-                                if (folderModel.isUnix) {
-                                    rootIndex = modelIndex(0);
+                                anchors.left: check.right
+                                anchors.leftMargin: appStyle.spacing.horizontal
+                                anchors.verticalCenter: parent.verticalCenter
+                                source: model.avatar
+                                width: appStyle.icon.smallSize
+                                height: appStyle.icon.smallSize
+                            }
+
+                            Label {
+                                anchors.left: icon.right
+                                anchors.leftMargin: appStyle.spacing.horizontal
+                                anchors.right: parent.right
+                                anchors.verticalCenter: parent.verticalCenter
+                                text: model.name
+                            }
+
+                            MouseArea {
+                                anchors.top: parent.top
+                                anchors.bottom: parent.bottom
+                                anchors.left: check.right
+                                anchors.right: parent.right
+
+                                onClicked: {
+                                    crumbs.push({'name': model.name, 'url': model.url});
                                 }
                             }
                         }
+                    }
+
+                    Component.onCompleted: {
+                        crumbs.push({'name': qsTr('My computer'), 'url': 'file:///'});
                     }
                 }
             }

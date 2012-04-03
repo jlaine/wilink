@@ -20,8 +20,8 @@
 #ifndef __WILINK_SHARES_MODEL_H__
 #define __WILINK_SHARES_MODEL_H__
 
+#include <QAbstractListModel>
 #include <QAbstractProxyModel>
-#include <QFileSystemModel>
 #include <QUrl>
 
 #include "QXmppShareIq.h"
@@ -92,7 +92,7 @@ public:
     QModelIndex parent(const QModelIndex &index) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
-    static QXmppShareDatabase *database();
+    QXmppShareDatabase *database() const;
 
 signals:
     void clientChanged(ChatClient *client);
@@ -113,6 +113,7 @@ private slots:
     void _q_presenceReceived(const QXmppPresence &presence);
     void _q_serverChanged(const QString &server);
     void _q_searchReceived(const QXmppShareSearchIq &shareIq);
+    void _q_settingsChanged() const;
 
 private:
     void clear();
@@ -159,65 +160,18 @@ private:
     friend class ShareQueueModelPrivate;
 };
 
-class ShareFolderModel : public QFileSystemModel
+class SharePlaceModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(QString forcedFolder READ forcedFolder WRITE setForcedFolder NOTIFY forcedFolderChanged)
-    Q_PROPERTY(bool isUnix READ isUnix CONSTANT)
-    Q_PROPERTY(QStringList selectedFolders READ selectedFolders WRITE setSelectedFolders NOTIFY selectedFoldersChanged)
-
-public:
-    ShareFolderModel(QObject *parent = 0);
-    QVariant data(const QModelIndex &index, int role) const;
-    bool setData(const QModelIndex & index, const QVariant &value, int role = Qt::EditRole);
-    Qt::ItemFlags flags(const QModelIndex &index) const;
-
-    QString forcedFolder() const;
-    void setForcedFolder(const QString &forced);
-
-    bool isUnix() const;
-
-    QStringList selectedFolders() const;
-    void setSelectedFolders(const QStringList &selected);
-
-signals:
-    void forcedFolderChanged(const QString &forced);
-    void selectedFoldersChanged(const QStringList &selected);
-
-public slots:
-    void setCheckState(const QString &path, int state);
-
-private:
-    QString m_forced;
-    QStringList m_selected;
-};
-
-class SharePlaceModel : public QAbstractProxyModel
-{
-    Q_OBJECT
-    Q_PROPERTY(ShareFolderModel* sourceModel READ sourceModel WRITE setSourceModel NOTIFY sourceModelChanged)
 
 public:
     SharePlaceModel(QObject *parent = 0);
-    QModelIndex index(int row, int column, const QModelIndex& parent) const;
-    QModelIndex parent(const QModelIndex &index) const;
-    int columnCount(const QModelIndex &parent = QModelIndex()) const;
-    int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
-    QModelIndex mapFromSource(const QModelIndex &sourceIndex) const;
-    QModelIndex mapToSource(const QModelIndex &proxyIndex) const;
-
-    ShareFolderModel *sourceModel() const;
-    void setSourceModel(ShareFolderModel *sourceModel);
-
-signals:
-    void sourceModelChanged(ShareFolderModel *sourceModel);
-
-private slots:
-    void sourceDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight);
+    // QAbstractItemModel
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    int rowCount(const QModelIndex &parent) const;
 
 private:
-    ShareFolderModel *m_fsModel;
     QList<QString> m_paths;
 };
 
