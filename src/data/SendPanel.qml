@@ -38,8 +38,8 @@ Item {
         id: placeModel
 
         Component.onCompleted: {
-            placeModel.append({'name': 'Files', 'isDir': true, 'url': 'file:///'});
-            placeModel.append({'name': 'Photos', 'isDir': true, 'url': 'wifirst://www.wifirst.net/w'});
+            placeModel.append({'avatar': '128x128/file.png', 'name': 'Files', 'isDir': true, 'url': 'file:///'});
+            placeModel.append({'avatar': '128x128/photos.png', 'name': 'Photos', 'isDir': true, 'url': 'wifirst://www.wifirst.net/w'});
         }
     }
 
@@ -94,7 +94,7 @@ Item {
 
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
-                source: model.isDir ? '128x128/album.png' : '128x128/file.png'
+                source: model.avatar
                 width: appStyle.icon.smallSize
                 height: appStyle.icon.smallSize
             }
