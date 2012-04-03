@@ -169,7 +169,9 @@ Panel {
                         anchors.left: parent.left
                         anchors.right: parent.right
                         highlight: Item {}
-                        model: PhotoModel {}
+                        model: PhotoModel {
+                            showFiles: false
+                        }
                         delegate: Item {
                             height: appStyle.icon.smallSize
                             width: parent.width

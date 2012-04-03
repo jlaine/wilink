@@ -206,7 +206,8 @@ public:
 PhotoModel::PhotoModel(QObject *parent)
     : ChatModel(parent),
     m_fs(0),
-    m_permissions(FileSystemJob::None)
+    m_permissions(FileSystemJob::None),
+    m_showFiles(true)
 {
     bool check;
     Q_UNUSED(check);
@@ -331,6 +332,19 @@ bool PhotoModel::removeRow(int row)
     return true;
 }
 
+bool PhotoModel::showFiles() const
+{
+    return m_showFiles;
+}
+
+void PhotoModel::setShowFiles(bool show)
+{
+    if (show != m_showFiles) {
+        m_showFiles = show;
+        emit showFilesChanged();
+    }
+}
+
 void PhotoModel::upload(const QString &filePath)
 {
     QString base = m_rootUrl.toString();
@@ -373,8 +387,10 @@ void PhotoModel::_q_jobFinished(FileSystemJob *job)
 
         removeRows(0, rootItem->children.size());
         foreach (const FileInfo& info, job->results()) {
-            PhotoItem *item = new PhotoItem(info);
-            addItem(item, rootItem);
+            if (info.isDir() || m_showFiles) {
+                PhotoItem *item = new PhotoItem(info);
+                addItem(item, rootItem);
+            }
         }
         break;
     default:

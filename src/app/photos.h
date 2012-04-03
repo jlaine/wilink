@@ -74,6 +74,7 @@ class PhotoModel : public ChatModel
     Q_OBJECT
     Q_PROPERTY(bool canCreateAlbum READ canCreateAlbum NOTIFY permissionsChanged)
     Q_PROPERTY(bool canUpload READ canUpload NOTIFY permissionsChanged)
+    Q_PROPERTY(bool showFiles READ showFiles WRITE setShowFiles NOTIFY showFilesChanged)
     Q_PROPERTY(QUrl rootUrl READ rootUrl WRITE setRootUrl NOTIFY rootUrlChanged)
     Q_PROPERTY(PhotoQueueModel* uploads READ uploads CONSTANT)
 
@@ -82,6 +83,9 @@ public:
 
     QUrl rootUrl() const;
     void setRootUrl(const QUrl &rootUrl);
+
+    bool showFiles() const;
+    void setShowFiles(bool show);
 
     bool canCreateAlbum() const;
     bool canUpload() const;
@@ -93,6 +97,7 @@ public:
 signals:
     void permissionsChanged();
     void rootUrlChanged(const QUrl &rootUrl);
+    void showFilesChanged();
 
 public slots:
     void createAlbum(const QString &name);
@@ -109,6 +114,7 @@ private:
     QMap<QString,FileSystem*> m_fileSystems;
     FileSystemJob::Operations m_permissions;
     QUrl m_rootUrl;
+    bool m_showFiles;
     PhotoQueueModel *m_uploads;
 };
 
