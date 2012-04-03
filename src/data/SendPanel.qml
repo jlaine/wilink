@@ -20,14 +20,27 @@
 import QtQuick 1.1
 import wiLink 2.0
 
-Panel {
+Item {
     id: panel
 
-    width: 600
-    height: 100
+    property variant url
 
-    Style {
-        id: appStyle
+    anchors.left: parent ? parent.left : undefined
+    anchors.right: parent ? parent.right : undefined
+    clip: true
+    height: 200
+
+    PhotoModel {
+        id: folderModel
+    }
+
+    ListModel {
+        id: placeModel
+
+        Component.onCompleted: {
+            placeModel.append({'name': 'Files', 'isDir': true, 'url': 'file:///'});
+            placeModel.append({'name': 'Photos', 'isDir': true, 'url': 'wifirst://www.wifirst.net/w'});
+        }
     }
 
     Rectangle {
@@ -46,38 +59,13 @@ Panel {
         z: 1
 
         onLocationChanged: {
-            if (location.isDir) {
+            if (location.url) {
                 folderModel.rootUrl = location.url;
+                folderView.model = folderModel;
+            } else {
+                folderView.model = placeModel;
             }
-        }
-    }
-
-    ToolBar {
-        id: rootView
-
-        anchors.centerIn: parent
-        spacing: appStyle.icon.normalSize
-
-        ToolButton {
-            iconSize: appStyle.icon.largeSize
-            iconSource: '128x128/file.png'
-            width: appStyle.icon.largeSize * 1.5
-            text: qsTr('Send a file')
-
-            onClicked: {
-                crumbBar.push({'name': 'Files', 'isDir': true, 'url': 'file:///'});
-            }
-        }
-
-        ToolButton {
-            iconSize: appStyle.icon.largeSize
-            iconSource: '128x128/photos.png'
-            width: appStyle.icon.largeSize * 1.5
-            text: qsTr('Send a photo')
-
-            onClicked: {
-                crumbBar.push({'name': 'Photos', 'isDir': true, 'url': 'wifirst://www.wifirst.net/w'});
-            }
+            folderView.forceActiveFocus();
         }
     }
 
@@ -92,12 +80,13 @@ Panel {
             id: item
 
             width: view.width
-            height: 64
+            height: appStyle.icon.normalSize
 
             function clicked() {
-                crumbBar.push({'name': model.name, 'isDir': model.isDir, 'url': model.url});
-                folderModel.rootUrl = model.url;
-                folderView.forceActiveFocus();
+                view.currentIndex = model.index;
+                if (model.isDir) {
+                    crumbBar.push({'name': model.name, 'isDir': model.isDir, 'url': model.url});
+                }
             }
 
             Image {
@@ -123,15 +112,13 @@ Panel {
                 onClicked: item.clicked()
             }
         }
-        model: PhotoModel {
-            id: folderModel
-        }
-        opacity: 0
+        model: placeModel
     }
 
     Component.onCompleted: {
         crumbBar.push({'name': 'Send', 'isDir': true, url: ''});
     }
+
     Keys.onPressed: {
         if (event.key == Qt.Key_Back ||
                  event.key == Qt.Key_Backspace ||
@@ -144,12 +131,5 @@ Panel {
                  event.key == Qt.Key_Return) {
             folderView.currentItem.clicked();
         }
-    }
-
-    states: State {
-        name: 'browsing'
-        when: (folderModel.rootUrl != '')
-        PropertyChanges { target: folderView; opacity: 1 }
-        PropertyChanges { target: rootView; opacity: 0 }
     }
 }
