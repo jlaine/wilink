@@ -56,14 +56,34 @@ Panel {
                 return false;
             }
 
-            function toggleState(url) {
-                for (var i = 0; i < selectionModel.count; ++i) {
-                    if (selectionModel.get(i).url == url) {
-                        selectionModel.remove(i);
-                        return;
+            function setState(url, checked) {
+                // FIXME: disallow change on root
+                //if (changedPath == m_forced || changedPath.startsWith(m_forced + "/"))
+                //    return;
+
+                if (checked) {
+                    var changedUrl = '' + url;
+                    var found = false;
+                    for (var i = selectionModel.count - 1; i >= 0; --i) {
+                        var currentUrl = '' + selectionModel.get(i).url;
+                        if (currentUrl == changedUrl) {
+                            found = true;
+                        } else if ((currentUrl.indexOf(changedUrl + '/') == 0) ||
+                                   (changedUrl.indexOf(currentUrl + '/') == 0)) {
+                            // unselect any children or parents
+                            selectionModel.remove(i);
+                        }
+                    }
+                    if (!found)
+                        selectionModel.append({'url': url});
+                } else {
+                    for (var i = selectionModel.count - 1; i >= 0; --i) {
+                        if (selectionModel.get(i).url == url) {
+                            selectionModel.remove(i);
+                            break;
+                        }
                     }
                 }
-                selectionModel.append({'url': url});
             }
 
             Component.onCompleted: {
@@ -117,7 +137,7 @@ Panel {
                             iconSource: model.avatar
                             text: model.name
 
-                            onClicked: selectionModel.toggleState(model.url)
+                            onClicked: selectionModel.setState(model.url, !checked)
                         }
                     }
                 }
@@ -162,7 +182,7 @@ Panel {
                                 anchors.verticalCenter: parent.verticalCenter
                                 checked: selectionModel.getState(model.url)
                                 width: 12
-                                onClicked: selectionModel.toggleState(model.url)
+                                onClicked: selectionModel.setState(model.url, !checked)
                             }
 
                             Image {
