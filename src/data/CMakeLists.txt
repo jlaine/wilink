@@ -81,9 +81,12 @@ set(ICONS
 
 set(LARGE_ICONS
     scalable/album.svg
+    scalable/audio-x-generic.svgz
     scalable/file.svg
+    scalable/image-x-generic.svgz
     scalable/peer.svg
     scalable/photos.svg
+    scalable/video-x-generic.svgz
     scalable/wiLink.svg)
 
 # 16x16 icons
