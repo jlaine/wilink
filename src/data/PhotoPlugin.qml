@@ -29,7 +29,7 @@ Plugin {
         var url;
         var domain = Utils.jidToDomain(appClient.jid);
         if (domain == 'wifirst.net')
-            url = 'wifirst://www.wifirst.net/w';
+            url = 'wifirst://default';
         else if (domain == 'gmail.com')
             url = 'picasa://default';
         else

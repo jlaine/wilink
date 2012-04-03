@@ -23,7 +23,7 @@ import wiLink 2.0
 Item {
     id: panel
 
-    property variant url
+    property variant jid
 
     anchors.left: parent ? parent.left : undefined
     anchors.right: parent ? parent.right : undefined
@@ -39,7 +39,7 @@ Item {
 
         Component.onCompleted: {
             placeModel.append({'avatar': '128x128/file.png', 'name': 'Files', 'isDir': true, 'url': application.homeUrl});
-            placeModel.append({'avatar': '128x128/photos.png', 'name': 'Photos', 'isDir': true, 'url': 'wifirst://www.wifirst.net/w'});
+            placeModel.append({'avatar': '128x128/photos.png', 'name': 'Photos', 'isDir': true, 'url': 'wifirst://default'});
         }
     }
 
@@ -110,6 +110,9 @@ Item {
             MouseArea {
                 anchors.fill: parent
                 onClicked: item.clicked()
+                onDoubleClicked: {
+                    console.log("send " + model.url + " to " + panel.jid);
+                }
             }
         }
         model: placeModel
