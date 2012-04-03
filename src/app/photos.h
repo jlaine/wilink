@@ -106,6 +106,7 @@ private slots:
 
 private:
     FileSystem *m_fs;
+    QMap<QString,FileSystem*> m_fileSystems;
     FileSystemJob::Operations m_permissions;
     QUrl m_rootUrl;
     PhotoQueueModel *m_uploads;

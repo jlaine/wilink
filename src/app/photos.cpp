@@ -38,6 +38,7 @@ static const QSize UPLOAD_SIZE(2048, 2048);
 
 static PhotoCache *photoCache = 0;
 static QCache<QString, QImage> photoImageCache;
+static bool photoInitialised = false;
 
 class PhotoNetworkAccessManagerFactory : public FileSystemNetworkAccessManagerFactory
 {
@@ -282,23 +283,8 @@ void PhotoModel::createAlbum(const QString &name)
  */
 void PhotoModel::refresh()
 {
-    bool check;
-    Q_UNUSED(check);
-
-    if (!m_fs) {
-
-        FileSystem::setNetworkAccessManagerFactory(new PhotoNetworkAccessManagerFactory);
-
-        m_fs = FileSystem::create(m_rootUrl, this);
-        check = connect(m_fs, SIGNAL(jobFinished(FileSystemJob*)),
-                        this, SLOT(_q_jobFinished(FileSystemJob*)));
-        Q_ASSERT(check);
-
-        m_fs->open(m_rootUrl);
-    } else {
-        removeRows(0, rootItem->children.size());
-        m_fs->list(m_rootUrl);
-    }
+    removeRows(0, rootItem->children.size());
+    m_fs->list(m_rootUrl);
 }
 
 QUrl PhotoModel::rootUrl() const
@@ -308,11 +294,35 @@ QUrl PhotoModel::rootUrl() const
 
 void PhotoModel::setRootUrl(const QUrl &rootUrl)
 {
-    if (rootUrl != m_rootUrl) {
-        m_rootUrl = rootUrl;
+    bool check;
+    Q_UNUSED(check);
+
+    if (rootUrl == m_rootUrl)
+        return;
+
+    m_rootUrl = rootUrl;
+    m_fs = m_fileSystems.value(rootUrl.scheme());
+    if (m_fs) {
         refresh();
-        emit rootUrlChanged(m_rootUrl);
+    } else {
+        if (!photoInitialised) {
+            FileSystem::setNetworkAccessManagerFactory(new PhotoNetworkAccessManagerFactory);
+            photoInitialised = true;
+        }
+
+        m_fs = FileSystem::create(m_rootUrl, this);
+        if (m_fs) {
+            check = connect(m_fs, SIGNAL(jobFinished(FileSystemJob*)),
+                            this, SLOT(_q_jobFinished(FileSystemJob*)));
+            Q_ASSERT(check);
+
+            m_fileSystems.insert(m_rootUrl.scheme(), m_fs);
+            m_fs->open(m_rootUrl);
+        } else {
+            removeRows(0, rootItem->children.size());
+        }
     }
+    emit rootUrlChanged(m_rootUrl);
 }
 
 bool PhotoModel::removeRow(int row)
