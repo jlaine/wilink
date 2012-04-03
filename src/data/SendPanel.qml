@@ -38,7 +38,7 @@ Item {
         id: placeModel
 
         Component.onCompleted: {
-            placeModel.append({'avatar': '128x128/file.png', 'name': 'Files', 'isDir': true, 'url': 'file:///'});
+            placeModel.append({'avatar': '128x128/file.png', 'name': 'Files', 'isDir': true, 'url': application.homeUrl});
             placeModel.append({'avatar': '128x128/photos.png', 'name': 'Photos', 'isDir': true, 'url': 'wifirst://www.wifirst.net/w'});
         }
     }

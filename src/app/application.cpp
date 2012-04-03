@@ -275,6 +275,11 @@ QString Application::executablePath() const
     return applicationFilePath();
 }
 
+QUrl Application::homeUrl() const
+{
+    return QUrl::fromLocalFile(QDir::homePath());
+}
+
 bool Application::isInstalled() const
 {
     QDir dir = QFileInfo(executablePath()).dir();
