@@ -48,7 +48,7 @@ Panel {
         ListModel {
             id: selectionModel
 
-            function checkState(url) {
+            function getState(url) {
                 for (var i = 0; i < selectionModel.count; ++i) {
                     if (selectionModel.get(i).url == url)
                         return true;
@@ -113,7 +113,7 @@ Panel {
                             anchors.right: parent.right
                             anchors.rightMargin: appStyle.margin.normal
                             anchors.verticalCenter: parent.verticalCenter
-                            checked: selectionModel.checkState(model.url)
+                            checked: selectionModel.getState(model.url)
                             iconSource: model.avatar
                             text: model.name
 
@@ -160,7 +160,7 @@ Panel {
                                 anchors.left: parent.left
                                 anchors.leftMargin: appStyle.margin.normal
                                 anchors.verticalCenter: parent.verticalCenter
-                                checked: selectionModel.checkState(model.url)
+                                checked: selectionModel.getState(model.url)
                                 width: 12
                                 onClicked: selectionModel.toggleState(model.url)
                             }
