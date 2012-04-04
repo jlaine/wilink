@@ -641,57 +641,6 @@ void ShareModel::_q_settingsChanged() const
     globalDatabase->setMappedDirectories(dirs);
 }
 
-class ShareQueueItem : public ChatModelItem
-{
-public:
-    ShareQueueItem();
-    QXmppShareItem *nextFile(QXmppShareItem *item = 0) const;
-
-    QString requestId;
-    QXmppShareItem shareItem;
-
-    bool aborted;
-    QSet<QXmppShareItem*> done;
-    QMap<QXmppShareItem*, QXmppShareTransfer*> transfers;
-
-    qint64 doneBytes;
-    qint64 doneFiles;
-    qint64 totalBytes;
-    qint64 totalFiles;
-};
-
-ShareQueueItem::ShareQueueItem()
-    : aborted(false),
-    doneBytes(0),
-    doneFiles(0),
-    totalBytes(0),
-    totalFiles(0)
-{
-}
-
-QXmppShareItem *ShareQueueItem::nextFile(QXmppShareItem *item) const
-{
-    if (aborted)
-        return 0;
-
-    if (!item)
-        item = (QXmppShareItem*)&shareItem;
-
-    if (item->type() == QXmppShareItem::FileItem &&
-        !done.contains(item) &&
-        !transfers.contains(item))
-        return item;
-
-    foreach (QXmppShareItem *child, item->children()) {
-        Q_ASSERT(child);
-        QXmppShareItem *file = nextFile(child);
-        if (file)
-            return file;
-    }
-
-    return 0;
-}
-
 SharePlaceModel::SharePlaceModel(QObject *parent)
     : QAbstractListModel(parent)
 {
