@@ -58,7 +58,8 @@ class ShareModel : public QAbstractItemModel
 
 public:
     enum Role {
-        CanDownloadRole = ChatModel::UserRole,
+        AvatarRole = ChatModel::UserRole,
+        CanDownloadRole,
         IsDirRole,
         JidRole,
         NameRole,

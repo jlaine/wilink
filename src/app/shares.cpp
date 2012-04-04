@@ -186,6 +186,7 @@ ShareModel::ShareModel(QObject *parent)
 
     // set role names
     QHash<int, QByteArray> roleNames;
+    roleNames.insert(AvatarRole, "avatar");
     roleNames.insert(CanDownloadRole, "canDownload");
     roleNames.insert(IsDirRole, "isDir");
     roleNames.insert(JidRole, "jid");
@@ -326,7 +327,16 @@ QVariant ShareModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || !item)
         return QVariant();
 
-    if (role == CanDownloadRole)
+    if (role == AvatarRole) {
+        if (item->type() == QXmppShareItem::CollectionItem) {
+            if (item->locations().isEmpty() || item->locations().first().node().isEmpty())
+                return wApp->qmlUrl("peer.png");
+            else
+                return wApp->qmlUrl("album.png");
+        } else {
+            return wApp->qmlUrl("file.png");
+        }
+    } else if (role == CanDownloadRole)
         return d->canDownload(item);
     else if (role == IsDirRole)
         return item->type() == QXmppShareItem::CollectionItem;

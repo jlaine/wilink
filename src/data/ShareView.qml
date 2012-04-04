@@ -63,7 +63,7 @@ Item {
                 width: appStyle.icon.smallSize
                 height: appStyle.icon.smallSize
                 smooth: true
-                source: model.isDir ? (model.node.length ? 'album.png' : 'peer.png') : 'file.png'
+                source: model.avatar
             }
 
             Image {
