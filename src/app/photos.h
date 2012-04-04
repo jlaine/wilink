@@ -137,7 +137,7 @@ public:
     PhotoQueueModel(QObject *parent = 0);
     ~PhotoQueueModel();
 
-    void append(const QString &sourcePath, FileSystem *fileSystem, const QString &destinationPath);
+    void append(const QString &sourcePath, FileSystem *fileSystem, const QUrl &url);
     void download(const FileInfo &info, FileSystem *fileSystem);
 
     // QAbstractItemModel
@@ -147,7 +147,9 @@ public slots:
     void cancel(int row);
 
 private slots:
-    void _q_jobFinished();
+    void _q_downloadFinished();
+    void _q_downloadProgress(qint64 done, qint64 total);
+    void _q_uploadFinished();
     void _q_uploadProgress(qint64 done, qint64 total);
     void _q_uploadResized(QIODevice *device);
 
@@ -157,6 +159,7 @@ private:
     PhotoModel *m_photoModel;
     PhotoResizer *m_resizer;
     QThread *m_resizerThread;
+    PhotoQueueItem *m_downloadItem;
     QIODevice *m_uploadDevice;
     PhotoQueueItem *m_uploadItem;
 };

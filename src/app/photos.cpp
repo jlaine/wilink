@@ -429,10 +429,11 @@ public:
 
     QString name;
     QString sourcePath;
-    QString destinationPath;
     FileSystem *fileSystem;
     bool finished;
+    bool isUpload;
     FileSystemJob *job;
+    QUrl url;
 
     qint64 doneBytes;
     qint64 doneFiles;
@@ -442,6 +443,8 @@ public:
 
 PhotoQueueItem::PhotoQueueItem()
     : fileSystem(0)
+    , finished(false)
+    , isUpload(false)
     , job(0)
     , doneBytes(0)
     , doneFiles(0)
@@ -451,11 +454,12 @@ PhotoQueueItem::PhotoQueueItem()
 }
 
 PhotoQueueModel::PhotoQueueModel(QObject *parent)
-    : ChatModel(parent),
-    m_resizer(0),
-    m_resizerThread(0),
-    m_uploadDevice(0),
-    m_uploadItem(0)
+    : ChatModel(parent)
+    , m_resizer(0)
+    , m_resizerThread(0)
+    , m_downloadItem(0)
+    , m_uploadDevice(0)
+    , m_uploadItem(0)
 {
     // set role names
     QHash<int, QByteArray> names = roleNames();
@@ -484,13 +488,14 @@ PhotoQueueModel::~PhotoQueueModel()
     delete m_resizerThread;
 }
 
-void PhotoQueueModel::append(const QString &filePath, FileSystem *fileSystem, const QString &destinationPath)
+void PhotoQueueModel::append(const QString &filePath, FileSystem *fileSystem, const QUrl &url)
 {
     PhotoQueueItem *item = new PhotoQueueItem;
 
+    item->isUpload = true;
     item->name = QFileInfo(filePath).fileName();
     item->sourcePath = filePath;
-    item->destinationPath = destinationPath;
+    item->url = url;
     item->fileSystem = fileSystem;
     item->totalFiles = 1;
     addItem(item, rootItem);
@@ -507,14 +512,15 @@ void PhotoQueueModel::download(const FileInfo &info, FileSystem *fileSystem)
         qWarning("can't download dirs for now");
     } else {
         PhotoQueueItem *item = new PhotoQueueItem;
-        //item->sourcePath = filePath;
-        //item->destinationPath = destinationPath;
+        item->url = info.url();
         item->name = info.name();
         item->fileSystem = fileSystem;
         item->totalBytes = info.size();
         item->totalFiles = 1;
         addItem(item, rootItem);
     }
+    
+    processQueue();
 }
 
 void PhotoQueueModel::cancel(int row)
@@ -559,22 +565,68 @@ QVariant PhotoQueueModel::data(const QModelIndex &index, int role) const
 
 void PhotoQueueModel::processQueue()
 {
-    if (m_uploadItem)
-        return;
+    bool check;
+    Q_UNUSED(check);
 
-    foreach (ChatModelItem *ptr, rootItem->children) {
-        PhotoQueueItem *item = static_cast<PhotoQueueItem*>(ptr);
-        if (!item->finished) {
-            m_uploadItem = item;
-            QMetaObject::invokeMethod(m_resizer, "resize", Q_ARG(QString, item->sourcePath));
-            break;
+    // process downloads
+    if (!m_downloadItem) {
+        foreach (ChatModelItem *ptr, rootItem->children) {
+            PhotoQueueItem *item = static_cast<PhotoQueueItem*>(ptr);
+            if (!item->isUpload && !item->finished) {
+                m_downloadItem = item;
+                m_downloadItem->job = item->fileSystem->get(item->url, FileSystem::FullSize);
+
+                check = connect(m_downloadItem->job, SIGNAL(finished()),
+                                this, SLOT(_q_downloadFinished()));
+                Q_ASSERT(check);
+
+                check = connect(m_downloadItem->job, SIGNAL(downloadProgress(qint64,qint64)),
+                                this, SLOT(_q_downloadProgress(qint64,qint64)));
+                Q_ASSERT(check);
+                break;
+            }
         }
+    }
+
+    // process uploads
+    if (!m_uploadItem) {
+        foreach (ChatModelItem *ptr, rootItem->children) {
+            PhotoQueueItem *item = static_cast<PhotoQueueItem*>(ptr);
+            if (item->isUpload && !item->finished) {
+                m_uploadItem = item;
+                QMetaObject::invokeMethod(m_resizer, "resize", Q_ARG(QString, item->sourcePath));
+                break;
+            }
+        }
+    }
+}
+
+/** When an download finishes, process the results.
+ */
+void PhotoQueueModel::_q_downloadFinished()
+{
+    if (m_downloadItem) {
+        removeItem(m_downloadItem);
+        m_downloadItem = 0;
+    }
+
+    processQueue();
+}
+
+/** When upload progress changes, emit notifications.
+ */
+void PhotoQueueModel::_q_downloadProgress(qint64 done, qint64 total)
+{
+    if (m_downloadItem) {
+        m_downloadItem->doneBytes = done;
+        m_downloadItem->totalBytes = total;
+        emit dataChanged(createIndex(m_downloadItem), createIndex(m_downloadItem));
     }
 }
 
 /** When an upload finishes, process the results.
  */
-void PhotoQueueModel::_q_jobFinished()
+void PhotoQueueModel::_q_uploadFinished()
 {
     if (m_uploadItem) {
         removeItem(m_uploadItem);
@@ -602,13 +654,19 @@ void PhotoQueueModel::_q_uploadProgress(qint64 done, qint64 total)
 
 void PhotoQueueModel::_q_uploadResized(QIODevice *device)
 {
+    bool check;
+    Q_UNUSED(check);
+
     if (m_uploadItem) {
         m_uploadDevice = device;
-        m_uploadItem->job = m_uploadItem->fileSystem->put(m_uploadItem->destinationPath, m_uploadDevice);
-        connect(m_uploadItem->job, SIGNAL(finished()),
-                this, SLOT(_q_jobFinished()));
-        connect(m_uploadItem->job, SIGNAL(uploadProgress(qint64,qint64)),
-                this, SLOT(_q_uploadProgress(qint64,qint64)));
+        m_uploadItem->job = m_uploadItem->fileSystem->put(m_uploadItem->url, m_uploadDevice);
+        check = connect(m_uploadItem->job, SIGNAL(finished()),
+                        this, SLOT(_q_uploadFinished()));
+        Q_ASSERT(check);
+
+        check = connect(m_uploadItem->job, SIGNAL(uploadProgress(qint64,qint64)),
+                        this, SLOT(_q_uploadProgress(qint64,qint64)));
+        Q_ASSERT(check);
     }
 }
 
