@@ -82,7 +82,7 @@ void PhotoCache::_q_jobFinished()
     if (m_downloadJob->error() == FileSystemJob::NoError) {
         // load image
         QImage *image = new QImage;
-        image->load(m_downloadJob->data(), NULL);
+        image->load(m_downloadJob, NULL);
         photoImageCache.insert(QString::number(m_downloadItem->type) + m_downloadItem->url.toString(), image);
         emit photoChanged(m_downloadItem->url, m_downloadItem->type);
     }
@@ -644,7 +644,7 @@ void PhotoQueueModel::_q_downloadFinished()
 
             QFile output(QDir(dirPath).filePath(m_downloadItem->jobInfo.name()));
             output.open(QIODevice::WriteOnly);
-            output.write(m_downloadItem->job->data()->readAll());
+            output.write(m_downloadItem->job->readAll());
             output.close();
         }
 
