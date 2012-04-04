@@ -439,7 +439,7 @@ public:
     bool isUpload;
 
     FileSystemJob *job;
-    FileInfo jobInfo;
+    QFile *jobOutput;
     qint64 jobDoneBytes;
     qint64 jobTotalBytes;
 
@@ -454,6 +454,7 @@ PhotoQueueItem::PhotoQueueItem()
     , finished(false)
     , isUpload(false)
     , job(0)
+    , jobOutput(0)
     , jobDoneBytes(0)
     , jobTotalBytes(0)
     , doneBytes(0)
@@ -590,13 +591,29 @@ void PhotoQueueModel::processQueue()
             if (!item->isUpload && !item->items.isEmpty()) {
                 FileInfo childInfo = item->items.takeFirst();
 
+                // FIXME: determine path
+                QString dirPath("/tmp");
+                if (item->info.isDir()) {
+                    const QString targetDir = item->info.name();
+                    if (!targetDir.isEmpty()) {
+                        QDir dir(dirPath);
+                        if (dir.exists(targetDir) || dir.mkpath(targetDir))
+                            dirPath = dir.filePath(targetDir);
+                    }
+                }
+
                 m_downloadItem = item;
                 m_downloadItem->job = item->fileSystem->get(childInfo.url(), FileSystem::FullSize);
-                m_downloadItem->jobInfo = childInfo;
+                m_downloadItem->jobOutput = new QFile(QDir(dirPath).filePath(childInfo.name()), this);
+                m_downloadItem->jobOutput->open(QIODevice::WriteOnly);
                 m_downloadItem->jobTotalBytes = childInfo.size();
 
                 check = connect(m_downloadItem->job, SIGNAL(finished()),
                                 this, SLOT(_q_downloadFinished()));
+                Q_ASSERT(check);
+
+                check = connect(m_downloadItem->job, SIGNAL(readyRead()),
+                                this, SLOT(_q_downloadReadyRead()));
                 Q_ASSERT(check);
 
                 check = connect(m_downloadItem->job, SIGNAL(downloadProgress(qint64,qint64)),
@@ -631,21 +648,10 @@ void PhotoQueueModel::_q_downloadFinished()
         FileSystemJob *job = m_downloadItem->job;
 
         if (job->error() == FileSystemJob::NoError) {
-            // FIXME: determine path
-            QString dirPath("/tmp");
-            if (m_downloadItem->info.isDir()) {
-                const QString targetDir = m_downloadItem->info.name();
-                if (!targetDir.isEmpty()) {
-                    QDir dir(dirPath);
-                    if (dir.exists(targetDir) || dir.mkpath(targetDir))
-                        dirPath = dir.filePath(targetDir);
-                }
-            }
-
-            QFile output(QDir(dirPath).filePath(m_downloadItem->jobInfo.name()));
-            output.open(QIODevice::WriteOnly);
-            output.write(m_downloadItem->job->readAll());
-            output.close();
+            m_downloadItem->jobOutput->write(m_downloadItem->job->readAll());
+            m_downloadItem->jobOutput->close();
+        } else {
+            m_downloadItem->jobOutput->remove();
         }
 
         m_downloadItem->job->deleteLater();
@@ -673,6 +679,13 @@ void PhotoQueueModel::_q_downloadProgress(qint64 done, qint64 total)
         m_downloadItem->jobDoneBytes = done;
         emit dataChanged(createIndex(m_downloadItem), createIndex(m_downloadItem));
     }
+}
+
+void PhotoQueueModel::_q_downloadReadyRead()
+{
+    Q_ASSERT(m_downloadItem);
+
+    m_downloadItem->jobOutput->write(m_downloadItem->job->readAll());
 }
 
 void PhotoQueueModel::_q_listFinished()

@@ -1186,6 +1186,7 @@ void ShareFileSystemGet::_q_transferReceived(QXmppTransferJob *job)
 
     m_job = job;
     m_job->accept(new ShareFileSystemBuffer(this));
+    setOpenMode(QIODevice::ReadOnly);
 
     check = connect(m_job, SIGNAL(progress(qint64,qint64)),
                     this, SIGNAL(downloadProgress(qint64,qint64)));
