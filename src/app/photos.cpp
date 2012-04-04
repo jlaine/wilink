@@ -571,10 +571,12 @@ void PhotoQueueModel::cancel(int row)
         return;
 
     PhotoQueueItem *item = static_cast<PhotoQueueItem*>(rootItem->children.at(row));
-    if (item->job)
+    if (item->job) {
+        item->items.clear();
         item->job->abort();
-    else
+    } else {
         removeRow(row);
+    }
 }
 
 QVariant PhotoQueueModel::data(const QModelIndex &index, int role) const

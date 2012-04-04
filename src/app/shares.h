@@ -37,8 +37,6 @@ class QXmppShareDatabase;
 class QXmppShareManager;
 class QXmppTransferJob;
 class ShareModelPrivate;
-class ShareQueueModel;
-class ShareQueueModelPrivate;
 
 /** Model representing a tree of share items (collections and files).
  */
@@ -50,7 +48,6 @@ class ShareModel : public QAbstractItemModel
     Q_PROPERTY(ChatClient* client READ client WRITE setClient NOTIFY clientChanged)
     Q_PROPERTY(bool connected READ isConnected NOTIFY isConnectedChanged)
     Q_PROPERTY(QString filter READ filter WRITE setFilter NOTIFY filterChanged)
-    Q_PROPERTY(ShareQueueModel *queue READ queue CONSTANT)
     Q_PROPERTY(QString rootJid READ rootJid WRITE setRootJid NOTIFY rootJidChanged)
     Q_PROPERTY(QString rootNode READ rootNode WRITE setRootNode NOTIFY rootNodeChanged)
     Q_PROPERTY(QString shareServer READ shareServer NOTIFY shareServerChanged)
@@ -80,8 +77,6 @@ public:
     bool isBusy() const;
     bool isConnected() const;
 
-    ShareQueueModel *queue() const;
-
     QString rootJid() const;
     void setRootJid(const QString &rootJid);
 
@@ -110,7 +105,6 @@ signals:
     void shareUrlChanged();
 
 public slots:
-    void download(int row);
     void refresh();
 
 private slots:
@@ -127,42 +121,6 @@ private:
     QXmppShareItem *rootItem;
     ShareModelPrivate *d;
     friend class ShareModelPrivate;
-};
-
-class ShareQueueModel : public ChatModel
-{
-    Q_OBJECT
-
-public:
-    enum Role {
-        IsDirRole = ChatModel::UserRole,
-        NodeRole,
-        SpeedRole,
-        DoneBytesRole,
-        DoneFilesRole,
-        TotalBytesRole,
-        TotalFilesRole,
-    };
-
-    ShareQueueModel(QObject *parent = 0);
-    ~ShareQueueModel();
-
-    void add(const QXmppShareItem &item, const QString &filter);
-    bool contains(const QXmppShareItem &item) const;
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-    void setManager(QXmppShareManager *manager);
-
-public slots:
-    void cancel(int row);
-
-private slots:
-    void _q_refresh();
-    void _q_searchReceived(const QXmppShareSearchIq &shareIq);
-    void _q_transferFinished();
-
-private:
-    ShareQueueModelPrivate *d;
-    friend class ShareQueueModelPrivate;
 };
 
 class ShareFileSystem : public FileSystem

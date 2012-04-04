@@ -107,7 +107,6 @@ public:
     ChatClient *shareClient;
     QString shareServer;
     QTimer *timer;
-    ShareQueueModel *queueModel;
 
 private:
     ShareModel *q;
@@ -119,7 +118,6 @@ ShareModelPrivate::ShareModelPrivate(ShareModel *qq)
       shareClient(0),
       q(qq)
 {
-    queueModel = new ShareQueueModel(q);
 }
 
 bool ShareModelPrivate::canDownload(const QXmppShareItem *item) const
@@ -133,7 +131,7 @@ bool ShareModelPrivate::canDownload(const QXmppShareItem *item) const
             return false;
     }
 
-    return !queueModel->contains(*item);
+    return true;
 }
 
 void ShareModelPrivate::setShareClient(ChatClient *newClient)
@@ -256,11 +254,6 @@ bool ShareModel::isBusy() const
 bool ShareModel::isConnected() const
 {
     return d->connected;
-}
-
-ShareQueueModel* ShareModel::queue() const
-{
-    return d->queueModel;
 }
 
 QString ShareModel::rootJid() const
@@ -392,18 +385,6 @@ QXmppShareDatabase *ShareModel::database() const
     return globalDatabase;
 }
 
-void ShareModel::download(int row)
-{
-    if (row < 0 || row > rootItem->size() - 1)
-        return;
-
-    QXmppShareItem *item = rootItem->child(row);
-    if (d->canDownload(item)) {
-        d->queueModel->add(*item, d->filter);
-        emit dataChanged(createIndex(item), createIndex(item));
-    }
-}
-
 QModelIndex ShareModel::index(int row, int column, const QModelIndex &parent) const
 {
     if (!hasIndex(row, column, parent))
@@ -514,7 +495,6 @@ void ShareModel::_q_presenceReceived(const QXmppPresence &presence)
                             this, SLOT(_q_searchReceived(QXmppShareSearchIq)));
             Q_ASSERT(check);
         }
-        d->queueModel->setManager(shareManager);
 
         if (!d->connected) {
             d->connected = true;
@@ -710,281 +690,6 @@ QXmppShareItem *ShareQueueItem::nextFile(QXmppShareItem *item) const
     }
 
     return 0;
-}
-
-class ShareQueueModelPrivate
-{
-public:
-    ShareQueueModelPrivate(ShareQueueModel *qq);
-    void process();
-    qint64 transfers() const;
-
-    QXmppShareManager *manager;
-    QTimer *timer;
-
-private:
-    ShareQueueModel *q;
-};
-
-ShareQueueModelPrivate::ShareQueueModelPrivate(ShareQueueModel *qq)
-    : manager(0),
-    timer(0),
-    q(qq)
-{
-}
-
-qint64 ShareQueueModelPrivate::transfers() const
-{
-    qint64 transfers = 0;
-    foreach (ChatModelItem *ptr, q->rootItem->children) {
-        ShareQueueItem *item = static_cast<ShareQueueItem*>(ptr);
-        transfers += item->transfers.size();
-    }
-    return transfers;
-}
-
-void ShareQueueModelPrivate::process()
-{
-    Q_ASSERT(manager);
-
-    // check how many downloads are active
-    qint64 activeDownloads = transfers();
-    if (activeDownloads >= parallelDownloadLimit)
-        return;
-
-    // start downloads
-    foreach (ChatModelItem *ptr, q->rootItem->children) {
-        ShareQueueItem *item = static_cast<ShareQueueItem*>(ptr);
-
-        while (activeDownloads < parallelDownloadLimit) {
-            // find next item
-            QXmppShareItem *file = item->nextFile();
-            if (!file)
-                break;
-
-            QXmppShareTransfer *transfer = manager->get(*file);
-            if (transfer) {
-                bool check;
-                Q_UNUSED(check);
-
-                check = q->connect(transfer, SIGNAL(finished()),
-                                   q, SLOT(_q_transferFinished()));
-                Q_ASSERT(check);
-
-                item->transfers.insert(file, transfer);
-                activeDownloads++;
-
-                // start periodic refresh
-                if (!timer->isActive())
-                    timer->start();
-            } else {
-                item->done.insert(file);
-            }
-            emit q->dataChanged(q->createIndex(item), q->createIndex(item));
-        }
-    }
-}
-
-ShareQueueModel::ShareQueueModel(QObject *parent)
-    : ChatModel(parent)
-{
-    bool check;
-    Q_UNUSED(check);
-
-    d = new ShareQueueModelPrivate(this);
-
-    // timer to refresh progress
-    d->timer = new QTimer(this);
-    d->timer->setInterval(500);
-    check = connect(d->timer, SIGNAL(timeout()),
-                    this, SLOT(_q_refresh()));
-    Q_ASSERT(check);
-
-    // set role names
-    QHash<int, QByteArray> names = roleNames();
-    names.insert(IsDirRole, "isDir");
-    names.insert(NodeRole, "node");
-    names.insert(SpeedRole, "speed");
-    names.insert(DoneBytesRole, "doneBytes");
-    names.insert(DoneFilesRole, "doneFiles");
-    names.insert(TotalBytesRole, "totalBytes");
-    names.insert(TotalFilesRole, "totalFiles");
-    setRoleNames(names);
-}
-
-ShareQueueModel::~ShareQueueModel()
-{
-    delete d;
-}
-
-void ShareQueueModel::add(const QXmppShareItem &shareItem, const QString &filter)
-{
-    if (!d->manager || shareItem.locations().isEmpty())
-        return;
-
-    ShareQueueItem *item = new ShareQueueItem;
-    copy(&item->shareItem, &shareItem);
-
-    if (item->shareItem.type() == QXmppShareItem::CollectionItem) {
-        item->requestId = d->manager->search(item->shareItem.locations().first(), 0, filter);
-    } else {
-        item->totalBytes = item->shareItem.fileSize();
-        item->totalFiles = 1;
-    }
-    addItem(item, rootItem);
-    d->process();
-}
-
-void ShareQueueModel::cancel(int row)
-{
-    if (row < 0 || row > rootItem->children.size() - 1)
-        return;
-
-    ShareQueueItem *item = static_cast<ShareQueueItem*>(rootItem->children.at(row));
-    if (!item->aborted) {
-        item->aborted = true;
-        foreach (QXmppShareTransfer *transfer, item->transfers.values())
-            transfer->abort();
-    }
-}
-
-bool ShareQueueModel::contains(const QXmppShareItem &shareItem) const
-{
-    foreach (ChatModelItem *ptr, rootItem->children) {
-        ShareQueueItem *item  = static_cast<ShareQueueItem*>(ptr);
-        if (item->shareItem.locations() == shareItem.locations())
-            return true;
-    }
-    return false;
-}
-
-QVariant ShareQueueModel::data(const QModelIndex &index, int role) const
-{
-    ShareQueueItem *item = static_cast<ShareQueueItem*>(index.internalPointer());
-    if (!index.isValid() || !item)
-        return QVariant();
-
-    const QXmppShareItem *shareItem = &item->shareItem;
-    if (role == IsDirRole)
-        return shareItem->type() == QXmppShareItem::CollectionItem;
-    else if (role == JidRole) {
-        if (shareItem->locations().isEmpty())
-            return QString();
-        else
-            return shareItem->locations().first().jid();
-    }
-    else if (role == NameRole)
-        return shareItem->name();
-    else if (role == NodeRole) {
-        if (shareItem->locations().isEmpty())
-            return QString();
-        else
-            return shareItem->locations().first().node();
-    }
-    else if (role == SpeedRole) {
-        qint64 speed = 0;
-        foreach (QXmppShareTransfer *transfer, item->transfers.values())
-            speed += transfer->speed();
-        return speed;
-    }
-    else if (role == DoneBytesRole) {
-        qint64 done = item->doneBytes;
-        foreach (QXmppShareTransfer *transfer, item->transfers.values())
-            done += transfer->doneBytes();
-        return done;
-    }
-    else if (role == DoneFilesRole)
-        return item->done.size();
-    else if (role == TotalBytesRole)
-        return item->totalBytes;
-    else if (role == TotalFilesRole)
-        return item->totalFiles;
-    return QVariant();
-}
-
-void ShareQueueModel::setManager(QXmppShareManager *manager)
-{
-    if (manager != d->manager) {
-        d->manager = manager;
-        if (d->manager) {
-            bool check;
-            Q_UNUSED(check);
-
-            check = connect(d->manager, SIGNAL(shareSearchIqReceived(QXmppShareSearchIq)),
-                            this, SLOT(_q_searchReceived(QXmppShareSearchIq)));
-            Q_ASSERT(check);
-        }
-    }
-}
-
-/** Periodically refresh transfer progress.
- */
-void ShareQueueModel::_q_refresh()
-{
-    foreach (ChatModelItem *ptr, rootItem->children) {
-        ShareQueueItem *item = static_cast<ShareQueueItem*>(ptr);
-        if (item->transfers.size())
-            emit dataChanged(createIndex(item), createIndex(item));
-    }
-}
-
-void ShareQueueModel::_q_searchReceived(const QXmppShareSearchIq &shareIq)
-{
-    // filter requests
-    if (shareIq.type() == QXmppIq::Get || shareIq.type() == QXmppIq::Set)
-        return;
-
-    foreach (ChatModelItem *ptr, rootItem->children) {
-        ShareQueueItem *item = static_cast<ShareQueueItem*>(ptr);
-        if (item->requestId == shareIq.id()) {
-            if (shareIq.type() == QXmppIq::Result) {
-                const QString oldName = item->shareItem.name();
-                QXmppShareItem *collection = (QXmppShareItem*)&shareIq.collection();
-                copy(&item->shareItem, collection);
-                item->shareItem.setName(oldName);
-                foreach (QXmppShareItem *child, collection->children())
-                    item->shareItem.appendChild(*child);
-                totals(&item->shareItem, item->totalBytes, item->totalFiles);
-                emit dataChanged(createIndex(item), createIndex(item));
-
-                d->process();
-            } else {
-                removeItem(item);
-            }
-            return;
-        }
-    }
-}
-
-void ShareQueueModel::_q_transferFinished()
-{
-    QXmppShareTransfer *transfer = qobject_cast<QXmppShareTransfer*>(sender());
-    if (!transfer)
-        return;
-
-    foreach (ChatModelItem *ptr, rootItem->children) {
-        ShareQueueItem *item = static_cast<ShareQueueItem*>(ptr);
-        QXmppShareItem *file = item->transfers.key(transfer);
-        if (file) {
-            item->done.insert(file);
-            item->doneBytes += file->fileSize();
-            item->transfers.remove(file);
-            transfer->deleteLater();
-
-            // stop periodic refresh
-            if (!d->transfers())
-                d->timer->stop();
-
-            // check for completion
-            if (item->transfers.isEmpty() && !item->nextFile())
-                removeItem(item);
-            else
-                emit dataChanged(createIndex(item), createIndex(item));
-            break;
-        }
-    }
-
-    d->process();
 }
 
 SharePlaceModel::SharePlaceModel(QObject *parent)
