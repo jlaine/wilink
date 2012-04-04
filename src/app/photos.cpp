@@ -40,6 +40,25 @@ static PhotoCache *photoCache = 0;
 static QCache<QString, QImage> photoImageCache;
 static bool photoInitialised = false;
 
+static QString availableFilePath(const QString &dirPath, const QString &name)
+{
+    QString fileName = name;
+    QDir downloadsDir(dirPath);
+    if (downloadsDir.exists(fileName))
+    {
+        const QString fileBase = QFileInfo(fileName).completeBaseName();
+        const QString fileSuffix = QFileInfo(fileName).suffix();
+        int i = 2;
+        while (downloadsDir.exists(fileName))
+        {
+            fileName = QString("%1_%2").arg(fileBase, QString::number(i++));
+            if (!fileSuffix.isEmpty())
+                fileName += "." + fileSuffix;
+        }
+    }
+    return downloadsDir.absoluteFilePath(fileName);
+}
+
 class PhotoNetworkAccessManagerFactory : public FileSystemNetworkAccessManagerFactory
 {
 public:
@@ -598,8 +617,8 @@ void PhotoQueueModel::processQueue()
             if (!item->isUpload && !item->items.isEmpty()) {
                 FileInfo childInfo = item->items.takeFirst();
 
-                // FIXME: determine path
-                QString dirPath("/tmp");
+                // determine path
+                QString dirPath(wApp->settings()->sharesLocation());
                 if (item->info.isDir()) {
                     const QString targetDir = item->info.name();
                     if (!targetDir.isEmpty()) {
@@ -608,10 +627,11 @@ void PhotoQueueModel::processQueue()
                             dirPath = dir.filePath(targetDir);
                     }
                 }
+                const QString filePath = availableFilePath(dirPath, childInfo.name() + ".part");
 
                 m_downloadItem = item;
                 m_downloadItem->job = item->fileSystem->get(childInfo.url(), FileSystem::FullSize);
-                m_downloadItem->jobOutput = new QFile(QDir(dirPath).filePath(childInfo.name()), this);
+                m_downloadItem->jobOutput = new QFile(filePath, this);
                 m_downloadItem->jobOutput->open(QIODevice::WriteOnly);
                 m_downloadItem->jobTotalBytes = childInfo.size();
 
@@ -656,7 +676,11 @@ void PhotoQueueModel::_q_downloadFinished()
 
         if (job->error() == FileSystemJob::NoError) {
             m_downloadItem->jobOutput->write(m_downloadItem->job->readAll());
-            m_downloadItem->jobOutput->close();
+
+            // rename file
+            QFileInfo tempInfo(m_downloadItem->jobOutput->fileName());
+            const QString finalPath = availableFilePath(tempInfo.dir().path(), tempInfo.fileName().remove(QRegExp("\\.part$")));
+            m_downloadItem->jobOutput->rename(finalPath);
         } else {
             m_downloadItem->jobOutput->remove();
         }
