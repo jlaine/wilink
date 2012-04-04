@@ -70,7 +70,7 @@ public:
     QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize);
 };
 
-class PhotoModel : public ChatModel
+class FolderModel : public ChatModel
 {
     Q_OBJECT
     Q_PROPERTY(bool busy READ isBusy NOTIFY isBusyChanged)
@@ -81,7 +81,7 @@ class PhotoModel : public ChatModel
     Q_PROPERTY(PhotoQueueModel* uploads READ uploads CONSTANT)
 
 public:
-    PhotoModel(QObject *parent = 0);
+    FolderModel(QObject *parent = 0);
 
     QUrl rootUrl() const;
     void setRootUrl(const QUrl &rootUrl);
@@ -162,7 +162,7 @@ private slots:
 private:
     void processQueue();
 
-    PhotoModel *m_photoModel;
+    FolderModel *m_photoModel;
     PhotoResizer *m_resizer;
     QThread *m_resizerThread;
     PhotoQueueItem *m_downloadItem;

@@ -118,7 +118,7 @@ Panel {
         z: 2
     }
 
-    PhotoModel {
+    FolderModel {
         id: photoModel
     }
 

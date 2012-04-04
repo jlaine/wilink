@@ -159,7 +159,7 @@ Panel {
         anchors.top: crumbBar.bottom
         anchors.bottom: queueHelp.top
 
-        model: PhotoModel {
+        model: FolderModel {
             onBusyChanged: {
                 if (view.count == 0 && !busy && searchEdit.text.length > 0)
                     searchEdit.state = 'error';

@@ -30,7 +30,7 @@ Item {
     clip: true
     height: 200
 
-    PhotoModel {
+    FolderModel {
         id: folderModel
     }
 

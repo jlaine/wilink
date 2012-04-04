@@ -169,7 +169,7 @@ Panel {
                         anchors.left: parent.left
                         anchors.right: parent.right
                         highlight: Item {}
-                        model: PhotoModel {
+                        model: FolderModel {
                             showFiles: false
                         }
                         delegate: Item {

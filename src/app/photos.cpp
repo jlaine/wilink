@@ -205,7 +205,7 @@ public:
     PhotoItem(const FileInfo &info) : FileInfo(info) {};
 };
 
-PhotoModel::PhotoModel(QObject *parent)
+FolderModel::FolderModel(QObject *parent)
     : ChatModel(parent)
     , m_fs(0)
     , m_listJob(0)
@@ -230,7 +230,7 @@ PhotoModel::PhotoModel(QObject *parent)
     Q_ASSERT(check);
 }
 
-QVariant PhotoModel::data(const QModelIndex &index, int role) const
+QVariant FolderModel::data(const QModelIndex &index, int role) const
 {
     Q_ASSERT(m_fs);
     PhotoItem *item = static_cast<PhotoItem*>(index.internalPointer());
@@ -256,17 +256,17 @@ QVariant PhotoModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-bool PhotoModel::canCreateAlbum() const
+bool FolderModel::canCreateAlbum() const
 {
     return m_permissions & FileSystemJob::Mkdir;
 }
 
-bool PhotoModel::canUpload() const
+bool FolderModel::canUpload() const
 {
     return m_permissions & FileSystemJob::Put;
 }
 
-void PhotoModel::createAlbum(const QString &name)
+void FolderModel::createAlbum(const QString &name)
 {
     if (name.isEmpty())
         return;
@@ -276,7 +276,7 @@ void PhotoModel::createAlbum(const QString &name)
     m_fs->mkdir(newUrl);
 }
 
-void PhotoModel::download(int row)
+void FolderModel::download(int row)
 {
     if (row < 0 || row > rootItem->children.size() - 1)
         return;
@@ -285,26 +285,26 @@ void PhotoModel::download(int row)
     m_uploads->download(*item, m_fs);
 }
 
-bool PhotoModel::isBusy() const
+bool FolderModel::isBusy() const
 {
     return m_listJob != 0;
 }
 
 /** Refresh the contents of the current folder.
  */
-void PhotoModel::refresh()
+void FolderModel::refresh()
 {
     removeRows(0, rootItem->children.size());
     m_listJob = m_fs->list(m_rootUrl);
     emit isBusyChanged();
 }
 
-QUrl PhotoModel::rootUrl() const
+QUrl FolderModel::rootUrl() const
 {
     return m_rootUrl;
 }
 
-void PhotoModel::setRootUrl(const QUrl &rootUrl)
+void FolderModel::setRootUrl(const QUrl &rootUrl)
 {
     bool check;
     Q_UNUSED(check);
@@ -337,7 +337,7 @@ void PhotoModel::setRootUrl(const QUrl &rootUrl)
     emit rootUrlChanged(m_rootUrl);
 }
 
-bool PhotoModel::removeRow(int row)
+bool FolderModel::removeRow(int row)
 {
     if (row < 0 || row >= rootItem->children.size())
         return false;
@@ -350,12 +350,12 @@ bool PhotoModel::removeRow(int row)
     return true;
 }
 
-bool PhotoModel::showFiles() const
+bool FolderModel::showFiles() const
 {
     return m_showFiles;
 }
 
-void PhotoModel::setShowFiles(bool show)
+void FolderModel::setShowFiles(bool show)
 {
     if (show != m_showFiles) {
         m_showFiles = show;
@@ -363,7 +363,7 @@ void PhotoModel::setShowFiles(bool show)
     }
 }
 
-void PhotoModel::upload(const QString &filePath)
+void FolderModel::upload(const QString &filePath)
 {
     QString base = m_rootUrl.toString();
     while (base.endsWith("/"))
@@ -372,7 +372,7 @@ void PhotoModel::upload(const QString &filePath)
     m_uploads->append(filePath, m_fs, base + "/" + QFileInfo(filePath).fileName());
 }
 
-PhotoQueueModel *PhotoModel::uploads() const
+PhotoQueueModel *FolderModel::uploads() const
 {
     return m_uploads;
 }
@@ -381,7 +381,7 @@ PhotoQueueModel *PhotoModel::uploads() const
  *
  * @param job
  */
-void PhotoModel::_q_jobFinished(FileSystemJob *job)
+void FolderModel::_q_jobFinished(FileSystemJob *job)
 {
     Q_ASSERT(m_fs);
 
@@ -422,7 +422,7 @@ void PhotoModel::_q_jobFinished(FileSystemJob *job)
 
 /** When a photo changes, emit notifications.
  */
-void PhotoModel::_q_photoChanged(const QUrl &url, FileSystem::ImageSize size)
+void FolderModel::_q_photoChanged(const QUrl &url, FileSystem::ImageSize size)
 {
     Q_UNUSED(size);
     foreach (ChatModelItem *ptr, rootItem->children) {
