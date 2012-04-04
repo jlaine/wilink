@@ -1046,13 +1046,40 @@ FileSystemJob* ShareFileSystem::list(const QUrl &dirUrl)
     return new ShareFileSystemList(this, urlToLocation(dirUrl));
 }
 
+class ShareFileSystemBuffer : public QIODevice
+{
+public:
+    ShareFileSystemBuffer(ShareFileSystemGet *parent)
+        : QIODevice(parent)
+        , m_job(parent)
+    {
+        setOpenMode(QIODevice::WriteOnly);
+    }
+
+protected:
+    qint64 readData(char*, qint64)
+    {
+        return -1;
+    }
+
+    qint64 writeData(const char* data, qint64 size)
+    {
+        return m_job->_q_dataReceived(data, size);
+    }
+
+private:
+    ShareFileSystemGet *m_job;
+};
+
 ShareFileSystemGet::ShareFileSystemGet(ShareFileSystem *fs, const QXmppShareLocation &location)
     : FileSystemJob(FileSystemJob::Get, fs)
-    , m_buffer(0)
     , m_job(0)
 {
     bool check;
     Q_UNUSED(check);
+
+    //m_buffer = new QBuffer(this);
+    //m_buffer->open(QIODevice::WriteOnly);
 
     if (location.jid().isEmpty() || location.node().isEmpty()) {
         setErrorString("Invalid location requested");
@@ -1105,6 +1132,26 @@ void ShareFileSystemGet::abort()
     }
 }
 
+qint64 ShareFileSystemGet::bytesAvailable() const
+{
+    return QIODevice::bytesAvailable() + m_buffer.size();
+}
+
+qint64 ShareFileSystemGet::readData(char *data, qint64 maxSize)
+{
+    qint64 bytes = qMin(maxSize, qint64(m_buffer.size()));
+    memcpy(data, m_buffer.constData(), bytes);
+    m_buffer.remove(0, bytes);
+    return bytes;
+}
+
+qint64 ShareFileSystemGet::_q_dataReceived(const char *data, qint64 size)
+{
+    m_buffer.append(data, size);
+    emit readyRead();
+    return size;
+}
+
 void ShareFileSystemGet::_q_shareGetIqReceived(const QXmppShareGetIq &iq)
 {
     if (iq.id() != m_packetId)
@@ -1121,10 +1168,7 @@ void ShareFileSystemGet::_q_shareGetIqReceived(const QXmppShareGetIq &iq)
 
 void ShareFileSystemGet::_q_transferFinished()
 {
-    if (m_job->error() == QXmppTransferJob::NoError) {
-        m_buffer->open(QIODevice::ReadOnly);
-        setData(m_buffer);
-    } else {
+    if (m_job->error() != QXmppTransferJob::NoError) {
         setErrorString("Transfer failed");
         setError(UnknownError);
     }
@@ -1140,10 +1184,8 @@ void ShareFileSystemGet::_q_transferReceived(QXmppTransferJob *job)
     if (m_job || job->direction() != QXmppTransferJob::IncomingDirection || job->sid() != m_sid)
         return;
 
-    m_buffer = new QBuffer(this);
-    m_buffer->open(QIODevice::WriteOnly);
     m_job = job;
-    m_job->accept(m_buffer);
+    m_job->accept(new ShareFileSystemBuffer(this));
 
     check = connect(m_job, SIGNAL(progress(qint64,qint64)),
                     this, SIGNAL(downloadProgress(qint64,qint64)));

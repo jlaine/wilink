@@ -32,7 +32,6 @@
 using namespace QNetIO;
 
 class ChatClient;
-class QBuffer;
 class QXmppPresence;
 class QXmppShareDatabase;
 class QXmppShareManager;
@@ -182,6 +181,9 @@ class ShareFileSystemGet : public FileSystemJob
 public:
     ShareFileSystemGet(ShareFileSystem *fs, const QXmppShareLocation &location);
 
+    qint64 bytesAvailable() const;
+    qint64 _q_dataReceived(const char* data, qint64 bytes);
+
 public slots:
     void abort();
 
@@ -190,8 +192,11 @@ private slots:
     void _q_transferFinished();
     void _q_transferReceived(QXmppTransferJob *job);
 
+protected:
+    qint64 readData(char *data, qint64 maxSize);
+
 private:
-    QBuffer *m_buffer;
+    QByteArray m_buffer;
     QXmppTransferJob* m_job;
     QString m_packetId;
     QString m_sid;
