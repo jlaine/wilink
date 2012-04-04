@@ -242,7 +242,7 @@ FolderModel::FolderModel(QObject *parent)
     names.insert(UrlRole, "url");
     setRoleNames(names);
 
-    m_uploads = new PhotoQueueModel(this);
+    m_uploads = new FolderQueueModel(this);
 
     check = connect(PhotoCache::instance(), SIGNAL(photoChanged(QUrl,FileSystem::ImageSize)),
                     this, SLOT(_q_photoChanged(QUrl,FileSystem::ImageSize)));
@@ -391,7 +391,7 @@ void FolderModel::upload(const QString &filePath)
     m_uploads->append(filePath, m_fs, base + "/" + QFileInfo(filePath).fileName());
 }
 
-PhotoQueueModel *FolderModel::uploads() const
+FolderQueueModel *FolderModel::uploads() const
 {
     return m_uploads;
 }
@@ -490,7 +490,7 @@ PhotoQueueItem::PhotoQueueItem()
 {
 }
 
-PhotoQueueModel::PhotoQueueModel(QObject *parent)
+FolderQueueModel::FolderQueueModel(QObject *parent)
     : ChatModel(parent)
     , m_resizer(0)
     , m_resizerThread(0)
@@ -517,7 +517,7 @@ PhotoQueueModel::PhotoQueueModel(QObject *parent)
             this, SLOT(_q_uploadResized(QIODevice*)));
 }
 
-PhotoQueueModel::~PhotoQueueModel()
+FolderQueueModel::~FolderQueueModel()
 {
     m_resizerThread->quit();
     m_resizerThread->wait();
@@ -525,7 +525,7 @@ PhotoQueueModel::~PhotoQueueModel()
     delete m_resizerThread;
 }
 
-void PhotoQueueModel::append(const QString &filePath, FileSystem *fileSystem, const QUrl &url)
+void FolderQueueModel::append(const QString &filePath, FileSystem *fileSystem, const QUrl &url)
 {
     PhotoQueueItem *item = new PhotoQueueItem;
 
@@ -540,7 +540,7 @@ void PhotoQueueModel::append(const QString &filePath, FileSystem *fileSystem, co
     processQueue();
 }
 
-void PhotoQueueModel::download(const FileInfo &info, FileSystem *fileSystem)
+void FolderQueueModel::download(const FileInfo &info, FileSystem *fileSystem)
 {
     bool check;
     Q_UNUSED(check);
@@ -565,7 +565,7 @@ void PhotoQueueModel::download(const FileInfo &info, FileSystem *fileSystem)
     processQueue();
 }
 
-void PhotoQueueModel::cancel(int row)
+void FolderQueueModel::cancel(int row)
 {
     if (row < 0 || row > rootItem->children.size() - 1)
         return;
@@ -579,7 +579,7 @@ void PhotoQueueModel::cancel(int row)
     }
 }
 
-QVariant PhotoQueueModel::data(const QModelIndex &index, int role) const
+QVariant FolderQueueModel::data(const QModelIndex &index, int role) const
 {
     PhotoQueueItem *item = static_cast<PhotoQueueItem*>(index.internalPointer());
     if (!index.isValid() || !item)
@@ -607,7 +607,7 @@ QVariant PhotoQueueModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-void PhotoQueueModel::processQueue()
+void FolderQueueModel::processQueue()
 {
     bool check;
     Q_UNUSED(check);
@@ -668,7 +668,7 @@ void PhotoQueueModel::processQueue()
 
 /** When an download finishes, process the results.
  */
-void PhotoQueueModel::_q_downloadFinished()
+void FolderQueueModel::_q_downloadFinished()
 {
     bool check;
     Q_UNUSED(check);
@@ -706,7 +706,7 @@ void PhotoQueueModel::_q_downloadFinished()
 
 /** When upload progress changes, emit notifications.
  */
-void PhotoQueueModel::_q_downloadProgress(qint64 done, qint64 total)
+void FolderQueueModel::_q_downloadProgress(qint64 done, qint64 total)
 {
     if (m_downloadItem) {
         m_downloadItem->jobDoneBytes = done;
@@ -714,14 +714,14 @@ void PhotoQueueModel::_q_downloadProgress(qint64 done, qint64 total)
     }
 }
 
-void PhotoQueueModel::_q_downloadReadyRead()
+void FolderQueueModel::_q_downloadReadyRead()
 {
     Q_ASSERT(m_downloadItem);
 
     m_downloadItem->jobOutput->write(m_downloadItem->job->readAll());
 }
 
-void PhotoQueueModel::_q_listFinished()
+void FolderQueueModel::_q_listFinished()
 {
     FileSystemJob *job = qobject_cast<FileSystemJob*>(sender());
     if (!job)
@@ -751,7 +751,7 @@ void PhotoQueueModel::_q_listFinished()
 
 /** When an upload finishes, process the results.
  */
-void PhotoQueueModel::_q_uploadFinished()
+void FolderQueueModel::_q_uploadFinished()
 {
     if (m_uploadItem) {
         removeItem(m_uploadItem);
@@ -768,7 +768,7 @@ void PhotoQueueModel::_q_uploadFinished()
 
 /** When upload progress changes, emit notifications.
  */
-void PhotoQueueModel::_q_uploadProgress(qint64 done, qint64 total)
+void FolderQueueModel::_q_uploadProgress(qint64 done, qint64 total)
 {
     if (m_uploadItem) {
         m_uploadItem->doneBytes = done;
@@ -777,7 +777,7 @@ void PhotoQueueModel::_q_uploadProgress(qint64 done, qint64 total)
     }
 }
 
-void PhotoQueueModel::_q_uploadResized(QIODevice *device)
+void FolderQueueModel::_q_uploadResized(QIODevice *device)
 {
     bool check;
     Q_UNUSED(check);

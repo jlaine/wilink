@@ -34,7 +34,7 @@ class PhotoCachePrivate;
 class PhotoDownloadItem;
 class PhotoItem;
 class PhotoQueueItem;
-class PhotoQueueModel;
+class FolderQueueModel;
 class PhotoResizer;
 class QThread;
 
@@ -78,7 +78,7 @@ class FolderModel : public ChatModel
     Q_PROPERTY(bool canUpload READ canUpload NOTIFY permissionsChanged)
     Q_PROPERTY(bool showFiles READ showFiles WRITE setShowFiles NOTIFY showFilesChanged)
     Q_PROPERTY(QUrl rootUrl READ rootUrl WRITE setRootUrl NOTIFY rootUrlChanged)
-    Q_PROPERTY(PhotoQueueModel* uploads READ uploads CONSTANT)
+    Q_PROPERTY(FolderQueueModel* uploads READ uploads CONSTANT)
 
 public:
     FolderModel(QObject *parent = 0);
@@ -92,7 +92,7 @@ public:
     bool canCreateAlbum() const;
     bool canUpload() const;
     bool isBusy() const;
-    PhotoQueueModel *uploads() const;
+    FolderQueueModel *uploads() const;
 
     // QAbstractItemModel
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
@@ -121,10 +121,10 @@ private:
     FileSystemJob::Operations m_permissions;
     QUrl m_rootUrl;
     bool m_showFiles;
-    PhotoQueueModel *m_uploads;
+    FolderQueueModel *m_uploads;
 };
 
-class PhotoQueueModel : public ChatModel
+class FolderQueueModel : public ChatModel
 {
     Q_OBJECT
 
@@ -138,8 +138,8 @@ public:
         TotalFilesRole,
     };
 
-    PhotoQueueModel(QObject *parent = 0);
-    ~PhotoQueueModel();
+    FolderQueueModel(QObject *parent = 0);
+    ~FolderQueueModel();
 
     void append(const QString &sourcePath, FileSystem *fileSystem, const QUrl &url);
     void download(const FileInfo &info, FileSystem *fileSystem);
