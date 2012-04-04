@@ -285,12 +285,18 @@ void PhotoModel::download(int row)
     m_uploads->download(*item, m_fs);
 }
 
+bool PhotoModel::isBusy() const
+{
+    return m_listJob != 0;
+}
+
 /** Refresh the contents of the current folder.
  */
 void PhotoModel::refresh()
 {
     removeRows(0, rootItem->children.size());
     m_listJob = m_fs->list(m_rootUrl);
+    emit isBusyChanged();
 }
 
 QUrl PhotoModel::rootUrl() const
@@ -406,6 +412,7 @@ void PhotoModel::_q_jobFinished(FileSystemJob *job)
                 }
             }
             m_listJob = 0;
+            emit isBusyChanged();
         }
         break;
     default:

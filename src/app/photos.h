@@ -73,6 +73,7 @@ public:
 class PhotoModel : public ChatModel
 {
     Q_OBJECT
+    Q_PROPERTY(bool busy READ isBusy NOTIFY isBusyChanged)
     Q_PROPERTY(bool canCreateAlbum READ canCreateAlbum NOTIFY permissionsChanged)
     Q_PROPERTY(bool canUpload READ canUpload NOTIFY permissionsChanged)
     Q_PROPERTY(bool showFiles READ showFiles WRITE setShowFiles NOTIFY showFilesChanged)
@@ -90,12 +91,14 @@ public:
 
     bool canCreateAlbum() const;
     bool canUpload() const;
+    bool isBusy() const;
     PhotoQueueModel *uploads() const;
 
     // QAbstractItemModel
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
 signals:
+    void isBusyChanged();
     void permissionsChanged();
     void rootUrlChanged(const QUrl &rootUrl);
     void showFilesChanged();
