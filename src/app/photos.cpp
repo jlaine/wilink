@@ -440,6 +440,7 @@ public:
 
     FileSystemJob *job;
     qint64 jobDoneBytes;
+    qint64 jobTotalBytes;
 
     qint64 doneBytes;
     qint64 doneFiles;
@@ -453,6 +454,7 @@ PhotoQueueItem::PhotoQueueItem()
     , isUpload(false)
     , job(0)
     , jobDoneBytes(0)
+    , jobTotalBytes(0)
     , doneBytes(0)
     , doneFiles(0)
     , totalBytes(0)
@@ -589,6 +591,7 @@ void PhotoQueueModel::processQueue()
 
                 m_downloadItem = item;
                 m_downloadItem->job = item->fileSystem->get(childInfo.url(), FileSystem::FullSize);
+                m_downloadItem->jobTotalBytes = childInfo.size();
 
                 check = connect(m_downloadItem->job, SIGNAL(finished()),
                                 this, SLOT(_q_downloadFinished()));
@@ -624,7 +627,7 @@ void PhotoQueueModel::_q_downloadFinished()
 
     if (m_downloadItem) {
         m_downloadItem->job->deleteLater();
-        m_downloadItem->doneBytes += m_downloadItem->jobDoneBytes;
+        m_downloadItem->doneBytes += m_downloadItem->jobTotalBytes;
         m_downloadItem->doneFiles++;
         m_downloadItem->jobDoneBytes = 0;
 
