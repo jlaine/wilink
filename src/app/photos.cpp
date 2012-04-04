@@ -628,22 +628,10 @@ void PhotoQueueModel::_q_downloadFinished()
         m_downloadItem->doneFiles++;
         m_downloadItem->jobDoneBytes = 0;
 
-        if (!m_downloadItem->items.isEmpty()) {
-            FileInfo childInfo = m_downloadItem->items.takeFirst();
-
-            m_downloadItem->job = m_downloadItem->fileSystem->get(childInfo.url(), FileSystem::FullSize);
-
-            check = connect(m_downloadItem->job, SIGNAL(finished()),
-                            this, SLOT(_q_downloadFinished()));
-            Q_ASSERT(check);
-
-            check = connect(m_downloadItem->job, SIGNAL(downloadProgress(qint64,qint64)),
-                            this, SLOT(_q_downloadProgress(qint64,qint64)));
-            Q_ASSERT(check);
-        } else {
+        if (m_downloadItem->items.isEmpty())
             removeItem(m_downloadItem);
-            m_downloadItem = 0;
-        }
+
+        m_downloadItem = 0;
     }
 
     processQueue();
