@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QBuffer>
 #include <QCoreApplication>
 #include <QDesktopServices>
 #include <QSet>
@@ -1047,6 +1048,7 @@ FileSystemJob* ShareFileSystem::list(const QUrl &dirUrl)
 
 ShareFileSystemGet::ShareFileSystemGet(ShareFileSystem *fs, const QXmppShareLocation &location)
     : FileSystemJob(FileSystemJob::Get, fs)
+    , m_buffer(0)
     , m_job(0)
 {
     bool check;
@@ -1110,9 +1112,8 @@ void ShareFileSystemGet::_q_shareGetIqReceived(const QXmppShareGetIq &iq)
 void ShareFileSystemGet::_q_transferFinished()
 {
     if (m_job->error() == QXmppTransferJob::NoError) {
-        QFile *fp = new QFile("/tmp/shares");
-        fp->open(QIODevice::ReadOnly);
-        setData(fp);
+        m_buffer->open(QIODevice::ReadOnly);
+        setData(m_buffer);
     } else {
         setErrorString("Transfer failed");
         setError(UnknownError);
@@ -1129,8 +1130,10 @@ void ShareFileSystemGet::_q_transferReceived(QXmppTransferJob *job)
     if (m_job || job->direction() != QXmppTransferJob::IncomingDirection || job->sid() != m_sid)
         return;
 
-    job->accept("/tmp/shares");
+    m_buffer = new QBuffer(this);
+    m_buffer->open(QIODevice::WriteOnly);
     m_job = job;
+    m_job->accept(m_buffer);
 
     check = connect(m_job, SIGNAL(progress(qint64,qint64)),
                     this, SIGNAL(downloadProgress(qint64,qint64)));

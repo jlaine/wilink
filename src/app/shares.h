@@ -32,6 +32,7 @@
 using namespace QNetIO;
 
 class ChatClient;
+class QBuffer;
 class QXmppPresence;
 class QXmppShareDatabase;
 class QXmppShareManager;
@@ -187,6 +188,7 @@ private slots:
     void _q_transferReceived(QXmppTransferJob *job);
 
 private:
+    QBuffer *m_buffer;
     QXmppTransferJob* m_job;
     QString m_packetId;
     QString m_sid;
