@@ -179,7 +179,7 @@ Panel {
         z: 1
     }
 
-    ShareQueueView {
+    FolderQueueView {
         id: queueView
 
         anchors.left: parent.left

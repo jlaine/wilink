@@ -49,6 +49,7 @@
     <file>Dock.qml</file>
     <file>DockButton.qml</file>
     <file>ErrorNotification.qml</file>
+    <file>FolderQueueView.qml</file>
     <file>GeneralPreferencePanel.qml</file>
     <file>GroupBox.qml</file>
     <file>Highlight.qml</file>
@@ -111,7 +112,6 @@
     <file>SharePanel.qml</file>
     <file>SharePlugin.qml</file>
     <file>SharePreferencePanel.qml</file>
-    <file>ShareQueueView.qml</file>
     <file>ShareView.qml</file>
     <file>SoundPreferencePanel.qml</file>
     <file>StatusBar.qml</file>

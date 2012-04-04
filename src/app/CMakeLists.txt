@@ -140,6 +140,7 @@ if(RELOAD_TRANSLATIONS)
         ../data/DiscoveryPanel.qml
         ../data/Dock.qml
         ../data/ErrorNotification.qml
+        ../data/FolderQueueView.qml
         ../data/GeneralPreferencePanel.qml
         ../data/HistoryView.qml
         ../data/InputMenu.qml
@@ -175,7 +176,6 @@ if(RELOAD_TRANSLATIONS)
         ../data/SharePanel.qml
         ../data/SharePlugin.qml
         ../data/SharePreferencePanel.qml
-        ../data/ShareQueueView.qml
         ../data/ShareView.qml
         ../data/SoundPreferencePanel.qml
         ../data/StatusBar.qml

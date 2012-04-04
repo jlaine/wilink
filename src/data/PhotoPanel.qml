@@ -172,7 +172,7 @@ Panel {
         }
     }
 
-    ShareQueueView {
+    FolderQueueView {
         id: footer
 
         anchors.left: parent.left
