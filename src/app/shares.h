@@ -36,7 +36,6 @@ class QXmppPresence;
 class QXmppShareDatabase;
 class QXmppShareManager;
 class QXmppTransferJob;
-class ShareFileSystemPrivate;
 class ShareModelPrivate;
 class ShareQueueModel;
 class ShareQueueModelPrivate;
@@ -165,25 +164,17 @@ private:
     friend class ShareQueueModelPrivate;
 };
 
-class ShareFileSystem : public QNetIO::FileSystem
+class ShareFileSystem : public FileSystem
 {
     Q_OBJECT
 
 public:
     ShareFileSystem(QObject *parent = 0);
-    ~ShareFileSystem();
-
     FileSystemJob* get(const QUrl &fileUrl, ImageSize type);
     FileSystemJob* list(const QUrl &dirUrl);
-
-private slots:
-    void _q_searchReceived(const QXmppShareSearchIq &shareIq);
-
-private:
-    ShareFileSystemPrivate *d;
 };
 
-class ShareFileSystemGet : public QNetIO::FileSystemJob
+class ShareFileSystemGet : public FileSystemJob
 {
     Q_OBJECT
 
@@ -199,6 +190,21 @@ private:
     QXmppTransferJob* m_job;
     QString m_packetId;
     QString m_sid;
+};
+
+class ShareFileSystemList : public FileSystemJob
+{
+    Q_OBJECT
+
+public:
+    ShareFileSystemList(ShareFileSystem *fs, const QXmppShareLocation &location);
+
+private slots:
+    void _q_searchReceived(const QXmppShareSearchIq &shareIq);
+
+private:
+    QString m_jid;
+    QString m_packetId;
 };
 
 class SharePlaceModel : public QAbstractListModel
