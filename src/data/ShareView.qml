@@ -109,8 +109,8 @@ Item {
 
                 onClicked: {
                     itemHovered = false
-                    if (model.isDir && (model.jid != view.model.rootJid || model.node != view.model.rootNode)) {
-                        crumbBar.push(model);
+                    if (model.isDir) {
+                        crumbBar.push({'name': model.name, 'url': model.url});
                     }
                 }
 
@@ -136,7 +136,6 @@ Item {
                 iconSource: 'download.png'
                 state: 'inactive'
                 text: qsTr('Download')
-                visible: model.canDownload
 
                 onClicked: {
                     view.model.download(model.index);

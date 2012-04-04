@@ -122,10 +122,33 @@ Panel {
         anchors.top: searchBar.bottom
 
         onLocationChanged: {
-            view.model.rootJid = location.jid;
-            view.model.rootNode = location.node;
+            view.model.rootUrl = location.url;
         }
         z: 1
+    }
+
+    ShareModel {
+        client: appClient
+
+        onConnectedChanged: {
+            if (connected) {
+                // update breadcrumbs
+                if (!crumbBar.model.count) {
+                    crumbBar.push({'name': qsTr('Home'), 'url': 'share:'});
+                } else {
+                    crumbBar.model.setProperty(0, 'url', 'share:');
+                    refresh();
+                }
+
+                // show dock icon
+                for (var i = 0; i < dock.model.count; i++) {
+                    if (dock.model.get(i).panelSource == 'SharePanel.qml') {
+                        dock.model.setProperty(i, 'visible', true);
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     ShareView {
@@ -136,34 +159,12 @@ Panel {
         anchors.top: crumbBar.bottom
         anchors.bottom: queueHelp.top
 
-        model: ShareModel {
-            client: appClient
+        model: PhotoModel {
             onBusyChanged: {
                 if (view.count == 0 && !busy && searchEdit.text.length > 0)
                     searchEdit.state = 'error';
                 else
                     searchEdit.state = '';
-            }
-
-            onConnectedChanged: {
-                if (connected) {
-                    // update breadcrumbs
-                    if (!crumbBar.model.count) {
-                        crumbBar.push({'name': qsTr('Home'), 'jid': view.model.shareServer, 'node': ''});
-                    } else {
-                        crumbBar.model.setProperty(0, 'jid', view.model.shareServer);
-                        crumbBar.model.setProperty(0, 'node', '');
-                        refresh();
-                    }
-
-                    // show dock icon
-                    for (var i = 0; i < dock.model.count; i++) {
-                        if (dock.model.get(i).panelSource == 'SharePanel.qml') {
-                            dock.model.setProperty(i, 'visible', true);
-                            break;
-                        }
-                    }
-                }
             }
         }
     }
@@ -186,7 +187,7 @@ Panel {
         anchors.bottom: parent.bottom
         clip: true
         height: queueView.count > 0 ? 120 : 0
-        model: view.model.queue
+        model: view.model.uploads
         style: 'shares'
     }
 }
