@@ -206,10 +206,11 @@ public:
 };
 
 PhotoModel::PhotoModel(QObject *parent)
-    : ChatModel(parent),
-    m_fs(0),
-    m_permissions(FileSystemJob::None),
-    m_showFiles(true)
+    : ChatModel(parent)
+    , m_fs(0)
+    , m_listJob(0)
+    , m_permissions(FileSystemJob::None)
+    , m_showFiles(true)
 {
     bool check;
     Q_UNUSED(check);
@@ -289,7 +290,7 @@ void PhotoModel::download(int row)
 void PhotoModel::refresh()
 {
     removeRows(0, rootItem->children.size());
-    m_fs->list(m_rootUrl);
+    m_listJob = m_fs->list(m_rootUrl);
 }
 
 QUrl PhotoModel::rootUrl() const
@@ -393,15 +394,18 @@ void PhotoModel::_q_jobFinished(FileSystemJob *job)
         refresh();
         break;
     case FileSystemJob::List:
-        m_permissions = job->allowedOperations();
-        emit permissionsChanged();
+        if (job == m_listJob) {
+            m_permissions = job->allowedOperations();
+            emit permissionsChanged();
 
-        removeRows(0, rootItem->children.size());
-        foreach (const FileInfo& info, job->results()) {
-            if (info.isDir() || m_showFiles) {
-                PhotoItem *item = new PhotoItem(info);
-                addItem(item, rootItem);
+            removeRows(0, rootItem->children.size());
+            foreach (const FileInfo& info, job->results()) {
+                if (info.isDir() || m_showFiles) {
+                    PhotoItem *item = new PhotoItem(info);
+                    addItem(item, rootItem);
+                }
             }
+            m_listJob = 0;
         }
         break;
     default:
@@ -427,13 +431,15 @@ class PhotoQueueItem : public ChatModelItem
 public:
     PhotoQueueItem();
 
-    QString name;
+    FileInfo info;
+    FileInfoList items;
     QString sourcePath;
     FileSystem *fileSystem;
     bool finished;
     bool isUpload;
+
     FileSystemJob *job;
-    QUrl url;
+    qint64 jobDoneBytes;
 
     qint64 doneBytes;
     qint64 doneFiles;
@@ -446,6 +452,7 @@ PhotoQueueItem::PhotoQueueItem()
     , finished(false)
     , isUpload(false)
     , job(0)
+    , jobDoneBytes(0)
     , doneBytes(0)
     , doneFiles(0)
     , totalBytes(0)
@@ -493,9 +500,9 @@ void PhotoQueueModel::append(const QString &filePath, FileSystem *fileSystem, co
     PhotoQueueItem *item = new PhotoQueueItem;
 
     item->isUpload = true;
-    item->name = QFileInfo(filePath).fileName();
+    item->info.setName(QFileInfo(filePath).fileName());
+    item->info.setUrl(url);
     item->sourcePath = filePath;
-    item->url = url;
     item->fileSystem = fileSystem;
     item->totalFiles = 1;
     addItem(item, rootItem);
@@ -505,21 +512,26 @@ void PhotoQueueModel::append(const QString &filePath, FileSystem *fileSystem, co
 
 void PhotoQueueModel::download(const FileInfo &info, FileSystem *fileSystem)
 {
+    bool check;
+    Q_UNUSED(check);
+
     PhotoQueueItem *item = new PhotoQueueItem;
-    //copy(&item->shareItem, &shareItem);
+    item->fileSystem = fileSystem;
+    item->info = info;
 
     if (info.isDir()) {
-        qWarning("can't download dirs for now");
+        item->job = item->fileSystem->list(info.url());
+
+        check = connect(item->job, SIGNAL(finished()),
+                        this, SLOT(_q_listFinished()));
+        Q_ASSERT(check);
     } else {
-        PhotoQueueItem *item = new PhotoQueueItem;
-        item->url = info.url();
-        item->name = info.name();
-        item->fileSystem = fileSystem;
+        item->items << info;
         item->totalBytes = info.size();
         item->totalFiles = 1;
-        addItem(item, rootItem);
     }
     
+    addItem(item, rootItem);
     processQueue();
 }
 
@@ -547,12 +559,12 @@ QVariant PhotoQueueModel::data(const QModelIndex &index, int role) const
         //return QUrl::fromLocalFile(item->sourcePath);
         return wApp->qmlUrl("file.png");
     } else if (role == NameRole) {
-        return item->name;
+        return item->info.name();
     } else if (role == SpeedRole) {
         // FIXME: implement speed calculation
         return 0;
     } else if (role == DoneBytesRole) {
-        return item->doneBytes;
+        return item->doneBytes + item->jobDoneBytes;
     } else if (role == DoneFilesRole) {
         return item->doneFiles;
     } else if (role == TotalBytesRole) {
@@ -572,9 +584,11 @@ void PhotoQueueModel::processQueue()
     if (!m_downloadItem) {
         foreach (ChatModelItem *ptr, rootItem->children) {
             PhotoQueueItem *item = static_cast<PhotoQueueItem*>(ptr);
-            if (!item->isUpload && !item->finished) {
+            if (!item->isUpload && !item->items.isEmpty()) {
+                FileInfo childInfo = item->items.takeFirst();
+
                 m_downloadItem = item;
-                m_downloadItem->job = item->fileSystem->get(item->url, FileSystem::FullSize);
+                m_downloadItem->job = item->fileSystem->get(childInfo.url(), FileSystem::FullSize);
 
                 check = connect(m_downloadItem->job, SIGNAL(finished()),
                                 this, SLOT(_q_downloadFinished()));
@@ -605,9 +619,31 @@ void PhotoQueueModel::processQueue()
  */
 void PhotoQueueModel::_q_downloadFinished()
 {
+    bool check;
+    Q_UNUSED(check);
+
     if (m_downloadItem) {
-        removeItem(m_downloadItem);
-        m_downloadItem = 0;
+        m_downloadItem->job->deleteLater();
+        m_downloadItem->doneBytes += m_downloadItem->jobDoneBytes;
+        m_downloadItem->doneFiles++;
+        m_downloadItem->jobDoneBytes = 0;
+
+        if (!m_downloadItem->items.isEmpty()) {
+            FileInfo childInfo = m_downloadItem->items.takeFirst();
+
+            m_downloadItem->job = m_downloadItem->fileSystem->get(childInfo.url(), FileSystem::FullSize);
+
+            check = connect(m_downloadItem->job, SIGNAL(finished()),
+                            this, SLOT(_q_downloadFinished()));
+            Q_ASSERT(check);
+
+            check = connect(m_downloadItem->job, SIGNAL(downloadProgress(qint64,qint64)),
+                            this, SLOT(_q_downloadProgress(qint64,qint64)));
+            Q_ASSERT(check);
+        } else {
+            removeItem(m_downloadItem);
+            m_downloadItem = 0;
+        }
     }
 
     processQueue();
@@ -618,9 +654,36 @@ void PhotoQueueModel::_q_downloadFinished()
 void PhotoQueueModel::_q_downloadProgress(qint64 done, qint64 total)
 {
     if (m_downloadItem) {
-        m_downloadItem->doneBytes = done;
-        m_downloadItem->totalBytes = total;
+        m_downloadItem->jobDoneBytes = done;
         emit dataChanged(createIndex(m_downloadItem), createIndex(m_downloadItem));
+    }
+}
+
+void PhotoQueueModel::_q_listFinished()
+{
+    FileSystemJob *job = qobject_cast<FileSystemJob*>(sender());
+    if (!job)
+        return;
+
+    foreach (ChatModelItem *ptr, rootItem->children) {
+        PhotoQueueItem *item = static_cast<PhotoQueueItem*>(ptr);
+        if (item->job == job) {
+            if (job->error() != FileSystemJob::NoError) {
+                removeItem(item);
+            } else {
+                foreach (const FileInfo &child, job->results()) {
+                    // FIXME: recurse
+                    if (!child.isDir()) {
+                        item->items << child;
+                        item->totalFiles++;
+                        item->totalBytes += child.size();
+                    }
+                }
+                emit dataChanged(createIndex(item), createIndex(item));
+                processQueue();
+            }
+            break;
+        }
     }
 }
 
@@ -659,7 +722,7 @@ void PhotoQueueModel::_q_uploadResized(QIODevice *device)
 
     if (m_uploadItem) {
         m_uploadDevice = device;
-        m_uploadItem->job = m_uploadItem->fileSystem->put(m_uploadItem->url, m_uploadDevice);
+        m_uploadItem->job = m_uploadItem->fileSystem->put(m_uploadItem->info.url(), m_uploadDevice);
         check = connect(m_uploadItem->job, SIGNAL(finished()),
                         this, SLOT(_q_uploadFinished()));
         Q_ASSERT(check);

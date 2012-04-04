@@ -113,6 +113,7 @@ private slots:
 
 private:
     FileSystem *m_fs;
+    FileSystemJob *m_listJob;
     QMap<QString,FileSystem*> m_fileSystems;
     FileSystemJob::Operations m_permissions;
     QUrl m_rootUrl;
@@ -149,6 +150,7 @@ public slots:
 private slots:
     void _q_downloadFinished();
     void _q_downloadProgress(qint64 done, qint64 total);
+    void _q_listFinished();
     void _q_uploadFinished();
     void _q_uploadProgress(qint64 done, qint64 total);
     void _q_uploadResized(QIODevice *device);
