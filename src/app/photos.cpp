@@ -275,6 +275,15 @@ void PhotoModel::createAlbum(const QString &name)
     m_fs->mkdir(newUrl);
 }
 
+void PhotoModel::download(int row)
+{
+    if (row < 0 || row > rootItem->children.size() - 1)
+        return;
+
+    PhotoItem *item = static_cast<PhotoItem*>(rootItem->children.at(row));
+    m_uploads->download(*item, m_fs);
+}
+
 /** Refresh the contents of the current folder.
  */
 void PhotoModel::refresh()
@@ -418,6 +427,7 @@ class PhotoQueueItem : public ChatModelItem
 public:
     PhotoQueueItem();
 
+    QString name;
     QString sourcePath;
     QString destinationPath;
     FileSystem *fileSystem;
@@ -425,14 +435,18 @@ public:
     FileSystemJob *job;
 
     qint64 doneBytes;
+    qint64 doneFiles;
     qint64 totalBytes;
+    qint64 totalFiles;
 };
 
 PhotoQueueItem::PhotoQueueItem()
-    : fileSystem(0),
-    job(0),
-    doneBytes(0),
-    totalBytes(0)
+    : fileSystem(0)
+    , job(0)
+    , doneBytes(0)
+    , doneFiles(0)
+    , totalBytes(0)
+    , totalFiles(0)
 {
 }
 
@@ -473,12 +487,34 @@ PhotoQueueModel::~PhotoQueueModel()
 void PhotoQueueModel::append(const QString &filePath, FileSystem *fileSystem, const QString &destinationPath)
 {
     PhotoQueueItem *item = new PhotoQueueItem;
+
+    item->name = QFileInfo(filePath).fileName();
     item->sourcePath = filePath;
     item->destinationPath = destinationPath;
     item->fileSystem = fileSystem;
+    item->totalFiles = 1;
     addItem(item, rootItem);
 
     processQueue();
+}
+
+void PhotoQueueModel::download(const FileInfo &info, FileSystem *fileSystem)
+{
+    PhotoQueueItem *item = new PhotoQueueItem;
+    //copy(&item->shareItem, &shareItem);
+
+    if (info.isDir()) {
+        qWarning("can't download dirs for now");
+    } else {
+        PhotoQueueItem *item = new PhotoQueueItem;
+        //item->sourcePath = filePath;
+        //item->destinationPath = destinationPath;
+        item->name = info.name();
+        item->fileSystem = fileSystem;
+        item->totalBytes = info.size();
+        item->totalFiles = 1;
+        addItem(item, rootItem);
+    }
 }
 
 void PhotoQueueModel::cancel(int row)
@@ -505,18 +541,18 @@ QVariant PhotoQueueModel::data(const QModelIndex &index, int role) const
         //return QUrl::fromLocalFile(item->sourcePath);
         return wApp->qmlUrl("file.png");
     } else if (role == NameRole) {
-        return QFileInfo(item->sourcePath).fileName();
+        return item->name;
     } else if (role == SpeedRole) {
         // FIXME: implement speed calculation
         return 0;
     } else if (role == DoneBytesRole) {
         return item->doneBytes;
     } else if (role == DoneFilesRole) {
-        return 0;
+        return item->doneFiles;
     } else if (role == TotalBytesRole) {
         return item->totalBytes;
     } else if (role == TotalFilesRole) {
-        return 1;
+        return item->totalFiles;
     }
     return QVariant();
 }

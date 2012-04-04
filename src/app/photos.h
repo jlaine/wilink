@@ -32,6 +32,7 @@ using namespace QNetIO;
 
 class PhotoCachePrivate;
 class PhotoDownloadItem;
+class PhotoItem;
 class PhotoQueueItem;
 class PhotoQueueModel;
 class PhotoResizer;
@@ -103,6 +104,7 @@ public slots:
     void createAlbum(const QString &name);
     void refresh();
     bool removeRow(int row);
+    void download(int index);
     void upload(const QString &filePath);
 
 private slots:
@@ -136,6 +138,7 @@ public:
     ~PhotoQueueModel();
 
     void append(const QString &sourcePath, FileSystem *fileSystem, const QString &destinationPath);
+    void download(const FileInfo &info, FileSystem *fileSystem);
 
     // QAbstractItemModel
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
