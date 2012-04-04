@@ -1095,6 +1095,16 @@ ShareFileSystemGet::ShareFileSystemGet(ShareFileSystem *fs, const QXmppShareLoca
     finishLater(FileSystemJob::UnknownError);
 }
 
+void ShareFileSystemGet::abort()
+{
+    if (m_job) {
+        m_job->abort();
+    } else {
+        setError(UnknownError);
+        emit finished();
+    }
+}
+
 void ShareFileSystemGet::_q_shareGetIqReceived(const QXmppShareGetIq &iq)
 {
     if (iq.id() != m_packetId)

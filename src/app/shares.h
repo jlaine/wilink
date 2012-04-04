@@ -182,6 +182,9 @@ class ShareFileSystemGet : public FileSystemJob
 public:
     ShareFileSystemGet(ShareFileSystem *fs, const QXmppShareLocation &location);
 
+public slots:
+    void abort();
+
 private slots:
     void _q_shareGetIqReceived(const QXmppShareGetIq &iq);
     void _q_transferFinished();
