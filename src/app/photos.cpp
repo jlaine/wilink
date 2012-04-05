@@ -391,6 +391,10 @@ void FolderModel::setRootUrl(const QUrl &rootUrl)
 
         d->fs = FileSystem::create(d->rootUrl, this);
         if (d->fs) {
+            check = connect(d->fs, SIGNAL(directoryChanged(QUrl)),
+                            this, SLOT(_q_directoryChanged(QUrl)));
+            Q_ASSERT(check);
+
             check = connect(d->fs, SIGNAL(jobFinished(FileSystemJob*)),
                             this, SLOT(_q_jobFinished(FileSystemJob*)));
             Q_ASSERT(check);
@@ -513,6 +517,15 @@ void FolderModel::_q_jobFinished(FileSystemJob *job)
     default:
         break;
     }
+}
+
+/** When a directory changes, refresh listing.
+ */
+void FolderModel::_q_directoryChanged(const QUrl &url)
+{
+    qDebug("need refresh");
+    if (url == d->rootUrl)
+        refresh();
 }
 
 /** When a photo changes, emit notifications.
