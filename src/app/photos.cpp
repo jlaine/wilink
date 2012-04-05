@@ -301,7 +301,7 @@ void FolderModel::download(int row)
         return;
 
     FolderModelItem *item = static_cast<FolderModelItem*>(rootItem->children.at(row));
-    m_queue->download(*item, m_fs);
+    m_queue->download(m_fs, *item, m_filter);
 }
 
 QString FolderModel::filter() const
@@ -328,7 +328,7 @@ bool FolderModel::isBusy() const
 void FolderModel::refresh()
 {
     removeRows(0, rootItem->children.size());
-    m_listJob = m_fs->list(m_rootUrl);
+    m_listJob = m_fs->list(m_rootUrl, m_filter);
     emit isBusyChanged();
 }
 
@@ -402,7 +402,7 @@ void FolderModel::upload(const QString &filePath)
     while (base.endsWith("/"))
         base.chop(1);
 
-    m_queue->upload(filePath, m_fs, base + "/" + QFileInfo(filePath).fileName());
+    m_queue->upload(m_fs, filePath, base + "/" + QFileInfo(filePath).fileName());
 }
 
 FolderQueueModel *FolderModel::uploads() const
@@ -581,7 +581,7 @@ QVariant FolderQueueModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-void FolderQueueModel::download(const FileInfo &info, FileSystem *fileSystem)
+void FolderQueueModel::download(FileSystem *fileSystem, const FileInfo &info, const QString &filter)
 {
     bool check;
     Q_UNUSED(check);
@@ -591,7 +591,7 @@ void FolderQueueModel::download(const FileInfo &info, FileSystem *fileSystem)
     item->info = info;
 
     if (info.isDir()) {
-        item->job = item->fileSystem->list(info.url());
+        item->job = item->fileSystem->list(info.url(), filter);
 
         check = connect(item->job, SIGNAL(finished()),
                         this, SLOT(_q_listFinished()));
@@ -606,7 +606,7 @@ void FolderQueueModel::download(const FileInfo &info, FileSystem *fileSystem)
     processQueue();
 }
 
-void FolderQueueModel::upload(const QString &filePath, FileSystem *fileSystem, const QUrl &url)
+void FolderQueueModel::upload(FileSystem *fileSystem, const QString &filePath, const QUrl &url)
 {
     PhotoQueueItem *item = new PhotoQueueItem;
 

@@ -705,9 +705,9 @@ FileSystemJob* ShareFileSystem::get(const QUrl &fileUrl, ImageSize type)
     return new ShareFileSystemGet(this, urlToLocation(fileUrl));
 }
 
-FileSystemJob* ShareFileSystem::list(const QUrl &dirUrl)
+FileSystemJob* ShareFileSystem::list(const QUrl &dirUrl, const QString &filter)
 {
-    return new ShareFileSystemList(this, urlToLocation(dirUrl));
+    return new ShareFileSystemList(this, urlToLocation(dirUrl), filter);
 }
 
 class ShareFileSystemBuffer : public QIODevice
@@ -861,8 +861,7 @@ void ShareFileSystemGet::_q_transferReceived(QXmppTransferJob *job)
     Q_ASSERT(check);
 }
 
-
-ShareFileSystemList::ShareFileSystemList(ShareFileSystem* fs, const QXmppShareLocation &dirLocation)
+ShareFileSystemList::ShareFileSystemList(ShareFileSystem* fs, const QXmppShareLocation &dirLocation, const QString &filter)
     : FileSystemJob(FileSystemJob::List, fs)
 {
     bool check;
@@ -885,7 +884,7 @@ ShareFileSystemList::ShareFileSystemList(ShareFileSystem* fs, const QXmppShareLo
             location.setNode(QString());
         }
 
-        m_packetId = shareManager->search(location, 1, "");
+        m_packetId = shareManager->search(location, 1, filter);
         m_jid = location.jid();
         return;
     }

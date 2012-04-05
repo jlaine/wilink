@@ -130,7 +130,7 @@ class ShareFileSystem : public FileSystem
 public:
     ShareFileSystem(QObject *parent = 0);
     FileSystemJob* get(const QUrl &fileUrl, ImageSize type);
-    FileSystemJob* list(const QUrl &dirUrl);
+    FileSystemJob* list(const QUrl &dirUrl, const QString &filter = QString());
 };
 
 class ShareFileSystemGet : public FileSystemJob
@@ -166,7 +166,7 @@ class ShareFileSystemList : public FileSystemJob
     Q_OBJECT
 
 public:
-    ShareFileSystemList(ShareFileSystem *fs, const QXmppShareLocation &location);
+    ShareFileSystemList(ShareFileSystem *fs, const QXmppShareLocation &location, const QString &filter);
 
 private slots:
     void _q_searchReceived(const QXmppShareSearchIq &shareIq);

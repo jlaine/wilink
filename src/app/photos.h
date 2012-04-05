@@ -147,8 +147,8 @@ public:
     FolderQueueModel(QObject *parent = 0);
     ~FolderQueueModel();
 
-    void download(const FileInfo &info, FileSystem *fileSystem);
-    void upload(const QString &sourcePath, FileSystem *fileSystem, const QUrl &url);
+    void download(FileSystem *fileSystem, const FileInfo &info, const QString &filter);
+    void upload(FileSystem *fileSystem, const QString &sourcePath, const QUrl &url);
 
     // QAbstractItemModel
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
