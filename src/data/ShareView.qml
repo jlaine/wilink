@@ -45,7 +45,7 @@ Item {
 
             anchors.left: parent.left
             anchors.right: parent.right
-            height: thumbnail.height + 2 * appStyle.margin.normal
+            height: thumbnail.height + appStyle.margin.normal
 
             Highlight {
                 id: highlight
@@ -60,8 +60,8 @@ Item {
                 anchors.left: parent.left
                 anchors.leftMargin: appStyle.margin.normal
                 anchors.verticalCenter: parent.verticalCenter
-                width: appStyle.icon.smallSize
-                height: appStyle.icon.smallSize
+                width: appStyle.icon.normalSize
+                height: appStyle.icon.normalSize
                 fillMode: Image.PreserveAspectFit
                 smooth: true
                 source: model.avatar
@@ -133,7 +133,6 @@ Item {
                 anchors.right: parent.right
                 anchors.rightMargin: appStyle.margin.normal
                 anchors.verticalCenter: parent.verticalCenter
-                iconSize: appStyle.icon.tinySize
                 iconSource: 'download.png'
                 state: 'inactive'
                 text: qsTr('Download')
