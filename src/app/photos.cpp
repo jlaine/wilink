@@ -479,18 +479,27 @@ void FolderModel::_q_jobFinished(FileSystemJob *job)
             }
 
             // create or update items
+            int newRow = 0;
             foreach (const FileInfo& info, job->results()) {
                 if (!d->showFiles && !info.isDir())
                     continue;
 
-                FolderModelItem *item = remaining.value(info.url());
+                FolderModelItem *item = remaining.take(info.url());
                 if (item) {
+                    const int oldRow = item->row();
+                    if (oldRow != newRow) {
+                        beginMoveRows(QModelIndex(), oldRow, oldRow, QModelIndex(), newRow);
+                        rootItem->children.move(oldRow, newRow);
+                        endMoveRows();
+                    }
+
                     *item = info;
                     emit dataChanged(createIndex(item), createIndex(item));
                 } else {
                     item = new FolderModelItem(info);
-                    addItem(item, rootItem);
+                    addItem(item, rootItem, newRow);
                 }
+                newRow++;
             }
 
             // remove obsolete items
