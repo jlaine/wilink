@@ -104,6 +104,8 @@ Panel {
             anchors.verticalCenter: parent.verticalCenter
             anchors.margins: 8
             hintText: qsTr('Enter the name of the file you are looking for.')
+            state: (view.count == 0 && !view.model.busy && searchEdit.text.length > 0) ? 'error' : ''
+
             onTextChanged: searchTimer.restart()
 
             Timer {
@@ -159,12 +161,11 @@ Panel {
         anchors.bottom: queueHelp.top
 
         model: FolderModel {
-            onBusyChanged: {
-                if (view.count == 0 && !busy && searchEdit.text.length > 0)
-                    searchEdit.state = 'error';
-                else
-                    searchEdit.state = '';
-            }
+        }
+
+        Spinner {
+            anchors.centerIn: parent
+            busy: view.model.busy
         }
     }
 

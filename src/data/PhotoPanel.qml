@@ -137,6 +137,11 @@ Panel {
             anchors.fill: parent
             focus: true
             model:  photoModel
+
+            Spinner {
+                anchors.centerIn: parent
+                busy: photoModel.busy
+            }
         }
 
         PhotoFlickView {

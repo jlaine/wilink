@@ -85,12 +85,14 @@ RoomPermissionDialog 1.0 RoomPermissionDialog.qml
 RoomSubjectDialog 1.0 RoomSubjectDialog.qml
 ScrollBar 1.0 ScrollBar.qml
 ScrollView 1.0 ScrollView.qml
+SendPanel 1.0 SendPanel.qml
 SetupWindow 1.0 SetupWindow.qml
 SharePanel 1.0 SharePanel.qml
 SharePlugin 1.0 SharePlugin.qml
 SharePreferencePanel 1.0 SharePreferencePanel.qml
 ShareView 1.0 ShareView.qml
 SoundPreferencePanel 1.0 SoundPreferencePanel.qml
+Spinner 1.0 Spinner.qml
 StatusBar 1.0 StatusBar.qml
 StatusPill 1.0 StatusPill.qml
 Style 1.0 Style.qml
@@ -103,3 +105,4 @@ WebPanel 1.0 WebPanel.qml
 WebPlugin 1.0 WebPlugin.qml
 WebTab 1.0 WebTab.qml
 WifirstPlugin 1.0 WifirstPlugin.qml
+test 1.0 test.qml
