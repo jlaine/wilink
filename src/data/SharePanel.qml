@@ -136,7 +136,6 @@ Panel {
                 if (!crumbBar.model.count) {
                     crumbBar.push({'name': qsTr('Home'), 'url': 'share:'});
                 } else {
-                    crumbBar.model.setProperty(0, 'url', 'share:');
                     view.model.refresh();
                 }
 

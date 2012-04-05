@@ -478,6 +478,7 @@ void FolderModel::_q_jobFinished(FileSystemJob *job)
                 remaining.insert(item->url(), item);
             }
 
+            // create or update items
             foreach (const FileInfo& info, job->results()) {
                 if (!d->showFiles && !info.isDir())
                     continue;
@@ -492,9 +493,10 @@ void FolderModel::_q_jobFinished(FileSystemJob *job)
                 }
             }
 
-            foreach (FolderModelItem *item, remaining.values()) {
+            // remove obsolete items
+            foreach (FolderModelItem *item, remaining.values())
                 removeItem(item);
-            }
+
             d->listJob = 0;
             emit isBusyChanged();
         }
