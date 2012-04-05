@@ -60,7 +60,7 @@ Dialog {
 
     onAccepted: {
         console.log("Remove photo " + modelData.url);
-        model.removeRow(index);
+        model.remove(index);
         dialog.close();
     }
 }

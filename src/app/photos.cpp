@@ -464,10 +464,8 @@ void FolderModel::_q_jobFinished(FileSystemJob *job)
     switch (job->operation())
     {
     case FileSystemJob::Open:
-    case FileSystemJob::Mkdir:
     case FileSystemJob::Put:
     case FileSystemJob::Remove:
-    case FileSystemJob::Rmdir:
         refresh();
         break;
     case FileSystemJob::List:
