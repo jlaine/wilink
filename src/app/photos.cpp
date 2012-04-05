@@ -482,6 +482,11 @@ void FolderModel::_q_listFinished()
         d->permissions = d->listJob->allowedOperations();
         emit permissionsChanged();
 
+        removeRows(0, rootItem->children.size());
+        foreach (const FileInfo& info, d->listJob->results())
+            addItem(new FolderModelItem(info), rootItem);
+
+#if 0
         // collect old items
         QMultiMap<QUrl,FolderModelItem*> remaining;
         foreach (ChatModelItem *ptr, rootItem->children) {
@@ -516,7 +521,7 @@ void FolderModel::_q_listFinished()
         // remove obsolete items
         foreach (FolderModelItem *item, remaining.values())
             removeItem(item);
-
+#endif
     } else {
         removeRows(0, rootItem->children.size());
     }
@@ -530,7 +535,6 @@ void FolderModel::_q_listFinished()
  */
 void FolderModel::_q_directoryChanged(const QUrl &url)
 {
-    qDebug("need refresh");
     if (url == d->rootUrl)
         refresh();
 }
