@@ -100,9 +100,13 @@ void PhotoCache::_q_jobFinished()
     if (m_downloadJob->error() == FileSystemJob::NoError) {
         // load image
         QImage *image = new QImage;
-        image->load(m_downloadJob, NULL);
-        photoImageCache.insert(QString::number(m_downloadItem->type) + m_downloadItem->url.toString(), image);
-        emit photoChanged(m_downloadItem->url, m_downloadItem->type);
+        if (image->load(m_downloadJob, NULL)) {
+            photoImageCache.insert(QString::number(m_downloadItem->type) + m_downloadItem->url.toString(), image);
+            emit photoChanged(m_downloadItem->url, m_downloadItem->type);
+        } else {
+            qWarning("Could not load image %s", qPrintable(m_downloadItem->url.toString()));
+            delete image;
+        }
     }
 
     m_downloadJob->deleteLater();
