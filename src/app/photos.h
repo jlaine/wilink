@@ -30,11 +30,11 @@
 
 using namespace QNetIO;
 
+class FolderModelItem;
+class FolderQueueModel;
 class PhotoCachePrivate;
 class PhotoDownloadItem;
-class PhotoItem;
 class PhotoQueueItem;
-class FolderQueueModel;
 class PhotoResizer;
 class QThread;
 
@@ -76,12 +76,16 @@ class FolderModel : public ChatModel
     Q_PROPERTY(bool busy READ isBusy NOTIFY isBusyChanged)
     Q_PROPERTY(bool canCreateAlbum READ canCreateAlbum NOTIFY permissionsChanged)
     Q_PROPERTY(bool canUpload READ canUpload NOTIFY permissionsChanged)
+    Q_PROPERTY(QString filter READ filter WRITE setFilter NOTIFY filterChanged)
     Q_PROPERTY(bool showFiles READ showFiles WRITE setShowFiles NOTIFY showFilesChanged)
     Q_PROPERTY(QUrl rootUrl READ rootUrl WRITE setRootUrl NOTIFY rootUrlChanged)
     Q_PROPERTY(FolderQueueModel* uploads READ uploads CONSTANT)
 
 public:
     FolderModel(QObject *parent = 0);
+
+    QString filter() const;
+    void setFilter(const QString &filter);
 
     QUrl rootUrl() const;
     void setRootUrl(const QUrl &rootUrl);
@@ -98,6 +102,7 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
 signals:
+    void filterChanged();
     void isBusyChanged();
     void permissionsChanged();
     void rootUrlChanged(const QUrl &rootUrl);
@@ -115,6 +120,7 @@ private slots:
     void _q_photoChanged(const QUrl &url, FileSystem::ImageSize size);
 
 private:
+    QString m_filter;
     FileSystem *m_fs;
     FileSystemJob *m_listJob;
     QMap<QString,FileSystem*> m_fileSystems;

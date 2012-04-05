@@ -18,7 +18,6 @@
  */
 
 #include <QAction>
-#include <QApplication>
 #include <QBuffer>
 #include <QCache>
 #include <QFile>
@@ -218,10 +217,10 @@ QImage PhotoImageProvider::requestImage(const QString &id, QSize *size, const QS
     return image;
 }
 
-class PhotoItem : public ChatModelItem, public FileInfo
+class FolderModelItem : public ChatModelItem, public FileInfo
 {
 public:
-    PhotoItem(const FileInfo &info) : FileInfo(info) {};
+    FolderModelItem(const FileInfo &info) : FileInfo(info) {};
 };
 
 FolderModel::FolderModel(QObject *parent)
@@ -234,6 +233,7 @@ FolderModel::FolderModel(QObject *parent)
     bool check;
     Q_UNUSED(check);
 
+    // set role names
     QHash<int, QByteArray> names = roleNames();
     names.insert(ImageRole, "image");
     names.insert(ImageReadyRole, "imageReady");
@@ -252,7 +252,7 @@ FolderModel::FolderModel(QObject *parent)
 QVariant FolderModel::data(const QModelIndex &index, int role) const
 {
     Q_ASSERT(m_fs);
-    PhotoItem *item = static_cast<PhotoItem*>(index.internalPointer());
+    FolderModelItem *item = static_cast<FolderModelItem*>(index.internalPointer());
     if (!index.isValid() || !item)
         return QVariant();
 
@@ -300,8 +300,22 @@ void FolderModel::download(int row)
     if (row < 0 || row > rootItem->children.size() - 1)
         return;
 
-    PhotoItem *item = static_cast<PhotoItem*>(rootItem->children.at(row));
+    FolderModelItem *item = static_cast<FolderModelItem*>(rootItem->children.at(row));
     m_uploads->download(*item, m_fs);
+}
+
+QString FolderModel::filter() const
+{
+    return m_filter;
+}
+
+void FolderModel::setFilter(const QString &filter)
+{
+    if (filter != m_filter) {
+        m_filter = filter;
+        refresh();
+        emit filterChanged();
+    }
 }
 
 bool FolderModel::isBusy() const
@@ -361,7 +375,7 @@ bool FolderModel::removeRow(int row)
     if (row < 0 || row >= rootItem->children.size())
         return false;
 
-    PhotoItem *item = static_cast<PhotoItem*>(rootItem->children.at(row));
+    FolderModelItem *item = static_cast<FolderModelItem*>(rootItem->children.at(row));
     if (item->isDir())
         m_fs->rmdir(item->url());
     else
@@ -426,7 +440,7 @@ void FolderModel::_q_jobFinished(FileSystemJob *job)
             removeRows(0, rootItem->children.size());
             foreach (const FileInfo& info, job->results()) {
                 if (info.isDir() || m_showFiles) {
-                    PhotoItem *item = new PhotoItem(info);
+                    FolderModelItem *item = new FolderModelItem(info);
                     addItem(item, rootItem);
                 }
             }
@@ -445,7 +459,7 @@ void FolderModel::_q_photoChanged(const QUrl &url, FileSystem::ImageSize size)
 {
     Q_UNUSED(size);
     foreach (ChatModelItem *ptr, rootItem->children) {
-        PhotoItem *item = static_cast<PhotoItem*>(ptr);
+        FolderModelItem *item = static_cast<FolderModelItem*>(ptr);
         if (item->url() == url) {
             emit dataChanged(createIndex(item), createIndex(item));
         }

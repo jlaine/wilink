@@ -137,7 +137,7 @@ Panel {
                     crumbBar.push({'name': qsTr('Home'), 'url': 'share:'});
                 } else {
                     crumbBar.model.setProperty(0, 'url', 'share:');
-                    refresh();
+                    view.model.refresh();
                 }
 
                 // show dock icon
