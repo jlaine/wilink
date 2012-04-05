@@ -358,7 +358,6 @@ bool FolderModel::isBusy() const
  */
 void FolderModel::refresh()
 {
-    removeRows(0, rootItem->children.size());
     d->listJob = d->fs->list(d->rootUrl, d->filter);
     emit isBusyChanged();
 }
@@ -468,13 +467,29 @@ void FolderModel::_q_jobFinished(FileSystemJob *job)
             d->permissions = job->allowedOperations();
             emit permissionsChanged();
 
-            removeRows(0, rootItem->children.size());
+            // collect old items
+            QMultiMap<QUrl,FolderModelItem*> remaining;
+            foreach (ChatModelItem *ptr, rootItem->children) {
+                FolderModelItem *item = static_cast<FolderModelItem*>(ptr);
+                remaining.insert(item->url(), item);
+            }
+
             foreach (const FileInfo& info, job->results()) {
                 if (!d->showFiles && !info.isDir())
                     continue;
 
-                FolderModelItem *item = new FolderModelItem(info);
-                addItem(item, rootItem);
+                FolderModelItem *item = remaining.value(info.url());
+                if (item) {
+                    *item = info;
+                    emit dataChanged(createIndex(item), createIndex(item));
+                } else {
+                    item = new FolderModelItem(info);
+                    addItem(item, rootItem);
+                }
+            }
+
+            foreach (FolderModelItem *item, remaining.values()) {
+                removeItem(item);
             }
             d->listJob = 0;
             emit isBusyChanged();
