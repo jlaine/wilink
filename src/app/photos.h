@@ -125,9 +125,9 @@ private:
     FileSystemJob *m_listJob;
     QMap<QString,FileSystem*> m_fileSystems;
     FileSystemJob::Operations m_permissions;
+    FolderQueueModel *m_queue;
     QUrl m_rootUrl;
     bool m_showFiles;
-    FolderQueueModel *m_uploads;
 };
 
 class FolderQueueModel : public ChatModel
@@ -147,8 +147,8 @@ public:
     FolderQueueModel(QObject *parent = 0);
     ~FolderQueueModel();
 
-    void append(const QString &sourcePath, FileSystem *fileSystem, const QUrl &url);
     void download(const FileInfo &info, FileSystem *fileSystem);
+    void upload(const QString &sourcePath, FileSystem *fileSystem, const QUrl &url);
 
     // QAbstractItemModel
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;

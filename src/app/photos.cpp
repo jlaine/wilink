@@ -242,7 +242,7 @@ FolderModel::FolderModel(QObject *parent)
     names.insert(UrlRole, "url");
     setRoleNames(names);
 
-    m_uploads = new FolderQueueModel(this);
+    m_queue = new FolderQueueModel(this);
 
     check = connect(PhotoCache::instance(), SIGNAL(photoChanged(QUrl,FileSystem::ImageSize)),
                     this, SLOT(_q_photoChanged(QUrl,FileSystem::ImageSize)));
@@ -301,7 +301,7 @@ void FolderModel::download(int row)
         return;
 
     FolderModelItem *item = static_cast<FolderModelItem*>(rootItem->children.at(row));
-    m_uploads->download(*item, m_fs);
+    m_queue->download(*item, m_fs);
 }
 
 QString FolderModel::filter() const
@@ -402,12 +402,12 @@ void FolderModel::upload(const QString &filePath)
     while (base.endsWith("/"))
         base.chop(1);
 
-    m_uploads->append(filePath, m_fs, base + "/" + QFileInfo(filePath).fileName());
+    m_queue->upload(filePath, m_fs, base + "/" + QFileInfo(filePath).fileName());
 }
 
 FolderQueueModel *FolderModel::uploads() const
 {
-    return m_uploads;
+    return m_queue;
 }
 
 /** When a command finishes, process its results.
@@ -539,46 +539,6 @@ FolderQueueModel::~FolderQueueModel()
     delete m_resizerThread;
 }
 
-void FolderQueueModel::append(const QString &filePath, FileSystem *fileSystem, const QUrl &url)
-{
-    PhotoQueueItem *item = new PhotoQueueItem;
-
-    item->isUpload = true;
-    item->info.setName(QFileInfo(filePath).fileName());
-    item->info.setUrl(url);
-    item->sourcePath = filePath;
-    item->fileSystem = fileSystem;
-    item->totalFiles = 1;
-    addItem(item, rootItem);
-
-    processQueue();
-}
-
-void FolderQueueModel::download(const FileInfo &info, FileSystem *fileSystem)
-{
-    bool check;
-    Q_UNUSED(check);
-
-    PhotoQueueItem *item = new PhotoQueueItem;
-    item->fileSystem = fileSystem;
-    item->info = info;
-
-    if (info.isDir()) {
-        item->job = item->fileSystem->list(info.url());
-
-        check = connect(item->job, SIGNAL(finished()),
-                        this, SLOT(_q_listFinished()));
-        Q_ASSERT(check);
-    } else {
-        item->items << info;
-        item->totalBytes = info.size();
-        item->totalFiles = 1;
-    }
-    
-    addItem(item, rootItem);
-    processQueue();
-}
-
 void FolderQueueModel::cancel(int row)
 {
     if (row < 0 || row > rootItem->children.size() - 1)
@@ -619,6 +579,46 @@ QVariant FolderQueueModel::data(const QModelIndex &index, int role) const
         return item->totalFiles;
     }
     return QVariant();
+}
+
+void FolderQueueModel::download(const FileInfo &info, FileSystem *fileSystem)
+{
+    bool check;
+    Q_UNUSED(check);
+
+    PhotoQueueItem *item = new PhotoQueueItem;
+    item->fileSystem = fileSystem;
+    item->info = info;
+
+    if (info.isDir()) {
+        item->job = item->fileSystem->list(info.url());
+
+        check = connect(item->job, SIGNAL(finished()),
+                        this, SLOT(_q_listFinished()));
+        Q_ASSERT(check);
+    } else {
+        item->items << info;
+        item->totalBytes = info.size();
+        item->totalFiles = 1;
+    }
+
+    addItem(item, rootItem);
+    processQueue();
+}
+
+void FolderQueueModel::upload(const QString &filePath, FileSystem *fileSystem, const QUrl &url)
+{
+    PhotoQueueItem *item = new PhotoQueueItem;
+
+    item->isUpload = true;
+    item->info.setName(QFileInfo(filePath).fileName());
+    item->info.setUrl(url);
+    item->sourcePath = filePath;
+    item->fileSystem = fileSystem;
+    item->totalFiles = 1;
+    addItem(item, rootItem);
+
+    processQueue();
 }
 
 void FolderQueueModel::processQueue()
