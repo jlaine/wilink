@@ -113,7 +113,7 @@ signals:
 public slots:
     void createAlbum(const QString &name);
     void refresh();
-    bool removeRow(int row);
+    bool remove(int index);
     void download(int index);
     void upload(const QString &filePath);
 

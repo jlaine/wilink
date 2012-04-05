@@ -404,7 +404,7 @@ void FolderModel::setRootUrl(const QUrl &rootUrl)
     emit rootUrlChanged(d->rootUrl);
 }
 
-bool FolderModel::removeRow(int row)
+bool FolderModel::remove(int row)
 {
     if (row < 0 || row >= rootItem->children.size())
         return false;
