@@ -234,8 +234,9 @@ public:
 
     QString filter;
     FileSystem *fs;
-    FileSystemJob *listJob;
     QMap<QString,FileSystem*> fileSystems;
+    FileSystemJob *listJob;
+    FileSystemJob *openJob;
     FileSystemJob::Operations permissions;
     FolderQueueModel *queue;
     QUrl rootUrl;
@@ -248,6 +249,7 @@ private:
 FolderModelPrivate::FolderModelPrivate(FolderModel *qq)
     : fs(0)
     , listJob(0)
+    , openJob(0)
     , permissions(FileSystemJob::None)
     , queue(0)
     , showFiles(true)
@@ -362,7 +364,12 @@ bool FolderModel::isBusy() const
  */
 void FolderModel::refresh()
 {
+    bool check;
+    Q_UNUSED(check);
+
     d->listJob = d->fs->list(d->rootUrl, d->filter);
+    check = connect(d->listJob, SIGNAL(finished()),
+                    this, SLOT(_q_listFinished()));
     emit isBusyChanged();
 }
 
@@ -391,16 +398,17 @@ void FolderModel::setRootUrl(const QUrl &rootUrl)
 
         d->fs = FileSystem::create(d->rootUrl, this);
         if (d->fs) {
+            // register filesystem
+            d->fileSystems.insert(d->rootUrl.scheme(), d->fs);
             check = connect(d->fs, SIGNAL(directoryChanged(QUrl)),
                             this, SLOT(_q_directoryChanged(QUrl)));
             Q_ASSERT(check);
 
-            check = connect(d->fs, SIGNAL(jobFinished(FileSystemJob*)),
-                            this, SLOT(_q_jobFinished(FileSystemJob*)));
+            // open file system
+            d->openJob = d->fs->open(d->rootUrl);
+            check = connect(d->openJob, SIGNAL(finished()),
+                            this, SLOT(_q_openFinished()));
             Q_ASSERT(check);
-
-            d->fileSystems.insert(d->rootUrl.scheme(), d->fs);
-            d->fs->open(d->rootUrl);
         } else {
             removeRows(0, rootItem->children.size());
         }
@@ -452,69 +460,70 @@ FolderQueueModel *FolderModel::uploads() const
  *
  * @param job
  */
-void FolderModel::_q_jobFinished(FileSystemJob *job)
+void FolderModel::_q_openFinished()
 {
-    Q_ASSERT(d->fs);
-
-    if (job->error() != FileSystemJob::NoError) {
-        qWarning() << job->operationName() << "command failed";
+    if (sender() != d->openJob)
         return;
-    }
 
-    switch (job->operation())
-    {
-    case FileSystemJob::Open:
-    case FileSystemJob::Put:
-    case FileSystemJob::Remove:
+    if (d->openJob->error() == FileSystemJob::NoError) {
         refresh();
-        break;
-    case FileSystemJob::List:
-        if (job == d->listJob) {
-            d->permissions = job->allowedOperations();
-            emit permissionsChanged();
-
-            // collect old items
-            QMultiMap<QUrl,FolderModelItem*> remaining;
-            foreach (ChatModelItem *ptr, rootItem->children) {
-                FolderModelItem *item = static_cast<FolderModelItem*>(ptr);
-                remaining.insert(item->url(), item);
-            }
-
-            // create or update items
-            int newRow = 0;
-            foreach (const FileInfo& info, job->results()) {
-                if (!d->showFiles && !info.isDir())
-                    continue;
-
-                FolderModelItem *item = remaining.take(info.url());
-                if (item) {
-                    const int oldRow = item->row();
-                    if (oldRow != newRow) {
-                        beginMoveRows(QModelIndex(), oldRow, oldRow, QModelIndex(), newRow);
-                        rootItem->children.move(oldRow, newRow);
-                        endMoveRows();
-                    }
-
-                    *item = info;
-                    emit dataChanged(createIndex(item), createIndex(item));
-                } else {
-                    item = new FolderModelItem(info);
-                    addItem(item, rootItem, newRow);
-                }
-                newRow++;
-            }
-
-            // remove obsolete items
-            foreach (FolderModelItem *item, remaining.values())
-                removeItem(item);
-
-            d->listJob = 0;
-            emit isBusyChanged();
-        }
-        break;
-    default:
-        break;
     }
+
+    d->openJob->deleteLater();
+    d->openJob = 0;
+}
+
+void FolderModel::_q_listFinished()
+{
+    if (sender() != d->listJob)
+        return;
+
+    if (d->listJob->error() == FileSystemJob::NoError) {
+        d->permissions = d->listJob->allowedOperations();
+        emit permissionsChanged();
+
+        // collect old items
+        QMultiMap<QUrl,FolderModelItem*> remaining;
+        foreach (ChatModelItem *ptr, rootItem->children) {
+            FolderModelItem *item = static_cast<FolderModelItem*>(ptr);
+            remaining.insert(item->url(), item);
+        }
+
+        // create or update items
+        int newRow = 0;
+        foreach (const FileInfo& info, d->listJob->results()) {
+            if (!d->showFiles && !info.isDir())
+                continue;
+
+            FolderModelItem *item = remaining.take(info.url());
+            if (item) {
+                const int oldRow = item->row();
+                if (oldRow != newRow) {
+                    beginMoveRows(QModelIndex(), oldRow, oldRow, QModelIndex(), newRow);
+                    rootItem->children.move(oldRow, newRow);
+                    endMoveRows();
+                }
+
+                *item = info;
+                emit dataChanged(createIndex(item), createIndex(item));
+            } else {
+                item = new FolderModelItem(info);
+                addItem(item, rootItem, newRow);
+            }
+            newRow++;
+        }
+
+        // remove obsolete items
+        foreach (FolderModelItem *item, remaining.values())
+            removeItem(item);
+
+    } else {
+        removeRows(0, rootItem->children.size());
+    }
+
+    d->listJob->deleteLater();
+    d->listJob = 0;
+    emit isBusyChanged();
 }
 
 /** When a directory changes, refresh listing.

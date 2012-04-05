@@ -118,8 +118,9 @@ public slots:
     void upload(const QString &filePath);
 
 private slots:
-    void _q_jobFinished(FileSystemJob *job);
     void _q_directoryChanged(const QUrl &url);
+    void _q_listFinished();
+    void _q_openFinished();
     void _q_photoChanged(const QUrl &url, FileSystem::ImageSize size);
 
 private:
