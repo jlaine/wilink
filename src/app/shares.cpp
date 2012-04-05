@@ -20,7 +20,6 @@
 #include <QBuffer>
 #include <QCoreApplication>
 #include <QDesktopServices>
-#include <QSet>
 #include <QTimer>
 
 #include "QDjango.h"
@@ -94,19 +93,13 @@ class ShareModelPrivate
 {
 public:
     ShareModelPrivate(ShareModel *qq);
-    bool canDownload(const QXmppShareItem *item) const;
     void setShareClient(ChatClient *shareClient);
     QXmppShareManager *shareManager();
 
     ChatClient *client;
     bool connected;
-    QString filter;
-    QString requestId;
-    QString rootJid;
-    QString rootNode;
     ChatClient *shareClient;
     QString shareServer;
-    QTimer *timer;
 
 private:
     ShareModel *q;
@@ -118,20 +111,6 @@ ShareModelPrivate::ShareModelPrivate(ShareModel *qq)
       shareClient(0),
       q(qq)
 {
-}
-
-bool ShareModelPrivate::canDownload(const QXmppShareItem *item) const
-{
-    if (item->locations().isEmpty())
-        return false;
-
-    // don't download from self
-    foreach (const QXmppShareLocation &location, item->locations()) {
-        if (location.jid() == shareClient->configuration().jid())
-            return false;
-    }
-
-    return true;
 }
 
 void ShareModelPrivate::setShareClient(ChatClient *newClient)
@@ -177,28 +156,9 @@ QXmppShareManager *ShareModelPrivate::shareManager()
 }
 
 ShareModel::ShareModel(QObject *parent)
-    : QAbstractItemModel(parent)
+    : QObject(parent)
 {
     d = new ShareModelPrivate(this);
-    rootItem = new QXmppShareItem(QXmppShareItem::CollectionItem);
-
-    // set role names
-    QHash<int, QByteArray> roleNames;
-    roleNames.insert(AvatarRole, "avatar");
-    roleNames.insert(CanDownloadRole, "canDownload");
-    roleNames.insert(IsDirRole, "isDir");
-    roleNames.insert(JidRole, "jid");
-    roleNames.insert(NameRole, "name");
-    roleNames.insert(NodeRole, "node");
-    roleNames.insert(PopularityRole, "popularity");
-    roleNames.insert(SizeRole, "size");
-    setRoleNames(roleNames);
-
-    // add timer
-    d->timer = new QTimer(this);
-    d->timer->setSingleShot(true);
-    d->timer->setInterval(100);
-    connect(d->timer, SIGNAL(timeout()), this, SLOT(refresh()));
 
     connect(database(), SIGNAL(directoryChanged(QString)),
             this, SIGNAL(shareUrlChanged()));
@@ -206,7 +166,6 @@ ShareModel::ShareModel(QObject *parent)
 
 ShareModel::~ShareModel()
 {
-    delete rootItem;
     delete d;
 }
 
@@ -232,56 +191,9 @@ void ShareModel::setClient(ChatClient *client)
     }
 }
 
-QString ShareModel::filter() const
-{
-    return d->filter;
-}
-
-void ShareModel::setFilter(const QString &filter)
-{
-    if (filter != d->filter) {
-        d->filter = filter;
-        d->timer->start();
-        emit filterChanged(d->filter);
-    }
-}
-
-bool ShareModel::isBusy() const
-{
-    return !d->requestId.isEmpty();
-}
-
 bool ShareModel::isConnected() const
 {
     return d->connected;
-}
-
-QString ShareModel::rootJid() const
-{
-    return d->rootJid;
-}
-
-void ShareModel::setRootJid(const QString &rootJid)
-{
-    if (rootJid != d->rootJid) {
-        d->rootJid = rootJid;
-        d->timer->start();
-        emit rootJidChanged(d->rootJid);
-    }
-}
-
-QString ShareModel::rootNode() const
-{
-    return d->rootNode;
-}
-
-void ShareModel::setRootNode(const QString &rootNode)
-{
-    if (rootNode != d->rootNode) {
-        d->rootNode = rootNode;
-        d->timer->start();
-        emit rootNodeChanged(d->rootNode);
-    }
 }
 
 QString ShareModel::shareServer() const
@@ -292,66 +204,6 @@ QString ShareModel::shareServer() const
 QUrl ShareModel::shareUrl() const
 {
     return QUrl::fromLocalFile(database()->directory());
-}
-
-void ShareModel::clear()
-{
-    rootItem->clearChildren();
-    reset();
-}
-
-int ShareModel::columnCount(const QModelIndex &parent) const
-{
-    Q_UNUSED(parent);
-    return 1;
-}
-
-QModelIndex ShareModel::createIndex(QXmppShareItem *item, int column) const
-{
-    if (item && item != rootItem)
-        return QAbstractItemModel::createIndex(item->row(), column, item);
-    else
-        return QModelIndex();
-}
-
-QVariant ShareModel::data(const QModelIndex &index, int role) const
-{
-    QXmppShareItem *item = static_cast<QXmppShareItem*>(index.internalPointer());
-    if (!index.isValid() || !item)
-        return QVariant();
-
-    if (role == AvatarRole) {
-        if (item->type() == QXmppShareItem::CollectionItem) {
-            if (item->locations().isEmpty() || item->locations().first().node().isEmpty())
-                return wApp->qmlUrl("peer.png");
-            else
-                return wApp->qmlUrl("album.png");
-        } else {
-            return wApp->qmlUrl("file.png");
-        }
-    } else if (role == CanDownloadRole)
-        return d->canDownload(item);
-    else if (role == IsDirRole)
-        return item->type() == QXmppShareItem::CollectionItem;
-    else if (role == JidRole) {
-        if (item->locations().isEmpty())
-            return QString();
-        else
-            return item->locations().first().jid();
-    }
-    else if (role == NameRole)
-        return item->name();
-    else if (role == NodeRole) {
-        if (item->locations().isEmpty())
-            return QString();
-        else
-            return item->locations().first().node();
-    }
-    else if (role == PopularityRole)
-        return item->popularity();
-    else if (role == SizeRole)
-        return item->fileSize();
-    return QVariant();
 }
 
 QXmppShareDatabase *ShareModel::database() const
@@ -385,57 +237,6 @@ QXmppShareDatabase *ShareModel::database() const
     return globalDatabase;
 }
 
-QModelIndex ShareModel::index(int row, int column, const QModelIndex &parent) const
-{
-    if (!hasIndex(row, column, parent))
-        return QModelIndex();
-
-    QXmppShareItem *parentItem;
-    if (!parent.isValid())
-        parentItem = rootItem;
-    else
-        parentItem = static_cast<QXmppShareItem*>(parent.internalPointer());
-
-    QXmppShareItem *childItem = parentItem->child(row);
-    if (childItem)
-        return createIndex(childItem);
-    else
-        return QModelIndex();
-}
-
-QModelIndex ShareModel::parent(const QModelIndex &index) const
-{
-    if (!index.isValid())
-        return QModelIndex();
-
-    QXmppShareItem *childItem = static_cast<QXmppShareItem*>(index.internalPointer());
-    QXmppShareItem *parentItem = childItem->parent();
-
-    return createIndex(parentItem);
-}
-
-void ShareModel::refresh()
-{
-    QXmppShareManager *shareManager = d->shareManager();
-    if (!shareManager || d->rootJid.isEmpty())
-        return;
-
-    // browse files
-    clear();
-    d->requestId = shareManager->search(QXmppShareLocation(d->rootJid, d->rootNode), 1, d->filter);
-    emit isBusyChanged();
-}
-
-int ShareModel::rowCount(const QModelIndex &parent) const
-{
-    QXmppShareItem *parentItem;
-    if (!parent.isValid())
-        parentItem = rootItem;
-    else
-        parentItem = static_cast<QXmppShareItem*>(parent.internalPointer());
-    return parentItem->size();
-}
-
 void ShareModel::_q_disconnected()
 {
     // if we are using a slave client and the main client
@@ -448,9 +249,6 @@ void ShareModel::_q_disconnected()
         d->connected = false;
         emit isConnectedChanged();
     }
-    clear();
-    d->requestId.clear();
-    emit isBusyChanged();
 }
 
 void ShareModel::_q_presenceReceived(const QXmppPresence &presence)
@@ -490,10 +288,6 @@ void ShareModel::_q_presenceReceived(const QXmppPresence &presence)
         if (!shareManager) {
             shareManager = new QXmppShareManager(d->shareClient, database());
             d->shareClient->addExtension(shareManager);
-
-            check = connect(shareManager, SIGNAL(shareSearchIqReceived(QXmppShareSearchIq)),
-                            this, SLOT(_q_searchReceived(QXmppShareSearchIq)));
-            Q_ASSERT(check);
         }
 
         if (!d->connected) {
@@ -561,74 +355,6 @@ void ShareModel::_q_serverChanged(const QString &server)
     presence.setExtensions(x);
     presence.setVCardUpdateType(QXmppPresence::VCardUpdateNone);
     d->shareClient->sendPacket(presence);
-}
-
-void ShareModel::_q_searchReceived(const QXmppShareSearchIq &shareIq)
-{
-    // filter requests
-    if (shareIq.from() != d->rootJid ||
-        shareIq.type() == QXmppIq::Get ||
-        (shareIq.type() == QXmppIq::Set && !d->rootNode.isEmpty()) ||
-        (shareIq.type() != QXmppIq::Set && shareIq.id() != d->requestId))
-        return;
-
-    if (shareIq.type() == QXmppIq::Error)
-    {
-        removeRows(0, rootItem->size());
-    } else {
-        QXmppShareItem *newItem = (QXmppShareItem*)&shareIq.collection();
-
-        // update own data
-        copy(rootItem, newItem);
-
-        // update children
-        QList<QXmppShareItem*> removed = rootItem->children();
-        for (int newRow = 0; newRow < newItem->size(); newRow++) {
-            QXmppShareItem *newChild = newItem->child(newRow);
-            QXmppShareItem *oldChild = 0;
-            foreach (QXmppShareItem *ptr, removed) {
-                if (ptr->locations() == newChild->locations()) {
-                    oldChild = ptr;
-                    break;
-                }
-            }
-
-            if (oldChild) {
-                // update existing child
-                const int oldRow = oldChild->row();
-                if (oldRow != newRow)
-                {
-                    beginMoveRows(QModelIndex(), oldRow, oldRow, QModelIndex(), newRow);
-                    rootItem->moveChild(oldRow, newRow);
-                    endMoveRows();
-                }
-
-                // update data
-                copy(oldChild, newChild);
-                emit dataChanged(createIndex(oldChild), createIndex(oldChild));
-
-                removed.removeAll(oldChild);
-            } else {
-                // insert new child
-                beginInsertRows(QModelIndex(), newRow, newRow);
-                rootItem->insertChild(newRow, *newChild);
-                endInsertRows();
-            }
-        }
-
-        // remove old children
-        foreach (QXmppShareItem *oldChild, removed) {
-            beginRemoveRows(QModelIndex(), oldChild->row(), oldChild->row());
-            rootItem->removeChild(oldChild);
-            endRemoveRows();
-        }
-    }
-
-    // notify busy change
-    if (shareIq.id() == d->requestId) {
-        d->requestId.clear();
-        emit isBusyChanged();
-    }
 }
 
 void ShareModel::_q_settingsChanged() const

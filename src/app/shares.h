@@ -40,85 +40,40 @@ class ShareModelPrivate;
 
 /** Model representing a tree of share items (collections and files).
  */
-class ShareModel : public QAbstractItemModel
+class ShareModel : public QObject
 {
     Q_OBJECT
     Q_ENUMS(Recurse)
-    Q_PROPERTY(bool busy READ isBusy NOTIFY isBusyChanged)
     Q_PROPERTY(ChatClient* client READ client WRITE setClient NOTIFY clientChanged)
     Q_PROPERTY(bool connected READ isConnected NOTIFY isConnectedChanged)
-    Q_PROPERTY(QString filter READ filter WRITE setFilter NOTIFY filterChanged)
-    Q_PROPERTY(QString rootJid READ rootJid WRITE setRootJid NOTIFY rootJidChanged)
-    Q_PROPERTY(QString rootNode READ rootNode WRITE setRootNode NOTIFY rootNodeChanged)
     Q_PROPERTY(QString shareServer READ shareServer NOTIFY shareServerChanged)
     Q_PROPERTY(QUrl shareUrl READ shareUrl NOTIFY shareUrlChanged)
 
 public:
-    enum Role {
-        AvatarRole = ChatModel::UserRole,
-        CanDownloadRole,
-        IsDirRole,
-        JidRole,
-        NameRole,
-        NodeRole,
-        PopularityRole,
-        SizeRole,
-    };
-
     ShareModel(QObject *parent = 0);
     ~ShareModel();
 
     ChatClient *client() const;
     void setClient(ChatClient *client);
 
-    QString filter() const;
-    void setFilter(const QString &filter);
-
-    bool isBusy() const;
+    QXmppShareDatabase *database() const;
     bool isConnected() const;
-
-    QString rootJid() const;
-    void setRootJid(const QString &rootJid);
-
-    QString rootNode() const;
-    void setRootNode(const QString &rootNode);
-
     QString shareServer() const;
     QUrl shareUrl() const;
 
-    int columnCount(const QModelIndex &parent = QModelIndex()) const;
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-    QModelIndex index(int row, int column, const QModelIndex &parent) const;
-    QModelIndex parent(const QModelIndex &index) const;
-    int rowCount(const QModelIndex &parent = QModelIndex()) const;
-
-    QXmppShareDatabase *database() const;
-
 signals:
     void clientChanged(ChatClient *client);
-    void filterChanged(const QString &filter);
-    void isBusyChanged();
     void isConnectedChanged();
-    void rootJidChanged(const QString &rootJid);
-    void rootNodeChanged(const QString &rootNode);
     void shareServerChanged(const QString &shareServer);
     void shareUrlChanged();
-
-public slots:
-    void refresh();
 
 private slots:
     void _q_disconnected();
     void _q_presenceReceived(const QXmppPresence &presence);
     void _q_serverChanged(const QString &server);
-    void _q_searchReceived(const QXmppShareSearchIq &shareIq);
     void _q_settingsChanged() const;
 
 private:
-    void clear();
-    QModelIndex createIndex(QXmppShareItem *item, int column = 0) const;
-
-    QXmppShareItem *rootItem;
     ShareModelPrivate *d;
     friend class ShareModelPrivate;
 };
