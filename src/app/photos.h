@@ -31,6 +31,7 @@
 using namespace QNetIO;
 
 class FolderModelItem;
+class FolderModelPrivate;
 class FolderQueueModel;
 class PhotoCachePrivate;
 class PhotoDownloadItem;
@@ -83,6 +84,7 @@ class FolderModel : public ChatModel
 
 public:
     FolderModel(QObject *parent = 0);
+    ~FolderModel();
 
     QString filter() const;
     void setFilter(const QString &filter);
@@ -120,14 +122,7 @@ private slots:
     void _q_photoChanged(const QUrl &url, FileSystem::ImageSize size);
 
 private:
-    QString m_filter;
-    FileSystem *m_fs;
-    FileSystemJob *m_listJob;
-    QMap<QString,FileSystem*> m_fileSystems;
-    FileSystemJob::Operations m_permissions;
-    FolderQueueModel *m_queue;
-    QUrl m_rootUrl;
-    bool m_showFiles;
+    FolderModelPrivate *d;
 };
 
 class FolderQueueModel : public ChatModel

@@ -223,15 +223,47 @@ public:
     FolderModelItem(const FileInfo &info) : FileInfo(info) {};
 };
 
+class FolderModelPrivate
+{
+public:
+    FolderModelPrivate(FolderModel *qq);
+
+    QString filter;
+    FileSystem *fs;
+    FileSystemJob *listJob;
+    QMap<QString,FileSystem*> fileSystems;
+    FileSystemJob::Operations permissions;
+    FolderQueueModel *queue;
+    QUrl rootUrl;
+    bool showFiles;
+
+private:
+    FolderModel *q;
+};
+
+FolderModelPrivate::FolderModelPrivate(FolderModel *qq)
+    : fs(0)
+    , listJob(0)
+    , permissions(FileSystemJob::None)
+    , queue(0)
+    , showFiles(true)
+    , q(qq)
+{
+}
+
 FolderModel::FolderModel(QObject *parent)
     : ChatModel(parent)
-    , m_fs(0)
-    , m_listJob(0)
-    , m_permissions(FileSystemJob::None)
-    , m_showFiles(true)
 {
     bool check;
     Q_UNUSED(check);
+
+    d = new FolderModelPrivate(this);
+    d->queue = new FolderQueueModel(this);
+
+    // watch image changes
+    check = connect(PhotoCache::instance(), SIGNAL(photoChanged(QUrl,FileSystem::ImageSize)),
+                    this, SLOT(_q_photoChanged(QUrl,FileSystem::ImageSize)));
+    Q_ASSERT(check);
 
     // set role names
     QHash<int, QByteArray> names = roleNames();
@@ -241,12 +273,11 @@ FolderModel::FolderModel(QObject *parent)
     names.insert(SizeRole, "size");
     names.insert(UrlRole, "url");
     setRoleNames(names);
+}
 
-    m_queue = new FolderQueueModel(this);
-
-    check = connect(PhotoCache::instance(), SIGNAL(photoChanged(QUrl,FileSystem::ImageSize)),
-                    this, SLOT(_q_photoChanged(QUrl,FileSystem::ImageSize)));
-    Q_ASSERT(check);
+FolderModel::~FolderModel()
+{
+    delete d;
 }
 
 QVariant FolderModel::data(const QModelIndex &index, int role) const
@@ -257,10 +288,10 @@ QVariant FolderModel::data(const QModelIndex &index, int role) const
         return QVariant();
 
     if (role == AvatarRole) {
-        return PhotoCache::instance()->imageUrl(*item, FileSystem::SmallSize, m_fs);
+        return PhotoCache::instance()->imageUrl(*item, FileSystem::SmallSize, d->fs);
     }
     else if (role == ImageRole) {
-        return PhotoCache::instance()->imageUrl(*item, FileSystem::LargeSize, m_fs);
+        return PhotoCache::instance()->imageUrl(*item, FileSystem::LargeSize, d->fs);
     }
     else if (role == ImageReadyRole)
         return PhotoCache::instance()->imageReady(item->url(), FileSystem::LargeSize);
@@ -277,12 +308,12 @@ QVariant FolderModel::data(const QModelIndex &index, int role) const
 
 bool FolderModel::canCreateAlbum() const
 {
-    return m_permissions & FileSystemJob::Mkdir;
+    return d->permissions & FileSystemJob::Mkdir;
 }
 
 bool FolderModel::canUpload() const
 {
-    return m_permissions & FileSystemJob::Put;
+    return d->permissions & FileSystemJob::Put;
 }
 
 void FolderModel::createAlbum(const QString &name)
@@ -290,9 +321,9 @@ void FolderModel::createAlbum(const QString &name)
     if (name.isEmpty())
         return;
 
-    QUrl newUrl = m_rootUrl;
+    QUrl newUrl = d->rootUrl;
     newUrl.setPath(newUrl.path() + "/" + name);
-    m_fs->mkdir(newUrl);
+    d->fs->mkdir(newUrl);
 }
 
 void FolderModel::download(int row)
@@ -301,18 +332,18 @@ void FolderModel::download(int row)
         return;
 
     FolderModelItem *item = static_cast<FolderModelItem*>(rootItem->children.at(row));
-    m_queue->download(m_fs, *item, m_filter);
+    d->queue->download(d->fs, *item, d->filter);
 }
 
 QString FolderModel::filter() const
 {
-    return m_filter;
+    return d->filter;
 }
 
 void FolderModel::setFilter(const QString &filter)
 {
-    if (filter != m_filter) {
-        m_filter = filter;
+    if (filter != d->filter) {
+        d->filter = filter;
         refresh();
         emit filterChanged();
     }
@@ -320,7 +351,7 @@ void FolderModel::setFilter(const QString &filter)
 
 bool FolderModel::isBusy() const
 {
-    return m_listJob != 0;
+    return d->listJob != 0;
 }
 
 /** Refresh the contents of the current folder.
@@ -328,13 +359,13 @@ bool FolderModel::isBusy() const
 void FolderModel::refresh()
 {
     removeRows(0, rootItem->children.size());
-    m_listJob = m_fs->list(m_rootUrl, m_filter);
+    d->listJob = d->fs->list(d->rootUrl, d->filter);
     emit isBusyChanged();
 }
 
 QUrl FolderModel::rootUrl() const
 {
-    return m_rootUrl;
+    return d->rootUrl;
 }
 
 void FolderModel::setRootUrl(const QUrl &rootUrl)
@@ -342,12 +373,12 @@ void FolderModel::setRootUrl(const QUrl &rootUrl)
     bool check;
     Q_UNUSED(check);
 
-    if (rootUrl == m_rootUrl)
+    if (rootUrl == d->rootUrl)
         return;
 
-    m_rootUrl = rootUrl;
-    m_fs = m_fileSystems.value(rootUrl.scheme());
-    if (m_fs) {
+    d->rootUrl = rootUrl;
+    d->fs = d->fileSystems.value(rootUrl.scheme());
+    if (d->fs) {
         refresh();
     } else {
         if (!photoInitialised) {
@@ -355,19 +386,19 @@ void FolderModel::setRootUrl(const QUrl &rootUrl)
             photoInitialised = true;
         }
 
-        m_fs = FileSystem::create(m_rootUrl, this);
-        if (m_fs) {
-            check = connect(m_fs, SIGNAL(jobFinished(FileSystemJob*)),
+        d->fs = FileSystem::create(d->rootUrl, this);
+        if (d->fs) {
+            check = connect(d->fs, SIGNAL(jobFinished(FileSystemJob*)),
                             this, SLOT(_q_jobFinished(FileSystemJob*)));
             Q_ASSERT(check);
 
-            m_fileSystems.insert(m_rootUrl.scheme(), m_fs);
-            m_fs->open(m_rootUrl);
+            d->fileSystems.insert(d->rootUrl.scheme(), d->fs);
+            d->fs->open(d->rootUrl);
         } else {
             removeRows(0, rootItem->children.size());
         }
     }
-    emit rootUrlChanged(m_rootUrl);
+    emit rootUrlChanged(d->rootUrl);
 }
 
 bool FolderModel::removeRow(int row)
@@ -377,37 +408,37 @@ bool FolderModel::removeRow(int row)
 
     FolderModelItem *item = static_cast<FolderModelItem*>(rootItem->children.at(row));
     if (item->isDir())
-        m_fs->rmdir(item->url());
+        d->fs->rmdir(item->url());
     else
-        m_fs->remove(item->url());
+        d->fs->remove(item->url());
     return true;
 }
 
 bool FolderModel::showFiles() const
 {
-    return m_showFiles;
+    return d->showFiles;
 }
 
 void FolderModel::setShowFiles(bool show)
 {
-    if (show != m_showFiles) {
-        m_showFiles = show;
+    if (show != d->showFiles) {
+        d->showFiles = show;
         emit showFilesChanged();
     }
 }
 
 void FolderModel::upload(const QString &filePath)
 {
-    QString base = m_rootUrl.toString();
+    QString base = d->rootUrl.toString();
     while (base.endsWith("/"))
         base.chop(1);
 
-    m_queue->upload(m_fs, filePath, base + "/" + QFileInfo(filePath).fileName());
+    d->queue->upload(d->fs, filePath, base + "/" + QFileInfo(filePath).fileName());
 }
 
 FolderQueueModel *FolderModel::uploads() const
 {
-    return m_queue;
+    return d->queue;
 }
 
 /** When a command finishes, process its results.
@@ -416,7 +447,7 @@ FolderQueueModel *FolderModel::uploads() const
  */
 void FolderModel::_q_jobFinished(FileSystemJob *job)
 {
-    Q_ASSERT(m_fs);
+    Q_ASSERT(d->fs);
 
     if (job->error() != FileSystemJob::NoError) {
         qWarning() << job->operationName() << "command failed";
@@ -433,18 +464,19 @@ void FolderModel::_q_jobFinished(FileSystemJob *job)
         refresh();
         break;
     case FileSystemJob::List:
-        if (job == m_listJob) {
-            m_permissions = job->allowedOperations();
+        if (job == d->listJob) {
+            d->permissions = job->allowedOperations();
             emit permissionsChanged();
 
             removeRows(0, rootItem->children.size());
             foreach (const FileInfo& info, job->results()) {
-                if (info.isDir() || m_showFiles) {
-                    FolderModelItem *item = new FolderModelItem(info);
-                    addItem(item, rootItem);
-                }
+                if (!d->showFiles && !info.isDir())
+                    continue;
+
+                FolderModelItem *item = new FolderModelItem(info);
+                addItem(item, rootItem);
             }
-            m_listJob = 0;
+            d->listJob = 0;
             emit isBusyChanged();
         }
         break;
