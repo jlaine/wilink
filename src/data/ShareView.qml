@@ -62,6 +62,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 width: appStyle.icon.smallSize
                 height: appStyle.icon.smallSize
+                fillMode: Image.PreserveAspectFit
                 smooth: true
                 source: model.avatar
             }

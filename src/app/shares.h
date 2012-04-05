@@ -141,6 +141,7 @@ public:
     ShareFileSystemGet(ShareFileSystem *fs, const QXmppShareLocation &location);
 
     qint64 bytesAvailable() const;
+    bool isSequential() const;
     qint64 _q_dataReceived(const char* data, qint64 bytes);
 
 public slots:

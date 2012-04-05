@@ -801,6 +801,11 @@ qint64 ShareFileSystemGet::bytesAvailable() const
     return QIODevice::bytesAvailable() + m_buffer.size();
 }
 
+bool ShareFileSystemGet::isSequential() const
+{
+    return true;
+}
+
 qint64 ShareFileSystemGet::readData(char *data, qint64 maxSize)
 {
     qint64 bytes = qMin(maxSize, qint64(m_buffer.size()));
