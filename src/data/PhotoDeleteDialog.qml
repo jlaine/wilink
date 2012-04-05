@@ -23,16 +23,14 @@ import wiLink 2.0
 Dialog {
     id: dialog
 
-    property alias model: listHelper.model
-    property variant modelData: listHelper.get(dialog.index)
+    property url avatar
     property int index: -1
+    property variant model
+    property string name
 
     minimumHeight: 150
     title: qsTr('Delete photo');
 
-    ListHelper {
-        id: listHelper
-    }
     Item {
         anchors.fill: contents
 
@@ -45,7 +43,7 @@ Dialog {
             width: 64
             height: 64
             smooth: true
-            source: modelData.avatar
+            source: dialog.avatar
         }
 
         Label {
@@ -53,13 +51,12 @@ Dialog {
             anchors.left: image.right
             anchors.leftMargin: 8
             anchors.right: parent.right
-            text: qsTr('Do you want to delete %1 from your photos?').replace('%1', '<b>' + modelData.name + '</b>')
+            text: qsTr('Do you want to delete %1 from your photos?').replace('%1', '<b>' + dialog.name + '</b>')
             wrapMode: Text.WordWrap
         }
     }
 
     onAccepted: {
-        console.log("Remove photo " + modelData.url);
         model.remove(index);
         dialog.close();
     }

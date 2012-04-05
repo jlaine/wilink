@@ -107,9 +107,14 @@ FocusScope {
         Keys.onPressed: {
             if (event.key == Qt.Key_Delete ||
                (event.key == Qt.Key_Backspace && event.modifiers == Qt.ControlModifier)) {
-                // FIXME: handle delete
                 if (view.currentIndex >= 0) {
-                    dialogSwapper.showPanel('PhotoDeleteDialog.qml', {'model': photoModel, 'index': view.currentIndex});
+                    var model = view.currentItem.data();
+                    dialogSwapper.showPanel('PhotoDeleteDialog.qml', {
+                        avatar: model.avatar,
+                        index: view.currentIndex,
+                        model: photoModel,
+                        name: model.name
+                    });
                 }
             }
             else if (event.key == Qt.Key_Back ||

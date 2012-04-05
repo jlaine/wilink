@@ -76,19 +76,6 @@ static void copy(QXmppShareItem *oldChild, const QXmppShareItem *newChild)
     oldChild->setType(newChild->type());
 }
 
-static void totals(const QXmppShareItem *item, qint64 &bytes, qint64 &files)
-{
-    for (int i = 0; i < item->size(); ++i) {
-        const QXmppShareItem *child = item->child(i);
-        if (child->type() == QXmppShareItem::FileItem) {
-            bytes += child->fileSize();
-            files++;
-        } else {
-            totals(child, bytes, files);
-        }
-    }
-}
-
 class ShareModelPrivate
 {
 public:
