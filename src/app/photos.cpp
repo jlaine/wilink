@@ -33,6 +33,8 @@
 #include "declarative.h"
 #include "photos.h"
 
+#define BLOCK_SIZE 16384
+
 static const QSize UPLOAD_SIZE(2048, 2048);
 
 static PhotoCache *photoCache = 0;
@@ -749,11 +751,15 @@ void FolderQueueModel::processQueue()
                 Q_ASSERT(check);
 
                 check = connect(m_downloadItem->job, SIGNAL(readyRead()),
-                                this, SLOT(_q_downloadReadyRead()));
+                                this, SLOT(_q_downloadData()));
                 Q_ASSERT(check);
 
                 check = connect(m_downloadItem->job, SIGNAL(downloadProgress(qint64,qint64)),
                                 this, SLOT(_q_downloadProgress(qint64,qint64)));
+                Q_ASSERT(check);
+
+                check = connect(m_downloadItem->jobOutput, SIGNAL(bytesWritten(qint64)),
+                                this, SLOT(_q_downloadData()));
                 Q_ASSERT(check);
                 break;
             }
@@ -770,6 +776,26 @@ void FolderQueueModel::processQueue()
                 break;
             }
         }
+    }
+}
+
+/** Transfer the next block of data.
+ */
+void FolderQueueModel::_q_downloadData()
+{
+    Q_ASSERT(m_downloadItem);
+
+    // don't saturate output
+    if (m_downloadItem->jobOutput->bytesToWrite() > 2 * BLOCK_SIZE)
+        return;
+
+    char buffer[BLOCK_SIZE];
+    const qint64 length = m_downloadItem->job->read(buffer, BLOCK_SIZE);
+    if (length < 0) {
+        qWarning("Download could not read from input, aborting");
+        m_downloadItem->job->abort();
+    } else if (length > 0) {
+        m_downloadItem->jobOutput->write(buffer, length);
     }
 }
 
@@ -819,13 +845,6 @@ void FolderQueueModel::_q_downloadProgress(qint64 done, qint64 total)
         m_downloadItem->jobDoneBytes = done;
         emit dataChanged(createIndex(m_downloadItem), createIndex(m_downloadItem));
     }
-}
-
-void FolderQueueModel::_q_downloadReadyRead()
-{
-    Q_ASSERT(m_downloadItem);
-
-    m_downloadItem->jobOutput->write(m_downloadItem->job->readAll());
 }
 
 void FolderQueueModel::_q_listFinished()
