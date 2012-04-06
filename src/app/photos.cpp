@@ -290,7 +290,6 @@ FolderModel::~FolderModel()
 
 QVariant FolderModel::data(const QModelIndex &index, int role) const
 {
-    Q_ASSERT(m_fs);
     FolderModelItem *item = static_cast<FolderModelItem*>(index.internalPointer());
     if (!index.isValid() || !item)
         return QVariant();
@@ -841,6 +840,8 @@ void FolderQueueModel::_q_downloadFinished()
  */
 void FolderQueueModel::_q_downloadProgress(qint64 done, qint64 total)
 {
+    Q_UNUSED(total);
+
     if (m_downloadItem) {
         m_downloadItem->jobDoneBytes = done;
         emit dataChanged(createIndex(m_downloadItem), createIndex(m_downloadItem));
