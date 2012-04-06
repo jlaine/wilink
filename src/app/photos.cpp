@@ -731,10 +731,17 @@ void FolderQueueModel::processQueue()
                 }
                 const QString filePath = availableFilePath(dirPath, childInfo.name() + ".part");
 
+                // open output
+                QFile *output = new QFile(filePath, this);
+                if (!output->open(QIODevice::WriteOnly)) {
+                    qWarning("Could not open %s for writing", qPrintable(filePath));
+                    delete output;
+                    continue;
+                }
+
                 m_downloadItem = item;
                 m_downloadItem->job = item->fileSystem->get(childInfo.url(), FileSystem::FullSize);
-                m_downloadItem->jobOutput = new QFile(filePath, this);
-                m_downloadItem->jobOutput->open(QIODevice::WriteOnly);
+                m_downloadItem->jobOutput = output;
                 m_downloadItem->jobTotalBytes = childInfo.size();
 
                 check = connect(m_downloadItem->job, SIGNAL(finished()),
