@@ -70,7 +70,6 @@ class ShareModelPrivate
 public:
     ShareModelPrivate(ShareModel *qq);
     void setShareClient(ChatClient *shareClient);
-    QXmppShareManager *shareManager();
 
     ChatClient *client;
     bool connected;
@@ -123,14 +122,6 @@ void ShareModelPrivate::setShareClient(ChatClient *newClient)
     }
 }
 
-QXmppShareManager *ShareModelPrivate::shareManager()
-{
-    if (shareClient)
-        return shareClient->findExtension<QXmppShareManager>();
-    else
-        return 0;
-}
-
 ShareModel::ShareModel(QObject *parent)
     : QObject(parent)
 {
@@ -170,11 +161,6 @@ void ShareModel::setClient(ChatClient *client)
 bool ShareModel::isConnected() const
 {
     return d->connected;
-}
-
-QString ShareModel::shareServer() const
-{
-    return d->shareManager() ? d->shareServer : QString();
 }
 
 QUrl ShareModel::shareUrl() const
@@ -232,8 +218,8 @@ void ShareModel::_q_presenceReceived(const QXmppPresence &presence)
     bool check;
     Q_UNUSED(check);
 
-    Q_ASSERT(d->shareClient);
-    if (d->shareServer.isEmpty() || presence.from() != d->shareServer)
+    ChatClient *shareClient = qobject_cast<ChatClient*>(sender());
+    if (!shareClient || d->shareServer.isEmpty() || presence.from() != d->shareServer)
         return;
 
     // find shares extension
@@ -253,17 +239,17 @@ void ShareModel::_q_presenceReceived(const QXmppPresence &presence)
     {
         // configure transfer manager
         const QString forceProxy = shareExtension.firstChildElement("force-proxy").value();
-        QXmppTransferManager *transferManager = d->shareClient->findExtension<QXmppTransferManager>();
+        QXmppTransferManager *transferManager = shareClient->findExtension<QXmppTransferManager>();
         if (forceProxy == QLatin1String("1") && !transferManager->proxyOnly()) {
             qDebug("Shares forcing SOCKS5 proxy");
             transferManager->setProxyOnly(true);
         }
 
         // add share manager
-        QXmppShareManager *shareManager = d->shareClient->findExtension<QXmppShareManager>();
+        QXmppShareManager *shareManager = shareClient->findExtension<QXmppShareManager>();
         if (!shareManager) {
-            shareManager = new QXmppShareManager(d->shareClient, database());
-            d->shareClient->addExtension(shareManager);
+            shareManager = new QXmppShareManager(shareClient, database());
+            shareClient->addExtension(shareManager);
         }
 
         if (!d->connected) {
@@ -279,7 +265,7 @@ void ShareModel::_q_presenceReceived(const QXmppPresence &presence)
         const QString newJid = d->client->configuration().user() + '@' + newDomain;
 
         // avoid redirect loop
-        if (d->shareClient != d->client ||
+        if (shareClient != d->client ||
             newDomain == d->client->configuration().domain()) {
             qWarning("Shares not redirecting to domain %s", qPrintable(newDomain));
             return;
@@ -307,7 +293,6 @@ void ShareModel::_q_serverChanged(const QString &server)
 
     // update server
     d->shareServer = server;
-    emit shareServerChanged(d->shareServer);
     if (d->shareServer.isEmpty())
         return;
 
