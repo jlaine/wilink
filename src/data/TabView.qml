@@ -64,7 +64,7 @@ ListView {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                panelSwapper.setCurrentItem(model.panel);
+                panelSwapper.currentIndex = model.index;
             }
         }
 
