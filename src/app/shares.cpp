@@ -444,9 +444,6 @@ ShareFileSystemGet::ShareFileSystemGet(ShareFileSystem *fs, const QXmppShareLoca
     bool check;
     Q_UNUSED(check);
 
-    //m_buffer = new QBuffer(this);
-    //m_buffer->open(QIODevice::WriteOnly);
-
     if (location.jid().isEmpty() || location.node().isEmpty()) {
         setErrorString("Invalid location requested");
         finishLater(FileSystemJob::UrlError);
