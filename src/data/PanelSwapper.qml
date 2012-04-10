@@ -90,21 +90,11 @@ FocusScope {
         var panel = findPanel(source, properties);
         if (panel) {
             // if the panel already exists, show it
-            panelSwapper.setCurrentItem(panel);
+            panelSwapper.currentIndex = d.findPanelIndex(panel);
         } else {
             // otherwise create and show it
             addPanel(source, properties, true);
         }
-    }
-
-    function setCurrentItem(panel) {
-        for (var i = 0; i < panels.count; i += 1) {
-            if (panels.get(i).panel == panel) {
-                currentIndex = i;
-                return;
-            }
-        }
-        currentIndex = -1;
     }
 
     function decrementCurrentIndex() {
