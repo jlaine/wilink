@@ -24,6 +24,7 @@ FocusScope {
     id: panelSwapper
 
     property alias model: panels
+    property int currentIndex: -1
     property Item currentItem
     property string currentSource
 
@@ -68,7 +69,7 @@ FocusScope {
             });
 
             if (show)
-                panelSwapper.setCurrentItem(panel);
+                panelSwapper.currentIndex = panels.count - 1;
         }
     }
 
@@ -97,55 +98,42 @@ FocusScope {
     }
 
     function setCurrentItem(panel) {
-        if (panel == currentItem)
-            return;
-
-        // show new item
-        if (panel) {
-            panel.opacity = 1;
-            panel.focus = true;
-            panel.z = 1;
-        } else {
-            background.opacity = 1;
-        }
-
-        // hide old item
-        if (currentItem) {
-            currentItem.opacity = 0;
-            currentItem.z = -1;
-        } else {
-            background.opacity = 0;
-        }
-
-        currentItem = panel;
         for (var i = 0; i < panels.count; i += 1) {
             if (panels.get(i).panel == panel) {
-                currentSource = panels.get(i).source;
+                currentIndex = i;
                 return;
             }
         }
-        currentSource = '';
+        currentIndex = -1;
     }
 
     function decrementCurrentIndex() {
-        var currentIndex = d.findPanelIndex(panelSwapper.currentItem);
-        if (currentIndex >= 0 && panels.count > 1) {
-            var newIndex = (currentIndex == 0) ? (panels.count - 1) : (currentIndex - 1);
-            panelSwapper.setCurrentItem(panels.get(newIndex).panel);
+        if (panelSwapper.currentIndex < 0 || panels.count < 2)
+            return;
+
+        if (panelSwapper.currentIndex == 0) {
+            panelSwapper.currentIndex = panels.count - 1;
+        } else {
+            panelSwapper.currentIndex -= 1;
         }
     }
 
     function incrementCurrentIndex() {
-        var currentIndex = d.findPanelIndex(panelSwapper.currentItem);
-        if (currentIndex >= 0 && panels.count > 1) {
-            var newIndex = (currentIndex == panels.count - 1) ? 0 : (currentIndex + 1);
-            panelSwapper.setCurrentItem(panels.get(newIndex).panel);
+        if (panelSwapper.currentIndex < 0 || panels.count < 2)
+            return;
+
+        if (panelSwapper.currentIndex == panels.count - 1) {
+            panelSwapper.currentIndex = 0;
+        } else {
+            panelSwapper.currentIndex += 1;
         }
     }
 
     Rectangle {
         id: background
         anchors.fill: parent
+
+        opacity: panelSwapper.currentIndex < 0 ? 1.0 : 0.0
     }
 
     // private implementation
@@ -166,19 +154,45 @@ FocusScope {
 
             console.log("PanelSwapper removing panel " + panels.get(i).source + " " + Utils.dumpProperties(panels.get(i).properties));
 
-            // if the panel was visible, show last remaining panel
-            if (panelSwapper.currentItem == panel) {
-                if (panels.count == 1)
-                    panelSwapper.setCurrentItem(null);
-                else if (i == panels.count - 1)
-                    panelSwapper.setCurrentItem(panels.get(i - 1).panel);
-                else
-                    panelSwapper.setCurrentItem(panels.get(i + 1).panel);
+            // remove panel
+            panels.remove(i);
+            if (panels.count == 0) {
+                panelSwapper.currentIndex = -1;
+            } else if (i <= panelSwapper.currentIndex) {
+                panelSwapper.currentIndex -= 1;
             }
 
             // destroy panel
-            panels.remove(i);
             panel.destroy();
+        }
+    }
+
+    onCurrentIndexChanged: {
+        var panel = null, source = '';
+
+        if (panelSwapper.currentIndex >= 0 && panelSwapper.currentIndex < panels.count) {
+            var item = panels.get(panelSwapper.currentIndex);
+            panel = item.panel;
+            source = item.source;
+        }
+
+        if (panel != panelSwapper.currentItem) {
+            // show new item
+            if (panel) {
+                panel = panel;
+                panel.opacity = 1;
+                panel.focus = true;
+                panel.z = 1;
+            }
+
+            // hide old item
+            if (panelSwapper.currentItem) {
+                panelSwapper.currentItem.opacity = 0;
+                panelSwapper.currentItem.z = -1;
+            }
+
+            panelSwapper.currentItem = panel;
+            panelSwapper.currentSource = source;
         }
     }
 }

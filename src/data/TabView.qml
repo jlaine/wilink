@@ -25,10 +25,12 @@ ListView {
 
     property QtObject panelSwapper
 
+    currentIndex: Qt.isQtObject(panelSwapper) ? panelSwapper.currentIndex : -1
     height: appStyle.icon.smallSize
     model: panelSwapper.model
     orientation: ListView.Horizontal
     spacing: -8
+
     delegate: BorderImage {
         id: rect
 
@@ -82,7 +84,7 @@ ListView {
 
         states: State {
             name: 'current'
-            when: (model.panel == panelSwapper.currentItem)
+            when: (model.index == tabView.currentIndex)
 
             PropertyChanges {
                 target: rect
