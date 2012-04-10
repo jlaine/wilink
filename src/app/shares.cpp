@@ -65,17 +65,6 @@ static void closeDatabase()
     delete globalDatabase;
 }
 
-static void copy(QXmppShareItem *oldChild, const QXmppShareItem *newChild)
-{
-    oldChild->setFileDate(newChild->fileDate());
-    oldChild->setFileHash(newChild->fileHash());
-    oldChild->setFileSize(newChild->fileSize());
-    oldChild->setLocations(newChild->locations());
-    oldChild->setName(newChild->name());
-    oldChild->setPopularity(newChild->popularity());
-    oldChild->setType(newChild->type());
-}
-
 class ShareModelPrivate
 {
 public:
