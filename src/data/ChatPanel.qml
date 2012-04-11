@@ -53,7 +53,7 @@ Panel {
         anchors.bottom: parent.bottom
         visible: width > 0
         width: chatPanel.singlePanel ? parent.width : appStyle.sidebarWidth
-        z: 1
+        z: 2
 
         ChatContactView {
             id: rooms
@@ -262,6 +262,7 @@ Panel {
         anchors.left: chatPanel.singlePanel ? parent.left : sidebar.right
         anchors.right: parent.right
         panelSwapper: chatSwapper
+        z: 1
     }
 
     PanelSwapper {
