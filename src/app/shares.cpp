@@ -17,7 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QCoreApplication>
 #include <QDesktopServices>
 #include <QTimer>
 
@@ -36,8 +35,7 @@
 
 Q_IMPORT_PLUGIN(share_filesystem)
 
-static QXmppShareDatabase *globalDatabase = 0;
-static ShareWatcher *globalWatcher = 0;
+Q_GLOBAL_STATIC(ShareWatcher, theShareWatcher);
 
 static QUrl locationToUrl(const QXmppShareLocation& loc)
 {
@@ -59,13 +57,9 @@ static QXmppShareLocation urlToLocation(const QUrl &url)
     return loc;
 }
 
-static void closeDatabase()
-{
-    delete globalDatabase;
-}
-
 ShareWatcher::ShareWatcher(QObject *parent)
     : QObject(parent)
+    , m_shareDatabase(0)
 {
     foreach (ChatClient *client, ChatClient::instances())
         addClient(client);
@@ -95,12 +89,12 @@ void ShareWatcher::addClient(ChatClient *client)
     }
 }
 
-QXmppShareDatabase *ShareWatcher::database() const
+QXmppShareDatabase *ShareWatcher::database()
 {
     bool check;
     Q_UNUSED(check);
 
-    if (!globalDatabase) {
+    if (!m_shareDatabase) {
         // initialise database
         const QString databaseName = QDir(QDesktopServices::storageLocation(QDesktopServices::DataLocation)).filePath("database.sqlite");
         QSqlDatabase sharesDb = QSqlDatabase::addDatabase("QSQLITE");
@@ -113,7 +107,7 @@ QXmppShareDatabase *ShareWatcher::database() const
         sharesDb.exec("DROP TABLE files");
 
         // create shares database
-        globalDatabase = new QXmppShareDatabase;
+        m_shareDatabase = new QXmppShareDatabase(this);
         check = connect(wApp->settings(), SIGNAL(sharesDirectoriesChanged(QVariantList)),
                         this, SLOT(_q_settingsChanged()));
         Q_ASSERT(check);
@@ -121,9 +115,9 @@ QXmppShareDatabase *ShareWatcher::database() const
                         this, SLOT(_q_settingsChanged()));
         Q_ASSERT(check);
         _q_settingsChanged();
-        qAddPostRoutine(closeDatabase);
     }
-    return globalDatabase;
+
+    return m_shareDatabase;
 }
 
 void ShareWatcher::_q_disconnected()
@@ -199,8 +193,8 @@ void ShareWatcher::_q_settingsChanged() const
     foreach (const QVariant &dir, wApp->settings()->sharesDirectories())
         dirs << dir.toUrl().toLocalFile();
 
-    globalDatabase->setDirectory(wApp->settings()->sharesLocation());
-    globalDatabase->setMappedDirectories(dirs);
+    m_shareDatabase->setDirectory(wApp->settings()->sharesLocation());
+    m_shareDatabase->setMappedDirectories(dirs);
 }
 
 void ShareWatcher::_q_serverChanged(const QString &server)
@@ -239,10 +233,7 @@ ShareFileSystem::ShareFileSystem(QObject *parent)
     bool check;
     Q_UNUSED(check);
 
-    if (!globalWatcher)
-        globalWatcher = new ShareWatcher;
-
-    check = connect(globalWatcher, SIGNAL(isConnectedChanged()),
+    check = connect(theShareWatcher(), SIGNAL(isConnectedChanged()),
                     this, SLOT(_q_connected()));
     Q_ASSERT(check);
 }

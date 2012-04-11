@@ -51,8 +51,9 @@ private slots:
 
 private:
     void addClient(ChatClient *client);
-    QXmppShareDatabase *database() const;
+    QXmppShareDatabase *database();
 
+    QXmppShareDatabase *m_shareDatabase;
     QString m_shareServer;
 };
 
