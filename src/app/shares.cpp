@@ -128,7 +128,7 @@ void ShareWatcher::_q_disconnected()
 void ShareWatcher::_q_presenceReceived(const QXmppPresence &presence)
 {
     ChatClient *client = qobject_cast<ChatClient*>(sender());
-    if (!client || m_shareServer.isEmpty() || presence.from() != m_shareServer)
+    if (!client || client->shareServer().isEmpty() || presence.from() != client->shareServer())
         return;
 
     // find shares extension
@@ -223,8 +223,6 @@ void ShareWatcher::_q_serverChanged(const QString &server)
     presence.setExtensions(x);
     presence.setVCardUpdateType(QXmppPresence::VCardUpdateNone);
     client->sendPacket(presence);
-
-    m_shareServer = server;
 }
 
 ShareFileSystem::ShareFileSystem(QObject *parent)
