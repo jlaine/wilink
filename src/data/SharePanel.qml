@@ -126,30 +126,11 @@ Panel {
         onLocationChanged: {
             view.model.rootUrl = location.url;
         }
-        z: 1
-    }
 
-    ShareModel {
-        client: appClient
-
-        onConnectedChanged: {
-            if (connected) {
-                // update breadcrumbs
-                if (!crumbBar.model.count) {
-                    crumbBar.push({'name': qsTr('Home'), 'url': 'share:'});
-                } else {
-                    view.model.refresh();
-                }
-
-                // show dock icon
-                for (var i = 0; i < dock.model.count; i++) {
-                    if (dock.model.get(i).panelSource == 'SharePanel.qml') {
-                        dock.model.setProperty(i, 'visible', true);
-                        break;
-                    }
-                }
-            }
+        Component.onCompleted: {
+            crumbBar.push({'name': qsTr('Home'), 'url': 'share:'});
         }
+        z: 1
     }
 
     ShareView {

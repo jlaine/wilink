@@ -36,29 +36,15 @@ class QXmppPresence;
 class QXmppShareDatabase;
 class QXmppShareManager;
 class QXmppTransferJob;
-class ShareModelPrivate;
 
-/** Model representing a tree of share items (collections and files).
- */
-class ShareModel : public QObject
+class ShareWatcher : public QObject
 {
     Q_OBJECT
-    Q_ENUMS(Recurse)
-    Q_PROPERTY(ChatClient* client READ client WRITE setClient NOTIFY clientChanged)
-    Q_PROPERTY(bool connected READ isConnected NOTIFY isConnectedChanged)
 
 public:
-    ShareModel(QObject *parent = 0);
-    ~ShareModel();
-
-    ChatClient *client() const;
-    void setClient(ChatClient *client);
-
-    QXmppShareDatabase *database() const;
-    bool isConnected() const;
+    ShareWatcher(QObject *parent = 0);
 
 signals:
-    void clientChanged(ChatClient *client);
     void isConnectedChanged();
 
 private slots:
@@ -68,8 +54,10 @@ private slots:
     void _q_settingsChanged() const;
 
 private:
-    ShareModelPrivate *d;
-    friend class ShareModelPrivate;
+    void addClient(ChatClient *client);
+    QXmppShareDatabase *database() const;
+
+    QString m_shareServer;
 };
 
 class ShareFileSystem : public FileSystem
@@ -80,6 +68,9 @@ public:
     ShareFileSystem(QObject *parent = 0);
     FileSystemJob* get(const QUrl &fileUrl, ImageSize type);
     FileSystemJob* list(const QUrl &dirUrl, const QString &filter = QString());
+
+private slots:
+    void _q_connected();
 };
 
 class ShareFileSystemGet : public FileSystemJob

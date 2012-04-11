@@ -334,7 +334,6 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterType<RoomModel>(uri, 2, 0, "RoomModel");
     qmlRegisterType<RoomPermissionModel>(uri, 2, 0, "RoomPermissionModel");
     qmlRegisterType<RosterModel>(uri, 2, 0, "RosterModel");
-    qmlRegisterType<ShareModel>(uri, 2, 0, "ShareModel");
     qmlRegisterType<SharePlaceModel>(uri, 2, 0, "SharePlaceModel");
     qmlRegisterUncreatableType<QSoundPlayer>(uri, 2, 0, "SoundPlayer", "");
     qmlRegisterUncreatableType<QSoundPlayerJob>(uri, 2, 0, "SoundPlayerJob", "");

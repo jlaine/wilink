@@ -38,7 +38,7 @@
 Q_IMPORT_PLUGIN(share_filesystem)
 
 static QXmppShareDatabase *globalDatabase = 0;
-static const int parallelDownloadLimit = 2;
+static ShareWatcher *globalWatcher = 0;
 
 static QUrl locationToUrl(const QXmppShareLocation& loc)
 {
@@ -65,102 +65,38 @@ static void closeDatabase()
     delete globalDatabase;
 }
 
-class ShareModelPrivate
-{
-public:
-    ShareModelPrivate(ShareModel *qq);
-    void setShareClient(ChatClient *shareClient);
-
-    ChatClient *client;
-    bool connected;
-    ChatClient *shareClient;
-    QString shareServer;
-
-private:
-    ShareModel *q;
-};
-
-ShareModelPrivate::ShareModelPrivate(ShareModel *qq)
-    : client(0),
-      connected(false),
-      shareClient(0),
-      q(qq)
-{
-}
-
-void ShareModelPrivate::setShareClient(ChatClient *newClient)
-{
-    if (newClient == shareClient)
-        return;
-
-    // delete old share client
-    if (shareClient) {
-        shareClient->disconnect(q, SLOT(_q_presenceReceived(QXmppPresence)));
-        shareClient->disconnect(q, SLOT(_q_serverChanged(QString)));
-        if (shareClient != client)
-            shareClient->deleteLater();
-    }
-
-    // set new share client
-    shareClient = newClient;
-    if (shareClient) {
-        bool check;
-        Q_UNUSED(check);
-
-        check = q->connect(shareClient, SIGNAL(presenceReceived(QXmppPresence)),
-                           q, SLOT(_q_presenceReceived(QXmppPresence)));
-        Q_ASSERT(check);
-
-        check = q->connect(shareClient, SIGNAL(shareServerChanged(QString)),
-                           q, SLOT(_q_serverChanged(QString)));
-        Q_ASSERT(check);
-
-        // if we already know the server, register with it
-        const QString server = shareClient->shareServer();
-        if (!server.isEmpty())
-            q->_q_serverChanged(server);
-    }
-}
-
-ShareModel::ShareModel(QObject *parent)
+ShareWatcher::ShareWatcher(QObject *parent)
     : QObject(parent)
 {
-    d = new ShareModelPrivate(this);
+    foreach (ChatClient *client, ChatClient::instances())
+        addClient(client);
 }
 
-ShareModel::~ShareModel()
-{
-    delete d;
-}
-
-ChatClient *ShareModel::client() const
-{
-    return d->client;
-}
-
-void ShareModel::setClient(ChatClient *client)
+void ShareWatcher::addClient(ChatClient *client)
 {
     bool check;
     Q_UNUSED(check);
 
-    if (client != d->client) {
-        d->client = client;
+    check = connect(client, SIGNAL(disconnected()),
+                    this, SLOT(_q_disconnected()));
+    Q_ASSERT(check);
 
-        check = connect(d->client, SIGNAL(disconnected()),
-                        this, SLOT(_q_disconnected()));
-        Q_ASSERT(check);
+    check = connect(client, SIGNAL(presenceReceived(QXmppPresence)),
+                    this, SLOT(_q_presenceReceived(QXmppPresence)));
+    Q_ASSERT(check);
 
-        d->setShareClient(d->client);
-        emit clientChanged(d->client);
+    check = connect(client, SIGNAL(shareServerChanged(QString)),
+                    this, SLOT(_q_serverChanged(QString)));
+    Q_ASSERT(check);
+
+    // if we already know the server, register with it
+    const QString server = client->shareServer();
+    if (!server.isEmpty()) {
+        QMetaObject::invokeMethod(client, "shareServerChanged", Q_ARG(QString, server));
     }
 }
 
-bool ShareModel::isConnected() const
-{
-    return d->connected;
-}
-
-QXmppShareDatabase *ShareModel::database() const
+QXmppShareDatabase *ShareWatcher::database() const
 {
     bool check;
     Q_UNUSED(check);
@@ -191,35 +127,21 @@ QXmppShareDatabase *ShareModel::database() const
     return globalDatabase;
 }
 
-void ShareModel::_q_disconnected()
+void ShareWatcher::_q_disconnected()
 {
-    // if we are using a slave client and the main client
-    // disconnects, kill the slave
-    if (d->client != d->shareClient && sender() == d->client)
-        d->setShareClient(d->client);
-
-    // clear model and any pending request
-    if (d->connected) {
-        d->connected = false;
-        emit isConnectedChanged();
-    }
+    emit isConnectedChanged();
 }
 
-void ShareModel::_q_presenceReceived(const QXmppPresence &presence)
+void ShareWatcher::_q_presenceReceived(const QXmppPresence &presence)
 {
-    bool check;
-    Q_UNUSED(check);
-
-    ChatClient *shareClient = qobject_cast<ChatClient*>(sender());
-    if (!shareClient || d->shareServer.isEmpty() || presence.from() != d->shareServer)
+    ChatClient *client = qobject_cast<ChatClient*>(sender());
+    if (!client || m_shareServer.isEmpty() || presence.from() != m_shareServer)
         return;
 
     // find shares extension
     QXmppElement shareExtension;
-    foreach (const QXmppElement &extension, presence.extensions())
-    {
-        if (extension.attribute("xmlns") == ns_shares)
-        {
+    foreach (const QXmppElement &extension, presence.extensions()) {
+        if (extension.attribute("xmlns") == ns_shares) {
             shareExtension = extension;
             break;
         }
@@ -231,86 +153,48 @@ void ShareModel::_q_presenceReceived(const QXmppPresence &presence)
     {
         // configure transfer manager
         const QString forceProxy = shareExtension.firstChildElement("force-proxy").value();
-        QXmppTransferManager *transferManager = shareClient->findExtension<QXmppTransferManager>();
+        QXmppTransferManager *transferManager = client->findExtension<QXmppTransferManager>();
         if (forceProxy == QLatin1String("1") && !transferManager->proxyOnly()) {
             qDebug("Shares forcing SOCKS5 proxy");
             transferManager->setProxyOnly(true);
         }
 
         // add share manager
-        QXmppShareManager *shareManager = shareClient->findExtension<QXmppShareManager>();
+        QXmppShareManager *shareManager = client->findExtension<QXmppShareManager>();
         if (!shareManager) {
-            shareManager = new QXmppShareManager(shareClient, database());
-            shareClient->addExtension(shareManager);
+            shareManager = new QXmppShareManager(client, database());
+            client->addExtension(shareManager);
         }
 
-        if (!d->connected) {
-            d->connected = true;
-            emit isConnectedChanged();
-        }
+        emit isConnectedChanged();
     }
     else if (presence.type() == QXmppPresence::Error &&
         presence.error().type() == QXmppStanza::Error::Modify &&
         presence.error().condition() == QXmppStanza::Error::Redirect)
     {
         const QString newDomain = shareExtension.firstChildElement("domain").value();
-        const QString newJid = d->client->configuration().user() + '@' + newDomain;
 
         // avoid redirect loop
-        if (shareClient != d->client ||
-            newDomain == d->client->configuration().domain()) {
-            qWarning("Shares not redirecting to domain %s", qPrintable(newDomain));
-            return;
+        foreach (ChatClient *client, ChatClient::instances()) {
+            if (client->configuration().domain() == newDomain) {
+                qWarning("Shares not redirecting to domain %s", qPrintable(newDomain));
+                return;
+            }
         }
-
-        // replace client
-        ChatClient *newClient = new ChatClient(this);
-        newClient->setLogger(d->client->logger());
-
-        check = connect(newClient, SIGNAL(disconnected()),
-                        this, SLOT(_q_disconnected()));
-        Q_ASSERT(check);
-
-        d->setShareClient(newClient);
 
         // reconnect to another server
         qDebug("Shares redirecting to %s", qPrintable(newDomain));
-        newClient->connectToServer(newJid, d->client->configuration().password());
+        ChatClient *newClient = new ChatClient(this);
+        newClient->setLogger(client->logger());
+
+        addClient(newClient);
+
+        const QString newJid = client->configuration().user() + '@' + newDomain;
+        newClient->connectToServer(newJid, client->configuration().password());
     }
 }
 
-void ShareModel::_q_serverChanged(const QString &server)
-{
-    Q_ASSERT(d->shareClient);
-
-    // update server
-    d->shareServer = server;
-    if (d->shareServer.isEmpty())
-        return;
-
-    qDebug("Shares registering with %s", qPrintable(d->shareServer));
-
-    // register with server
-    QXmppElement x;
-    x.setTagName("x");
-    x.setAttribute("xmlns", ns_shares);
-
-    VCard card;
-    card.setJid(jidToBareJid(d->client->jid()));
-
-    QXmppElement nickName;
-    nickName.setTagName("nickName");
-    nickName.setValue(card.name());
-    x.appendChild(nickName);
-
-    QXmppPresence presence;
-    presence.setTo(d->shareServer);
-    presence.setExtensions(x);
-    presence.setVCardUpdateType(QXmppPresence::VCardUpdateNone);
-    d->shareClient->sendPacket(presence);
-}
-
-void ShareModel::_q_settingsChanged() const
+void ShareWatcher::_q_settingsChanged() const
 {
     QStringList dirs;
     foreach (const QVariant &dir, wApp->settings()->sharesDirectories())
@@ -318,6 +202,36 @@ void ShareModel::_q_settingsChanged() const
 
     globalDatabase->setDirectory(wApp->settings()->sharesLocation());
     globalDatabase->setMappedDirectories(dirs);
+}
+
+void ShareWatcher::_q_serverChanged(const QString &server)
+{
+    ChatClient *client = qobject_cast<ChatClient*>(sender());
+    if (!client)
+        return;
+
+    qDebug("Shares registering with %s", qPrintable(server));
+
+    // register with server
+    QXmppElement x;
+    x.setTagName("x");
+    x.setAttribute("xmlns", ns_shares);
+
+    VCard card;
+    card.setJid(jidToBareJid(client->jid()));
+
+    QXmppElement nickName;
+    nickName.setTagName("nickName");
+    nickName.setValue(card.name());
+    x.appendChild(nickName);
+
+    QXmppPresence presence;
+    presence.setTo(server);
+    presence.setExtensions(x);
+    presence.setVCardUpdateType(QXmppPresence::VCardUpdateNone);
+    client->sendPacket(presence);
+
+    m_shareServer = server;
 }
 
 SharePlaceModel::SharePlaceModel(QObject *parent)
@@ -375,6 +289,15 @@ int SharePlaceModel::rowCount(const QModelIndex &parent) const
 ShareFileSystem::ShareFileSystem(QObject *parent)
     : FileSystem(parent)
 {
+    bool check;
+    Q_UNUSED(check);
+
+    if (!globalWatcher)
+        globalWatcher = new ShareWatcher;
+
+    check = connect(globalWatcher, SIGNAL(isConnectedChanged()),
+                    this, SLOT(_q_connected()));
+    Q_ASSERT(check);
 }
 
 FileSystemJob* ShareFileSystem::get(const QUrl &fileUrl, ImageSize type)
@@ -387,6 +310,11 @@ FileSystemJob* ShareFileSystem::get(const QUrl &fileUrl, ImageSize type)
 FileSystemJob* ShareFileSystem::list(const QUrl &dirUrl, const QString &filter)
 {
     return new ShareFileSystemList(this, urlToLocation(dirUrl), filter);
+}
+
+void ShareFileSystem::_q_connected()
+{
+    emit directoryChanged(QUrl("share:"));
 }
 
 class ShareFileSystemBuffer : public QIODevice

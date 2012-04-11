@@ -31,8 +31,7 @@ Plugin {
             'panelSource': 'SharePanel.qml',
             'priority': 8,
             'shortcut': Qt.ControlModifier + Qt.Key_S,
-            'text': qsTr('Shares'),
-            'visible': false});
+            'text': qsTr('Shares')});
         appPreferences.append({
             'iconSource': 'share.png',
             'name': qsTr('Shares'),
