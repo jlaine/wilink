@@ -122,7 +122,7 @@ Panel {
 
                     anchors.fill: parent
                     highlight: Item {}
-                    model: SharePlaceModel {}
+                    model: PlaceModel {}
                     delegate: Item {
                         height: appStyle.icon.smallSize
                         width: parent.width

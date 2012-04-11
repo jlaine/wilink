@@ -77,6 +77,7 @@ set(wiLink_SOURCES
     phone.cpp
     phone/sip.cpp
     phone/stun.cpp
+    places.cpp
     player.cpp
     rooms.cpp
     roster.cpp
@@ -106,6 +107,7 @@ set(wiLink_MOC_HEADERS
     phone.h
     phone/sip.h
     phone/stun.h
+    places.h
     player.h
     rooms.h
     roster.h

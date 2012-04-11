@@ -20,10 +20,6 @@
 #ifndef __WILINK_SHARES_MODEL_H__
 #define __WILINK_SHARES_MODEL_H__
 
-#include <QAbstractListModel>
-#include <QAbstractProxyModel>
-#include <QUrl>
-
 #include "QXmppShareIq.h"
 
 #include "filesystem.h"
@@ -115,21 +111,6 @@ private slots:
 private:
     QString m_jid;
     QString m_packetId;
-};
-
-class SharePlaceModel : public QAbstractListModel
-{
-    Q_OBJECT
-
-public:
-    SharePlaceModel(QObject *parent = 0);
-
-    // QAbstractItemModel
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-    int rowCount(const QModelIndex &parent) const;
-
-private:
-    QList<QString> m_paths;
 };
 
 #endif

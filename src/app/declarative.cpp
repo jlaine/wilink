@@ -54,10 +54,10 @@
 #include "phone.h"
 #include "phone/sip.h"
 #include "photos.h"
+#include "places.h"
 #include "player.h"
 #include "rooms.h"
 #include "roster.h"
-#include "shares.h"
 #include "updater.h"
 #include "window.h"
 
@@ -316,6 +316,7 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterType<Conversation>(uri, 2, 0, "Conversation");
     qmlRegisterType<DiscoveryModel>(uri, 2, 0, "DiscoveryModel");
     qmlRegisterType<DropArea>(uri, 2, 0, "DropArea");
+    qmlRegisterType<FolderModel>(uri, 2, 0, "FolderModel");
     qmlRegisterUncreatableType<HistoryModel>(uri, 2, 0, "HistoryModel", "");
     qmlRegisterType<Idle>(uri, 2, 0, "Idle");
     qmlRegisterType<ListHelper>(uri, 2, 0, "ListHelper");
@@ -327,14 +328,13 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterUncreatableType<SipClient>(uri, 2, 0, "SipClient", "");
     qmlRegisterUncreatableType<SipCall>(uri, 2, 0, "SipCall", "");
     qmlRegisterUncreatableType<FolderQueueModel>(uri, 2, 0, "FolderQueueModel", "");
-    qmlRegisterType<FolderModel>(uri, 2, 0, "FolderModel");
+    qmlRegisterType<PlaceModel>(uri, 2, 0, "PlaceModel");
     qmlRegisterType<PlayerModel>(uri, 2, 0, "PlayerModel");
     qmlRegisterType<RoomConfigurationModel>(uri, 2, 0, "RoomConfigurationModel");
     qmlRegisterType<RoomListModel>(uri, 2, 0, "RoomListModel");
     qmlRegisterType<RoomModel>(uri, 2, 0, "RoomModel");
     qmlRegisterType<RoomPermissionModel>(uri, 2, 0, "RoomPermissionModel");
     qmlRegisterType<RosterModel>(uri, 2, 0, "RosterModel");
-    qmlRegisterType<SharePlaceModel>(uri, 2, 0, "SharePlaceModel");
     qmlRegisterUncreatableType<QSoundPlayer>(uri, 2, 0, "SoundPlayer", "");
     qmlRegisterUncreatableType<QSoundPlayerJob>(uri, 2, 0, "SoundPlayerJob", "");
     qmlRegisterType<QSoundTester>(uri, 2, 0, "SoundTester");

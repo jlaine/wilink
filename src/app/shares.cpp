@@ -17,7 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QBuffer>
 #include <QCoreApplication>
 #include <QDesktopServices>
 #include <QTimer>
@@ -232,58 +231,6 @@ void ShareWatcher::_q_serverChanged(const QString &server)
     client->sendPacket(presence);
 
     m_shareServer = server;
-}
-
-SharePlaceModel::SharePlaceModel(QObject *parent)
-    : QAbstractListModel(parent)
-{
-    QList<QDesktopServices::StandardLocation> locations;
-    locations << QDesktopServices::DocumentsLocation;
-    locations << QDesktopServices::MusicLocation;
-    locations << QDesktopServices::MoviesLocation;
-    locations << QDesktopServices::PicturesLocation;
-
-    foreach (QDesktopServices::StandardLocation location, locations) {
-        const QString path = QDesktopServices::storageLocation(location);
-        QDir dir(path);
-        if (path.isEmpty() || dir == QDir::home())
-            continue;
-
-        // do not use "path" directly, on Windows it uses back slashes
-        // where the rest of Qt uses forward slashes
-        m_paths << dir.path();
-    }
-
-    // set role names
-    QHash<int, QByteArray> roleNames;
-    roleNames.insert(ChatModel::AvatarRole, "avatar");
-    roleNames.insert(ChatModel::NameRole, "name");
-    roleNames.insert(ChatModel::JidRole, "url");
-    setRoleNames(roleNames);
-}
-
-QVariant SharePlaceModel::data(const QModelIndex &index, int role) const
-{
-    const int i = index.row();
-    if (!index.isValid())
-        return QVariant();
-
-    if (role == ChatModel::AvatarRole)
-        return wApp->qmlUrl("128x128/album.png");
-    else if (role == ChatModel::NameRole)
-        return QFileInfo(m_paths.value(i)).fileName();
-    else if (role == ChatModel::JidRole)
-        return QUrl::fromLocalFile(m_paths.value(i));
-
-    return QVariant();
-}
-
-int SharePlaceModel::rowCount(const QModelIndex &parent) const
-{
-    if (parent.isValid())
-        return 0;
-    else
-        return m_paths.size();
 }
 
 ShareFileSystem::ShareFileSystem(QObject *parent)
