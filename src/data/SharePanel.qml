@@ -175,7 +175,7 @@ Panel {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: queueView.top
-        text: qsTr('Received files are stored in your <a href="%1">downloads folder</a>.').replace('%1', view.model.shareUrl)
+        text: qsTr('Received files are stored in your <a href="%1">downloads folder</a>.').replace('%1', application.settings.sharesUrl)
         z: 1
     }
 

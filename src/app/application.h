@@ -133,6 +133,7 @@ class ApplicationSettings : public QObject
     Q_PROPERTY(bool sharesConfigured READ sharesConfigured WRITE setSharesConfigured NOTIFY sharesConfiguredChanged)
     Q_PROPERTY(QVariantList sharesDirectories READ sharesDirectories WRITE setSharesDirectories NOTIFY sharesDirectoriesChanged)
     Q_PROPERTY(QString sharesLocation READ sharesLocation WRITE setSharesLocation NOTIFY sharesLocationChanged)
+    Q_PROPERTY(QUrl sharesUrl READ sharesUrl NOTIFY sharesLocationChanged)
     Q_PROPERTY(bool showOfflineContacts READ showOfflineContacts WRITE setShowOfflineContacts NOTIFY showOfflineContactsChanged)
     Q_PROPERTY(bool sortContactsByStatus READ sortContactsByStatus WRITE setSortContactsByStatus NOTIFY sortContactsByStatusChanged)
 
@@ -182,6 +183,7 @@ public:
 
     QString sharesLocation() const;
     void setSharesLocation(const QString &location);
+    QUrl sharesUrl() const;
 
     bool showOfflineContacts() const;
     void setShowOfflineContacts(bool show);

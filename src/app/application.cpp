@@ -871,6 +871,13 @@ void ApplicationSettings::setSharesLocation(const QString &location)
     }
 }
 
+/** Returns the base share directory URL.
+ */
+QUrl ApplicationSettings::sharesUrl() const
+{
+    return QUrl::fromLocalFile(sharesLocation());
+}
+
 /** Returns true if offline contacts should be displayed.
  */
 bool ApplicationSettings::showOfflineContacts() const

@@ -46,7 +46,6 @@ class ShareModel : public QObject
     Q_ENUMS(Recurse)
     Q_PROPERTY(ChatClient* client READ client WRITE setClient NOTIFY clientChanged)
     Q_PROPERTY(bool connected READ isConnected NOTIFY isConnectedChanged)
-    Q_PROPERTY(QUrl shareUrl READ shareUrl NOTIFY shareUrlChanged)
 
 public:
     ShareModel(QObject *parent = 0);
@@ -57,12 +56,10 @@ public:
 
     QXmppShareDatabase *database() const;
     bool isConnected() const;
-    QUrl shareUrl() const;
 
 signals:
     void clientChanged(ChatClient *client);
     void isConnectedChanged();
-    void shareUrlChanged();
 
 private slots:
     void _q_disconnected();

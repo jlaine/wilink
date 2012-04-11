@@ -126,9 +126,6 @@ ShareModel::ShareModel(QObject *parent)
     : QObject(parent)
 {
     d = new ShareModelPrivate(this);
-
-    connect(database(), SIGNAL(directoryChanged(QString)),
-            this, SIGNAL(shareUrlChanged()));
 }
 
 ShareModel::~ShareModel()
@@ -161,11 +158,6 @@ void ShareModel::setClient(ChatClient *client)
 bool ShareModel::isConnected() const
 {
     return d->connected;
-}
-
-QUrl ShareModel::shareUrl() const
-{
-    return QUrl::fromLocalFile(database()->directory());
 }
 
 QXmppShareDatabase *ShareModel::database() const
