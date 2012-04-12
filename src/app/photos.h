@@ -80,7 +80,7 @@ public:
 
 signals:
     void finished();
-    void result(const QUrl &root, const FileInfo &info);
+    void results(const QUrl &root, const FileInfoList &results);
 
 public slots:
     void abort();
@@ -184,7 +184,8 @@ private slots:
     void _q_downloadData();
     void _q_downloadFinished();
     void _q_downloadProgress(qint64 done, qint64 total);
-    void _q_listFinished();
+    void _q_iteratorFinished();
+    void _q_iteratorResults(const QUrl &url, const FileInfoList &results);
     void _q_uploadFinished();
     void _q_uploadProgress(qint64 done, qint64 total);
     void _q_uploadResized(QIODevice *device);

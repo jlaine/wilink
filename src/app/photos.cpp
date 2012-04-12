@@ -266,8 +266,8 @@ void FolderIterator::_q_listFinished()
         return;
 
     if (m_job->error() == FileSystemJob::NoError) {
+        emit results(m_url, m_job->results());
         foreach (const FileInfo &child, m_job->results()) {
-            emit result(m_url, child);
             if (child.isDir())
                 m_queue.append(child.url());
         }
@@ -735,10 +735,14 @@ void FolderQueueModel::download(FileSystem *fileSystem, const FileInfo &info, co
     item->info = info;
 
     if (info.isDir()) {
-        item->job = item->fileSystem->list(info.url(), filter);
+        item->iterator = new FolderIterator(fileSystem, info.url(), filter, this);
 
-        check = connect(item->job, SIGNAL(finished()),
-                        this, SLOT(_q_listFinished()));
+        check = connect(item->iterator, SIGNAL(finished()),
+                        this, SLOT(_q_iteratorFinished()));
+        Q_ASSERT(check);
+
+        check = connect(item->iterator, SIGNAL(results(QUrl,FileInfoList)),
+                        this, SLOT(_q_iteratorResults(QUrl,FileInfoList)));
         Q_ASSERT(check);
     } else {
         item->items << info;
@@ -893,6 +897,49 @@ void FolderQueueModel::_q_downloadFinished()
     processQueue();
 }
 
+void FolderQueueModel::_q_iteratorFinished()
+{
+    FolderIterator *iterator = qobject_cast<FolderIterator*>(sender());
+    if (!iterator)
+        return;
+
+    foreach (ChatModelItem *ptr, rootItem->children) {
+        FolderQueueItem *item = static_cast<FolderQueueItem*>(ptr);
+        if (item->iterator == iterator) {
+            if (item->items.isEmpty()) {
+                removeItem(item);
+            } else {
+                emit dataChanged(createIndex(item), createIndex(item));
+                processQueue();
+            }
+            break;
+        }
+    }
+}
+
+void FolderQueueModel::_q_iteratorResults(const QUrl &url, const FileInfoList &results)
+{
+    FolderIterator *iterator = qobject_cast<FolderIterator*>(sender());
+    if (!iterator)
+        return;
+
+    foreach (ChatModelItem *ptr, rootItem->children) {
+        FolderQueueItem *item = static_cast<FolderQueueItem*>(ptr);
+        if (item->iterator == iterator) {
+            foreach (const FileInfo &child, results) {
+                if (!child.isDir()) {
+                    item->items << child;
+                    item->totalFiles++;
+                    item->totalBytes += child.size();
+                }
+            }
+            emit dataChanged(createIndex(item), createIndex(item));
+            break;
+        }
+    }
+}
+
+
 /** When upload progress changes, emit notifications.
  */
 void FolderQueueModel::_q_downloadProgress(qint64 done, qint64 total)
@@ -902,34 +949,6 @@ void FolderQueueModel::_q_downloadProgress(qint64 done, qint64 total)
     if (m_downloadItem) {
         m_downloadItem->jobDoneBytes = done;
         emit dataChanged(createIndex(m_downloadItem), createIndex(m_downloadItem));
-    }
-}
-
-void FolderQueueModel::_q_listFinished()
-{
-    FileSystemJob *job = qobject_cast<FileSystemJob*>(sender());
-    if (!job)
-        return;
-
-    foreach (ChatModelItem *ptr, rootItem->children) {
-        FolderQueueItem *item = static_cast<FolderQueueItem*>(ptr);
-        if (item->job == job) {
-            if (job->error() != FileSystemJob::NoError) {
-                removeItem(item);
-            } else {
-                foreach (const FileInfo &child, job->results()) {
-                    // FIXME: recurse
-                    if (!child.isDir()) {
-                        item->items << child;
-                        item->totalFiles++;
-                        item->totalBytes += child.size();
-                    }
-                }
-                emit dataChanged(createIndex(item), createIndex(item));
-                processQueue();
-            }
-            break;
-        }
     }
 }
 
