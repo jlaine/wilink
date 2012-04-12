@@ -553,10 +553,10 @@ void FolderModel::_q_photoChanged(const QUrl &url, FileSystem::ImageSize size)
     }
 }
 
-class PhotoQueueItem : public ChatModelItem
+class FolderQueueItem : public ChatModelItem
 {
 public:
-    PhotoQueueItem();
+    FolderQueueItem();
 
     FileInfo info;
     FileInfoList items;
@@ -576,7 +576,7 @@ public:
     qint64 totalFiles;
 };
 
-PhotoQueueItem::PhotoQueueItem()
+FolderQueueItem::FolderQueueItem()
     : fileSystem(0)
     , finished(false)
     , isUpload(false)
@@ -631,7 +631,7 @@ void FolderQueueModel::cancel(int row)
     if (row < 0 || row > rootItem->children.size() - 1)
         return;
 
-    PhotoQueueItem *item = static_cast<PhotoQueueItem*>(rootItem->children.at(row));
+    FolderQueueItem *item = static_cast<FolderQueueItem*>(rootItem->children.at(row));
     if (item->job) {
         item->items.clear();
         item->job->abort();
@@ -642,7 +642,7 @@ void FolderQueueModel::cancel(int row)
 
 QVariant FolderQueueModel::data(const QModelIndex &index, int role) const
 {
-    PhotoQueueItem *item = static_cast<PhotoQueueItem*>(index.internalPointer());
+    FolderQueueItem *item = static_cast<FolderQueueItem*>(index.internalPointer());
     if (!index.isValid() || !item)
         return QVariant();
 
@@ -673,7 +673,7 @@ void FolderQueueModel::download(FileSystem *fileSystem, const FileInfo &info, co
     bool check;
     Q_UNUSED(check);
 
-    PhotoQueueItem *item = new PhotoQueueItem;
+    FolderQueueItem *item = new FolderQueueItem;
     item->fileSystem = fileSystem;
     item->info = info;
 
@@ -695,7 +695,7 @@ void FolderQueueModel::download(FileSystem *fileSystem, const FileInfo &info, co
 
 void FolderQueueModel::upload(FileSystem *fileSystem, const QString &filePath, const QUrl &url)
 {
-    PhotoQueueItem *item = new PhotoQueueItem;
+    FolderQueueItem *item = new FolderQueueItem;
 
     item->isUpload = true;
     item->info.setName(QFileInfo(filePath).fileName());
@@ -716,7 +716,7 @@ void FolderQueueModel::processQueue()
     // process downloads
     if (!m_downloadItem) {
         foreach (ChatModelItem *ptr, rootItem->children) {
-            PhotoQueueItem *item = static_cast<PhotoQueueItem*>(ptr);
+            FolderQueueItem *item = static_cast<FolderQueueItem*>(ptr);
             if (!item->isUpload && !item->items.isEmpty()) {
                 FileInfo childInfo = item->items.takeFirst();
 
@@ -768,7 +768,7 @@ void FolderQueueModel::processQueue()
     // process uploads
     if (!m_uploadItem) {
         foreach (ChatModelItem *ptr, rootItem->children) {
-            PhotoQueueItem *item = static_cast<PhotoQueueItem*>(ptr);
+            FolderQueueItem *item = static_cast<FolderQueueItem*>(ptr);
             if (item->isUpload && !item->finished) {
                 m_uploadItem = item;
                 QMetaObject::invokeMethod(m_resizer, "resize", Q_ARG(QString, item->sourcePath));
@@ -855,7 +855,7 @@ void FolderQueueModel::_q_listFinished()
         return;
 
     foreach (ChatModelItem *ptr, rootItem->children) {
-        PhotoQueueItem *item = static_cast<PhotoQueueItem*>(ptr);
+        FolderQueueItem *item = static_cast<FolderQueueItem*>(ptr);
         if (item->job == job) {
             if (job->error() != FileSystemJob::NoError) {
                 removeItem(item);

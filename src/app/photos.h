@@ -35,7 +35,7 @@ class FolderModelPrivate;
 class FolderQueueModel;
 class PhotoCachePrivate;
 class PhotoDownloadItem;
-class PhotoQueueItem;
+class FolderQueueItem;
 class PhotoResizer;
 class QThread;
 
@@ -168,9 +168,9 @@ private:
     FolderModel *m_photoModel;
     PhotoResizer *m_resizer;
     QThread *m_resizerThread;
-    PhotoQueueItem *m_downloadItem;
+    FolderQueueItem *m_downloadItem;
     QIODevice *m_uploadDevice;
-    PhotoQueueItem *m_uploadItem;
+    FolderQueueItem *m_uploadItem;
 };
 
 class PhotoResizer : public QObject

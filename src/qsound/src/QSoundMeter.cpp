@@ -38,7 +38,7 @@ static int loudness(const char *data, qint64 length, qint64 offset, int sampleSi
     qint64 sum = 0;
     qint64 count = 0;
     for ( ; ptr < end; ptr += sampleSize) {
-        qint16 sample = *((quint16*)ptr);
+        qint16 sample = *((qint16*)ptr);
         sum += (sample * sample);
         count++;
     }
