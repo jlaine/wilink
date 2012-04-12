@@ -82,6 +82,9 @@ signals:
     void finished();
     void result(const QUrl &root, const FileInfo &info);
 
+public slots:
+    void abort();
+
 private slots:
     void _q_listFinished();
 
@@ -90,6 +93,7 @@ private:
 
     QString m_filter;
     FileSystem *m_fs;
+    FileSystemJob *m_job;
     QList<QUrl> m_queue;
     QUrl m_url;
 };

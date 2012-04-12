@@ -227,6 +227,7 @@ FolderIterator::FolderIterator(FileSystem *fileSystem, const QUrl &url, const QS
     : QObject(parent)
     , m_filter(filter)
     , m_fs(fileSystem)
+    , m_job(0)
 {
     m_queue.append(url);
     processQueue();
@@ -246,25 +247,34 @@ void FolderIterator::processQueue()
 
     qDebug("listing %s", qPrintable(m_url.toString()));
 
-    FileSystemJob *job = m_fs->list(m_url, m_filter);
-    check = connect(job, SIGNAL(finished()),
+    m_job = m_fs->list(m_url, m_filter);
+    check = connect(m_job, SIGNAL(finished()),
                     this, SLOT(_q_listFinished()));
     Q_ASSERT(check);
 }
 
+void FolderIterator::abort()
+{
+    m_queue.clear();
+    if (m_job)
+        m_job->abort();
+}
+
 void FolderIterator::_q_listFinished()
 {
-    FileSystemJob *job = qobject_cast<FileSystemJob*>(sender());
+    if (!m_job || sender() != m_job)
+        return;
 
-    if (job->error() == FileSystemJob::NoError) {
-        foreach (const FileInfo &child, job->results()) {
+    if (m_job->error() == FileSystemJob::NoError) {
+        foreach (const FileInfo &child, m_job->results()) {
             emit result(m_url, child);
             if (child.isDir())
                 m_queue.append(child.url());
         }
     }
 
-    job->deleteLater();
+    m_job->deleteLater();
+    m_job = 0;
     processQueue();
 }
 
@@ -605,6 +615,7 @@ public:
 
     FileInfo info;
     FileInfoList items;
+    FolderIterator *iterator;
     QString sourcePath;
     FileSystem *fileSystem;
     bool finished;
@@ -624,6 +635,7 @@ public:
 FolderQueueItem::FolderQueueItem()
     : fileSystem(0)
     , finished(false)
+    , iterator(0)
     , isUpload(false)
     , job(0)
     , jobOutput(0)
