@@ -231,7 +231,7 @@ FolderIterator::FolderIterator(FileSystem *fileSystem, const FileInfo &info, con
 {
     qRegisterMetaType<FileInfoList>("FileInfoList");
     if (info.isDir()) {
-        m_queue.append(qMakePair(info.url(), destination.resolved(info.name() + "/")));
+        m_queue.append(qMakePair(info.url(), FileInfo::fileUrl(destination, info.name())));
         processQueue();
     } else {
         FileInfoList results;
@@ -252,9 +252,6 @@ void FolderIterator::processQueue()
     }
 
     m_current = m_queue.takeFirst();
-
-    qDebug("listing %s", qPrintable(m_current.first.toString()));
-
     m_job = m_fs->list(m_current.first, m_filter);
     check = connect(m_job, SIGNAL(finished()),
                     this, SLOT(_q_listFinished()));
@@ -277,7 +274,7 @@ void FolderIterator::_q_listFinished()
         emit results(m_job->results(), m_current.second);
         foreach (const FileInfo &child, m_job->results()) {
             if (child.isDir()) {
-                m_queue.append(qMakePair(child.url(), m_current.second.resolved(child.name() + "/")));
+                m_queue.append(qMakePair(child.url(), FileInfo::fileUrl(m_current.second, child.name())));
             }
         }
     }
@@ -805,8 +802,6 @@ void FolderQueueModel::processQueue()
                     if (!parentDir.mkdir(dir.dirName())) {
                         qWarning("Could not create %s directory", qPrintable(dir.path()));
                         continue;
-                    } else {
-                        qDebug("Create %s directory", qPrintable(dir.path()));
                     }
                 }
                 const QString filePath = availableFilePath(dir.path(), xfer.fileInfo.name() + ".part");
