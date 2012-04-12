@@ -223,14 +223,22 @@ QImage PhotoImageProvider::requestImage(const QString &id, QSize *size, const QS
     return image;
 }
 
-FolderIterator::FolderIterator(FileSystem *fileSystem, const QUrl &url, const QString &filter, QObject *parent)
+FolderIterator::FolderIterator(FileSystem *fileSystem, const FileInfo &info, const QString &filter, const QUrl &destination, QObject *parent)
     : QObject(parent)
     , m_filter(filter)
     , m_fs(fileSystem)
     , m_job(0)
 {
-    m_queue.append(url);
-    processQueue();
+    qRegisterMetaType<FileInfoList>("FileInfoList");
+    if (info.isDir()) {
+        m_queue.append(qMakePair(info.url(), destination.resolved(info.name() + "/")));
+        processQueue();
+    } else {
+        FileInfoList results;
+        results << info;
+        QMetaObject::invokeMethod(this, "results", Qt::QueuedConnection, Q_ARG(FileInfoList, results), Q_ARG(QUrl, destination));
+        QMetaObject::invokeMethod(this, "finished", Qt::QueuedConnection);
+    }
 }
 
 void FolderIterator::processQueue()
@@ -243,11 +251,11 @@ void FolderIterator::processQueue()
         return;
     }
 
-    m_url = m_queue.takeFirst();
+    m_current = m_queue.takeFirst();
 
-    qDebug("listing %s", qPrintable(m_url.toString()));
+    qDebug("listing %s", qPrintable(m_current.first.toString()));
 
-    m_job = m_fs->list(m_url, m_filter);
+    m_job = m_fs->list(m_current.first, m_filter);
     check = connect(m_job, SIGNAL(finished()),
                     this, SLOT(_q_listFinished()));
     Q_ASSERT(check);
@@ -266,10 +274,11 @@ void FolderIterator::_q_listFinished()
         return;
 
     if (m_job->error() == FileSystemJob::NoError) {
-        emit results(m_url, m_job->results());
+        emit results(m_job->results(), m_current.second);
         foreach (const FileInfo &child, m_job->results()) {
-            if (child.isDir())
-                m_queue.append(child.url());
+            if (child.isDir()) {
+                m_queue.append(qMakePair(child.url(), m_current.second.resolved(child.name() + "/")));
+            }
         }
     }
 
@@ -608,13 +617,26 @@ void FolderModel::_q_photoChanged(const QUrl &url, FileSystem::ImageSize size)
     }
 }
 
+class FolderQueueFile
+{
+public:
+    FolderQueueFile(const FileInfo &info, const QUrl &destination)
+        : fileInfo(info)
+        , destinationUrl(destination)
+    {
+    }
+
+    FileInfo fileInfo;
+    QUrl destinationUrl;
+};
+
 class FolderQueueItem : public ChatModelItem
 {
 public:
     FolderQueueItem();
 
     FileInfo info;
-    FileInfoList items;
+    QList<FolderQueueFile> items;
     FolderIterator *iterator;
     QString sourcePath;
     FileSystem *fileSystem;
@@ -734,24 +756,19 @@ void FolderQueueModel::download(FileSystem *fileSystem, const FileInfo &info, co
     item->fileSystem = fileSystem;
     item->info = info;
 
-    if (info.isDir()) {
-        item->iterator = new FolderIterator(fileSystem, info.url(), filter, this);
+    const QUrl destUrl = QUrl::fromLocalFile(wApp->settings()->sharesLocation());
 
-        check = connect(item->iterator, SIGNAL(finished()),
-                        this, SLOT(_q_iteratorFinished()));
-        Q_ASSERT(check);
+    item->iterator = new FolderIterator(fileSystem, info, filter, destUrl);
 
-        check = connect(item->iterator, SIGNAL(results(QUrl,FileInfoList)),
-                        this, SLOT(_q_iteratorResults(QUrl,FileInfoList)));
-        Q_ASSERT(check);
-    } else {
-        item->items << info;
-        item->totalBytes = info.size();
-        item->totalFiles = 1;
-    }
+    check = connect(item->iterator, SIGNAL(finished()),
+                    this, SLOT(_q_iteratorFinished()));
+    Q_ASSERT(check);
+
+    check = connect(item->iterator, SIGNAL(results(FileInfoList,QUrl)),
+                    this, SLOT(_q_iteratorResults(FileInfoList,QUrl)));
+    Q_ASSERT(check);
 
     addItem(item, rootItem);
-    processQueue();
 }
 
 void FolderQueueModel::upload(FileSystem *fileSystem, const QString &filePath, const QUrl &url)
@@ -779,19 +796,20 @@ void FolderQueueModel::processQueue()
         foreach (ChatModelItem *ptr, rootItem->children) {
             FolderQueueItem *item = static_cast<FolderQueueItem*>(ptr);
             if (!item->isUpload && !item->items.isEmpty()) {
-                FileInfo childInfo = item->items.takeFirst();
+                FolderQueueFile xfer = item->items.takeFirst();
 
                 // determine path
-                QString dirPath(wApp->settings()->sharesLocation());
-                if (item->info.isDir()) {
-                    const QString targetDir = item->info.name();
-                    if (!targetDir.isEmpty()) {
-                        QDir dir(dirPath);
-                        if (dir.exists(targetDir) || dir.mkpath(targetDir))
-                            dirPath = dir.filePath(targetDir);
+                QDir dir(xfer.destinationUrl.toLocalFile());
+                if (!dir.exists()) {
+                    QDir parentDir(QFileInfo(dir.path()).dir().path());
+                    if (!parentDir.mkdir(dir.dirName())) {
+                        qWarning("Could not create %s directory", qPrintable(dir.path()));
+                        continue;
+                    } else {
+                        qDebug("Create %s directory", qPrintable(dir.path()));
                     }
                 }
-                const QString filePath = availableFilePath(dirPath, childInfo.name() + ".part");
+                const QString filePath = availableFilePath(dir.path(), xfer.fileInfo.name() + ".part");
 
                 // open output
                 QFile *output = new QFile(filePath, this);
@@ -802,9 +820,9 @@ void FolderQueueModel::processQueue()
                 }
 
                 m_downloadItem = item;
-                m_downloadItem->job = item->fileSystem->get(childInfo.url(), FileSystem::FullSize);
+                m_downloadItem->job = item->fileSystem->get(xfer.fileInfo.url(), FileSystem::FullSize);
                 m_downloadItem->jobOutput = output;
-                m_downloadItem->jobTotalBytes = childInfo.size();
+                m_downloadItem->jobTotalBytes = xfer.fileInfo.size();
 
                 check = connect(m_downloadItem->job, SIGNAL(finished()),
                                 this, SLOT(_q_downloadFinished()));
@@ -906,6 +924,8 @@ void FolderQueueModel::_q_iteratorFinished()
     foreach (ChatModelItem *ptr, rootItem->children) {
         FolderQueueItem *item = static_cast<FolderQueueItem*>(ptr);
         if (item->iterator == iterator) {
+            item->iterator->deleteLater();
+            item->iterator = 0;
             if (item->items.isEmpty()) {
                 removeItem(item);
             } else {
@@ -917,7 +937,7 @@ void FolderQueueModel::_q_iteratorFinished()
     }
 }
 
-void FolderQueueModel::_q_iteratorResults(const QUrl &url, const FileInfoList &results)
+void FolderQueueModel::_q_iteratorResults(const FileInfoList &results, const QUrl &dest)
 {
     FolderIterator *iterator = qobject_cast<FolderIterator*>(sender());
     if (!iterator)
@@ -928,7 +948,7 @@ void FolderQueueModel::_q_iteratorResults(const QUrl &url, const FileInfoList &r
         if (item->iterator == iterator) {
             foreach (const FileInfo &child, results) {
                 if (!child.isDir()) {
-                    item->items << child;
+                    item->items << FolderQueueFile(child, dest);
                     item->totalFiles++;
                     item->totalBytes += child.size();
                 }

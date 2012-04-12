@@ -76,11 +76,11 @@ class FolderIterator : public QObject
     Q_OBJECT
 
 public:
-    FolderIterator(FileSystem *fileSystem, const QUrl &url, const QString &filter, QObject *parent = 0);
+    FolderIterator(FileSystem *fileSystem, const FileInfo &info, const QString &filter, const QUrl &destination, QObject *parent = 0);
 
 signals:
     void finished();
-    void results(const QUrl &root, const FileInfoList &results);
+    void results(const FileInfoList &results, const QUrl &url);
 
 public slots:
     void abort();
@@ -91,11 +91,11 @@ private slots:
 private:
     void processQueue();
 
+    QPair<QUrl, QUrl> m_current;
     QString m_filter;
     FileSystem *m_fs;
     FileSystemJob *m_job;
-    QList<QUrl> m_queue;
-    QUrl m_url;
+    QList<QPair<QUrl, QUrl> > m_queue;
 };
 
 class FolderModel : public ChatModel
@@ -185,7 +185,7 @@ private slots:
     void _q_downloadFinished();
     void _q_downloadProgress(qint64 done, qint64 total);
     void _q_iteratorFinished();
-    void _q_iteratorResults(const QUrl &url, const FileInfoList &results);
+    void _q_iteratorResults(const FileInfoList &results, const QUrl &url);
     void _q_uploadFinished();
     void _q_uploadProgress(qint64 done, qint64 total);
     void _q_uploadResized(QIODevice *device);
