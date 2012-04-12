@@ -71,6 +71,29 @@ public:
     QImage requestImage(const QString &id, QSize *size, const QSize &requestedSize);
 };
 
+class FolderIterator : public QObject
+{
+    Q_OBJECT
+
+public:
+    FolderIterator(FileSystem *fileSystem, const QUrl &url, const QString &filter, QObject *parent = 0);
+
+signals:
+    void finished();
+    void result(const QUrl &root, const FileInfo &info);
+
+private slots:
+    void _q_listFinished();
+
+private:
+    void processQueue();
+
+    QString m_filter;
+    FileSystem *m_fs;
+    QList<QUrl> m_queue;
+    QUrl m_url;
+};
+
 class FolderModel : public ChatModel
 {
     Q_OBJECT

@@ -223,6 +223,51 @@ QImage PhotoImageProvider::requestImage(const QString &id, QSize *size, const QS
     return image;
 }
 
+FolderIterator::FolderIterator(FileSystem *fileSystem, const QUrl &url, const QString &filter, QObject *parent)
+    : QObject(parent)
+    , m_filter(filter)
+    , m_fs(fileSystem)
+{
+    m_queue.append(url);
+    processQueue();
+}
+
+void FolderIterator::processQueue()
+{
+    bool check;
+    Q_UNUSED(check);
+
+    if (m_queue.isEmpty()) {
+        emit finished();
+        return;
+    }
+
+    m_url = m_queue.takeFirst();
+
+    qDebug("listing %s", qPrintable(m_url.toString()));
+
+    FileSystemJob *job = m_fs->list(m_url, m_filter);
+    check = connect(job, SIGNAL(finished()),
+                    this, SLOT(_q_listFinished()));
+    Q_ASSERT(check);
+}
+
+void FolderIterator::_q_listFinished()
+{
+    FileSystemJob *job = qobject_cast<FileSystemJob*>(sender());
+
+    if (job->error() == FileSystemJob::NoError) {
+        foreach (const FileInfo &child, job->results()) {
+            emit result(m_url, child);
+            if (child.isDir())
+                m_queue.append(child.url());
+        }
+    }
+
+    job->deleteLater();
+    processQueue();
+}
+
 class FolderModelItem : public ChatModelItem, public FileInfo
 {
 public:
