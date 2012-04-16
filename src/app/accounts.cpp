@@ -172,6 +172,8 @@ bool AccountModel::setPassword(const QString &jid, const QString &password)
 
 void AccountModel::_q_reload()
 {
+    removeRows(0, rootItem->children.size());
+
     const QStringList chatJids = wApp->settings()->chatAccounts();
     foreach (const QString &jid, chatJids) {
         addItem(new AccountItem(jid), rootItem);
