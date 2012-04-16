@@ -504,12 +504,11 @@ void SipCallPrivate::setState(QXmppCall::State newState)
         onStateChanged();
         emit q->stateChanged(state);
 
-        if (state == QXmppCall::ActiveState) {
-            startStamp = QDateTime::currentDateTime();
+        if (state == QXmppCall::ActiveState)
             emit q->connected();
-        } else if (state == QXmppCall::FinishedState) {
+        else if (state == QXmppCall::FinishedState)
+        {
             q->debug(QString("SIP call %1 finished").arg(QString::fromUtf8(id)));
-            finishStamp = QDateTime::currentDateTime();
             emit q->finished();
         }
     }
