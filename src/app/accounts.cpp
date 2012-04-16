@@ -17,11 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QSet>
+
 #include "application.h"
 #include "accounts.h"
 #include "wallet.h"
 
 #include "QXmppUtils.h"
+
+static QSet<AccountModel*> globalInstances;
 
 class AccountItem : public ChatModelItem
 {
@@ -78,6 +82,13 @@ AccountModel::AccountModel(QObject *parent)
 
     // load accounts
     _q_reload();
+
+    globalInstances.insert(this);
+}
+
+AccountModel::~AccountModel()
+{
+    globalInstances.remove(this);
 }
 
 void AccountModel::append(const QVariantMap &obj)
@@ -144,6 +155,10 @@ void AccountModel::save()
 
     // save accounts
     wApp->settings()->setChatAccounts(newJids);
+    foreach (AccountModel *other, globalInstances) {
+        if (other != this)
+            other->_q_reload();
+    }
 }
 
 QString AccountModel::getPassword(const QString &jid) const

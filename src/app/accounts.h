@@ -30,6 +30,7 @@ class AccountModel : public ChatModel
 
 public:
     AccountModel(QObject *parent = 0);
+    ~AccountModel();
 
     // QAbstractItemModel interface
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;

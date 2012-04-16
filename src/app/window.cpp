@@ -143,6 +143,12 @@ Window *Window::createWindow()
     return new Window;
 }
 
+void Window::destroyWindow(Window *window)
+{
+    if (window)
+        window->deleteLater();
+}
+
 QFileDialog *Window::fileDialog()
 {
     QFileDialog *dialog = new QDeclarativeFileDialog(this);
