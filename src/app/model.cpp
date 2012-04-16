@@ -125,47 +125,6 @@ void ChatModel::removeItem(ChatModelItem *item)
     endRemoveRows();
 }
 
-/** Move an item to the given parent.
- *
- * @param index
- * @param newParent
- */
-QModelIndex ChatModel::reparentItem(const QModelIndex &index, const QModelIndex &newParent)
-{
-    if (!index.isValid())
-        return index;
-    ChatModelItem *item = static_cast<ChatModelItem*>(index.internalPointer());
-
-    /* determine requested parent item */
-    ChatModelItem *newParentItem;
-    if (!newParent.isValid())
-        newParentItem = rootItem;
-    else
-        newParentItem = static_cast<ChatModelItem*>(newParent.internalPointer());
-
-    /* check if we need to do anything */
-    ChatModelItem *currentParentItem = item->parent;
-    if (currentParentItem == newParentItem)
-        return index;
-
-    /* determine current parent index */
-    QModelIndex currentParent;
-    if (currentParentItem != rootItem)
-        currentParent = createIndex(currentParentItem, 0);
-
-    /* move item */
-    beginMoveRows(currentParent, item->row(), item->row(),
-                  newParent, newParentItem->children.size());
-    if (currentParentItem)
-        currentParentItem->children.removeAll(item);
-    if (newParentItem)
-        newParentItem->children.append(item);
-    item->parent = newParentItem;
-    endMoveRows();
-
-    return createIndex(item, 0);
-}
-
 int ChatModel::rowCount(const QModelIndex &parent) const
 {
     ChatModelItem *parentItem = parent.isValid() ? static_cast<ChatModelItem*>(parent.internalPointer()) : rootItem;

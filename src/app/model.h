@@ -60,11 +60,7 @@ public:
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
     QModelIndex parent(const QModelIndex &index) const;
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
-
-    // Q_INVOKABLE so that it can be accessed from QML
-    Q_INVOKABLE int rowCount(const QModelIndex &parent) const;
-
-    QModelIndex reparentItem(const QModelIndex &index, const QModelIndex &newParent);
+    int rowCount(const QModelIndex &parent) const;
 
 protected:
     void addItem(ChatModelItem *item, ChatModelItem *parentItem, int pos = -1);
