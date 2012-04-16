@@ -281,7 +281,7 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterType<QSoundTester>(uri, 2, 0, "SoundTester");
     qmlRegisterUncreatableType<Updater>(uri, 2, 0, "Updater", "");
     qmlRegisterType<VCard>(uri, 2, 0, "VCard");
-    qmlRegisterUncreatableType<Window>(uri, 2, 0, "Window", "");
+    qmlRegisterType<Window>(uri, 2, 0, "Window");
 
     // crutches for Qt..
     qRegisterMetaType<QIODevice::OpenMode>("QIODevice::OpenMode");

@@ -337,10 +337,11 @@ void Application::resetWindows()
 
     /* check we have a valid account */
     if (d->appSettings->chatAccounts().isEmpty()) {
+        Window *window = new Window;
 #ifdef MEEGO_EDITION_HARMATTAN
-        Window *window = new Window(qmlUrl("MeegoSetup.qml"), QString());
+        window->setSource(qmlUrl("MeegoSetup.qml"));
 #else
-        Window *window = new Window(qmlUrl("SetupWindow.qml"), QString());
+        window->setSource(qmlUrl("SetupWindow.qml"));
 #endif
 
         const QSize size = QApplication::desktop()->availableGeometry(window).size();
@@ -355,10 +356,12 @@ void Application::resetWindows()
     int ypos = 20;
     const QStringList chatJids = d->appSettings->chatAccounts();
     foreach (const QString &jid, chatJids) {
+        Window *window = new Window;
+        window->setObjectName(jid);
 #ifdef MEEGO_EDITION_HARMATTAN
-        Window *window = new Window(qmlUrl("MeegoMain.qml"), jid);
+        window->setSource(qmlUrl("MeegoMain.qml"));
 #else
-        Window *window = new Window(qmlUrl("MainWindow.qml"), jid);
+        window->setSource(qmlUrl("MainWindow.qml"));
 #endif
 
 #ifdef WILINK_EMBEDDED

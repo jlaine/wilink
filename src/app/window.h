@@ -21,9 +21,10 @@
 #define __WILINK_WINDOW_H__
 
 #include <QMainWindow>
+#include <QUrl>
 
 class QFileDialog;
-class QUrl;
+class WindowPrivate;
 
 /** Chat represents the user interface's main window.
  */
@@ -32,15 +33,21 @@ class Window : public QMainWindow
     Q_OBJECT
     Q_PROPERTY(bool isActiveWindow READ isActiveWindow NOTIFY windowStateChanged)
     Q_PROPERTY(bool fullScreen READ isFullScreen WRITE setFullScreen NOTIFY windowStateChanged)
+    Q_PROPERTY(QUrl source READ source WRITE setSource NOTIFY sourceChanged)
 
 public:
-    Window(const QUrl &url, const QString &jid, QWidget *parent = 0);
+    Window(QWidget *parent = 0);
+    ~Window();
     void setFullScreen(bool fullScreen);
+
+    QUrl source() const;
+    void setSource(const QUrl &source);
 
 signals:
     void showAbout();
     void showHelp();
     void showPreferences();
+    void sourceChanged();
     void windowStateChanged();
 
 public slots:
@@ -53,6 +60,9 @@ private slots:
 
 protected:
     void changeEvent(QEvent *event);
+
+private:
+    WindowPrivate *d;
 };
 
 #endif

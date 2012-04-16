@@ -32,31 +32,37 @@
 #include "declarative.h"
 #include "window.h"
 
-Window::Window(const QUrl &url, const QString &jid, QWidget *parent)
+class WindowPrivate
+{
+public:
+    QDeclarativeView *view;
+};
+
+Window::Window(QWidget *parent)
     : QMainWindow(parent)
 {
     bool check;
     Q_UNUSED(check);
 
-    setObjectName(jid);
+    d = new WindowPrivate;
 
     // create declarative view
-    QDeclarativeView *view = new QDeclarativeView;
-    view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
-    check = connect(view, SIGNAL(statusChanged(QDeclarativeView::Status)),
+    d->view = new QDeclarativeView;
+    d->view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
+    check = connect(d->view, SIGNAL(statusChanged(QDeclarativeView::Status)),
                     this, SLOT(_q_statusChanged()));
     Q_ASSERT(check);
 
     // load plugin
     Plugin plugin;
     plugin.registerTypes("wiLink");
-    plugin.initializeEngine(view->engine(), "wiLink");
+    plugin.initializeEngine(d->view->engine(), "wiLink");
 
-    QDeclarativeContext *context = view->rootContext();
+    QDeclarativeContext *context = d->view->rootContext();
     context->setContextProperty("application", wApp);
     context->setContextProperty("window", this);
 
-    setCentralWidget(view);
+    setCentralWidget(d->view);
 
 #ifndef WILINK_EMBEDDED
     /* "File" menu */
@@ -98,9 +104,11 @@ Window::Window(const QUrl &url, const QString &jid, QWidget *parent)
     /* set up keyboard shortcuts */
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_W), this);
     connect(shortcut, SIGNAL(activated()), this, SLOT(close()));
+}
 
-    // load QML
-    view->setSource(url);
+Window::~Window()
+{
+    delete d;
 }
 
 void Window::alert()
@@ -151,14 +159,26 @@ void Window::showAndRaise()
     activateWindow();
 }
 
+QUrl Window::source() const
+{
+    return d->view->source();
+}
+
+void Window::setSource(const QUrl &source)
+{
+    if (source != d->view->source()) {
+        d->view->setSource(source);
+        emit sourceChanged();
+    }
+}
+
 void Window::_q_statusChanged()
 {
-    QDeclarativeView *view = qobject_cast<QDeclarativeView*>(sender());
-    if (!view || view->status() != QDeclarativeView::Ready)
+    if (d->view->status() != QDeclarativeView::Ready)
         return;
 
-    view->setAttribute(Qt::WA_OpaquePaintEvent);
-    view->setAttribute(Qt::WA_NoSystemBackground);
-    view->viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
-    view->viewport()->setAttribute(Qt::WA_NoSystemBackground);
+    d->view->setAttribute(Qt::WA_OpaquePaintEvent);
+    d->view->setAttribute(Qt::WA_NoSystemBackground);
+    d->view->viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
+    d->view->viewport()->setAttribute(Qt::WA_NoSystemBackground);
 }
