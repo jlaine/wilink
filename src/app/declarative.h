@@ -178,20 +178,6 @@ public:
     }
 };
 
-class DeclarativeWallet : public QObject
-{
-    Q_OBJECT
-
-public:
-    DeclarativeWallet(QObject *parent = 0);
-    static QString realm(const QString &jid);
-
-public slots:
-    QString find(const QString &realm) const;
-    QString get(const QString &jid) const;
-    void set(const QString &jid, const QString &password);
-};
-
 class DropArea : public QDeclarativeItem
 {
     Q_OBJECT

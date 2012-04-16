@@ -180,56 +180,6 @@ void NetworkAccessManager::onSslErrors(QNetworkReply *reply, const QList<QSslErr
     //reply->ignoreSslErrors();
 }
 
-DeclarativeWallet::DeclarativeWallet(QObject *parent)
-    : QObject(parent)
-{
-}
-
-QString DeclarativeWallet::find(const QString &realm) const
-{
-    QString tmpJid;
-    QString tmpPassword;
-
-    if (QNetIO::Wallet::instance()->getCredentials(realm, tmpJid, tmpPassword))
-        return tmpJid;
-    return QString();
-}
-
-QString DeclarativeWallet::get(const QString &jid) const
-{
-    const QString key = realm(jid);
-
-    if (!key.isEmpty()) {
-        QString tmpJid(jid);
-        QString tmpPassword;
-
-        if (QNetIO::Wallet::instance()->getCredentials(key, tmpJid, tmpPassword))
-            return tmpPassword;
-    }
-    return QString();
-}
-
-/** Returns the authentication realm for the given JID.
- */
-QString DeclarativeWallet::realm(const QString &jid)
-{
-    const QString domain = jidToDomain(jid);
-    if (domain == QLatin1String("wifirst.net"))
-        return QLatin1String("www.wifirst.net");
-    else if (domain == QLatin1String("gmail.com"))
-        return QLatin1String("www.google.com");
-    return domain;
-}
-
-void DeclarativeWallet::set(const QString &jid, const QString &password)
-{
-    const QString key = realm(jid);
-    if (!key.isEmpty()) {
-        qDebug("Setting password for %s (%s)", qPrintable(jid), qPrintable(key));
-        QNetIO::Wallet::instance()->setCredentials(key, jid, password);
-    }
-}
-
 static QStringList droppedFiles(QGraphicsSceneDragDropEvent *event)
 {
     QStringList files;
@@ -331,7 +281,6 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterType<QSoundTester>(uri, 2, 0, "SoundTester");
     qmlRegisterUncreatableType<Updater>(uri, 2, 0, "Updater", "");
     qmlRegisterType<VCard>(uri, 2, 0, "VCard");
-    qmlRegisterType<DeclarativeWallet>(uri, 2, 0, "Wallet");
     qmlRegisterUncreatableType<Window>(uri, 2, 0, "Window", "");
 
     // crutches for Qt..
