@@ -39,10 +39,6 @@ Window::Window(const QUrl &url, const QString &jid, QWidget *parent)
     Q_UNUSED(check);
 
     setObjectName(jid);
-    if (jid.isEmpty())
-        setWindowTitle(qApp->applicationName());
-    else
-        setWindowTitle(QString("%1 - %2").arg(jid, qApp->applicationName()));
 
     // create declarative view
     QDeclarativeView *view = new QDeclarativeView;

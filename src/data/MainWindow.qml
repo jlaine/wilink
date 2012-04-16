@@ -160,6 +160,8 @@ FocusScope {
             application.quit();
         }
 
+        window.windowTitle = jid + ' - ' + application.applicationName;
+
         var password = accountModel.getPassword(jid);
         appClient.connectToServer(jid, password);
     }
