@@ -18,6 +18,7 @@
  */
 
 import QtQuick 1.1
+import wiLink 2.0
 import 'utils.js' as Utils
 
 Item {
@@ -46,13 +47,7 @@ Item {
         anchors.left: parent.left
         anchors.right: parent.right
         clip: true
-        model: ListModel {
-            Component.onCompleted: {
-                for (var i in application.settings.chatAccounts) {
-                    append({'jid': application.settings.chatAccounts[i]});
-                }
-            }
-        }
+        model: AccountModel {}
         delegate: Item {
             height: appStyle.icon.smallSize + 4
             width: parent.width

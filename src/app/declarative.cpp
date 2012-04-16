@@ -221,15 +221,6 @@ QString DeclarativeWallet::realm(const QString &jid)
     return domain;
 }
 
-void DeclarativeWallet::remove(const QString &jid)
-{
-    const QString key = realm(jid);
-    if (!key.isEmpty()) {
-        qDebug("Removing password for %s (%s)", qPrintable(jid), qPrintable(key));
-        QNetIO::Wallet::instance()->deleteCredentials(key);
-    }
-}
-
 void DeclarativeWallet::set(const QString &jid, const QString &password)
 {
     const QString key = realm(jid);

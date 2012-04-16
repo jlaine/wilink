@@ -33,7 +33,12 @@ public:
 
     // QAbstractItemModel interface
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
+
+public slots:
+    // QML ListModel
+    void append(const QVariantMap &obj);
+    void remove(int index);
+    void save();
 
 private slots:
     void _q_reload();

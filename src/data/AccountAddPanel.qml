@@ -26,7 +26,7 @@ FocusScope {
     id: panel
 
     property string domain: ''
-    property ListModel model
+    property alias model: accountHelper.model
     property string testJid
     property string testPassword
 
@@ -35,6 +35,10 @@ FocusScope {
 
     function forceActiveFocus() {
         jidInput.forceActiveFocus();
+    }
+
+    ListHelper {
+        id: accountHelper
     }
 
     PanelHelp {
@@ -168,8 +172,8 @@ FocusScope {
                     jid += '@' + panel.domain;
 
                 // check for duplicate account
-                for (var i = 0; i < model.count; i++) {
-                    if (Utils.jidToDomain(model.get(i).jid) == Utils.jidToDomain(jid)) {
+                for (var i = 0; i < accountHelper.count; i++) {
+                    if (Utils.jidToDomain(accountHelper.getProperty(i, 'jid')) == Utils.jidToDomain(jid)) {
                         panel.state = 'dupe';
                         return;
                     }

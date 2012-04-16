@@ -32,7 +32,19 @@ public:
     QString username() const;
 
     const QString jid;
+    QString changedPassword;
 };
+
+static QString realm(const QString &jid)
+{
+    const QString domain = jidToDomain(jid);
+    if (domain == QLatin1String("wifirst.net"))
+        return QLatin1String("www.wifirst.net");
+    else if (domain == QLatin1String("gmail.com"))
+        return QLatin1String("www.google.com");
+    else
+        return domain;
+}
 
 AccountItem::AccountItem(const QString &jid_)
     : jid(jid_)
@@ -41,19 +53,9 @@ AccountItem::AccountItem(const QString &jid_)
 
 QString AccountItem::password() const
 {
-    // determine realm
-    QString realm;
-    const QString domain = jidToDomain(jid);
-    if (domain == QLatin1String("wifirst.net"))
-        realm = QLatin1String("www.wifirst.net");
-    else if (domain == QLatin1String("gmail.com"))
-        realm = QLatin1String("www.google.com");
-    else
-        realm = domain;
-
     QString tmpJid(jid);
     QString password;
-    if (QNetIO::Wallet::instance()->getCredentials(realm, tmpJid, password))
+    if (QNetIO::Wallet::instance()->getCredentials(realm(jid), tmpJid, password))
         return password;
     else
         return QString();
@@ -89,6 +91,20 @@ AccountModel::AccountModel(QObject *parent)
     _q_reload();
 }
 
+void AccountModel::append(const QVariantMap &obj)
+{
+    const QString jid = obj.value("jid").toString();
+    const QString password = obj.value("password").toString();
+    if (jid.isEmpty() || password.isEmpty()) {
+        qWarning("JID and password are required to add an account");
+        return;
+    }
+
+    AccountItem *item = new AccountItem(jid);
+    item->changedPassword = password;
+    addItem(item, rootItem);
+}
+
 QVariant AccountModel::data(const QModelIndex &index, int role) const
 {
     AccountItem *item = static_cast<AccountItem*>(index.internalPointer());
@@ -108,9 +124,38 @@ QVariant AccountModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-bool AccountModel::setData(const QModelIndex &index, const QVariant &value, int role)
+void AccountModel::remove(int index)
 {
-    return false;
+    removeRows(index, 1);
+}
+
+void AccountModel::save()
+{
+    QStringList newJids;
+
+    // save passwords for new accounts
+    foreach (ChatModelItem *ptr, rootItem->children) {
+        AccountItem *item = static_cast<AccountItem*>(ptr);
+        if (!item->changedPassword.isEmpty()) {
+            const QString key = realm(item->jid);
+            qDebug("Setting password for %s (%s)", qPrintable(item->jid), qPrintable(key));
+            QNetIO::Wallet::instance()->setCredentials(key, item->jid, item->changedPassword);
+        }
+        newJids << item->jid;
+    }
+
+    // remove password for removed accounts
+    const QStringList oldJids = wApp->settings()->chatAccounts();
+    foreach (const QString &jid, oldJids) {
+        if (!newJids.contains(jid)) {
+            const QString key = realm(jid);
+            qDebug("Removing password for %s (%s)", qPrintable(jid), qPrintable(key));
+            QNetIO::Wallet::instance()->deleteCredentials(key);
+        }
+    }
+
+    // save accounts
+    wApp->settings()->setChatAccounts(newJids);
 }
 
 void AccountModel::_q_reload()

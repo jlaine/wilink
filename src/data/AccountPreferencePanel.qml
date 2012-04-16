@@ -25,28 +25,8 @@ Panel {
     id: panel
 
     function save() {
-        var newJids = [];
-
-        // save passwords for new accounts
-        for (var i = 0; i < listPanel.model.count; i++) {
-            var entry = listPanel.model.get(i);
-            if (entry.password != undefined) {
-                wallet.set(entry.jid, entry.password);
-            }
-            newJids.push(entry.jid);
-        }
-
-        // remove password for removed accounts
-        var oldJids = application.settings.chatAccounts;
-        for (var i = 0; i < oldJids.length; i++) {
-            var jid = oldJids[i];
-            if (newJids.indexOf(jid) < 0) {
-                wallet.remove(jid);
-            }
-        }
-
         // save accounts
-        application.settings.chatAccounts = newJids;
+        listPanel.model.save();
         application.resetWindows();
     }
 
@@ -87,10 +67,6 @@ Panel {
         }
     }
 
-    Wallet {
-        id: wallet
-    }
- 
     states: State {
         name: 'edit'
         PropertyChanges { target: listPanel; opacity: 0 }

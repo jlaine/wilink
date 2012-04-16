@@ -60,7 +60,7 @@ public:
     QModelIndex index(int row, int column, const QModelIndex &parent) const;
     QModelIndex parent(const QModelIndex &index) const;
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
-    int rowCount(const QModelIndex &parent) const;
+    int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
 protected:
     void addItem(ChatModelItem *item, ChatModelItem *parentItem, int pos = -1);

@@ -189,7 +189,6 @@ public:
 public slots:
     QString find(const QString &realm) const;
     QString get(const QString &jid) const;
-    void remove(const QString &jid);
     void set(const QString &jid, const QString &password);
 };
 
