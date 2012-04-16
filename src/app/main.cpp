@@ -29,6 +29,7 @@
 #endif
 
 #include "application.h"
+#include "window.h"
 
 static int aborted = 0;
 static void signal_handler(int sig)
@@ -65,6 +66,9 @@ int main(int argc, char *argv[])
 
     /* Create system tray icon */
     app.createSystemTrayIcon();
+
+    Window window;
+    window.setSource(app.qmlUrl("boot.qml"));
 
     /* Show chat windows */
     QTimer::singleShot(0, &app, SLOT(resetWindows()));

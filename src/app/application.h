@@ -64,7 +64,9 @@ class Application : public QApplication
     Q_PROPERTY(QUrl homeUrl READ homeUrl CONSTANT)
     Q_PROPERTY(QString organizationName READ organizationName CONSTANT)
     Q_PROPERTY(QString osType READ osType CONSTANT)
+    Q_PROPERTY(bool isAndroid READ isAndroid CONSTANT)
     Q_PROPERTY(bool isInstalled READ isInstalled CONSTANT)
+    Q_PROPERTY(bool isMeego READ isMeego CONSTANT)
     Q_PROPERTY(bool isMobile READ isMobile CONSTANT)
     Q_PROPERTY(ApplicationSettings* settings READ settings CONSTANT)
     Q_PROPERTY(QSoundPlayer* soundPlayer READ soundPlayer CONSTANT)
@@ -89,15 +91,19 @@ public:
     QString executablePath() const;
     QUrl qmlUrl(const QString &name) const;
 
+    bool isAndroid() const;
     bool isInstalled() const;
+    bool isMeego() const;
     bool isMobile() const;
     QString osType() const;
 
     // preferences
     ApplicationSettings *settings() const;
 
-public slots:
+signals:
     void resetWindows();
+
+public slots:
     QUrl resolvedUrl(const QUrl &url, const QUrl &base);
     Notification *showMessage(const QString &title, const QString &message, const QString &action);
     void showWindows();

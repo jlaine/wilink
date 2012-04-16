@@ -52,6 +52,7 @@ signals:
 
 public slots:
     void alert();
+    Window *createWindow();
     QFileDialog *fileDialog();
     void showAndRaise();
 

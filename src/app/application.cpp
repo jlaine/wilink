@@ -280,10 +280,28 @@ QUrl Application::homeUrl() const
     return QUrl::fromLocalFile(QDir::homePath());
 }
 
+bool Application::isAndroid() const
+{
+#ifdef Q_OS_ANDROID
+    return true;
+#else
+    return false;
+#endif
+}
+
 bool Application::isInstalled() const
 {
     QDir dir = QFileInfo(executablePath()).dir();
     return !dir.exists("CMakeFiles");
+}
+
+bool Application::isMeego() const
+{
+#ifdef MEEGO_EDITION_HARMATTAN
+    return true;
+#else
+    return false;
+#endif
 }
 
 bool Application::isMobile() const
@@ -328,6 +346,7 @@ ApplicationSettings* Application::settings() const
     return d->appSettings;
 }
 
+#if 0
 void Application::resetWindows()
 {
     /* close any existing windows */
@@ -390,6 +409,7 @@ void Application::resetWindows()
         xpos += 100;
     }
 }
+#endif
 
 QUrl Application::resolvedUrl(const QUrl &url, const QUrl &base)
 {

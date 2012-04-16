@@ -21,6 +21,7 @@
     <file>128x128/wiLink.png</file>
     <!-- QML -->
     <file>utils.js</file>
+    <file>boot.qml</file>
     <file>AboutDialog.qml</file>
     <file>AccountAddPanel.qml</file>
     <file>AccountListPanel.qml</file>

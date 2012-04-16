@@ -138,6 +138,11 @@ void Window::changeEvent(QEvent *event)
         emit windowStateChanged();
 }
 
+Window *Window::createWindow()
+{
+    return new Window;
+}
+
 QFileDialog *Window::fileDialog()
 {
     QFileDialog *dialog = new QDeclarativeFileDialog(this);
