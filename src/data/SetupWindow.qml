@@ -45,12 +45,12 @@ FocusScope {
         anchors.margins: 8
         domain: 'wifirst.net'
         focus: true
-        model: ListModel {}
+        model: AccountModel {}
         opacity: 1
 
         onAccepted: {
-            wallet.set(jid, password);
-            application.settings.chatAccounts = [jid];
+            model.append({'jid': jid, 'password': password});
+            model.save();
             application.resetWindows();
         }
         onClose: application.quit()
@@ -65,10 +65,6 @@ FocusScope {
         anchors.margins: 8
 
         text: qsTr('If you need help, please refer to the <a href="%1">%2 FAQ</a>.').replace('%1', 'https://www.wifirst.net/wilink/faq').replace('%2', application.applicationName)
-    }
-
-    Wallet {
-        id: wallet
     }
 
     Connections {
