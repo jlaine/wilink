@@ -27,7 +27,6 @@ class AccountItem : public ChatModelItem
 {
 public:
     AccountItem(const QString &jid);
-    QString password() const;
     QString type() const;
     QString username() const;
 
@@ -49,16 +48,6 @@ static QString realm(const QString &jid)
 AccountItem::AccountItem(const QString &jid_)
     : jid(jid_)
 {
-}
-
-QString AccountItem::password() const
-{
-    QString tmpJid(jid);
-    QString password;
-    if (QNetIO::Wallet::instance()->getCredentials(realm(jid), tmpJid, password))
-        return password;
-    else
-        return QString();
 }
 
 QString AccountItem::type() const
@@ -114,7 +103,7 @@ QVariant AccountModel::data(const QModelIndex &index, int role) const
     if (role == JidRole) {
         return item->jid;
     } else if (role == PasswordRole) {
-        return item->password();
+        return getPassword(item->jid);
     } else if (role == TypeRole) {
         return item->type();
     } else if (role == UsernameRole) {
@@ -137,9 +126,8 @@ void AccountModel::save()
     foreach (ChatModelItem *ptr, rootItem->children) {
         AccountItem *item = static_cast<AccountItem*>(ptr);
         if (!item->changedPassword.isEmpty()) {
-            const QString key = realm(item->jid);
-            qDebug("Setting password for %s (%s)", qPrintable(item->jid), qPrintable(key));
-            QNetIO::Wallet::instance()->setCredentials(key, item->jid, item->changedPassword);
+            setPassword(item->jid, item->changedPassword);
+            item->changedPassword = QString();
         }
         newJids << item->jid;
     }
@@ -156,6 +144,30 @@ void AccountModel::save()
 
     // save accounts
     wApp->settings()->setChatAccounts(newJids);
+}
+
+QString AccountModel::getPassword(const QString &jid) const
+{
+    const QString key = realm(jid);
+
+    if (!key.isEmpty()) {
+        QString tmpJid(jid);
+        QString tmpPassword;
+
+        if (QNetIO::Wallet::instance()->getCredentials(key, tmpJid, tmpPassword))
+            return tmpPassword;
+    }
+    return QString();
+}
+
+bool AccountModel::setPassword(const QString &jid, const QString &password)
+{
+    const QString key = realm(jid);
+    if (key.isEmpty())
+        return false;
+
+    qDebug("Setting password for %s (%s)", qPrintable(jid), qPrintable(key));
+    return QNetIO::Wallet::instance()->setCredentials(key, jid, password);
 }
 
 void AccountModel::_q_reload()

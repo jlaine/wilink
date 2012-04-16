@@ -40,6 +40,10 @@ public slots:
     void remove(int index);
     void save();
 
+    // Wallet
+    QString getPassword(const QString &jid) const;
+    bool setPassword(const QString &jid, const QString &password);
+
 private slots:
     void _q_reload();
 

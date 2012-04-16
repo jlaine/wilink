@@ -18,6 +18,7 @@
  */
 
 import QtQuick 1.1
+import wiLink 2.0
 
 Dialog {
     id: dialog
@@ -26,6 +27,10 @@ Dialog {
 
     minimumHeight: 250
     title: qsTr('Password required')
+
+    AccountModel {
+        id: accountModel
+    }
 
     Column {
         anchors.fill: contents
@@ -84,7 +89,7 @@ Dialog {
             return;
 
         var password = passwordInput.text;
-        appWallet.set(dialog.jid, password);
+        accountModel.setPassword(dialog.jid, password);
         appClient.connectToServer(dialog.jid, password);
         dialog.close();
     }

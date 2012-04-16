@@ -67,8 +67,8 @@ FocusScope {
         isMobile: application.isMobile
     }
 
-    Wallet {
-        id: appWallet
+    AccountModel {
+        id: accountModel
     }
 
     PluginLoader {
@@ -160,7 +160,7 @@ FocusScope {
             application.quit();
         }
 
-        var password = appWallet.get(jid);
+        var password = accountModel.getPassword(jid);
         appClient.connectToServer(jid, password);
     }
 
