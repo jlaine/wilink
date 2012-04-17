@@ -93,12 +93,6 @@ Panel {
             return loginView.evaluateJavaScript(js);
         }
 
-        AccountModel {
-            id: accountModel
-
-            Component.onCompleted: loginView.doLogin()
-        }
-
         onLoadFinished: {
             var account = accountModel.get(accountIndex);
             if (account.type == 'wifirst') {
@@ -114,6 +108,8 @@ Panel {
             doLogin();
         }
     }
+
+    Component.onCompleted: loginView.doLogin()
 
     Keys.onPressed: {
         if (event.modifiers == Qt.ControlModifier && event.key == Qt.Key_T) {
