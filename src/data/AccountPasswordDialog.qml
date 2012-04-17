@@ -29,10 +29,6 @@ Dialog {
     minimumHeight: 250
     title: qsTr('Password required')
 
-    AccountModel {
-        id: accountModel
-    }
-
     Column {
         anchors.fill: contents
         spacing: appStyle.spacing.vertical
