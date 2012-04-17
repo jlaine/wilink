@@ -31,6 +31,8 @@ class WindowPrivate;
 class Window : public QMainWindow
 {
     Q_OBJECT
+    Q_PROPERTY(int desktopWidth READ desktopWidth CONSTANT)
+    Q_PROPERTY(int desktopHeight READ desktopHeight CONSTANT)
     Q_PROPERTY(bool isActiveWindow READ isActiveWindow NOTIFY windowStateChanged)
     Q_PROPERTY(bool fullScreen READ isFullScreen WRITE setFullScreen NOTIFY windowStateChanged)
     Q_PROPERTY(QUrl source READ source WRITE setSource NOTIFY sourceChanged)
@@ -38,6 +40,8 @@ class Window : public QMainWindow
 public:
     Window(QWidget *parent = 0);
     ~Window();
+    int desktopHeight() const;
+    int desktopWidth() const;
     void setFullScreen(bool fullScreen);
 
     QUrl source() const;
