@@ -24,6 +24,7 @@ Dialog {
     id: dialog
 
     property alias jid: vcard.jid
+    property QtObject rosterManager
 
     minimumHeight: 150
     title: qsTr('Rename contact')
@@ -68,7 +69,7 @@ Dialog {
     onAccepted: {
         var name = bar.text;
         console.log("Rename contact " + jid + ": " + name);
-        appClient.rosterManager.renameItem(jid, name);
+        dialog.rosterManager.renameItem(jid, name);
         dialog.close();
     }
 }

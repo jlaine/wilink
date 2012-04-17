@@ -23,7 +23,8 @@ import 'utils.js' as Utils
 InputDialog {
     id: dialog
 
-    property string domain: Utils.jidToDomain(appClient.jid)
+    property QtObject client
+    property string domain: Qt.isQtObject(client) ? Utils.jidToDomain(client.jid) : ''
 
     helpText: domain == 'wifirst.net' ? qsTr('Your wAmis are automatically added to your chat contacts, so the easiest way to add Wifirst contacts is to <a href=\"%1\">add them as wAmis</a>').replace('%1', 'https://www.wifirst.net/w/friends?from=wiLink') : ''
     labelText: qsTr('Enter the address of the contact you want to add.')
@@ -39,7 +40,7 @@ InputDialog {
 
         var jid = textValue;
         console.log("Add contact " + jid);
-        appClient.rosterManager.subscribe(jid);
+        dialog.client.rosterManager.subscribe(jid);
         dialog.close();
     }
 

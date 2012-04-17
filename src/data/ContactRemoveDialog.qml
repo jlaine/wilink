@@ -24,6 +24,7 @@ Dialog {
     id: dialog
 
     property alias jid: vcard.jid
+    property QtObject rosterManager
 
     minimumHeight: 150
     title: qsTr('Remove contact');
@@ -55,7 +56,7 @@ Dialog {
 
     onAccepted: {
         console.log("Remove contact " + vcard.jid);
-        appClient.rosterManager.removeItem(vcard.jid);
+        dialog.rosterManager.removeItem(vcard.jid);
         dialog.close();
     }
 }

@@ -198,7 +198,7 @@ Panel {
             title: qsTr('My contacts')
 
             onAddClicked: {
-                dialogSwapper.showPanel('ContactAddDialog.qml');
+                dialogSwapper.showPanel('ContactAddDialog.qml', {client: appClient});
             }
 
             onCurrentJidChanged: {
@@ -230,7 +230,7 @@ Panel {
                         return;
                     }
 
-                    dialogSwapper.showPanel('ContactAddNotification.qml', {'jid': bareJid});
+                    dialogSwapper.showPanel('ContactAddNotification.qml', {jid: bareJid, rosterManager: appClient.rosterManager});
                 }
             }
         }
@@ -334,9 +334,9 @@ Panel {
                 if (item.action == 'profile') {
                     Qt.openUrlExternally(vcard.url);
                 } else if (item.action == 'rename') {
-                    dialogSwapper.showPanel('ContactRenameDialog.qml', {'jid': jid});
+                    dialogSwapper.showPanel('ContactRenameDialog.qml', {jid: jid, rosterManager: appClient.rosterManager});
                 } else if (item.action == 'remove') {
-                    dialogSwapper.showPanel('ContactRemoveDialog.qml', {'jid': jid});
+                    dialogSwapper.showPanel('ContactRemoveDialog.qml', {jid: jid, rosterManager: appClient.rosterManager});
                 }
             }
 

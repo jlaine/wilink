@@ -24,6 +24,7 @@ NotificationDialog {
     id: dialog
 
     property alias jid: vcard.jid
+    property QtObject rosterManager
 
     iconSource: vcard.avatar
     text: qsTr('%1 has asked to add you to his or her contact list.\n\nDo you accept?').replace('%1', jid);
@@ -37,10 +38,10 @@ NotificationDialog {
         console.log("Contact accepted " + jid);
 
         // accept subscription
-        appClient.rosterManager.acceptSubscription(jid);
+        dialog.rosterManager.acceptSubscription(jid);
 
         // request reciprocal subscription
-        appClient.rosterManager.subscribe(jid);
+        dialog.rosterManager.subscribe(jid);
 
         // close dialog
         dialog.close();
@@ -50,7 +51,7 @@ NotificationDialog {
         console.log("Contact rejected " + jid);
 
         // refuse subscription
-        appClient.rosterManager.refuseSubscription(jid);
+        dialog.rosterManager.refuseSubscription(jid);
     }
 }
 
