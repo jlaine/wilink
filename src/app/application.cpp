@@ -416,14 +416,6 @@ QUrl Application::resolvedUrl(const QUrl &url, const QUrl &base)
     return base.resolved(url);
 }
 
-void Application::showWindows()
-{
-    foreach (Window *chat, d->chats) {
-        chat->setWindowState(chat->windowState() & ~Qt::WindowMinimized);
-        chat->showAndRaise();
-    }
-}
-
 QSoundPlayer *Application::soundPlayer()
 {
     return d->soundPlayer;
@@ -515,7 +507,7 @@ Notification *Application::showMessage(const QString &title, const QString &mess
 void Application::trayActivated(QSystemTrayIcon::ActivationReason reason)
 {
     if (reason != QSystemTrayIcon::Context)
-        showWindows();
+        emit showWindows();
 }
 
 void Application::trayClicked()

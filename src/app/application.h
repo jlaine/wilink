@@ -102,11 +102,11 @@ public:
 
 signals:
     void resetWindows();
+    void showWindows();
 
 public slots:
     QUrl resolvedUrl(const QUrl &url, const QUrl &base);
     Notification *showMessage(const QString &title, const QString &message, const QString &action);
-    void showWindows();
 
 private slots:
 #ifdef USE_SYSTRAY

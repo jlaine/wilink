@@ -67,6 +67,10 @@ Rectangle {
 
             window.showAndRaise();
         });
+
+        application.showWindows.connect(function() {
+            window.showAndRaise();
+        });
     }
 
     Loader {

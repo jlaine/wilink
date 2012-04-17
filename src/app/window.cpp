@@ -175,6 +175,7 @@ void Window::setFullScreen(bool fullScreen)
 
 void Window::showAndRaise()
 {
+    setWindowState(windowState() & ~Qt::WindowMinimized);
     show();
     raise();
     activateWindow();
