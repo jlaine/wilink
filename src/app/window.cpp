@@ -155,27 +155,6 @@ void Window::changeEvent(QEvent *event)
         emit windowStateChanged();
 }
 
-Window *Window::createWindow()
-{
-    return new Window;
-}
-
-int Window::desktopHeight() const
-{
-    return QApplication::desktop()->availableGeometry(this).height();
-}
-
-int Window::desktopWidth() const
-{
-    return QApplication::desktop()->availableGeometry(this).width();
-}
-
-void Window::destroyWindow(Window *window)
-{
-    if (window)
-        window->deleteLater();
-}
-
 QFileDialog *Window::fileDialog()
 {
     QFileDialog *dialog = new QDeclarativeFileDialog(this);
