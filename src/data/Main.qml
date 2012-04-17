@@ -38,6 +38,7 @@ Rectangle {
         }
 
         application.resetWindows.connect(function() {
+            loader.source = '';
             loader.source = accountModel.count ? 'MainWindow.qml' : 'SetupWindow.qml';
             window.showAndRaise();
         });
