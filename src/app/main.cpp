@@ -68,7 +68,11 @@ int main(int argc, char *argv[])
     app.createSystemTrayIcon();
 
     Window window;
-    window.setSource(app.qmlUrl("boot.qml"));
+#ifdef MEEGO_EDITION_HARMATTAN
+    window.setSource(app.qmlUrl("MeegoMain.qml"));
+#else
+    window.setSource(app.qmlUrl("Main.qml"));
+#endif
 
     /* Show chat windows */
     QTimer::singleShot(0, &app, SLOT(resetWindows()));

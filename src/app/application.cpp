@@ -44,7 +44,6 @@
 #include "declarative.h"
 #include "systeminfo.h"
 #include "updater.h"
-#include "window.h"
 
 #ifdef Q_OS_MAC
 extern bool qt_mac_execute_apple_script(const QString &script, AEDesc *ret);
@@ -58,7 +57,6 @@ public:
     ApplicationPrivate();
 
     ApplicationSettings *appSettings;
-    QList<Window*> chats;
     QUrl qmlRoot;
     QSoundPlayer *soundPlayer;
     QThread *soundThread;
@@ -177,7 +175,7 @@ Application::Application(int &argc, char **argv)
 
 Application::~Application()
 {
-#ifndef WILINK_EMBEDDED
+#if 0
     // save window geometry
     foreach (QWidget *chat, d->chats) {
         const QString key = chat->objectName();
@@ -205,10 +203,6 @@ Application::~Application()
 #endif
     }
 #endif
-
-    // destroy chat windows
-    foreach (QWidget *chat, d->chats)
-        delete chat;
 
     // stop sound player
     d->soundThread->quit();
@@ -295,15 +289,6 @@ bool Application::isInstalled() const
     return !dir.exists("CMakeFiles");
 }
 
-bool Application::isMeego() const
-{
-#ifdef MEEGO_EDITION_HARMATTAN
-    return true;
-#else
-    return false;
-#endif
-}
-
 bool Application::isMobile() const
 {
 #ifdef WILINK_EMBEDDED
@@ -345,71 +330,6 @@ ApplicationSettings* Application::settings() const
 {
     return d->appSettings;
 }
-
-#if 0
-void Application::resetWindows()
-{
-    /* close any existing windows */
-    foreach (QWidget *chat, d->chats)
-        chat->deleteLater();
-    d->chats.clear();
-
-    /* check we have a valid account */
-    if (d->appSettings->chatAccounts().isEmpty()) {
-        Window *window = new Window;
-#ifdef MEEGO_EDITION_HARMATTAN
-        window->setSource(qmlUrl("MeegoSetup.qml"));
-#else
-        window->setSource(qmlUrl("SetupWindow.qml"));
-#endif
-
-        const QSize size = QApplication::desktop()->availableGeometry(window).size();
-        window->move((size.width() - window->width()) / 2, (size.height() - window->height()) / 2);
-        window->showAndRaise();
-        d->chats << window;
-        return;
-    }
-
-    /* connect to chat accounts */
-    int xpos = 30;
-    int ypos = 20;
-    const QStringList chatJids = d->appSettings->chatAccounts();
-    foreach (const QString &jid, chatJids) {
-        Window *window = new Window;
-        window->setObjectName(jid);
-#ifdef MEEGO_EDITION_HARMATTAN
-        window->setSource(qmlUrl("MeegoMain.qml"));
-#else
-        window->setSource(qmlUrl("MainWindow.qml"));
-#endif
-
-#ifdef WILINK_EMBEDDED
-        Q_UNUSED(xpos);
-        Q_UNUSED(ypos);
-#ifndef Q_OS_ANDROID
-        window->setFullScreen(true);
-#endif
-#else
-        // restore window geometry
-        const QByteArray geometry = d->appSettings->windowGeometry(jid);
-        if (!geometry.isEmpty()) {
-            window->restoreGeometry(geometry);
-            window->setFullScreen(false);
-        } else {
-            QSize size = QApplication::desktop()->availableGeometry(window).size();
-            size.setHeight(size.height() - 100);
-            size.setWidth((size.height() * 4.0) / 3.0);
-            window->resize(size);
-            window->move(xpos, ypos);
-        }
-#endif
-        window->showAndRaise();
-
-        d->chats << window;
-        xpos += 100;
-    }
-}
-#endif
 
 QUrl Application::resolvedUrl(const QUrl &url, const QUrl &base)
 {

@@ -55,14 +55,14 @@ Rectangle {
                     xpos += 100;
     */
                 }
-                loader.source = application.isMeego ? 'MeegoMain.qml' : 'MainWindow.qml';
+                loader.source = 'MainWindow.qml';
             } else {
                 window.minimumWidth = 360;
                 window.minimumHeight = 240;
                 window.size = window.minimumSize;
                 //const QSize size = QApplication::desktop()->availableGeometry(window).size();
                 //window.move((size.width() - window->width()) / 2, (size.height() - window->height()) / 2);
-                loader.source = application.isMeego ? 'MeegoSetup.qml' : 'SetupWindow.qml';
+                loader.source = 'SetupWindow.qml';
             }
 
             window.showAndRaise();

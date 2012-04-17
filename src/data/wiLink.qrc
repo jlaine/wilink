@@ -21,7 +21,6 @@
     <file>128x128/wiLink.png</file>
     <!-- QML -->
     <file>utils.js</file>
-    <file>boot.qml</file>
     <file>AboutDialog.qml</file>
     <file>AccountAddPanel.qml</file>
     <file>AccountListPanel.qml</file>
@@ -63,9 +62,9 @@
     <file>Label.qml</file>
     <file>LogPanel.qml</file>
     <file>DebugPlugin.qml</file>
+    <file>Main.qml</file>
     <file>MainWindow.qml</file>
     <file>MeegoMain.qml</file>
-    <file>MeegoSetup.qml</file>
     <file>Menu.qml</file>
     <file>MenuDelegate.qml</file>
     <file>NewsDialog.qml</file>
