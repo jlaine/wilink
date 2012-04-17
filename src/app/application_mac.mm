@@ -45,7 +45,7 @@ static inline CFStringRef qstringToCFStringRef(const QString &string)
     Q_UNUSED(app);
     Q_UNUSED(flag);
 
-    wApp->showWindows();
+    QMetaObject::invokeMethod(wApp, "showWindows");
     return NO;
 }
 
