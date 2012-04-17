@@ -24,11 +24,6 @@ import wiLink 2.0
 Panel {
     id: panel
 
-    ListHelper {
-        id: listHelper
-        model: logView.model
-    }
-
     PanelHeader {
         id: header
 
@@ -60,9 +55,9 @@ Panel {
                 onClicked: {
                     // copy the 20 last messages, to avoid freeze with important log
                     var text = '';
-                    var count = listHelper.count;
+                    var count = logView.model.count;
                     for (var i = Math.max(0, count - 20); i < count; i++) {
-                        var item = listHelper.get(i);
+                        var item = logView.model.get(i);
                         text += Qt.formatDateTime(item.date, 'hh:mm:ss') + '\n';
                         text += item.content + '\n';
                     }

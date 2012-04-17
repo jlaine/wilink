@@ -21,13 +21,11 @@ import QtQuick 1.1
 import wiLink 2.0
 
 Item {
-    property alias model: listHelper.model
+    id: slideView
+
+    property QtObject model
     property alias running: timer.running
     property variant url
-
-    ListHelper {
-        id: listHelper
-    }
 
     Repeater {
         id: view
@@ -76,10 +74,10 @@ Item {
         triggeredOnStart: true
 
         onTriggered: {
-            var item = listHelper.get(modelIndex);
+            var item = slideView.model.get(modelIndex);
             if (item)
                 view.model.append(item);
-            modelIndex = (modelIndex + 1) % listHelper.count;
+            modelIndex = (modelIndex + 1) % slideView.model.count;
         }
     }
 }

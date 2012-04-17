@@ -26,7 +26,7 @@ Rectangle {
 
     property int chatState: QXmppMessage.None
     property alias text: input.text
-    property alias model: listHelper.model
+    property QtObject model
     signal returnPressed
     signal tabPressed
 
@@ -75,10 +75,6 @@ Rectangle {
         border.width: 1
         color: 'white'
         height: input.paintedHeight + 2 * input.anchors.margins
-
-        ListHelper {
-            id: listHelper
-        }
 
         Timer {
             id: inactiveTimer
@@ -154,6 +150,9 @@ Rectangle {
             }
 
             Keys.onTabPressed: {
+                if (!Qt.isQtObject(chatEdit.model))
+                    return;
+
                 // select word, including 'at' sign
                 var text = input.text;
                 var end = input.cursorPosition;
@@ -168,8 +167,8 @@ Rectangle {
                 // search matching participants
                 var needle = input.text.slice(start, end).toLowerCase();
                 var matches = [];
-                for (var i = 0; i < listHelper.count; i += 1) {
-                    var name = listHelper.getProperty(i, 'name');
+                for (var i = 0; i < chatEdit.model.count; i += 1) {
+                    var name = chatEdit.model.getProperty(i, 'name');
                     if (name.slice(0, needle.length).toLowerCase() == needle) {
                         matches[matches.length] = name;
                     }

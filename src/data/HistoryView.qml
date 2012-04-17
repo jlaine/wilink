@@ -29,11 +29,6 @@ Item {
 
     clip: true
 
-    ListHelper {
-        id: listHelper
-        model: historyView.model
-    }
-
     ListView {
         id: historyView
 
@@ -71,18 +66,18 @@ Item {
                 onClicked: {
                     // get selection
                     var selection = [];
-                    for (var i = 0; i <= listHelper.count; i++) {
-                        if (listHelper.getProperty(i, 'selected'))
+                    for (var i = 0; i < historyView.model.count; i++) {
+                        if (historyView.model.getProperty(i, 'selected'))
                             selection.push(i);
                     }
 
                     // copy selection
                     var text = '';
                     if (selection.length == 1) {
-                        text = listHelper.get(selection[0]).body;
+                        text = historyView.model.getProperty(selection[0], 'body');
                     } else {
                         for (var i in selection) {
-                            var item = listHelper.get(selection[i]);
+                            var item = historyView.model.get(selection[i]);
                             text += '[ ' + item.from + ' - ' + Utils.formatDateTime(item.date) + ' ]\n';
                             text += item.body;
                             if (i < selection.length - 1)

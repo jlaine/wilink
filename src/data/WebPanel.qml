@@ -65,7 +65,7 @@ Panel {
 
         function doLogin() {
             accountIndex += 1;
-            var account = accountHelper.get(accountIndex);
+            var account = accountModel.get(accountIndex);
             if (!account)
                 return;
 
@@ -93,15 +93,14 @@ Panel {
             return loginView.evaluateJavaScript(js);
         }
 
-        ListHelper {
-            id: accountHelper
-            model: AccountModel {}
+        AccountModel {
+            id: accountModel
 
             Component.onCompleted: loginView.doLogin()
         }
 
         onLoadFinished: {
-            var account = accountHelper.get(accountIndex);
+            var account = accountModel.get(accountIndex);
             if (account.type == 'wifirst') {
                 var data = "login=" + account.username + "&password=" + account.password;
                 var status = doXhr('POST', 'https://www.wifirst.net/sessions', data);

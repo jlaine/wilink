@@ -53,11 +53,6 @@ Panel {
         client: appClient
     }
 
-    ListHelper {
-        id: newsListHelper
-        model: newsListModel
-    }
-
     ContactView {
         id: sidebar
 
@@ -130,7 +125,7 @@ Panel {
 
         onCurrentIndexChanged: {
             if (currentIndex >= 0) {
-                var item = newsListHelper.get(currentIndex);
+                var item = newsListModel.get(currentIndex);
                 main.subTitle = item.name;
                 mainView.model.source = item.url;
             }

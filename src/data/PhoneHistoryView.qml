@@ -28,11 +28,6 @@ FocusScope {
     property alias model: historyView.model
     signal addressClicked(string address)
 
-    ListHelper {
-        id: listHelper
-        model: historyView.model
-    }
-
     Rectangle {
         id: background
         anchors.fill: parent
