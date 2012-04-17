@@ -25,6 +25,8 @@ import 'utils.js' as Utils
 Panel {
     id: panel
 
+    property string accountJid
+
     PanelHeader {
         id: header
 
@@ -66,11 +68,6 @@ Panel {
         anchors.right: parent.right
         anchors.top: header.bottom
 
-        Component.onCompleted: {
-            var domain = Utils.jidToDomain(appClient.jid);
-            crumbBar.push({'name': domain, 'jid': domain, 'node': ''})
-        }
-
         onLocationChanged: {
             discoView.model.rootJid = location.jid;
             discoView.model.rootNode = location.node;
@@ -88,7 +85,6 @@ Panel {
 
         model: DiscoveryModel {
             details: true
-            manager: appClient.discoveryManager
         }
 
         delegate: Item {
@@ -119,6 +115,13 @@ Panel {
                 }
             }
         }
+    }
+
+    onAccountJidChanged: {
+        var domain = Utils.jidToDomain(panel.accountJid);
+        var client = accountModel.clientForJid(panel.accountJid);
+        discoView.model.manager = client.discoveryManager;
+        crumbBar.push({'name': domain, 'jid': domain, 'node': ''})
     }
 }
 
