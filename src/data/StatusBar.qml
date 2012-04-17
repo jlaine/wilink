@@ -25,6 +25,7 @@ Rectangle {
     id: statusBar
 
     property bool autoAway: false
+    property QtObject client
 
     color: '#567dbc'
     height: appStyle.icon.tinySize + 3 * appStyle.margin.normal
@@ -49,7 +50,7 @@ Rectangle {
 
             onItemClicked: {
                 var statusType = menu.model.get(index).status;
-                appClient.statusType = statusType;
+                statusBar.client.statusType = statusType;
             }
 
             Component.onCompleted: {
@@ -89,7 +90,7 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             height: appStyle.icon.tinySize
             width: appStyle.icon.tinySize
-            presenceStatus: appClient.statusType
+            presenceStatus: statusBar.client.statusType
         }
 
         Image {
@@ -135,7 +136,7 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         color: 'white'
         text: {
-            switch (appClient.state) {
+            switch (statusBar.client.state) {
             case QXmppClient.ConnectedState:
                 return qsTr('Connected');
             case QXmppClient.ConnectingState:
@@ -151,13 +152,13 @@ Rectangle {
 
         onIdleTimeChanged: {
             if (idle.idleTime >= 300) {
-                if (appClient.statusType == QXmppPresence.Online) {
+                if (statusBar.client.statusType == QXmppPresence.Online) {
                     autoAway = true;
-                    appClient.statusType = QXmppPresence.Away;
+                    statusBar.client.statusType = QXmppPresence.Away;
                 }
             } else if (autoAway) {
                 autoAway = false;
-                appClient.statusType = QXmppPresence.Online;
+                statusBar.client.statusType = QXmppPresence.Online;
             }
         }
 
