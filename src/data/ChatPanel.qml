@@ -104,7 +104,7 @@ Panel {
             height: headerHeight + 4 + rowHeight * (appStyle.isMobile ? 2 : 4)
 
             onAddClicked: {
-                dialogSwapper.showPanel('RoomJoinDialog.qml');
+                dialogSwapper.showPanel('RoomJoinDialog.qml', {client: appClient});
             }
 
             onCurrentJidChanged: {

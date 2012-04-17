@@ -24,6 +24,7 @@ import 'utils.js' as Utils
 Dialog {
     id: dialog
 
+    property QtObject client
     property alias model: roomView.model
 
     helpText: qsTr('Enter the name of the chat room you want to join. If the chat room does not exist yet, it will be created for you.')
@@ -36,7 +37,7 @@ Dialog {
             var jid = roomEdit.text;
             if (jid.indexOf('@') < 0)
                 jid += '@' + roomView.model.rootJid;
-            var panel = swapper.findPanel('ChatPanel.qml', {'accountJid': Utils.jidToBareJid(appClient.jid)});
+            var panel = swapper.findPanel('ChatPanel.qml', {'accountJid': Utils.jidToBareJid(dialog.client.jid)});
             panel.showRoom(jid);
             dialog.close();
         }
@@ -64,8 +65,8 @@ Dialog {
             clip: true
             model: DiscoveryModel {
                 details: false
-                manager: appClient.discoveryManager
-                rootJid: appClient.mucServer
+                manager: Qt.isQtObject(dialog.client) ? dialog.client.discoveryManager : null
+                rootJid: Qt.isQtObject(dialog.client) ? dialog.client.mucServer : ''
             }
 
             delegate: Rectangle {
