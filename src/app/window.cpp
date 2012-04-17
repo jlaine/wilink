@@ -25,6 +25,7 @@
 #include <QDesktopWidget>
 #include <QFileDialog>
 #include <QMenuBar>
+#include <QSettings>
 #include <QShortcut>
 #include <QStringList>
 
@@ -104,10 +105,26 @@ Window::Window(QWidget *parent)
     /* set up keyboard shortcuts */
     QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_W), this);
     connect(shortcut, SIGNAL(activated()), this, SLOT(close()));
+
+    // restore geometry
+    const QByteArray geometry = QSettings().value("WindowGeometry").toByteArray();
+    if (!geometry.isEmpty()) {
+        restoreGeometry(geometry);
+    } else {
+        const QSize desktopSize = QApplication::desktop()->availableGeometry(this).size();
+        QSize size;
+        size.setHeight(desktopSize.height() - 100);
+        size.setWidth((desktopSize.height() * 4.0) / 3.0);
+        resize(size);
+        move((desktopSize.width() - width()) / 2, (desktopSize.height() - height()) / 2);
+    }
 }
 
 Window::~Window()
 {
+    // save geometry
+    QSettings settings;
+    settings.setValue("WindowGeometry", saveGeometry());
     delete d;
 }
 

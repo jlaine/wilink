@@ -175,16 +175,6 @@ Application::Application(int &argc, char **argv)
 
 Application::~Application()
 {
-#if 0
-    // save window geometry
-    foreach (QWidget *chat, d->chats) {
-        const QString key = chat->objectName();
-        if (!key.isEmpty()) {
-            d->appSettings->setWindowGeometry(key, chat->saveGeometry());
-        }
-    }
-#endif
-
 #ifdef USE_LIBNOTIFY
     // uninitialise libnotify
     notify_uninit();
@@ -850,24 +840,5 @@ void ApplicationSettings::setSortContactsByStatus(bool sort)
         d->settings->setValue("SortContactsByStatus", sort);
         emit sortContactsByStatusChanged(sort);
     }
-}
-
-/** Retrieves the stored geometry of a window.
- *
- * @param key
- */
-QByteArray ApplicationSettings::windowGeometry(const QString &key) const
-{
-    return d->settings->value("WindowGeometry/" + key).toByteArray();
-}
-
-/** Stores the geometry of a window.
- *
- * @param key
- * @param geometry
- */
-void ApplicationSettings::setWindowGeometry(const QString &key, const QByteArray &geometry)
-{
-    d->settings->setValue("WindowGeometry/" + key, geometry);
 }
 

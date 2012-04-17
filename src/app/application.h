@@ -195,9 +195,6 @@ public:
     bool sortContactsByStatus() const;
     void setSortContactsByStatus(bool sort);
 
-    QByteArray windowGeometry(const QString &key) const;
-    void setWindowGeometry(const QString &key, const QByteArray &geometry);
-
 signals:
     /// \cond
     void audioInputDeviceNameChanged(const QString &name);
