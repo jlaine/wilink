@@ -28,43 +28,17 @@ Rectangle {
     }
 
     Component.onCompleted: {
+        window.minimumWidth = 360;
+        window.minimumHeight = 360;
+
+        if (application.isMobile) {
+            window.fullScreen = !application.isAndroid;
+        } else {
+            window.fullScreen = false;
+        }
 
         application.resetWindows.connect(function() {
-            // check we have a valid account
-            if (accountModel.count) {
-                window.minimumWidth = 240;
-                window.minimumHeight = 360;
-
-                if (application.isMobile) {
-                    window.fullScreen = !application.isAndroid;
-                } else {
-                    // restore window geometry
-    /*
-                    var xpos = 30;
-                    const QByteArray geometry = d->appSettings->windowGeometry(jid);
-                    if (!geometry.isEmpty()) {
-                        window->restoreGeometry(geometry);
-                        window->setFullScreen(false);
-                    } else {
-                        QSize size = QApplication::desktop()->availableGeometry(window).size();
-                        size.setHeight(size.height() - 100);
-                        size.setWidth((size.height() * 4.0) / 3.0);
-                        window->resize(size);
-                        window->move(xpos, ypos);
-                    }
-                    xpos += 100;
-    */
-                }
-                loader.source = 'MainWindow.qml';
-            } else {
-                window.minimumWidth = 360;
-                window.minimumHeight = 240;
-                window.size = window.minimumSize;
-                //const QSize size = QApplication::desktop()->availableGeometry(window).size();
-                //window.move((size.width() - window->width()) / 2, (size.height() - window->height()) / 2);
-                loader.source = 'SetupWindow.qml';
-            }
-
+            loader.source = accountModel.count ? 'MainWindow.qml' : 'SetupWindow.qml';
             window.showAndRaise();
         });
 
