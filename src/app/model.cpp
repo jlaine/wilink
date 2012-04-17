@@ -40,6 +40,9 @@ int ChatModelItem::row() const
 ChatModel::ChatModel(QObject *parent)
     : QAbstractItemModel(parent)
 {
+    bool check;
+    Q_UNUSED(check);
+
     // set role names
     QHash<int, QByteArray> roleNames;
     roleNames.insert(ChatModel::AvatarRole, "avatar");
@@ -48,8 +51,21 @@ ChatModel::ChatModel(QObject *parent)
     roleNames.insert(ChatModel::NameRole, "name");
     setRoleNames(roleNames);
 
-    // create rool
+    // create root
     rootItem = new ChatModelItem;
+
+    // connect signals
+    check = connect(this, SIGNAL(modelReset()),
+                    this, SIGNAL(countChanged()));
+    Q_ASSERT(check);
+
+    check = connect(this, SIGNAL(rowsInserted(QModelIndex,int,int)),
+                    this, SIGNAL(countChanged()));
+    Q_ASSERT(check);
+
+    check = connect(this, SIGNAL(rowsRemoved(QModelIndex,int,int)),
+                    this, SIGNAL(countChanged()));
+    Q_ASSERT(check);
 }
 
 ChatModel::~ChatModel()

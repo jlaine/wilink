@@ -42,6 +42,7 @@ private:
 class ChatModel : public QAbstractItemModel
 {
     Q_OBJECT
+    Q_PROPERTY(int count READ rowCount NOTIFY countChanged)
 
 public:
     enum Role {
@@ -61,6 +62,9 @@ public:
     QModelIndex parent(const QModelIndex &index) const;
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
+
+signals:
+    void countChanged();
 
 protected:
     void addItem(ChatModelItem *item, ChatModelItem *parentItem, int pos = -1);
