@@ -1,3 +1,7 @@
+wiLink 2.3.0 (UNRELEASED)
+ * Application:
+  - Show all accounts in a single window.
+
 wiLink 2.2.2 (2012-03-08)
  * Calls:
   - Fix call widget creation.
