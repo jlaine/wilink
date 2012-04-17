@@ -23,6 +23,10 @@ import wiLink 2.0
 Panel {
     id: panel
 
+    property string accountJid
+    property bool busy: Qt.isQtObject(client) && client.diagnosticManager.running
+    property QtObject client
+
     PanelHeader {
         id: header
 
@@ -34,17 +38,17 @@ Panel {
         toolBar: ToolBar {
             ToolButton {
                 iconSource: 'copy.png'
-                enabled: !appClient.diagnosticManager.running
+                enabled: !panel.busy
                 text: qsTr('Copy')
 
                 onClicked: appClipboard.copy(diagnostic.text)
             }
             ToolButton {
                 iconSource: 'refresh.png'
-                enabled: !appClient.diagnosticManager.running
+                enabled: !panel.busy
                 text: qsTr('Refresh')
 
-                onClicked: appClient.diagnosticManager.refresh();
+                onClicked: panel.client.diagnosticManager.refresh();
             }
         }
     }
@@ -62,7 +66,7 @@ Panel {
         Label {
             id: diagnostic
 
-            text: appClient.diagnosticManager.html
+            text: Qt.isQtObject(panel.client) ? panel.client.diagnosticManager.html : ''
         }
     }
 
@@ -83,7 +87,7 @@ Panel {
         anchors.top: header.bottom
         anchors.bottom: parent.bottom
         color: '#aaffffff'
-        visible: appClient.diagnosticManager.running
+        visible: panel.busy
         z: 10
 
         Label {
@@ -93,8 +97,9 @@ Panel {
         }
     }
 
-    Component.onCompleted: {
-        appClient.diagnosticManager.refresh()
+    onAccountJidChanged: {
+        panel.client = accountModel.clientForJid(panel.accountJid);
+        panel.client.diagnosticManager.refresh()
     }
 
     Keys.forwardTo: scrollBar

@@ -25,15 +25,21 @@ Plugin {
     imageSource: 'diagnostics.png'
 
     onLoaded: {
-        dock.model.add({
-            'iconSource': 'dock-diagnostics.png',
-            'iconPress': 'diagnostics.png',
-            'panelSource': 'DiagnosticPanel.qml',
-            'priority': 6,
-            'shortcut': Qt.ControlModifier + Qt.Key_I,
-            'text': qsTr('Diagnostics'),
-            'visible': true,
-        });
+        for (var i = 0; i < accountModel.count; ++i) {
+            var account = accountModel.get(i);
+            if (account.type == 'wifirst') {
+                dock.model.add({
+                    'iconSource': 'dock-diagnostics.png',
+                    'iconPress': 'diagnostics.png',
+                    'panelProperties': {accountJid: account.jid},
+                    'panelSource': 'DiagnosticPanel.qml',
+                    'priority': 6,
+                    'shortcut': Qt.ControlModifier + Qt.Key_I,
+                    'text': qsTr('Diagnostics'),
+                    'visible': true,
+                });
+            }
+        }
     }
 
     onUnloaded: {
