@@ -89,11 +89,11 @@ Plugin {
             if (account.type == 'wifirst') {
                 plugin.accountJid = account.jid;
 
-                var panel = swapper.findPanel('ChatPanel.qml', {accountJid: account.jid});
-                if (panel.client.state == QXmppClient.ConnectedState) {
+                var client = accountModel.clientForJid(account.jid);
+                if (client.state == QXmppClient.ConnectedState) {
                     timer.triggered();
                 } else {
-                    panel.client.connected.connect(function() {
+                    client.connected.connect(function() {
                         timer.triggered();
                     });
                 }

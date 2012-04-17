@@ -50,6 +50,11 @@ FocusScope {
 
     AccountModel {
         id: accountModel
+
+        function clientForJid(jid) {
+            var panel = swapper.findPanel('ChatPanel.qml', {accountJid: jid});
+            return panel ? panel.client : undefined;
+        }
     }
 
     QXmppLogger {

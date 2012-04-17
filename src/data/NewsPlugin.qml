@@ -25,13 +25,19 @@ Plugin {
     imageSource: 'rss.png'
 
     onLoaded: {
-        dock.model.add({
-            'iconSource': 'dock-rss.png',
-            'iconPress': 'rss.png',
-            'panelSource': 'NewsPanel.qml',
-            'shortcut': Qt.ControlModifier + Qt.Key_N,
-            'text': qsTr('News'),
-            'visible': true});
+        for (var i = 0; i < accountModel.count; ++i) {
+            var account = accountModel.get(i);
+            if (account.type == 'wifirst') {
+                dock.model.add({
+                    'iconSource': 'dock-rss.png',
+                    'iconPress': 'rss.png',
+                    'panelProperties': {accountJid: account.jid},
+                    'panelSource': 'NewsPanel.qml',
+                    'shortcut': Qt.ControlModifier + Qt.Key_N,
+                    'text': qsTr('News'),
+                    'visible': true});
+            }
+        }
     }
 
     onUnloaded: {

@@ -24,6 +24,7 @@ import 'utils.js' as Utils
 Panel {
     id: panel
 
+    property string accountJid
     property QtObject soundJob
     property string soundUrl
 
@@ -50,7 +51,7 @@ Panel {
 
     NewsListModel {
         id: newsListModel
-        client: appClient
+
     }
 
     ContactView {
@@ -370,6 +371,10 @@ Panel {
                 Qt.openUrlExternally(item.link);
             }
         }
+    }
+
+    onAccountJidChanged: {
+        newsListModel.client = accountModel.clientForJid(panel.accountJid);
     }
 
     states: State {
