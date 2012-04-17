@@ -27,7 +27,6 @@ Plugin {
     onLoaded: {
         for (var i = 0; i < accountModel.count; ++i) {
             var account = accountModel.get(i);
-            console.log("got account:" + account.jid);
 
             dock.model.add({
                 'iconSource': 'dock-chat.png',

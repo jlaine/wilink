@@ -364,7 +364,6 @@ Panel {
     onAccountJidChanged: {
         var jid = chatPanel.accountJid;
         var password = accountModel.getPassword(jid);
-        console.log("got jid: " + jid + ", password: " +password);
         appClient.connectToServer(jid, password);
     }
 
