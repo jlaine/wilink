@@ -18,6 +18,7 @@
  */
 
 import QtQuick 1.1
+import 'utils.js' as Utils
 
 Plugin {
     name: qsTr('Chat')
@@ -27,7 +28,9 @@ Plugin {
     onLoaded: {
         for (var i = 0; i < accountModel.count; ++i) {
             var account = accountModel.get(i);
-
+            var title = qsTr('Chat');
+            if (accountModel.count > 1)
+                title += '<br/><small>' + Utils.jidToDomain(account.jid) + '</small>';
             dock.model.add({
                 'iconSource': 'dock-chat.png',
                 'iconPress': 'chat.png',
@@ -35,7 +38,7 @@ Plugin {
                 'panelProperties': {'accountJid': account.jid},
                 'panelSource': 'ChatPanel.qml',
                 'priority': 10,
-                'text': qsTr('Chat'),
+                'text': title,
                 'visible': true});
             swapper.showPanel('ChatPanel.qml', {'accountJid': account.jid});
         }

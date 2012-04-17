@@ -37,6 +37,10 @@ Plugin {
             else
                 continue;
 
+            var title = qsTr('Photos');
+            if (accountModel.count > 1)
+                title += '<br/><small>' + Utils.jidToDomain(account.jid) + '</small>';
+
             dock.model.add({
                 'iconSource': 'dock-photo.png',
                 'iconPress': 'photos.png',
@@ -44,7 +48,7 @@ Plugin {
                 'panelProperties': {'url': url},
                 'priority': 7,
                 'shortcut': Qt.ControlModifier + Qt.Key_P,
-                'text': qsTr('Photos'),
+                'text': title,
                 'visible': true});
         }
     }
