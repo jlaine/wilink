@@ -29,12 +29,6 @@ Rectangle {
         id: accountModel
     }
 
-    ListHelper {
-        id: accountHelper
-
-        model: accountModel
-    }
-
     Repeater {
         model: accountModel
         delegate: Rectangle {
@@ -83,7 +77,7 @@ Rectangle {
     Component.onCompleted: {
         application.resetWindows.connect(function() {
             // check we have a valid account
-            if (!accountHelper.count) {
+            if (!accountModel.count) {
                 console.log("no accounts");
                 if (!Qt.isQtObject(addWindow))
                     addWindow = window.createWindow();
