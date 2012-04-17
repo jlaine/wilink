@@ -38,7 +38,7 @@ Panel {
         onAuthenticationFailed: {
             console.log("Failed to authenticate with chat server");
             var jid = Utils.jidToBareJid(appClient.jid);
-            dialogSwapper.showPanel('AccountPasswordDialog.qml', {'jid': jid});
+            dialogSwapper.showPanel('AccountPasswordDialog.qml', {client: appClient, jid: jid});
         }
 
         onConflictReceived: {

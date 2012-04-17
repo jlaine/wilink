@@ -23,6 +23,7 @@ import wiLink 2.0
 Dialog {
     id: dialog
 
+    property QtObject client
     property string jid
 
     minimumHeight: 250
@@ -90,7 +91,7 @@ Dialog {
 
         var password = passwordInput.text;
         accountModel.setPassword(dialog.jid, password);
-        appClient.connectToServer(dialog.jid, password);
+        dialog.client.connectToServer(dialog.jid, password);
         dialog.close();
     }
 }
