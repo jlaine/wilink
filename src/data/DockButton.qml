@@ -22,15 +22,32 @@ import QtQuick 1.1
 Item {
     id: button
 
-    property bool active: dialogSwapper.currentSource == 'PreferenceDialog.qml' ? dialogSwapper.currentSource == panelSource : swapper.currentSource == panelSource
+    property bool active
     property bool enabled: true
     property bool notified: false
     property string iconSource: ''
     property string iconPress: ''
+    property variant panelProperties
     property string panelSource: ''
     property string text
     property int shortcut: 0
     signal clicked
+
+    active: {
+        if (panelSource == 'PreferenceDialog.qml') {
+            return dialogSwapper.currentSource == panelSource;
+        } else if (panelSource == 'ChatPanel.qml') {
+            var item = swapper.model.get(swapper.currentIndex);
+            return item.source == panelSource &&
+                   item.properties.accountJid == panelProperties.accountJid;
+        } else if (panelSource == 'PhotoPanel.qml') {
+            var item = swapper.model.get(swapper.currentIndex);
+            return item.source == panelSource &&
+                   item.properties.url == panelProperties.url;
+        } else {
+            return swapper.currentSource == panelSource;
+        }
+    }
 
     height: appStyle.icon.normalSize
     width: appStyle.icon.normalSize

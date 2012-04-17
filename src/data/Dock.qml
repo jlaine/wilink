@@ -98,6 +98,7 @@ Rectangle {
                 iconSource: model.iconSource
                 iconPress: model.iconPress
                 notified: model.notified == true
+                panelProperties: model.panelProperties
                 panelSource: model.panelSource
                 shortcut: model.shortcut ? model.shortcut : 0
                 text: model.text
