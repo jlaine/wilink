@@ -23,29 +23,20 @@ import wiLink 2.0
 Rectangle {
     id: boot
 
-    property QtObject addWindow
-
     AccountModel {
         id: accountModel
     }
 
-    Repeater {
-        model: accountModel
-        delegate: Rectangle {
-            id: item
+    Component.onCompleted: {
 
-            property QtObject wnd
-
-            height: 30
-            width: 30
-            color: 'green'
-
-            Component.onCompleted: {
-                wnd = window.createWindow();
-                wnd.objectName = jid;
+        application.resetWindows.connect(function() {
+            // check we have a valid account
+            if (accountModel.count) {
+                window.minimumWidth = 240;
+                window.minimumHeight = 360;
 
                 if (application.isMobile) {
-                    wnd.fullScreen = !application.isAndroid;
+                    window.fullScreen = !application.isAndroid;
                 } else {
                     // restore window geometry
     /*
@@ -64,32 +55,22 @@ Rectangle {
                     xpos += 100;
     */
                 }
-                wnd.source = application.isMeego ? 'MeegoMain.qml' : 'MainWindow.qml';
-                wnd.showAndRaise();
-            }
-            Component.onDestruction: {
-                console.log("del wnd");
-                window.destroyWindow(wnd);
-            }
-        }
-    }
-
-    Component.onCompleted: {
-        application.resetWindows.connect(function() {
-            // check we have a valid account
-            if (!accountModel.count) {
-                console.log("no accounts");
-                if (!Qt.isQtObject(addWindow))
-                    addWindow = window.createWindow();
-                addWindow.source = application.isMeego ? 'MeegoSetup.qml' : 'SetupWindow.qml';
+                loader.source = application.isMeego ? 'MeegoMain.qml' : 'MainWindow.qml';
+            } else {
+                window.minimumWidth = 360;
+                window.minimumHeight = 240;
+                window.size = window.minimumSize;
                 //const QSize size = QApplication::desktop()->availableGeometry(window).size();
                 //window.move((size.width() - window->width()) / 2, (size.height() - window->height()) / 2);
-                addWindow.showAndRaise();
-                return;
-            } else if (Qt.isQtObject(addWindow)) {
-                window.destroyWindow(addWindow);
-                addWindow = null;
+                loader.source = application.isMeego ? 'MeegoSetup.qml' : 'SetupWindow.qml';
             }
+
+            window.showAndRaise();
         });
+    }
+
+    Loader {
+        id: loader
+        anchors.fill: parent
     }
 }

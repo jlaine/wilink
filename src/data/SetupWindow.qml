@@ -74,10 +74,6 @@ FocusScope {
     }
 
     Component.onCompleted: {
-        window.minimumWidth = 360;
-        window.minimumHeight = 240;
-        window.size = window.minimumSize;
-        window.windowTitle = application.applicationName;
         panel.forceActiveFocus();
     }
 }

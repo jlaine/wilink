@@ -84,8 +84,7 @@ Panel {
 
         model: LogModel {
             id: logModel
-
-            logger: appClient.logger
+            logger: appLogger
         }
 
         delegate: Rectangle {

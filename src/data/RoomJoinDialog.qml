@@ -19,6 +19,7 @@
 
 import QtQuick 1.1
 import wiLink 2.0
+import 'utils.js' as Utils
 
 Dialog {
     id: dialog
@@ -35,7 +36,7 @@ Dialog {
             var jid = roomEdit.text;
             if (jid.indexOf('@') < 0)
                 jid += '@' + roomView.model.rootJid;
-            var panel = swapper.findPanel('ChatPanel.qml');
+            var panel = swapper.findPanel('ChatPanel.qml', {'accountJid': Utils.jidToBareJid(appClient.jid)});
             panel.showRoom(jid);
             dialog.close();
         }

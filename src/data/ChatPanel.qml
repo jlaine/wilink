@@ -18,14 +18,34 @@
  */
 
 import QtQuick 1.1
+import QXmpp 0.4
 import wiLink 2.0
 import 'utils.js' as Utils
 
 Panel {
     id: chatPanel
 
+    property string accountJid
+    property alias client: appClient
     property alias rooms: roomListModel
     property bool pendingMessages: (roomListModel.pendingMessages + rosterModel.pendingMessages) > 0
+
+    Client {
+        id: appClient
+
+        logger: appLogger
+
+        onAuthenticationFailed: {
+            console.log("Failed to authenticate with chat server");
+            var jid = Utils.jidToBareJid(appClient.jid);
+            dialogSwapper.showPanel('AccountPasswordDialog.qml', {'jid': jid});
+        }
+
+        onConflictReceived: {
+            console.log("Received a resource conflict from chat server");
+            application.quit();
+        }
+    }
 
     /** Convenience method to show a conversation panel.
      */
@@ -338,6 +358,13 @@ Panel {
                     'text': qsTr('Remove contact')});
             }
         }
+    }
+
+    onAccountJidChanged: {
+        var jid = chatPanel.accountJid;
+        var password = accountModel.getPassword(jid);
+        console.log("got jid: " + jid + ", password: " +password);
+        appClient.connectToServer(jid, password);
     }
 
     Keys.onPressed: {

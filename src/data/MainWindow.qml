@@ -27,25 +27,6 @@ FocusScope {
 
     focus: true
 
-    Client {
-        id: appClient
-
-        logger: QXmppLogger {
-            loggingType: QXmppLogger.SignalLogging
-        }
-
-        onAuthenticationFailed: {
-            console.log("Failed to authenticate with chat server");
-            var jid = Utils.jidToBareJid(appClient.jid);
-            dialogSwapper.showPanel('AccountPasswordDialog.qml', {'jid': jid});
-        }
-
-        onConflictReceived: {
-            console.log("Received a resource conflict from chat server");
-            application.quit();
-        }
-    }
-
     Item {
         id: appClipboard
 
@@ -69,6 +50,11 @@ FocusScope {
 
     AccountModel {
         id: accountModel
+    }
+
+    QXmppLogger {
+        id: appLogger
+        loggingType: QXmppLogger.SignalLogging
     }
 
     PluginLoader {
@@ -151,19 +137,6 @@ FocusScope {
     }
 
     Component.onCompleted: {
-        window.minimumWidth = 240;
-        window.minimumHeight = 360;
-
-        var jid = window.objectName;
-        if (jid == '') {
-            console.log("Failed to get window JID");
-            application.quit();
-        }
-
-        window.windowTitle = jid + ' - ' + application.applicationName;
-
-        var password = accountModel.getPassword(jid);
-        appClient.connectToServer(jid, password);
     }
 
     Keys.forwardTo: dock

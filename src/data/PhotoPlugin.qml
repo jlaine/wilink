@@ -26,24 +26,27 @@ Plugin {
     imageSource: 'photos.png'
 
     onLoaded: {
-        var url;
-        var domain = Utils.jidToDomain(appClient.jid);
-        if (domain == 'wifirst.net')
-            url = 'wifirst://default';
-        else if (domain == 'gmail.com')
-            url = 'picasa://default';
-        else
-            return;
+        for (var i = 0; i < accountModel.count; ++i) {
+            var account = accountModel.get(i);
 
-        dock.model.add({
-            'iconSource': 'dock-photo.png',
-            'iconPress': 'photos.png',
-            'panelSource': 'PhotoPanel.qml',
-            'panelProperties': {'url': url},
-            'priority': 7,
-            'shortcut': Qt.ControlModifier + Qt.Key_P,
-            'text': qsTr('Photos'),
-            'visible': true});
+            var url;
+            if (account.type == 'wifirst')
+                url = 'wifirst://default';
+            else if (account.type == 'google')
+                url = 'picasa://default';
+            else
+                continue;
+
+            dock.model.add({
+                'iconSource': 'dock-photo.png',
+                'iconPress': 'photos.png',
+                'panelSource': 'PhotoPanel.qml',
+                'panelProperties': {'url': url},
+                'priority': 7,
+                'shortcut': Qt.ControlModifier + Qt.Key_P,
+                'text': qsTr('Photos'),
+                'visible': true});
+        }
     }
 
     onUnloaded: {

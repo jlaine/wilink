@@ -344,7 +344,7 @@ Panel {
     Binding {
         target: historyModel.client
         property: 'logger'
-        value: appClient.logger
+        value: appLogger
     }
 
     Connections {

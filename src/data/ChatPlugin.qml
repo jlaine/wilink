@@ -25,15 +25,21 @@ Plugin {
     imageSource: 'chat.png'
 
     onLoaded: {
-        dock.model.add({
-            'iconSource': 'dock-chat.png',
-            'iconPress': 'chat.png',
-            'notified': false,
-            'panelSource': 'ChatPanel.qml',
-            'priority': 10,
-            'text': qsTr('Chat'),
-            'visible': true});
-        swapper.showPanel('ChatPanel.qml');
+        for (var i = 0; i < accountModel.count; ++i) {
+            var account = accountModel.get(i);
+            console.log("got account:" + account.jid);
+
+            dock.model.add({
+                'iconSource': 'dock-chat.png',
+                'iconPress': 'chat.png',
+                'notified': false,
+                'panelProperties': {'accountJid': account.jid},
+                'panelSource': 'ChatPanel.qml',
+                'priority': 10,
+                'text': qsTr('Chat'),
+                'visible': true});
+            swapper.showPanel('ChatPanel.qml', {'accountJid': account.jid});
+        }
     }
 
     onUnloaded: {

@@ -18,7 +18,6 @@
  */
 
 import QtQuick 1.1
-import 'utils.js' as Utils
 
 Plugin {
     id: plugin
@@ -30,17 +29,19 @@ Plugin {
     imageSource: 'phone.png'
 
     onLoaded: {
-        if (Utils.jidToDomain(appClient.jid) != 'wifirst.net')
-            return;
-        dock.model.add({
-            'iconSource': 'dock-phone.png',
-            'iconPress': 'phone.png',
-            'panelSource': 'PhonePanel.qml',
-            'priority': 9,
-            'shortcut': Qt.ControlModifier + Qt.Key_T,
-            'text': qsTr('Phone'),
-            'visible': true});
-        swapper.addPanel('PhonePanel.qml');
+        for (var i = 0; i < accountModel.count; ++i) {
+            if (accountModel.getProperty(i, 'type') == 'wifirst') {
+                dock.model.add({
+                    'iconSource': 'dock-phone.png',
+                    'iconPress': 'phone.png',
+                    'panelSource': 'PhonePanel.qml',
+                    'priority': 9,
+                    'shortcut': Qt.ControlModifier + Qt.Key_T,
+                    'text': qsTr('Phone'),
+                    'visible': true});
+                swapper.addPanel('PhonePanel.qml');
+            }
+        }
     }
 
     onUnloaded: {

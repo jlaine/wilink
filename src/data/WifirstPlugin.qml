@@ -22,6 +22,10 @@ import QXmpp 0.4
 import 'utils.js' as Utils
 
 Plugin {
+    id: plugin
+
+    property string accountJid
+
     name: 'Wifirst'
     description: qsTr('This plugin allows you to access Wifirst services.')
     imageSource: 'wiLink.png'
@@ -52,7 +56,7 @@ Plugin {
                     // check for "home" chat room
                     var roomCap = listModel.get(i).link.match(/xmpp:([^?]+)\?join/);
                     if (roomCap) {
-                        var panel = swapper.findPanel('ChatPanel.qml');
+                        var panel = swapper.findPanel('ChatPanel.qml', {'accountJid': plugin.accountJid});
                         panel.rooms.addRoom(roomCap[1]);
                     }
                 }
@@ -80,15 +84,21 @@ Plugin {
     }
 
     onLoaded: {
-        if (Utils.jidToDomain(appClient.jid) != 'wifirst.net')
-            return;
+        for (var i = 0; i < accountModel.count; ++i) {
+            var account = accountModel.get(i);
+            if (account.type == 'wifirst') {
+                plugin.accountJid = account.jid;
 
-        if (appClient.state == QXmppClient.ConnectedState) {
-            timer.triggered();
-        } else {
-            appClient.connected.connect(function() {
-                timer.triggered();
-            });
+                var panel = swapper.findPanel('ChatPanel.qml', {accountJid: account.jid});
+                if (panel.client.state == QXmppClient.ConnectedState) {
+                    timer.triggered();
+                } else {
+                    panel.client.connected.connect(function() {
+                        timer.triggered();
+                    });
+                }
+                break;
+            }
         }
     }
 }
