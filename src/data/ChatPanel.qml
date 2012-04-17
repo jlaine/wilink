@@ -50,7 +50,7 @@ Panel {
     /** Convenience method to show a conversation panel.
      */
     function showConversation(jid) {
-        swapper.showPanel('ChatPanel.qml');
+        swapper.showPanel('ChatPanel.qml', {accountJid: chatPanel.accountJid});
         chatSwapper.showPanel('ConversationPanel.qml', {'jid': Utils.jidToBareJid(jid)});
         if (chatPanel.singlePanel)
             chatPanel.state = 'no-sidebar';
@@ -59,7 +59,7 @@ Panel {
     /** Convenience method to show a chat room panel.
      */
     function showRoom(jid) {
-        swapper.showPanel('ChatPanel.qml');
+        swapper.showPanel('ChatPanel.qml', {accountJid: chatPanel.accountJid});
         chatSwapper.showPanel('RoomPanel.qml', {'jid': jid})
         if (chatPanel.singlePanel)
             chatPanel.state = 'no-sidebar';
@@ -299,7 +299,8 @@ Panel {
 
     onPendingMessagesChanged: {
         for (var i = 0; i < dock.model.count; i++) {
-            if (dock.model.get(i).panelSource == 'ChatPanel.qml') {
+            if (dock.model.get(i).panelSource == 'ChatPanel.qml' &&
+                dock.model.get(i).panelProperties.accountJid == chatPanel.accountJid) {
                 dock.model.setProperty(i, 'notified', pendingMessages);
                 break;
             }
