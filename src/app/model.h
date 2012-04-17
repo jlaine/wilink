@@ -58,13 +58,18 @@ public:
 
     // QAbstractItemModel
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
-    QModelIndex index(int row, int column, const QModelIndex &parent) const;
+    QModelIndex index(int row, int column, const QModelIndex &parent = QModelIndex()) const;
     QModelIndex parent(const QModelIndex &index) const;
     bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex());
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
 
 signals:
     void countChanged();
+
+public slots:
+    // QML ListModel
+    QVariant get(int row) const;
+    QVariant getProperty(int row, const QString &name) const;
 
 protected:
     void addItem(ChatModelItem *item, ChatModelItem *parentItem, int pos = -1);

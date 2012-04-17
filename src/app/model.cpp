@@ -98,6 +98,32 @@ QModelIndex ChatModel::createIndex(ChatModelItem *item, int column) const
         return QModelIndex();
 }
 
+QVariant ChatModel::get(int row) const
+{
+    const QModelIndex idx = index(row, 0);
+    if (idx.isValid()) {
+        QVariantMap result;
+        const QHash<int, QByteArray> roleMap = roleNames();
+        foreach (int role, roleMap.keys()) {
+            const QString name = QString::fromAscii(roleMap.value(role));
+            result.insert(name, idx.data(role));
+        }
+        result.insert("index", row);
+        return result;
+    }
+    return QVariant();
+}
+
+QVariant ChatModel::getProperty(int row, const QString &name) const
+{
+    const QModelIndex idx = index(row, 0);
+    if (idx.isValid()) {
+        const int role = roleNames().key(name.toAscii());
+        return idx.data(role);
+    }
+    return QVariant();
+}
+
 QModelIndex ChatModel::index(int row, int column, const QModelIndex &parent) const
 {
     if (!hasIndex(row, column, parent))
