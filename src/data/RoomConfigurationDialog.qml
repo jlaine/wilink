@@ -88,7 +88,7 @@ Dialog {
     }
 
     onAccepted: {
-        configurationModel.save();
+        configurationModel.submit();
         dialog.close();
     }
 }

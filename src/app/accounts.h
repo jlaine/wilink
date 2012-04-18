@@ -32,14 +32,17 @@ public:
     AccountModel(QObject *parent = 0);
     ~AccountModel();
 
-    // QAbstractItemModel interface
+    /// \cond
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    /// \endcond
 
 public slots:
     // QML ListModel
     void append(const QVariantMap &obj);
     void remove(int index);
-    void save();
+
+    // QAbstractItemModel
+    bool submit();
 
     // Wallet
     QString getPassword(const QString &jid) const;

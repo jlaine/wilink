@@ -25,9 +25,7 @@ Panel {
     id: panel
 
     function save() {
-        // save accounts
-        listPanel.model.save();
-        application.resetWindows();
+        listPanel.model.submit();
     }
 
     color: 'transparent'

@@ -50,8 +50,7 @@ FocusScope {
 
         onAccepted: {
             model.append({'jid': jid, 'password': password});
-            model.save();
-            application.resetWindows();
+            model.submit();
         }
         onClose: application.quit()
     }

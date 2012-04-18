@@ -129,7 +129,7 @@ void AccountModel::remove(int index)
     removeRows(index, 1);
 }
 
-void AccountModel::save()
+bool AccountModel::submit()
 {
     QStringList newJids;
 
@@ -159,6 +159,9 @@ void AccountModel::save()
         if (other != this)
             other->_q_reload();
     }
+
+    QMetaObject::invokeMethod(wApp, "resetWindows");
+    return true;
 }
 
 QString AccountModel::getPassword(const QString &jid) const

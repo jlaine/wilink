@@ -123,19 +123,21 @@ int RoomConfigurationModel::rowCount(const QModelIndex &parent) const
     return parent.isValid() ? 0 : m_form.fields().size();
 }
 
-void RoomConfigurationModel::save()
-{
-    if (m_room) {
-        m_room->setConfiguration(m_form);
-    }
-}
-
 void RoomConfigurationModel::setValue(int row, const QVariant &value)
 {
     if (row > 0 && row <  m_form.fields().size() &&
         value != m_form.fields()[row].value()) {
         m_form.fields()[row].setValue(value);
         emit dataChanged(index(row), index(row));
+    }
+}
+
+bool RoomConfigurationModel::submit()
+{
+    if (m_room) {
+        return m_room->setConfiguration(m_form);
+    } else {
+        return false;
     }
 }
 
@@ -679,10 +681,10 @@ void RoomPermissionModel::setRoom(QXmppMucRoom *room)
     }
 }
 
-void RoomPermissionModel::save()
+bool RoomPermissionModel::submit()
 {
     if (!m_room)
-        return;
+        return false;
 
     QList<QXmppMucItem> permissions;
     foreach (ChatModelItem *ptr, rootItem->children) {
@@ -694,7 +696,7 @@ void RoomPermissionModel::save()
         permissions << mucItem;
     }
 
-    m_room->setPermissions(permissions);
+    return m_room->setPermissions(permissions);
 }
 
 void RoomPermissionModel::_q_permissionsReceived(const QList<QXmppMucItem> &permissions)

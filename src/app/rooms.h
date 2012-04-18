@@ -39,9 +39,11 @@ class RoomConfigurationModel : public QAbstractListModel
 public:
     RoomConfigurationModel(QObject *parent = 0);
 
+    /// cond
     QVariant data(const QModelIndex &index, int role) const;
     QModelIndex index(int row, int column = 0, const QModelIndex & parent = QModelIndex()) const;
     int rowCount(const QModelIndex &parent) const;
+    /// endcond
 
     QXmppMucRoom *room() const;
     void setRoom(QXmppMucRoom *room);
@@ -50,8 +52,8 @@ signals:
     void roomChanged(QXmppMucRoom *room);
 
 public slots:
-    void save();
     void setValue(int row, const QVariant &value);
+    bool submit();
 
 private slots:
     void _q_configurationReceived(const QXmppDataForm &configuration);
@@ -175,7 +177,7 @@ signals:
 public slots:
     void setPermission(const QString &jid, int affiliation);
     void removePermission(const QString &jid);
-    void save();
+    bool submit();
 
 private slots:
     void _q_permissionsReceived(const QList<QXmppMucItem> &permissions);

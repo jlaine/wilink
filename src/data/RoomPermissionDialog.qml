@@ -172,7 +172,7 @@ Dialog {
     }
 
     onAccepted: {
-        permissionModel.save();
+        permissionModel.submit();
         dialog.close();
     }
 }
