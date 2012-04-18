@@ -33,8 +33,6 @@ Panel {
         application.settings.sharesDirectories = urls;
     }
 
-    color: 'transparent'
-
     GroupBox {
         id: places
 

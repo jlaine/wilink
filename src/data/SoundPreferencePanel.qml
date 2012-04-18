@@ -39,8 +39,6 @@ Panel {
         application.settings.outgoingMessageSound = outgoingMessageSound.checked ? ':/message-outgoing.ogg' : '';
     }
 
-    color: 'transparent'
-
     SoundTester {
         id: tester
 

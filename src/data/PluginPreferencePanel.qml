@@ -33,8 +33,6 @@ Panel {
         appPlugins.storePreferences();
     }
 
-    color: 'transparent'
-
     GroupBox {
         id: list
 

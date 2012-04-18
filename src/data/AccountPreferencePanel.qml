@@ -28,8 +28,6 @@ Panel {
         listPanel.model.submit();
     }
 
-    color: 'transparent'
-
     GroupBox {
         id: accounts
 

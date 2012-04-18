@@ -30,8 +30,6 @@ Panel {
         application.settings.sortContactsByStatus = sortContactsByStatus.checked;
     }
 
-    color: 'transparent'
-
     GroupBox {
         id: general
 

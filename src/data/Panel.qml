@@ -22,7 +22,6 @@ import QtQuick 1.1
 FocusScope {
     id: panel
 
-    property alias color: background.color
     property bool singlePanel: width < 500
 
     signal close
@@ -30,11 +29,5 @@ FocusScope {
 
     anchors.fill: parent
     opacity: 0
-
-    Rectangle {
-        id: background
-        anchors.fill: parent
-        z: -1
-    }
 }
 
