@@ -99,7 +99,6 @@ public:
     ApplicationSettings *settings() const;
 
 signals:
-    void resetWindows();
     void showWindows();
 
 public slots:

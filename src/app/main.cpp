@@ -21,7 +21,6 @@
 #include <signal.h>
 
 #include <QLocale>
-#include <QTimer>
 #include <QTranslator>
 
 #ifdef Q_OS_WIN
@@ -67,15 +66,13 @@ int main(int argc, char *argv[])
     /* Create system tray icon */
     app.createSystemTrayIcon();
 
+    /* Create window */
     Window window;
 #ifdef MEEGO_EDITION_HARMATTAN
     window.setSource(app.qmlUrl("MeegoMain.qml"));
 #else
     window.setSource(app.qmlUrl("Main.qml"));
 #endif
-
-    /* Show chat windows */
-    QTimer::singleShot(0, &app, SLOT(resetWindows()));
 
     /* Run application */
     return app.exec();

@@ -25,31 +25,28 @@ Rectangle {
 
     AccountModel {
         id: accountModel
-    }
 
-    Component.onCompleted: {
-        window.minimumWidth = 360;
-        window.minimumHeight = 360;
-
-        if (application.isMobile) {
-            window.fullScreen = !application.isAndroid;
-        } else {
-            window.fullScreen = false;
-        }
-
-        application.resetWindows.connect(function() {
+        onModelReset: {
             loader.source = '';
             loader.source = accountModel.count ? 'MainWindow.qml' : 'SetupWindow.qml';
-            window.showAndRaise();
-        });
-
-        application.showWindows.connect(function() {
-            window.showAndRaise();
-        });
+        }
     }
 
     Loader {
         id: loader
         anchors.fill: parent
+    }
+
+    Component.onCompleted: {
+        window.minimumWidth = 360;
+        window.minimumHeight = 360;
+        window.fullScreen = application.isMobile && !application.isAndroid;
+        window.showAndRaise();
+
+        application.showWindows.connect(function() {
+            window.showAndRaise();
+        });
+
+        loader.source = accountModel.count ? 'MainWindow.qml' : 'SetupWindow.qml';
     }
 }

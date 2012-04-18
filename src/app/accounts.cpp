@@ -160,7 +160,6 @@ bool AccountModel::submit()
             other->_q_reload();
     }
 
-    QMetaObject::invokeMethod(wApp, "resetWindows");
     return true;
 }
 
@@ -190,11 +189,19 @@ bool AccountModel::setPassword(const QString &jid, const QString &password)
 
 void AccountModel::_q_reload()
 {
-    removeRows(0, rootItem->children.size());
+    beginResetModel();
+
+    foreach (ChatModelItem *item, rootItem->children)
+        delete item;
+    rootItem->children.clear();
 
     const QStringList chatJids = wApp->settings()->chatAccounts();
     foreach (const QString &jid, chatJids) {
-        addItem(new AccountItem(jid), rootItem);
+        AccountItem *item = new AccountItem(jid);
+        item->parent = rootItem;
+        rootItem->children.append(item);
     }
+
+    endResetModel();
 }
 
