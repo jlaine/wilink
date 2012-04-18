@@ -30,7 +30,7 @@ Panel {
             else
                 appPlugins.unloadPlugin(plugin.source);
         }
-        //appPlugins.storePreferences();
+        appPlugins.storePreferences();
     }
 
     GroupBox {
