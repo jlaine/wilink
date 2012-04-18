@@ -29,15 +29,6 @@ FocusScope {
     signal addressClicked(string address)
 
     Rectangle {
-        id: background
-        anchors.fill: parent
-        border.color: '#88a4d1'
-        border.width: 1
-        color: '#ffffff'
-        smooth: true
-    }
-
-    Rectangle {
         id: header
         anchors.left: parent.left
         anchors.right: parent.right
