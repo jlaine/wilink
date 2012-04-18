@@ -74,7 +74,7 @@ FocusScope {
 
     Rectangle {
         anchors.fill: parent
-        color: 'pink'
+        color: 'white'
     }
 
     Loader {
