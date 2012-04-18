@@ -30,15 +30,8 @@
 #include <QSystemTrayIcon>
 #endif
 
-#define HELP_URL "https://www.wifirst.net/wilink/faq"
-
-class UpdateDialog;
-class Updater;
-class QAuthenticator;
-class QAbstractNetworkCache;
 class QSoundPlayer;
 class QSystemTrayIcon;
-class QThread;
 
 class ApplicationPrivate;
 class ApplicationSettings;
