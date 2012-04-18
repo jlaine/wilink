@@ -23,8 +23,6 @@ import wiLink 2.0
 import 'utils.js' as Utils
 
 FocusScope {
-    id: root
-
     focus: true
 
     AccountModel {
@@ -118,9 +116,6 @@ FocusScope {
             target: menuLoader.item
             onItemClicked: menuLoader.hide()
         }
-    }
-
-    Component.onCompleted: {
     }
 
     Keys.forwardTo: dock

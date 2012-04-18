@@ -20,7 +20,7 @@
 import QtQuick 1.1
 import wiLink 2.0
 
-Rectangle {
+FocusScope {
     id: root
 
     AccountModel {
