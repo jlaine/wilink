@@ -70,6 +70,8 @@ public:
     bool invitePending;
     bool inviteQueued;
     SipMessage inviteRequest;
+    QHostAddress localRtpAddress;
+    quint16 localRtpPort;
     QByteArray remoteRecipient;
     QList<QByteArray> remoteRoute;
     QHostAddress remoteRtpAddress;

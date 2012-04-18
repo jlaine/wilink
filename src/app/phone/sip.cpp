@@ -159,6 +159,7 @@ SipCallPrivate::SipCallPrivate(SipCall *qq)
     , activeTime("0 0")
     , invitePending(false)
     , inviteQueued(false)
+    , localRtpPort(0)
     , remoteRtpPort(0)
     , q(qq)
 {
@@ -303,15 +304,6 @@ static QString addressToSdp(const QHostAddress &host)
 
 SdpMessage SipCallPrivate::buildSdp(const QList<QXmppJinglePayloadType> &payloadTypes) const
 {
-    QXmppJingleCandidate localCandidate;
-    foreach (const QXmppJingleCandidate &candidate, iceConnection->localCandidates()) {
-        if (candidate.component() == RTP_COMPONENT &&
-            candidate.type() == QXmppJingleCandidate::ServerReflexiveType) {
-            localCandidate = candidate;
-            break;
-        }
-    }
-
     static const QDateTime ntpEpoch(QDate(1900, 1, 1));
     quint32 ntpSeconds = ntpEpoch.secsTo(QDateTime::currentDateTime());
 
@@ -322,7 +314,7 @@ SdpMessage SipCallPrivate::buildSdp(const QList<QXmppJinglePayloadType> &payload
         QString::number(ntpSeconds),
         addressToSdp(client->d->localAddress)).toUtf8());
     sdp.addField('s', "-");
-    sdp.addField('c', addressToSdp(localCandidate.host()).toUtf8());
+    sdp.addField('c', addressToSdp(localRtpAddress).toUtf8());
     sdp.addField('t', activeTime);
 
     // ICE credentials
@@ -345,7 +337,7 @@ SdpMessage SipCallPrivate::buildSdp(const QList<QXmppJinglePayloadType> &payload
     }
     attrs << "sendrecv";
 
-    sdp.addField('m', "audio " + QByteArray::number(localCandidate.port()) + " "  + profiles);
+    sdp.addField('m', "audio " + QByteArray::number(localRtpPort) + " "  + profiles);
     foreach (const QByteArray &attr, attrs)
         sdp.addField('a', attr);
 
@@ -657,10 +649,13 @@ void SipCall::localCandidatesChanged()
     bool foundRtcp = false;
     foreach (const QXmppJingleCandidate &candidate, d->iceConnection->localCandidates()) {
         if (candidate.type() == QXmppJingleCandidate::ServerReflexiveType) {
-            if (candidate.component() == RTP_COMPONENT)
+            if (candidate.component() == RTP_COMPONENT) {
                 foundRtp = true;
-            else if (candidate.component() == RTCP_COMPONENT)
+                d->localRtpAddress = candidate.host();
+                d->localRtpPort = candidate.port();
+            } else if (candidate.component() == RTCP_COMPONENT) {
                 foundRtcp = true;
+            }
         }
     }
 
@@ -669,6 +664,26 @@ void SipCall::localCandidatesChanged()
         d->sendInvite();
         d->inviteQueued = false;
     }
+}
+
+QHostAddress SipCall::localRtpAddress() const
+{
+    return d->localRtpAddress;
+}
+
+void SipCall::setLocalRtpAddress(const QHostAddress &address)
+{
+    d->localRtpAddress = address;
+}
+
+quint16 SipCall::localRtpPort() const
+{
+    return d->localRtpPort;
+}
+
+void SipCall::setLocalRtpPort(quint16 port)
+{
+    d->localRtpPort = port;
 }
 
 QString SipCall::recipient() const
@@ -1342,6 +1357,11 @@ QString SipClient::domain() const
 void SipClient::setDomain(const QString &domain)
 {
     d->domain = domain;
+}
+
+QHostAddress SipClient::localAddress() const
+{
+    return d->localAddress;
 }
 
 QXmppLogger *SipClient::logger() const

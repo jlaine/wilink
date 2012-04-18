@@ -164,6 +164,12 @@ public:
     QString recipient() const;
     QXmppCall::State state() const;
 
+    QHostAddress localRtpAddress() const;
+    void setLocalRtpAddress(const QHostAddress &address);
+
+    quint16 localRtpPort() const;
+    void setLocalRtpPort(quint16 port);
+
     QHostAddress remoteRtpAddress() const;
     quint16 remoteRtpPort() const;
 
@@ -236,6 +242,8 @@ public:
 
     QString domain() const;
     void setDomain(const QString &domain);
+
+    QHostAddress localAddress() const;
 
     QXmppLogger *logger() const;
     void setLogger(QXmppLogger *logger);
