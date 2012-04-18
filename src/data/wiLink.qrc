@@ -109,7 +109,7 @@
     <file>ScrollBar.qml</file>
     <file>ScrollView.qml</file>
     <file>SendPanel.qml</file>
-    <file>SetupWindow.qml</file>
+    <file>SetupDialog.qml</file>
     <file>SharePanel.qml</file>
     <file>SharePlugin.qml</file>
     <file>SharePreferencePanel.qml</file>

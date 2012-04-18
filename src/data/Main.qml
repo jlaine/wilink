@@ -21,20 +21,37 @@ import QtQuick 1.1
 import wiLink 2.0
 
 Rectangle {
-    id: boot
+    id: root
 
     AccountModel {
         id: accountModel
 
         onModelReset: {
             loader.source = '';
-            loader.source = accountModel.count ? 'MainWindow.qml' : 'SetupWindow.qml';
+            if (accountModel.count)
+                loader.source = 'MainWindow.qml';
         }
+    }
+
+    Style {
+        id: appStyle
+        isMobile: application.isMobile
+    }
+
+    Rectangle {
+        anchors.fill: parent
+        color: 'pink'
     }
 
     Loader {
         id: loader
+
         anchors.fill: parent
+    }
+
+    SetupDialog {
+        anchors.centerIn: parent
+        opacity: accountModel.count ? 0.0 : 1.0;
     }
 
     Component.onCompleted: {
@@ -47,6 +64,6 @@ Rectangle {
             window.showAndRaise();
         });
 
-        loader.source = accountModel.count ? 'MainWindow.qml' : 'SetupWindow.qml';
+        loader.source = accountModel.count ? 'MainWindow.qml' : '';
     }
 }

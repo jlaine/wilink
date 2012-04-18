@@ -43,11 +43,6 @@ FocusScope {
         }
     }
 
-    Style {
-        id: appStyle
-        isMobile: application.isMobile
-    }
-
     AccountModel {
         id: accountModel
 

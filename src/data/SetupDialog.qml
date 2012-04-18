@@ -21,19 +21,11 @@ import QtQuick 1.1
 import wiLink 2.0
 import 'utils.js' as Utils
 
-FocusScope {
-    id: root
+Dialog {
+    id: dialog
 
     focus: true
-
-    Style {
-        id: appStyle
-    }
-
-    Rectangle {
-        color: 'white'
-        anchors.fill: parent
-    }
+    opacity: 1
 
     AccountAddPanel {
         id: panel
