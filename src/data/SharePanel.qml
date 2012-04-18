@@ -104,7 +104,7 @@ Panel {
             anchors.verticalCenter: parent.verticalCenter
             anchors.margins: 8
             hintText: qsTr('Enter the name of the file you are looking for.')
-            state: (view.count == 0 && !view.model.busy && searchEdit.text.length > 0) ? 'error' : ''
+            state: (view.model.count == 0 && !view.model.busy && searchEdit.text.length > 0) ? 'error' : ''
 
             onTextChanged: searchTimer.restart()
 
@@ -142,6 +142,17 @@ Panel {
         anchors.bottom: queueHelp.top
 
         model: FolderModel {
+            onCountChanged: {
+                // show dock icon
+                if (rootUrl == 'share:' && count > 0) {
+                    for (var i = 0; i < dock.model.count; i++) {
+                        if (dock.model.get(i).panelSource == 'SharePanel.qml') {
+                            dock.model.setProperty(i, 'visible', true);
+                            break;
+                        }
+                    }
+                }
+            }
         }
 
         Spinner {

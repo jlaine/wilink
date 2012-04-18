@@ -32,7 +32,7 @@ Plugin {
             'priority': 8,
             'shortcut': Qt.ControlModifier + Qt.Key_S,
             'text': qsTr('Shares'),
-            'visible': true});
+            'visible': false});
         appPreferences.append({
             'iconSource': 'share.png',
             'name': qsTr('Shares'),
