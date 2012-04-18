@@ -26,15 +26,16 @@ Dialog {
 
     focus: true
     opacity: 1
+    title: qsTr('Add an account')
+    footerComponent: PanelHelp {
+        anchors.margins: 8
+        text: qsTr('If you need help, please refer to the <a href="%1">%2 FAQ</a>.').replace('%1', 'https://www.wifirst.net/wilink/faq').replace('%2', application.applicationName)
+    }
 
     AccountAddPanel {
         id: panel
 
-        anchors.top: parent.top
-        anchors.bottom: help.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.margins: 8
+        anchors.fill: dialog.contents
         domain: 'wifirst.net'
         focus: true
         model: AccountModel {}
@@ -45,17 +46,6 @@ Dialog {
             model.submit();
         }
         onClose: application.quit()
-    }
-
-    PanelHelp {
-        id: help
-
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.margins: 8
-
-        text: qsTr('If you need help, please refer to the <a href="%1">%2 FAQ</a>.').replace('%1', 'https://www.wifirst.net/wilink/faq').replace('%2', application.applicationName)
     }
 
     Connections {
