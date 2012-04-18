@@ -159,6 +159,7 @@ SipCallPrivate::SipCallPrivate(SipCall *qq)
     , activeTime("0 0")
     , invitePending(false)
     , inviteQueued(false)
+    , remoteRtpPort(0)
     , q(qq)
 {
 }

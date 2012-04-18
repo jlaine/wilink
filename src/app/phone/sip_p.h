@@ -72,6 +72,8 @@ public:
     SipMessage inviteRequest;
     QByteArray remoteRecipient;
     QList<QByteArray> remoteRoute;
+    QHostAddress remoteRtpAddress;
+    quint16 remoteRtpPort;
     QByteArray remoteUri;
 
     SipClient *client;
