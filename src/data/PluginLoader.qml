@@ -101,7 +101,7 @@ Item {
     }
 
     // FIXME : get / set preferences
-    Component.onCompleted: {
+    function populate() {
         pluginModel.append({ source: 'ChatPlugin.qml', autoload: true });
         pluginModel.append({ source: 'DebugPlugin.qml' });
         pluginModel.append({ source: 'DiagnosticPlugin.qml', autoload: true });
@@ -123,5 +123,13 @@ Item {
         for (var i in application.settings.enabledPlugins) {
             loadPlugin(application.settings.enabledPlugins[i]);
         }
+    }
+
+    Timer {
+        interval: 100
+        repeat: false
+        running: true
+
+        onTriggered: loader.populate()
     }
 }
