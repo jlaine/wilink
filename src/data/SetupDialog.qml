@@ -25,7 +25,6 @@ Dialog {
     id: dialog
 
     focus: true
-    opacity: 1
     title: qsTr('Add an account')
     footerComponent: PanelHelp {
         anchors.margins: 8
@@ -44,6 +43,7 @@ Dialog {
         onAccepted: {
             model.append({'jid': jid, 'password': password});
             model.submit();
+            dialog.accepted();
         }
         onClose: application.quit()
     }

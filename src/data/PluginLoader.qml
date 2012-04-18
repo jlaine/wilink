@@ -100,8 +100,29 @@ Item {
         application.settings.enabledPlugins = enabledPlugins;
     }
 
-    // FIXME : get / set preferences
-    function populate() {
+    function load() {
+        console.log("loading plugins");
+
+        // FIXME : get / set preferences
+        for (var i = 0; i < pluginModel.count; i++) {
+            var plugin = pluginModel.get(i);
+            if (plugin.autoload && application.settings.disabledPlugins.indexOf(plugin.source) < 0)
+                loadPlugin(plugin.source);
+        }
+        for (var i in application.settings.enabledPlugins) {
+            loadPlugin(application.settings.enabledPlugins[i]);
+        }
+    }
+
+    function unload() {
+        console.log("unloading plugins");
+        for (var i = pluginModel.count - 1; i >= 0; i--) {
+            var plugin = pluginModel.get(i);
+            unloadPlugin(plugin.source);
+        }
+    }
+
+    Component.onCompleted: {
         pluginModel.append({ source: 'ChatPlugin.qml', autoload: true });
         pluginModel.append({ source: 'DebugPlugin.qml' });
         pluginModel.append({ source: 'DiagnosticPlugin.qml', autoload: true });
@@ -114,22 +135,5 @@ Item {
         pluginModel.append({ source: 'SharePlugin.qml', autoload: true });
         pluginModel.append({ source: 'WebPlugin.qml' });
         pluginModel.append({ source: 'WifirstPlugin.qml', autoload: true });
-
-        for (var i = 0; i < pluginModel.count; i++) {
-            var plugin = pluginModel.get(i);
-            if (plugin.autoload && application.settings.disabledPlugins.indexOf(plugin.source) < 0)
-                loadPlugin(plugin.source);
-        }
-        for (var i in application.settings.enabledPlugins) {
-            loadPlugin(application.settings.enabledPlugins[i]);
-        }
-    }
-
-    Timer {
-        interval: 100
-        repeat: false
-        running: true
-
-        onTriggered: loader.populate()
     }
 }

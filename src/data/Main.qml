@@ -18,6 +18,7 @@
  */
 
 import QtQuick 1.1
+import QXmpp 0.4
 import wiLink 2.0
 
 FocusScope {
@@ -26,11 +27,32 @@ FocusScope {
     AccountModel {
         id: accountModel
 
-        onModelReset: {
-            loader.source = '';
-            if (accountModel.count)
-                loader.source = 'MainWindow.qml';
+        function clientForJid(jid) {
+            var panel = swapper.findPanel('ChatPanel.qml', {accountJid: jid});
+            return panel ? panel.client : undefined;
         }
+
+        onModelReset: {
+            appPlugins.unload();
+            if (accountModel.count) {
+                appPlugins.load();
+            } else {
+                dialogSwapper.showPanel('SetupDialog.qml');
+            }
+        }
+    }
+
+    QXmppLogger {
+        id: appLogger
+        loggingType: QXmppLogger.SignalLogging
+    }
+
+    PluginLoader {
+        id: appPlugins
+    }
+
+    PreferenceModel {
+        id: appPreferences
     }
 
     Style {
@@ -49,9 +71,75 @@ FocusScope {
         anchors.fill: parent
     }
 
-    SetupDialog {
-        anchors.centerIn: parent
-        opacity: accountModel.count ? 0.0 : 1.0;
+    Dock {
+        id: dock
+
+        anchors.left: parent.left
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        z: 1
+    }
+
+    PanelSwapper {
+        id: swapper
+
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        anchors.left: dock.right
+        anchors.right: parent.right
+        focus: true
+    }
+
+    MouseArea {
+        id: cancelArea
+
+        anchors.fill: parent
+        enabled: false
+        z: 11
+
+        onClicked: menuLoader.hide()
+    }
+
+    PanelSwapper {
+        id: dialogSwapper
+
+        opacity: 0
+        z: 10
+
+        onCurrentItemChanged: {
+            if (currentItem) {
+                dialogSwapper.focus = true;
+                x = Math.max(0, Math.floor((parent.width - currentItem.width) / 2));
+                y = Math.max(0, Math.floor((parent.height - currentItem.height) / 2));
+                opacity = 1;
+            } else {
+                swapper.focus = true;
+                opacity = 0;
+            }
+        }
+    }
+
+    Loader {
+        id: menuLoader
+
+        z: 12
+
+        function hide() {
+            cancelArea.enabled = false;
+            menuLoader.item.opacity = 0;
+        }
+
+        function show(x, y) {
+            cancelArea.enabled = true;
+            menuLoader.x = x;
+            menuLoader.y = y;
+            menuLoader.item.opacity = 1;
+        }
+
+        Connections {
+            target: menuLoader.item
+            onItemClicked: menuLoader.hide()
+        }
     }
 
     Component.onCompleted: {
@@ -64,6 +152,12 @@ FocusScope {
             window.showAndRaise();
         });
 
-        loader.source = accountModel.count ? 'MainWindow.qml' : '';
+        if (accountModel.count) {
+            appPlugins.load();
+        } else {
+            dialogSwapper.showPanel('SetupDialog.qml');
+        }
     }
+
+    Keys.forwardTo: dock
 }
