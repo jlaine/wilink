@@ -18,8 +18,9 @@
  */
 
 #include <QSet>
+#include <QSettings>
+#include <QStringList>
 
-#include "application.h"
 #include "accounts.h"
 #include "wallet.h"
 
@@ -132,6 +133,7 @@ void AccountModel::remove(int index)
 bool AccountModel::submit()
 {
     QStringList newJids;
+    QSettings settings;
 
     // save passwords for new accounts
     foreach (ChatModelItem *ptr, rootItem->children) {
@@ -144,7 +146,7 @@ bool AccountModel::submit()
     }
 
     // remove password for removed accounts
-    const QStringList oldJids = wApp->settings()->chatAccounts();
+    const QStringList oldJids = settings.value("ChatAccounts").toStringList();
     foreach (const QString &jid, oldJids) {
         if (!newJids.contains(jid)) {
             const QString key = realm(jid);
@@ -154,7 +156,7 @@ bool AccountModel::submit()
     }
 
     // save accounts
-    wApp->settings()->setChatAccounts(newJids);
+    settings.setValue("ChatAccounts", newJids);
     foreach (AccountModel *other, globalInstances) {
         if (other != this)
             other->_q_reload();
@@ -195,11 +197,13 @@ void AccountModel::_q_reload()
         delete item;
     rootItem->children.clear();
 
-    const QStringList chatJids = wApp->settings()->chatAccounts();
+    const QStringList chatJids = QSettings().value("ChatAccounts").toStringList();
     foreach (const QString &jid, chatJids) {
-        AccountItem *item = new AccountItem(jid);
-        item->parent = rootItem;
-        rootItem->children.append(item);
+        if (QRegExp("^[^@/ ]+@[^@/ ]+$").exactMatch(jid)) {
+            AccountItem *item = new AccountItem(jid);
+            item->parent = rootItem;
+            rootItem->children.append(item);
+        }
     }
 
     endResetModel();

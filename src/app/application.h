@@ -121,7 +121,6 @@ class ApplicationSettings : public QObject
     Q_OBJECT
     Q_PROPERTY(QString audioInputDeviceName READ audioInputDeviceName WRITE setAudioInputDeviceName NOTIFY audioInputDeviceNameChanged)
     Q_PROPERTY(QString audioOutputDeviceName READ audioOutputDeviceName WRITE setAudioOutputDeviceName NOTIFY audioOutputDeviceNameChanged)
-    Q_PROPERTY(QStringList chatAccounts READ chatAccounts WRITE setChatAccounts NOTIFY chatAccountsChanged)
     Q_PROPERTY(QStringList disabledPlugins READ disabledPlugins WRITE setDisabledPlugins NOTIFY disabledPluginsChanged)
     Q_PROPERTY(QString downloadsLocation READ downloadsLocation CONSTANT)
     Q_PROPERTY(QStringList enabledPlugins READ enabledPlugins WRITE setEnabledPlugins NOTIFY enabledPluginsChanged)
@@ -146,9 +145,6 @@ public:
 
     QString audioOutputDeviceName() const;
     void setAudioOutputDeviceName(const QString &name);
-
-    QStringList chatAccounts() const;
-    void setChatAccounts(const QStringList &accounts);
 
     QStringList disabledPlugins() const;
     void setDisabledPlugins(const QStringList &plugins);
@@ -196,7 +192,6 @@ signals:
     /// \cond
     void audioInputDeviceNameChanged(const QString &name);
     void audioOutputDeviceNameChanged(const QString &name);
-    void chatAccountsChanged(const QStringList &accounts);
     void disabledPluginsChanged(const QStringList &plugins);
     void enabledPluginsChanged(const QStringList &plugins);
     void incomingMessageNotificationChanged(bool notification);

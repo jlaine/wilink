@@ -441,16 +441,6 @@ ApplicationSettings::ApplicationSettings(QObject *parent)
     d(new ApplicationSettingsPrivate)
 {
     d->settings = new QSettings(this);
-
-    // clean acounts
-    QStringList cleanAccounts = chatAccounts();
-    foreach (const QString &jid, cleanAccounts) {
-        if (!QRegExp("^[^@/ ]+@[^@/ ]+$").exactMatch(jid)) {
-            qWarning("Removing bad account %s", qPrintable(jid));
-            cleanAccounts.removeAll(jid);
-        }
-    }
-    setChatAccounts(cleanAccounts);
 }
 
 /** Returns the name of the audio input device.
@@ -488,25 +478,6 @@ void ApplicationSettings::setAudioOutputDeviceName(const QString &name)
     if (name != audioOutputDeviceName()) {
         d->settings->setValue("AudioOutputDevice", name);
         emit audioOutputDeviceNameChanged(name);
-    }
-}
-
-/** Returns the list of chat account JIDs.
- */
-QStringList ApplicationSettings::chatAccounts() const
-{
-    return d->settings->value("ChatAccounts").toStringList();
-}
-
-/** Sets the list of chat account JIDs.
- *
- * @param accounts
- */
-void ApplicationSettings::setChatAccounts(const QStringList &accounts)
-{
-    if (accounts != chatAccounts()) {
-        d->settings->setValue("ChatAccounts", accounts);
-        emit chatAccountsChanged(accounts);
     }
 }
 
