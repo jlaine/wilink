@@ -35,6 +35,7 @@
     <file>ChatPanel.qml</file>
     <file>ChatPlugin.qml</file>
     <file>CheckBox.qml</file>
+    <file>Clipboard.qml</file>
     <file>ComboBox.qml</file>
     <file>ContactAddDialog.qml</file>
     <file>ContactAddNotification.qml</file>

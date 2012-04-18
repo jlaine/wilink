@@ -24,6 +24,10 @@ import wiLink 2.0
 Panel {
     id: panel
 
+    Clipboard {
+        id: clipboard
+    }
+
     PanelHeader {
         id: header
 
@@ -61,7 +65,7 @@ Panel {
                         text += Qt.formatDateTime(item.date, 'hh:mm:ss') + '\n';
                         text += item.content + '\n';
                     }
-                    appClipboard.copy(text);
+                    clipboard.copy(text);
                 }
             }
 

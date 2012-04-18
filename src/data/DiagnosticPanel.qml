@@ -27,6 +27,10 @@ Panel {
     property bool busy: Qt.isQtObject(client) && client.diagnosticManager.running
     property QtObject client
 
+    Clipboard {
+        id: clipboard
+    }
+
     PanelHeader {
         id: header
 
@@ -41,7 +45,7 @@ Panel {
                 enabled: !panel.busy
                 text: qsTr('Copy')
 
-                onClicked: appClipboard.copy(diagnostic.text)
+                onClicked: clipboard.copy(diagnostic.text)
             }
             ToolButton {
                 iconSource: 'refresh.png'

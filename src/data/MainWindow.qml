@@ -27,22 +27,6 @@ FocusScope {
 
     focus: true
 
-    Item {
-        id: appClipboard
-
-        visible: false
-
-        function copy(text) {
-            helper.text = text;
-            helper.selectAll();
-            helper.copy();
-        }
-
-        TextEdit {
-            id: helper
-        }
-    }
-
     AccountModel {
         id: accountModel
 

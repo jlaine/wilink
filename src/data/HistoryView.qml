@@ -29,6 +29,10 @@ Item {
 
     clip: true
 
+    Clipboard {
+        id: clipboard
+    }
+
     ListView {
         id: historyView
 
@@ -84,7 +88,7 @@ Item {
                                 text += '\n\n';
                         }
                     }
-                    appClipboard.copy(text);
+                    clipboard.copy(text);
 
                     // clear selection
                     block.state = '';
