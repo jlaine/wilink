@@ -342,10 +342,6 @@ Acceptez-vous?</translation>
         <source>Copy</source>
         <translation>Copier</translation>
     </message>
-    <message>
-        <source>Diagnostics in progress..</source>
-        <translation>Diagnostics en cours...</translation>
-    </message>
 </context>
 <context>
     <name>DiagnosticPlugin</name>
@@ -404,6 +400,17 @@ Acceptez-vous?</translation>
     <message>
         <source>Close</source>
         <translation>Fermer</translation>
+    </message>
+</context>
+<context>
+    <name>FolderQueueView</name>
+    <message>
+        <source>%1 files</source>
+        <translation>%1 fichiers</translation>
+    </message>
+    <message>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
     </message>
 </context>
 <context>
@@ -904,7 +911,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>Close</source>
-        <translation>Fermer</translation>
+        <translation type="obsolete">Fermer</translation>
     </message>
     <message>
         <source>Show this room</source>
@@ -957,10 +964,14 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>SetupWindow</name>
+    <name>SetupDialog</name>
     <message>
         <source>If you need help, please refer to the &lt;a href=&quot;%1&quot;&gt;%2 FAQ&lt;/a&gt;.</source>
         <translation>Si vous avez besoin d&apos;aide, merci de consulter la &lt;a href=&quot;%1&quot;&gt;FAQ %2&lt;/a&gt;.</translation>
+    </message>
+    <message>
+        <source>Add an account</source>
+        <translation>Ajouter un compte</translation>
     </message>
 </context>
 <context>
@@ -1034,17 +1045,6 @@ Acceptez-vous?</translation>
     <message>
         <source>My computer</source>
         <translation>Poste de travail</translation>
-    </message>
-</context>
-<context>
-    <name>FolderQueueView</name>
-    <message>
-        <source>%1 files</source>
-        <translation>%1 fichiers</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Annuler</translation>
     </message>
 </context>
 <context>

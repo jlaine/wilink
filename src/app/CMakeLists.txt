@@ -174,7 +174,7 @@ if(RELOAD_TRANSLATIONS)
         ../data/RoomParticipantView.qml
         ../data/RoomPermissionDialog.qml
         ../data/RoomSubjectDialog.qml
-        ../data/SetupWindow.qml
+        ../data/SetupDialog.qml
         ../data/SharePanel.qml
         ../data/SharePlugin.qml
         ../data/SharePreferencePanel.qml
