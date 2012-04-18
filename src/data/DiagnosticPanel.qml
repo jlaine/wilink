@@ -79,22 +79,9 @@ Panel {
         flickableItem: flickable
     }
 
-    Rectangle {
-        id: overlay
-
-        anchors.left: parent.left
-        anchors.right: scrollBar.left
-        anchors.top: header.bottom
-        anchors.bottom: parent.bottom
-        color: '#aaffffff'
-        visible: panel.busy
-        z: 10
-
-        Label {
-            anchors.centerIn: parent
-            font.pixelSize: appStyle.font.largeSize
-            text: qsTr('Diagnostics in progress..')
-        }
+    Spinner {
+        anchors.centerIn: flickable
+        busy: panel.busy
     }
 
     onAccountJidChanged: {
