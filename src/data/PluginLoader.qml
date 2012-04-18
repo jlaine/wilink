@@ -101,9 +101,6 @@ Item {
     }
 
     function load() {
-        console.log("loading plugins");
-
-        // FIXME : get / set preferences
         for (var i = 0; i < pluginModel.count; i++) {
             var plugin = pluginModel.get(i);
             if (plugin.autoload && application.settings.disabledPlugins.indexOf(plugin.source) < 0)
@@ -115,7 +112,6 @@ Item {
     }
 
     function unload() {
-        console.log("unloading plugins");
         for (var i = pluginModel.count - 1; i >= 0; i--) {
             var plugin = pluginModel.get(i);
             unloadPlugin(plugin.source);
