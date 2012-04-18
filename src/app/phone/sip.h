@@ -164,6 +164,9 @@ public:
     QString recipient() const;
     QXmppCall::State state() const;
 
+    QHostAddress remoteRtpAddress() const;
+    quint16 remoteRtpPort() const;
+
     QXmppRtpAudioChannel *audioChannel() const;
 
 signals:

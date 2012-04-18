@@ -366,10 +366,6 @@ SdpMessage SipCallPrivate::buildSdp(const QList<QXmppJinglePayloadType> &payload
 bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
 {
     QList<QXmppJinglePayloadType> payloads;
-    QXmppJingleCandidate remoteCandidate;
-    remoteCandidate.setComponent(RTP_COMPONENT);
-    remoteCandidate.setProtocol("udp");
-    remoteCandidate.setType(QXmppJingleCandidate::HostType);
 
     // parse descriptor
     QPair<char, QByteArray> field;
@@ -377,7 +373,7 @@ bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
         if (field.first == 'c') {
             // determine remote host
             if (field.second.startsWith("IN IP4 ") || field.second.startsWith("IN IP6 ")) {
-                remoteCandidate.setHost(QHostAddress(QString::fromUtf8(field.second.mid(7))));
+                remoteRtpAddress = QHostAddress(QString::fromUtf8(field.second.mid(7)));
             }
         } else if (field.first == 'm') {
             QList<QByteArray> bits = field.second.split(' ');
@@ -385,7 +381,7 @@ bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
                 continue;
 
             // determine remote port
-            remoteCandidate.setPort(bits[1].toUInt());
+            remoteRtpPort = bits[1].toUInt();
 
             // parse payload types
             for (int i = 3; i < bits.size(); ++i) {
@@ -462,10 +458,18 @@ bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
         }
     }
 
-    // add remote candidate
+    // add RTP remote candidate
+    QXmppJingleCandidate remoteCandidate;
+    remoteCandidate.setComponent(RTP_COMPONENT);
+    remoteCandidate.setProtocol("udp");
+    remoteCandidate.setType(QXmppJingleCandidate::HostType);
+    remoteCandidate.setHost(remoteRtpAddress);
+    remoteCandidate.setPort(remoteRtpPort);
     iceConnection->addRemoteCandidate(remoteCandidate);
+
+    // add RTCP remote candidate
     remoteCandidate.setComponent(RTCP_COMPONENT);
-    remoteCandidate.setPort(remoteCandidate.port() + 1);
+    remoteCandidate.setPort(remoteRtpPort + 1);
     iceConnection->addRemoteCandidate(remoteCandidate);
 
     // assign remote payload types
@@ -670,6 +674,16 @@ void SipCall::localCandidatesChanged()
 QString SipCall::recipient() const
 {
     return QString::fromUtf8(d->remoteRecipient);
+}
+
+QHostAddress SipCall::remoteRtpAddress() const
+{
+    return d->remoteRtpAddress;
+}
+
+quint16 SipCall::remoteRtpPort() const
+{
+    return d->remoteRtpPort;
 }
 
 QXmppCall::State SipCall::state() const
