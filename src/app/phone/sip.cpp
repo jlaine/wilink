@@ -501,7 +501,7 @@ void SipCallPrivate::setState(QXmppCall::State newState)
     if (state != newState)
     {
         state = newState;
-        onStateChanged();
+        //onStateChanged();
         emit q->stateChanged(state);
 
         if (state == QXmppCall::ActiveState) {

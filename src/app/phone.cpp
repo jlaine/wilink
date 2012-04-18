@@ -29,6 +29,7 @@
 
 #include "QSoundMeter.h"
 #include "QSoundPlayer.h"
+#include "QSoundStream.h"
 #include "QXmppRtpChannel.h"
 #include "QXmppUtils.h"
 
@@ -356,6 +357,7 @@ public:
     int duration;
     int flags;
 
+    QSoundStream *audioStream;
     SipCall *call;
     QNetworkReply *reply;
     int soundId;
@@ -365,6 +367,7 @@ PhoneHistoryItem::PhoneHistoryItem()
     : id(0),
     duration(0),
     flags(0),
+    audioStream(0),
     call(0),
     reply(0),
     soundId(0)
@@ -559,12 +562,36 @@ void PhoneHistoryModel::callStateChanged(QXmppCall::State state)
 
     // update the item
     if (state == QXmppCall::ActiveState) {
-        connect(call, SIGNAL(inputVolumeChanged(int)),
-                this, SIGNAL(inputVolumeChanged(int)));
-        connect(call, SIGNAL(outputVolumeChanged(int)),
-                this, SIGNAL(outputVolumeChanged(int)));
-    }
-    else if (state == QXmppCall::FinishedState) {
+
+        // start audio input / output
+        if (!item->audioStream) {
+            QXmppRtpAudioChannel *channel = item->call->audioChannel();
+
+            item->audioStream = new QSoundStream(wApp->soundPlayer());
+            item->audioStream->setDevice(channel);
+            item->audioStream->setFormat(
+                channel->payloadType().channels(),
+                channel->payloadType().clockrate());
+
+            connect(item->audioStream, SIGNAL(inputVolumeChanged(int)),
+                    this, SIGNAL(inputVolumeChanged(int)));
+            connect(item->audioStream, SIGNAL(outputVolumeChanged(int)),
+                    this, SIGNAL(outputVolumeChanged(int)));
+
+            item->audioStream->moveToThread(wApp->soundPlayer()->thread());
+            QMetaObject::invokeMethod(item->audioStream, "startOutput");
+            QMetaObject::invokeMethod(item->audioStream, "startInput");
+        }
+
+    } else if (state == QXmppCall::FinishedState) {
+        // stop audio input / output
+        if (item->audioStream) {
+            item->audioStream->stopInput();
+            item->audioStream->stopOutput();
+            delete item->audioStream;
+            item->audioStream = 0;
+        }
+
         call->disconnect(this);
         item->call = 0;
         item->duration = call->duration();
@@ -701,8 +728,11 @@ void PhoneHistoryModel::hangup()
 
 int PhoneHistoryModel::inputVolume() const
 {
-    QList<SipCall*> calls = activeCalls();
-    return calls.isEmpty() ? 0 : calls.first()->inputVolume();
+    for (int i = m_items.size() - 1; i >= 0; --i) {
+        if (m_items[i]->audioStream)
+            return m_items[i]->audioStream->inputVolume();
+    }
+    return 0;
 }
 
 int PhoneHistoryModel::maximumVolume() const
@@ -712,8 +742,11 @@ int PhoneHistoryModel::maximumVolume() const
 
 int PhoneHistoryModel::outputVolume() const
 {
-    QList<SipCall*> calls = activeCalls();
-    return calls.isEmpty() ? 0 : calls.first()->outputVolume();
+    for (int i = m_items.size() - 1; i >= 0; --i) {
+        if (m_items[i]->audioStream)
+            return m_items[i]->audioStream->outputVolume();
+    }
+    return 0;
 }
 
 /** Returns the user's own phone number.
