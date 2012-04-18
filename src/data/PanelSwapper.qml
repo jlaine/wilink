@@ -119,13 +119,6 @@ FocusScope {
         }
     }
 
-    Rectangle {
-        id: background
-        anchors.fill: parent
-
-        opacity: panelSwapper.currentIndex < 0 ? 1.0 : 0.0
-    }
-
     // private implementation
     Item {
         id: d
