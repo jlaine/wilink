@@ -74,12 +74,9 @@ FocusScope {
     }
 
     function findPanel(source, properties) {
-        if (properties == undefined)
-            properties = {};
-
         for (var i = 0; i < panels.count; i += 1) {
             if (panels.get(i).source == source &&
-                Utils.equalProperties(panels.get(i).properties, properties)) {
+                (properties === undefined || Utils.equalProperties(panels.get(i).properties, properties))) {
                 return panels.get(i).panel;
             }
         }
