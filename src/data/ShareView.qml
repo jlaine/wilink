@@ -20,131 +20,118 @@
 import QtQuick 1.1
 import 'utils.js' as Utils
 
-Item {
-    id: block
+ScrollView {
+    id: view
 
-    property alias count: view.count
-    property alias model: view.model
     property bool itemHovered: false
 
-    Rectangle {
-        id: background
+    anchors.fill: parent
+    highlight: Item {}
 
-        anchors.fill: parent
-        color: '#ffffff'
-    }
+    delegate: Item {
+        id: item
 
-    ScrollView {
-        id: view
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: thumbnail.height + appStyle.margin.normal
 
-        anchors.fill: parent
-        highlight: Item {}
+        Highlight {
+            id: highlight
 
-        delegate: Item {
-            id: item
+            anchors.fill: parent
+            state: 'inactive'
+        }
+
+        Image {
+            id: thumbnail
 
             anchors.left: parent.left
-            anchors.right: parent.right
-            height: thumbnail.height + appStyle.margin.normal
+            anchors.leftMargin: appStyle.margin.normal
+            anchors.verticalCenter: parent.verticalCenter
+            width: appStyle.icon.normalSize
+            height: appStyle.icon.normalSize
+            fillMode: Image.PreserveAspectFit
+            smooth: true
+            source: model.avatar
+        }
 
-            Highlight {
-                id: highlight
+        Image {
+            id: fire
 
-                anchors.fill: parent
-                state: 'inactive'
+            anchors.fill: thumbnail
+            source: 'fire.png'
+            smooth: true
+            visible: model.popularity > 10
+        }
+
+        Item {
+            anchors.left: thumbnail.right
+            anchors.leftMargin: appStyle.spacing.horizontal
+            anchors.right: downloadButton.left
+            anchors.rightMargin: appStyle.spacing.horizontal
+            anchors.verticalCenter: parent.verticalCenter
+            height: model.size > 0 ? text.height + sizeText.height : text.height
+
+            Label {
+                id: text
+
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.right: parent.right
+                elide: Text.ElideRight
+                text: model.name
             }
 
-            Image {
-                id: thumbnail
+            Label {
+                id: sizeText
 
                 anchors.left: parent.left
-                anchors.leftMargin: appStyle.margin.normal
-                anchors.verticalCenter: parent.verticalCenter
-                width: appStyle.icon.normalSize
-                height: appStyle.icon.normalSize
-                fillMode: Image.PreserveAspectFit
-                smooth: true
-                source: model.avatar
+                anchors.bottom: parent.bottom
+                elide: Text.ElideLeft
+                text: (model.size > 0 || !model.isDir) ? Utils.formatSize(model.size) : ''
             }
+        }
 
-            Image {
-                id: fire
+        MouseArea {
+            anchors.fill: parent
+            hoverEnabled: true
 
-                anchors.fill: thumbnail
-                source: 'fire.png'
-                smooth: true
-                visible: model.popularity > 10
-            }
-
-            Item {
-                anchors.left: thumbnail.right
-                anchors.leftMargin: appStyle.spacing.horizontal
-                anchors.right: downloadButton.left
-                anchors.rightMargin: appStyle.spacing.horizontal
-                anchors.verticalCenter: parent.verticalCenter
-                height: model.size > 0 ? text.height + sizeText.height : text.height
-
-                Label {
-                    id: text
-
-                    anchors.top: parent.top
-                    anchors.left: parent.left
-                    anchors.right: parent.right
-                    elide: Text.ElideRight
-                    text: model.name
-                }
-
-                Label {
-                    id: sizeText
-
-                    anchors.left: parent.left
-                    anchors.bottom: parent.bottom
-                    elide: Text.ElideLeft
-                    text: (model.size > 0 || !model.isDir) ? Utils.formatSize(model.size) : ''
+            onClicked: {
+                itemHovered = false
+                if (model.isDir) {
+                    crumbBar.push({'name': model.name, 'url': model.url});
                 }
             }
 
-            MouseArea {
-                anchors.fill: parent
-                hoverEnabled: true
+            onEntered: {
+                downloadButton.state = ''
+                highlight.state = ''
+                itemHovered = true
+            }
+            onExited: {
+                highlight.state = 'inactive'
+                downloadButton.state = 'inactive'
+                itemHovered = false
+            }
+        }
 
-                onClicked: {
-                    itemHovered = false
-                    if (model.isDir) {
-                        crumbBar.push({'name': model.name, 'url': model.url});
-                    }
-                }
+        Button {
+            id: downloadButton
 
-                onEntered: {
-                    downloadButton.state = ''
-                    highlight.state = ''
-                    itemHovered = true
-                }
-                onExited: {
-                    highlight.state = 'inactive'
-                    downloadButton.state = 'inactive'
-                    itemHovered = false
-                }
+            anchors.right: parent.right
+            anchors.rightMargin: appStyle.margin.normal
+            anchors.verticalCenter: parent.verticalCenter
+            iconSource: 'download.png'
+            state: 'inactive'
+            text: qsTr('Download')
+
+            onClicked: {
+                view.model.download(model.index);
             }
 
-            Button {
-                id: downloadButton
-
-                anchors.right: parent.right
-                anchors.rightMargin: appStyle.margin.normal
-                anchors.verticalCenter: parent.verticalCenter
-                iconSource: 'download.png'
-                state: 'inactive'
-                text: qsTr('Download')
-
-                onClicked: {
-                    view.model.download(model.index);
-                }
-
-                states: State {
-                    name: 'inactive'
-                    PropertyChanges { target: downloadButton; opacity: 0.5 }
-                }
+            states: State {
+                name: 'inactive'
+                PropertyChanges { target: downloadButton; opacity: 0.5 }
             }
         }
     }
