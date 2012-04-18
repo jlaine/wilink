@@ -77,8 +77,8 @@ ApplicationPrivate::ApplicationPrivate()
     , libnotify_accepts_actions(0)
 #endif
 #ifdef USE_SYSTRAY
-    , trayIcon(0),
-    , trayMenu(0),
+    , trayIcon(0)
+    , trayMenu(0)
     , trayNotification(0)
 #endif
 {
