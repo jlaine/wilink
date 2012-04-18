@@ -568,9 +568,9 @@ void PhoneHistoryModel::callStateChanged(QXmppCall::State state)
         call->disconnect(this);
         item->call = 0;
         item->duration = call->duration();
-        if (!call->error().isEmpty()) {
+        if (!call->errorString().isEmpty()) {
             item->flags |= FLAGS_ERROR;
-            emit error(call->error());
+            emit error(call->errorString());
         }
         emit currentCallsChanged();
         emit inputVolumeChanged(0);

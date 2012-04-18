@@ -233,7 +233,7 @@ void SipCallPrivate::handleReply(const SipMessage &reply)
             setState(QXmppCall::ActiveState);
         } else {
             q->warning(QString("SIP call %1 does not have a valid SDP descriptor").arg(QString::fromUtf8(id)));
-            error = QLatin1String("Invalid SDP descriptor");
+            errorString = QLatin1String("Invalid SDP descriptor");
             q->hangup();
         }
     }
@@ -242,7 +242,7 @@ void SipCallPrivate::handleReply(const SipMessage &reply)
         q->warning(QString("SIP call %1 failed").arg(
             QString::fromUtf8(id)));
         timeoutTimer->stop();
-        error = QString("%1: %2").arg(QString::number(reply.statusCode()), reply.reasonPhrase());
+        errorString = QString("%1: %2").arg(QString::number(reply.statusCode()), reply.reasonPhrase());
         setState(QXmppCall::FinishedState);
     }
 }
@@ -674,12 +674,12 @@ int SipCall::duration() const
     return 0;
 }
 
-/// Returns the call's error.
+/// Returns the call's error string.
 ///
 
-QString SipCall::error() const
+QString SipCall::errorString() const
 {
-    return d->error;
+    return d->errorString;
 }
 
 QByteArray SipCall::id() const
@@ -755,7 +755,7 @@ void SipCall::transactionFinished()
 void SipCall::handleTimeout()
 {
     warning(QString("SIP call %1 timed out").arg(QString::fromUtf8(d->id)));
-    d->error = QLatin1String("Outgoing call timed out");
+    d->errorString = QLatin1String("Outgoing call timed out");
     d->setState(QXmppCall::FinishedState);
 }
 

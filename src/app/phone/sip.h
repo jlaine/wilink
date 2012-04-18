@@ -151,6 +151,7 @@ class SipCall : public QXmppLoggable
 {
     Q_OBJECT
     Q_PROPERTY(QXmppCall::Direction direction READ direction CONSTANT)
+    Q_PROPERTY(QString errorString READ errorString NOTIFY stateChanged)
     Q_PROPERTY(QString recipient READ recipient CONSTANT)
     Q_PROPERTY(QXmppCall::State state READ state NOTIFY stateChanged)
     Q_PROPERTY(int inputVolume READ inputVolume NOTIFY inputVolumeChanged)
@@ -161,7 +162,7 @@ public:
 
     QXmppCall::Direction direction() const;
     int duration() const;
-    QString error() const;
+    QString errorString() const;
     QByteArray id() const;
     QString recipient() const;
     QXmppCall::State state() const;
