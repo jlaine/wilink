@@ -151,11 +151,19 @@ FocusScope {
         application.showWindows.connect(function() {
             window.showAndRaise();
         });
+    }
 
-        if (accountModel.count) {
-            appPlugins.load();
-        } else {
-            dialogSwapper.showPanel('SetupDialog.qml');
+    Timer {
+        interval: 100
+        repeat: false
+        running: true
+
+        onTriggered: {
+            if (accountModel.count) {
+                appPlugins.load();
+            } else {
+                dialogSwapper.showPanel('SetupDialog.qml');
+            }
         }
     }
 
