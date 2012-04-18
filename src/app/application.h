@@ -129,7 +129,6 @@ class ApplicationSettings : public QObject
     Q_PROPERTY(QString lastRunVersion READ lastRunVersion WRITE setLastRunVersion NOTIFY lastRunVersionChanged)
     Q_PROPERTY(bool openAtLogin READ openAtLogin WRITE setOpenAtLogin NOTIFY openAtLoginChanged)
     Q_PROPERTY(QString outgoingMessageSound READ outgoingMessageSound WRITE setOutgoingMessageSound NOTIFY outgoingMessageSoundChanged)
-    Q_PROPERTY(QStringList playerUrls READ playerUrls WRITE setPlayerUrls NOTIFY playerUrlsChanged)
     Q_PROPERTY(bool sharesConfigured READ sharesConfigured WRITE setSharesConfigured NOTIFY sharesConfiguredChanged)
     Q_PROPERTY(QVariantList sharesDirectories READ sharesDirectories WRITE setSharesDirectories NOTIFY sharesDirectoriesChanged)
     Q_PROPERTY(QString sharesLocation READ sharesLocation WRITE setSharesLocation NOTIFY sharesLocationChanged)
@@ -169,9 +168,6 @@ public:
     QString outgoingMessageSound() const;
     void setOutgoingMessageSound(const QString &soundFile);
 
-    QStringList playerUrls() const;
-    void setPlayerUrls(const QStringList &urls);
-
     bool sharesConfigured() const;
     void setSharesConfigured(bool configured);
 
@@ -199,7 +195,6 @@ signals:
     void lastRunVersionChanged(const QString &version);
     void openAtLoginChanged(bool run);
     void outgoingMessageSoundChanged(const QString &sound);
-    void playerUrlsChanged(const QStringList &urls);
     void sharesConfiguredChanged(bool configured);
     void sharesDirectoriesChanged(const QVariantList &directories);
     void sharesLocationChanged(const QString &location);

@@ -34,7 +34,6 @@
 #include "QXmppMucManager.h"
 #include "QXmppUtils.h"
 
-#include "application.h"
 #include "client.h"
 #include "history.h"
 #include "rooms.h"

@@ -675,25 +675,6 @@ void ApplicationSettings::setOutgoingMessageSound(const QString &soundFile)
     }
 }
 
-/** Returns the list of recently used media URLs.
- */
-QStringList ApplicationSettings::playerUrls() const
-{
-    return d->settings->value("PlayerUrls").toStringList();
-}
-
-/** Sets the list of recently used media URLs.
- *
- * @param urls
- */
-void ApplicationSettings::setPlayerUrls(const QStringList &urls)
-{
-    if (urls != playerUrls()) {
-        d->settings->setValue("PlayerUrls", urls);
-        emit playerUrlsChanged(urls);
-    }
-}
-
 /** Returns true if shares have been configured.
  */
 bool ApplicationSettings::sharesConfigured() const
