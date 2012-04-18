@@ -72,17 +72,13 @@ FocusScope {
         }
     }
 
+    // The background
     Rectangle {
         anchors.fill: parent
         color: 'white'
     }
 
-    Loader {
-        id: loader
-
-        anchors.fill: parent
-    }
-
+    // The left-hand dock
     Dock {
         id: dock
 
@@ -92,6 +88,7 @@ FocusScope {
         z: 1
     }
 
+    // The main display area
     PanelSwapper {
         id: swapper
 
@@ -100,16 +97,6 @@ FocusScope {
         anchors.left: dock.right
         anchors.right: parent.right
         focus: true
-    }
-
-    MouseArea {
-        id: cancelArea
-
-        anchors.fill: parent
-        enabled: false
-        z: 11
-
-        onClicked: menuLoader.hide()
     }
 
     PanelSwapper {
@@ -131,18 +118,28 @@ FocusScope {
         }
     }
 
+    MouseArea {
+        id: menuCancelArea
+
+        anchors.fill: parent
+        enabled: false
+        z: 11
+
+        onClicked: menuLoader.hide()
+    }
+
     Loader {
         id: menuLoader
 
         z: 12
 
         function hide() {
-            cancelArea.enabled = false;
+            menuCancelArea.enabled = false;
             menuLoader.item.opacity = 0;
         }
 
         function show(x, y) {
-            cancelArea.enabled = true;
+            menuCancelArea.enabled = true;
             menuLoader.x = x;
             menuLoader.y = y;
             menuLoader.item.opacity = 1;
