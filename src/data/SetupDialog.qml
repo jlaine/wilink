@@ -43,7 +43,7 @@ Dialog {
         onAccepted: {
             model.append({'jid': jid, 'password': password});
             model.submit();
-            dialog.accepted();
+            dialog.close();
         }
         onClose: application.quit()
     }
