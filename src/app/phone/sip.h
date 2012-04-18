@@ -221,6 +221,7 @@ class SipClient : public QXmppLoggable
     Q_PROPERTY(State state READ state NOTIFY stateChanged)
     Q_PROPERTY(QString displayName READ displayName WRITE setDisplayName)
     Q_PROPERTY(QString domain READ domain WRITE setDomain)
+    Q_PROPERTY(QString password READ password WRITE setPassword)
     Q_PROPERTY(QString username READ username WRITE setUsername)
 
 public:
