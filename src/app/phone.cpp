@@ -438,7 +438,6 @@ PhoneHistoryModel::PhoneHistoryModel(QObject *parent)
 
     // sip
     m_client = new SipClient;
-    m_client->setSoundPlayer(wApp->soundPlayer());
     check = connect(m_client, SIGNAL(callDialled(SipCall*)),
                     this, SLOT(addCall(SipCall*)));
     Q_ASSERT(check);

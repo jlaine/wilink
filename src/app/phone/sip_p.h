@@ -27,7 +27,6 @@
 
 #include "sip.h"
 
-class QSoundStream;
 class QUdpSocket;
 class QTimer;
 
@@ -67,7 +66,6 @@ public:
     QXmppCall::State state;
     QByteArray activeTime;
     QXmppRtpAudioChannel *audioChannel;
-    QSoundStream *audioStream;
     QXmppIceConnection *iceConnection;
     bool invitePending;
     bool inviteQueued;
@@ -92,9 +90,6 @@ public:
     SipMessage buildRetry(const SipMessage &original, SipCallContext *ctx);
     void handleReply(const SipMessage &reply);
     void setState(SipClient::State state);
-
-    // audio
-    QSoundPlayer *soundPlayer;
 
     // timers
     QTimer *connectTimer;

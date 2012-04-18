@@ -27,9 +27,6 @@
 #include <QThread>
 #include <QTimer>
 
-#include "QSoundPlayer.h"
-#include "QSoundStream.h"
-
 #include "QXmppRtpChannel.h"
 #include "QXmppSaslAuth.h"
 #include "QXmppStun.h"
@@ -160,7 +157,6 @@ bool SipCallContext::handleAuthentication(const SipMessage &reply)
 SipCallPrivate::SipCallPrivate(SipCall *qq)
     : state(QXmppCall::ConnectingState)
     , activeTime("0 0")
-    , audioStream(0)
     , invitePending(false)
     , inviteQueued(false)
     , q(qq)
@@ -501,7 +497,6 @@ void SipCallPrivate::setState(QXmppCall::State newState)
     if (state != newState)
     {
         state = newState;
-        //onStateChanged();
         emit q->stateChanged(state);
 
         if (state == QXmppCall::ActiveState) {
@@ -511,35 +506,6 @@ void SipCallPrivate::setState(QXmppCall::State newState)
             q->debug(QString("SIP call %1 finished").arg(QString::fromUtf8(id)));
             finishStamp = QDateTime::currentDateTime();
             emit q->finished();
-        }
-    }
-}
-
-void SipCallPrivate::onStateChanged()
-{
-    if (state == QXmppCall::ActiveState) {
-        // start audio input / output
-        if (!audioStream) {
-            audioStream = new QSoundStream(client->d->soundPlayer);
-            audioStream->setDevice(audioChannel);
-            audioStream->setFormat(
-                audioChannel->payloadType().channels(),
-                audioChannel->payloadType().clockrate());
-
-            QObject::connect(audioStream, SIGNAL(inputVolumeChanged(int)),
-                             q, SIGNAL(inputVolumeChanged(int)));
-            QObject::connect(audioStream, SIGNAL(outputVolumeChanged(int)),
-                             q, SIGNAL(outputVolumeChanged(int)));
-            audioStream->startOutput();
-            audioStream->startInput();
-        }
-    } else {
-        // stop audio input / output
-        if (audioStream) {
-            audioStream->stopInput();
-            audioStream->stopOutput();
-            delete audioStream;
-            audioStream = 0;
         }
     }
 }
@@ -679,16 +645,6 @@ QByteArray SipCall::id() const
     return d->id;
 }
 
-int SipCall::inputVolume() const
-{
-    return d->audioStream ? d->audioStream->inputVolume() : 0;
-}
-
-int SipCall::outputVolume() const
-{
-    return d->audioStream ? d->audioStream->outputVolume() : 0;
-}
-
 void SipCall::localCandidatesChanged()
 {
     // check whether we have server-reflexive candidates for all components
@@ -780,8 +736,7 @@ void SipCall::hangup()
 }
 
 SipClientPrivate::SipClientPrivate(SipClient *qq)
-    : soundPlayer(0)
-    , logger(0)
+    : logger(0)
     , state(SipClient::DisconnectedState)
     , stunCookie(0)
     , stunDone(false)
@@ -1415,16 +1370,6 @@ QString SipClient::username() const
 void SipClient::setUsername(const QString &username)
 {
     d->username = username;
-}
-
-QSoundPlayer *SipClient::soundPlayer() const
-{
-    return d->soundPlayer;
-}
-
-void SipClient::setSoundPlayer(QSoundPlayer *soundPlayer)
-{
-    d->soundPlayer = soundPlayer;
 }
 
 SipMessage::SipMessage(const QByteArray &bytes)

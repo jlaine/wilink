@@ -29,7 +29,6 @@
 
 class QHostInfo;
 class QUdpSocket;
-class QSoundPlayer;
 class QTimer;
 class QXmppRtpAudioChannel;
 
@@ -154,8 +153,6 @@ class SipCall : public QXmppLoggable
     Q_PROPERTY(QString errorString READ errorString NOTIFY stateChanged)
     Q_PROPERTY(QString recipient READ recipient CONSTANT)
     Q_PROPERTY(QXmppCall::State state READ state NOTIFY stateChanged)
-    Q_PROPERTY(int inputVolume READ inputVolume NOTIFY inputVolumeChanged)
-    Q_PROPERTY(int outputVolume READ outputVolume NOTIFY outputVolumeChanged)
 
 public:
     ~SipCall();
@@ -168,8 +165,6 @@ public:
     QXmppCall::State state() const;
 
     QXmppRtpAudioChannel *audioChannel() const;
-    int inputVolume() const;
-    int outputVolume() const;
 
 signals:
     /// This signal is emitted when a call is connected.
@@ -253,9 +248,6 @@ public:
 
     QString username() const;
     void setUsername(const QString &user);
-
-    QSoundPlayer *soundPlayer() const;
-    void setSoundPlayer(QSoundPlayer *soundPlayer);
 
 signals:
     void connected();
