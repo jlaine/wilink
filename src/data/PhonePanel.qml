@@ -366,6 +366,10 @@ Panel {
         }
     }
 
+    onDockClicked: {
+        panel.state = (panel.state == 'no-sidebar') ? '' : 'no-sidebar';
+    }
+
     states: State {
         name: 'no-sidebar'
 

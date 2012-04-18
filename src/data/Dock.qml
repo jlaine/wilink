@@ -109,10 +109,7 @@ Rectangle {
                     var model = listModel.get(index);
                     var panel = swapper.findPanel(model.panelSource, model.panelProperties);
                     if (panel && panel == swapper.currentItem) {
-                        if (panel.state == 'no-sidebar')
-                            panel.state = '';
-                        else
-                            panel.state = 'no-sidebar';
+                        panel.dockClicked();
                     } else {
                         swapper.showPanel(model.panelSource, model.panelProperties);
                     }

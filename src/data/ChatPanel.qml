@@ -368,6 +368,10 @@ Panel {
         appClient.connectToServer(jid, password);
     }
 
+    onDockClicked: {
+        chatPanel.state = (chatPanel.state == 'no-sidebar') ? '' : 'no-sidebar';
+    }
+
     Keys.onPressed: {
         if ((event.modifiers  & Qt.ControlModifier) && (event.modifiers & Qt.AltModifier) && event.key == Qt.Key_Left) {
             chatSwapper.decrementCurrentIndex();

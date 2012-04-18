@@ -22,9 +22,11 @@ import QtQuick 1.1
 FocusScope {
     id: panel
 
-    signal close
     property alias color: background.color
     property bool singlePanel: width < 500
+
+    signal close
+    signal dockClicked
 
     anchors.fill: parent
     opacity: 0
