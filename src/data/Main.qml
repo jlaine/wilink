@@ -60,6 +60,18 @@ FocusScope {
         isMobile: application.isMobile
     }
 
+    Updater {
+        id: appUpdater
+
+        onStateChanged: {
+            // when an update is ready to install, prompt user
+            if (appUpdater.state == Updater.PromptState) {
+                dialogSwapper.showPanel('AboutDialog.qml');
+                window.alert();
+            }
+        }
+    }
+
     Rectangle {
         anchors.fill: parent
         color: 'pink'

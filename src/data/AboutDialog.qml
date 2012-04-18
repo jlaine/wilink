@@ -23,7 +23,6 @@ import wiLink 2.0
 Dialog {
     id: dialog
 
-    property QtObject appUpdater: application.updater
     property bool prompting: Qt.isQtObject(appUpdater) && appUpdater.state == Updater.PromptState
 
     footerComponent: Item {

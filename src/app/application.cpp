@@ -68,21 +68,19 @@ public:
     QMenu *trayMenu;
     Notification *trayNotification;
 #endif
-    Updater *updater;
 };
 
 ApplicationPrivate::ApplicationPrivate()
-    : appSettings(0),
-    qmlRoot("qrc:/"),
+    : appSettings(0)
+    , qmlRoot("qrc:/")
 #ifdef USE_LIBNOTIFY
-    libnotify_accepts_actions(0),
+    , libnotify_accepts_actions(0)
 #endif
 #ifdef USE_SYSTRAY
-    trayIcon(0),
-    trayMenu(0),
-    trayNotification(0),
+    , trayIcon(0),
+    , trayMenu(0),
+    , trayNotification(0)
 #endif
-    updater(0)
 {
 }
 
@@ -168,9 +166,6 @@ Application::Application(int &argc, char **argv)
 
     // add SSL root CA for wifirst.net and download.wifirst.net
     QSslSocket::addDefaultCaCertificates(":/UTN_USERFirst_Hardware_Root_CA.pem");
-
-    // create software updater
-    d->updater = new Updater;
 }
 
 Application::~Application()
@@ -424,11 +419,6 @@ QSystemTrayIcon *Application::trayIcon()
     return d->trayIcon;
 }
 #endif
-
-Updater *Application::updater() const
-{
-    return d->updater;
-}
 
 class ApplicationSettingsPrivate
 {

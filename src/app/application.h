@@ -68,7 +68,6 @@ class Application : public QApplication
     Q_PROPERTY(bool isMobile READ isMobile CONSTANT)
     Q_PROPERTY(ApplicationSettings* settings READ settings CONSTANT)
     Q_PROPERTY(QSoundPlayer* soundPlayer READ soundPlayer CONSTANT)
-    Q_PROPERTY(Updater* updater READ updater CONSTANT)
 
 public:
     Application(int &argc, char **argv);
@@ -81,7 +80,6 @@ public:
     void createSystemTrayIcon();
     QSoundPlayer *soundPlayer();
     QThread *soundThread();
-    Updater *updater() const;
 #ifdef USE_SYSTRAY
     QSystemTrayIcon *trayIcon();
 #endif
