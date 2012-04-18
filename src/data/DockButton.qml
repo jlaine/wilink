@@ -38,12 +38,12 @@ Item {
             return dialogSwapper.currentSource == panelSource;
         } else if (panelSource == 'ChatPanel.qml') {
             var item = swapper.model.get(swapper.currentIndex);
-            return item &&
+            return item !== undefined &&
                    item.source == panelSource &&
                    item.properties.accountJid == panelProperties.accountJid;
         } else if (panelSource == 'PhotoPanel.qml') {
             var item = swapper.model.get(swapper.currentIndex);
-            return item &&
+            return item !== undefined &&
                    item.source == panelSource &&
                    item.properties.url == panelProperties.url;
         } else {
