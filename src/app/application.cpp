@@ -264,15 +264,6 @@ QUrl Application::homeUrl() const
     return QUrl::fromLocalFile(QDir::homePath());
 }
 
-bool Application::isAndroid() const
-{
-#ifdef Q_OS_ANDROID
-    return true;
-#else
-    return false;
-#endif
-}
-
 bool Application::isInstalled() const
 {
     QDir dir = QFileInfo(executablePath()).dir();

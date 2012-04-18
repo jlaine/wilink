@@ -145,7 +145,7 @@ FocusScope {
     Component.onCompleted: {
         window.minimumWidth = 360;
         window.minimumHeight = 360;
-        window.fullScreen = application.isMobile && !application.isAndroid;
+        window.fullScreen = application.isMobile && application.osType != 'android';
         window.showAndRaise();
 
         application.showWindows.connect(function() {
