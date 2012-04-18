@@ -62,8 +62,8 @@ public:
 
     QXmppCall::Direction direction;
     QString errorString;
-    QTime startTime;
-    QTime stopTime;
+    QDateTime startStamp;
+    QDateTime finishStamp;
     QXmppCall::State state;
     QByteArray activeTime;
     QXmppRtpAudioChannel *audioChannel;

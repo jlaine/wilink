@@ -518,7 +518,7 @@ void SipCallPrivate::onStateChanged()
 {
     if (state == QXmppCall::ActiveState)
     {
-        startTime.start();
+        startStamp = QDateTime::currentDateTime();
 
         // prepare audio format
 
@@ -539,8 +539,8 @@ void SipCallPrivate::onStateChanged()
         }
 
     } else {
-        if (startTime.isValid() && !stopTime.isValid())
-            stopTime.start();
+        if (startStamp.isValid() && !finishStamp.isValid())
+            finishStamp = QDateTime::currentDateTime();
 
         // stop audio input / output
         if (audioStream) {
@@ -665,11 +665,11 @@ QXmppCall::Direction SipCall::direction() const
 
 int SipCall::duration() const
 {
-    if (d->startTime.isValid()) {
-        if (d->stopTime.isValid())
-            return d->startTime.secsTo(d->stopTime);
+    if (d->startStamp.isValid()) {
+        if (d->finishStamp.isValid())
+            return d->startStamp.secsTo(d->finishStamp);
         else
-            return d->startTime.secsTo(QTime::currentTime());
+            return d->startStamp.secsTo(QDateTime::currentDateTime());
     }
     return 0;
 }
@@ -974,8 +974,6 @@ SipClient::~SipClient()
 
 SipCall *SipClient::call(const QString &recipient)
 {
-    info(QString("SIP call to %1").arg(recipient));
-
     if (d->state != ConnectedState) {
         warning("Cannot dial call, not connected to server");
         return 0;
@@ -983,6 +981,7 @@ SipCall *SipClient::call(const QString &recipient)
 
     // construct call
     SipCall *call = new SipCall(recipient, QXmppCall::OutgoingDirection, this);
+    info(QString("SIP call %1 to %2").arg(call->id(), recipient));
 
     // register call
     connect(call, SIGNAL(destroyed(QObject*)),
