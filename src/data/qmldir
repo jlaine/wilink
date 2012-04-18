@@ -12,6 +12,7 @@ ChatEdit 1.0 ChatEdit.qml
 ChatPanel 1.0 ChatPanel.qml
 ChatPlugin 1.0 ChatPlugin.qml
 CheckBox 1.0 CheckBox.qml
+Clipboard 1.0 Clipboard.qml
 ComboBox 1.0 ComboBox.qml
 ContactAddDialog 1.0 ContactAddDialog.qml
 ContactAddNotification 1.0 ContactAddNotification.qml
@@ -39,9 +40,8 @@ InputMenu 1.0 InputMenu.qml
 KeyPad 1.0 KeyPad.qml
 Label 1.0 Label.qml
 LogPanel 1.0 LogPanel.qml
-MainWindow 1.0 MainWindow.qml
+Main 1.0 Main.qml
 MeegoMain 1.0 MeegoMain.qml
-MeegoSetup 1.0 MeegoSetup.qml
 Menu 1.0 Menu.qml
 MenuDelegate 1.0 MenuDelegate.qml
 NewsDialog 1.0 NewsDialog.qml
@@ -86,7 +86,7 @@ RoomSubjectDialog 1.0 RoomSubjectDialog.qml
 ScrollBar 1.0 ScrollBar.qml
 ScrollView 1.0 ScrollView.qml
 SendPanel 1.0 SendPanel.qml
-SetupWindow 1.0 SetupWindow.qml
+SetupDialog 1.0 SetupDialog.qml
 SharePanel 1.0 SharePanel.qml
 SharePlugin 1.0 SharePlugin.qml
 SharePreferencePanel 1.0 SharePreferencePanel.qml
@@ -105,4 +105,3 @@ WebPanel 1.0 WebPanel.qml
 WebPlugin 1.0 WebPlugin.qml
 WebTab 1.0 WebTab.qml
 WifirstPlugin 1.0 WifirstPlugin.qml
-test 1.0 test.qml

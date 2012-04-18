@@ -147,7 +147,7 @@ if(RELOAD_TRANSLATIONS)
         ../data/HistoryView.qml
         ../data/InputMenu.qml
         ../data/LogPanel.qml
-        ../data/MainWindow.qml
+        ../data/Main.qml
         ../data/NewsDialog.qml
         ../data/NewsPanel.qml
         ../data/NewsPlugin.qml
