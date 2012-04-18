@@ -317,11 +317,6 @@ QSoundPlayer *Application::soundPlayer()
     return d->soundPlayer;
 }
 
-QThread *Application::soundThread()
-{
-    return d->soundThread;
-}
-
 #ifdef USE_LIBNOTIFY
 static void notificationClicked(NotifyNotification *notification, char *action, gpointer data)
 {

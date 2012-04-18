@@ -79,7 +79,6 @@ public:
     static void platformInit();
     void createSystemTrayIcon();
     QSoundPlayer *soundPlayer();
-    QThread *soundThread();
 #ifdef USE_SYSTRAY
     QSystemTrayIcon *trayIcon();
 #endif

@@ -439,7 +439,7 @@ PhoneHistoryModel::PhoneHistoryModel(QObject *parent)
     check = connect(m_client, SIGNAL(callDialled(SipCall*)),
                     this, SLOT(addCall(SipCall*)));
     Q_ASSERT(check);
-    m_client->moveToThread(wApp->soundThread());
+    m_client->moveToThread(wApp->soundPlayer()->thread());
 
     // ticker for call durations
     m_ticker = new QTimer(this);
