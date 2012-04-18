@@ -158,12 +158,12 @@ bool SipCallContext::handleAuthentication(const SipMessage &reply)
 }
 
 SipCallPrivate::SipCallPrivate(SipCall *qq)
-    : state(QXmppCall::ConnectingState),
-    activeTime("0 0"),
-    audioStream(0),
-    invitePending(false),
-    inviteQueued(false),
-    q(qq)
+    : state(QXmppCall::ConnectingState)
+    , activeTime("0 0")
+    , audioStream(0)
+    , invitePending(false)
+    , inviteQueued(false)
+    , q(qq)
 {
 }
 
@@ -788,14 +788,14 @@ void SipCall::hangup()
 }
 
 SipClientPrivate::SipClientPrivate(SipClient *qq)
-    : soundPlayer(0),
-    logger(0),
-    state(SipClient::DisconnectedState),
-    stunCookie(0),
-    stunDone(false),
-    stunReflexivePort(0),
-    stunServerPort(0),
-    q(qq)
+    : soundPlayer(0)
+    , logger(0)
+    , state(SipClient::DisconnectedState)
+    , stunCookie(0)
+    , stunDone(false)
+    , stunReflexivePort(0)
+    , stunServerPort(0)
+    , q(qq)
 {
 }
 
