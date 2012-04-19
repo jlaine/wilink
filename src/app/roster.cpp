@@ -653,7 +653,7 @@ QUrl VCardCache::imageUrl(const QString &jid)
     if (get(jid))
         return QUrl("image://roster/" + jid);
     else
-        return wApp->qmlUrl("peer.png");
+        return QUrl("image://icon/peer");
 }
 
 VCardCache *VCardCache::instance()

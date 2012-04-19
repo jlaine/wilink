@@ -296,7 +296,7 @@ bool PlayerModel::addUrl(const QUrl &url)
 
     Item *item = new Item;
     item->title = QFileInfo(url.path()).baseName();
-    item->imageUrl = wApp->qmlUrl("file.png");
+    item->imageUrl = QUrl("image://icon/file");
     item->url = url;
 
     // fetch meta data
