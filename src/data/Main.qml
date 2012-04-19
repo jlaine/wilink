@@ -24,6 +24,8 @@ import wiLink 2.0
 FocusScope {
     id: root
 
+    focus: !application.isMobile
+
     // A model representing the user's accounts.
     AccountModel {
         id: accountModel
