@@ -634,11 +634,11 @@ public:
 
     FileInfo info;
     QList<FolderQueueFile> items;
-    FolderIterator *iterator;
     QString sourcePath;
     FileSystem *fileSystem;
     bool finished;
     bool isUpload;
+    FolderIterator *iterator;
 
     FileSystemJob *job;
     QFile *jobOutput;
@@ -654,8 +654,8 @@ public:
 FolderQueueItem::FolderQueueItem()
     : fileSystem(0)
     , finished(false)
-    , iterator(0)
     , isUpload(false)
+    , iterator(0)
     , job(0)
     , jobOutput(0)
     , jobDoneBytes(0)
