@@ -30,17 +30,9 @@ contains(MEEGO_EDITION,harmattan) {
 # embedded version
 android|symbian|contains(MEEGO_EDITION,harmattan) {
     DEFINES += WILINK_EMBEDDED
-    RESOURCES += \
-        ../data/32x32/tiny.qrc \
-        ../data/64x64/normal.qrc \
-        ../data/wiLink.qrc
-} else {
-    RESOURCES += \
-        ../data/16x16/tiny.qrc \
-        ../data/32x32/normal.qrc \
-        ../data/wiLink.qrc
 }
 
+RESOURCES += ../data/wiLink.qrc
 SOURCES += \
     accounts.cpp \
     application.cpp \
