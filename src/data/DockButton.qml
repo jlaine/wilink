@@ -59,8 +59,10 @@ Item {
         opacity: button.enabled ? 1 : 0.5
         smooth: true
         source: (button.iconPress != '' && button.active) ? button.iconPress : button.iconSource
-        sourceSize.width: parent.width
-        sourceSize.height: parent.height
+        sourceSize.height: appStyle.icon.normalSize
+        sourceSize.width: appStyle.icon.normalSize
+        width: parent.width
+        height: parent.height
     }
 
     Rectangle {

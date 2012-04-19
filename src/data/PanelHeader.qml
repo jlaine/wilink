@@ -24,7 +24,7 @@ Item {
 
     property alias toolBar: toolBarLoader.sourceComponent
     property int iconMargin: 8
-    property alias iconSize: iconImage.width
+    property int iconSize: appStyle.icon.normalSize
     property alias iconSource: iconImage.source
     property alias title: titleText.text
     property alias subTitle: subTitleText.text
@@ -52,8 +52,8 @@ Item {
         anchors.leftMargin: iconMargin
         anchors.verticalCenter: parent.verticalCenter
         smooth: true
-        height: appStyle.icon.normalSize
-        width: appStyle.icon.normalSize
+        sourceSize.height: iconSize
+        sourceSize.width: iconSize
 
         states: State {
             name: 'collapsed'
