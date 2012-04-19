@@ -25,7 +25,7 @@ Image {
     property bool busy: false
 
     opacity: spinner.busy ? 1.0 : 0.0
-    source: '128x128/spinner.png'
+    source: 'image://icon/128x128/spinner'
 
     Behavior on opacity {
         NumberAnimation {

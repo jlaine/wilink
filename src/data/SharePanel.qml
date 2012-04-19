@@ -29,11 +29,11 @@ Panel {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        iconSource: 'share.png'
+        iconSource: 'image://icon/share'
         title: qsTr('Shares')
         toolBar: ToolBar {
             ToolButton {
-                iconSource: 'back.png'
+                iconSource: 'image://icon/back'
                 text: qsTr('Go back')
                 enabled: crumbBar.model.count > 1
 
@@ -43,7 +43,7 @@ Panel {
             ToolButton {
                 id: preferenceButton
 
-                iconSource: 'options.png'
+                iconSource: 'image://icon/options'
                 text: qsTr('Options')
 
                 onClicked: {
@@ -91,7 +91,7 @@ Panel {
             anchors.verticalCenter: parent.verticalCenter
             height: appStyle.icon.tinySize
             width: appStyle.icon.tinySize
-            source: 'search.png'
+            source: 'image://icon/search'
             smooth: true
         }
 

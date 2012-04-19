@@ -133,7 +133,7 @@ Item {
                 Image {
                     id: inputIcon
 
-                    source: 'audio-input.png'
+                    source: 'image://icon/audio-input'
                     height: appStyle.icon.tinySize
                     width: appStyle.icon.tinySize
                 }
@@ -141,7 +141,7 @@ Item {
                 Image {
                     id: outputIcon
 
-                    source: 'audio-output.png'
+                    source: 'image://icon/audio-output'
                     height: appStyle.icon.tinySize
                     width: appStyle.icon.tinySize
                 }
@@ -167,7 +167,7 @@ Item {
                 id: cameraButton
 
                 enabled: Qt.isQtObject(call) && call.state == QXmppCall.ActiveState
-                iconSource: 'camera.png'
+                iconSource: 'image://icon/camera'
 
                 onClicked: {
                     if (video.openMode & CallVideoHelper.WriteOnly)
@@ -179,7 +179,7 @@ Item {
                 states: State {
                     name: 'active'
                     when: (video.openMode & CallVideoHelper.WriteOnly) != 0
-                    PropertyChanges { target: cameraButton; iconSource: 'camera-active.png' }
+                    PropertyChanges { target: cameraButton; iconSource: 'image://icon/camera-active' }
                 }
             }
 
@@ -187,7 +187,7 @@ Item {
                 id: fullScreenButton
 
                 enabled: Qt.isQtObject(call) && call.state == QXmppCall.ActiveState
-                iconSource: 'fullscreen.png'
+                iconSource: 'image://icon/fullscreen'
 
                 onClicked: {
                     if (callWidget.state == '')
@@ -200,7 +200,7 @@ Item {
             Button {
                 id: hangupButton
 
-                iconSource: 'hangup.png'
+                iconSource: 'image://icon/hangup'
                 onClicked: call.hangup()
             }
         }

@@ -22,19 +22,19 @@ import QtQuick 1.1
 Plugin {
     name: qsTr('Shares')
     description: qsTr('This plugin allows you to share documents.')
-    imageSource: 'share.png'
+    imageSource: 'image://icon/share'
 
     onLoaded: {
         dock.model.add({
-            'iconSource': 'dock-share.png',
-            'iconPress': 'share.png',
+            'iconSource': 'image://icon/dock-share',
+            'iconPress': 'image://icon/share',
             'panelSource': 'SharePanel.qml',
             'priority': 8,
             'shortcut': Qt.ControlModifier + Qt.Key_S,
             'text': qsTr('Shares'),
             'visible': false});
         appPreferences.append({
-            'iconSource': 'share.png',
+            'iconSource': 'image://icon/share',
             'name': qsTr('Shares'),
             'source': 'SharePreferencePanel.qml'});
         swapper.addPanel('SharePanel.qml');

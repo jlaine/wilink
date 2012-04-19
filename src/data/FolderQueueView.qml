@@ -67,7 +67,7 @@ Item {
                 width: appStyle.icon.smallSize
                 height: appStyle.icon.smallSize
                 smooth: true
-                source: block.style == 'shares' ? (model.isDir ? (model.node.length ? 'album.png' : 'peer.png') : 'file.png') : model.avatar
+                source: block.style == 'shares' ? (model.isDir ? (model.node.length ? 'image://icon/album' : 'image://icon/peer') : 'image://icon/file') : model.avatar
             }
 
             ProgressBar {
@@ -109,7 +109,7 @@ Item {
                 anchors.rightMargin: appStyle.margin.normal
                 anchors.verticalCenter: parent.verticalCenter
                 iconSize: appStyle.icon.tinySize
-                iconSource: 'close.png'
+                iconSource: 'image://icon/close'
                 text: qsTr('Cancel')
 
                 onClicked: view.model.cancel(model.index)

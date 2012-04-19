@@ -27,7 +27,7 @@ IconImageProvider::IconImageProvider()
 QImage IconImageProvider::requestImage(const QString &id, QSize *size, const QSize &requestedSize)
 {
     qDebug("req %s", qPrintable(id));
-    QImage image(":/" + id);
+    QImage image(":/" + id + ".png");
     if (requestedSize.isValid())
         image = image.scaled(requestedSize.width(), requestedSize.height(), Qt::KeepAspectRatio);
 

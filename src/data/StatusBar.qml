@@ -99,7 +99,7 @@ Rectangle {
             anchors.right: parent.right
             anchors.rightMargin: appStyle.margin.normal
             anchors.verticalCenter: parent.verticalCenter
-            source: 'eject.png'
+            source: 'image://icon/eject'
             z: 1
         }
 

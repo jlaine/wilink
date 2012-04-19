@@ -54,7 +54,7 @@ Item {
 
             anchors.left: parent.left
             anchors.verticalCenter: parent.verticalCenter
-            source: 'left-arrow.png'
+            source: 'image://icon/left-arrow'
 
             MouseArea {
                 anchors.fill: parent
@@ -175,7 +175,7 @@ Item {
 
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
-            source: 'right-arrow.png'
+            source: 'image://icon/right-arrow'
 
             MouseArea {
                 anchors.fill: parent

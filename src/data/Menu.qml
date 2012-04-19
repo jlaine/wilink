@@ -54,7 +54,7 @@ Rectangle {
         anchors.fill: menu
         anchors { leftMargin: -5; topMargin: -5; rightMargin: -8; bottomMargin: -9 }
         border { left: 10; top: 10; right: 10; bottom: 10 }
-        source: 'shadow.png'
+        source: 'image://icon/shadow'
         smooth: true
         z: -1
     }

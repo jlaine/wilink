@@ -287,7 +287,7 @@ Panel {
 
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: parent.right
-                    iconSource: 'album.png'
+                    iconSource: 'image://icon/album'
 
                     onClicked: {
                         var dialog = window.fileDialog();

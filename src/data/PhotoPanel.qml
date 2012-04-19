@@ -37,19 +37,19 @@ Panel {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        iconSource: 'photos.png'
+        iconSource: 'image://icon/photos'
         title: qsTr('Photos')
         toolBar: ToolBar {
             ToolButton {
                 enabled: crumbBar.model.count > 1
-                iconSource: 'back.png'
+                iconSource: 'image://icon/back'
                 text: qsTr('Go back')
 
                 onClicked: crumbBar.pop()
             }
 
             ToolButton {
-                iconSource: 'upload.png'
+                iconSource: 'image://icon/upload'
                 text: qsTr('Upload')
                 enabled: photoModel.canUpload
                 visible: panel.state == ''
@@ -69,13 +69,13 @@ Panel {
             }
 
             ToolButton {
-                iconSource: 'stop.png'
+                iconSource: 'image://icon/stop'
                 text: qsTr('Cancel')
                 visible: false
             }
 
             ToolButton {
-                iconSource: 'add.png'
+                iconSource: 'image://icon/add'
                 text: qsTr('Create')
                 enabled: photoModel.canCreateAlbum
                 visible: panel.state == ''

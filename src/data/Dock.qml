@@ -119,8 +119,8 @@ Rectangle {
         DockButton {
             id: preferenceButton
 
-            iconSource: 'dock-options.png'
-            iconPress: 'options.png'
+            iconSource: 'image://icon/dock-options'
+            iconPress: 'image://icon/options'
             panelSource: 'PreferenceDialog.qml'
             text: qsTr('Preferences')
             visible: true
@@ -131,8 +131,8 @@ Rectangle {
 
         DockButton {
             id: quitButton
-            iconSource: 'dock-close.png'
-            iconPress: 'close.png'
+            iconSource: 'image://icon/dock-close'
+            iconPress: 'image://icon/close'
             text: qsTr('Quit')
             visible: application.isMobile
             onClicked: {

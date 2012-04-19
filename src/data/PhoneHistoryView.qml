@@ -83,7 +83,7 @@ FocusScope {
                     width: appStyle.icon.smallSize
                     height: appStyle.icon.smallSize
                     smooth: true
-                    source: model.direction == QXmppCall.OutgoingDirection ? 'call-outgoing.png' : 'call-incoming.png'
+                    source: model.direction == QXmppCall.OutgoingDirection ? 'image://icon/call-outgoing' : 'image://icon/call-incoming'
                 }
 
                 Label {
@@ -181,15 +181,15 @@ FocusScope {
             Component.onCompleted: {
                 menu.model.append({
                     'action': 'call',
-                    'icon': 'call.png',
+                    'icon': 'image://icon/call',
                     'text': qsTr('Call')});
                 menu.model.append({
                     'action': 'contact',
-                    'icon': 'add.png',
+                    'icon': 'image://icon/add',
                     'text': qsTr('Add to contacts')});
                 menu.model.append({
                     'action': 'remove',
-                    'icon': 'remove.png',
+                    'icon': 'image://icon/remove',
                     'text': qsTr('Remove')});
             }
         }

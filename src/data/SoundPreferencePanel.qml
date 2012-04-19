@@ -77,7 +77,7 @@ Panel {
                     anchors.verticalCenter: parent.verticalCenter
                     height: appStyle.icon.smallSize
                     width: appStyle.icon.smallSize
-                    source: 'audio-output.png'
+                    source: 'image://icon/audio-output'
                 }
 
                 Label {
@@ -122,7 +122,7 @@ Panel {
                     anchors.verticalCenter: parent.verticalCenter
                     height: appStyle.icon.smallSize
                     width: appStyle.icon.smallSize
-                    source: 'audio-input.png'
+                    source: 'image://icon/audio-input'
                 }
 
                 Label {

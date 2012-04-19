@@ -133,11 +133,11 @@ Panel {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        iconSource: 'start.png'
+        iconSource: 'image://icon/start'
         title: qsTr('Music player')
         toolBar: ToolBar {
             ToolButton {
-                iconSource: 'add.png'
+                iconSource: 'image://icon/add'
                 text: qsTr('Add')
 
                 onClicked: {
@@ -155,7 +155,7 @@ Panel {
             }
 
             ToolButton {
-                iconSource: 'stop.png'
+                iconSource: 'image://icon/stop'
                 text: qsTr('Stop')
                 enabled: Qt.isQtObject(panel.soundJob)
 
@@ -165,7 +165,7 @@ Panel {
             }
 
             ToolButton {
-                iconSource: 'clear.png'
+                iconSource: 'image://icon/clear'
                 text: qsTr('Clear')
 
                 onClicked: {

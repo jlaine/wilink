@@ -59,7 +59,7 @@ ScrollView {
             id: fire
 
             anchors.fill: thumbnail
-            source: 'fire.png'
+            source: 'image://icon/fire'
             smooth: true
             visible: model.popularity > 10
         }
@@ -121,7 +121,7 @@ ScrollView {
             anchors.right: parent.right
             anchors.rightMargin: appStyle.margin.normal
             anchors.verticalCenter: parent.verticalCenter
-            iconSource: 'download.png'
+            iconSource: 'image://icon/download'
             state: 'inactive'
             text: qsTr('Download')
 

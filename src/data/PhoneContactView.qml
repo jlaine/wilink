@@ -53,7 +53,7 @@ ContactView {
             width: appStyle.icon.smallSize
             height: appStyle.icon.smallSize
             smooth: true
-            source: 'peer.png'
+            source: 'image://icon/peer'
         }
 
         Column {
@@ -143,7 +143,7 @@ ContactView {
 
         Button {
             iconSize: appStyle.icon.tinySize
-            iconSource: 'call.png'
+            iconSource: 'image://icon/call'
             smooth: true
 
             onClicked: {
@@ -177,11 +177,11 @@ ContactView {
             Component.onCompleted: {
                 menu.model.append({
                     'action': 'edit',
-                    'icon': 'options.png',
+                    'icon': 'image://icon/options',
                     'text': qsTr('Modify')});
                 menu.model.append({
                     'action': 'remove',
-                    'icon': 'remove.png',
+                    'icon': 'image://icon/remove',
                     'text': qsTr('Remove')});
             }
         }

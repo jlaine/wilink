@@ -76,7 +76,7 @@ Item {
         anchors.right: parent.right
         anchors.rightMargin: 8
         anchors.verticalCenter: parent.verticalCenter
-        source: 'eject.png'
+        source: 'image://icon/eject'
         z: 1
     }
 

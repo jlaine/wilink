@@ -70,7 +70,7 @@ Panel {
 
         onError: {
             dialogSwapper.showPanel('ErrorNotification.qml', {
-                'iconSource': 'phone.png',
+                'iconSource': 'image://icon/phone',
                 'title': qsTr('Call failed'),
                 'text': qsTr('Sorry, but the call could not be completed.') + '\n\n' + error,
             });
@@ -120,12 +120,12 @@ Panel {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: parent.top
-            iconSource: 'phone.png'
+            iconSource: 'image://icon/phone'
             title: qsTr('Phone')
             subTitle: historyModel.phoneNumber ? qsTr('Your number is %1').replace('%1', historyModel.phoneNumber) : ''
             toolBar: ToolBar {
                 ToolButton {
-                    iconSource: 'call.png'
+                    iconSource: 'image://icon/call'
                     text: qsTr('Voicemail')
                     visible: historyModel.voicemailNumber != ''
 
@@ -138,7 +138,7 @@ Panel {
                 }
 
                 ToolButton {
-                    iconSource: 'clear.png'
+                    iconSource: 'image://icon/clear'
                     text: qsTr('Clear')
 
                     onClicked: {
@@ -199,7 +199,7 @@ Panel {
 
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
-                    iconSource: 'back.png'
+                    iconSource: 'image://icon/back'
 
                     onClicked: numberEdit.backspacePressed()
                 }
@@ -210,7 +210,7 @@ Panel {
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
                     enabled: historyModel.client.state == SipClient.ConnectedState
-                    iconSource: 'call.png'
+                    iconSource: 'image://icon/call'
                     text: qsTr('Call')
 
                     onClicked: {
@@ -231,7 +231,7 @@ Panel {
 
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
-                    iconSource: 'hangup.png'
+                    iconSource: 'image://icon/hangup'
                     text: qsTr('Hangup')
                     visible: false
 
@@ -290,7 +290,7 @@ Panel {
 
                     anchors.bottom: parent.bottom
                     anchors.horizontalCenter: parent.horizontalCenter
-                    source: 'audio-input.png'
+                    source: 'image://icon/audio-input'
                     height: 32
                     width: 32
                 }
@@ -318,7 +318,7 @@ Panel {
 
                     anchors.bottom: parent.bottom
                     anchors.horizontalCenter: parent.horizontalCenter
-                    source: 'audio-output.png'
+                    source: 'image://icon/audio-output'
                     height: 32
                     width: 32
                 }

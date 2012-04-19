@@ -33,11 +33,11 @@ Panel {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        iconSource: 'peer.png'
+        iconSource: 'image://icon/peer'
         title: qsTr('Service discovery')
         toolBar: ToolBar {
             ToolButton {
-                iconSource: 'back.png'
+                iconSource: 'image://icon/back'
                 text: qsTr('Go back')
                 enabled: crumbBar.model.count > 1
 
@@ -45,7 +45,7 @@ Panel {
             }
 
             ToolButton {
-                iconSource: 'refresh.png'
+                iconSource: 'image://icon/refresh'
                 text: qsTr('Refresh')
 
                 onClicked: {
@@ -54,7 +54,7 @@ Panel {
             }
 
             ToolButton {
-                iconSource: 'close.png'
+                iconSource: 'image://icon/close'
                 text: qsTr('Close')
                 onClicked: panel.close()
             }
@@ -97,7 +97,7 @@ Panel {
 
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
-                source: 'peer.png'
+                source: 'image://icon/peer'
             }
 
             Label {

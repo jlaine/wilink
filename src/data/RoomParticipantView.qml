@@ -66,7 +66,7 @@ ScrollView {
             anchors.right: parent.right
             asynchronous: true
             anchors.rightMargin: 10
-            source: 'moderator.png'
+            source: 'image://icon/moderator'
             smooth: true
             height: appStyle.icon.smallSize
             width: appStyle.icon.smallSize
@@ -123,12 +123,12 @@ ScrollView {
                 menu.model.append({
                     'action': 'profile',
                     'enabled': profileEnabled,
-                    'icon': 'information.png',
+                    'icon': 'image://icon/information',
                     'text': qsTr('Show profile')});
                 menu.model.append({
                     'action': 'kick',
                     'enabled': kickEnabled,
-                    'icon': 'remove.png',
+                    'icon': 'image://icon/remove',
                     'text': qsTr('Kick user')});
             }
         }

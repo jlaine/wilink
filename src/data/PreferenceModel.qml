@@ -31,19 +31,19 @@ ListModel {
 
     Component.onCompleted: {
         append({
-            'iconSource': 'options.png',
+            'iconSource': 'image://icon/options',
             'name': qsTr('General'),
             'source': 'GeneralPreferencePanel.qml'});
         append({
-            'iconSource': 'peer.png',
+            'iconSource': 'image://icon/peer',
             'name': qsTr('Accounts'),
             'source': 'AccountPreferencePanel.qml'});
         append({
-            'iconSource': 'audio-output.png',
+            'iconSource': 'image://icon/audio-output',
             'name': qsTr('Sound'),
             'source': 'SoundPreferencePanel.qml'});
         append({
-            'iconSource': 'plugin.png',
+            'iconSource': 'image://icon/plugin',
             'name': qsTr('Plugins'),
             'source': 'PluginPreferencePanel.qml'});
     }

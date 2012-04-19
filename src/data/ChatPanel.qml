@@ -83,7 +83,7 @@ Panel {
             anchors.top: parent.top
             currentJid: (window.isActiveWindow && swapper.currentItem == chatPanel && Qt.isQtObject(chatSwapper.currentItem) && chatSwapper.currentItem.jid != undefined) ? chatSwapper.currentItem.jid : ''
             enabled: appClient.mucServer != ''
-            iconSource: 'chat.png'
+            iconSource: 'image://icon/chat'
             model: RoomListModel {
                 id: roomListModel
                 client: appClient
@@ -346,16 +346,16 @@ Panel {
                 menu.model.append({
                     'action': 'profile',
                     'enabled': profileEnabled,
-                    'icon': 'information.png',
+                    'icon': 'image://icon/information',
                     'text': qsTr('Show profile')});
                 menu.model.append({
                     'action': 'rename',
-                    'icon': 'options.png',
+                    'icon': 'image://icon/options',
                     'name': model.name,
                     'text': qsTr('Rename contact')});
                 menu.model.append({
                     'action': 'remove',
-                    'icon': 'remove.png',
+                    'icon': 'image://icon/remove',
                     'name': model.name,
                     'text': qsTr('Remove contact')});
             }

@@ -27,7 +27,7 @@ NotificationDialog {
     property string caller
     property Item swapper
 
-    iconSource: 'phone.png'
+    iconSource: 'image://icon/phone'
     text: qsTr('%1 wants to talk to you.\n\nDo you accept?').replace('%1', caller)
     title: qsTr('Call from %1').replace('%1', caller)
 

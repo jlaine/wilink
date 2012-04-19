@@ -22,15 +22,15 @@ import QtQuick 1.1
 Plugin {
     name: qsTr('Debugging')
     description: qsTr('This plugin allows you to view debugging information.')
-    imageSource: 'debug.png'
+    imageSource: 'image://icon/debug'
 
     onLoaded: {
         for (var i = 0; i < accountModel.count; ++i) {
             var account = accountModel.get(i);
             if (account.type == 'wifirst') {
                 dock.model.add({
-                    'iconSource': 'dock-peer.png',
-                    'iconPress': 'peer.png',
+                    'iconSource': 'image://icon/dock-peer',
+                    'iconPress': 'image://icon/peer',
                     'panelProperties': {accountJid: account.jid},
                     'panelSource': 'DiscoveryPanel.qml',
                     'priority': -1,
@@ -41,8 +41,8 @@ Plugin {
             }
 
         dock.model.add({
-            'iconSource': 'dock-debug.png',
-            'iconPress': 'debug.png',
+            'iconSource': 'image://icon/dock-debug',
+            'iconPress': 'image://icon/debug',
             'panelSource': 'LogPanel.qml',
             'priority': -1,
             'shortcut': Qt.ControlModifier + Qt.Key_L,

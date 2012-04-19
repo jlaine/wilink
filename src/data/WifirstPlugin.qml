@@ -28,7 +28,7 @@ Plugin {
 
     name: 'Wifirst'
     description: qsTr('This plugin allows you to access Wifirst services.')
-    imageSource: 'wiLink.png'
+    imageSource: 'image://icon/wiLink'
 
     XmlListModel {
         id: listModel

@@ -22,15 +22,15 @@ import QtQuick 1.1
 Plugin {
     name: qsTr('News reader')
     description: qsTr('This plugin allows you to read RSS news feeds.')
-    imageSource: 'rss.png'
+    imageSource: 'image://icon/rss'
 
     onLoaded: {
         for (var i = 0; i < accountModel.count; ++i) {
             var account = accountModel.get(i);
             if (account.type == 'wifirst') {
                 dock.model.add({
-                    'iconSource': 'dock-rss.png',
-                    'iconPress': 'rss.png',
+                    'iconSource': 'image://icon/dock-rss',
+                    'iconPress': 'image://icon/rss',
                     'panelProperties': {accountJid: account.jid},
                     'panelSource': 'NewsPanel.qml',
                     'shortcut': Qt.ControlModifier + Qt.Key_N,

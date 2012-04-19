@@ -34,11 +34,11 @@ Panel {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        iconSource: 'debug.png'
+        iconSource: 'image://icon/debug'
         title: qsTr('Debugging console')
         toolBar: ToolBar {
             ToolButton {
-                iconSource: 'start.png'
+                iconSource: 'image://icon/start'
                 text: qsTr('Start')
                 visible: !logModel.enabled
 
@@ -46,7 +46,7 @@ Panel {
             }
 
             ToolButton {
-                iconSource: 'stop.png'
+                iconSource: 'image://icon/stop'
                 text: qsTr('Stop')
                 visible: logModel.enabled
 
@@ -54,7 +54,7 @@ Panel {
             }
 
             ToolButton {
-                iconSource: 'copy.png'
+                iconSource: 'image://icon/copy'
                 text: qsTr('Copy')
                 onClicked: {
                     // copy the 20 last messages, to avoid freeze with important log
@@ -70,7 +70,7 @@ Panel {
             }
 
             ToolButton {
-                iconSource: 'clear.png'
+                iconSource: 'image://icon/clear'
                 text: qsTr('Clear')
 
                 onClicked: logModel.clear()

@@ -158,11 +158,11 @@ Panel {
                 Component.onCompleted: {
                     menu.model.append({
                         'action': 'edit',
-                        'icon': 'options.png',
+                        'icon': 'image://icon/options',
                         'text': qsTr('Modify')});
                     menu.model.append({
                         'action': 'remove',
-                        'icon': 'remove.png',
+                        'icon': 'image://icon/remove',
                         'text': qsTr('Remove')});
                 }
             }
@@ -186,7 +186,7 @@ Panel {
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
-            iconSource: 'rss.png'
+            iconSource: 'image://icon/rss'
             title: qsTr('News reader')
         }
 
@@ -223,7 +223,7 @@ Panel {
                         else if (model.imageSource)
                             return application.resolvedUrl(model.imageSource, mainView.model.source);
                         else
-                            return 'rss.png';
+                            return 'image://icon/rss';
                     }
                 }
 
@@ -290,7 +290,7 @@ Panel {
                         spacing: appStyle.margin.normal
 
                         Button {
-                            iconSource: 'start.png'
+                            iconSource: 'image://icon/start'
                             text: qsTr('Play sound')
                             visible: model.audioSource ? (panel.soundUrl != model.audioSource) : false
 
@@ -298,7 +298,7 @@ Panel {
                         }
 
                         Button {
-                            iconSource: 'stop.png'
+                            iconSource: 'image://icon/stop'
                             text: qsTr('Stop sound')
                             visible: model.audioSource ? (panel.soundUrl == model.audioSource) : false
 

@@ -49,7 +49,7 @@ Item {
         anchors.left: parent.left
         anchors.leftMargin: appStyle.margin.normal
         anchors.verticalCenter: parent.verticalCenter
-        source: (Qt.isQtObject(job) && job.direction == QXmppTransferJob.OutgoingDirection) ? 'upload.png' : 'download.png'
+        source: (Qt.isQtObject(job) && job.direction == QXmppTransferJob.OutgoingDirection) ? 'image://icon/upload' : 'image://icon/download'
     }
 
     ProgressBar {
@@ -83,7 +83,7 @@ Item {
 
         anchors.right: cancelButton.left
         anchors.verticalCenter: parent.verticalCenter
-        iconSource: 'file.png'
+        iconSource: 'image://icon/file'
         text: qsTr('Open')
         //visible: job && job.state == QXmppTransferJob.FinishedState && job.error == QXmppTransferJob.NoError
         visible: Qt.isQtObject(job) && job.state == QXmppTransferJob.FinishedState && job.direction == QXmppTransferJob.IncomingDirection
@@ -103,7 +103,7 @@ Item {
         anchors.right: closeButton.left
         anchors.rightMargin: appStyle.margin.normal
         anchors.verticalCenter: parent.verticalCenter
-        iconSource: 'remove.png'
+        iconSource: 'image://icon/remove'
         text: qsTr('Cancel')
         visible: Qt.isQtObject(job) && job.state != QXmppTransferJob.FinishedState
 
@@ -116,7 +116,7 @@ Item {
         anchors.right: parent.right
         anchors.rightMargin: appStyle.margin.normal
         anchors.verticalCenter: parent.verticalCenter
-        iconSource: 'close.png'
+        iconSource: 'image://icon/close'
         text: qsTr('Close')
         visible: Qt.isQtObject(job) && job.state == QXmppTransferJob.FinishedState
 

@@ -23,7 +23,7 @@ import 'utils.js' as Utils
 Plugin {
     name: qsTr('Chat')
     description: qsTr('This plugin allows you to chat with your friends.')
-    imageSource: 'chat.png'
+    imageSource: 'image://icon/chat'
 
     onLoaded: {
         for (var i = 0; i < accountModel.count; ++i) {
@@ -32,8 +32,8 @@ Plugin {
             if (accountModel.count > 1)
                 title += '<br/><small>' + Utils.jidToDomain(account.jid) + '</small>';
             dock.model.add({
-                'iconSource': 'dock-chat.png',
-                'iconPress': 'chat.png',
+                'iconSource': 'image://icon/dock-chat',
+                'iconPress': 'image://icon/chat',
                 'notified': false,
                 'panelProperties': {'accountJid': account.jid},
                 'panelSource': 'ChatPanel.qml',

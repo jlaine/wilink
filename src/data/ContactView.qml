@@ -86,7 +86,7 @@ Item {
             anchors.rightMargin: 2
             anchors.verticalCenter: parent.verticalCenter
             iconSize: appStyle.icon.tinySize
-            iconSource: 'add.png'
+            iconSource: 'image://icon/add'
 
             onClicked: block.addClicked()
         }

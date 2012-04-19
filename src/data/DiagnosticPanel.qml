@@ -37,18 +37,18 @@ Panel {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        iconSource: 'diagnostics.png'
+        iconSource: 'image://icon/diagnostics'
         title: qsTr('Diagnostics')
         toolBar: ToolBar {
             ToolButton {
-                iconSource: 'copy.png'
+                iconSource: 'image://icon/copy'
                 enabled: !panel.busy
                 text: qsTr('Copy')
 
                 onClicked: clipboard.copy(diagnostic.text)
             }
             ToolButton {
-                iconSource: 'refresh.png'
+                iconSource: 'image://icon/refresh'
                 enabled: !panel.busy
                 text: qsTr('Refresh')
 

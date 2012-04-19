@@ -81,7 +81,7 @@ Panel {
                 id: image
                 anchors.top: parent.top
                 anchors.left: parent.left
-                source: Qt.isQtObject(plugin) ? plugin.imageSource : 'plugin.png'
+                source: Qt.isQtObject(plugin) ? plugin.imageSource : 'image://icon/plugin'
             }
 
             Label {

@@ -147,7 +147,7 @@ FocusScope {
         Button {
             id: addButton
 
-            iconSource: 'add.png'
+            iconSource: 'image://icon/add'
             text: qsTr('Add')
 
             onClicked: {
@@ -178,7 +178,7 @@ FocusScope {
         }
 
         Button {
-            iconSource: 'back.png'
+            iconSource: 'image://icon/back'
             text: qsTr('Cancel')
 
             onClicked: {

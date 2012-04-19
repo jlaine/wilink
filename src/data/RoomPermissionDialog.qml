@@ -115,7 +115,7 @@ Dialog {
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
                     anchors.right: parent.right
-                    iconSource: 'remove.png'
+                    iconSource: 'image://icon/remove'
                     onClicked: {
                         permissionModel.removePermission(model.jid);
                     }
@@ -159,7 +159,7 @@ Dialog {
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
                 anchors.right: parent.right
-                iconSource: 'add.png'
+                iconSource: 'image://icon/add'
 
                 onClicked: {
                     if (input.acceptableInput) {

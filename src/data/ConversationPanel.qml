@@ -65,7 +65,7 @@ Panel {
         }
         toolBar: ToolBar {
             ToolButton {
-                iconSource: 'call.png'
+                iconSource: 'image://icon/call'
                 text: qsTr('Call')
                 visible: vcard.features & VCard.VoiceFeature
 
@@ -98,7 +98,7 @@ Panel {
             }
 
             ToolButton {
-                iconSource: 'upload.png'
+                iconSource: 'image://icon/upload'
                 text: qsTr('Send')
                 visible: vcard.features & VCard.FileTransferFeature
 
@@ -139,7 +139,7 @@ Panel {
             }
 
             ToolButton {
-                iconSource: 'clear.png'
+                iconSource: 'image://icon/clear'
                 text: qsTr('Clear')
                 visible: true
 

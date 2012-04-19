@@ -23,7 +23,7 @@ import 'utils.js' as Utils
 Plugin {
     name: qsTr('Photos')
     description: qsTr('This plugin allows you to access your photos.')
-    imageSource: 'photos.png'
+    imageSource: 'image://icon/photos'
 
     onLoaded: {
         for (var i = 0; i < accountModel.count; ++i) {
@@ -42,8 +42,8 @@ Plugin {
                 title += '<br/><small>' + Utils.jidToDomain(account.jid) + '</small>';
 
             dock.model.add({
-                'iconSource': 'dock-photo.png',
-                'iconPress': 'photos.png',
+                'iconSource': 'image://icon/dock-photo',
+                'iconPress': 'image://icon/photos',
                 'panelSource': 'PhotoPanel.qml',
                 'panelProperties': {'url': url},
                 'priority': 7,

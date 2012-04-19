@@ -22,12 +22,12 @@ import QtQuick 1.1
 Plugin {
     name: qsTr('Music')
     description: qsTr('This plugin allows you to play music.')
-    imageSource: 'start.png'
+    imageSource: 'image://icon/start'
 
     onLoaded: {
         dock.model.add({
-            'iconSource': 'dock-start.png',
-            'iconPress': 'start.png',
+            'iconSource': 'image://icon/dock-start',
+            'iconPress': 'image://icon/start',
             'panelSource': 'PlayerPanel.qml',
             'shortcut': Qt.ControlModifier + Qt.Key_U,
             'text': qsTr('Music'),

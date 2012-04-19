@@ -25,7 +25,7 @@ import 'utils.js' as Utils
 Panel {
     id: panel
 
-    property string iconSource: 'chat.png'
+    property string iconSource: 'image://icon/chat'
     property alias jid: participantModel.jid
     property alias room: participantModel.room
     property string title: Utils.jidToUser(jid)
@@ -55,12 +55,12 @@ Panel {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        iconSource: 'chat.png'
+        iconSource: 'image://icon/chat'
         title: Utils.jidToUser(jid)
         subTitle: Qt.isQtObject(room) ? room.subject : ''
         toolBar: ToolBar {
             ToolButton {
-                iconSource: 'invite.png'
+                iconSource: 'image://icon/invite'
                 text: qsTr('Invite')
 
                 onClicked: {
@@ -72,7 +72,7 @@ Panel {
             }
 
             ToolButton {
-                iconSource: 'chat.png'
+                iconSource: 'image://icon/chat'
                 text: qsTr('Subject')
                 visible: Qt.isQtObject(room) && (room.allowedActions & QXmppMucRoom.SubjectAction)
 
@@ -82,7 +82,7 @@ Panel {
             }
 
             ToolButton {
-                iconSource: 'options.png'
+                iconSource: 'image://icon/options'
                 text: qsTr('Options')
                 visible: Qt.isQtObject(room) && (room.allowedActions & QXmppMucRoom.ConfigurationAction)
 
@@ -92,7 +92,7 @@ Panel {
             }
 
             ToolButton {
-                iconSource: 'permissions.png'
+                iconSource: 'image://icon/permissions'
                 text: qsTr('Permissions')
                 visible: Qt.isQtObject(room) && (room.allowedActions & QXmppMucRoom.PermissionsAction)
 
@@ -184,7 +184,7 @@ Panel {
 
         onError: {
             dialogSwapper.showPanel('ErrorNotification.qml', {
-                'iconSource': 'chat.png',
+                'iconSource': 'image://icon/chat',
                 'title': qsTranslate('RoomPanel', 'Chat room error'),
                 'text': qsTranslate('RoomPanel', "Sorry, but you cannot join chat room '%1'.\n\n%2").replace('%1', room.jid).replace('%2', ''),
             });
@@ -196,7 +196,7 @@ Panel {
 
         onKicked: {
             dialogSwapper.showPanel('ErrorNotification.qml', {
-                'iconSource': 'chat.png',
+                'iconSource': 'image://icon/chat',
                 'title': qsTranslate('RoomPanel', 'Chat room error'),
                 'text': qsTranslate('RoomPanel', "Sorry, but you were kicked from chat room '%1'.\n\n%2").replace('%1', room.jid).replace('%2', reason),
             });

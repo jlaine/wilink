@@ -36,7 +36,7 @@ Dialog {
                 id: refreshButton
 
                 enabled: Qt.isQtObject(appUpdater) && appUpdater.state == Updater.IdleState
-                iconSource: 'refresh.png'
+                iconSource: 'image://icon/refresh'
                 text: qsTr('Check for updates')
                 visible: !prompting
                 onClicked: appUpdater.check()
@@ -45,7 +45,7 @@ Dialog {
             Button {
                 id: installButton
 
-                iconSource: 'start.png'
+                iconSource: 'image://icon/start'
                 text: qsTr('Install')
                 visible: prompting
                 onClicked: appUpdater.install()
@@ -54,7 +54,7 @@ Dialog {
             Button {
                 id: rejectButton
 
-                iconSource: 'close.png'
+                iconSource: 'image://icon/close'
                 text: prompting ? qsTr('Cancel') : qsTr('Close')
                 onClicked: {
                     if (prompting)
@@ -99,7 +99,7 @@ Dialog {
                 height: 48
                 width: 48
                 smooth: true
-                source: '128x128/wiLink.png'
+                source: 'image://icon/128x128/wiLink'
             }
 
             Label {

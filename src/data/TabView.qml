@@ -38,7 +38,7 @@ ListView {
         border { left: 32; right: 32 }
         height: tabView.height
         width: 200
-        source: 'tab.png'
+        source: 'image://icon/tab'
         z: model.panel.z
 
         Image {
@@ -76,7 +76,7 @@ ListView {
             anchors.rightMargin: 12
             anchors.verticalCenter: parent.verticalCenter
             iconSize: appStyle.icon.tinySize
-            iconSource: 'close.png'
+            iconSource: 'image://icon/close'
             width: iconSize
             visible: tabView.model.count > 1
 
@@ -89,7 +89,7 @@ ListView {
 
             PropertyChanges {
                 target: rect
-                source: 'tab-active.png'
+                source: 'image://icon/tab-active'
             }
         }
     }

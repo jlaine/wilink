@@ -62,7 +62,7 @@ Item {
                 anchors.right: cancelButton.left
                 anchors.rightMargin: appStyle.spacing.horizontal
                 anchors.verticalCenter: parent.verticalCenter
-                iconSource: 'copy.png'
+                iconSource: 'image://icon/copy'
                 iconSize: appStyle.icon.tinySize
                 text: qsTr('Copy')
                 visible: false
@@ -103,7 +103,7 @@ Item {
                 anchors.right: parent.right
                 anchors.rightMargin: appStyle.spacing.horizontal
                 anchors.verticalCenter: parent.verticalCenter
-                iconSource: 'close.png'
+                iconSource: 'image://icon/close'
                 iconSize: appStyle.icon.tinySize
                 text: qsTr('Cancel')
                 visible: false

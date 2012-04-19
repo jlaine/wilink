@@ -40,7 +40,7 @@ Panel {
 
             anchors.verticalCenter: parent.verticalCenter
             iconSize: appStyle.icon.tinySize
-            iconSource: 'add.png'
+            iconSource: 'image://icon/add'
             width: iconSize
 
             onClicked: tabSwapper.addPanel('WebTab.qml', {}, true);

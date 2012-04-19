@@ -22,15 +22,15 @@ import QtQuick 1.1
 Plugin {
     name: qsTr('Diagnostics')
     description: qsTr('This plugin allows you to run tests to diagnostic network issues.')
-    imageSource: 'diagnostics.png'
+    imageSource: 'image://icon/diagnostics'
 
     onLoaded: {
         for (var i = 0; i < accountModel.count; ++i) {
             var account = accountModel.get(i);
             if (account.type == 'wifirst') {
                 dock.model.add({
-                    'iconSource': 'dock-diagnostics.png',
-                    'iconPress': 'diagnostics.png',
+                    'iconSource': 'image://icon/dock-diagnostics',
+                    'iconPress': 'image://icon/diagnostics',
                     'panelProperties': {accountJid: account.jid},
                     'panelSource': 'DiagnosticPanel.qml',
                     'priority': 6,

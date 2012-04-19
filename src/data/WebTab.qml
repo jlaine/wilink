@@ -24,7 +24,7 @@ import wiLink 2.0
 Panel {
     id: panel
 
-    property string iconSource: 'web.png'
+    property string iconSource: 'image://icon/web'
     property alias title: webView.title
     property alias url: webView.url
     clip: true
@@ -56,7 +56,7 @@ Panel {
 
             ToolButton {
                 enabled: webView.back.enabled
-                iconSource: 'back.png'
+                iconSource: 'image://icon/back'
                 width: iconSize
 
                 onClicked: webView.back.triggered()
@@ -64,7 +64,7 @@ Panel {
 
             ToolButton {
                 enabled: webView.forward.enabled
-                iconSource: 'forward.png'
+                iconSource: 'image://icon/forward'
                 width: iconSize
 
                 onClicked: webView.forward.triggered()
@@ -72,7 +72,7 @@ Panel {
 
             ToolButton {
                 enabled: webView.url != '' && webView.reload.enabled
-                iconSource: 'refresh.png'
+                iconSource: 'image://icon/refresh'
                 visible: !webView.stop.enabled
                 width: iconSize
 
@@ -80,7 +80,7 @@ Panel {
             }
 
             ToolButton {
-                iconSource: 'stop.png'
+                iconSource: 'image://icon/stop'
                 visible: webView.stop.enabled
                 width: iconSize
 

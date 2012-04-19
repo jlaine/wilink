@@ -62,7 +62,7 @@ Item {
                     anchors.top: parent.top
                     anchors.left: parent.left
                     smooth: true
-                    source: Utils.jidToDomain(model.jid) == 'wifirst.net' ? 'wiLink.png' : 'peer.png'
+                    source: Utils.jidToDomain(model.jid) == 'wifirst.net' ? 'image://icon/wiLink' : 'image://icon/peer'
                     height: appStyle.icon.smallSize
                     width: appStyle.icon.smallSize
                 }
@@ -94,12 +94,12 @@ Item {
         height: appStyle.icon.smallSize + 8
 
         Button {
-            iconSource: 'add.png'
+            iconSource: 'image://icon/add'
             onClicked: panel.addClicked()
         }
 
         Button {
-            iconSource: 'remove.png'
+            iconSource: 'image://icon/remove'
             onClicked: {
                 if (accountView.currentIndex >= 0) {
                     accountView.model.remove(accountView.currentIndex);
