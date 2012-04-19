@@ -24,6 +24,7 @@ import wiLink 2.0
 FocusScope {
     id: root
 
+    // A model representing the user's accounts.
     AccountModel {
         id: accountModel
 
@@ -60,6 +61,7 @@ FocusScope {
         isMobile: application.isMobile
     }
 
+    // The application updater.
     Updater {
         id: appUpdater
 
@@ -72,13 +74,13 @@ FocusScope {
         }
     }
 
-    // The background
+    // The window background.
     Rectangle {
         anchors.fill: parent
         color: 'white'
     }
 
-    // The left-hand dock
+    // The left-hand dock.
     Dock {
         id: dock
 
@@ -88,7 +90,7 @@ FocusScope {
         z: 1
     }
 
-    // The main display area
+    // The main display area.
     PanelSwapper {
         id: swapper
 
@@ -99,6 +101,7 @@ FocusScope {
         focus: true
     }
 
+    // The overlay for displaying dialogs.
     PanelSwapper {
         id: dialogSwapper
 
@@ -107,17 +110,18 @@ FocusScope {
 
         onCurrentItemChanged: {
             if (currentItem) {
-                dialogSwapper.focus = true;
+                dialogSwapper.forceActiveFocus();
                 x = Math.max(0, Math.floor((parent.width - currentItem.width) / 2));
                 y = Math.max(0, Math.floor((parent.height - currentItem.height) / 2));
                 opacity = 1;
             } else {
-                swapper.focus = true;
+                swapper.forceActiveFocus();
                 opacity = 0;
             }
         }
     }
 
+    // The mouse area used to cancel menus by clicking outside the menu.
     MouseArea {
         id: menuCancelArea
 
@@ -128,6 +132,7 @@ FocusScope {
         onClicked: menuLoader.hide()
     }
 
+    // The overlay for displaying popup menus and combo boxes.
     Loader {
         id: menuLoader
 
@@ -173,6 +178,22 @@ FocusScope {
             } else {
                 dialogSwapper.showPanel('SetupDialog.qml');
             }
+        }
+    }
+
+    Connections {
+        target: window
+
+        onShowAbout: {
+            dialogSwapper.showPanel('AboutDialog.qml');
+        }
+
+        onShowHelp: {
+            Qt.openUrlExternally('https://www.wifirst.net/wilink/faq');
+        }
+
+        onShowPreferences: {
+            dialogSwapper.showPanel('PreferenceDialog.qml');
         }
     }
 

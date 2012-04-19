@@ -141,18 +141,6 @@ Rectangle {
         }
     }
 
-    Connections {
-        target: window
-
-        onShowAbout: {
-            dialogSwapper.showPanel('AboutDialog.qml');
-        }
-
-        onShowHelp: Qt.openUrlExternally('https://www.wifirst.net/wilink/faq')
-
-        onShowPreferences: preferenceButton.clicked()
-    }
-
     Keys.onPressed: {
         var val = event.modifiers + event.key;
         for (var i = 0; i < control.children.length; i++) {

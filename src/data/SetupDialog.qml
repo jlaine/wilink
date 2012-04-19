@@ -24,7 +24,6 @@ import 'utils.js' as Utils
 Dialog {
     id: dialog
 
-    focus: true
     title: qsTr('Add an account')
     footerComponent: PanelHelp {
         anchors.margins: 8
@@ -46,15 +45,5 @@ Dialog {
             dialog.close();
         }
         onClose: application.quit()
-    }
-
-    Connections {
-        target: window
-
-        onShowHelp: Qt.openUrlExternally('https://www.wifirst.net/wilink/faq')
-    }
-
-    Component.onCompleted: {
-        panel.forceActiveFocus();
     }
 }
