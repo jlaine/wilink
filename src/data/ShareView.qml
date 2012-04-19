@@ -25,7 +25,6 @@ ScrollView {
 
     property bool itemHovered: false
 
-    anchors.fill: parent
     highlight: Item {}
 
     delegate: Item {
@@ -48,20 +47,10 @@ ScrollView {
             anchors.left: parent.left
             anchors.leftMargin: appStyle.margin.normal
             anchors.verticalCenter: parent.verticalCenter
-            width: appStyle.icon.normalSize
-            height: appStyle.icon.normalSize
             fillMode: Image.PreserveAspectFit
-            smooth: true
             source: model.avatar
-        }
-
-        Image {
-            id: fire
-
-            anchors.fill: thumbnail
-            source: 'image://icon/fire'
-            smooth: true
-            visible: model.popularity > 10
+            sourceSize.width: appStyle.icon.normalSize
+            sourceSize.height: appStyle.icon.normalSize
         }
 
         Item {
