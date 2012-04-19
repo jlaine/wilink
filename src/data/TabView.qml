@@ -47,10 +47,10 @@ ListView {
             anchors.left: parent.left
             anchors.leftMargin: 12
             anchors.verticalCenter: parent.verticalCenter
-            height: appStyle.icon.tinySize
-            width: appStyle.icon.tinySize
             smooth: true
             source: model.panel.iconSource
+            sourceSize.height: appStyle.icon.tinySize
+            sourceSize.width: appStyle.icon.tinySize
         }
 
         Label {
