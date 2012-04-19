@@ -69,10 +69,13 @@ int main(int argc, char *argv[])
     /* Create window */
     Window window;
 #ifdef MEEGO_EDITION_HARMATTAN
-    window.setSource(app.qmlUrl("MeegoMain.qml"));
+    QUrl qmlSource("qrc:/MeegoMain.qml");
 #else
-    window.setSource(app.qmlUrl("Main.qml"));
+    QUrl qmlSource("qrc:/Main.qml");
 #endif
+    if (argc > 1)
+        qmlSource = QUrl(QString::fromLocal8Bit(argv[1]));
+    window.setSource(qmlSource);
 
     /* Run application */
     return app.exec();

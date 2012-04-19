@@ -57,7 +57,6 @@ public:
     ApplicationPrivate();
 
     ApplicationSettings *appSettings;
-    QUrl qmlRoot;
     QSoundPlayer *soundPlayer;
     QThread *soundThread;
 #ifdef USE_LIBNOTIFY
@@ -72,7 +71,6 @@ public:
 
 ApplicationPrivate::ApplicationPrivate()
     : appSettings(0)
-    , qmlRoot("qrc:/")
 #ifdef USE_LIBNOTIFY
     , libnotify_accepts_actions(0)
 #endif
@@ -92,13 +90,6 @@ Application::Application(int &argc, char **argv)
     Q_UNUSED(check);
 
     wApp = this;
-
-    // process command line argument
-    for (int i = 1; i < argc; ++i) {
-        if (!strcmp(argv[i], "-qmlroot") && i < argc - 1) {
-            d->qmlRoot = QUrl(QString::fromLocal8Bit(argv[++i]));
-        }
-    }
 
     // set application properties
     setApplicationName("wiLink");
@@ -277,11 +268,6 @@ bool Application::isMobile() const
 QString Application::osType() const
 {
     return SystemInfo::osType();
-}
-
-QUrl Application::qmlUrl(const QString &name) const
-{
-    return d->qmlRoot.resolved(QUrl(name));
 }
 
 #if 0

@@ -77,7 +77,6 @@ public:
 #endif
 
     QString executablePath() const;
-    QUrl qmlUrl(const QString &name) const;
 
     bool isInstalled() const;
     bool isMobile() const;
