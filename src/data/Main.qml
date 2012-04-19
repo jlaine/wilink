@@ -43,11 +43,18 @@ FocusScope {
         }
     }
 
+    // Logger which records debugging and protocol (XMPP, SIP) information.
+    //
+    // Its data can be viewed using the debugging plugin.
     QXmppLogger {
         id: appLogger
         loggingType: QXmppLogger.SignalLogging
     }
 
+    // Manager for loading and unloading plugins.
+    //
+    // The plugins contain the bulk of the application logic,
+    // they control which panels are displayed, etc..
     PluginLoader {
         id: appPlugins
     }
@@ -156,17 +163,10 @@ FocusScope {
         }
     }
 
-    Component.onCompleted: {
-        window.minimumWidth = 360;
-        window.minimumHeight = 360;
-        window.fullScreen = application.isMobile && application.osType != 'android';
-        window.showAndRaise();
-
-        application.showWindows.connect(function() {
-            window.showAndRaise();
-        });
-    }
-
+    // A timer to delay the application startup.
+    //
+    // This allows the window to be painted before accessing the
+    // system wallet, which is blocking on OS X.
     Timer {
         interval: 100
         repeat: false
@@ -179,6 +179,17 @@ FocusScope {
                 dialogSwapper.showPanel('SetupDialog.qml');
             }
         }
+    }
+
+    Component.onCompleted: {
+        window.minimumWidth = 360;
+        window.minimumHeight = 360;
+        window.fullScreen = application.isMobile && application.osType != 'android';
+        window.showAndRaise();
+
+        application.showWindows.connect(function() {
+            window.showAndRaise();
+        });
     }
 
     Connections {
