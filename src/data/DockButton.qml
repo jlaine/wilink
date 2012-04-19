@@ -35,7 +35,7 @@ Item {
 
     active: {
         var item;
-        if (panelSource == 'PreferenceDialog.qml') {
+        if (dialogSwapper.currentIndex >= 0) {
             item = dialogSwapper.model.get(dialogSwapper.currentIndex);
         } else {
             item = swapper.model.get(swapper.currentIndex);

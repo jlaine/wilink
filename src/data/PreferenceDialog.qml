@@ -98,7 +98,7 @@ Dialog {
             anchors.right: parent.right 
             anchors.rightMargin: appStyle.margin.small
 
-            onCurrentSourceChanged: {
+            onCurrentIndexChanged: {
                 var currentSource = prefSwapper.model.get(prefSwapper.currentIndex).source;
                 for (var i = 0; i < tabList.model.count; i++) {
                     if (tabList.model.get(i).source == currentSource) {
