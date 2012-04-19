@@ -89,10 +89,9 @@ Panel {
             anchors.left: parent.left
             anchors.leftMargin: 8
             anchors.verticalCenter: parent.verticalCenter
-            height: appStyle.icon.tinySize
-            width: appStyle.icon.tinySize
             source: 'image://icon/search'
-            smooth: true
+            sourceSize.height: appStyle.icon.tinySize
+            sourceSize.width: appStyle.icon.tinySize
         }
 
         InputBar {

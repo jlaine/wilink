@@ -75,8 +75,8 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             opacity: button.enabled ? 1 : 0.5
             smooth: true
-            width: iconSize
-            height: iconSize
+            sourceSize.width: iconSize
+            sourceSize.height: iconSize
         }
 
         Label {

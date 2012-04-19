@@ -62,8 +62,8 @@ Dialog {
                     anchors.verticalCenter: parent.verticalCenter
                     smooth: true
                     source: model.iconSource
-                    height: appStyle.icon.smallSize
-                    width: appStyle.icon.smallSize
+                    sourceSize.height: appStyle.icon.smallSize
+                    sourceSize.width: appStyle.icon.smallSize
                 }
 
                 Label {

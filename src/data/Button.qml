@@ -45,12 +45,11 @@ Rectangle {
     Image {
         id: image
 
-        height: iconSize
-        width: iconSize
         anchors.left: parent.left
         anchors.leftMargin: margins
         anchors.verticalCenter: parent.verticalCenter
-        smooth: true
+        sourceSize.height: iconSize
+        sourceSize.width: iconSize
     }
 
     Label {

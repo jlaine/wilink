@@ -80,10 +80,9 @@ FocusScope {
                     anchors.left: parent.left
                     anchors.leftMargin: appStyle.margin.normal
                     anchors.verticalCenter: parent.verticalCenter
-                    width: appStyle.icon.smallSize
-                    height: appStyle.icon.smallSize
-                    smooth: true
                     source: model.direction == QXmppCall.OutgoingDirection ? 'image://icon/call-outgoing' : 'image://icon/call-incoming'
+                    sourceSize.width: appStyle.icon.smallSize
+                    sourceSize.height: appStyle.icon.smallSize
                 }
 
                 Label {

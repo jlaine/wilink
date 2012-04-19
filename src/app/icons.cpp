@@ -28,26 +28,24 @@ IconImageProvider::IconImageProvider()
 
 QImage IconImageProvider::requestImage(const QString &id, QSize *size, const QSize &requestedSize)
 {
-    if (requestedSize.isValid()) {
-        qDebug("req %s %ix%i", qPrintable(id), requestedSize.width(), requestedSize.height());
-    } else {
-        qDebug("req %s", qPrintable(id));
-    }
-
     QString filePath;
     const QList<int> allSizes = QList<int>() << 128 << 64 << 32 << 16;
     foreach (const int size, allSizes) {
         const QString testPath = QString(":/%1x%2/%3.png").arg(QString::number(size), QString::number(size), id);
-        if (QFileInfo(testPath).exists()) {
+        const bool sizeSufficient = !requestedSize.isValid() || (size >= requestedSize.width() && size >= requestedSize.height());
+        if ((filePath.isEmpty() || sizeSufficient) && QFileInfo(testPath).exists()) {
             filePath = testPath;
         }
     }
     if (filePath.isEmpty())
         filePath = ":/" + id + ".png";
 
+    if (!requestedSize.isValid())
+        qDebug("icon '%s' %s", qPrintable(id), qPrintable(filePath));
+
     QImage image(filePath);
-    if (requestedSize.isValid())
-        image = image.scaled(requestedSize.width(), requestedSize.height(), Qt::KeepAspectRatio);
+    if (requestedSize.isValid() && requestedSize != image.size())
+        image = image.scaled(requestedSize.width(), requestedSize.height(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
     if (size)
         *size = image.size();

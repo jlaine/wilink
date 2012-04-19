@@ -50,10 +50,9 @@ ContactView {
             anchors.leftMargin: 6
             anchors.verticalCenter: parent.verticalCenter
             asynchronous: true
-            width: appStyle.icon.smallSize
-            height: appStyle.icon.smallSize
-            smooth: true
             source: 'image://icon/peer'
+            sourceSize.width: appStyle.icon.smallSize
+            sourceSize.height: appStyle.icon.smallSize
         }
 
         Column {

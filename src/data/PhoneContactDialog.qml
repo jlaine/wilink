@@ -41,7 +41,7 @@ Dialog {
             anchors.left: parent.left
             source: 'image://icon/peer'
             sourceSize.width: 64
-            sourceSize.hight: 64
+            sourceSize.height: 64
         }
 
         Column {

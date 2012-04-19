@@ -291,8 +291,8 @@ Panel {
                     anchors.bottom: parent.bottom
                     anchors.horizontalCenter: parent.horizontalCenter
                     source: 'image://icon/audio-input'
-                    height: 32
-                    width: 32
+                    sourceSize.height: 32
+                    sourceSize.width: 32
                 }
             }
 
@@ -319,8 +319,8 @@ Panel {
                     anchors.bottom: parent.bottom
                     anchors.horizontalCenter: parent.horizontalCenter
                     source: 'image://icon/audio-output'
-                    height: 32
-                    width: 32
+                    sourceSize.height: 32
+                    sourceSize.width: 32
                 }
             }
         }

@@ -190,8 +190,8 @@ FocusScope {
         anchors.margins: 2
         opacity: 0.5
         source: 'image://icon/resize'
-        height: appStyle.icon.tinySize
-        width: appStyle.icon.tinySize
+        sourceSize.height: appStyle.icon.tinySize
+        sourceSize.width: appStyle.icon.tinySize
         visible: !appStyle.isMobile
 
         MouseArea {

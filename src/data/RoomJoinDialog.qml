@@ -79,10 +79,9 @@ Dialog {
                     anchors.left: parent.left
                     anchors.leftMargin: 4
                     anchors.verticalCenter: parent.verticalCenter
-                    width: appStyle.icon.smallSize
-                    height: appStyle.icon.smallSize
-                    smooth: true
                     source: 'image://icon/chat'
+                    sourceSize.width: appStyle.icon.smallSize
+                    sourceSize.height: appStyle.icon.smallSize
                 }
 
                 Label {
