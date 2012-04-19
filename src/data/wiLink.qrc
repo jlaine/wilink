@@ -89,6 +89,7 @@
     <file>PhotoPanel.qml</file>
     <file>PhotoPlugin.qml</file>
     <file>PhotoSlideView.qml</file>
+    <file>PhotoWall.qml</file>
     <file>PlayerPanel.qml</file>
     <file>PlayerPlugin.qml</file>
     <file>Plugin.qml</file>
