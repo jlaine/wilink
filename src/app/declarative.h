@@ -193,6 +193,21 @@ protected:
     void dropEvent(QGraphicsSceneDragDropEvent *event);
 };
 
+class WheelArea : public QDeclarativeItem
+{
+    Q_OBJECT
+
+public:
+    WheelArea(QDeclarativeItem *parent = 0);
+
+protected:
+    void wheelEvent(QGraphicsSceneWheelEvent *event);
+
+signals:
+    void verticalWheel(int delta);
+    void horizontalWheel(int delta);
+};
+
 class Plugin : public QDeclarativeExtensionPlugin
 {
     Q_OBJECT

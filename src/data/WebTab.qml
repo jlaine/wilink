@@ -145,6 +145,13 @@ Panel {
             }
         }
 
+        WheelArea {
+            anchors.fill: webFlickable
+
+            onHorizontalWheel: horizontalScrollBar.moveBy(-delta)
+            onVerticalWheel: verticalScrollBar.moveBy(-delta)
+        }
+
         ScrollBar {
             id: verticalScrollBar
 

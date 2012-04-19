@@ -217,6 +217,26 @@ void DropArea::dropEvent(QGraphicsSceneDragDropEvent *event)
     }
 }
 
+WheelArea::WheelArea(QDeclarativeItem *parent)
+    : QDeclarativeItem(parent)
+{
+}
+
+void WheelArea::wheelEvent(QGraphicsSceneWheelEvent *event)
+{
+    switch(event->orientation()) {
+        case Qt::Horizontal:
+            emit horizontalWheel(event->delta());
+            break;
+        case Qt::Vertical:
+            emit verticalWheel(event->delta());
+            break;
+        default:
+            event->ignore();
+            break;
+    }
+}
+
 void Plugin::initializeEngine(QDeclarativeEngine *engine, const char *uri)
 {
     Q_UNUSED(uri);
@@ -281,6 +301,7 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterType<QSoundTester>(uri, 2, 0, "SoundTester");
     qmlRegisterType<Updater>(uri, 2, 0, "Updater");
     qmlRegisterType<VCard>(uri, 2, 0, "VCard");
+    qmlRegisterType<WheelArea>(uri, 2, 0, "WheelArea");
     qmlRegisterType<Window>(uri, 2, 0, "Window");
 
     // crutches for Qt..
