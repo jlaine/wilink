@@ -107,8 +107,8 @@ LIBS += \
     -L../qnetio/src $$QNETIO_LIBS \
     -L../qsound/src $$QSOUND_LIBS \
     -L../qxmpp/src $$QXMPP_LIBS \
-    -L../qdjango/src/db -lqdjango-db \
-    -L../qxmpp-extra -lqxmpp-extra
+    -L../qxmpp-extra -lqxmpp-extra \
+    -L../qdjango/src/db -lqdjango-db
 
 # Installation
 QMAKE_TARGET_COMPANY="Wifirst"
