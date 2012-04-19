@@ -57,11 +57,13 @@ Item {
         states: State {
             name: 'collapsed'
             when: header.width < 400
-            PropertyChanges { target: iconImage; anchors.leftMargin: 0; width: 0; opacity: 0 }
+            PropertyChanges { target: iconImage; opacity: 0 }
+            PropertyChanges { target: column; anchors.left: parent.left }
         }
     }
 
     Column {
+        id: column
         anchors.left: iconImage.right
         anchors.leftMargin: iconMargin
         anchors.right: toolBarLoader.left
