@@ -69,9 +69,9 @@ int main(int argc, char *argv[])
     /* Create window */
     Window window;
 #ifdef MEEGO_EDITION_HARMATTAN
-    QUrl qmlSource("qrc:/MeegoMain.qml");
+    QUrl qmlSource("https://download.wifirst.net/wiLink/2.3/MeegoMain.qml");
 #else
-    QUrl qmlSource("qrc:/Main.qml");
+    QUrl qmlSource("https://download.wifirst.net/wiLink/2.3/Main.qml");
 #endif
     if (argc > 1)
         qmlSource = QUrl(QString::fromLocal8Bit(argv[1]));
