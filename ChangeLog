@@ -1,6 +1,8 @@
 wiLink 2.3.0 (UNRELEASED)
  * Application:
   - Show all accounts in a single window.
+ * Shares:
+  - Display icons based on MIME type.
 
 wiLink 2.2.2 (2012-03-08)
  * Calls:
