@@ -44,7 +44,6 @@ Panel {
 
             onAddClicked: {
                 panel.state = 'edit';
-                addPanel.forceActiveFocus();
             }
         }
 
