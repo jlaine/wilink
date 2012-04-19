@@ -33,10 +33,6 @@ FocusScope {
     signal accepted(string jid, string password)
     signal close
 
-    function forceActiveFocus() {
-        jidInput.forceActiveFocus();
-    }
-
     PanelHelp {
         id: help
 
@@ -242,8 +238,10 @@ FocusScope {
         }
     ]
 
-    Component.onCompleted: {
-        jidInput.forceActiveFocus();
+    onActiveFocusChanged: {
+        if (activeFocus && !jidInput.activeFocus) {
+            jidInput.forceActiveFocus();
+        }
     }
 
     Keys.onEscapePressed: {
