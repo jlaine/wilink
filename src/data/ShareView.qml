@@ -32,7 +32,7 @@ ScrollView {
 
         anchors.left: parent.left
         anchors.right: parent.right
-        height: thumbnail.height + appStyle.margin.normal
+        height: appStyle.icon.normalSize + appStyle.margin.normal
 
         Highlight {
             id: highlight
