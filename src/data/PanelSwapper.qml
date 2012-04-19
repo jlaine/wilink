@@ -74,13 +74,7 @@ FocusScope {
                 return;
             }
 
-            // FIXME: when Qt Quick 1.1 becomes available,
-            // let createObject assign the properties itself.
-            var panel = component.createObject(panelSwapper);
-            for (var key in properties) {
-                panel[key] = properties[key];
-            }
-
+            var panel = component.createObject(panelSwapper, properties);
             panels.append({'source': source, 'properties': properties, 'panel': panel});
             panel.close.connect(function() {
                 d.removePanel(panel);
