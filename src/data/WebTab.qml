@@ -152,6 +152,11 @@ Panel {
             onVerticalWheel: verticalScrollBar.moveBy(-delta)
         }
 
+        Spinner {
+            anchors.centerIn: webFlickable
+            busy: webView.stop.enabled
+        }
+
         ScrollBar {
             id: verticalScrollBar
 
