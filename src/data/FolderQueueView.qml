@@ -64,10 +64,9 @@ Item {
                 anchors.leftMargin: appStyle.margin.normal
                 anchors.verticalCenter: parent.verticalCenter
                 fillMode: Image.PreserveAspectFit
-                width: appStyle.icon.smallSize
-                height: appStyle.icon.smallSize
-                smooth: true
                 source: block.style == 'shares' ? (model.isDir ? (model.node.length ? 'image://icon/album' : 'image://icon/peer') : 'image://icon/file') : model.avatar
+                sourceSize.width: appStyle.icon.smallSize
+                sourceSize.height: appStyle.icon.smallSize
             }
 
             ProgressBar {
