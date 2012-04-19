@@ -20,13 +20,31 @@
 import QtQuick 1.1
 import 'utils.js' as Utils
 
+/*!
+    \qmlclass PanelSwapper
+    \inqmlmodule wiLink 2.0
+    \brief A class for switching between panel.
+
+    The PanelSwapper class manages a list of panels, and allows switching
+    them. Only one panel can be displayed at a time.
+*/
 FocusScope {
     id: panelSwapper
 
+    /*!
+        A model holding the panels and their properties.
+    */
     property alias model: panels
+
+    /*!
+        The index of the current item.
+    */
     property int currentIndex: -1
+
+    /*!
+        The current item.
+    */
     property Item currentItem
-    property string currentSource
 
     ListModel {
         id: panels
@@ -148,12 +166,11 @@ FocusScope {
     }
 
     onCurrentIndexChanged: {
-        var panel = null, source = '';
+        var panel = null;
 
         if (panelSwapper.currentIndex >= 0 && panelSwapper.currentIndex < panels.count) {
             var item = panels.get(panelSwapper.currentIndex);
             panel = item.panel;
-            source = item.source;
         }
 
         if (panel != panelSwapper.currentItem) {
@@ -172,7 +189,6 @@ FocusScope {
             }
 
             panelSwapper.currentItem = panel;
-            panelSwapper.currentSource = source;
         }
     }
 }
