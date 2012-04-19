@@ -28,8 +28,10 @@
 #include "roster.h"
 
 #ifdef WILINK_EMBEDDED
+#define SMILEY_ROOT ":/32x32"
 #define HISTORY_DAYS 7
 #else
+#define SMILEY_ROOT ":/16x16"
 #define HISTORY_DAYS 14
 #endif
 
@@ -86,26 +88,26 @@ bool HistoryMessage::groupWith(const HistoryMessage &other) const
 static QString transformToken(const QString &token)
 {
     QMap<QString, QStringList> smileys;
-    smileys[":/face-angry.png"] = QStringList() << ":@" << ":-@";
-    smileys[":/face-cool.png"] = QStringList() << "8-)" << "B-)";
-    smileys[":/face-crying.png"] = QStringList() << ";(" << ";-(" << ";'-(" << ":'(" << ":'-(";
-    smileys[":/face-embarrassed.png"] = QStringList() << ":$";
-    smileys[":/face-laughing.png"] = QStringList() << ":D" << ":-D";
-    smileys[":/face-plain.png"] = QStringList() << ":|" << ":-|";
-    smileys[":/face-raspberry.png"] = QStringList() << ":p" << ":-p" << ":P" << ":-P";
-    smileys[":/face-sad.png"] = QStringList() << ":(" << ":-(";
-    smileys[":/face-sleeping.png"] = QStringList() << "|-)";
-    smileys[":/face-smile.png"] = QStringList() << ":)" << ":-)";
-    smileys[":/face-surprise.png"] = QStringList() << ":o" << ":-o" << ":O" << ":-O";
-    smileys[":/face-uncertain.png"] = QStringList() << ":s" << ":-s" << ":S" << ":-S" << ":/" << ":-/";
-    smileys[":/face-wink.png"] = QStringList() << ";)" << ";-)";
+    smileys["face-angry.png"] = QStringList() << ":@" << ":-@";
+    smileys["face-cool.png"] = QStringList() << "8-)" << "B-)";
+    smileys["face-crying.png"] = QStringList() << ";(" << ";-(" << ";'-(" << ":'(" << ":'-(";
+    smileys["face-embarrassed.png"] = QStringList() << ":$";
+    smileys["face-laughing.png"] = QStringList() << ":D" << ":-D";
+    smileys["face-plain.png"] = QStringList() << ":|" << ":-|";
+    smileys["face-raspberry.png"] = QStringList() << ":p" << ":-p" << ":P" << ":-P";
+    smileys["face-sad.png"] = QStringList() << ":(" << ":-(";
+    smileys["face-sleeping.png"] = QStringList() << "|-)";
+    smileys["face-smile.png"] = QStringList() << ":)" << ":-)";
+    smileys["face-surprise.png"] = QStringList() << ":o" << ":-o" << ":O" << ":-O";
+    smileys["face-uncertain.png"] = QStringList() << ":s" << ":-s" << ":S" << ":-S" << ":/" << ":-/";
+    smileys["face-wink.png"] = QStringList() << ";)" << ";-)";
 
     const QRegExp linkRegex("(ftp|http|https)://.+");
 
     // handle smileys
     foreach (const QString &smiley, smileys.keys()) {
         if (smileys.value(smiley).contains(token))
-            return QString("<img alt=\"%1\" src=\"%2\" />").arg(token, smiley);
+            return QString("<img alt=\"%1\" src=\"%2/%3\" />").arg(token, SMILEY_ROOT, smiley);
     }
 
     // handle links
