@@ -158,7 +158,7 @@ Panel {
             anchors.topMargin: iconOffset
             height: appStyle.icon.tinySize
             width: appStyle.icon.tinySize
-            opacity: header.iconSize > 0 ? 1: 0
+            opacity: header.width < 400 ? 0.0 : 1.0
             presenceStatus: vcard.status
         }
     }
