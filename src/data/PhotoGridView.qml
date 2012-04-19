@@ -61,12 +61,14 @@ FocusScope {
                 anchors.fill: parent
                 spacing: appStyle.spacing.vertical
 
-                PhotoDelegate {
+                Image {
                     id: thumbnail
 
                     anchors.horizontalCenter: parent.horizontalCenter
-                    width: iconSize
-                    height: iconSize
+                    fillMode: Image.PreserveAspectFit
+                    source: model.avatar
+                    sourceSize.width: iconSize
+                    sourceSize.height: iconSize
                 }
 
                 Label {

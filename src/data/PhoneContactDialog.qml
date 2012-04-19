@@ -39,9 +39,9 @@ Dialog {
 
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
-            height: 64
-            width: 64
-            source: 'image://icon/128x128/peer'
+            source: 'image://icon/peer'
+            sourceSize.width: 64
+            sourceSize.hight: 64
         }
 
         Column {

@@ -128,17 +128,17 @@ bool PhotoCache::imageReady(const QUrl &url, FileSystem::ImageSize type) const
 QUrl PhotoCache::imageUrl(const FileInfo &info, FileSystem::ImageSize type, FileSystem *fs)
 {
     if (info.isDir())
-        return wApp->qmlUrl("128x128/album.png");
+        return QUrl("image://icon/album");
 
     const QString mimeType = info.mimeType();
     if (mimeType.startsWith("audio/"))
-        return wApp->qmlUrl("128x128/audio-x-generic.png");
+        return QUrl("image://icon/audio-x-generic");
     else if (mimeType.startsWith("text/"))
-        return wApp->qmlUrl("128x128/text-x-generic.png");
+        return QUrl("image://icon/text-x-generic");
     else if (mimeType.startsWith("video/"))
-        return wApp->qmlUrl("128x128/video-x-generic.png");
+        return QUrl("image://icon/video-x-generic");
     else if (!mimeType.startsWith("image/"))
-        return wApp->qmlUrl("128x128/file.png");
+        return QUrl("image://icon/file");
 
     const QUrl url = info.url();
     const QString key = QString::number(type) + url.toString();
@@ -174,7 +174,7 @@ QUrl PhotoCache::imageUrl(const FileInfo &info, FileSystem::ImageSize type, File
             return cacheUrl;
         }
     }
-    return wApp->qmlUrl("128x128/image-x-generic.png");
+    return QUrl("image://icon/image-x-generic");
 }
 
 PhotoCache *PhotoCache::instance()
@@ -212,7 +212,7 @@ QImage PhotoImageProvider::requestImage(const QString &id, QSize *size, const QS
         image = *cached;
     } else {
         qWarning("Could not get photo for %s", qPrintable(id));
-        image = QImage(":/128x128/file.png");
+        image = QImage(":/128x128/image-x-generic.png");
     }
 
     if (requestedSize.isValid())
@@ -726,7 +726,7 @@ QVariant FolderQueueModel::data(const QModelIndex &index, int role) const
         // FIXME: using a thumbnail for large pictures
         // is a total performance killer
         //return QUrl::fromLocalFile(item->sourcePath);
-        return wApp->qmlUrl("file.png");
+        return QUrl("image://icon/file");
     } else if (role == NameRole) {
         return item->info.name();
     } else if (role == SpeedRole) {

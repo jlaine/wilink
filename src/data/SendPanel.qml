@@ -38,8 +38,8 @@ Item {
         id: placeModel
 
         Component.onCompleted: {
-            placeModel.append({'avatar': 'image://icon/128x128/file', 'name': 'Files', 'isDir': true, 'url': application.homeUrl});
-            placeModel.append({'avatar': 'image://icon/128x128/photos', 'name': 'Photos', 'isDir': true, 'url': 'wifirst://default'});
+            placeModel.append({'avatar': 'image://icon/file', 'name': 'Files', 'isDir': true, 'url': application.homeUrl});
+            placeModel.append({'avatar': 'image://icon/photos', 'name': 'Photos', 'isDir': true, 'url': 'wifirst://default'});
             placeModel.append({'avatar': 'image://icon/share', 'name': 'Shares', 'isDir': true, 'url': 'share:'})
         }
     }

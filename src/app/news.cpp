@@ -116,7 +116,7 @@ QVariant NewsListModel::data(const QModelIndex &index, int role) const
         return QVariant();
 
     if (role == AvatarRole) {
-        return wApp->qmlUrl("rss.png");
+        return QUrl("image://icon/rss");
     } else if (role == NameRole) {
         return item->name;
     } else if (role == UrlRole) {

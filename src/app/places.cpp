@@ -60,7 +60,7 @@ QVariant PlaceModel::data(const QModelIndex &index, int role) const
         return QVariant();
 
     if (role == ChatModel::AvatarRole)
-        return wApp->qmlUrl("128x128/album.png");
+        return QUrl("image://icon/album");
     else if (role == ChatModel::NameRole)
         return QFileInfo(m_paths.value(i)).fileName();
     else if (role == ChatModel::JidRole)

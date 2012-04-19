@@ -524,7 +524,7 @@ void VCard::update()
             newNickName = vcard.nickName();
             newUrl = QUrl(vcard.url());
         } else {
-            newAvatar = wApp->qmlUrl("peer.png");
+            newAvatar = QUrl("image://icon/peer");
         }
         foreach (ChatClient *client, m_cache->d->clients) {
             const QString name = client->rosterManager()->getRosterEntry(jidToBareJid(m_jid)).name();

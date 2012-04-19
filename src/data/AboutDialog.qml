@@ -96,10 +96,10 @@ Dialog {
                 id: appIcon
                 anchors.top: parent.top
                 anchors.left: parent.left
-                height: 48
-                width: 48
                 smooth: true
-                source: 'image://icon/128x128/wiLink'
+                source: 'image://icon/wiLink'
+                sourceSize.height: 48
+                sourceSize.width: 48
             }
 
             Label {
