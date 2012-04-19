@@ -52,6 +52,7 @@ SOURCES += \
     diagnostics.cpp \
     discovery.cpp \
     history.cpp \
+    icons.cpp \
     main.cpp \
     model.cpp \
     news.cpp \
@@ -78,6 +79,7 @@ HEADERS += \
     diagnostics.h \
     discovery.h \
     history.h \
+    icons.h \
     model.h \
     news.h \
     photos.h \

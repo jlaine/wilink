@@ -70,6 +70,7 @@ set(wiLink_SOURCES
     diagnostics.cpp
     discovery.cpp
     history.cpp
+    icons.cpp
     main.cpp
     model.cpp
     news.cpp

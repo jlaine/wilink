@@ -50,6 +50,7 @@
 #include "diagnostics.h"
 #include "discovery.h"
 #include "history.h"
+#include "icons.h"
 #include "news.h"
 #include "phone.h"
 #include "phone/sip.h"
@@ -240,6 +241,7 @@ void WheelArea::wheelEvent(QGraphicsSceneWheelEvent *event)
 void Plugin::initializeEngine(QDeclarativeEngine *engine, const char *uri)
 {
     Q_UNUSED(uri);
+    engine->addImageProvider("icon", new IconImageProvider);
     engine->addImageProvider("photo", new PhotoImageProvider);
     engine->addImageProvider("roster", new RosterImageProvider);
     engine->setNetworkAccessManagerFactory(new NetworkAccessManagerFactory);
