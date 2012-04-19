@@ -242,6 +242,14 @@ FocusScope {
         }
     ]
 
+    Component.onCompleted: {
+        jidInput.forceActiveFocus();
+    }
+
+    Keys.onEscapePressed: {
+        panel.close();
+    }
+
     Keys.onReturnPressed: {
         if (addButton.enabled) {
             addButton.clicked();
