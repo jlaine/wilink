@@ -18,6 +18,7 @@
  */
 
 import QtQuick 1.1
+import 'utils.js' as Utils
 
 Item {
     id: button
@@ -41,17 +42,9 @@ Item {
             item = swapper.model.get(swapper.currentIndex);
         }
 
-        if (panelSource == 'ChatPanel.qml') {
-            return item !== undefined &&
-                   item.source == panelSource &&
-                   item.properties.accountJid == panelProperties.accountJid;
-        } else if (panelSource == 'PhotoPanel.qml') {
-            return item !== undefined &&
-                   item.source == panelSource &&
-                   item.properties.url == panelProperties.url;
-        } else {
-            return item !== undefined && item.source == panelSource;
-        }
+        return item !== undefined &&
+               item.source == panelSource &&
+               (panelProperties === undefined || Utils.equalProperties(item.properties, panelProperties));
     }
 
     height: appStyle.icon.normalSize
