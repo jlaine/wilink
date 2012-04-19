@@ -141,9 +141,8 @@ ContactView {
         id: callButtonComponent
 
         Button {
-            iconSize: appStyle.icon.tinySize
+            iconSize: appStyle.icon.smallSize
             iconSource: 'image://icon/call'
-            smooth: true
 
             onClicked: {
                 block.itemClicked(parent.model);

@@ -61,10 +61,9 @@ Item {
 
                     anchors.top: parent.top
                     anchors.left: parent.left
-                    smooth: true
                     source: Utils.jidToDomain(model.jid) == 'wifirst.net' ? 'image://icon/wiLink' : 'image://icon/peer'
-                    height: appStyle.icon.smallSize
-                    width: appStyle.icon.smallSize
+                    sourceSize.height: appStyle.icon.smallSize
+                    sourceSize.width: appStyle.icon.smallSize
                 }
 
                 Label {

@@ -51,7 +51,6 @@ Item {
         anchors.left: parent.left
         anchors.leftMargin: iconMargin
         anchors.verticalCenter: parent.verticalCenter
-        smooth: true
         sourceSize.height: iconSize
         sourceSize.width: iconSize
 

@@ -96,7 +96,6 @@ Dialog {
                 id: appIcon
                 anchors.top: parent.top
                 anchors.left: parent.left
-                smooth: true
                 source: 'image://icon/wiLink'
                 sourceSize.height: 48
                 sourceSize.width: 48
