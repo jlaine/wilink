@@ -22,9 +22,53 @@
 import os
 import re
 
+# find files
+cert_files = []
+image_files = []
+js_files = []
+qml_files = []
+sound_files = []
+for dirname in ['.', '128x128']:
+    for name in sorted(os.listdir(dirname)):
+        if dirname == '.':
+            path = name
+        else:
+            path = os.path.join(dirname, name)
+        if name.endswith('.js'):
+            js_files.append(path)
+        elif name.endswith('.ogg'):
+            sound_files.append(path)
+        elif name.endswith('.pem'):
+            cert_files.append(path)
+        elif name.endswith('.png'):
+            image_files.append(path)
+        elif name.endswith('.qml'):
+            qml_files.append(path)
+
 fp = open('qmldir', 'w')
-for name in sorted(os.listdir('.')):
-    m = re.match('^(.+)\.qml$', name)
+for path in qml_files:
+    m = re.match('^([^/]+)\.qml$', path)
     if m:
-        fp.write("%s 1.0 %s\n" % (m.group(1), name))
+        fp.write("%s 1.0 %s\n" % (m.group(1), path))
 fp.close()
+
+fp = open('wiLink.qrc', 'w')
+
+fp.write('<!DOCTYPE RCC><RCC version="1.0">\n')
+fp.write('<qresource>\n')
+fp.write('    <!-- Certificates -->\n')
+for path in cert_files:
+    fp.write('    <file>%s</file>\n' % path)
+fp.write('    <!-- Images -->\n')
+for path in image_files:
+    fp.write('    <file>%s</file>\n' % path)
+fp.write('    <!-- QML -->\n')
+for path in js_files + qml_files:
+    fp.write('    <file>%s</file>\n' % path)
+fp.write('    <!-- Sounds -->\n')
+for path in sound_files:
+    fp.write('    <file>%s</file>\n' % path)
+fp.write('</qresource>\n')
+fp.write('</RCC>\n')
+fp.close()
+

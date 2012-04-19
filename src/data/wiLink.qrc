@@ -1,5 +1,7 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
+    <!-- Certificates -->
+    <file>UTN_USERFirst_Hardware_Root_CA.pem</file>
     <!-- Images -->
     <file>down-arrow.png</file>
     <file>eject.png</file>
@@ -134,6 +136,5 @@
     <file>call-outgoing.ogg</file>
     <file>message-incoming.ogg</file>
     <file>message-outgoing.ogg</file>
-    <file>UTN_USERFirst_Hardware_Root_CA.pem</file>
 </qresource>
 </RCC>
