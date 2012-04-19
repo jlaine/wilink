@@ -5,6 +5,9 @@ QSOUND_LIBRARY_NAME = qsound
 
 android {
     QSOUND_INCLUDE_DIR += $$PWD/src/fake
+} else:contains(MEEGO_EDITION,harmattan) {
+    CONFIG += mobility
+    MOBILITY += multimedia
 } else {
     QT += multimedia
 }
