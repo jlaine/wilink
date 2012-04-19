@@ -6,9 +6,9 @@
     <file>left-arrow.png</file>
     <file>right-arrow.png</file>
     <file>shadow.png</file>
-    <file>up-arrow.png</file>
-    <file>tab.png</file>
     <file>tab-active.png</file>
+    <file>tab.png</file>
+    <file>up-arrow.png</file>
     <file>128x128/album.png</file>
     <file>128x128/audio-x-generic.png</file>
     <file>128x128/file.png</file>
@@ -28,10 +28,10 @@
     <file>AccountPreferencePanel.qml</file>
     <file>Bubble.qml</file>
     <file>Button.qml</file>
-    <file>ChatEdit.qml</file>
     <file>CallNotification.qml</file>
     <file>CallWidget.qml</file>
     <file>ChatContactView.qml</file>
+    <file>ChatEdit.qml</file>
     <file>ChatPanel.qml</file>
     <file>ChatPlugin.qml</file>
     <file>CheckBox.qml</file>
@@ -42,8 +42,9 @@
     <file>ContactRemoveDialog.qml</file>
     <file>ContactRenameDialog.qml</file>
     <file>ContactView.qml</file>
-    <file>CrumbBar.qml</file>
     <file>ConversationPanel.qml</file>
+    <file>CrumbBar.qml</file>
+    <file>DebugPlugin.qml</file>
     <file>DiagnosticPanel.qml</file>
     <file>DiagnosticPlugin.qml</file>
     <file>Dialog.qml</file>
@@ -62,7 +63,6 @@
     <file>KeyPad.qml</file>
     <file>Label.qml</file>
     <file>LogPanel.qml</file>
-    <file>DebugPlugin.qml</file>
     <file>Main.qml</file>
     <file>MeegoMain.qml</file>
     <file>Menu.qml</file>
@@ -82,10 +82,10 @@
     <file>PhonePanel.qml</file>
     <file>PhonePlugin.qml</file>
     <file>PhotoAlbumDialog.qml</file>
-    <file>PhotoDeleteDialog.qml</file>
     <file>PhotoDelegate.qml</file>
-    <file>PhotoGridView.qml</file>
+    <file>PhotoDeleteDialog.qml</file>
     <file>PhotoFlickView.qml</file>
+    <file>PhotoGridView.qml</file>
     <file>PhotoPanel.qml</file>
     <file>PhotoPlugin.qml</file>
     <file>PhotoSlideView.qml</file>
@@ -115,8 +115,8 @@
     <file>SharePlugin.qml</file>
     <file>SharePreferencePanel.qml</file>
     <file>ShareView.qml</file>
-    <file>Spinner.qml</file>
     <file>SoundPreferencePanel.qml</file>
+    <file>Spinner.qml</file>
     <file>StatusBar.qml</file>
     <file>StatusPill.qml</file>
     <file>Style.qml</file>
