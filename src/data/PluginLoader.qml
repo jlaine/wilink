@@ -103,11 +103,10 @@ Item {
     function load() {
         for (var i = 0; i < pluginModel.count; i++) {
             var plugin = pluginModel.get(i);
-            if (plugin.autoload && application.settings.disabledPlugins.indexOf(plugin.source) < 0)
+            if ((plugin.autoload && application.settings.disabledPlugins.indexOf(plugin.source) < 0)
+                || application.settings.enabledPlugins.indexOf(plugin.source)) {
                 loadPlugin(plugin.source);
-        }
-        for (var i in application.settings.enabledPlugins) {
-            loadPlugin(application.settings.enabledPlugins[i]);
+            }
         }
     }
 
