@@ -192,7 +192,9 @@ QString NetworkAccessManager::userAgent()
 
     if (globalUserAgent.isEmpty()) {
         QString osDetails;
-#if defined(Q_OS_LINUX)
+#if defined(Q_OS_ANDROID)
+        osDetails = QLatin1String("Linux; Android");
+#elif defined(Q_OS_LINUX)
         osDetails = QLatin1String("X11; Linux");
         QProcess process;
         process.start(QString("uname"), QStringList(QString("-m")), QIODevice::ReadOnly);
@@ -214,6 +216,8 @@ QString NetworkAccessManager::userAgent()
             osDetails += QLatin1String("; Mac OS X 10.6");
             break;
         }
+#elif defined(Q_OS_SYMBIAN)
+        osDetails = QLatin1String("Symbian");
 #elif defined(Q_OS_WIN)
         DWORD dwVersion = GetVersion();
         DWORD dwMajorVersion = (DWORD)(LOBYTE(LOWORD(dwVersion)));
