@@ -49,7 +49,6 @@ Plugin {
                 console.log("Menu failed, retry in " + refresh + "s");
                 timer.interval = refresh * 1000;
                 timer.start();
-                return;
                 break;
             case XmlListModel.Ready:
                 for (var i = 0; i < listModel.count; i++) {
@@ -65,6 +64,7 @@ Plugin {
                 var refresh = 900;
                 console.log("Menu succeeded, refresh in " + refresh + "s");
                 timer.interval = refresh * 1000;
+                timer.start();
                 break;
             }
         }
@@ -91,14 +91,8 @@ Plugin {
 
                 // FIXME: there is a race condition here, we don't know when
                 // the ChatPanel will be ready!
-                var client = accountModel.clientForJid(account.jid);
-                if (client.state == QXmppClient.ConnectedState) {
-                    timer.triggered();
-                } else {
-                    client.connected.connect(function() {
-                        timer.triggered();
-                    });
-                }
+                timer.interval = 2500;
+                timer.start();
                 break;
             }
         }
