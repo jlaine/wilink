@@ -244,6 +244,11 @@ Panel {
             client: appClient
         }
 
+        // FIXME : this is a hack to make sure ConversationPanel loads fast
+        ConversationPanel {
+            opacity: 0
+        }
+
         // FIXME : this is a hack to replay received messages after
         // adding the appropriate conversation
         Connections {
