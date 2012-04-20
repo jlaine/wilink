@@ -27,6 +27,10 @@
 #include <QProcess>
 #include <QSslError>
 
+#ifdef Q_OS_WIN
+#include <windows.h>
+#endif
+
 #include "QXmppCallManager.h"
 #include "QXmppDiscoveryManager.h"
 #include "QXmppMucManager.h"
@@ -211,7 +215,10 @@ QString NetworkAccessManager::userAgent()
             break;
         }
 #elif defined(Q_OS_WIN)
-        osDetails = QLatin1String("Windows NT");
+        DWORD dwVersion = GetVersion();
+        DWORD dwMajorVersion = (DWORD)(LOBYTE(LOWORD(dwVersion)));
+        DWORD dwMinorVersion = (DWORD)(HIBYTE(LOWORD(dwVersion)));
+        osDetails = QString("Windows NT %1.%2").arg(QString::number(dwMajorVersion), QString::number(dwMinorVersion));
 #endif
         globalUserAgent = QString("Mozilla/5.0 (%1) %2/%3").arg(osDetails, qApp->applicationName(), qApp->applicationVersion());
     }
