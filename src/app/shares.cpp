@@ -211,7 +211,7 @@ void ShareWatcher::_q_serverChanged(const QString &server)
     x.setAttribute("xmlns", ns_shares);
 
     VCard card;
-    card.setJid(jidToBareJid(client->jid()));
+    card.setJid(QXmppUtils::jidToBareJid(client->jid()));
 
     QXmppElement nickName;
     nickName.setTagName("nickName");

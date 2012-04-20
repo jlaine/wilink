@@ -180,7 +180,7 @@ QVariant RoomListModel::data(const QModelIndex &index, int role) const
     } else if (role == ChatModel::MessagesRole) {
         return item->messages;
     } else if (role == ChatModel::NameRole) {
-        return jidToUser(item->jid);
+        return QXmppUtils::jidToUser(item->jid);
     } else if (role == ParticipantsRole) {
         if (m_client) {
             const QList<QXmppMucRoom*> rooms = m_client->mucManager()->rooms();
@@ -408,7 +408,7 @@ QVariant RoomModel::data(const QModelIndex &index, int role) const
     } else if (role == ChatModel::JidRole) {
         return item->jid;
     } else if (role == ChatModel::NameRole) {
-        return jidToResource(item->jid);
+        return QXmppUtils::jidToResource(item->jid);
     } else if (role == RoomModel::AffiliationRole) {
         return item->affiliation;
     }
@@ -478,7 +478,7 @@ void RoomModel::_q_messageReceived(const QXmppMessage &msg)
             message.date = QDateTime::currentDateTime();
     }
     message.jid = msg.from();
-    message.received = jidToResource(msg.from()) != m_room->nickName();
+    message.received = QXmppUtils::jidToResource(msg.from()) != m_room->nickName();
     m_historyModel->addMessage(message);
 }
 

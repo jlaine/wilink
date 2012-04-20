@@ -413,7 +413,7 @@ QVariant HistoryModel::data(const QModelIndex &index, int role) const
         const QString jid = msg->jid;
 
         // chat rooms
-        const QString resource = jidToResource(jid);
+        const QString resource = QXmppUtils::jidToResource(jid);
         if (!resource.isEmpty())
             return resource;
 
@@ -477,7 +477,7 @@ void HistoryModel::_q_archiveChatReceived(const QXmppArchiveChat &chat)
 {
     Q_ASSERT(d->client);
 
-    if (jidToBareJid(chat.with()) != d->jid)
+    if (QXmppUtils::jidToBareJid(chat.with()) != d->jid)
         return;
 
     foreach (const QXmppArchiveMessage &msg, chat.messages()) {
@@ -485,7 +485,7 @@ void HistoryModel::_q_archiveChatReceived(const QXmppArchiveChat &chat)
         message.archived = true;
         message.body = msg.body();
         message.date = msg.date();
-        message.jid = msg.isReceived() ? jidToBareJid(chat.with()) : d->client->configuration().jidBare();
+        message.jid = msg.isReceived() ? QXmppUtils::jidToBareJid(chat.with()) : d->client->configuration().jidBare();
         message.received = msg.isReceived();
         addMessage(message);
     }
@@ -496,7 +496,7 @@ void HistoryModel::_q_archiveListReceived(const QList<QXmppArchiveChat> &chats)
     Q_ASSERT(d->client);
 
     for (int i = chats.size() - 1; i >= 0; i--)
-        if (jidToBareJid(chats[i].with()) == d->jid)
+        if (QXmppUtils::jidToBareJid(chats[i].with()) == d->jid)
             d->client->archiveManager()->retrieveCollection(chats[i].with(), chats[i].start());
 }
 

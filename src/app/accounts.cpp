@@ -41,7 +41,7 @@ public:
 
 static QString realm(const QString &jid)
 {
-    const QString domain = jidToDomain(jid);
+    const QString domain = QXmppUtils::jidToDomain(jid);
     if (domain == QLatin1String("wifirst.net"))
         return QLatin1String("www.wifirst.net");
     else if (domain == QLatin1String("gmail.com"))
@@ -57,7 +57,7 @@ AccountItem::AccountItem(const QString &jid_)
 
 QString AccountItem::type() const
 {
-    const QString domain = jidToDomain(jid);
+    const QString domain = QXmppUtils::jidToDomain(jid);
     if (domain == QLatin1String("wifirst.net"))
         return QLatin1String("wifirst");
     else if (domain == QLatin1String("gmail.com"))

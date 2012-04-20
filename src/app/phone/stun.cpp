@@ -109,7 +109,7 @@ void StunTester::readyRead()
         // send next request
         request = QXmppStunMessage();
         request.setCookie(qrand());
-        request.setId(generateRandomBytes(12));
+        request.setId(QXmppUtils::generateRandomBytes(12));
         request.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
 
         requestAddress = response.changedHost;
@@ -150,7 +150,7 @@ void StunTester::start()
     // initial binding request
     request = QXmppStunMessage();
     request.setCookie(qrand());
-    request.setId(generateRandomBytes(12));
+    request.setId(QXmppUtils::generateRandomBytes(12));
     request.setType(QXmppStunMessage::Binding | QXmppStunMessage::Request);
 
     requestAddress = serverAddress;

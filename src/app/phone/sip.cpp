@@ -129,8 +129,8 @@ QByteArray SdpMessage::toByteArray() const
 SipCallContext::SipCallContext()
     : cseq(1)
 {
-    id = generateStanzaHash().toLatin1();
-    tag = generateStanzaHash(8).toLatin1();
+    id = QXmppUtils::generateStanzaHash().toLatin1();
+    tag = QXmppUtils::generateStanzaHash(8).toLatin1();
 }
 
 bool SipCallContext::handleAuthentication(const SipMessage &reply)
@@ -812,7 +812,7 @@ SipMessage SipClientPrivate::buildRequest(const QByteArray &method, const QByteA
         addr += QString("\"%1\"").arg(displayName);
     addr += QString("<sip:%1@%2>").arg(username, domain);
 
-    const QString branch = "z9hG4bK-" + generateStanzaHash();
+    const QString branch = "z9hG4bK-" + QXmppUtils::generateStanzaHash();
     const QString host = QString("%1:%2").arg(
         localAddress.toString(),
         QString::number(socket->localPort()));

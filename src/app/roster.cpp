@@ -449,11 +449,11 @@ QString VCard::jid() const
  */
 QString VCard::jidForFeature(Feature feature) const
 {
-    if (m_jid.isEmpty() || !m_cache || !jidToResource(m_jid).isEmpty())
+    if (m_jid.isEmpty() || !m_cache || !QXmppUtils::jidToResource(m_jid).isEmpty())
         return QString();
 
     foreach (const QString &key, m_cache->d->features.keys()) {
-        if (jidToBareJid(key) == m_jid && (m_cache->d->features.value(key) & feature))
+        if (QXmppUtils::jidToBareJid(key) == m_jid && (m_cache->d->features.value(key) & feature))
             return key;
     }
     return QString();
@@ -527,14 +527,14 @@ void VCard::update()
             newAvatar = QUrl("image://icon/peer");
         }
         foreach (ChatClient *client, m_cache->d->clients) {
-            const QString name = client->rosterManager()->getRosterEntry(jidToBareJid(m_jid)).name();
+            const QString name = client->rosterManager()->getRosterEntry(QXmppUtils::jidToBareJid(m_jid)).name();
             if (!name.isEmpty()) {
                 newName = name;
                 break;
             }
         }
         if (newName.isEmpty())
-            newName = jidToUser(m_jid);
+            newName = QXmppUtils::jidToUser(m_jid);
     }
 
     // notify changes
@@ -589,7 +589,7 @@ VCardCache::~VCardCache()
 
 ChatClient *VCardCache::client(const QString &jid) const
 {
-    const QString domain = jidToDomain(jid);
+    const QString domain = QXmppUtils::jidToDomain(jid);
     foreach (ChatClient *client, d->clients) {
         const QString clientDomain = client->configuration().domain();
         if (domain == clientDomain || domain.endsWith("." + clientDomain))
@@ -762,20 +762,20 @@ void VCardCache::_q_discoveryInfoReceived(const QXmppDiscoveryIq &disco)
     }
     d->features.insert(jid, features);
 
-    emit discoChanged(jidToBareJid(jid));
+    emit discoChanged(QXmppUtils::jidToBareJid(jid));
 }
 
 void VCardCache::_q_presenceReceived(const QXmppPresence &presence)
 {
     const QString jid = presence.from();
-    if (jidToResource(jid).isEmpty())
+    if (QXmppUtils::jidToResource(jid).isEmpty())
         return;
 
     if ((presence.type() == QXmppPresence::Available && !d->features.contains(jid)) ||
         (presence.type() == QXmppPresence::Unavailable && d->features.remove(jid)))
-        emit discoChanged(jidToBareJid(jid));
+        emit discoChanged(QXmppUtils::jidToBareJid(jid));
 
-    emit presenceChanged(jidToBareJid(jid));
+    emit presenceChanged(QXmppUtils::jidToBareJid(jid));
 }
 
 void VCardCache::_q_vCardReceived(const QXmppVCardIq& vCard)

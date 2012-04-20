@@ -110,7 +110,7 @@ void stunHash()
     stream << length;
     stream.device()->seek(pos);
 
-    QByteArray integrity = generateHmacSha1(key, buffer);
+    QByteArray integrity = QXmppUtils::generateHmacSha1(key, buffer);
     qDebug() << "integrity" << integrity.toHex();
     stream << quint16(MessageIntegrity);
     stream << quint16(integrity.size());
@@ -123,7 +123,7 @@ void stunHash()
     stream << length;
     stream.device()->seek(pos);
 
-    quint32 fingerprint = generateCrc32(buffer) ^ 0x5354554eL;
+    quint32 fingerprint = QXmppUtils::generateCrc32(buffer) ^ 0x5354554eL;
     qDebug() << "fingerprint" << fingerprint;
     stream << quint16(Fingerprint);
     stream << quint16(sizeof(fingerprint));

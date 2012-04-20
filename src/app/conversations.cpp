@@ -111,7 +111,7 @@ int Conversation::remoteState() const
 void Conversation::messageReceived(const QXmppMessage &msg)
 {
     if (msg.type() != QXmppMessage::Chat ||
-        jidToBareJid(msg.from()) != m_jid)
+        QXmppUtils::jidToBareJid(msg.from()) != m_jid)
         return;
 
     // handle chat state

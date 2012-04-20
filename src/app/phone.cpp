@@ -397,7 +397,7 @@ void PhoneHistoryItem::parse(const QDomElement &element)
 {
     id = element.firstChildElement("id").text().toInt();
     address = element.firstChildElement("address").text();
-    date = datetimeFromString(element.firstChildElement("date").text());
+    date = QXmppUtils::datetimeFromString(element.firstChildElement("date").text());
     duration = element.firstChildElement("duration").text().toInt();
     flags = element.firstChildElement("flags").text().toInt();
 }
