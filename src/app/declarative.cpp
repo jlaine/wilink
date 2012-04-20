@@ -24,6 +24,7 @@
 #include <QMimeData>
 #include <QNetworkDiskCache>
 #include <QNetworkRequest>
+#include <QProcess>
 #include <QSslError>
 
 #include "QXmppCallManager.h"
@@ -183,27 +184,38 @@ void NetworkAccessManager::onSslErrors(QNetworkReply *reply, const QList<QSslErr
 
 QString NetworkAccessManager::userAgent()
 {
-    QString osDetails;
+    static QString globalUserAgent;
+
+    if (globalUserAgent.isEmpty()) {
+        QString osDetails;
 #if defined(Q_OS_LINUX)
-    osDetails = QLatin1String("X11; Linux");
+        osDetails = QLatin1String("X11; Linux");
+        QProcess process;
+        process.start(QString("uname"), QStringList(QString("-m")), QIODevice::ReadOnly);
+        process.waitForFinished();
+        const QString arch = QString::fromLocal8Bit(process.readAllStandardOutput()).trimmed();
+        if (!arch.isEmpty())
+            osDetails += " " + arch;
 #elif defined(Q_OS_MAC)
-    osDetails = QLatin1String("Macintosh");
-    switch (QSysInfo::MacintoshVersion)
-    {
-    case QSysInfo::MV_10_4:
-        osDetails += QLatin1String("; Mac OS X 10.4");
-        break;
-    case QSysInfo::MV_10_5:
-        osDetails += QLatin1String("; Mac OS X 10.5");
-        break;
-    case QSysInfo::MV_10_6:
-        osDetails += QLatin1String("; Mac OS X 10.6");
-        break;
-    }
+        osDetails = QLatin1String("Macintosh");
+        switch (QSysInfo::MacintoshVersion)
+        {
+        case QSysInfo::MV_10_4:
+            osDetails += QLatin1String("; Mac OS X 10.4");
+            break;
+        case QSysInfo::MV_10_5:
+            osDetails += QLatin1String("; Mac OS X 10.5");
+            break;
+        case QSysInfo::MV_10_6:
+            osDetails += QLatin1String("; Mac OS X 10.6");
+            break;
+        }
 #elif defined(Q_OS_WIN)
-    osDetails = QLatin1String("Windows NT");
+        osDetails = QLatin1String("Windows NT");
 #endif
-    return QString("Mozilla/5.0 (%1) %2/%3").arg(osDetails, qApp->applicationName(), qApp->applicationVersion());
+        globalUserAgent = QString("Mozilla/5.0 (%1) %2/%3").arg(osDetails, qApp->applicationName(), qApp->applicationVersion());
+    }
+    return globalUserAgent;
 }
 
 static QStringList droppedFiles(QGraphicsSceneDragDropEvent *event)
