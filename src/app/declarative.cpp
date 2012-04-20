@@ -165,7 +165,7 @@ QNetworkReply *NetworkAccessManager::createRequest(Operation op, const QNetworkR
 {
     QNetworkRequest request(req);
     request.setRawHeader("Accept-Language", QLocale::system().name().toAscii());
-    request.setRawHeader("User-Agent", QString(qApp->applicationName() + "/" + qApp->applicationVersion()).toAscii());
+    request.setRawHeader("User-Agent", userAgent().toAscii());
     return QNetworkAccessManager::createRequest(op, request, outgoingData);
 }
 
@@ -179,6 +179,29 @@ void NetworkAccessManager::onSslErrors(QNetworkReply *reply, const QList<QSslErr
 
     // uncomment for debugging purposes only
     //reply->ignoreSslErrors();
+}
+
+QString NetworkAccessManager::userAgent()
+{
+    QString osDetails;
+#if defined(Q_OS_MAC)
+    osDetails = QLatin1String("Macintosh");
+    switch (QSysInfo::MacintoshVersion)
+    {
+    case QSysInfo::MV_10_4:
+        osDetails += QLatin1String("; Mac OS X 10.4");
+        break;
+    case QSysInfo::MV_10_5:
+        osDetails += QLatin1String("; Mac OS X 10.5");
+        break;
+    case QSysInfo::MV_10_6:
+        osDetails += QLatin1String("; Mac OS X 10.6");
+        break;
+    }
+#elif defined(Q_OS_WIN)
+    osDetails = "Windows NT";
+#endif
+    return QString("Mozilla/5.0 (%1) %2/%3").arg(osDetails, qApp->applicationName(), qApp->applicationVersion());
 }
 
 static QStringList droppedFiles(QGraphicsSceneDragDropEvent *event)

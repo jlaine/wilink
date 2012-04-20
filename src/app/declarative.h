@@ -161,6 +161,7 @@ class NetworkAccessManager : public QNetworkAccessManager
 
 public:
     NetworkAccessManager(QObject *parent = 0);
+    static QString userAgent();
 
 protected:
     virtual QNetworkReply *createRequest(Operation op, const QNetworkRequest &req, QIODevice *outgoingData = 0);
