@@ -98,7 +98,7 @@ Application::Application(int &argc, char **argv)
     setOrganizationName("Wifirst");
     setQuitOnLastWindowClosed(false);
 #ifndef Q_OS_MAC
-    setWindowIcon(QIcon(":/wiLink.png"));
+    setWindowIcon(QIcon(":/32x32/wiLink.png"));
 #endif
 
     // initialise settings
@@ -212,9 +212,9 @@ void Application::createSystemTrayIcon()
 #ifdef USE_SYSTRAY
     d->trayIcon = new QSystemTrayIcon;
 #ifdef Q_OS_MAC
-    d->trayIcon->setIcon(QIcon(":/wiLink-black.png"));
+    d->trayIcon->setIcon(QIcon(":/32x32/wiLink-black.png"));
 #else
-    d->trayIcon->setIcon(QIcon(":/wiLink.png"));
+    d->trayIcon->setIcon(QIcon(":/32x32/wiLink.png"));
 #endif
 
     d->trayMenu = new QMenu;
