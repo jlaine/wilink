@@ -89,6 +89,8 @@ Plugin {
             if (account.type == 'wifirst') {
                 plugin.accountJid = account.jid;
 
+                // FIXME: there is a race condition here, we don't know when
+                // the ChatPanel will be ready!
                 var client = accountModel.clientForJid(account.jid);
                 if (client.state == QXmppClient.ConnectedState) {
                     timer.triggered();
