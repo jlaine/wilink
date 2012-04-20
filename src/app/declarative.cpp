@@ -184,7 +184,9 @@ void NetworkAccessManager::onSslErrors(QNetworkReply *reply, const QList<QSslErr
 QString NetworkAccessManager::userAgent()
 {
     QString osDetails;
-#if defined(Q_OS_MAC)
+#if defined(Q_OS_LINUX)
+    osDetails = QLatin1String("X11; Linux");
+#elif defined(Q_OS_MAC)
     osDetails = QLatin1String("Macintosh");
     switch (QSysInfo::MacintoshVersion)
     {
@@ -199,7 +201,7 @@ QString NetworkAccessManager::userAgent()
         break;
     }
 #elif defined(Q_OS_WIN)
-    osDetails = "Windows NT";
+    osDetails = QLatin1String("Windows NT");
 #endif
     return QString("Mozilla/5.0 (%1) %2/%3").arg(osDetails, qApp->applicationName(), qApp->applicationVersion());
 }
