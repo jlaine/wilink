@@ -2,6 +2,7 @@ include(../../wilink.pri)
 include(../idle/idle.pri)
 include(../qnetio/qnetio.pri)
 include(../qsound/qsound.pri)
+include(../3rdparty/qdjango/qdjango.pri)
 include(../3rdparty/qxmpp/qxmpp.pri)
 
 QT += declarative network sql xml
@@ -108,7 +109,7 @@ LIBS += \
     -L../qsound/src $$QSOUND_LIBS \
     -L../3rdparty/qxmpp/src $$QXMPP_LIBS \
     -L../qxmpp-extra -lqxmpp-extra \
-    -L../3rdparty/qdjango/src/db -lqdjango-db
+    -L../3rdparty/qdjango/src/db $$QDJANGO_DB_LIBS
 
 # Installation
 QMAKE_TARGET_COMPANY="Wifirst"
