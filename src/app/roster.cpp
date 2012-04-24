@@ -30,7 +30,6 @@
 #include <QStringList>
 #include <QUrl>
 
-#include "QXmppConstants.h"
 #include "QXmppDiscoveryIq.h"
 #include "QXmppDiscoveryManager.h"
 #include "QXmppMessage.h"
@@ -745,15 +744,15 @@ void VCardCache::_q_discoveryInfoReceived(const QXmppDiscoveryIq &disco)
     VCard::Features features = 0;
     foreach (const QString &var, disco.features())
     {
-        if (var == ns_chat_states)
+        if (var == "http://jabber.org/protocol/chatstates")
             features |= VCard::ChatStatesFeature;
-        else if (var == ns_stream_initiation_file_transfer)
+        else if (var == "http://jabber.org/protocol/si/profile/file-transfer")
             features |= VCard::FileTransferFeature;
-        else if (var == ns_version)
+        else if (var == "jabber:iq:version")
             features |= VCard::VersionFeature;
-        else if (var == ns_jingle_rtp_audio)
+        else if (var == "urn:xmpp:jingle:apps:rtp:audio")
             features |= VCard::VoiceFeature;
-        else if (var == ns_jingle_rtp_video)
+        else if (var == "urn:xmpp:jingle:apps:rtp:video")
             features |= VCard::VideoFeature;
     }
     foreach (const QXmppDiscoveryIq::Identity& id, disco.identities()) {
