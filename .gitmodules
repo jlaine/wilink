@@ -10,3 +10,9 @@
 [submodule "src/qdjango"]
 	path = src/qdjango
 	url = https://code.google.com/p/qdjango/
+[submodule "src/3rdparty/qxmpp"]
+	path = src/3rdparty/qxmpp
+	url = https://code.google.com/p/qxmpp/
+[submodule "src/3rdparty/qdjango"]
+	path = src/3rdparty/qdjango
+	url = https://code.google.com/p/qdjango/
