@@ -1,18 +1,12 @@
-[submodule "src/qnetio"]
-	path = src/qnetio
-	url = git://git.bolloretelecom.eu/qnetio.git
-[submodule "src/qxmpp"]
-	path = src/qxmpp
-	url = git://git.bolloretelecom.eu/qxmpp.git
-[submodule "src/qxmpp-extra"]
-	path = src/qxmpp-extra
-	url = git://git.bolloretelecom.eu/qxmpp-extra.git
-[submodule "src/qdjango"]
-	path = src/qdjango
-	url = https://code.google.com/p/qdjango/
 [submodule "src/3rdparty/qxmpp"]
 	path = src/3rdparty/qxmpp
 	url = https://code.google.com/p/qxmpp/
 [submodule "src/3rdparty/qdjango"]
 	path = src/3rdparty/qdjango
 	url = https://code.google.com/p/qdjango/
+[submodule "src/qnetio"]
+	path = src/qnetio
+	url = git://git.bolloretelecom.eu/qnetio.git
+[submodule "src/qxmpp-extra"]
+	path = src/qxmpp-extra
+	url = git://git.bolloretelecom.eu/qxmpp-extra.git
