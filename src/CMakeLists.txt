@@ -1,11 +1,6 @@
-add_definitions(-DQXMPP_STREAM_LOG_PACKETS)
 set(QNETIO_DONT_USE_TESTS 1)
 set(QNETIO_LIBRARY_TYPE STATIC)
 set(QSOUND_DONT_USE_TESTS 1)
-set(QXMPP_DONT_INSTALL 1)
-set(QXMPP_DONT_USE_TESTS 1)
-set(QXMPP_DONT_USE_VPX 1)
-set(QXMPP_LIBRARY_TYPE STATIC)
 
 # FIXME: remove hard-coded paths
 include_directories(/usr/include/qdjango/db)
