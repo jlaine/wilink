@@ -7,6 +7,8 @@ android {
     QSOUND_INCLUDE_DIR += $$PWD/src/fake
 } else:mac {
     QT += multimedia
+} else:win32 {
+    QT += multimedia
 } else {
     CONFIG += mobility
     MOBILITY += multimedia
