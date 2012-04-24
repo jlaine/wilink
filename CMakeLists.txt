@@ -12,9 +12,10 @@ set(WILINK_VERSION ${WILINK_VERSION_MAJOR}.${WILINK_VERSION_MINOR}.${WILINK_VERS
 # Required
 set(QT_MIN_VERSION 4.7.4)
 find_package(Qt4 REQUIRED)
+find_package(PkgConfig REQUIRED)
 
 find_library(QDJANGO_DB_LIBRARY qdjango-db REQUIRED)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../../qdjango/src/db)
+pkg_check_modules(QXMPP qxmpp)
 
 # Extra runtime dependencies
 if(APPLE)

@@ -6,7 +6,7 @@ set(QSOUND_DONT_USE_TESTS 1)
 include_directories(/usr/include/qdjango/db)
 include_directories(/usr/include/qdjango/http)
 include_directories(/usr/include/qdjango/script)
-include_directories(/usr/include/qxmpp)
+include_directories(${QXMPP_INCLUDE_DIRS})
 
 add_subdirectory(data)
 add_subdirectory(idle)
