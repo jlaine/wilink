@@ -8,11 +8,8 @@ include(${QT_USE_FILE})
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qdjango/src/db)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qnetio/src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qsound/src)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp/src/base)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp/src/client)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp-extra/diagnostics)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp-extra/shares)
 
