@@ -203,7 +203,7 @@ if(WIN32)
 endif(WIN32)
 
 add_executable(wiLink ${wiLink_SOURCES} ${wiLink_MOC_SOURCES} ${wiLink_RCC_SOURCES} ${WILINK_RESOURCE})
-target_link_libraries(wiLink idle qnetio qxmpp qxmpp-diagnostics qxmpp-shares qdjango-db qsound ${wilink_LIBRARIES})
+target_link_libraries(wiLink idle qnetio ${QXMPP_LIBRARIES} qxmpp-diagnostics qxmpp-shares ${QDJANGO_LIBRARIES} qsound ${wilink_LIBRARIES})
 
 if(APPLE)
     get_filename_component(BUNDLE_ICON_NAME ${CPACK_BUNDLE_ICON} NAME_WE)

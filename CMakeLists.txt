@@ -14,7 +14,7 @@ set(QT_MIN_VERSION 4.7.4)
 find_package(Qt4 REQUIRED)
 find_package(PkgConfig REQUIRED)
 
-find_library(QDJANGO_DB_LIBRARY qdjango-db REQUIRED)
+pkg_check_modules(QDJANGO qdjango-db)
 pkg_check_modules(QXMPP qxmpp)
 
 # Extra runtime dependencies

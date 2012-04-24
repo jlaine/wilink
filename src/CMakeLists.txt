@@ -2,11 +2,10 @@ set(QNETIO_DONT_USE_TESTS 1)
 set(QNETIO_LIBRARY_TYPE STATIC)
 set(QSOUND_DONT_USE_TESTS 1)
 
-# FIXME: remove hard-coded paths
-include_directories(/usr/include/qdjango/db)
-include_directories(/usr/include/qdjango/http)
-include_directories(/usr/include/qdjango/script)
+include_directories(${QDJANGO_INCLUDE_DIRS})
 include_directories(${QXMPP_INCLUDE_DIRS})
+link_directories(${QDJANGO_LIBRARY_DIRS})
+link_directories(${QDXMPP_LIBRARY_DIRS})
 
 add_subdirectory(data)
 add_subdirectory(idle)
