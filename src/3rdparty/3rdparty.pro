@@ -1,2 +1,2 @@
 TEMPLATE = subdirs
-SUBDIRS = libmad
+SUBDIRS = qdjango qxmpp libmad

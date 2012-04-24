@@ -220,7 +220,7 @@ void ShareWatcher::_q_serverChanged(const QString &server)
 
     QXmppPresence presence;
     presence.setTo(server);
-    presence.setExtensions(x);
+    presence.setExtensions(QXmppElementList() << x);
     presence.setVCardUpdateType(QXmppPresence::VCardUpdateNone);
     client->sendPacket(presence);
 }

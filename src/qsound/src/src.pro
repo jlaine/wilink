@@ -1,5 +1,5 @@
 include(../qsound.pri)
-include(../../qxmpp/qxmpp.pri)
+include(../../3rdparty/qxmpp/qxmpp.pri)
 
 TEMPLATE = lib
 CONFIG += staticlib
