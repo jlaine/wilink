@@ -42,7 +42,7 @@ windows)
     rm -rf release-win32
     mkdir release-win32
     cd release-win32
-    cmake .. -DCMAKE_TOOLCHAIN_FILE=../cmake/mingw32.toolchain
+    PKG_CONFIG_LIBDIR=/usr/i586-mingw32msvc/lib/pkgconfig cmake .. -DCMAKE_TOOLCHAIN_FILE=../cmake/mingw32.toolchain
     make package
     ;;
 *)

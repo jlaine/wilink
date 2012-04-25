@@ -2,6 +2,8 @@ set(QNETIO_DONT_USE_TESTS 1)
 set(QNETIO_LIBRARY_TYPE STATIC)
 set(QSOUND_DONT_USE_TESTS 1)
 
+add_definitions(${QDJANGO_CFLAGS_OTHER})
+add_definitions(${QXMPP_CFLAGS_OTHER})
 include_directories(${QDJANGO_INCLUDE_DIRS})
 include_directories(${QXMPP_INCLUDE_DIRS})
 link_directories(${QDJANGO_LIBRARY_DIRS})
@@ -14,4 +16,3 @@ add_subdirectory(qsound)
 add_subdirectory(qxmpp-extra)
 
 add_subdirectory(app)
-add_subdirectory(tests)
