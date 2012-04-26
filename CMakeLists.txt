@@ -42,8 +42,6 @@ if(WIN32)
         ${CMAKE_FIND_ROOT_PATH}/bin/phonon4.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/libeay32.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/libgcc_s_dw2-1.dll
-        ${CMAKE_FIND_ROOT_PATH}/bin/libqdjango-db0.dll
-        ${CMAKE_FIND_ROOT_PATH}/bin/libqxmpp0.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/libogg-0.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/libspeex-1.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/libvorbis-0.dll
@@ -51,6 +49,8 @@ if(WIN32)
         ${CMAKE_FIND_ROOT_PATH}/bin/libtheoradec-1.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/libtheoraenc-1.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/libz.dll
+        ${CMAKE_FIND_ROOT_PATH}/bin/qdjango-db0.dll
+        ${CMAKE_FIND_ROOT_PATH}/bin/qxmpp0.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/ssleay32.dll)
     set(WILINK_IMAGE_PLUGINS
         ${QT_PLUGINS_DIR}/imageformats/qgif4.dll
