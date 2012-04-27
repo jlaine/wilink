@@ -47,7 +47,7 @@ NotifierBackendLibnotify::NotifierBackendLibnotify(Notifier *qq)
     }
 };
 
-NotifierBackendLibnotify::~NotifierBackendLibnotify(Notifier *qq)
+NotifierBackendLibnotify::~NotifierBackendLibnotify()
 {
     notify_uninit();
 }
