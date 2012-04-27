@@ -57,12 +57,13 @@ if(WIN32)
         ${QT_PLUGINS_DIR}/imageformats/qjpeg4.dll)
     set(WILINK_SQL_PLUGINS
         ${QT_PLUGINS_DIR}/sqldrivers/qsqlite4.dll)
-    set(WILINK_QML_PLUGINS
-        ${QT_IMPORTS_DIR}/QtWebKit/qmlwebkitplugin.dll)
     install(FILES ${WILINK_EXTRA_RUNTIME} DESTINATION bin)
     install(FILES ${WILINK_IMAGE_PLUGINS} DESTINATION bin/imageformats)
     install(FILES ${WILINK_SQL_PLUGINS} DESTINATION bin/sqldrivers)
-    install(FILES ${WILINK_QML_PLUGINS} DESTINATION bin/imports/QtWebKit)
+    install(FILES
+        ${QT_IMPORTS_DIR}/QtWebKit/qmldir
+        ${QT_IMPORTS_DIR}/QtWebKit/qmlwebkitplugin.dll
+        DESTINATION bin/imports/QtWebKit)
 endif(WIN32)
 
 # Packaging
