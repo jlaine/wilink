@@ -50,6 +50,7 @@ fix_deps() {
             mkdir -p `dirname $dep_inst`
             cp $dep $dep_inst
             install_name_tool -id $dep_id $dep_inst
+            fix_deps $dep_inst
         fi
     done
 }

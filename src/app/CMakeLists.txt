@@ -1,6 +1,5 @@
 set(QT_USE_QTDECLARATIVE 1)
 set(QT_USE_QTNETWORK 1)
-set(QT_USE_QTMULTIMEDIA 1)
 set(QT_USE_QTSQL 1)
 set(QT_USE_QTWEBKIT 1)
 set(QT_USE_QTXML 1)
@@ -8,13 +7,6 @@ include(${QT_USE_FILE})
 
 # Libraries
 set(app_LIBRARIES ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTDECLARATIVE_LIBRARY} ${QT_QTNETWORK_LIBRARY} ${QT_QTWEBKIT_LIBRARY})
-
-find_library(QTMULTIMEDIAKIT_LIBRARY QtMultimediaKit)
-if(QTMULTIMEDIAKIT_LIBRARY)
-    message(STATUS "Found QtMultimediaKit library")
-    include_directories(/usr/include/QtMobility)
-    include_directories(/usr/include/QtMultimediaKit)
-endif()
 
 # wiLink
 add_definitions(-DWILINK_VERSION="${WILINK_VERSION}")
