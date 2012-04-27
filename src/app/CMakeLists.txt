@@ -6,13 +6,6 @@ set(QT_USE_QTWEBKIT 1)
 set(QT_USE_QTXML 1)
 include(${QT_USE_FILE})
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qnetio/src)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qsound/src)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp-extra/diagnostics)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp-extra/shares)
-
 # Libraries
 set(app_LIBRARIES ${QT_QTGUI_LIBRARY} ${QT_QTDECLARATIVE_LIBRARY} ${QT_QTWEBKIT_LIBRARY})
 
