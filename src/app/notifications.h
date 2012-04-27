@@ -21,6 +21,11 @@
 #define __NOTIFIER_H__
 
 #include <QObject>
+#ifdef USE_SYSTRAY
+#include <QSystemTrayIcon>
+#endif
+
+class NotifierPrivate;
 
 class Notification : public QObject
 {
@@ -51,8 +56,14 @@ public:
 public slots:
     Notification *showMessage(const QString &title, const QString &message, const QString &action);
 
+private slots:
+#ifdef USE_SYSTRAY
+    void _q_trayActivated(QSystemTrayIcon::ActivationReason reason);
+    void _q_trayClicked();
+#endif
+
 private:
-    NotifierBackend *d;
+    NotifierPrivate *d;
 };
 
 #endif

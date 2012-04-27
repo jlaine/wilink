@@ -24,10 +24,6 @@
 #include <QString>
 #include <QUrl>
 
-#ifdef USE_SYSTRAY
-#include <QSystemTrayIcon>
-#endif
-
 class QSoundPlayer;
 
 class ApplicationPrivate;
@@ -49,7 +45,6 @@ public:
 
     static void alert(QWidget *widget);
     static void platformInit();
-    void createSystemTrayIcon();
     QSoundPlayer *soundPlayer();
 
     bool isMobile() const;
@@ -60,12 +55,6 @@ signals:
 
 public slots:
     QUrl resolvedUrl(const QUrl &url, const QUrl &base);
-
-private slots:
-#ifdef USE_SYSTRAY
-    void trayActivated(QSystemTrayIcon::ActivationReason reason);
-    void trayClicked();
-#endif
 
 private:
     ApplicationPrivate * const d;

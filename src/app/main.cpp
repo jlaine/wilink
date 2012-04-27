@@ -63,9 +63,6 @@ int main(int argc, char *argv[])
     signal(SIGINT, signal_handler);
     signal(SIGTERM, signal_handler);
 
-    /* Create system tray icon */
-    app.createSystemTrayIcon();
-
     /* Create window */
     Window window;
 #ifdef MEEGO_EDITION_HARMATTAN

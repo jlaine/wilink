@@ -26,29 +26,89 @@
 #endif
 
 #include <QCoreApplication>
+#include <QMenu>
+#include <QSystemTrayIcon>
+
+class NotifierPrivate
+{
+public:
+    NotifierPrivate();
+
+    NotifierBackend *backend;
+#ifdef USE_SYSTRAY
+    QSystemTrayIcon *trayIcon;
+    QMenu *trayMenu;
+    Notification *trayNotification;
+#endif
+};
+
+NotifierPrivate::NotifierPrivate()
+    : backend(0)
+#ifdef USE_SYSTRAY
+    , trayIcon(0)
+    , trayMenu(0)
+    , trayNotification(0)
+#endif
+{
+}
 
 Notifier::Notifier(QObject *parent)
     : QObject(parent)
 {
+    d = new NotifierPrivate;
 #if defined(USE_LIBNOTIFY)
-    d = new NotifierBackendLibnotify(this);
+    d->backend = new NotifierBackendLibnotify(this);
 #elif defined(USE_GROWL)
-    d = new NotifierBackendGrowl(this);
+    d->backend = new NotifierBackendGrowl(this);
+#endif
+
+#ifdef USE_SYSTRAY
+    d->trayIcon = new QSystemTrayIcon;
+#ifdef Q_OS_MAC
+    d->trayIcon->setIcon(QIcon(":/32x32/wiLink-black.png"));
 #else
-    d = 0;
+    d->trayIcon->setIcon(QIcon(":/32x32/wiLink.png"));
+#endif
+
+    d->trayMenu = new QMenu;
+    QAction *action = d->trayMenu->addAction(QIcon(":/close.png"), tr("&Quit"));
+    connect(action, SIGNAL(triggered()),
+            qApp, SLOT(quit()));
+    d->trayIcon->setContextMenu(d->trayMenu);
+
+    connect(d->trayIcon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
+            this, SLOT(_q_trayActivated(QSystemTrayIcon::ActivationReason)));
+    connect(d->trayIcon, SIGNAL(messageClicked()),
+            this, SLOT(_q_trayClicked()));
+    d->trayIcon->show();
 #endif
 }
 
 Notifier::~Notifier()
 {
-    if (d)
-        delete d;
+#ifdef USE_SYSTRAY
+    // destroy tray icon
+    if (d->trayIcon)
+    {
+#ifdef Q_OS_WIN
+        // FIXME : on Windows, deleting the icon crashes the program
+        d->trayIcon->hide();
+#else
+        delete d->trayIcon;
+        delete d->trayMenu;
+#endif
+    }
+#endif
+
+    if (d->backend)
+        delete d->backend;
+    delete d;
 }
 
 Notification *Notifier::showMessage(const QString &title, const QString &message, const QString &action)
 {
-    if (d)
-        return d->showMessage(title, message, action);
+    if (d->backend)
+        return d->backend->showMessage(title, message, action);
     else
         return 0;
 
@@ -65,3 +125,18 @@ Notification *Notifier::showMessage(const QString &title, const QString &message
 #endif
 }
 
+#ifdef USE_SYSTRAY
+void Notifier::_q_trayActivated(QSystemTrayIcon::ActivationReason reason)
+{
+//    if (reason != QSystemTrayIcon::Context)
+//        emit showWindows();
+}
+
+void Notifier::_q_trayClicked()
+{
+    if (d->trayNotification) {
+        QMetaObject::invokeMethod(d->trayNotification, "clicked");
+        d->trayNotification = 0;
+    }
+}
+#endif
