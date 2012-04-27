@@ -65,6 +65,9 @@ if(APPLE)
         list(APPEND plugin_LIBRARIES ${GROWL_LIBRARY})
         list(APPEND plugin_SOURCES notifications_growl.mm)
     endif()
+
+    list(APPEND plugin_LIBRARIES "-framework Carbon")
+    list(APPEND plugin_SOURCES idle/idle_mac.cpp)
 elseif (UNIX)
     # libnotify support
     find_package(PkgConfig)
@@ -76,6 +79,19 @@ elseif (UNIX)
         list(APPEND plugin_LIBRARIES ${LIBNOTIFY_LIBRARIES})
         list(APPEND plugin_SOURCES notifications_libnotify.cpp)
     endif()
+
+    # idle
+    list(APPEND plugin_SOURCE idle/idle_x11.cpp)
+    find_library(X11_LIBRARY NAMES X11)
+    find_library(XSS_LIBRARY NAMES Xss)
+    check_include_files(X11/extensions/scrnsaver.h HAVE_SCRNSAVER_H)
+    if(X11_LIBRARY AND XSS_LIBRARY AND HAVE_SCRNSAVER_H)
+        message(STATUS "Found X11 Screen saver library: ${XSS_LIBRARY} ${X11_LIBRARY}")
+        add_definitions(-DHAVE_XSS)
+        list(APPEND plugin_LIBRARIES ${XSS_LIBRARY} ${X11_LIBRARY})
+    endif()
+elseif(WIN32)
+    list(APPEND plugin_SOURCES idle/idle_win.cpp)
 endif()
 
 set(plugin_MOC_HEADERS
