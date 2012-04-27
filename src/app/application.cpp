@@ -27,6 +27,7 @@
 
 #include "application.h"
 #include "declarative.h"
+#include "notifications.h"
 #include "settings.h"
 #include "systeminfo.h"
 
@@ -96,36 +97,12 @@ Application::Application(int &argc, char **argv)
     d->soundPlayer->setNetworkAccessManager(new NetworkAccessManager(d->soundPlayer));
     d->soundPlayer->moveToThread(d->soundThread);
 
-#ifdef USE_LIBNOTIFY
-    /* initialise libnotify */
-    notify_init(applicationName().toUtf8().constData());
-
-    // test if callbacks are supported
-    d->libnotify_accepts_actions = false;
-    GList *capabilities = notify_get_server_caps();
-    if(capabilities != NULL) {
-        for(GList *c = capabilities; c != NULL; c = c->next) {
-            if(g_strcmp0((char*)c->data, "actions") == 0 ) {
-                d->libnotify_accepts_actions = true;
-                break;
-            }
-        }
-        g_list_foreach(capabilities, (GFunc)g_free, NULL);
-        g_list_free(capabilities);
-    }
-#endif
-
     // add SSL root CA for wifirst.net and download.wifirst.net
     QSslSocket::addDefaultCaCertificates(":/UTN_USERFirst_Hardware_Root_CA.pem");
 }
 
 Application::~Application()
 {
-#ifdef USE_LIBNOTIFY
-    // uninitialise libnotify
-    notify_uninit();
-#endif
-
 #ifdef USE_SYSTRAY
     // destroy tray icon
     if (d->trayIcon)

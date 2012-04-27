@@ -23,6 +23,8 @@ class NotifierBackendLibnotify : public NotifierBackend
 {
 public:
     NotifierBackendLibnotify(Notifier *qq);
+    ~NotifierBackendLibnotify();
+
     Notification *showMessage(const QString &title, const QString &message, const QString &action);
 
 private:

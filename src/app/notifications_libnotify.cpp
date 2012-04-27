@@ -47,6 +47,11 @@ NotifierBackendLibnotify::NotifierBackendLibnotify(Notifier *qq)
     }
 };
 
+NotifierBackendLibnotify::~NotifierBackendLibnotify(Notifier *qq)
+{
+    notify_uninit();
+}
+
 static void notificationClicked(NotifyNotification *notification, char *action, gpointer data)
 {
     if(g_strcmp0(action, "show-conversation") == 0)
