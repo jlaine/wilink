@@ -25,6 +25,22 @@ android|symbian|contains(MEEGO_EDITION,harmattan) {
     DEFINES += WILINK_EMBEDDED
 }
 
+# Libraries used internal by idle
+android|symbian|contains(MEEGO_EDITION,harmattan) {
+    SOURCES += idle_stub.cpp
+} else:mac {
+    LIBS += -framework Carbon
+    SOURCES += idle/idle_mac.cpp
+} else:unix {
+    DEFINES += HAVE_XSS
+    SOURCES += idle/idle_x11.cpp
+    LIBS += -lXss -lX11
+} else:win32 {
+    SOURCES += idle/idle_win.cpp
+} else {
+    SOURCES += idle/idle_stub.cpp
+}
+
 SOURCES += \
     accounts.cpp \
     calls.cpp \
@@ -36,6 +52,7 @@ SOURCES += \
     discovery.cpp \
     history.cpp \
     icons.cpp \
+    idle/idle.cpp \
     model.cpp \
     news.cpp \
     notifications.cpp \
@@ -62,6 +79,7 @@ HEADERS += \
     discovery.h \
     history.h \
     icons.h \
+    idle/idle.h \
     model.h \
     news.h \
     notifications.h \
@@ -78,14 +96,8 @@ HEADERS += \
     systeminfo.h \
     updater.h
 
-mac {
-    SOURCES += application_mac.mm
-    LIBS += -framework AppKit
-}
-
 INCLUDEPATH += \
     $$WILINK_INCLUDE_DIR \
-    $$IDLE_INCLUDE_DIR \
     $$QNETIO_INCLUDE_DIR \
     $$QSOUND_INCLUDE_DIR \
     $$QXMPP_INCLUDEPATH \
