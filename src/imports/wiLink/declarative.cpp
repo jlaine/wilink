@@ -312,25 +312,6 @@ void Plugin::registerTypes(const char *uri)
 {
     qDebug("register types");
 
-    // QXmpp
-    qmlRegisterUncreatableType<QXmppClient>("QXmpp", 0, 4, "QXmppClient", "");
-    qmlRegisterUncreatableType<QXmppCall>("QXmpp", 0, 4, "QXmppCall", "");
-    qmlRegisterUncreatableType<QXmppCallManager>("QXmpp", 0, 4, "QXmppCallManager", "");
-    qmlRegisterType<QXmppDeclarativeDataForm>("QXmpp", 0, 4, "QXmppDataForm");
-    qmlRegisterUncreatableType<DiagnosticManager>("QXmpp", 0, 4, "DiagnosticManager", "");
-    qmlRegisterUncreatableType<QXmppDiscoveryManager>("QXmpp", 0, 4, "QXmppDiscoveryManager", "");
-    qmlRegisterType<QXmppLogger>("QXmpp", 0, 4, "QXmppLogger");
-    qmlRegisterType<QXmppDeclarativeMessage>("QXmpp", 0, 4, "QXmppMessage");
-    qmlRegisterType<QXmppDeclarativeMucItem>("QXmpp", 0, 4, "QXmppMucItem");
-    qmlRegisterUncreatableType<QXmppMucManager>("QXmpp", 0, 4, "QXmppMucManager", "");
-    qmlRegisterUncreatableType<QXmppMucRoom>("QXmpp", 0, 4, "QXmppMucRoom", "");
-    qmlRegisterType<QXmppDeclarativePresence>("QXmpp", 0, 4, "QXmppPresence");
-    qmlRegisterUncreatableType<QXmppRosterManager>("QXmpp", 0, 4, "QXmppRosterManager", "");
-    qmlRegisterUncreatableType<QXmppRtpAudioChannel>("QXmpp", 0, 4, "QXmppRtpAudioChannel", "");
-    qmlRegisterUncreatableType<QXmppTransferJob>("QXmpp", 0, 4, "QXmppTransferJob", "");
-    qmlRegisterUncreatableType<QXmppTransferManager>("QXmpp", 0, 4, "QXmppTransferManager", "");
-    qRegisterMetaType<QXmppVideoFrame>("QXmppVideoFrame");
-
     // wiLink
     qmlRegisterType<AccountModel>(uri, 2, 0, "AccountModel");
     qmlRegisterType<ApplicationSettings>(uri, 2, 0, "ApplicationSettings");
@@ -340,6 +321,7 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterUncreatableType<DeclarativePen>(uri, 2, 0, "Pen", "");
     qmlRegisterType<ChatClient>(uri, 2, 0, "Client");
     qmlRegisterType<Conversation>(uri, 2, 0, "Conversation");
+    qmlRegisterUncreatableType<DiagnosticManager>(uri, 2, 0, "DiagnosticManager", "");
     qmlRegisterType<DiscoveryModel>(uri, 2, 0, "DiscoveryModel");
     qmlRegisterType<DropArea>(uri, 2, 0, "DropArea");
     qmlRegisterType<FolderModel>(uri, 2, 0, "FolderModel");
