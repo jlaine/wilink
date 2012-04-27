@@ -126,3 +126,5 @@ add_library(qmlwilinkplugin SHARED ${plugin_SOURCES} ${plugin_MOC_SOURCES})
 target_link_libraries(qmlwilinkplugin ${QT_LIBRARIES})
 target_link_libraries(qmlwilinkplugin qnetio ${QXMPP_LIBRARIES} qxmpp-extra ${QDJANGO_LIBRARIES} qsound ${plugin_LIBRARIES} ${QT_QTDECLARATIVE_LIBRARY})
 
+install(FILES qmldir DESTINATION bin/imports/wiLink)
+install(TARGETS qmlwilinkplugin DESTINATION bin/imports/wiLink)
