@@ -15,4 +15,5 @@ add_subdirectory(qnetio)
 add_subdirectory(qsound)
 add_subdirectory(qxmpp-extra)
 
+add_subdirectory(imports)
 add_subdirectory(app)

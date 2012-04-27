@@ -30,7 +30,7 @@
 #include <QStringList>
 
 #include "application.h"
-#include "declarative.h"
+//#include "declarative.h"
 #include "window.h"
 
 class WindowPrivate
@@ -54,10 +54,12 @@ Window::Window(QWidget *parent)
                     this, SLOT(_q_statusChanged()));
     Q_ASSERT(check);
 
+#if 0
     // load plugin
     Plugin plugin;
     plugin.registerTypes("wiLink");
     plugin.initializeEngine(d->view->engine(), "wiLink");
+#endif
 
     QDeclarativeContext *context = d->view->rootContext();
     context->setContextProperty("application", wApp);

@@ -16,7 +16,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp-extra/shares)
 # Libraries
 set(app_LIBRARIES ${QT_QTGUI_LIBRARY} ${QT_QTDECLARATIVE_LIBRARY} ${QT_QTWEBKIT_LIBRARY})
 
-# Needed for Qt >= 4.7 on Debian/Ubuntu
 find_library(QTMULTIMEDIAKIT_LIBRARY QtMultimediaKit)
 if(QTMULTIMEDIAKIT_LIBRARY)
     message(STATUS "Found QtMultimediaKit library")
@@ -29,92 +28,16 @@ add_definitions(-DWILINK_VERSION="${WILINK_VERSION}")
 if(WILINK_EMBEDDED)
     add_definitions(-DWILINK_EMBEDDED)
 endif()
-add_definitions(-DQT_STATICPLUGIN)
-if(NOT APPLE)
-    add_definitions(-DUSE_SYSTRAY)
-endif(NOT APPLE)
 
 set(app_SOURCES application.cpp main.cpp window.cpp)
 set(app_MOC_HEADERS application.h window.h)
-qt4_wrap_cpp(app_MOC_SOURCES ${app_MOC_HEADERS})
-
-set(plugin_SOURCES
-    accounts.cpp
-    calls.cpp
-    client.cpp
-    console.cpp
-    conversations.cpp
-    declarative.cpp
-    diagnostics.cpp
-    discovery.cpp
-    history.cpp
-    icons.cpp
-    model.cpp
-    news.cpp
-    notifications.cpp
-    photos.cpp
-    phone.cpp
-    phone/sip.cpp
-    phone/stun.cpp
-    places.cpp
-    player.cpp
-    rooms.cpp
-    roster.cpp
-    settings.cpp
-    shares.cpp
-    systeminfo.cpp
-    updater.cpp)
 
 if(APPLE)
     list(APPEND app_SOURCES application_mac.mm)
     list(APPEND app_LIBRARIES "-framework AppKit")
-
-    # Growl support
-    find_library(GROWL_LIBRARY Growl)
-    if(GROWL_LIBRARY)
-        message(STATUS "Found Growl library")
-        add_definitions(-DUSE_GROWL)
-        list(APPEND plugin_LIBRARIES ${GROWL_LIBRARY})
-        list(APPEND plugin_SOURCES notifications_growl.mm)
-    endif()
-elseif (UNIX)
-    # libnotify support
-    find_package(PkgConfig)
-    pkg_check_modules(LIBNOTIFY "libnotify")
-    if(LIBNOTIFY_FOUND)
-        message(STATUS "Found libnotify library")
-        include_directories(${LIBNOTIFY_INCLUDE_DIRS})
-        add_definitions(-DUSE_LIBNOTIFY)
-        list(APPEND plugin_LIBRARIES ${LIBNOTIFY_LIBRARIES})
-        list(APPEND plugin_SOURCES notifications_libnotify.cpp)
-    endif()
 endif()
 
-set(plugin_MOC_HEADERS
-    accounts.h
-    calls.h
-    client.h
-    console.h
-    conversations.h
-    declarative.h
-    diagnostics.h
-    discovery.h
-    history.h
-    model.h
-    news.h
-    notifications.h
-    photos.h
-    phone.h
-    phone/sip.h
-    phone/stun.h
-    places.h
-    player.h
-    rooms.h
-    roster.h
-    settings.h
-    shares.h
-    updater.h)
-
+qt4_wrap_cpp(app_MOC_SOURCES ${app_MOC_HEADERS})
 configure_file(../translations/translations.qrc.cmake ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc)
 if(RELOAD_TRANSLATIONS)
     qt4_create_translation(QM_FILES
@@ -190,11 +113,41 @@ else(RELOAD_TRANSLATIONS)
 endif(RELOAD_TRANSLATIONS)
 qt4_add_translation(QM_FILES ../translations/qt_fr.ts)
 
-qt4_wrap_cpp(plugin_MOC_SOURCES ${plugin_MOC_HEADERS})
+qt4_add_resources(RCC_SOURCES
+    ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc
+    ${CMAKE_CURRENT_SOURCE_DIR}/../data/wiLink.qrc)
 
-add_library(qmlwilinkplugin STATIC ${plugin_SOURCES} ${plugin_MOC_SOURCES})
-target_link_libraries(qmlwilinkplugin ${QT_LIBRARIES})
-target_link_libraries(qmlwilinkplugin idle qnetio ${QXMPP_LIBRARIES} qxmpp-extra ${QDJANGO_LIBRARIES} qsound ${plugin_LIBRARIES} ${QT_QTDECLARATIVE_LIBRARY})
+if(WIN32)
+    enable_language(RC)
+    set(WILINK_VERSION_WIN32 "${WILINK_VERSION_MAJOR},${WILINK_VERSION_MINOR},${WILINK_VERSION_PATCH},0")
+    configure_file(${CMAKE_SOURCE_DIR}/cmake/wiLink.rc.in ${CMAKE_CURRENT_BINARY_DIR}/wiLink.rc)
+    set(WILINK_RESOURCE wiLink.rc)
+endif(WIN32)
+
+add_executable(wiLink ${app_SOURCES} ${app_MOC_SOURCES} ${RCC_SOURCES} ${WILINK_RESOURCE})
+target_link_libraries(wiLink qmlwilinkplugin ${app_LIBRARIES})
+
+if(APPLE)
+    get_filename_component(BUNDLE_ICON_NAME ${CPACK_BUNDLE_ICON} NAME_WE)
+    set_target_properties(wiLink PROPERTIES MACOSX_BUNDLE TRUE)
+    set_target_properties(wiLink PROPERTIES MACOSX_BUNDLE_GUI_IDENTIFIER ${CPACK_BUNDLE_IDENTIFIER})
+    set_target_properties(wiLink PROPERTIES MACOSX_BUNDLE_ICON_FILE ${BUNDLE_ICON_NAME})
+    set_target_properties(wiLink PROPERTIES MACOSX_BUNDLE_BUNDLE_NAME ${CPACK_BUNDLE_NAME})
+    set_target_properties(wiLink PROPERTIES MACOSX_BUNDLE_BUNDLE_VERSION ${WILINK_VERSION})
+    set_target_properties(wiLink PROPERTIES MACOSX_BUNDLE_LONG_VERSION_STRING ${WILINK_VERSION})
+    set_target_properties(wiLink PROPERTIES MACOSX_BUNDLE_SHORT_VERSION_STRING ${WILINK_VERSION})
+    add_custom_command(TARGET wiLink POST_BUILD
+        COMMAND mkdir -p ${BUNDLE_LOCATION}/Contents/Resources/
+        COMMAND touch ${BUNDLE_LOCATION}/Contents/Resources/empty.lproj
+        COMMAND cp ${CPACK_BUNDLE_ICON} ${BUNDLE_LOCATION}/Contents/Resources/
+        COMMAND ${CMAKE_SOURCE_DIR}/cmake/copyplugins -b ${BUNDLE_LOCATION} -q ${QT_QMAKE_EXECUTABLE} -f "${WILINK_EXTRA_FRAMEWORKS}" -i "${WILINK_EXTRA_IMPORTS}" ${WILINK_EXTRA_PLUGINS}
+        DEPENDS wiLink)
+endif(APPLE)
+if(WIN32)
+    set_target_properties(wiLink PROPERTIES LINK_FLAGS "-mwindows")
+endif(WIN32)
+
+install(TARGETS wiLink DESTINATION bin)
 
 # tests
 #add_subdirectory(tests)
