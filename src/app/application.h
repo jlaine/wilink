@@ -31,7 +31,6 @@
 #endif
 
 class QSoundPlayer;
-class QSystemTrayIcon;
 
 class ApplicationPrivate;
 class ApplicationSettings;
@@ -54,7 +53,6 @@ class Application : public QApplication
     Q_OBJECT
     Q_PROPERTY(QString applicationName READ applicationName CONSTANT)
     Q_PROPERTY(QString applicationVersion READ applicationVersion CONSTANT)
-    Q_PROPERTY(QUrl homeUrl READ homeUrl CONSTANT)
     Q_PROPERTY(QString organizationName READ organizationName CONSTANT)
     Q_PROPERTY(QString osType READ osType CONSTANT)
     Q_PROPERTY(bool isInstalled READ isInstalled CONSTANT)
@@ -67,14 +65,9 @@ public:
     ~Application();
 
     static void alert(QWidget *widget);
-    QString cacheDirectory() const;
-    QUrl homeUrl() const;
     static void platformInit();
     void createSystemTrayIcon();
     QSoundPlayer *soundPlayer();
-#ifdef USE_SYSTRAY
-    QSystemTrayIcon *trayIcon();
-#endif
 
     QString executablePath() const;
 
@@ -113,6 +106,7 @@ class ApplicationSettings : public QObject
     Q_PROPERTY(QStringList disabledPlugins READ disabledPlugins WRITE setDisabledPlugins NOTIFY disabledPluginsChanged)
     Q_PROPERTY(QString downloadsLocation READ downloadsLocation CONSTANT)
     Q_PROPERTY(QStringList enabledPlugins READ enabledPlugins WRITE setEnabledPlugins NOTIFY enabledPluginsChanged)
+    Q_PROPERTY(QUrl homeUrl READ homeUrl CONSTANT)
     Q_PROPERTY(bool incomingMessageNotification READ incomingMessageNotification WRITE setIncomingMessageNotification NOTIFY incomingMessageNotificationChanged)
     Q_PROPERTY(QString incomingMessageSound READ incomingMessageSound WRITE setIncomingMessageSound NOTIFY incomingMessageSoundChanged)
     Q_PROPERTY(QString lastRunVersion READ lastRunVersion WRITE setLastRunVersion NOTIFY lastRunVersionChanged)
@@ -141,6 +135,8 @@ public:
 
     QStringList enabledPlugins() const;
     void setEnabledPlugins(const QStringList &plugins);
+
+    QUrl homeUrl() const;
 
     bool incomingMessageNotification() const;
     void setIncomingMessageNotification(bool notification);

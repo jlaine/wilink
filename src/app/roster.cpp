@@ -18,7 +18,7 @@
  */
 
 #include <QBuffer>
-#include <QDebug>
+#include <QDesktopServices>
 #include <QDir>
 #include <QDomDocument>
 #include <QImageReader>
@@ -38,7 +38,6 @@
 #include "QXmppUtils.h"
 #include "QXmppVCardManager.h"
 
-#include "application.h"
 #include "client.h"
 #include "roster.h"
 
@@ -576,9 +575,11 @@ void VCard::_q_presenceChanged(const QString &jid)
 VCardCache::VCardCache(QObject *parent)
     : QObject(parent)
 {
+    const QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+
     d = new VCardCachePrivate;
     d->cache = new QNetworkDiskCache(this);
-    d->cache->setCacheDirectory(wApp->cacheDirectory());
+    d->cache->setCacheDirectory(QDir(dataPath).filePath("cache"));
 }
 
 VCardCache::~VCardCache()

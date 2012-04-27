@@ -170,15 +170,6 @@ private slots:
     void onSslErrors(QNetworkReply *reply, const QList<QSslError> &errors);
 };
 
-class NetworkAccessManagerFactory : public QDeclarativeNetworkAccessManagerFactory
-{
-public:
-    QNetworkAccessManager *create(QObject * parent)
-    {
-        return new NetworkAccessManager(parent);
-    }
-};
-
 class DropArea : public QDeclarativeItem
 {
     Q_OBJECT

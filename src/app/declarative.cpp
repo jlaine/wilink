@@ -20,6 +20,7 @@
 #include <QCoreApplication>
 #include <QDeclarativeItem>
 #include <QDeclarativeEngine>
+#include <QDesktopServices>
 #include <QGraphicsSceneDragDropEvent>
 #include <QMimeData>
 #include <QNetworkDiskCache>
@@ -147,14 +148,32 @@ void ListHelper::setModel(QAbstractItemModel *model)
     }
 }
 
+class NetworkAccessManagerFactory : public QDeclarativeNetworkAccessManagerFactory
+{
+public:
+    NetworkAccessManagerFactory();
+
+    QNetworkAccessManager *create(QObject * parent)
+    {
+        return new NetworkAccessManager(parent);
+    }
+};
+
+NetworkAccessManagerFactory::NetworkAccessManagerFactory()
+{
+    const QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+    QNetIO::Wallet::setDataPath(QDir(dataPath).filePath("wallet"));
+}
+
 NetworkAccessManager::NetworkAccessManager(QObject *parent)
     : QNetworkAccessManager(parent)
 {
     bool check;
     Q_UNUSED(check);
 
+    const QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
     QNetworkDiskCache *cache = new QNetworkDiskCache(this);
-    cache->setCacheDirectory(wApp->cacheDirectory());
+    cache->setCacheDirectory(QDir(dataPath).filePath("cache"));
     setCache(cache);
 
     check = connect(this, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),

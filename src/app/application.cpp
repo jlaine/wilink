@@ -28,9 +28,7 @@
 #include <QDesktopWidget>
 #include <QDir>
 #include <QFileInfo>
-#include <QGraphicsObject>
 #include <QMenu>
-#include <QNetworkDiskCache>
 #include <QSettings>
 #include <QSslSocket>
 #include <QSystemTrayIcon>
@@ -106,17 +104,11 @@ Application::Application(int &argc, char **argv)
     if (isInstalled() && d->appSettings->openAtLogin())
         d->appSettings->setOpenAtLogin(true);
 
-    // initialise cache and wallet
+    // initialise cache
     const QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
     QDir().mkpath(dataPath);
     const QString lastRunVersion = d->appSettings->lastRunVersion();
-    if (lastRunVersion.isEmpty() || Updater::compareVersions(lastRunVersion, "1.1.900") < 0) {
-        QNetworkDiskCache cache;
-        cache.setCacheDirectory(QDir(dataPath).filePath("cache"));
-        cache.clear();
-    }
     d->appSettings->setLastRunVersion(WILINK_VERSION);
-    QNetIO::Wallet::setDataPath(QDir(dataPath).filePath("wallet"));
 
     // FIXME: register URL handler
     //QDesktopServices::setUrlHandler("xmpp", this, "openUrl");
@@ -199,12 +191,6 @@ void Application::platformInit()
 }
 #endif
 
-QString Application::cacheDirectory() const
-{
-    const QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
-    return QDir(dataPath).filePath("cache");
-}
-
 /** Create the system tray icon.
  */
 void Application::createSystemTrayIcon()
@@ -243,11 +229,6 @@ QString Application::executablePath() const
     return applicationFilePath().replace("/", "\\");
 #endif
     return applicationFilePath();
-}
-
-QUrl Application::homeUrl() const
-{
-    return QUrl::fromLocalFile(QDir::homePath());
 }
 
 bool Application::isInstalled() const
@@ -394,11 +375,6 @@ void Application::trayClicked()
         d->trayNotification = 0;
     }
 }
-
-QSystemTrayIcon *Application::trayIcon()
-{
-    return d->trayIcon;
-}
 #endif
 
 class ApplicationSettingsPrivate
@@ -505,6 +481,13 @@ void ApplicationSettings::setEnabledPlugins(const QStringList &plugins)
         d->settings->setValue("EnabledPlugins", plugins);
         emit enabledPluginsChanged(plugins);
     }
+}
+
+/** Returns thome HOME url.
+ */
+QUrl ApplicationSettings::homeUrl() const
+{
+    return QUrl::fromLocalFile(QDir::homePath());
 }
 
 /** Returns whether a notification should be shown for incoming messages.
