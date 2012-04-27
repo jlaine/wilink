@@ -24,12 +24,9 @@ if(QTMULTIMEDIAKIT_LIBRARY)
     include_directories(/usr/include/QtMultimediaKit)
 endif()
 
-# wiLink
-add_definitions(-DWILINK_VERSION="${WILINK_VERSION}")
 if(WILINK_EMBEDDED)
     add_definitions(-DWILINK_EMBEDDED)
 endif()
-add_definitions(-DQT_STATICPLUGIN)
 if(NOT APPLE)
     add_definitions(-DUSE_SYSTRAY)
 endif(NOT APPLE)
