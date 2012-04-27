@@ -30,6 +30,7 @@ class QAuthenticator;
 class QNetworkAccessManager;
 class QNetworkReply;
 class QNetworkRequest;
+class QSoundPlayer;
 class QTimer;
 class PhoneContactItem;
 class PhoneHistoryItem;
@@ -175,6 +176,7 @@ private:
     QList<PhoneHistoryItem*> m_items;
     QNetworkAccessManager *m_network;
     QString m_phoneNumber;
+    QSoundPlayer *m_player;
     bool m_registeredHandler;
     QUrl m_selfcareUrl;
     QTimer *m_ticker;

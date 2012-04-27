@@ -82,6 +82,8 @@ public:
     QSoundPlayer(QObject *parent = 0);
     ~QSoundPlayer();
 
+    static QSoundPlayer *instance();
+
     QAudioDeviceInfo inputDevice() const;
     QStringList inputDeviceNames() const;
 

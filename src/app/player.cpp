@@ -31,9 +31,7 @@
 #include <QTime>
 
 #include "QSoundFile.h"
-#include "QSoundPlayer.h"
 
-#include "application.h"
 #include "declarative.h"
 #include "player.h"
 
@@ -111,7 +109,6 @@ public:
     QMap<QUrl, QUrl> dataCache;
     QNetworkReply *dataReply;
     QNetworkAccessManager *network;
-    QSoundPlayer *player;
     PlayerModel *q;
 };
 
@@ -258,9 +255,6 @@ PlayerModel::PlayerModel(QObject *parent)
     d = new PlayerModelPrivate(this);
 
     d->network = new NetworkAccessManager(this);
-
-    // init player
-    d->player = wApp->soundPlayer();
 
     // set role names
     QHash<int, QByteArray> roleNames;

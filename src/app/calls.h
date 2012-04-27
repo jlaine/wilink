@@ -28,6 +28,7 @@
 
 class CallAudioHelper;
 class CallVideoItem;
+class QSoundPlayer;
 class QSoundStream;
 class QTimer;
 class QVideoGrabber;
@@ -68,6 +69,7 @@ private slots:
 
 private:
     QXmppCall *m_call;
+    QSoundPlayer *m_player;
     QSoundStream *m_stream;
 };
 

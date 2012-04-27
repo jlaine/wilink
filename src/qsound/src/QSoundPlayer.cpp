@@ -31,6 +31,8 @@
 #include "QSoundFile.h"
 #include "QSoundPlayer.h"
 
+static QSoundPlayer *thePlayer = 0;
+
 class QSoundPlayerJobPrivate
 {
 public:
@@ -238,11 +240,19 @@ QSoundPlayer::QSoundPlayer(QObject *parent)
 {
     qRegisterMetaType<QAudioDeviceInfo>();
     d = new QSoundPlayerPrivate;
+
+    thePlayer = this;
 }
 
 QSoundPlayer::~QSoundPlayer()
 {
+    thePlayer = 0;
     delete d;
+}
+
+QSoundPlayer* QSoundPlayer::instance()
+{
+    return thePlayer;
 }
 
 QSoundPlayerJob *QSoundPlayer::play(const QUrl &url, bool repeat)

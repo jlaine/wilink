@@ -33,7 +33,6 @@
 #include "QXmppRtpChannel.h"
 #include "QXmppUtils.h"
 
-#include "application.h"
 #include "declarative.h"
 #include "history.h"
 #include "phone.h"
@@ -436,12 +435,15 @@ PhoneHistoryModel::PhoneHistoryModel(QObject *parent)
     // http
     m_network = new NetworkAccessManager(this);
 
+    // sound
+    m_player = QSoundPlayer::instance();
+
     // sip
     m_client = new SipClient;
     check = connect(m_client, SIGNAL(callDialled(SipCall*)),
                     this, SLOT(addCall(SipCall*)));
     Q_ASSERT(check);
-    m_client->moveToThread(wApp->soundPlayer()->thread());
+    m_client->moveToThread(m_player->thread());
 
     // ticker for call durations
     m_ticker = new QTimer(this);
@@ -530,7 +532,7 @@ void PhoneHistoryModel::callRinging()
     // find the call
     foreach (PhoneHistoryItem *item, m_items) {
         if (item->call == call && !item->soundId) {
-            item->soundId = wApp->soundPlayer()->play(QUrl(":/call-outgoing.ogg"), true)->id();
+            item->soundId = m_player->play(QUrl(":/call-outgoing.ogg"), true)->id();
             break;
         }
     }
@@ -555,7 +557,7 @@ void PhoneHistoryModel::callStateChanged(QXmppCall::State state)
     PhoneHistoryItem *item = m_items[row];
 
     if (item->soundId && state != QXmppCall::ConnectingState) {
-        wApp->soundPlayer()->stop(item->soundId);
+        m_player->stop(item->soundId);
         item->soundId = 0;
     }
 
@@ -566,7 +568,7 @@ void PhoneHistoryModel::callStateChanged(QXmppCall::State state)
         if (!item->audioStream) {
             QXmppRtpAudioChannel *channel = item->call->audioChannel();
 
-            item->audioStream = new QSoundStream(wApp->soundPlayer());
+            item->audioStream = new QSoundStream(m_player);
             item->audioStream->setDevice(channel);
             item->audioStream->setFormat(
                 channel->payloadType().channels(),
@@ -577,7 +579,7 @@ void PhoneHistoryModel::callStateChanged(QXmppCall::State state)
             connect(item->audioStream, SIGNAL(outputVolumeChanged(int)),
                     this, SIGNAL(outputVolumeChanged(int)));
 
-            item->audioStream->moveToThread(wApp->soundPlayer()->thread());
+            item->audioStream->moveToThread(m_player->thread());
             QMetaObject::invokeMethod(item->audioStream, "startOutput");
             QMetaObject::invokeMethod(item->audioStream, "startInput");
         }

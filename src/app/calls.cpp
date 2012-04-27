@@ -36,7 +36,6 @@
 #include "QSoundPlayer.h"
 #include "QVideoGrabber.h"
 
-#include "application.h"
 #include "calls.h"
 
 void DeclarativePen::setColor(const QColor &c)
@@ -60,12 +59,13 @@ CallAudioHelper::CallAudioHelper(QObject *parent)
     : QObject(parent),
     m_call(0)
 {
-    m_stream = new QSoundStream(wApp->soundPlayer());
+    m_player = QSoundPlayer::instance();
+    m_stream = new QSoundStream(m_player);
     connect(m_stream, SIGNAL(inputVolumeChanged(int)),
             this, SIGNAL(inputVolumeChanged(int)));
     connect(m_stream, SIGNAL(outputVolumeChanged(int)),
             this, SIGNAL(outputVolumeChanged(int)));
-    m_stream->moveToThread(wApp->soundPlayer()->thread());
+    m_stream->moveToThread(m_player->thread());
 }
 
 CallAudioHelper::~CallAudioHelper()
@@ -93,7 +93,7 @@ void CallAudioHelper::setCall(QXmppCall *call)
             bool check;
 
             call->audioChannel()->setParent(0);
-            call->audioChannel()->moveToThread(wApp->soundPlayer()->thread());
+            call->audioChannel()->moveToThread(m_player->thread());
 
             check = connect(call, SIGNAL(audioModeChanged(QIODevice::OpenMode)),
                             this, SLOT(_q_audioModeChanged(QIODevice::OpenMode)));
