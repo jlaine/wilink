@@ -130,7 +130,7 @@ Notification *Notifier::showMessage(const QString &title, const QString &message
         return d->backend->showMessage(title, message, action);
 #if defined(USE_SYSTRAY)
     } else if (d->trayIcon) {
-        handle = new Notification(this);
+        Notification *handle = new Notification(this);
         if (d->trayNotification)
             delete d->trayNotification;
         d->trayNotification = handle;
