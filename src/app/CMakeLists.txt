@@ -14,7 +14,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp-extra/diagnostics)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp-extra/shares)
 
 # Libraries
-set(wilink_LIBRARIES ${QT_QTGUI_LIBRARY} ${QT_QTDECLARATIVE_LIBRARY} ${QT_QTWEBKIT_LIBRARY})
+set(app_LIBRARIES ${QT_QTGUI_LIBRARY} ${QT_QTDECLARATIVE_LIBRARY} ${QT_QTWEBKIT_LIBRARY})
 
 # Needed for Qt >= 4.7 on Debian/Ubuntu
 find_library(QTMULTIMEDIAKIT_LIBRARY QtMultimediaKit)
@@ -34,9 +34,12 @@ if(NOT APPLE)
     add_definitions(-DUSE_SYSTRAY)
 endif(NOT APPLE)
 
-set(wiLink_SOURCES
+set(app_SOURCES application.cpp main.cpp window.cpp)
+set(app_MOC_HEADERS application.h window.h)
+qt4_wrap_cpp(app_MOC_SOURCES ${app_MOC_HEADERS})
+
+set(plugin_SOURCES
     accounts.cpp
-    application.cpp
     calls.cpp
     client.cpp
     console.cpp
@@ -46,7 +49,6 @@ set(wiLink_SOURCES
     discovery.cpp
     history.cpp
     icons.cpp
-    main.cpp
     model.cpp
     news.cpp
     notifications.cpp
@@ -61,20 +63,19 @@ set(wiLink_SOURCES
     settings.cpp
     shares.cpp
     systeminfo.cpp
-    updater.cpp
-    window.cpp)
+    updater.cpp)
 
 if(APPLE)
-    set(wiLink_SOURCES ${wiLink_SOURCES} application_mac.mm)
-    list(APPEND wilink_LIBRARIES "-framework AppKit")
+    list(APPEND app_SOURCES application_mac.mm)
+    list(APPEND app_LIBRARIES "-framework AppKit")
 
     # Growl support
     find_library(GROWL_LIBRARY Growl)
     if(GROWL_LIBRARY)
         message(STATUS "Found Growl library")
         add_definitions(-DUSE_GROWL)
-        list(APPEND wilink_LIBRARIES ${GROWL_LIBRARY})
-        list(APPEND wiLink_SOURCES notifications_growl.mm)
+        list(APPEND plugin_LIBRARIES ${GROWL_LIBRARY})
+        list(APPEND plugin_SOURCES notifications_growl.mm)
     endif()
 elseif (UNIX)
     # libnotify support
@@ -84,13 +85,12 @@ elseif (UNIX)
         message(STATUS "Found libnotify library")
         include_directories(${LIBNOTIFY_INCLUDE_DIRS})
         add_definitions(-DUSE_LIBNOTIFY)
-        list(APPEND wilink_LIBRARIES ${LIBNOTIFY_LIBRARIES})
-        list(APPEND wiLink_SOURCES notifications_libnotify.cpp)
+        list(APPEND plugin_LIBRARIES ${LIBNOTIFY_LIBRARIES})
+        list(APPEND plugin_SOURCES notifications_libnotify.cpp)
     endif()
 endif()
 
-set(wiLink_MOC_HEADERS
-    application.h
+set(plugin_MOC_HEADERS
     accounts.h
     calls.h
     client.h
@@ -113,8 +113,7 @@ set(wiLink_MOC_HEADERS
     roster.h
     settings.h
     shares.h
-    updater.h
-    window.h)
+    updater.h)
 
 configure_file(../translations/translations.qrc.cmake ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc)
 if(RELOAD_TRANSLATIONS)
@@ -191,12 +190,10 @@ else(RELOAD_TRANSLATIONS)
 endif(RELOAD_TRANSLATIONS)
 qt4_add_translation(QM_FILES ../translations/qt_fr.ts)
 
-set(wiLink_RCCS
+qt4_add_resources(RCC_SOURCES
     ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc
     ${CMAKE_CURRENT_SOURCE_DIR}/../data/wiLink.qrc)
-
-qt4_add_resources(wiLink_RCC_SOURCES ${wiLink_RCCS})
-qt4_wrap_cpp(wiLink_MOC_SOURCES ${wiLink_MOC_HEADERS})
+qt4_wrap_cpp(plugin_MOC_SOURCES ${plugin_MOC_HEADERS})
 
 if(WIN32)
     enable_language(RC)
@@ -205,8 +202,8 @@ if(WIN32)
     set(WILINK_RESOURCE wiLink.rc)
 endif(WIN32)
 
-add_executable(wiLink ${wiLink_SOURCES} ${wiLink_MOC_SOURCES} ${wiLink_RCC_SOURCES} ${WILINK_RESOURCE})
-target_link_libraries(wiLink idle qnetio ${QXMPP_LIBRARIES} qxmpp-extra ${QDJANGO_LIBRARIES} qsound ${wilink_LIBRARIES})
+add_executable(wiLink ${app_SOURCES} ${app_MOC_SOURCES} ${plugin_SOURCES} ${plugin_MOC_SOURCES} ${RCC_SOURCES} ${WILINK_RESOURCE})
+target_link_libraries(wiLink idle qnetio ${QXMPP_LIBRARIES} qxmpp-extra ${QDJANGO_LIBRARIES} qsound ${app_LIBRARIES} ${plugin_LIBRARIES})
 
 if(APPLE)
     get_filename_component(BUNDLE_ICON_NAME ${CPACK_BUNDLE_ICON} NAME_WE)
