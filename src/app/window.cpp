@@ -31,6 +31,7 @@
 
 #include "application.h"
 #include "declarative.h"
+#include "settings.h"
 #include "window.h"
 
 class WindowPrivate
@@ -61,6 +62,7 @@ Window::Window(QWidget *parent)
 
     QDeclarativeContext *context = d->view->rootContext();
     context->setContextProperty("application", wApp);
+    context->setContextProperty("appSettings", wSettings);
     context->setContextProperty("window", this);
 
     setCentralWidget(d->view);

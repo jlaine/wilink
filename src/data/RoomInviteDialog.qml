@@ -34,7 +34,7 @@ Dialog {
 
         dynamicSortFilter: true
         sortCaseSensitivity: Qt.CaseInsensitive
-        sortRole: application.settings.sortContactsByStatus ? RosterModel.StatusSortRole : RosterModel.NameRole
+        sortRole: appSettings.sortContactsByStatus ? RosterModel.StatusSortRole : RosterModel.NameRole
         Component.onCompleted: sort(0)
     }
 

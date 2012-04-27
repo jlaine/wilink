@@ -54,9 +54,9 @@ Panel {
 
                 // run one-time configuration dialog
                 Component.onCompleted: {
-                    if (!application.settings.sharesConfigured && !application.isMobile) {
+                    if (!appSettings.sharesConfigured && !application.isMobile) {
                         preferenceButton.clicked();
-                        application.settings.sharesConfigured = true;
+                        appSettings.sharesConfigured = true;
                     }
                 }
             }
@@ -166,7 +166,7 @@ Panel {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: queueView.top
-        text: qsTr('Received files are stored in your <a href="%1">downloads folder</a>.').replace('%1', application.settings.sharesUrl)
+        text: qsTr('Received files are stored in your <a href="%1">downloads folder</a>.').replace('%1', appSettings.sharesUrl)
         z: 1
     }
 

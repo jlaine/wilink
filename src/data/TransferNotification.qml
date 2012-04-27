@@ -38,7 +38,7 @@ NotificationDialog {
 
     onAccepted: {
         // FIXME: this silently overwrite existing files!
-        var path = application.settings.downloadsLocation + '/' + job.fileName;
+        var path = appSettings.downloadsLocation + '/' + job.fileName;
         console.log("File accepted: " + path);
         panel.showConversation(job.jid);
         job.accept(path);

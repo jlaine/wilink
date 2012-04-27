@@ -29,8 +29,8 @@ Panel {
             urls[i] = selectionModel.get(i).url;
         }
 
-        application.settings.sharesLocation = sharesLocation.text;
-        application.settings.sharesDirectories = urls;
+        appSettings.sharesLocation = sharesLocation.text;
+        appSettings.sharesDirectories = urls;
     }
 
     GroupBox {
@@ -85,7 +85,7 @@ Panel {
             }
 
             Component.onCompleted: {
-                var urls = application.settings.sharesDirectories;
+                var urls = appSettings.sharesDirectories;
                 for (var i in urls) {
                     selectionModel.append({'url': urls[i]});
                 }
@@ -279,7 +279,7 @@ Panel {
                     anchors.right: button.left
                     anchors.rightMargin: appStyle.spacing.horizontal
                     readOnly: true
-                    text: application.settings.sharesLocation
+                    text: appSettings.sharesLocation
                 }
 
                 Button {
@@ -291,12 +291,12 @@ Panel {
 
                     onClicked: {
                         var dialog = window.fileDialog();
-                        dialog.directory = application.settings.sharesLocation;
+                        dialog.directory = appSettings.sharesLocation;
                         dialog.fileMode = QFileDialog.Directory;
                         dialog.options = QFileDialog.ShowDirsOnly;
                         dialog.windowTitle = qsTr('Downloads folder');
                         if (dialog.exec() && dialog.selectedFiles.length > 0) {
-                            application.settings.sharesLocation = dialog.selectedFiles[0];
+                            appSettings.sharesLocation = dialog.selectedFiles[0];
                         }
                     }
                 }

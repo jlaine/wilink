@@ -36,7 +36,6 @@
 #include "declarative.h"
 #include "settings.h"
 #include "systeminfo.h"
-#include "updater.h"
 
 Application *wApp = 0;
 
@@ -211,11 +210,6 @@ bool Application::isMobile() const
 QString Application::osType() const
 {
     return SystemInfo::osType();
-}
-
-ApplicationSettings* Application::settings() const
-{
-    return d->appSettings;
 }
 
 QUrl Application::resolvedUrl(const QUrl &url, const QUrl &base)

@@ -27,16 +27,16 @@ Panel {
         // devices
         if (input.currentIndex >= 0) {
             var device = input.model.get(input.currentIndex).text;
-            application.settings.audioInputDeviceName = device;
+            appSettings.audioInputDeviceName = device;
         }
         if (output.currentIndex >= 0) {
             var device = output.model.get(output.currentIndex).text;
-            application.settings.audioOutputDeviceName = device;
+            appSettings.audioOutputDeviceName = device;
         }
 
         // notifications
-        application.settings.incomingMessageSound = incomingMessageSound.checked ? ':/message-incoming.ogg' : '';
-        application.settings.outgoingMessageSound = outgoingMessageSound.checked ? ':/message-outgoing.ogg' : '';
+        appSettings.incomingMessageSound = incomingMessageSound.checked ? ':/message-incoming.ogg' : '';
+        appSettings.outgoingMessageSound = outgoingMessageSound.checked ? ':/message-outgoing.ogg' : '';
     }
 
     SoundTester {
@@ -102,7 +102,7 @@ Panel {
                     for (var i in names) {
                         var device = names[i];
                         model.append({'text': device});
-                        if (device == application.settings.audioOutputDeviceName) {
+                        if (device == appSettings.audioOutputDeviceName) {
                             output.currentIndex = i;
                         }
                     }
@@ -147,7 +147,7 @@ Panel {
                     for (var i in names) {
                         var device = names[i];
                         model.append({'text': device});
-                        if (device == application.settings.audioInputDeviceName) {
+                        if (device == appSettings.audioInputDeviceName) {
                             input.currentIndex = i;
                         }
                     }
@@ -238,7 +238,7 @@ Panel {
 
                 anchors.left: parent.left
                 anchors.right:  parent.right
-                checked: application.settings.incomingMessageSound.length > 0
+                checked: appSettings.incomingMessageSound.length > 0
                 text: qsTr('Incoming message')
                 onClicked: checked = !checked
             }
@@ -248,7 +248,7 @@ Panel {
 
                 anchors.left: parent.left
                 anchors.right:  parent.right
-                checked: application.settings.outgoingMessageSound.length > 0
+                checked: appSettings.outgoingMessageSound.length > 0
                 text: qsTr('Outgoing message')
                 onClicked: checked = !checked
             }

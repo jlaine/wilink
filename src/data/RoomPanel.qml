@@ -127,7 +127,7 @@ Panel {
                     var re = new RegExp('@' + Utils.escapeRegExp(room.nickName) + '[,:]');
                     if (text.match(re) && rooms.currentJid != jid) {
                         // show notification
-                        if (application.settings.incomingMessageNotification) {
+                        if (appSettings.incomingMessageNotification) {
                             var handle = application.showMessage(Utils.jidToResource(jid), text, qsTranslate('RoomPanel', 'Show this room'));
                             if (handle) {
                                 handle.clicked.connect(function() {
@@ -141,7 +141,7 @@ Panel {
                         window.alert();
 
                         // play a sound
-                        application.soundPlayer.play(application.settings.incomingMessageSound);
+                        application.soundPlayer.play(appSettings.incomingMessageSound);
 
                         // add pending message
                         roomListModel.addPendingMessage(jid);
@@ -174,7 +174,7 @@ Panel {
             var text = chatInput.text;
             if (room.sendMessage(text)) {
                 chatInput.text = '';
-                application.soundPlayer.play(application.settings.outgoingMessageSound);
+                application.soundPlayer.play(appSettings.outgoingMessageSound);
             }
         }
     }

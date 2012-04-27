@@ -96,15 +96,15 @@ Item {
             else if (plugin.autoload != true && plugin.loaded != undefined)
                 enabledPlugins.push(plugin.source);
         }
-        application.settings.disabledPlugins = disabledPlugins;
-        application.settings.enabledPlugins = enabledPlugins;
+        appSettings.disabledPlugins = disabledPlugins;
+        appSettings.enabledPlugins = enabledPlugins;
     }
 
     function load() {
         for (var i = 0; i < pluginModel.count; i++) {
             var plugin = pluginModel.get(i);
-            if ((plugin.autoload && application.settings.disabledPlugins.indexOf(plugin.source) < 0)
-                || application.settings.enabledPlugins.indexOf(plugin.source)) {
+            if ((plugin.autoload && appSettings.disabledPlugins.indexOf(plugin.source) < 0)
+                || appSettings.enabledPlugins.indexOf(plugin.source)) {
                 loadPlugin(plugin.source);
             }
         }

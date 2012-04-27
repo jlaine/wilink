@@ -24,10 +24,10 @@ Panel {
 
     function save() {
         if (openAtLogin.enabled)
-            application.settings.openAtLogin = openAtLogin.checked;
-        application.settings.incomingMessageNotification = incomingMessageNotification.checked;
-        application.settings.showOfflineContacts = showOfflineContacts.checked;
-        application.settings.sortContactsByStatus = sortContactsByStatus.checked;
+            appSettings.openAtLogin = openAtLogin.checked;
+        appSettings.incomingMessageNotification = incomingMessageNotification.checked;
+        appSettings.showOfflineContacts = showOfflineContacts.checked;
+        appSettings.sortContactsByStatus = sortContactsByStatus.checked;
     }
 
     GroupBox {
@@ -45,7 +45,7 @@ Panel {
 
                 anchors.left: parent.left
                 anchors.right:  parent.right
-                checked: application.settings.openAtLogin
+                checked: appSettings.openAtLogin
                 enabled: application.isInstalled
                 text: qsTr('Open at login')
                 onClicked: checked = !checked
@@ -56,7 +56,7 @@ Panel {
 
                 anchors.left: parent.left
                 anchors.right:  parent.right
-                checked: application.settings.showOfflineContacts
+                checked: appSettings.showOfflineContacts
                 text: qsTr('Show offline contacts')
                 onClicked: checked = !checked
             }
@@ -66,7 +66,7 @@ Panel {
 
                 anchors.left: parent.left
                 anchors.right:  parent.right
-                checked: application.settings.sortContactsByStatus
+                checked: appSettings.sortContactsByStatus
                 text: qsTr('Sort contacts by status')
                 onClicked: checked = !checked
             }
@@ -76,7 +76,7 @@ Panel {
 
                 anchors.left: parent.left
                 anchors.right:  parent.right
-                checked: application.settings.incomingMessageNotification
+                checked: appSettings.incomingMessageNotification
                 text: qsTr('Show incoming message popup')
                 onClicked: checked = !checked
             }
