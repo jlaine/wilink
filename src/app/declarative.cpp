@@ -46,7 +46,6 @@
 #include "wallet.h"
 
 #include "accounts.h"
-#include "application.h"
 #include "idle/idle.h"
 #include "calls.h"
 #include "client.h"
