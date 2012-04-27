@@ -1,3 +1,9 @@
+if(UNIX)
+  if(NOT APPLE)
+    add_definitions(-fPIC)
+  endif(NOT APPLE)
+endif(UNIX)
+
 # mad support
 find_library(MAD_LIBRARY mad)
 if(MAD_LIBRARY)
