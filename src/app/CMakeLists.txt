@@ -24,28 +24,6 @@ if(QTMULTIMEDIAKIT_LIBRARY)
     include_directories(/usr/include/QtMultimediaKit)
 endif()
 
-if (APPLE)
-    list(APPEND wilink_LIBRARIES "-framework AppKit")
-
-    # Growl support
-    find_library(GROWL_LIBRARY Growl)
-    if(GROWL_LIBRARY)
-        message(STATUS "Found Growl library")
-        add_definitions(-DUSE_GROWL)
-        list(APPEND wilink_LIBRARIES ${GROWL_LIBRARY})
-    endif()
-elseif (UNIX)
-    # libnotify support
-    find_package(PkgConfig)
-    pkg_check_modules(LIBNOTIFY "libnotify")
-    if(LIBNOTIFY_FOUND)
-        message(STATUS "Found libnotify library")
-        include_directories(${LIBNOTIFY_INCLUDE_DIRS})
-        add_definitions(-DUSE_LIBNOTIFY)
-        list(APPEND wilink_LIBRARIES ${LIBNOTIFY_LIBRARIES})
-    endif()
-endif()
-
 # wiLink
 add_definitions(-DWILINK_VERSION="${WILINK_VERSION}")
 if(WILINK_EMBEDDED)
@@ -71,6 +49,7 @@ set(wiLink_SOURCES
     main.cpp
     model.cpp
     news.cpp
+    notifications.cpp
     photos.cpp
     phone.cpp
     phone/sip.cpp
@@ -87,7 +66,27 @@ set(wiLink_SOURCES
 
 if(APPLE)
     set(wiLink_SOURCES ${wiLink_SOURCES} application_mac.mm)
-endif(APPLE)
+    list(APPEND wilink_LIBRARIES "-framework AppKit")
+
+    # Growl support
+    find_library(GROWL_LIBRARY Growl)
+    if(GROWL_LIBRARY)
+        message(STATUS "Found Growl library")
+        add_definitions(-DUSE_GROWL)
+        list(APPEND wilink_LIBRARIES ${GROWL_LIBRARY})
+        list(APPEND wilink_SOURCES notifications_mac.mm)
+    endif()
+elseif (UNIX)
+    # libnotify support
+    find_package(PkgConfig)
+    pkg_check_modules(LIBNOTIFY "libnotify")
+    if(LIBNOTIFY_FOUND)
+        message(STATUS "Found libnotify library")
+        include_directories(${LIBNOTIFY_INCLUDE_DIRS})
+        add_definitions(-DUSE_LIBNOTIFY)
+        list(APPEND wilink_LIBRARIES ${LIBNOTIFY_LIBRARIES})
+    endif()
+endif()
 
 set(wiLink_MOC_HEADERS
     application.h
@@ -102,6 +101,7 @@ set(wiLink_MOC_HEADERS
     history.h
     model.h
     news.h
+    notifications.h
     photos.h
     phone.h
     phone/sip.h

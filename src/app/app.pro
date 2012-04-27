@@ -49,6 +49,7 @@ SOURCES += \
     main.cpp \
     model.cpp \
     news.cpp \
+    notifications.cpp \
     phone.cpp \
     phone/sip.cpp \
     photos.cpp \
@@ -76,6 +77,7 @@ HEADERS += \
     icons.h \
     model.h \
     news.h \
+    notifications.h \
     photos.h \
     phone.h \
     places.h \

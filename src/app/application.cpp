@@ -34,6 +34,7 @@
 
 #include "application.h"
 #include "declarative.h"
+#include "notifications.h"
 #include "settings.h"
 #include "systeminfo.h"
 

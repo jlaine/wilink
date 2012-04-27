@@ -53,6 +53,11 @@ FocusScope {
         loggingType: QXmppLogger.SignalLogging
     }
 
+    // Notifier for displaying desktop notifications.
+    Notifier {
+        id: appNotifier
+    }
+
     // Manager for loading and unloading plugins.
     //
     // The plugins contain the bulk of the application logic,

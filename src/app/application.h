@@ -32,18 +32,7 @@ class QSoundPlayer;
 
 class ApplicationPrivate;
 class ApplicationSettings;
-
-class Notification : public QObject
-{
-    Q_OBJECT
-
-public:
-    Notification(QObject *parent = 0) : QObject(parent)
-    {}
-
-signals:
-    void clicked();
-};
+class Notification;
 
 class Application : public QApplication
 {
