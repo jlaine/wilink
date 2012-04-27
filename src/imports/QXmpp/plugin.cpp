@@ -41,21 +41,21 @@ void QXmppPlugin::registerTypes(const char *uri)
     qDebug("register types");
 
     // QXmpp
-    qmlRegisterUncreatableType<QXmppClient>("QXmpp", 0, 4, "QXmppClient", "");
-    qmlRegisterUncreatableType<QXmppCall>("QXmpp", 0, 4, "QXmppCall", "");
-    qmlRegisterUncreatableType<QXmppCallManager>("QXmpp", 0, 4, "QXmppCallManager", "");
-    qmlRegisterType<QXmppDeclarativeDataForm>("QXmpp", 0, 4, "QXmppDataForm");
-    qmlRegisterUncreatableType<QXmppDiscoveryManager>("QXmpp", 0, 4, "QXmppDiscoveryManager", "");
-    qmlRegisterType<QXmppLogger>("QXmpp", 0, 4, "QXmppLogger");
-    qmlRegisterType<QXmppDeclarativeMessage>("QXmpp", 0, 4, "QXmppMessage");
-    qmlRegisterType<QXmppDeclarativeMucItem>("QXmpp", 0, 4, "QXmppMucItem");
-    qmlRegisterUncreatableType<QXmppMucManager>("QXmpp", 0, 4, "QXmppMucManager", "");
-    qmlRegisterUncreatableType<QXmppMucRoom>("QXmpp", 0, 4, "QXmppMucRoom", "");
-    qmlRegisterType<QXmppDeclarativePresence>("QXmpp", 0, 4, "QXmppPresence");
-    qmlRegisterUncreatableType<QXmppRosterManager>("QXmpp", 0, 4, "QXmppRosterManager", "");
-    qmlRegisterUncreatableType<QXmppRtpAudioChannel>("QXmpp", 0, 4, "QXmppRtpAudioChannel", "");
-    qmlRegisterUncreatableType<QXmppTransferJob>("QXmpp", 0, 4, "QXmppTransferJob", "");
-    qmlRegisterUncreatableType<QXmppTransferManager>("QXmpp", 0, 4, "QXmppTransferManager", "");
+    qmlRegisterUncreatableType<QXmppClient>(uri, 0, 4, "QXmppClient", "");
+    qmlRegisterUncreatableType<QXmppCall>(uri, 0, 4, "QXmppCall", "");
+    qmlRegisterUncreatableType<QXmppCallManager>(uri, 0, 4, "QXmppCallManager", "");
+    qmlRegisterType<QXmppDeclarativeDataForm>(uri, 0, 4, "QXmppDataForm");
+    qmlRegisterUncreatableType<QXmppDiscoveryManager>(uri, 0, 4, "QXmppDiscoveryManager", "");
+    qmlRegisterType<QXmppLogger>(uri, 0, 4, "QXmppLogger");
+    qmlRegisterType<QXmppDeclarativeMessage>(uri, 0, 4, "QXmppMessage");
+    qmlRegisterType<QXmppDeclarativeMucItem>(uri, 0, 4, "QXmppMucItem");
+    qmlRegisterUncreatableType<QXmppMucManager>(uri, 0, 4, "QXmppMucManager", "");
+    qmlRegisterUncreatableType<QXmppMucRoom>(uri, 0, 4, "QXmppMucRoom", "");
+    qmlRegisterType<QXmppDeclarativePresence>(uri, 0, 4, "QXmppPresence");
+    qmlRegisterUncreatableType<QXmppRosterManager>(uri, 0, 4, "QXmppRosterManager", "");
+    qmlRegisterUncreatableType<QXmppRtpAudioChannel>(uri, 0, 4, "QXmppRtpAudioChannel", "");
+    qmlRegisterUncreatableType<QXmppTransferJob>(uri, 0, 4, "QXmppTransferJob", "");
+    qmlRegisterUncreatableType<QXmppTransferManager>(uri, 0, 4, "QXmppTransferManager", "");
     qRegisterMetaType<QXmppVideoFrame>("QXmppVideoFrame");
 }
 
