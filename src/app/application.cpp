@@ -21,7 +21,6 @@
 #include <QUrl>
 
 #include "application.h"
-#include "systeminfo.h"
 
 Application *wApp = 0;
 
@@ -61,20 +60,6 @@ void Application::platformInit()
 {
 }
 #endif
-
-bool Application::isMobile() const
-{
-#ifdef WILINK_EMBEDDED
-    return true;
-#else
-    return false;
-#endif
-}
-
-QString Application::osType() const
-{
-    return SystemInfo::osType();
-}
 
 QUrl Application::resolvedUrl(const QUrl &url, const QUrl &base)
 {

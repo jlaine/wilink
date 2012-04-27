@@ -24,7 +24,7 @@ import wiLink 2.0
 FocusScope {
     id: root
 
-    focus: !application.isMobile
+    focus: !appSettings.isMobile
 
     // A model representing the user's accounts.
     AccountModel {
@@ -83,7 +83,7 @@ FocusScope {
 
     Style {
         id: appStyle
-        isMobile: application.isMobile
+        isMobile: appSettings.isMobile
     }
 
     // The application updater.
@@ -202,7 +202,7 @@ FocusScope {
     Component.onCompleted: {
         window.minimumWidth = 360;
         window.minimumHeight = 360;
-        window.fullScreen = application.isMobile && application.osType != 'android';
+        window.fullScreen = appSettings.isMobile && appSettings.osType != 'android';
         window.showAndRaise();
 
         application.showWindows.connect(function() {

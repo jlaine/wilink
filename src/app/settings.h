@@ -32,12 +32,15 @@ class ApplicationSettingsPrivate;
 class ApplicationSettings : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QString downloadsLocation READ downloadsLocation CONSTANT)
+    Q_PROPERTY(QUrl homeUrl READ homeUrl CONSTANT)
+    Q_PROPERTY(bool isMobile READ isMobile CONSTANT)
+    Q_PROPERTY(QString osType READ osType CONSTANT)
+
     Q_PROPERTY(QString audioInputDeviceName READ audioInputDeviceName WRITE setAudioInputDeviceName NOTIFY audioInputDeviceNameChanged)
     Q_PROPERTY(QString audioOutputDeviceName READ audioOutputDeviceName WRITE setAudioOutputDeviceName NOTIFY audioOutputDeviceNameChanged)
     Q_PROPERTY(QStringList disabledPlugins READ disabledPlugins WRITE setDisabledPlugins NOTIFY disabledPluginsChanged)
-    Q_PROPERTY(QString downloadsLocation READ downloadsLocation CONSTANT)
     Q_PROPERTY(QStringList enabledPlugins READ enabledPlugins WRITE setEnabledPlugins NOTIFY enabledPluginsChanged)
-    Q_PROPERTY(QUrl homeUrl READ homeUrl CONSTANT)
     Q_PROPERTY(bool incomingMessageNotification READ incomingMessageNotification WRITE setIncomingMessageNotification NOTIFY incomingMessageNotificationChanged)
     Q_PROPERTY(QString incomingMessageSound READ incomingMessageSound WRITE setIncomingMessageSound NOTIFY incomingMessageSoundChanged)
     Q_PROPERTY(bool openAtLogin READ openAtLogin WRITE setOpenAtLogin NOTIFY openAtLoginChanged)
@@ -52,6 +55,11 @@ class ApplicationSettings : public QObject
 public:
     ApplicationSettings(QObject *parent = 0);
 
+    QString downloadsLocation() const;
+    QUrl homeUrl() const;
+    bool isMobile() const;
+    QString osType() const;
+
     QString audioInputDeviceName() const;
     void setAudioInputDeviceName(const QString &name);
 
@@ -61,12 +69,8 @@ public:
     QStringList disabledPlugins() const;
     void setDisabledPlugins(const QStringList &plugins);
 
-    QString downloadsLocation() const;
-
     QStringList enabledPlugins() const;
     void setEnabledPlugins(const QStringList &plugins);
-
-    QUrl homeUrl() const;
 
     bool incomingMessageNotification() const;
     void setIncomingMessageNotification(bool notification);

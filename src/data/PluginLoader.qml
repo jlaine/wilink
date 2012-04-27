@@ -121,10 +121,10 @@ Item {
         pluginModel.append({ source: 'ChatPlugin.qml', autoload: true });
         pluginModel.append({ source: 'DebugPlugin.qml' });
         pluginModel.append({ source: 'DiagnosticPlugin.qml', autoload: true });
-        if (!application.isMobile)
+        if (!appSettings.isMobile)
             pluginModel.append({ source: 'PlayerPlugin.qml' });
         pluginModel.append({ source: 'NewsPlugin.qml', autolib: true });
-        if (!application.isMobile)
+        if (!appSettings.isMobile)
             pluginModel.append({ source: 'PhonePlugin.qml', autoload: true });
         pluginModel.append({ source: 'PhotoPlugin.qml', autoload: true });
         pluginModel.append({ source: 'SharePlugin.qml', autoload: true });

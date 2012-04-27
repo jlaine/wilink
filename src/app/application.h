@@ -30,8 +30,6 @@ class Application : public QApplication
     Q_PROPERTY(QString applicationName READ applicationName CONSTANT)
     Q_PROPERTY(QString applicationVersion READ applicationVersion CONSTANT)
     Q_PROPERTY(QString organizationName READ organizationName CONSTANT)
-    Q_PROPERTY(QString osType READ osType CONSTANT)
-    Q_PROPERTY(bool isMobile READ isMobile CONSTANT)
 
 public:
     Application(int &argc, char **argv);
@@ -39,9 +37,6 @@ public:
 
     static void alert(QWidget *widget);
     static void platformInit();
-
-    bool isMobile() const;
-    QString osType() const;
 
 signals:
     void showWindows();

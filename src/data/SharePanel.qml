@@ -54,7 +54,7 @@ Panel {
 
                 // run one-time configuration dialog
                 Component.onCompleted: {
-                    if (!appSettings.sharesConfigured && !application.isMobile) {
+                    if (!appSettings.sharesConfigured && !appSettings.isMobile) {
                         preferenceButton.clicked();
                         appSettings.sharesConfigured = true;
                     }

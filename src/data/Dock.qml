@@ -134,7 +134,7 @@ Rectangle {
             iconSource: 'image://icon/dock-close'
             iconPress: 'image://icon/close'
             text: qsTr('Quit')
-            visible: application.isMobile
+            visible: appStyle.isMobile
             onClicked: {
                 application.quit();
             }

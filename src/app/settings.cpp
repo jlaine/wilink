@@ -24,6 +24,7 @@
 #include <QTextStream>
 
 #include "settings.h"
+#include "systeminfo.h"
 
 #ifdef Q_OS_MAC
 extern bool qt_mac_execute_apple_script(const QString &script, AEDesc *ret);
@@ -62,6 +63,20 @@ ApplicationSettings::ApplicationSettings(QObject *parent)
         setOpenAtLogin(true);
 
     wSettings = this;
+}
+
+bool ApplicationSettings::isMobile() const
+{
+#ifdef WILINK_EMBEDDED
+    return true;
+#else
+    return false;
+#endif
+}
+
+QString ApplicationSettings::osType() const
+{
+    return SystemInfo::osType();
 }
 
 /** Returns the name of the audio input device.
@@ -263,7 +278,6 @@ void ApplicationSettings::setOpenAtLogin(bool run)
         emit openAtLoginChanged(run);
     }
 }
-
 
 /** Returns the sound to play for outgoing messages.
  */
