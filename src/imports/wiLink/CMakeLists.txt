@@ -6,12 +6,12 @@ set(QT_USE_QTWEBKIT 1)
 set(QT_USE_QTXML 1)
 include(${QT_USE_FILE})
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qnetio/src)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qsound/src)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp-extra/diagnostics)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp-extra/shares)
+#include_directories(${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../..)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../qnetio/src)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../qsound/src)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../qxmpp-extra/diagnostics)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../qxmpp-extra/shares)
 
 add_definitions(-DQT_PLUGIN)
 
@@ -103,81 +103,6 @@ set(plugin_MOC_HEADERS
     settings.h
     shares.h
     updater.h)
-
-configure_file(../translations/translations.qrc.cmake ${CMAKE_CURRENT_BINARY_DIR}/translations.qrc)
-if(RELOAD_TRANSLATIONS)
-    qt4_create_translation(QM_FILES
-        application.cpp
-        window.cpp
-        ../data/AboutDialog.qml
-        ../data/AccountAddPanel.qml
-        ../data/AccountListPanel.qml
-        ../data/AccountPasswordDialog.qml
-        ../data/AccountPreferencePanel.qml
-        ../data/CallNotification.qml
-        ../data/CallWidget.qml
-        ../data/ChatEdit.qml
-        ../data/ChatPanel.qml
-        ../data/ChatPlugin.qml
-        ../data/ContactAddDialog.qml
-        ../data/ContactAddNotification.qml
-        ../data/ContactRenameDialog.qml
-        ../data/ContactRemoveDialog.qml
-        ../data/ConversationPanel.qml
-        ../data/DebugPlugin.qml
-        ../data/DiagnosticPanel.qml
-        ../data/DiagnosticPlugin.qml
-        ../data/Dialog.qml
-        ../data/DiscoveryPanel.qml
-        ../data/Dock.qml
-        ../data/ErrorNotification.qml
-        ../data/FolderQueueView.qml
-        ../data/GeneralPreferencePanel.qml
-        ../data/HistoryView.qml
-        ../data/InputMenu.qml
-        ../data/LogPanel.qml
-        ../data/Main.qml
-        ../data/NewsDialog.qml
-        ../data/NewsPanel.qml
-        ../data/NewsPlugin.qml
-        ../data/PhoneContactDialog.qml
-        ../data/PhoneContactView.qml
-        ../data/PhoneHistoryView.qml
-        ../data/PhoneNotification.qml
-        ../data/PhonePanel.qml
-        ../data/PhonePlugin.qml
-        ../data/PhotoAlbumDialog.qml
-        ../data/PhotoDeleteDialog.qml
-        ../data/PhotoPanel.qml
-        ../data/PhotoPlugin.qml
-        ../data/PlayerPanel.qml
-        ../data/PlayerPlugin.qml
-        ../data/PluginPreferencePanel.qml
-        ../data/PreferenceDialog.qml
-        ../data/PreferenceModel.qml
-        ../data/RoomInviteDialog.qml
-        ../data/RoomInviteNotification.qml
-        ../data/RoomJoinDialog.qml
-        ../data/RoomKickDialog.qml
-        ../data/RoomPanel.qml
-        ../data/RoomParticipantView.qml
-        ../data/RoomPermissionDialog.qml
-        ../data/RoomSubjectDialog.qml
-        ../data/SetupDialog.qml
-        ../data/SharePanel.qml
-        ../data/SharePlugin.qml
-        ../data/SharePreferencePanel.qml
-        ../data/ShareView.qml
-        ../data/SoundPreferencePanel.qml
-        ../data/StatusBar.qml
-        ../data/TransferNotification.qml
-        ../data/TransferWidget.qml
-        ../data/WifirstPlugin.qml
-        ../translations/fr.ts)
-else(RELOAD_TRANSLATIONS)
-    qt4_add_translation(QM_FILES ../translations/fr.ts)
-endif(RELOAD_TRANSLATIONS)
-qt4_add_translation(QM_FILES ../translations/qt_fr.ts)
 
 qt4_wrap_cpp(plugin_MOC_SOURCES ${plugin_MOC_HEADERS})
 
