@@ -21,7 +21,7 @@
 #include <Foundation/NSAutoreleasePool.h>
 #include <Growl/Growl.h>
 
-#include "notifications_mac.h"
+#include "notifications_growl.h"
 
 static inline CFStringRef qstringToCFStringRef(const QString &string)
 {
