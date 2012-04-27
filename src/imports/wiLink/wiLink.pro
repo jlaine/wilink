@@ -1,23 +1,15 @@
-include(../../wilink.pri)
-include(../idle/idle.pri)
-include(../qnetio/qnetio.pri)
-include(../qsound/qsound.pri)
-include(../3rdparty/qdjango/qdjango.pri)
-include(../3rdparty/qxmpp/qxmpp.pri)
+include(../../../wilink.pri)
+include(../../qnetio/qnetio.pri)
+include(../../qsound/qsound.pri)
+include(../../3rdparty/qdjango/qdjango.pri)
+include(../../3rdparty/qxmpp/qxmpp.pri)
+
+TEMPLATE = lib
+CONFIG += qt plugin
 
 QT += declarative network sql xml
 
 TARGET = wiLink
-VERSION = $$WILINK_VERSION
-
-DEFINES += QT_STATICPLUGIN
-
-# workaround for QTBUG-19232
-symbian {
-    DEFINES += WILINK_VERSION=\"$${WILINK_VERSION}\"
-} else {
-    DEFINES += WILINK_VERSION=\\\"$${WILINK_VERSION}\\\"
-}
 
 # FIXME: this is a hack so that Q_OS_ANDROID is defined
 android {
@@ -33,10 +25,8 @@ android|symbian|contains(MEEGO_EDITION,harmattan) {
     DEFINES += WILINK_EMBEDDED
 }
 
-RESOURCES += ../data/wiLink.qrc
 SOURCES += \
     accounts.cpp \
-    application.cpp \
     calls.cpp \
     client.cpp \
     console.cpp \
@@ -46,7 +36,6 @@ SOURCES += \
     discovery.cpp \
     history.cpp \
     icons.cpp \
-    main.cpp \
     model.cpp \
     news.cpp \
     notifications.cpp \
@@ -60,12 +49,10 @@ SOURCES += \
     settings.cpp \
     shares.cpp \
     systeminfo.cpp \
-    updater.cpp \
-    window.cpp
+    updater.cpp
 
 HEADERS += \
     accounts.h \
-    application.h \
     calls.h \
     client.h \
     console.h \
@@ -89,8 +76,7 @@ HEADERS += \
     settings.h \
     shares.h \
     systeminfo.h \
-    updater.h \
-    window.h \
+    updater.h
 
 mac {
     SOURCES += application_mac.mm
@@ -103,9 +89,9 @@ INCLUDEPATH += \
     $$QNETIO_INCLUDE_DIR \
     $$QSOUND_INCLUDE_DIR \
     $$QXMPP_INCLUDEPATH \
-    ../3rdparty/qdjango/src/db \
-    ../qxmpp-extra/diagnostics \
-    ../qxmpp-extra/shares
+    ../../3rdparty/qdjango/src/db \
+    ../../qxmpp-extra/diagnostics \
+    ../../qxmpp-extra/shares
 
 LIBS += \
     -L../idle $$IDLE_LIBS \
