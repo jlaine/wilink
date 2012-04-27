@@ -195,25 +195,6 @@ void ApplicationSettings::setIncomingMessageSound(const QString &soundFile)
     }
 }
 
-/** Returns the last version of the application which was run.
- */
-QString ApplicationSettings::lastRunVersion() const
-{
-    return d->settings->value("LastRunVersion").toString();
-}
-
-/** Sets the last version of the application which was run.
- *
- * @param version
- */
-void ApplicationSettings::setLastRunVersion(const QString &version)
-{
-    if (version != lastRunVersion()) {
-        d->settings->setValue("LastRunVersion", version);
-        emit lastRunVersionChanged(version);
-    }
-}
-
 /** Returns whether the application should be run at login.
  */
 bool ApplicationSettings::openAtLogin() const

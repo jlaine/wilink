@@ -24,18 +24,12 @@
 #endif
 #endif
 
-#include <QDesktopServices>
-#include <QDesktopWidget>
-#include <QDir>
-#include <QFileInfo>
 #include <QMenu>
-#include <QSettings>
 #include <QSslSocket>
 #include <QSystemTrayIcon>
 #include <QThread>
 #include <QUrl>
 
-#include "wallet.h"
 #include "QSoundPlayer.h"
 
 #include "application.h"
@@ -100,15 +94,6 @@ Application::Application(int &argc, char **argv)
     d->appSettings = new ApplicationSettings(this);
     if (d->appSettings->openAtLogin())
         d->appSettings->setOpenAtLogin(true);
-
-    // initialise cache
-    const QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
-    QDir().mkpath(dataPath);
-    const QString lastRunVersion = d->appSettings->lastRunVersion();
-    d->appSettings->setLastRunVersion(WILINK_VERSION);
-
-    // FIXME: register URL handler
-    //QDesktopServices::setUrlHandler("xmpp", this, "openUrl");
 
     // initialise sound player
     d->soundThread = new QThread(this);
@@ -227,24 +212,6 @@ QString Application::osType() const
 {
     return SystemInfo::osType();
 }
-
-#if 0
-/** Open an XMPP URI using the appropriate account.
- *
- * @param url
- */
-void Application::openUrl(const QUrl &url)
-{
-    foreach (Window *chat, d->chats)
-    {
-        if (chat->client()->configuration().jidBare() == url.authority()) {
-            QUrl simpleUrl = url;
-            simpleUrl.setAuthority(QString());
-            chat->openUrl(url);
-        }
-    }
-}
-#endif
 
 ApplicationSettings* Application::settings() const
 {

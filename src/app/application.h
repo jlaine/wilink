@@ -22,9 +22,7 @@
 
 #include <QApplication>
 #include <QString>
-#include <QStringList>
 #include <QUrl>
-#include <QVariant>
 
 #ifdef USE_SYSTRAY
 #include <QSystemTrayIcon>
@@ -34,7 +32,6 @@ class QSoundPlayer;
 
 class ApplicationPrivate;
 class ApplicationSettings;
-class ApplicationSettingsPrivate;
 
 class Notification : public QObject
 {

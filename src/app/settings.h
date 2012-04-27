@@ -40,7 +40,6 @@ class ApplicationSettings : public QObject
     Q_PROPERTY(QUrl homeUrl READ homeUrl CONSTANT)
     Q_PROPERTY(bool incomingMessageNotification READ incomingMessageNotification WRITE setIncomingMessageNotification NOTIFY incomingMessageNotificationChanged)
     Q_PROPERTY(QString incomingMessageSound READ incomingMessageSound WRITE setIncomingMessageSound NOTIFY incomingMessageSoundChanged)
-    Q_PROPERTY(QString lastRunVersion READ lastRunVersion WRITE setLastRunVersion NOTIFY lastRunVersionChanged)
     Q_PROPERTY(bool openAtLogin READ openAtLogin WRITE setOpenAtLogin NOTIFY openAtLoginChanged)
     Q_PROPERTY(QString outgoingMessageSound READ outgoingMessageSound WRITE setOutgoingMessageSound NOTIFY outgoingMessageSoundChanged)
     Q_PROPERTY(bool sharesConfigured READ sharesConfigured WRITE setSharesConfigured NOTIFY sharesConfiguredChanged)
@@ -75,9 +74,6 @@ public:
     QString incomingMessageSound() const;
     void setIncomingMessageSound(const QString &soundFile);
 
-    QString lastRunVersion() const;
-    void setLastRunVersion(const QString &version);
-
     bool openAtLogin() const;
     void setOpenAtLogin(bool run);
 
@@ -108,7 +104,6 @@ signals:
     void enabledPluginsChanged(const QStringList &plugins);
     void incomingMessageNotificationChanged(bool notification);
     void incomingMessageSoundChanged(const QString &sound);
-    void lastRunVersionChanged(const QString &version);
     void openAtLoginChanged(bool run);
     void outgoingMessageSoundChanged(const QString &sound);
     void sharesConfiguredChanged(bool configured);

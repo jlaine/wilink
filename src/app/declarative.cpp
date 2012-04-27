@@ -162,7 +162,11 @@ public:
 
 NetworkAccessManagerFactory::NetworkAccessManagerFactory()
 {
+    // initialise cache
     const QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+    QDir().mkpath(dataPath);
+
+    // initialise wallet
     QNetIO::Wallet::setDataPath(QDir(dataPath).filePath("wallet"));
 }
 
