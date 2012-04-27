@@ -2,10 +2,9 @@ TEMPLATE = subdirs
 
 SUBDIRS = \
     3rdparty \
-    idle \
     qnetio \
     qsound \
     qxmpp-extra
 
-SUBDIRS += app
+SUBDIRS += app imports
 CONFIG += ordered

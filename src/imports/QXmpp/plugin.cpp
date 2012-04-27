@@ -20,12 +20,6 @@
 #include <QCoreApplication>
 #include <QDeclarativeItem>
 #include <QDeclarativeEngine>
-#include <QDesktopServices>
-#include <QMimeData>
-#include <QNetworkDiskCache>
-#include <QNetworkRequest>
-#include <QProcess>
-#include <QSslError>
 
 #ifdef Q_OS_WIN
 #include <windows.h>
