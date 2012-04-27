@@ -342,7 +342,7 @@ void Plugin::registerTypes(const char *uri)
 
     // wiLink
     qmlRegisterType<AccountModel>(uri, 2, 0, "AccountModel");
-    qmlRegisterUncreatableType<ApplicationSettings>(uri, 2, 0, "ApplicationSettings", "");
+    qmlRegisterType<ApplicationSettings>(uri, 2, 0, "ApplicationSettings");
     qmlRegisterType<CallAudioHelper>(uri, 2, 0, "CallAudioHelper");
     qmlRegisterType<CallVideoHelper>(uri, 2, 0, "CallVideoHelper");
     qmlRegisterType<CallVideoItem>(uri, 2, 0, "CallVideoItem");

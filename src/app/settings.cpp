@@ -58,6 +58,9 @@ ApplicationSettings::ApplicationSettings(QObject *parent)
 {
     d->settings = new QSettings(this);
 
+    if (openAtLogin())
+        setOpenAtLogin(true);
+
     wSettings = this;
 }
 

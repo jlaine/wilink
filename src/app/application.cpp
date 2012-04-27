@@ -18,11 +18,9 @@
  */
 
 #include <QSslSocket>
-#include <QThread>
 #include <QUrl>
 
 #include "application.h"
-#include "settings.h"
 #include "systeminfo.h"
 
 Application *wApp = 0;
@@ -44,11 +42,6 @@ Application::Application(int &argc, char **argv)
 #ifndef Q_OS_MAC
     setWindowIcon(QIcon(":/32x32/wiLink.png"));
 #endif
-
-    // initialise settings
-    ApplicationSettings *appSettings = new ApplicationSettings(this);
-    if (appSettings->openAtLogin())
-        appSettings->setOpenAtLogin(true);
 
     // add SSL root CA for wifirst.net and download.wifirst.net
     QSslSocket::addDefaultCaCertificates(":/UTN_USERFirst_Hardware_Root_CA.pem");

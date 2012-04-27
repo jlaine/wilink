@@ -70,6 +70,10 @@ FocusScope {
         id: appPreferences
     }
 
+    ApplicationSettings {
+        id: appSettings
+    }
+
     SoundPlayer {
         id: appSoundPlayer
 
