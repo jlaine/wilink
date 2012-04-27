@@ -126,22 +126,20 @@ QFileDialog *Notifier::fileDialog()
 
 Notification *Notifier::showMessage(const QString &title, const QString &message, const QString &action)
 {
-    if (d->backend)
+    if (d->backend) {
         return d->backend->showMessage(title, message, action);
-    else
-        return 0;
-
-#if defined(USE_SYSTRAYZ)
-    if (d->trayIcon)
-    {
+#if defined(USE_SYSTRAY)
+    } else if (d->trayIcon) {
         handle = new Notification(this);
         if (d->trayNotification)
             delete d->trayNotification;
         d->trayNotification = handle;
         d->trayIcon->showMessage(title, message);
         return handle;
-    }
 #endif
+    } else {
+        return 0;
+    }
 }
 
 #ifdef USE_SYSTRAY

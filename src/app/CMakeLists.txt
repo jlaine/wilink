@@ -7,7 +7,7 @@ set(QT_USE_QTXML 1)
 include(${QT_USE_FILE})
 
 # Libraries
-set(app_LIBRARIES ${QT_QTGUI_LIBRARY} ${QT_QTDECLARATIVE_LIBRARY} ${QT_QTWEBKIT_LIBRARY})
+set(app_LIBRARIES ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTDECLARATIVE_LIBRARY} ${QT_QTNETWORK_LIBRARY} ${QT_QTWEBKIT_LIBRARY})
 
 find_library(QTMULTIMEDIAKIT_LIBRARY QtMultimediaKit)
 if(QTMULTIMEDIAKIT_LIBRARY)
@@ -118,7 +118,7 @@ if(WIN32)
 endif(WIN32)
 
 add_executable(wiLink ${app_SOURCES} ${app_MOC_SOURCES} ${RCC_SOURCES} ${WILINK_RESOURCE})
-target_link_libraries(wiLink qmlwilinkplugin ${app_LIBRARIES})
+target_link_libraries(wiLink ${app_LIBRARIES})
 
 if(APPLE)
     get_filename_component(BUNDLE_ICON_NAME ${CPACK_BUNDLE_ICON} NAME_WE)

@@ -33,7 +33,7 @@
 #include "settings.h"
 #include "shares.h"
 
-Q_IMPORT_PLUGIN(share_filesystem)
+//Q_IMPORT_PLUGIN(share_filesystem)
 
 Q_GLOBAL_STATIC(ShareWatcher, theShareWatcher);
 

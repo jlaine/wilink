@@ -13,8 +13,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qsound/src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp-extra/diagnostics)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../qxmpp-extra/shares)
 
-# Libraries
-set(app_LIBRARIES ${QT_QTGUI_LIBRARY} ${QT_QTDECLARATIVE_LIBRARY} ${QT_QTWEBKIT_LIBRARY})
+add_definitions(-DQT_PLUGIN)
 
 # Needed for Qt >= 4.7 on Debian/Ubuntu
 find_library(QTMULTIMEDIAKIT_LIBRARY QtMultimediaKit)
@@ -30,10 +29,6 @@ endif()
 if(NOT APPLE)
     add_definitions(-DUSE_SYSTRAY)
 endif(NOT APPLE)
-
-set(app_SOURCES application.cpp main.cpp window.cpp)
-set(app_MOC_HEADERS application.h window.h)
-qt4_wrap_cpp(app_MOC_SOURCES ${app_MOC_HEADERS})
 
 set(plugin_SOURCES
     accounts.cpp
@@ -63,9 +58,6 @@ set(plugin_SOURCES
     updater.cpp)
 
 if(APPLE)
-    list(APPEND app_SOURCES application_mac.mm)
-    list(APPEND app_LIBRARIES "-framework AppKit")
-
     # Growl support
     find_library(GROWL_LIBRARY Growl)
     if(GROWL_LIBRARY)
@@ -189,7 +181,7 @@ qt4_add_translation(QM_FILES ../translations/qt_fr.ts)
 
 qt4_wrap_cpp(plugin_MOC_SOURCES ${plugin_MOC_HEADERS})
 
-add_library(qmlwilinkplugin STATIC ${plugin_SOURCES} ${plugin_MOC_SOURCES})
+add_library(qmlwilinkplugin SHARED ${plugin_SOURCES} ${plugin_MOC_SOURCES})
 target_link_libraries(qmlwilinkplugin ${QT_LIBRARIES})
 target_link_libraries(qmlwilinkplugin idle qnetio ${QXMPP_LIBRARIES} qxmpp-extra ${QDJANGO_LIBRARIES} qsound ${plugin_LIBRARIES} ${QT_QTDECLARATIVE_LIBRARY})
 

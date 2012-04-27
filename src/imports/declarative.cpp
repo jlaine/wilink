@@ -373,3 +373,5 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterUncreatableType<QFileDialog>(uri, 2, 0, "QFileDialog", "");
     qmlRegisterType<QDeclarativeSortFilterProxyModel>(uri, 2, 0, "SortFilterProxyModel");
 }
+
+Q_EXPORT_PLUGIN2(qmlwilinkplugin, Plugin);
