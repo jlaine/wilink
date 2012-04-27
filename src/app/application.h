@@ -68,8 +68,6 @@ public:
     void createSystemTrayIcon();
     QSoundPlayer *soundPlayer();
 
-    QString executablePath() const;
-
     bool isMobile() const;
     QString osType() const;
 

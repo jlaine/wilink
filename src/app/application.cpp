@@ -214,20 +214,6 @@ void Application::createSystemTrayIcon()
 #endif
 }
 
-QString Application::executablePath() const
-{
-#ifdef Q_OS_MAC
-    const QString macDir("/Contents/MacOS");
-    const QString appDir = applicationDirPath();
-    if (appDir.endsWith(macDir))
-        return appDir.left(appDir.size() - macDir.size());
-#endif
-#ifdef Q_OS_WIN
-    return applicationFilePath().replace("/", "\\");
-#endif
-    return applicationFilePath();
-}
-
 bool Application::isMobile() const
 {
 #ifdef WILINK_EMBEDDED

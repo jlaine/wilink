@@ -17,12 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QCoreApplication>
 #include <QDesktopServices>
 #include <QDir>
 #include <QSettings>
 #include <QTextStream>
 
-#include "application.h"
 #include "settings.h"
 
 #ifdef Q_OS_MAC
@@ -32,8 +32,23 @@ extern bool qt_mac_execute_apple_script(const QString &script, AEDesc *ret);
 class ApplicationSettingsPrivate
 {
 public:
+    QString executablePath() const;
     QSettings *settings;
 };
+
+QString ApplicationSettingsPrivate::executablePath() const
+{
+#ifdef Q_OS_MAC
+    const QString macDir("/Contents/MacOS");
+    const QString appDir = qApp->applicationDirPath();
+    if (appDir.endsWith(macDir))
+        return appDir.left(appDir.size() - macDir.size());
+#endif
+#ifdef Q_OS_WIN
+    return qApp->applicationFilePath().replace("/", "\\");
+#endif
+    return qApp->applicationFilePath();
+}
 
 ApplicationSettings::ApplicationSettings(QObject *parent)
     : QObject(parent),
@@ -213,7 +228,7 @@ bool ApplicationSettings::openAtLogin() const
 void ApplicationSettings::setOpenAtLogin(bool run)
 {
     const QString appName = qApp->applicationName();
-    const QString appPath = wApp->executablePath();
+    const QString appPath = d->executablePath();
 #if defined(Q_OS_MAC)
     QString script = run ?
         QString("tell application \"System Events\"\n"
