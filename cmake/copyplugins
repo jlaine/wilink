@@ -41,7 +41,6 @@ fix_deps() {
     dst=$1
     filter=`basename $dst`
     for dep in `otool -L $dst | grep -v $filter | grep -v /usr/lib | grep -v @executable_path | grep -v /System/Library | cut -d" " -f1`; do
-        echo $dep
         dep_name=`echo $dep | sed -e 's/.*\/lib\///'`
         dep_id="@executable_path/../Frameworks/$dep_name"
         install_name_tool -change $dep $dep_id $dst
@@ -84,6 +83,15 @@ for import in $IMPORTS; do
     cp -a $src $dst
     fix_deps $dst/*.dylib
 done
+
+mkdir -p $DEPLOY_IMPORTS/QXmpp
+cp ../imports/QXmpp/*.dylib $DEPLOY_IMPORTS/QXmpp
+echo "plugin qmlqxmppplugin" > $DEPLOY_IMPORTS/QXmpp/qmldir
+fix_deps $DEPLOY_IMPORTS/QXmpp/*.dylib
+
+mkdir -p $DEPLOY_IMPORTS/wiLink
+cp ../imports/wiLink/*.dylib $DEPLOY_IMPORTS/wiLink
+echo "plugin qmlwilinkplugin" > $DEPLOY_IMPORTS/wiLink/qmldir
 fix_deps $DEPLOY_IMPORTS/wiLink/*.dylib
 
 # copy plugins
