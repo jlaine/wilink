@@ -310,6 +310,8 @@ void Plugin::initializeEngine(QDeclarativeEngine *engine, const char *uri)
 
 void Plugin::registerTypes(const char *uri)
 {
+    qDebug("register types");
+
     // QXmpp
     qmlRegisterUncreatableType<QXmppClient>("QXmpp", 0, 4, "QXmppClient", "");
     qmlRegisterUncreatableType<QXmppCall>("QXmpp", 0, 4, "QXmppCall", "");
