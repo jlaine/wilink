@@ -26,6 +26,7 @@ public:
     Notification *showMessage(const QString &title, const QString &message, const QString &action);
 
 private:
+    bool libnotify_accepts_actions;
     Notifier *q;
 };
 

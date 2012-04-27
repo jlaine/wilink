@@ -17,23 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "notifications_libnotify.h"
-
 #include <libnotify/notify.h>
 #ifndef NOTIFY_CHECK_VERSION
 #define NOTIFY_CHECK_VERSION(x,y,z) 0
 #endif
 
-class NotifierBackendLibnotify : public NotifierPrivate
-{
-public:
-    NotifierBackendLibnotify(Notifier *qq);
-    Notification *showMessage(const QString &title, const QString &message, const QString &action);
+#include <QCoreApplication>
 
-private:
-    bool libnotify_accepts_actions;
-    Notifier *q;
-};
+#include "notifications_libnotify.h"
 
 NotifierBackendLibnotify::NotifierBackendLibnotify(Notifier *qq)
     : libnotify_accepts_actions(false)
