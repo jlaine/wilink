@@ -128,7 +128,7 @@ Panel {
                     if (text.match(re) && rooms.currentJid != jid) {
                         // show notification
                         if (appSettings.incomingMessageNotification) {
-                            var handle = application.showMessage(Utils.jidToResource(jid), text, qsTranslate('RoomPanel', 'Show this room'));
+                            var handle = appNotifier.showMessage(Utils.jidToResource(jid), text, qsTranslate('RoomPanel', 'Show this room'));
                             if (handle) {
                                 handle.clicked.connect(function() {
                                     window.showAndRaise();

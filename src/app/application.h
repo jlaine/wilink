@@ -32,7 +32,6 @@ class QSoundPlayer;
 
 class ApplicationPrivate;
 class ApplicationSettings;
-class Notification;
 
 class Application : public QApplication
 {
@@ -61,7 +60,6 @@ signals:
 
 public slots:
     QUrl resolvedUrl(const QUrl &url, const QUrl &base);
-    Notification *showMessage(const QString &title, const QString &message, const QString &action);
 
 private slots:
 #ifdef USE_SYSTRAY

@@ -190,7 +190,7 @@ Panel {
                 if (contacts.currentJid != jid) {
                     // show notification
                     if (appSettings.incomingMessageNotification) {
-                        var handle = application.showMessage(vcard.name, text, qsTranslate('ConversationPanel', 'Show this conversation'));
+                        var handle = applNotifier.showMessage(vcard.name, text, qsTranslate('ConversationPanel', 'Show this conversation'));
                         if (handle) {
                             handle.clicked.connect(function() {
                                 window.showAndRaise();

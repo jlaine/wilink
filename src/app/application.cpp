@@ -17,13 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef USE_LIBNOTIFY
-#include <libnotify/notify.h>
-#ifndef NOTIFY_CHECK_VERSION
-#define NOTIFY_CHECK_VERSION(x,y,z) 0
-#endif
-#endif
-
 #include <QMenu>
 #include <QSslSocket>
 #include <QSystemTrayIcon>
@@ -34,7 +27,6 @@
 
 #include "application.h"
 #include "declarative.h"
-#include "notifications.h"
 #include "settings.h"
 #include "systeminfo.h"
 
@@ -48,9 +40,6 @@ public:
     ApplicationSettings *appSettings;
     QSoundPlayer *soundPlayer;
     QThread *soundThread;
-#ifdef USE_LIBNOTIFY
-    bool libnotify_accepts_actions;
-#endif
 #ifdef USE_SYSTRAY
     QSystemTrayIcon *trayIcon;
     QMenu *trayMenu;
@@ -60,9 +49,6 @@ public:
 
 ApplicationPrivate::ApplicationPrivate()
     : appSettings(0)
-#ifdef USE_LIBNOTIFY
-    , libnotify_accepts_actions(0)
-#endif
 #ifdef USE_SYSTRAY
     , trayIcon(0)
     , trayMenu(0)
@@ -221,81 +207,6 @@ QUrl Application::resolvedUrl(const QUrl &url, const QUrl &base)
 QSoundPlayer *Application::soundPlayer()
 {
     return d->soundPlayer;
-}
-
-#ifdef USE_LIBNOTIFY
-static void notificationClicked(NotifyNotification *notification, char *action, gpointer data)
-{
-    if(g_strcmp0(action, "show-conversation") == 0)
-    {
-        Notification *handle = static_cast<Notification*>(data);
-        QMetaObject::invokeMethod(handle, "clicked");
-        notify_notification_close(notification, NULL);
-    }
-}
-
-static void notificationClosed(NotifyNotification *notification)
-{
-    if(notification)
-    {
-        g_object_unref(G_OBJECT(notification));
-    }
-}
-#endif
-
-Notification *Application::showMessage(const QString &title, const QString &message, const QString &action)
-{
-    Notification *handle = 0;
-
-#if defined(USE_LIBNOTIFY)
-    NotifyNotification *notification = notify_notification_new((const char *)title.toUtf8(),
-                                                               (const char *)message.toUtf8(),
-#if !NOTIFY_CHECK_VERSION(0, 7, 0)
-                                                               NULL,
-#endif
-                                                               NULL);
-
-    if( !notification ) {
-        qWarning("Failed to create notification");
-        return 0;
-    }
-
-    // Set timeout
-    notify_notification_set_timeout(notification, NOTIFY_EXPIRES_DEFAULT);
-
-    // set action handled when notification is closed
-    g_signal_connect(notification, "closed", G_CALLBACK(notificationClosed), NULL);
-
-    // Set callback if supported
-    if(d->libnotify_accepts_actions) {
-        handle = new Notification(this);
-        notify_notification_add_action(notification,
-                                       "show-conversation",
-                                       action.toUtf8(),
-                                       (NotifyActionCallback) &notificationClicked,
-                                       handle,
-                                       FALSE);
-    }
-
-    // Schedule notification for showing
-    if (!notify_notification_show(notification, NULL))
-        qDebug("Failed to send notification");
-
-#elif defined(USE_SYSTRAY)
-    if (d->trayIcon)
-    {
-        handle = new Notification(this);
-        if (d->trayNotification)
-            delete d->trayNotification;
-        d->trayNotification = handle;
-        d->trayIcon->showMessage(title, message);
-    }
-#else
-    Q_UNUSED(title);
-    Q_UNUSED(message);
-    Q_UNUSED(action);
-#endif
-    return handle;
 }
 
 #ifdef USE_SYSTRAY
