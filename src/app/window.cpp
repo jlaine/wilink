@@ -155,12 +155,6 @@ void Window::changeEvent(QEvent *event)
         emit windowStateChanged();
 }
 
-QFileDialog *Window::fileDialog()
-{
-    QFileDialog *dialog = new QDeclarativeFileDialog(this);
-    return dialog;
-}
-
 void Window::setFullScreen(bool fullScreen)
 {
     if (fullScreen)

@@ -20,12 +20,26 @@
 #ifndef __NOTIFIER_H__
 #define __NOTIFIER_H__
 
-#include <QObject>
+#include <QFileDialog>
 #ifdef USE_SYSTRAY
 #include <QSystemTrayIcon>
 #endif
 
 class NotifierPrivate;
+
+class QDeclarativeFileDialog : public QFileDialog
+{
+    Q_OBJECT
+    Q_PROPERTY(QString directory READ directory WRITE setDirectory)
+    Q_PROPERTY(QStringList nameFilters READ nameFilters WRITE setNameFilters)
+    Q_PROPERTY(QStringList selectedFiles READ selectedFiles)
+
+public:
+    QDeclarativeFileDialog(QWidget *parent = 0) : QFileDialog(parent) {}
+
+    QString directory() const;
+    void setDirectory(const QString &directory);
+};
 
 class Notification : public QObject
 {
@@ -54,6 +68,7 @@ public:
     ~Notifier();
 
 public slots:
+    QFileDialog *fileDialog();
     Notification *showMessage(const QString &title, const QString &message, const QString &action);
 
 private slots:

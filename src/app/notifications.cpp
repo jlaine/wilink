@@ -29,6 +29,19 @@
 #include <QMenu>
 #include <QSystemTrayIcon>
 
+#include "declarative.h"
+
+QString QDeclarativeFileDialog::directory() const
+{
+    return QFileDialog::directory().path();
+}
+
+void QDeclarativeFileDialog::setDirectory(const QString &directory)
+{
+    QFileDialog::setDirectory(QDir(directory));
+}
+
+
 class NotifierPrivate
 {
 public:
@@ -103,6 +116,12 @@ Notifier::~Notifier()
     if (d->backend)
         delete d->backend;
     delete d;
+}
+
+QFileDialog *Notifier::fileDialog()
+{
+    QFileDialog *dialog = new QDeclarativeFileDialog(0);
+    return dialog;
 }
 
 Notification *Notifier::showMessage(const QString &title, const QString &message, const QString &action)

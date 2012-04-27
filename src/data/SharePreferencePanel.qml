@@ -290,7 +290,7 @@ Panel {
                     iconSource: 'image://icon/album'
 
                     onClicked: {
-                        var dialog = window.fileDialog();
+                        var dialog = appNotifier.fileDialog();
                         dialog.directory = appSettings.sharesLocation;
                         dialog.fileMode = QFileDialog.Directory;
                         dialog.options = QFileDialog.ShowDirsOnly;

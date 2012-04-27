@@ -103,7 +103,7 @@ Panel {
                 visible: vcard.features & VCard.FileTransferFeature
 
                 onClicked: {
-                    var dialog = window.fileDialog();
+                    var dialog = appNotifier.fileDialog();
                     dialog.windowTitle = qsTr('Send a file');
                     dialog.fileMode = QFileDialog.ExistingFile;
                     if (dialog.exec()) {

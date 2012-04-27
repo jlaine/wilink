@@ -31,20 +31,6 @@
 #include "QXmppMessage.h"
 #include "QXmppPresence.h"
 
-class QDeclarativeFileDialog : public QFileDialog
-{
-    Q_OBJECT
-    Q_PROPERTY(QString directory READ directory WRITE setDirectory)
-    Q_PROPERTY(QStringList nameFilters READ nameFilters WRITE setNameFilters)
-    Q_PROPERTY(QStringList selectedFiles READ selectedFiles)
-
-public:
-    QDeclarativeFileDialog(QWidget *parent = 0) : QFileDialog(parent) {}
-
-    QString directory() const;
-    void setDirectory(const QString &directory);
-};
-
 class QDeclarativeSortFilterProxyModel : public QSortFilterProxyModel
 {
     Q_OBJECT

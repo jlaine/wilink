@@ -55,7 +55,7 @@ Panel {
                 visible: panel.state == ''
 
                 onClicked: {
-                    var dialog = window.fileDialog();
+                    var dialog = appNotifier.fileDialog();
                     dialog.fileMode = QFileDialog.ExistingFiles;
                     dialog.nameFilters = [qsTr("Image files") + " (*.jpg *.jpeg *.png *.gif)",
                                           qsTr("All files") +" (*)"];

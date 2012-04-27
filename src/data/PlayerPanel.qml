@@ -141,7 +141,7 @@ Panel {
                 text: qsTr('Add')
 
                 onClicked: {
-                    var dialog = window.fileDialog();
+                    var dialog = appNotifier.fileDialog();
                     dialog.fileMode = QFileDialog.ExistingFiles;
                     dialog.nameFilters = [qsTr("Sound files") + " (*.mp3 *.ogg *.wav)",
                                           qsTr("All files") +" (*)"];
