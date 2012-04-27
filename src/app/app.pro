@@ -5,8 +5,6 @@ QT += declarative network sql xml
 TARGET = wiLink
 VERSION = $$WILINK_VERSION
 
-DEFINES += QT_STATICPLUGIN
-
 # workaround for QTBUG-19232
 symbian {
     DEFINES += WILINK_VERSION=\"$${WILINK_VERSION}\"
@@ -43,23 +41,7 @@ mac {
     LIBS += -framework AppKit
 }
 
-INCLUDEPATH += \
-    $$WILINK_INCLUDE_DIR \
-    $$IDLE_INCLUDE_DIR \
-    $$QNETIO_INCLUDE_DIR \
-    $$QSOUND_INCLUDE_DIR \
-    $$QXMPP_INCLUDEPATH \
-    ../3rdparty/qdjango/src/db \
-    ../qxmpp-extra/diagnostics \
-    ../qxmpp-extra/shares
-
-LIBS += \
-    -L../idle $$IDLE_LIBS \
-    -L../qnetio/src $$QNETIO_LIBS \
-    -L../qsound/src $$QSOUND_LIBS \
-    -L../3rdparty/qxmpp/src $$QXMPP_LIBS \
-    -L../qxmpp-extra -lqxmpp-extra \
-    -L../3rdparty/qdjango/src/db $$QDJANGO_DB_LIBS
+INCLUDEPATH += $$WILINK_INCLUDE_DIR
 
 # Installation
 QMAKE_TARGET_COMPANY="Wifirst"
