@@ -25,7 +25,6 @@
 #include <QUrl>
 #include <QVariant>
 
-class ApplicationSettings;
 class ApplicationSettingsPrivate;
 
 /** The ApplicationSettings class represents the Application's settings.
