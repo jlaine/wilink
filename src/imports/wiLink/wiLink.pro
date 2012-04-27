@@ -94,12 +94,11 @@ INCLUDEPATH += \
     ../../qxmpp-extra/shares
 
 LIBS += \
-    -L../idle $$IDLE_LIBS \
-    -L../qnetio/src $$QNETIO_LIBS \
-    -L../qsound/src $$QSOUND_LIBS \
-    -L../3rdparty/qxmpp/src $$QXMPP_LIBS \
-    -L../qxmpp-extra -lqxmpp-extra \
-    -L../3rdparty/qdjango/src/db $$QDJANGO_DB_LIBS
+    -L../../qnetio/src $$QNETIO_LIBS \
+    -L../../qsound/src $$QSOUND_LIBS \
+    -L../../3rdparty/qxmpp/src $$QXMPP_LIBS \
+    -L../../qxmpp-extra -lqxmpp-extra \
+    -L../../3rdparty/qdjango/src/db $$QDJANGO_DB_LIBS
 
 # Installation
 QMAKE_TARGET_COMPANY="Wifirst"
