@@ -60,8 +60,10 @@ static inline CFStringRef qstringToCFStringRef(const QString &string)
 NotifierBackendGrowl::NotifierBackendGrowl(Notifier *qq)
     : q(qq)
 {
+    NSAutoreleasePool *autoreleasepool = [[NSAutoreleasePool alloc] init];
     GrowlController *growlDelegate = [[GrowlController alloc] init];
     [GrowlApplicationBridge setGrowlDelegate:growlDelegate];
+    [autoreleasepool release];
 }
 
 Notification *NotifierBackendGrowl::showMessage(const QString &title, const QString &message, const QString &action)
