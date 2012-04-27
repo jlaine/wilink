@@ -202,8 +202,12 @@ if(WIN32)
     set(WILINK_RESOURCE wiLink.rc)
 endif(WIN32)
 
-add_executable(wiLink ${app_SOURCES} ${app_MOC_SOURCES} ${plugin_SOURCES} ${plugin_MOC_SOURCES} ${RCC_SOURCES} ${WILINK_RESOURCE})
-target_link_libraries(wiLink idle qnetio ${QXMPP_LIBRARIES} qxmpp-extra ${QDJANGO_LIBRARIES} qsound ${app_LIBRARIES} ${plugin_LIBRARIES})
+add_library(qmlwilinkplugin STATIC ${plugin_SOURCES} ${plugin_MOC_SOURCES})
+target_link_libraries(qmlwilinkplugin ${QT_LIBRARIES})
+target_link_libraries(qmlwilinkplugin idle qnetio ${QXMPP_LIBRARIES} qxmpp-extra ${QDJANGO_LIBRARIES} qsound ${plugin_LIBRARIES} ${QT_QTDECLARATIVE_LIBRARY})
+
+add_executable(wiLink ${app_SOURCES} ${app_MOC_SOURCES} ${RCC_SOURCES} ${WILINK_RESOURCE})
+target_link_libraries(wiLink qmlwilinkplugin ${app_LIBRARIES})
 
 if(APPLE)
     get_filename_component(BUNDLE_ICON_NAME ${CPACK_BUNDLE_ICON} NAME_WE)
