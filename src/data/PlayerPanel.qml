@@ -31,7 +31,7 @@ Panel {
 
     function play(model) {
         stop();
-        panel.soundJob = application.soundPlayer.play(model.url);
+        panel.soundJob = appSoundPlayer.play(model.url);
         panel.soundJob.finished.connect(panel.finished);
     }
 

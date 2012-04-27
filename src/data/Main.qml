@@ -70,6 +70,13 @@ FocusScope {
         id: appPreferences
     }
 
+    SoundPlayer {
+        id: appSoundPlayer
+
+        inputDeviceName: appSettings.audioInputDeviceName
+        outputDeviceName: appSettings.audioOutputDeviceName
+    }
+
     Style {
         id: appStyle
         isMobile: application.isMobile

@@ -35,7 +35,7 @@ Panel {
 
     function play(model) {
         stop();
-        panel.soundJob = application.soundPlayer.play(decodeURIComponent(model.audioSource));
+        panel.soundJob = appSoundPlayer.play(decodeURIComponent(model.audioSource));
         panel.soundJob.finished.connect(panel.finished);
         panel.soundUrl = model.audioSource;
     }

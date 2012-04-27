@@ -287,9 +287,17 @@ QAudioDeviceInfo QSoundPlayer::inputDevice() const
     return QAudioDeviceInfo::defaultInputDevice();
 }
 
+QString QSoundPlayer::inputDeviceName() const
+{
+    return d->inputName;
+}
+
 void QSoundPlayer::setInputDeviceName(const QString &name)
 {
-    d->inputName = name;
+    if (name != d->inputName) {
+        d->inputName = name;
+        emit inputDeviceNameChanged();
+    }
 }
 
 QStringList QSoundPlayer::inputDeviceNames() const
@@ -309,9 +317,17 @@ QAudioDeviceInfo QSoundPlayer::outputDevice() const
     return QAudioDeviceInfo::defaultOutputDevice();
 }
 
+QString QSoundPlayer::outputDeviceName() const
+{
+    return d->outputName;
+}
+
 void QSoundPlayer::setOutputDeviceName(const QString &name)
 {
-    d->outputName = name;
+    if (name != d->outputName) {
+        d->outputName = name;
+        emit outputDeviceNameChanged();
+    }
 }
 
 QStringList QSoundPlayer::outputDeviceNames() const

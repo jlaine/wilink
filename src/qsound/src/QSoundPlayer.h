@@ -75,6 +75,8 @@ private:
 class QSoundPlayer : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QString inputDeviceName READ inputDeviceName WRITE setInputDeviceName NOTIFY inputDeviceNameChanged)
+    Q_PROPERTY(QString outputDeviceName READ outputDeviceName WRITE setOutputDeviceName NOTIFY outputDeviceNameChanged)
     Q_PROPERTY(QStringList inputDeviceNames READ inputDeviceNames CONSTANT)
     Q_PROPERTY(QStringList outputDeviceNames READ outputDeviceNames CONSTANT)
 
@@ -83,6 +85,12 @@ public:
     ~QSoundPlayer();
 
     static QSoundPlayer *instance();
+
+    QString inputDeviceName() const;
+    void setInputDeviceName(const QString &name);
+
+    QString outputDeviceName() const;
+    void setOutputDeviceName(const QString &name);
 
     QAudioDeviceInfo inputDevice() const;
     QStringList inputDeviceNames() const;
@@ -95,11 +103,11 @@ public:
 
 signals:
     void finished(int id);
+    void inputDeviceNameChanged();
+    void outputDeviceNameChanged();
 
 public slots:
     QSoundPlayerJob *play(const QUrl &url, bool repeat = false);
-    void setInputDeviceName(const QString &name);
-    void setOutputDeviceName(const QString &name);
     void stop(int id);
 
 private slots:

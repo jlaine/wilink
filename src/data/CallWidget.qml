@@ -220,7 +220,7 @@ Item {
         // play a sound
         if (callWidget.call.direction == QXmppCall.OutgoingDirection &&
             callWidget.call.state == QXmppCall.ConnectingState) {
-            callWidget.soundJob = application.soundPlayer.play(":/call-outgoing.ogg", true);
+            callWidget.soundJob = appSoundPlayer.play(":/call-outgoing.ogg", true);
         }
     }
 
