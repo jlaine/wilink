@@ -67,7 +67,6 @@
 #include "roster.h"
 #include "settings.h"
 #include "updater.h"
-#include "window.h"
 
 QDeclarativeSortFilterProxyModel::QDeclarativeSortFilterProxyModel(QObject *parent)
     : QSortFilterProxyModel(parent)
@@ -367,7 +366,6 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterType<Updater>(uri, 2, 0, "Updater");
     qmlRegisterType<VCard>(uri, 2, 0, "VCard");
     qmlRegisterType<WheelArea>(uri, 2, 0, "WheelArea");
-    qmlRegisterType<Window>(uri, 2, 0, "Window");
 
     // crutches for Qt..
     qRegisterMetaType<QIODevice::OpenMode>("QIODevice::OpenMode");
