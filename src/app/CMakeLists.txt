@@ -74,7 +74,7 @@ if(APPLE)
         message(STATUS "Found Growl library")
         add_definitions(-DUSE_GROWL)
         list(APPEND wilink_LIBRARIES ${GROWL_LIBRARY})
-        list(APPEND wilink_SOURCES notifications_mac.mm)
+        list(APPEND wiLink_SOURCES notifications_mac.mm)
     endif()
 elseif (UNIX)
     # libnotify support

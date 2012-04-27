@@ -243,7 +243,6 @@ static void notificationClosed(NotifyNotification *notification)
 }
 #endif
 
-#ifndef Q_OS_MAC
 Notification *Application::showMessage(const QString &title, const QString &message, const QString &action)
 {
     Notification *handle = 0;
@@ -298,7 +297,6 @@ Notification *Application::showMessage(const QString &title, const QString &mess
 #endif
     return handle;
 }
-#endif
 
 #ifdef USE_SYSTRAY
 void Application::trayActivated(QSystemTrayIcon::ActivationReason reason)

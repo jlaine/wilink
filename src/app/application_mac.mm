@@ -19,9 +19,6 @@
 
 #include <AppKit/AppKit.h>
 #include <Foundation/NSAutoreleasePool.h>
-#ifdef USE_GROWL
-#include <Growl/Growl.h>
-#endif
 
 #include "application.h"
 
@@ -60,36 +57,6 @@ static inline CFStringRef qstringToCFStringRef(const QString &string)
 
 @end
 
-#ifdef USE_GROWL
-@interface GrowlController : NSObject <GrowlApplicationBridgeDelegate>
-- (void) growlNotificationWasClicked: (CFDataRef)clickContext;
-- (NSDictionary *) registrationDictionaryForGrowl;
-@end
-
-@implementation GrowlController
-
-/** Catch clicks on notifications.
- */
-- (void) growlNotificationWasClicked:(CFDataRef)data
-{
-    Notification *handle = 0;
-    CFDataGetBytes(data, CFRangeMake(0,CFDataGetLength(data)), (UInt8*) &handle);
-    QMetaObject::invokeMethod(handle, "clicked");
-}
-
-/** Supply registration information.
- */
-- (NSDictionary *) registrationDictionaryForGrowl
-{
-        NSArray *notifications = [NSArray arrayWithObject: @"Notification"];
-        return [NSDictionary dictionaryWithObjectsAndKeys:
-                        notifications, GROWL_NOTIFICATIONS_ALL,
-                        notifications, GROWL_NOTIFICATIONS_DEFAULT, nil];
-}
-
-@end
-#endif
-
 void Application::alert(QWidget *widget)
 {
     Q_UNUSED(widget);
@@ -106,27 +73,6 @@ void Application::platformInit()
     NSApplication *cocoaApp = [NSApplication sharedApplication];
     AppController *appDelegate = [[AppController alloc] init];
     [cocoaApp setDelegate:appDelegate];
-#ifdef USE_GROWL
-    GrowlController *growlDelegate = [[GrowlController alloc] init];
-    [GrowlApplicationBridge setGrowlDelegate:growlDelegate];
-#endif
     [autoreleasepool release];
 }
 
-Notification *Application::showMessage(const QString &title, const QString &message, const QString &action)
-{
-#ifdef USE_GROWL
-    Notification *handle = new Notification(this);
-    CFDataRef context = CFDataCreate(kCFAllocatorDefault, (UInt8*)&handle, sizeof(&handle));
-    [GrowlApplicationBridge notifyWithTitle:(NSString*)qstringToCFStringRef(title)
-        description:(NSString*)qstringToCFStringRef(message)
-        notificationName:@"Notification"
-        iconData:nil
-        priority:0
-        isSticky:NO
-        clickContext:(NSData*)context];
-    return handle;
-#else
-    return 0;
-#endif
-}

@@ -17,42 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __NOTIFIER_H__
-#define __NOTIFIER_H__
+#include "notifications.h"
 
-#include <QObject>
-
-class Notification : public QObject
-{
-    Q_OBJECT
-
-public:
-    Notification(QObject *parent = 0) : QObject(parent)
-    {}
-
-signals:
-    void clicked();
-};
-
-class NotifierBackend
+class NotifierBackendGrowl : public NotifierBackend
 {
 public:
-    virtual Notification *showMessage(const QString &title, const QString &message, const QString &action) = 0;
-};
-
-class Notifier : public QObject
-{
-    Q_OBJECT
-
-public:
-    Notifier(QObject *parent = 0);
-    ~Notifier();
-
-public slots:
+    NotifierBackendGrowl(Notifier *qq);
     Notification *showMessage(const QString &title, const QString &message, const QString &action);
 
 private:
-    NotifierBackend *d;
+    Notifier *q;
 };
 
-#endif

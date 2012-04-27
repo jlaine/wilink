@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QCoreApplication>
+#include <QApplication>
 #include <QDesktopServices>
 #include <QDir>
 #include <QSettings>

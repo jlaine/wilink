@@ -17,7 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <AppKit/AppKit.h>
+#include <Foundation/NSAutoreleasePool.h>
 #include <Growl/Growl.h>
+
+#include "notifications_mac.h"
 
 static inline CFStringRef qstringToCFStringRef(const QString &string)
 {
@@ -53,9 +57,16 @@ static inline CFStringRef qstringToCFStringRef(const QString &string)
 
 @end
 
-Notification *Application::showMessage(const QString &title, const QString &message, const QString &action)
+NotifierBackendGrowl::NotifierBackendGrowl(Notifier *qq)
+    : q(qq)
 {
-    Notification *handle = new Notification(this);
+    GrowlController *growlDelegate = [[GrowlController alloc] init];
+    [GrowlApplicationBridge setGrowlDelegate:growlDelegate];
+}
+
+Notification *NotifierBackendGrowl::showMessage(const QString &title, const QString &message, const QString &action)
+{
+    Notification *handle = new Notification(q);
     CFDataRef context = CFDataCreate(kCFAllocatorDefault, (UInt8*)&handle, sizeof(&handle));
     [GrowlApplicationBridge notifyWithTitle:(NSString*)qstringToCFStringRef(title)
         description:(NSString*)qstringToCFStringRef(message)

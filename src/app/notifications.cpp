@@ -17,22 +17,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifdef USE_LIBNOTIFY
+#include "notifications.h"
+#if defined(USE_LIBNOTIFY)
 #include <libnotify/notify.h>
 #ifndef NOTIFY_CHECK_VERSION
 #define NOTIFY_CHECK_VERSION(x,y,z) 0
 #endif
+#elif defined(USE_GROWL)
+#include "notifications_mac.h"
 #endif
 
 #include <QCoreApplication>
-
-#include "notifications.h"
-
-class NotifierPrivate
-{
-public:
-    virtual Notification *showMessage(const QString &title, const QString &message, const QString &action) = 0;
-};
 
 #ifdef USE_LIBNOTIFY
 class NotifierPrivateLibnotify : public NotifierPrivate
