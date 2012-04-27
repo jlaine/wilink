@@ -35,13 +35,13 @@ class ApplicationPrivate
 public:
     ApplicationPrivate();
 
-    ApplicationSettings *appSettings;
     QSoundPlayer *soundPlayer;
     QThread *soundThread;
 };
 
 ApplicationPrivate::ApplicationPrivate()
-    : appSettings(0)
+    : soundPlayer(0)
+    , soundThread(0)
 {
 }
 
@@ -65,20 +65,20 @@ Application::Application(int &argc, char **argv)
 #endif
 
     // initialise settings
-    d->appSettings = new ApplicationSettings(this);
-    if (d->appSettings->openAtLogin())
-        d->appSettings->setOpenAtLogin(true);
+    ApplicationSettings *appSettings = new ApplicationSettings(this);
+    if (appSettings->openAtLogin())
+        appSettings->setOpenAtLogin(true);
 
     // initialise sound player
     d->soundThread = new QThread(this);
     d->soundThread->start();
     d->soundPlayer = new QSoundPlayer;
-    d->soundPlayer->setInputDeviceName(d->appSettings->audioInputDeviceName());
-    check = connect(d->appSettings, SIGNAL(audioInputDeviceNameChanged(QString)),
+    d->soundPlayer->setInputDeviceName(appSettings->audioInputDeviceName());
+    check = connect(appSettings, SIGNAL(audioInputDeviceNameChanged(QString)),
                     d->soundPlayer, SLOT(setInputDeviceName(QString)));
     Q_ASSERT(check);
-    d->soundPlayer->setOutputDeviceName(d->appSettings->audioOutputDeviceName());
-    check = connect(d->appSettings, SIGNAL(audioOutputDeviceNameChanged(QString)),
+    d->soundPlayer->setOutputDeviceName(appSettings->audioOutputDeviceName());
+    check = connect(wSettings, SIGNAL(audioOutputDeviceNameChanged(QString)),
                     d->soundPlayer, SLOT(setOutputDeviceName(QString)));
     Q_ASSERT(check);
     d->soundPlayer->setNetworkAccessManager(new NetworkAccessManager(d->soundPlayer));
