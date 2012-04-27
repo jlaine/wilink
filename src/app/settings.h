@@ -117,4 +117,6 @@ private:
     ApplicationSettingsPrivate *d;
 };
 
+extern ApplicationSettings *wSettings;
+
 #endif

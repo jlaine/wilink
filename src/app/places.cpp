@@ -21,7 +21,6 @@
 #include <QDir>
 #include <QUrl>
 
-#include "application.h"
 #include "model.h"
 #include "places.h"
 

@@ -29,7 +29,6 @@
 
 #include "QXmppClient.h"
 
-#include "application.h"
 #include "declarative.h"
 #include "photos.h"
 #include "settings.h"
@@ -754,7 +753,7 @@ void FolderQueueModel::download(FileSystem *fileSystem, const FileInfo &info, co
     item->fileSystem = fileSystem;
     item->info = info;
 
-    const QUrl destUrl = QUrl::fromLocalFile(wApp->settings()->sharesLocation());
+    const QUrl destUrl = QUrl::fromLocalFile(wSettings->sharesLocation());
 
     item->iterator = new FolderIterator(fileSystem, info, filter, destUrl);
 

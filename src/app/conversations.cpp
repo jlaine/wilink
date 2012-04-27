@@ -24,7 +24,6 @@
 #include "QXmppMessage.h"
 #include "QXmppUtils.h"
 
-#include "application.h"
 #include "client.h"
 #include "conversations.h"
 #include "history.h"

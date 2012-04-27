@@ -20,7 +20,6 @@
 #include "QXmppBookmarkManager.h"
 #include "QXmppBookmarkSet.h"
 
-#include "application.h"
 #include "client.h"
 #include "news.h"
 

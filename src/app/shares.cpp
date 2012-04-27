@@ -28,7 +28,6 @@
 #include "QXmppTransferManager.h"
 #include "QXmppUtils.h"
 
-#include "application.h"
 #include "client.h"
 #include "roster.h"
 #include "settings.h"
@@ -109,10 +108,10 @@ QXmppShareDatabase *ShareWatcher::database()
 
         // create shares database
         m_shareDatabase = new QXmppShareDatabase(this);
-        check = connect(wApp->settings(), SIGNAL(sharesDirectoriesChanged(QVariantList)),
+        check = connect(wSettings, SIGNAL(sharesDirectoriesChanged(QVariantList)),
                         this, SLOT(_q_settingsChanged()));
         Q_ASSERT(check);
-        check = connect(wApp->settings(), SIGNAL(sharesLocationChanged(QString)),
+        check = connect(wSettings, SIGNAL(sharesLocationChanged(QString)),
                         this, SLOT(_q_settingsChanged()));
         Q_ASSERT(check);
         _q_settingsChanged();
@@ -191,10 +190,10 @@ void ShareWatcher::_q_presenceReceived(const QXmppPresence &presence)
 void ShareWatcher::_q_settingsChanged() const
 {
     QStringList dirs;
-    foreach (const QVariant &dir, wApp->settings()->sharesDirectories())
+    foreach (const QVariant &dir, wSettings->sharesDirectories())
         dirs << dir.toUrl().toLocalFile();
 
-    m_shareDatabase->setDirectory(wApp->settings()->sharesLocation());
+    m_shareDatabase->setDirectory(wSettings->sharesLocation());
     m_shareDatabase->setMappedDirectories(dirs);
 }
 

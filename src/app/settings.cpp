@@ -29,6 +29,8 @@
 extern bool qt_mac_execute_apple_script(const QString &script, AEDesc *ret);
 #endif
 
+ApplicationSettings *wSettings = 0;
+
 class ApplicationSettingsPrivate
 {
 public:
@@ -55,6 +57,8 @@ ApplicationSettings::ApplicationSettings(QObject *parent)
     d(new ApplicationSettingsPrivate)
 {
     d->settings = new QSettings(this);
+
+    wSettings = this;
 }
 
 /** Returns the name of the audio input device.
