@@ -13,6 +13,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../qxmpp-extra/diagnostics)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../qxmpp-extra/shares)
 
 add_definitions(-DQT_PLUGIN)
+add_definitions(-DQT_SHARED)
 
 # Needed for Qt >= 4.7 on Debian/Ubuntu
 find_library(QTMULTIMEDIAKIT_LIBRARY QtMultimediaKit)
@@ -123,8 +124,7 @@ endif()
 
 qt4_wrap_cpp(plugin_MOC_SOURCES ${plugin_MOC_HEADERS})
 add_library(qmlwilinkplugin SHARED ${plugin_SOURCES} ${plugin_MOC_SOURCES})
-target_link_libraries(qmlwilinkplugin ${QT_LIBRARIES})
-target_link_libraries(qmlwilinkplugin qnetio ${QXMPP_LIBRARIES} qxmpp-extra ${QDJANGO_LIBRARIES} qsound ${plugin_LIBRARIES} ${QT_QTDECLARATIVE_LIBRARY})
+target_link_libraries(qmlwilinkplugin qnetio ${QXMPP_LIBRARIES} qxmpp-extra ${QDJANGO_LIBRARIES} qsound ${plugin_LIBRARIES} ${QT_LIBRARIES})
 
 install(FILES qmldir DESTINATION bin/imports/wiLink)
 install(TARGETS qmlwilinkplugin DESTINATION bin/imports/wiLink)
