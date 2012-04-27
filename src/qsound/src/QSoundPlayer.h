@@ -101,6 +101,8 @@ public:
     QNetworkAccessManager *networkAccessManager() const;
     void setNetworkAccessManager(QNetworkAccessManager *manager);
 
+    QThread *soundThread() const;
+
 signals:
     void finished(int id);
     void inputDeviceNameChanged();

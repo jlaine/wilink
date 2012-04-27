@@ -21,33 +21,14 @@
 #include <QThread>
 #include <QUrl>
 
-#include "QSoundPlayer.h"
-
 #include "application.h"
-#include "declarative.h"
 #include "settings.h"
 #include "systeminfo.h"
 
 Application *wApp = 0;
 
-class ApplicationPrivate
-{
-public:
-    ApplicationPrivate();
-
-    QSoundPlayer *soundPlayer;
-    QThread *soundThread;
-};
-
-ApplicationPrivate::ApplicationPrivate()
-    : soundPlayer(0)
-    , soundThread(0)
-{
-}
-
 Application::Application(int &argc, char **argv)
-    : QApplication(argc, argv),
-    d(new ApplicationPrivate)
+    : QApplication(argc, argv)
 {
     bool check;
     Q_UNUSED(check);
@@ -69,33 +50,12 @@ Application::Application(int &argc, char **argv)
     if (appSettings->openAtLogin())
         appSettings->setOpenAtLogin(true);
 
-    // initialise sound player
-    d->soundThread = new QThread(this);
-    d->soundThread->start();
-    d->soundPlayer = new QSoundPlayer;
-    d->soundPlayer->setInputDeviceName(appSettings->audioInputDeviceName());
-    check = connect(appSettings, SIGNAL(audioInputDeviceNameChanged(QString)),
-                    d->soundPlayer, SLOT(setInputDeviceName(QString)));
-    Q_ASSERT(check);
-    d->soundPlayer->setOutputDeviceName(appSettings->audioOutputDeviceName());
-    check = connect(wSettings, SIGNAL(audioOutputDeviceNameChanged(QString)),
-                    d->soundPlayer, SLOT(setOutputDeviceName(QString)));
-    Q_ASSERT(check);
-    d->soundPlayer->setNetworkAccessManager(new NetworkAccessManager(d->soundPlayer));
-    d->soundPlayer->moveToThread(d->soundThread);
-
     // add SSL root CA for wifirst.net and download.wifirst.net
     QSslSocket::addDefaultCaCertificates(":/UTN_USERFirst_Hardware_Root_CA.pem");
 }
 
 Application::~Application()
 {
-    // stop sound player
-    d->soundThread->quit();
-    d->soundThread->wait();
-    delete d->soundPlayer;
-
-    delete d;
 }
 
 #ifndef Q_OS_MAC
@@ -126,10 +86,5 @@ QString Application::osType() const
 QUrl Application::resolvedUrl(const QUrl &url, const QUrl &base)
 {
     return base.resolved(url);
-}
-
-QSoundPlayer *Application::soundPlayer()
-{
-    return d->soundPlayer;
 }
 

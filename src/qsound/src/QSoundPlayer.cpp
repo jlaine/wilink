@@ -25,6 +25,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QThread>
 #include <QUrl>
 #include <QVariant>
 
@@ -77,7 +78,7 @@ QSoundPlayerJob::QSoundPlayerJob(QSoundPlayer *player, int id)
     d->id = id;
     d->player = player;
 
-    moveToThread(player->thread());
+    moveToThread(player->soundThread());
     setParent(player);
 }
 
@@ -227,11 +228,13 @@ public:
     QMap<int, QSoundPlayerJob*> jobs;
     QNetworkAccessManager *network;
     int readerId;
+    QThread *soundThread;
 };
 
 QSoundPlayerPrivate::QSoundPlayerPrivate()
-    : network(0),
-    readerId(0)
+    : network(0)
+    , readerId(0)
+    , soundThread(0)
 {
 }
 
@@ -240,12 +243,17 @@ QSoundPlayer::QSoundPlayer(QObject *parent)
 {
     qRegisterMetaType<QAudioDeviceInfo>();
     d = new QSoundPlayerPrivate;
+    d->soundThread = new QThread(this);
+    d->soundThread->start();
 
     thePlayer = this;
 }
 
 QSoundPlayer::~QSoundPlayer()
 {
+    d->soundThread->quit();
+    d->soundThread->wait();
+
     thePlayer = 0;
     delete d;
 }
@@ -346,6 +354,11 @@ QNetworkAccessManager *QSoundPlayer::networkAccessManager() const
 void QSoundPlayer::setNetworkAccessManager(QNetworkAccessManager *network)
 {
     d->network = network;
+}
+
+QThread *QSoundPlayer::soundThread() const
+{
+    return d->soundThread;
 }
 
 void QSoundPlayer::stop(int id)

@@ -443,7 +443,7 @@ PhoneHistoryModel::PhoneHistoryModel(QObject *parent)
     check = connect(m_client, SIGNAL(callDialled(SipCall*)),
                     this, SLOT(addCall(SipCall*)));
     Q_ASSERT(check);
-    m_client->moveToThread(m_player->thread());
+    m_client->moveToThread(m_player->soundThread());
 
     // ticker for call durations
     m_ticker = new QTimer(this);
@@ -579,7 +579,7 @@ void PhoneHistoryModel::callStateChanged(QXmppCall::State state)
             connect(item->audioStream, SIGNAL(outputVolumeChanged(int)),
                     this, SIGNAL(outputVolumeChanged(int)));
 
-            item->audioStream->moveToThread(m_player->thread());
+            item->audioStream->moveToThread(m_player->soundThread());
             QMetaObject::invokeMethod(item->audioStream, "startOutput");
             QMetaObject::invokeMethod(item->audioStream, "startInput");
         }

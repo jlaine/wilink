@@ -24,11 +24,6 @@
 #include <QString>
 #include <QUrl>
 
-class QSoundPlayer;
-
-class ApplicationPrivate;
-class ApplicationSettings;
-
 class Application : public QApplication
 {
     Q_OBJECT
@@ -37,7 +32,6 @@ class Application : public QApplication
     Q_PROPERTY(QString organizationName READ organizationName CONSTANT)
     Q_PROPERTY(QString osType READ osType CONSTANT)
     Q_PROPERTY(bool isMobile READ isMobile CONSTANT)
-    Q_PROPERTY(QSoundPlayer* soundPlayer READ soundPlayer CONSTANT)
 
 public:
     Application(int &argc, char **argv);
@@ -45,7 +39,6 @@ public:
 
     static void alert(QWidget *widget);
     static void platformInit();
-    QSoundPlayer *soundPlayer();
 
     bool isMobile() const;
     QString osType() const;
@@ -55,9 +48,6 @@ signals:
 
 public slots:
     QUrl resolvedUrl(const QUrl &url, const QUrl &base);
-
-private:
-    ApplicationPrivate * const d;
 };
 
 extern Application *wApp;
