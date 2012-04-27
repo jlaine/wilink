@@ -85,6 +85,7 @@ elseif (UNIX)
         include_directories(${LIBNOTIFY_INCLUDE_DIRS})
         add_definitions(-DUSE_LIBNOTIFY)
         list(APPEND wilink_LIBRARIES ${LIBNOTIFY_LIBRARIES})
+        list(APPEND wiLink_SOURCES notifications_libnotify.cpp)
     endif()
 endif()
 
