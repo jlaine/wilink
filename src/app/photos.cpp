@@ -32,6 +32,7 @@
 #include "application.h"
 #include "declarative.h"
 #include "photos.h"
+#include "settings.h"
 
 #define BLOCK_SIZE 16384
 

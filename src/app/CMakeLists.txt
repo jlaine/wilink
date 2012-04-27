@@ -79,6 +79,7 @@ set(wiLink_SOURCES
     player.cpp
     rooms.cpp
     roster.cpp
+    settings.cpp
     shares.cpp
     systeminfo.cpp
     updater.cpp
@@ -109,6 +110,7 @@ set(wiLink_MOC_HEADERS
     player.h
     rooms.h
     roster.h
+    settings.h
     shares.h
     updater.h
     window.h)

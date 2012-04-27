@@ -65,6 +65,7 @@
 #include "player.h"
 #include "rooms.h"
 #include "roster.h"
+#include "settings.h"
 #include "updater.h"
 #include "window.h"
 

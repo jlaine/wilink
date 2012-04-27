@@ -56,6 +56,7 @@ SOURCES += \
     player.cpp \
     rooms.cpp \
     roster.cpp \
+    settings.cpp \
     shares.cpp \
     systeminfo.cpp \
     updater.cpp \
@@ -83,6 +84,7 @@ HEADERS += \
     phone/sip_p.h \
     rooms.h \
     roster.h \
+    settings.h \
     shares.h \
     systeminfo.h \
     updater.h \

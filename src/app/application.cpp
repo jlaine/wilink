@@ -40,6 +40,7 @@
 
 #include "application.h"
 #include "declarative.h"
+#include "settings.h"
 #include "systeminfo.h"
 #include "updater.h"
 

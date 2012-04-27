@@ -31,6 +31,7 @@
 #include "application.h"
 #include "client.h"
 #include "roster.h"
+#include "settings.h"
 #include "shares.h"
 
 Q_IMPORT_PLUGIN(share_filesystem)
