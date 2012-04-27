@@ -56,6 +56,32 @@ set(plugin_SOURCES
     systeminfo.cpp
     updater.cpp)
 
+set(plugin_MOC_HEADERS
+    accounts.h
+    calls.h
+    client.h
+    console.h
+    conversations.h
+    declarative.h
+    diagnostics.h
+    discovery.h
+    history.h
+    idle/idle.h
+    model.h
+    news.h
+    notifications.h
+    photos.h
+    phone.h
+    phone/sip.h
+    phone/stun.h
+    places.h
+    player.h
+    rooms.h
+    roster.h
+    settings.h
+    shares.h
+    updater.h)
+
 if(APPLE)
     # Growl support
     find_library(GROWL_LIBRARY Growl)
@@ -94,36 +120,8 @@ elseif(WIN32)
     list(APPEND plugin_SOURCES idle/idle_win.cpp)
 endif()
 
-set(plugin_MOC_HEADERS
-    accounts.h
-    calls.h
-    client.h
-    console.h
-    conversations.h
-    declarative.h
-    diagnostics.h
-    discovery.h
-    history.h
-    model.h
-    news.h
-    notifications.h
-    photos.h
-    phone.h
-    phone/sip.h
-    phone/stun.h
-    places.h
-    player.h
-    rooms.h
-    roster.h
-    settings.h
-    shares.h
-    updater.h)
-
 qt4_wrap_cpp(plugin_MOC_SOURCES ${plugin_MOC_HEADERS})
-
 add_library(qmlwilinkplugin SHARED ${plugin_SOURCES} ${plugin_MOC_SOURCES})
 target_link_libraries(qmlwilinkplugin ${QT_LIBRARIES})
 target_link_libraries(qmlwilinkplugin idle qnetio ${QXMPP_LIBRARIES} qxmpp-extra ${QDJANGO_LIBRARIES} qsound ${plugin_LIBRARIES} ${QT_QTDECLARATIVE_LIBRARY})
 
-# tests
-#add_subdirectory(tests)
