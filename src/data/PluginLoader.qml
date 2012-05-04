@@ -104,7 +104,7 @@ Item {
         for (var i = 0; i < pluginModel.count; i++) {
             var plugin = pluginModel.get(i);
             if ((plugin.autoload && appSettings.disabledPlugins.indexOf(plugin.source) < 0)
-                || appSettings.enabledPlugins.indexOf(plugin.source)) {
+                || appSettings.enabledPlugins.indexOf(plugin.source) >= 0) {
                 loadPlugin(plugin.source);
             }
         }
