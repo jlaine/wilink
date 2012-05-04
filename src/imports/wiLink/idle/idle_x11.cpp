@@ -20,15 +20,6 @@
 
 #include "idle.h"
 
-#ifndef HAVE_XSS
-
-IdlePlatform::IdlePlatform() {}
-IdlePlatform::~IdlePlatform() {}
-bool IdlePlatform::init() { return false; }
-int IdlePlatform::secondsIdle() { return 0; }
-
-#else
-
 #include <QApplication>
 #include <QDesktopWidget>
 #include <QX11Info>
@@ -94,5 +85,3 @@ int IdlePlatform::secondsIdle()
 		return 0;
 	return d->ss_info->idle / 1000;
 }
-
-#endif
