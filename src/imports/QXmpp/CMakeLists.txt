@@ -13,5 +13,5 @@ if(WIN32)
     set_target_properties(qmlqxmppplugin PROPERTIES PREFIX "")
 endif()
 
-install(FILES qmldir DESTINATION bin/imports/QXmpp)
-install(TARGETS qmlqxmppplugin DESTINATION bin/imports/QXmpp)
+install(FILES qmldir DESTINATION ${WILINK_IMPORTS_DIR}/QXmpp)
+install(TARGETS qmlqxmppplugin DESTINATION ${WILINK_IMPORTS_DIR}/QXmpp)

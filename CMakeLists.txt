@@ -18,6 +18,7 @@ pkg_check_modules(QDJANGO qdjango-db REQUIRED)
 pkg_check_modules(QXMPP qxmpp REQUIRED)
 
 # Extra runtime dependencies
+set(WILINK_IMPORTS_DIR lib/qt4/imports)
 if(APPLE)
     set(WILINK_EXTRA_FRAMEWORKS Growl)
     set(WILINK_EXTRA_IMPORTS QtWebKit)
@@ -27,7 +28,8 @@ if(APPLE)
         sqldrivers/libqsqlite.dylib)
 endif(APPLE)
 if(WIN32)
-    set(WILINK_EXTRA_RUNTIME
+    set(WILINK_IMPORTS_DIR bin/imports)
+    install(FILES
         ${CMAKE_FIND_ROOT_PATH}/bin/QtCore4.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/QtDeclarative4.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/QtGui4.dll
@@ -51,19 +53,19 @@ if(WIN32)
         ${CMAKE_FIND_ROOT_PATH}/bin/libz.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/qdjango-db0.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/qxmpp0.dll
-        ${CMAKE_FIND_ROOT_PATH}/bin/ssleay32.dll)
-    set(WILINK_IMAGE_PLUGINS
+        ${CMAKE_FIND_ROOT_PATH}/bin/ssleay32.dll
+        DESTINATION bin)
+    install(FILES
         ${QT_PLUGINS_DIR}/imageformats/qgif4.dll
-        ${QT_PLUGINS_DIR}/imageformats/qjpeg4.dll)
-    set(WILINK_SQL_PLUGINS
-        ${QT_PLUGINS_DIR}/sqldrivers/qsqlite4.dll)
-    install(FILES ${WILINK_EXTRA_RUNTIME} DESTINATION bin)
-    install(FILES ${WILINK_IMAGE_PLUGINS} DESTINATION bin/imageformats)
-    install(FILES ${WILINK_SQL_PLUGINS} DESTINATION bin/sqldrivers)
+        ${QT_PLUGINS_DIR}/imageformats/qjpeg4.dll
+        DESTINATION bin/imageformats)
+    install(FILES
+        ${QT_PLUGINS_DIR}/sqldrivers/qsqlite4.dll
+        DESTINATION bin/sqldrivers)
     install(FILES
         ${QT_IMPORTS_DIR}/QtWebKit/qmldir
         ${QT_IMPORTS_DIR}/QtWebKit/qmlwebkitplugin.dll
-        DESTINATION bin/imports/QtWebKit)
+        DESTINATION ${WILINK_IMPORTS_DIR}/QtWebKit)
 endif(WIN32)
 
 # Packaging

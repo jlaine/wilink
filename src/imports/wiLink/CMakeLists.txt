@@ -130,5 +130,5 @@ if(WIN32)
     set_target_properties(qmlwilinkplugin PROPERTIES PREFIX "")
 endif()
 
-install(FILES qmldir DESTINATION bin/imports/wiLink)
-install(TARGETS qmlwilinkplugin DESTINATION bin/imports/wiLink)
+install(FILES qmldir DESTINATION ${WILINK_IMPORTS_DIR}/wiLink)
+install(TARGETS qmlwilinkplugin DESTINATION ${WILINK_IMPORTS_DIR}/wiLink)
