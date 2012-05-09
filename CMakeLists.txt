@@ -28,7 +28,7 @@ if(APPLE)
         sqldrivers/libqsqlite.dylib)
 endif(APPLE)
 if(WIN32)
-    set(WILINK_IMPORTS_DIR bin/imports)
+    set(WILINK_IMPORTS_DIR bin)
     install(FILES
         ${CMAKE_FIND_ROOT_PATH}/bin/QtCore4.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/QtDeclarative4.dll
