@@ -25,7 +25,7 @@ android|symbian|contains(MEEGO_EDITION,harmattan) {
 
 # Libraries used internal by idle
 android|symbian|contains(MEEGO_EDITION,harmattan) {
-    SOURCES += idle_stub.cpp
+    SOURCES += idle/idle_stub.cpp
 } else:mac {
     LIBS += -framework Carbon
     SOURCES += idle/idle_mac.cpp
