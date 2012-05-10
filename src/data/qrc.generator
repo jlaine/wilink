@@ -45,15 +45,7 @@ for dirname in ['.', 'images', 'images/16x16', 'images/32x32', 'images/64x64', '
         elif name.endswith('.qml'):
             qml_files.append(path)
 
-fp = open('qmldir', 'w')
-for path in qml_files:
-    m = re.match('^([^/]+)\.qml$', path)
-    if m:
-        fp.write("%s 1.0 %s\n" % (m.group(1), path))
-fp.close()
-
 fp = open('wiLink.qrc', 'w')
-
 fp.write('<!DOCTYPE RCC><RCC version="1.0">\n')
 fp.write('<qresource>\n')
 fp.write('    <!-- Certificates -->\n')
