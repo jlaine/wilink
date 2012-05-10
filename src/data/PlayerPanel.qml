@@ -102,9 +102,9 @@ Panel {
                         if (!Qt.isQtObject(panel.soundJob) || panel.soundJob.url != model.url)
                             return model.imageUrl;
                         if (panel.soundJob.state == SoundPlayerJob.DownloadingState)
-                            return "download.png";
+                            return 'image://icon/download';
                         else
-                            return "start.png";
+                            return 'image://icon/start';
                     }
                 }
 
