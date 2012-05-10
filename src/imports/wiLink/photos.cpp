@@ -212,7 +212,7 @@ QImage PhotoImageProvider::requestImage(const QString &id, QSize *size, const QS
         image = *cached;
     } else {
         qWarning("Could not get photo for %s", qPrintable(id));
-        image = QImage(":/128x128/image-x-generic.png");
+        image = QImage(":/images/128x128/image-x-generic.png");
     }
 
     if (requestedSize.isValid())

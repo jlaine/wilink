@@ -145,7 +145,7 @@ QPixmap RosterImageProvider::requestPixmap(const QString &id, QSize *size, const
     }
     if (pixmap.isNull()) {
         qWarning("Could not get roster picture for %s", qPrintable(id));
-        pixmap = QPixmap(":/peer.png");
+        pixmap = QPixmap(":/images/128x128/peer.png");
         if (requestedSize.isValid())
             pixmap = pixmap.scaled(requestedSize.width(), requestedSize.height(), Qt::KeepAspectRatio);
     }

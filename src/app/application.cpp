@@ -40,7 +40,7 @@ Application::Application(int &argc, char **argv)
     setOrganizationName("Wifirst");
     setQuitOnLastWindowClosed(false);
 #ifndef Q_OS_MAC
-    setWindowIcon(QIcon(":/32x32/wiLink.png"));
+    setWindowIcon(QIcon(":/images/64x64/wiLink.png"));
 #endif
 
     // add SSL root CA for wifirst.net and download.wifirst.net

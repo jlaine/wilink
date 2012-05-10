@@ -84,7 +84,7 @@ Notifier::Notifier(QObject *parent)
 #endif
 
     d->trayMenu = new QMenu;
-    QAction *action = d->trayMenu->addAction(QIcon(":/images/close.png"), tr("&Quit"));
+    QAction *action = d->trayMenu->addAction(QIcon(":/images/32x32/close.png"), tr("&Quit"));
     connect(action, SIGNAL(triggered()),
             qApp, SLOT(quit()));
     d->trayIcon->setContextMenu(d->trayMenu);

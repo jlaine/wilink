@@ -45,7 +45,7 @@ INCLUDEPATH += $$WILINK_INCLUDE_DIR
 
 # Installation
 QMAKE_TARGET_COMPANY="Wifirst"
-QMAKE_TARGET_COPYRIGHT="Copyright (c) 2009-2011 Bollore telecom"
+QMAKE_TARGET_COPYRIGHT="Copyright (c) 2009-2012 Wifirst"
 android {
 } else:mac {
     ICON = ../data/wiLink.icns
@@ -74,13 +74,13 @@ android {
     desktop.path = $$PREFIX/share/applications
     desktop.files = ../data/wiLink.desktop
     icon32.path = $$PREFIX/share/icons/hicolor/32x32/apps
-    icon32.files = ../data/32x32/wiLink.png
+    icon32.files = ../data/images/32x32/wiLink.png
     icon64.path = $$PREFIX/share/icons/hicolor/64x64/apps
-    icon64.files = ../data/64x64/wiLink.png
+    icon64.files = ../data/images/64x64/wiLink.png
     pixmap.path = $$PREFIX/share/pixmaps
     pixmap.files = ../data/wiLink.xpm
     scalable.path = $$PREFIX/share/icons/hicolor/scalable/apps
-    scalable.files = ../data/scalable/wiLink.svg
+    scalable.files = ../data/images/scalable/wiLink.svg
     target.path = $$PREFIX/bin
     INSTALLS += desktop icon32 icon64 pixmap scalable target
 }
