@@ -56,6 +56,7 @@ signals:
 class NotifierBackend
 {
 public:
+    virtual ~NotifierBackend() {};
     virtual Notification *showMessage(const QString &title, const QString &message, const QString &action) = 0;
 };
 

@@ -45,6 +45,7 @@ typedef QPair<QSoundFile::MetaData, QString> QSoundInfo;
 class QSoundFilePrivate {
 public:
     QSoundFilePrivate();
+    virtual ~QSoundFilePrivate();
     virtual void close() = 0;
     virtual qint64 duration() const = 0;
     virtual bool open(QIODevice::OpenMode mode) = 0;
@@ -61,6 +62,10 @@ public:
 
 QSoundFilePrivate::QSoundFilePrivate()
     : m_repeat(false)
+{
+}
+
+QSoundFilePrivate::~QSoundFilePrivate()
 {
 }
 
