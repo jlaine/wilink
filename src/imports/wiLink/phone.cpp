@@ -532,7 +532,7 @@ void PhoneHistoryModel::callRinging()
     // find the call
     foreach (PhoneHistoryItem *item, m_items) {
         if (item->call == call && !item->soundId) {
-            item->soundId = m_player->play(QUrl(":/call-outgoing.ogg"), true)->id();
+            item->soundId = m_player->play(QUrl(":/sounds/call-outgoing.ogg"), true)->id();
             break;
         }
     }

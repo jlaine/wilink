@@ -35,8 +35,8 @@ Panel {
         }
 
         // notifications
-        appSettings.incomingMessageSound = incomingMessageSound.checked ? ':/message-incoming.ogg' : '';
-        appSettings.outgoingMessageSound = outgoingMessageSound.checked ? ':/message-outgoing.ogg' : '';
+        appSettings.incomingMessageSound = incomingMessageSound.checked ? ':/sounds/message-incoming.ogg' : '';
+        appSettings.outgoingMessageSound = outgoingMessageSound.checked ? ':/sounds/message-outgoing.ogg' : '';
     }
 
     SoundTester {

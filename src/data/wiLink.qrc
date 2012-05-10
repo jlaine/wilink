@@ -286,9 +286,9 @@
     <file>WebTab.qml</file>
     <file>WifirstPlugin.qml</file>
     <!-- Sounds -->
-    <file>call-incoming.ogg</file>
-    <file>call-outgoing.ogg</file>
-    <file>message-incoming.ogg</file>
-    <file>message-outgoing.ogg</file>
+    <file>sounds/call-incoming.ogg</file>
+    <file>sounds/call-outgoing.ogg</file>
+    <file>sounds/message-incoming.ogg</file>
+    <file>sounds/message-outgoing.ogg</file>
 </qresource>
 </RCC>

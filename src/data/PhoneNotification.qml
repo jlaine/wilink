@@ -41,7 +41,7 @@ NotificationDialog {
 
     Component.onCompleted: {
         // play a sound
-        dialog.soundJob = appSoundPlayer.play(":/call-incoming.ogg", true);
+        dialog.soundJob = appSoundPlayer.play(":/sounds/call-incoming.ogg", true);
     }
 
     Connections {
