@@ -46,6 +46,7 @@ signals:
 private slots:
     void _q_disconnected();
     void _q_presenceReceived(const QXmppPresence &presence);
+    void _q_searchReceived(const QXmppShareSearchIq &shareIq);
     void _q_serverChanged(const QString &server);
     void _q_settingsChanged() const;
 
@@ -66,7 +67,7 @@ public:
     FileSystemJob* list(const QUrl &dirUrl, const QString &filter = QString());
 
 private slots:
-    void _q_connected();
+    void _q_changed();
 };
 
 class ShareFileSystemGet : public FileSystemJob
