@@ -33,8 +33,6 @@
 #include "settings.h"
 #include "shares.h"
 
-//Q_IMPORT_PLUGIN(share_filesystem)
-
 Q_GLOBAL_STATIC(ShareWatcher, theShareWatcher);
 
 static QUrl locationToUrl(const QXmppShareLocation& loc)
@@ -469,14 +467,3 @@ void ShareFileSystemList::_q_searchReceived(const QXmppShareSearchIq &shareIq)
     emit finished();
 }
 
-class ShareFileSystemPlugin : public QNetIO::FileSystemPlugin
-{
-public:
-    QNetIO::FileSystem *create(const QUrl &url, QObject *parent) {
-        if (url.scheme() == QLatin1String("share"))
-            return new ShareFileSystem(parent);
-        return NULL;
-    };
-};
-
-Q_EXPORT_STATIC_PLUGIN2(share_filesystem, ShareFileSystemPlugin)

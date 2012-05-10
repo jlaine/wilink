@@ -71,11 +71,6 @@ for import in $IMPORTS; do
     fix_deps $dst/*.dylib
 done
 
-mkdir -p $DEPLOY_IMPORTS/QXmpp
-cp ../imports/QXmpp/*.dylib $DEPLOY_IMPORTS/QXmpp
-echo "plugin qmlqxmppplugin" > $DEPLOY_IMPORTS/QXmpp/qmldir
-fix_deps $DEPLOY_IMPORTS/QXmpp/*.dylib
-
 mkdir -p $DEPLOY_IMPORTS/wiLink
 cp ../imports/wiLink/*.dylib $DEPLOY_IMPORTS/wiLink
 echo "plugin qmlwilinkplugin" > $DEPLOY_IMPORTS/wiLink/qmldir

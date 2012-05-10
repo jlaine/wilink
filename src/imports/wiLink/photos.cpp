@@ -31,6 +31,7 @@
 
 #include "declarative.h"
 #include "photos.h"
+#include "shares.h"
 #include "settings.h"
 
 #define BLOCK_SIZE 16384
@@ -458,7 +459,10 @@ void FolderModel::setRootUrl(const QUrl &rootUrl)
             photoInitialised = true;
         }
 
-        d->fs = FileSystem::create(d->rootUrl, this);
+        if (d->rootUrl.scheme() == QLatin1String("share"))
+            d->fs = new ShareFileSystem(this);
+        else
+            d->fs = FileSystem::create(d->rootUrl, this);
         if (d->fs) {
             // register filesystem
             d->fileSystems.insert(d->rootUrl.scheme(), d->fs);

@@ -52,6 +52,7 @@
 #include "console.h"
 #include "conversations.h"
 #include "declarative.h"
+#include "declarative_qxmpp.h"
 #include "diagnostics.h"
 #include "discovery.h"
 #include "history.h"
@@ -310,7 +311,7 @@ void Plugin::initializeEngine(QDeclarativeEngine *engine, const char *uri)
 
 void Plugin::registerTypes(const char *uri)
 {
-    qDebug("register types");
+    qDebug("register types 2");
 
     // wiLink
     qmlRegisterType<AccountModel>(uri, 2, 0, "AccountModel");
@@ -350,6 +351,24 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterType<Updater>(uri, 2, 0, "Updater");
     qmlRegisterType<VCard>(uri, 2, 0, "VCard");
     qmlRegisterType<WheelArea>(uri, 2, 0, "WheelArea");
+
+    // QXmpp
+    qmlRegisterUncreatableType<QXmppClient>(uri, 2, 0, "QXmppClient", "");
+    qmlRegisterUncreatableType<QXmppCall>(uri, 2, 0, "QXmppCall", "");
+    qmlRegisterUncreatableType<QXmppCallManager>(uri, 2, 0, "QXmppCallManager", "");
+    qmlRegisterType<QXmppDeclarativeDataForm>(uri, 2, 0, "QXmppDataForm");
+    qmlRegisterUncreatableType<QXmppDiscoveryManager>(uri, 2, 0, "QXmppDiscoveryManager", "");
+    qmlRegisterType<QXmppLogger>(uri, 2, 0, "QXmppLogger");
+    qmlRegisterType<QXmppDeclarativeMessage>(uri, 2, 0, "QXmppMessage");
+    qmlRegisterType<QXmppDeclarativeMucItem>(uri, 2, 0, "QXmppMucItem");
+    qmlRegisterUncreatableType<QXmppMucManager>(uri, 2, 0, "QXmppMucManager", "");
+    qmlRegisterUncreatableType<QXmppMucRoom>(uri, 2, 0, "QXmppMucRoom", "");
+    qmlRegisterType<QXmppDeclarativePresence>(uri, 2, 0, "QXmppPresence");
+    qmlRegisterUncreatableType<QXmppRosterManager>(uri, 2, 0, "QXmppRosterManager", "");
+    qmlRegisterUncreatableType<QXmppRtpAudioChannel>(uri, 2, 0, "QXmppRtpAudioChannel", "");
+    qmlRegisterUncreatableType<QXmppTransferJob>(uri, 2, 0, "QXmppTransferJob", "");
+    qmlRegisterUncreatableType<QXmppTransferManager>(uri, 2, 0, "QXmppTransferManager", "");
+    qRegisterMetaType<QXmppVideoFrame>("QXmppVideoFrame");
 
     // crutches for Qt..
     qRegisterMetaType<QIODevice::OpenMode>("QIODevice::OpenMode");

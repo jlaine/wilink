@@ -73,6 +73,7 @@ HEADERS += \
     console.h \
     conversations.h \
     declarative.h \
+    declarative_qxmpp.h \
     diagnostics.h \
     discovery.h \
     history.h \

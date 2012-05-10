@@ -18,7 +18,7 @@
  */
 
 import QtQuick 1.1
-import QXmpp 0.4
+import wiLink 2.0
 
 Item {
     property variant presenceStatus

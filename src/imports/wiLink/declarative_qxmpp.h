@@ -20,11 +20,16 @@
 #ifndef __QXMPP_DECLARATIVE_H__
 #define __QXMPP_DECLARATIVE_H__
 
-#include <QDeclarativeExtensionPlugin>
-#include <QObject>
-
+#include "QXmppCallManager.h"
+#include "QXmppClient.h"
+#include "QXmppDiscoveryManager.h"
 #include "QXmppMessage.h"
+#include "QXmppMucManager.h"
 #include "QXmppPresence.h"
+#include "QXmppRtpChannel.h"
+#include "QXmppRosterManager.h"
+#include "QXmppTransferManager.h"
+#include "QXmppUtils.h"
 
 class QXmppDeclarativeDataForm : public QObject
 {
@@ -93,14 +98,6 @@ public:
         AdminAffiliation = QXmppMucItem::AdminAffiliation,
         OwnerAffiliation = QXmppMucItem::OwnerAffiliation,
     };
-};
-
-class QXmppPlugin : public QDeclarativeExtensionPlugin
-{
-    Q_OBJECT
-
-public:
-    void registerTypes(const char *uri);
 };
 
 #endif

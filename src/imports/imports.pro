@@ -1,2 +1,2 @@
 TEMPLATE = subdirs
-SUBDIRS = QXmpp wiLink
+SUBDIRS = wiLink
