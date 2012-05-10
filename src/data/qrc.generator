@@ -23,7 +23,6 @@ import os
 import re
 
 # find files
-cert_files = []
 image_files = []
 js_files = []
 qml_files = []
@@ -38,8 +37,6 @@ for dirname in ['.', 'images', 'images/16x16', 'images/32x32', 'images/64x64', '
             js_files.append(path)
         elif name.endswith('.ogg'):
             sound_files.append(path)
-        elif name.endswith('.pem'):
-            cert_files.append(path)
         elif name.endswith('.png'):
             image_files.append(path)
         elif name.endswith('.qml'):
@@ -48,9 +45,6 @@ for dirname in ['.', 'images', 'images/16x16', 'images/32x32', 'images/64x64', '
 fp = open('wiLink.qrc', 'w')
 fp.write('<!DOCTYPE RCC><RCC version="1.0">\n')
 fp.write('<qresource>\n')
-fp.write('    <!-- Certificates -->\n')
-for path in cert_files:
-    fp.write('    <file>%s</file>\n' % path)
 fp.write('    <!-- Images -->\n')
 for path in image_files:
     fp.write('    <file>%s</file>\n' % path)
