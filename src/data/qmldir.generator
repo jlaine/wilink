@@ -28,7 +28,7 @@ image_files = []
 js_files = []
 qml_files = []
 sound_files = []
-for dirname in ['.', '16x16', '32x32', '64x64', '128x128']:
+for dirname in ['.', 'images', 'images/16x16', 'images/32x32', 'images/64x64', 'images/128x128']:
     for name in sorted(os.listdir(dirname)):
         if dirname == '.':
             path = name

@@ -28,10 +28,10 @@
 #include "roster.h"
 
 #ifdef WILINK_EMBEDDED
-#define SMILEY_ROOT ":/32x32"
+#define SMILEY_ROOT ":/images/32x32"
 #define HISTORY_DAYS 7
 #else
-#define SMILEY_ROOT ":/16x16"
+#define SMILEY_ROOT ":/images/16x16"
 #define HISTORY_DAYS 14
 #endif
 

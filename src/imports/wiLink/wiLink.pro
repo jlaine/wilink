@@ -117,8 +117,8 @@ QMAKE_TARGET_COMPANY="Wifirst"
 QMAKE_TARGET_COPYRIGHT="Copyright (c) 2009-2011 Bollore telecom"
 android {
 } else:mac {
-    ICON = ../data/wiLink.icns
-    QMAKE_INFO_PLIST = ../data/wiLink.plist
+    ICON = ../../data/wiLink.icns
+    QMAKE_INFO_PLIST = ../../data/wiLink.plist
     QMAKE_POST_LINK = sed -i \"\" -e \"s,@VERSION@,$$VERSION,g\" -e \"s,@COPYRIGHT@,$$QMAKE_TARGET_COPYRIGHT,g\" wiLink.app/Contents/Info.plist
 } else:symbian {
     vendorinfo = \
@@ -132,7 +132,7 @@ android {
     mobile_deployment.pkg_prerules += vendorinfo
     DEPLOYMENT += mobile_deployment
 
-    ICON = ../data/scalable/wiLink.svg
+    ICON = ../../data/images/scalable/wiLink.svg
 
     TARGET.CAPABILITY = "NetworkServices ReadUserData WriteUserData UserEnvironment"
 } else:unix {
@@ -141,15 +141,15 @@ android {
         PREFIX=/usr/local
     }
     desktop.path = $$PREFIX/share/applications
-    desktop.files = ../data/wiLink.desktop
+    desktop.files = ../../data/wiLink.desktop
     icon32.path = $$PREFIX/share/icons/hicolor/32x32/apps
-    icon32.files = ../data/32x32/wiLink.png
+    icon32.files = ../../data/images/32x32/wiLink.png
     icon64.path = $$PREFIX/share/icons/hicolor/64x64/apps
-    icon64.files = ../data/64x64/wiLink.png
+    icon64.files = ../../data/images/64x64/wiLink.png
     pixmap.path = $$PREFIX/share/pixmaps
-    pixmap.files = ../data/wiLink.xpm
+    pixmap.files = ../../data/wiLink.xpm
     scalable.path = $$PREFIX/share/icons/hicolor/scalable/apps
-    scalable.files = ../data/scalable/wiLink.svg
+    scalable.files = ../../data/images/scalable/wiLink.svg
     target.path = $$PREFIX/bin
     INSTALLS += desktop icon32 icon64 pixmap scalable target
 }

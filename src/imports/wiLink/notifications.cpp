@@ -78,13 +78,13 @@ Notifier::Notifier(QObject *parent)
 #ifdef USE_SYSTRAY
     d->trayIcon = new QSystemTrayIcon;
 #ifdef Q_OS_MAC
-    d->trayIcon->setIcon(QIcon(":/32x32/wiLink-black.png"));
+    d->trayIcon->setIcon(QIcon(":/images/32x32/wiLink-black.png"));
 #else
-    d->trayIcon->setIcon(QIcon(":/32x32/wiLink.png"));
+    d->trayIcon->setIcon(QIcon(":/images/32x32/wiLink.png"));
 #endif
 
     d->trayMenu = new QMenu;
-    QAction *action = d->trayMenu->addAction(QIcon(":/close.png"), tr("&Quit"));
+    QAction *action = d->trayMenu->addAction(QIcon(":/images/close.png"), tr("&Quit"));
     connect(action, SIGNAL(triggered()),
             qApp, SLOT(quit()));
     d->trayIcon->setContextMenu(d->trayMenu);
