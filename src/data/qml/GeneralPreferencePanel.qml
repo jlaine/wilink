@@ -46,7 +46,6 @@ Panel {
                 anchors.left: parent.left
                 anchors.right:  parent.right
                 checked: appSettings.openAtLogin
-                enabled: application.isInstalled
                 text: qsTr('Open at login')
                 onClicked: checked = !checked
             }
