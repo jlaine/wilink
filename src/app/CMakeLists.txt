@@ -20,7 +20,7 @@ if(APPLE)
 endif()
 
 qt4_wrap_cpp(app_MOC_SOURCES ${app_MOC_HEADERS})
-qt4_add_resources(RCC_SOURCES app.qrc ../data/wiLink.qrc)
+qt4_add_resources(RCC_SOURCES app.qrc ../data/qml.qrc)
 
 if(WIN32)
     enable_language(RC)
