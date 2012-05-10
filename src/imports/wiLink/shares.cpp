@@ -125,6 +125,9 @@ void ShareWatcher::_q_disconnected()
 
 void ShareWatcher::_q_presenceReceived(const QXmppPresence &presence)
 {
+    bool check;
+    Q_UNUSED(check);
+
     ChatClient *client = qobject_cast<ChatClient*>(sender());
     if (!client || client->shareServer().isEmpty() || presence.from() != client->shareServer())
         return;
@@ -155,6 +158,10 @@ void ShareWatcher::_q_presenceReceived(const QXmppPresence &presence)
         if (!shareManager) {
             shareManager = new QXmppShareManager(client, database());
             client->addExtension(shareManager);
+
+            check = connect(shareManager, SIGNAL(shareSearchIqReceived(QXmppShareSearchIq)),
+                            this, SLOT(_q_searchReceived(QXmppShareSearchIq)));
+            Q_ASSERT(check);
         }
 
         emit isConnectedChanged();
@@ -184,6 +191,12 @@ void ShareWatcher::_q_presenceReceived(const QXmppPresence &presence)
         const QString newJid = client->configuration().user() + '@' + newDomain;
         newClient->connectToServer(newJid, client->configuration().password());
     }
+}
+
+void ShareWatcher::_q_searchReceived(const QXmppShareSearchIq &shareIq)
+{
+    if (shareIq.type() == QXmppIq::Set)
+        emit isConnectedChanged();
 }
 
 void ShareWatcher::_q_settingsChanged() const
@@ -235,7 +248,7 @@ ShareFileSystem::ShareFileSystem(QObject *parent)
     Q_UNUSED(check);
 
     check = connect(theShareWatcher(), SIGNAL(isConnectedChanged()),
-                    this, SLOT(_q_connected()));
+                    this, SLOT(_q_changed()));
     Q_ASSERT(check);
 }
 
@@ -251,7 +264,7 @@ FileSystemJob* ShareFileSystem::list(const QUrl &dirUrl, const QString &filter)
     return new ShareFileSystemList(this, urlToLocation(dirUrl), filter);
 }
 
-void ShareFileSystem::_q_connected()
+void ShareFileSystem::_q_changed()
 {
     emit directoryChanged(QUrl("share:"));
 }
