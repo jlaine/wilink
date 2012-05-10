@@ -36,6 +36,7 @@ mac)
     mkdir release-mac
     cd release-mac
     cmake ..
+    make
     make package
     ;;
 windows)
@@ -43,6 +44,7 @@ windows)
     mkdir release-win32
     cd release-win32
     PKG_CONFIG_LIBDIR=/usr/i586-mingw32msvc/lib/pkgconfig cmake .. -DCMAKE_TOOLCHAIN_FILE=../cmake/mingw32.toolchain
+    make
     make package
     ;;
 *)
