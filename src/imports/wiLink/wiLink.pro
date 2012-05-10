@@ -9,7 +9,7 @@ CONFIG += qt plugin
 
 QT += declarative network sql xml
 
-TARGET = wiLink
+TARGET = qmlwilinkplugin
 
 # FIXME: this is a hack so that Q_OS_ANDROID is defined
 android {
@@ -111,3 +111,12 @@ LIBS += \
     -L../../qxmpp-extra -lqxmpp-extra \
     -L../../3rdparty/qdjango/src/db $$QDJANGO_DB_LIBS
 
+unix {
+    isEmpty(PREFIX) {
+        PREFIX=/usr/local
+    }
+    qmldir.path = $$PREFIX/lib/qt4/imports/wiLink
+    qmldir.files = qmldir
+    target.path = $$PREFIX/lib/qt4/imports/wiLink
+    INSTALLS += qmldir target
+}
