@@ -311,8 +311,6 @@ void Plugin::initializeEngine(QDeclarativeEngine *engine, const char *uri)
 
 void Plugin::registerTypes(const char *uri)
 {
-    qDebug("register types 2");
-
     // wiLink
     qmlRegisterType<AccountModel>(uri, 2, 0, "AccountModel");
     qmlRegisterType<ApplicationSettings>(uri, 2, 0, "ApplicationSettings");

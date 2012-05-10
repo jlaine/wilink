@@ -21,6 +21,7 @@
 #include <signal.h>
 
 #include <QLocale>
+#include <QSslSocket>
 #include <QTranslator>
 
 #ifdef Q_OS_WIN
@@ -47,6 +48,19 @@ int main(int argc, char *argv[])
     /* Create application */
     Application::platformInit();
     Application app(argc, argv);
+
+    /* Set application properties */
+    app.setApplicationName("wiLink");
+    app.setApplicationVersion(WILINK_VERSION);
+    app.setOrganizationDomain("wifirst.net");
+    app.setOrganizationName("Wifirst");
+    app.setQuitOnLastWindowClosed(false);
+#ifndef Q_OS_MAC
+    app.setWindowIcon(QIcon(":/app.png"));
+#endif
+
+    /* Add SSL root CA for wifirst.net and download.wifirst.net */
+    QSslSocket::addDefaultCaCertificates(":/app.pem");
 
     /* Load translations */
     QString localeName = QLocale::system().name().split("_").first();

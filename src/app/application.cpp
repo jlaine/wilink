@@ -18,7 +18,6 @@
  */
 
 #include <QIcon>
-#include <QSslSocket>
 #include <QUrl>
 
 #include "application.h"
@@ -28,23 +27,7 @@ Application *wApp = 0;
 Application::Application(int &argc, char **argv)
     : QApplication(argc, argv)
 {
-    bool check;
-    Q_UNUSED(check);
-
     wApp = this;
-
-    // set application properties
-    setApplicationName("wiLink");
-    setApplicationVersion(WILINK_VERSION);
-    setOrganizationDomain("wifirst.net");
-    setOrganizationName("Wifirst");
-    setQuitOnLastWindowClosed(false);
-#ifndef Q_OS_MAC
-    setWindowIcon(QIcon(":/images/64x64/wiLink.png"));
-#endif
-
-    // add SSL root CA for wifirst.net and download.wifirst.net
-    QSslSocket::addDefaultCaCertificates(":/UTN_USERFirst_Hardware_Root_CA.pem");
 }
 
 Application::~Application()

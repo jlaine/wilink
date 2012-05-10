@@ -1,7 +1,5 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
-    <!-- Certificates -->
-    <file>UTN_USERFirst_Hardware_Root_CA.pem</file>
     <!-- Images -->
     <file>images/down-arrow.png</file>
     <file>images/eject.png</file>

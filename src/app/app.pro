@@ -26,7 +26,7 @@ android|symbian|contains(MEEGO_EDITION,harmattan) {
     DEFINES += WILINK_EMBEDDED
 }
 
-RESOURCES += ../data/wiLink.qrc
+RESOURCES += app.qrc ../data/wiLink.qrc
 SOURCES += \
     application.cpp \
     main.cpp \
