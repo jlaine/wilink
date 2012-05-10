@@ -17,7 +17,7 @@ android {
 # Libraries used internally by QSound
 QSOUND_INTERNAL_DEFINES += QSOUND_USE_MAD
 QSOUND_INCLUDE_DIR += $$PWD/../3rdparty/libmad
-QSOUND_INTERNAL_LIBS += -L../3rdparty/libmad -lmad
+QSOUND_INTERNAL_LIBS += -lmad
 
 mac {
     # qtkit support

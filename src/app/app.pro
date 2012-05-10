@@ -18,7 +18,6 @@ android {
 }
 contains(MEEGO_EDITION,harmattan) {
     DEFINES += MEEGO_EDITION_HARMATTAN
-    PREFIX = /usr
 }
 
 # embedded version
@@ -68,9 +67,6 @@ android {
     TARGET.CAPABILITY = "NetworkServices ReadUserData WriteUserData UserEnvironment"
 } else:unix {
     QT += dbus
-    isEmpty(PREFIX) {
-        PREFIX=/usr/local
-    }
     desktop.path = $$PREFIX/share/applications
     desktop.files = ../data/wiLink.desktop
     icon32.path = $$PREFIX/share/icons/hicolor/32x32/apps

@@ -106,15 +106,12 @@ INCLUDEPATH += \
 
 LIBS += \
     -L../../qnetio/src $$QNETIO_LIBS \
-    -L../../qsound/src $$QSOUND_LIBS \
+    -L../../qsound/src -L../../3rdparty/libmad $$QSOUND_LIBS \
     -L../../3rdparty/qxmpp/src $$QXMPP_LIBS \
     -L../../qxmpp-extra -lqxmpp-extra \
     -L../../3rdparty/qdjango/src/db $$QDJANGO_DB_LIBS
 
 unix {
-    isEmpty(PREFIX) {
-        PREFIX=/usr/local
-    }
     qmldir.path = $$PREFIX/lib/qt4/imports/wiLink
     qmldir.files = qmldir
     target.path = $$PREFIX/lib/qt4/imports/wiLink

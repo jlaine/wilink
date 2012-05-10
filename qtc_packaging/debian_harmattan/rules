@@ -44,6 +44,12 @@ install: build
 
 	# Add here commands to install the package into debian/wilink.
 	$(MAKE) INSTALL_ROOT="$(CURDIR)"/debian/wilink install
+	rm -rf $(CURDIR)/debian/wilink/usr/include
+	rm -rf $(CURDIR)/debian/wilink/usr/lib/pkgconfig
+	rm -rf $(CURDIR)/debian/wilink/usr/lib/libqdjango-script*
+	rm -rf $(CURDIR)/debian/wilink/usr/lib/*.so
+	rm -rf $(CURDIR)/debian/wilink/usr/share/doc/qxmpp
+	rm -rf $(CURDIR)/debian/wilink/usr/share/doc/qdjango
 
 # Build architecture-independent files here.
 binary-indep: build install
