@@ -176,6 +176,7 @@ void ShareWatcher::_q_presenceReceived(const QXmppPresence &presence)
         // reconnect to another server
         qDebug("Shares redirecting to %s", qPrintable(newDomain));
         ChatClient *newClient = new ChatClient(this);
+        newClient->setProperty("_parent_jid", client->jid());
         newClient->setLogger(client->logger());
 
         addClient(newClient);
@@ -208,8 +209,12 @@ void ShareWatcher::_q_serverChanged(const QString &server)
     x.setTagName("x");
     x.setAttribute("xmlns", ns_shares);
 
+    // get nickname
+    QString nickJid = client->property("_parent_jid").toString();
+    if (nickJid.isEmpty())
+        nickJid = client->jid();
     VCard card;
-    card.setJid(QXmppUtils::jidToBareJid(client->jid()));
+    card.setJid(QXmppUtils::jidToBareJid(nickJid));
 
     QXmppElement nickName;
     nickName.setTagName("nickName");
