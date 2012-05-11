@@ -104,13 +104,11 @@ public:
     QThread *soundThread() const;
 
 signals:
-    void finished(int id);
     void inputDeviceNameChanged();
     void outputDeviceNameChanged();
 
 public slots:
     QSoundPlayerJob *play(const QUrl &url, bool repeat = false);
-    void stop(int id);
 
 private slots:
     void _q_finished();

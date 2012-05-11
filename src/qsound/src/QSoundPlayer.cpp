@@ -361,13 +361,6 @@ QThread *QSoundPlayer::soundThread() const
     return d->soundThread;
 }
 
-void QSoundPlayer::stop(int id)
-{
-    QSoundPlayerJob *job = d->jobs.value(id);
-    if (job)
-        QMetaObject::invokeMethod(job, "stop");
-}
-
 void QSoundPlayer::_q_finished()
 {
     QSoundPlayerJob *job = qobject_cast<QSoundPlayerJob*>(sender());
@@ -376,6 +369,5 @@ void QSoundPlayer::_q_finished()
 
     d->jobs.take(job->id());
     job->deleteLater();
-    emit finished(job->id());
 }
 

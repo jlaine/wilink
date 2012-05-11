@@ -359,7 +359,7 @@ public:
     QSoundStream *audioStream;
     SipCall *call;
     QNetworkReply *reply;
-    int soundId;
+    QSoundPlayerJob *soundJob;
 };
 
 PhoneHistoryItem::PhoneHistoryItem()
@@ -369,7 +369,7 @@ PhoneHistoryItem::PhoneHistoryItem()
     audioStream(0),
     call(0),
     reply(0),
-    soundId(0)
+    soundJob(0)
 {
 }
 
@@ -531,8 +531,8 @@ void PhoneHistoryModel::callRinging()
 
     // find the call
     foreach (PhoneHistoryItem *item, m_items) {
-        if (item->call == call && !item->soundId) {
-            item->soundId = m_player->play(QUrl(":/sounds/call-outgoing.ogg"), true)->id();
+        if (item->call == call && !item->soundJob) {
+            item->soundJob = m_player->play(QUrl(":/sounds/call-outgoing.ogg"), true);
             break;
         }
     }
@@ -556,9 +556,9 @@ void PhoneHistoryModel::callStateChanged(QXmppCall::State state)
 
     PhoneHistoryItem *item = m_items[row];
 
-    if (item->soundId && state != QXmppCall::ConnectingState) {
-        m_player->stop(item->soundId);
-        item->soundId = 0;
+    if (item->soundJob && state != QXmppCall::ConnectingState) {
+        item->soundJob->stop();
+        item->soundJob = 0;
     }
 
     // update the item
