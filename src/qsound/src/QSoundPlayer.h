@@ -34,7 +34,6 @@ class QSoundPlayerJob : public QObject
 {
     Q_OBJECT
     Q_ENUMS(State)
-    Q_PROPERTY(int id READ id CONSTANT)
     Q_PROPERTY(State state READ state NOTIFY stateChanged)
     Q_PROPERTY(QUrl url READ url CONSTANT)
 
@@ -45,7 +44,6 @@ public:
         PlayingState = 2,
     };
 
-    int id() const;
     QSoundPlayerJob::State state() const;
     QUrl url() const;
 

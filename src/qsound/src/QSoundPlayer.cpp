@@ -20,11 +20,10 @@
 #include <QAbstractNetworkCache>
 #include <QAudioOutput>
 #include <QIODevice>
-#include <QMap>
-#include <QPair>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QSet>
 #include <QThread>
 #include <QUrl>
 #include <QVariant>
@@ -85,11 +84,6 @@ QSoundPlayerJob::~QSoundPlayerJob()
     if (d->audioOutput)
         d->audioOutput->deleteLater();
     delete d;
-}
-
-int QSoundPlayerJob::id() const
-{
-    return d->id;
 }
 
 QSoundPlayerJob::State QSoundPlayerJob::state() const
@@ -211,7 +205,7 @@ public:
     QSoundPlayerPrivate();
     QString inputName;
     QString outputName;
-    QMap<int, QSoundPlayerJob*> jobs;
+    QSet<QSoundPlayerJob*> jobs;
     QNetworkAccessManager *network;
     int readerId;
     QThread *soundThread;
@@ -257,7 +251,7 @@ QSoundPlayerJob *QSoundPlayer::play(const QUrl &url, bool repeat)
     QSoundPlayerJob *job = new QSoundPlayerJob(this, ++d->readerId);
     job->d->repeat = repeat;
     job->d->url = url;
-    d->jobs[job->id()] = job;
+    d->jobs.insert(job);
 
     if (url.scheme() == "file") {
         job->setFile(new QSoundFile(url.toLocalFile()));
@@ -353,7 +347,7 @@ void QSoundPlayer::_q_finished()
     if (!job)
         return;
 
-    d->jobs.take(job->id());
+    d->jobs.remove(job);
     job->deleteLater();
 }
 
