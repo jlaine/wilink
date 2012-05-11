@@ -5,14 +5,10 @@ if(UNIX)
 endif(UNIX)
 
 # mad support
-find_library(MAD_LIBRARY mad)
-if(MAD_LIBRARY)
-  check_include_files(mad.h HAVE_MAD_H)
-  if(HAVE_MAD_H)
-    message(STATUS "Found MAD library")
+pkg_check_modules(MAD mad)
+if(MAD_FOUND)
     add_definitions(-DQSOUND_USE_MAD)
-    list(APPEND qsound_LIBRARIES ${MAD_LIBRARY})
-  endif()
+    list(APPEND qsound_LIBRARIES ${MAD_LIBRARIES})
 endif()
 
 # vorbisfile support
