@@ -70,8 +70,6 @@
     <file>qml/PhotoPlugin.qml</file>
     <file>qml/PhotoSlideView.qml</file>
     <file>qml/PhotoWall.qml</file>
-    <file>qml/PlayerPanel.qml</file>
-    <file>qml/PlayerPlugin.qml</file>
     <file>qml/Plugin.qml</file>
     <file>qml/PluginLoader.qml</file>
     <file>qml/PluginPreferencePanel.qml</file>

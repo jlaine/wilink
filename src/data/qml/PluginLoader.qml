@@ -121,8 +121,6 @@ Item {
         pluginModel.append({ source: 'ChatPlugin.qml', autoload: true });
         pluginModel.append({ source: 'DebugPlugin.qml' });
         pluginModel.append({ source: 'DiagnosticPlugin.qml', autoload: true });
-        if (!appSettings.isMobile)
-            pluginModel.append({ source: 'PlayerPlugin.qml' });
         pluginModel.append({ source: 'NewsPlugin.qml', autolib: true });
         if (!appSettings.isMobile)
             pluginModel.append({ source: 'PhonePlugin.qml', autoload: true });

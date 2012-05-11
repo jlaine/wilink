@@ -63,7 +63,6 @@
 #include "phone/sip.h"
 #include "photos.h"
 #include "places.h"
-#include "player.h"
 #include "rooms.h"
 #include "roster.h"
 #include "settings.h"
@@ -333,7 +332,6 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterUncreatableType<SipCall>(uri, 2, 0, "SipCall", "");
     qmlRegisterUncreatableType<FolderQueueModel>(uri, 2, 0, "FolderQueueModel", "");
     qmlRegisterType<PlaceModel>(uri, 2, 0, "PlaceModel");
-    qmlRegisterType<PlayerModel>(uri, 2, 0, "PlayerModel");
     qmlRegisterType<RoomConfigurationModel>(uri, 2, 0, "RoomConfigurationModel");
     qmlRegisterType<RoomListModel>(uri, 2, 0, "RoomListModel");
     qmlRegisterType<RoomModel>(uri, 2, 0, "RoomModel");

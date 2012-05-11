@@ -50,7 +50,6 @@ set(plugin_SOURCES
     phone/sip.cpp
     phone/stun.cpp
     places.cpp
-    player.cpp
     rooms.cpp
     roster.cpp
     settings.cpp
@@ -78,7 +77,6 @@ set(plugin_MOC_HEADERS
     phone/sip.h
     phone/stun.h
     places.h
-    player.h
     rooms.h
     roster.h
     settings.h

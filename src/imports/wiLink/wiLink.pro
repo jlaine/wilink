@@ -58,7 +58,6 @@ SOURCES += \
     phone/sip.cpp \
     photos.cpp \
     places.cpp \
-    player.cpp \
     rooms.cpp \
     roster.cpp \
     settings.cpp \
@@ -85,7 +84,6 @@ HEADERS += \
     photos.h \
     phone.h \
     places.h \
-    player.h \
     phone/sip.h \
     phone/sip_p.h \
     rooms.h \
