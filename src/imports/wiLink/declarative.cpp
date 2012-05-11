@@ -171,10 +171,6 @@ NetworkAccessManager::NetworkAccessManager(QObject *parent)
     cache->setCacheDirectory(QDir(dataPath).filePath("cache"));
     setCache(cache);
 
-    check = connect(this, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
-                    QNetIO::Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*,QAuthenticator*)));
-    Q_ASSERT(check);
-
     check = connect(this, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)),
                     this, SLOT(onSslErrors(QNetworkReply*,QList<QSslError>)));
     Q_ASSERT(check);

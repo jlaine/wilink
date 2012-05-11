@@ -25,25 +25,100 @@ Dialog {
     id: dialog
 
     title: qsTr('Add an account')
-    footerComponent: PanelHelp {
-        anchors.margins: 8
-        text: qsTr('If you need help, please refer to the <a href="%1">%2 FAQ</a>.').replace('%1', 'https://www.wifirst.net/wilink/faq').replace('%2', application.applicationName)
-    }
 
-    AccountAddPanel {
-        id: panel
 
+    Item {
         anchors.fill: dialog.contents
-        domain: 'wifirst.net'
-        focus: true
-        model: AccountModel {}
-        opacity: 1
 
-        onAccepted: {
-            model.append({'jid': jid, 'password': password});
-            model.submit();
-            dialog.close();
+        PanelHelp {
+            id: help
+
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            text: qsTr("Enter the username and password for your '%1' account.").replace('%1', 'wifirst.net')
         }
-        onClose: application.quit()
+
+        Item {
+            id: usernameRow
+
+            anchors.top: help.bottom
+            anchors.topMargin: appStyle.spacing.vertical
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: usernameInput.height
+
+            Label {
+                id: usernameLabel
+
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+                elide: Text.ElideRight
+                font.bold: true
+                text: qsTr('Username')
+                width: 100
+            }
+
+            InputBar {
+                id: usernameInput
+
+                anchors.top: parent.top
+                anchors.left: usernameLabel.right
+                anchors.leftMargin: appStyle.spacing.horizontal
+                anchors.right: parent.right
+                validator: RegExpValidator {
+                    regExp: /.+/
+                }
+            }
+        }
+
+        Item {
+            id: passwordRow
+
+            anchors.top: usernameRow.bottom
+            anchors.topMargin: appStyle.spacing.vertical
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: passwordInput.height
+
+            Label {
+                id: passwordLabel
+
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+                elide: Text.ElideRight
+                font.bold: true
+                text: qsTr('Password')
+                width: 100
+            }
+
+            InputBar {
+                id: passwordInput
+
+                anchors.top: parent.top
+                anchors.left: passwordLabel.right
+                anchors.leftMargin: appStyle.spacing.horizontal
+                anchors.right: parent.right
+                echoMode: TextInput.Password
+                validator: RegExpValidator {
+                    regExp: /.+/
+                }
+            }
+        }
     }
+
+    onAccepted: {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', 'https://dev.wifirst.net/w/wilink/credentials', true, usernameInput.text, passwordInput.text);
+        xhr.setRequestHeader('Accept', 'application/xml');
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4) {
+                console.log("zob: " + xhr.status);
+                console.log("zob text: " + xhr.responseText);
+            }
+        }
+        xhr.send();
+    }
+
+    onRejected: application.quit()
 }

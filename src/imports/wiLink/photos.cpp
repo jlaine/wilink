@@ -33,6 +33,7 @@
 #include "photos.h"
 #include "shares.h"
 #include "settings.h"
+#include "wallet.h"
 
 #define BLOCK_SIZE 16384
 
@@ -66,7 +67,16 @@ class PhotoNetworkAccessManagerFactory : public FileSystemNetworkAccessManagerFa
 public:
     QNetworkAccessManager *create(QObject *parent)
     {
-        return new NetworkAccessManager(parent);
+        bool check;
+        Q_UNUSED(check);
+
+        QNetworkAccessManager *network = new NetworkAccessManager(parent);
+
+        check = QObject::connect(network, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
+                                 QNetIO::Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*,QAuthenticator*)));
+        Q_ASSERT(check);
+
+        return network;
     };
 };
 
