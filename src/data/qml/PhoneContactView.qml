@@ -57,7 +57,7 @@ ContactView {
 
         Column {
             anchors.left: avatar.right
-            anchors.right: callButtonLoader.left
+            anchors.right: callButton.left
             anchors.leftMargin: 3
             anchors.verticalCenter: parent.verticalCenter
 
@@ -83,16 +83,20 @@ ContactView {
             }
         }
 
-        Loader {
-            id: callButtonLoader
-
-            property QtObject model
+        Button {
+            id: callButton
 
             anchors.right: parent.right
             anchors.rightMargin: 6
             anchors.verticalCenter: parent.verticalCenter
-            sourceComponent: view.currentItem == item ? callButtonComponent : undefined
+            iconSize: appStyle.icon.smallSize
+            iconSource: 'image://icon/call'
+            visible: view.currentItem == item
             z: 1
+
+            onClicked: {
+                block.itemClicked(model);
+            }
         }
 
         MouseArea {
@@ -135,19 +139,6 @@ ContactView {
 
     onAddClicked: {
         dialogSwapper.showPanel('PhoneContactDialog.qml', {'model': contactsModel});
-    }
-
-    Component {
-        id: callButtonComponent
-
-        Button {
-            iconSize: appStyle.icon.smallSize
-            iconSource: 'image://icon/call'
-
-            onClicked: {
-                block.itemClicked(parent.model);
-            }
-        }
     }
 
     Component {
