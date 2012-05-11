@@ -86,7 +86,7 @@ PhoneContactModel::PhoneContactModel(QObject *parent)
     setRoleNames(roleNames);
 
     // http
-    m_network = new NetworkAccessManager(this);
+    m_network = new AuthenticatedNetworkAccessManager(this);
 }
 
 void PhoneContactModel::addContact(const QString &name, const QString &phone)
@@ -433,7 +433,7 @@ PhoneHistoryModel::PhoneHistoryModel(QObject *parent)
             this, SLOT(_q_nameChanged(QString)));
 
     // http
-    m_network = new NetworkAccessManager(this);
+    m_network = new AuthenticatedNetworkAccessManager(this);
 
     // sound
     m_player = QSoundPlayer::instance();

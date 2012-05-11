@@ -238,6 +238,17 @@ QString NetworkAccessManager::userAgent()
     return globalUserAgent;
 }
 
+AuthenticatedNetworkAccessManager::AuthenticatedNetworkAccessManager(QObject *parent)
+    : NetworkAccessManager(parent)
+{
+    bool check;
+    Q_UNUSED(check);
+
+    check = QObject::connect(this, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
+                             QNetIO::Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*,QAuthenticator*)));
+    Q_ASSERT(check);
+}
+
 static QStringList droppedFiles(QGraphicsSceneDragDropEvent *event)
 {
     QStringList files;
