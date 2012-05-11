@@ -108,6 +108,5 @@
     <file>qml/WebPanel.qml</file>
     <file>qml/WebPlugin.qml</file>
     <file>qml/WebTab.qml</file>
-    <file>qml/WifirstPlugin.qml</file>
 </qresource>
 </RCC>

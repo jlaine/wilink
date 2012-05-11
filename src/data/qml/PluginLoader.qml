@@ -129,6 +129,5 @@ Item {
         pluginModel.append({ source: 'PhotoPlugin.qml', autoload: true });
         pluginModel.append({ source: 'SharePlugin.qml', autoload: true });
         pluginModel.append({ source: 'WebPlugin.qml', autoload: true });
-        pluginModel.append({ source: 'WifirstPlugin.qml', autoload: true });
     }
 }
