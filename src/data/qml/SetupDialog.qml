@@ -120,5 +120,22 @@ Dialog {
         xhr.send();
     }
 
+    onActiveFocusChanged: {
+        if (activeFocus && !usernameInput.activeFocus) {
+            usernameInput.forceActiveFocus();
+        }
+    }
+
     onRejected: application.quit()
+
+    Keys.onReturnPressed: dialog.accepted()
+
+    Keys.onEscapePressed: dialog.rejected()
+
+    Keys.onTabPressed: {
+        if (usernameInput.activeFocus)
+            passwordInput.forceActiveFocus();
+        else
+            usernameInput.forceActiveFocus();
+    }
 }
