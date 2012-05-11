@@ -26,6 +26,9 @@ Dialog {
 
     title: qsTr('Add an account')
 
+    AccountModel {
+        id: accountModel
+    }
 
     Item {
         anchors.fill: dialog.contents
@@ -105,20 +108,86 @@ Dialog {
                 }
             }
         }
+
+        Label {
+            id: statusLabel
+
+            property string authErrorText: qsTr('Could not connect, please check your username and password.')
+            property string unknownErrorText: qsTr('An unknown error occured.')
+            property string incompleteText: qsTr('Please enter a valid username and password.')
+            property string testingText: qsTr('Checking your username and password..')
+
+            anchors.top: passwordRow.bottom
+            anchors.topMargin: appStyle.spacing.vertical
+            anchors.left: parent.left
+            anchors.right: parent.right
+            wrapMode: Text.WordWrap
+        }
     }
 
     onAccepted: {
+        if (!usernameInput.acceptableInput || !passwordInput.acceptableInput) {
+            dialog.state = 'incomplete';
+            return;
+        }
+        dialog.state = 'testing';
+
         var xhr = new XMLHttpRequest();
-        xhr.open('GET', 'https://dev.wifirst.net/w/wilink/credentials', true, usernameInput.text, passwordInput.text);
-        xhr.setRequestHeader('Accept', 'application/xml');
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4) {
-                console.log("zob: " + xhr.status);
-                console.log("zob text: " + xhr.responseText);
+                if (xhr.status == 200) {
+                    var jid, password;
+                    var doc = xhr.responseXML.documentElement;
+                    for (var i = 0; i < doc.childNodes.length; ++i) {
+                        var node = doc.childNodes[i];
+                        if (node.nodeName == 'id') {
+                            jid = node.firstChild.nodeValue;
+                        } else if (node.nodeName == 'password') {
+                            password = node.firstChild.nodeValue;
+                        }
+                    }
+                    if (jid && password) {
+                        accountModel.append({'jid': jid, 'password': password});
+                        accountModel.submit();
+                        dialog.close();
+                    } else {
+                        dialog.state = 'unknownError';
+                    }
+                } else if (xhr.status == 401) {
+                    dialog.state = 'authError';
+                } else {
+                    dialog.state = 'unknownError';
+                }
             }
         }
+        xhr.open('GET', 'https://dev.wifirst.net/w/wilink/credentials', true, usernameInput.text, passwordInput.text);
+        xhr.setRequestHeader('Accept', 'application/xml');
         xhr.send();
     }
+
+    states: [
+        State {
+            name: 'authError'
+            PropertyChanges { target: statusLabel; color: 'red'; text: statusLabel.authErrorText }
+        },
+
+        State {
+            name: 'unknownError'
+            PropertyChanges { target: statusLabel; color: 'red'; text: statusLabel.unknownErrorText }
+        },
+
+        State {
+            name: 'incomplete'
+            PropertyChanges { target: statusLabel; color: 'red'; text: statusLabel.incompleteText }
+        },
+
+        State {
+            name: 'testing'
+            PropertyChanges { target: statusLabel; text: statusLabel.testingText }
+            PropertyChanges { target: usernameInput; enabled: false }
+            PropertyChanges { target: passwordInput; enabled: false }
+        }
+    ]
 
     onActiveFocusChanged: {
         if (activeFocus && !usernameInput.activeFocus) {
