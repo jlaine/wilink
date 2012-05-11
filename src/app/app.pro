@@ -48,8 +48,7 @@ QMAKE_TARGET_COPYRIGHT="Copyright (c) 2009-2012 Wifirst"
 android {
 } else:mac {
     ICON = ../data/wiLink.icns
-    QMAKE_INFO_PLIST = ../data/wiLink.plist
-    QMAKE_POST_LINK = sed -i \"\" -e \"s,@VERSION@,$$VERSION,g\" -e \"s,@COPYRIGHT@,$$QMAKE_TARGET_COPYRIGHT,g\" wiLink.app/Contents/Info.plist
+    QMAKE_POST_LINK = sed -e \"s,@ICON@,wiLink.icns,g\" -e \"s,@EXECUTABLE@,wiLink,g\" -e \"s,@TYPEINFO@,????,g\" -e \"s,@VERSION@,$$VERSION,g\" -e \"s,@COPYRIGHT@,$$QMAKE_TARGET_COPYRIGHT,g\" $$PWD/app.plist > wiLink.app/Contents/Info.plist
 } else:symbian {
     vendorinfo = \
         "; Localised Vendor name" \
