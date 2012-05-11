@@ -44,7 +44,6 @@ public:
     QAudioOutput *audioOutput;
     QNetworkReply *networkReply;
     QSoundPlayer *player;
-    QSoundFile *reader;
     bool repeat;
     QSoundPlayerJob::State state;
     QUrl url;
@@ -58,7 +57,6 @@ QSoundPlayerJobPrivate::QSoundPlayerJobPrivate(QSoundPlayerJob *qq)
     audioOutput(0),
     networkReply(0),
     player(0),
-    reader(0),
     repeat(false),
     state(QSoundPlayerJob::IdleState),
     q(qq)
@@ -73,13 +71,11 @@ void QSoundPlayerJobPrivate::finish()
 }
 
 QSoundPlayerJob::QSoundPlayerJob(QSoundPlayer *player, int id)
+    : QObject(player)
 {
     d = new QSoundPlayerJobPrivate(this);
     d->id = id;
     d->player = player;
-
-    moveToThread(player->soundThread());
-    setParent(player);
 }
 
 QSoundPlayerJob::~QSoundPlayerJob() 
@@ -88,8 +84,6 @@ QSoundPlayerJob::~QSoundPlayerJob()
         d->networkReply->deleteLater();
     if (d->audioOutput)
         d->audioOutput->deleteLater();
-    if (d->reader)
-        d->reader->deleteLater();
     delete d;
 }
 
@@ -110,20 +104,32 @@ QUrl QSoundPlayerJob::url() const
 
 void QSoundPlayerJob::setFile(QSoundFile *soundFile)
 {
-    d->reader = soundFile;
-    d->reader->setRepeat(d->repeat);
+    bool check;
+    Q_UNUSED(check);
 
-    // move reader to audio thread
-    d->reader->setParent(0);
-    d->reader->moveToThread(thread());
-    d->reader->setParent(this);
-
-    if (d->reader->open(QIODevice::Unbuffered | QIODevice::ReadOnly))
-        QMetaObject::invokeMethod(this, "_q_start");
-    else {
+    // open sound file
+    soundFile->setRepeat(d->repeat);
+    if (!soundFile->open(QIODevice::Unbuffered | QIODevice::ReadOnly)) {
         qWarning("QSoundPlayer(%i) could not open sound file", d->id);
         d->finish();
+        return;
     }
+
+    // play file
+    qDebug("QSoundPlayer(%i) starting audio", d->id);
+    d->audioOutput = new QAudioOutput(d->player->outputDevice(), soundFile->format());
+
+    check = connect(d->audioOutput, SIGNAL(stateChanged(QAudio::State)),
+                    this, SLOT(_q_stateChanged(QAudio::State)));
+    Q_ASSERT(check);
+
+    d->audioOutput->moveToThread(d->player->soundThread());
+    soundFile->moveToThread(d->player->soundThread());
+    soundFile->setParent(d->audioOutput);
+    d->audioOutput->start(soundFile);
+
+    d->state = PlayingState;
+    emit stateChanged();
 }
 
 void QSoundPlayerJob::stop()
@@ -189,26 +195,6 @@ void QSoundPlayerJob::_q_downloadFinished()
 
     QIODevice *iodevice = d->player->networkAccessManager()->cache()->data(reply->url());
     setFile(new QSoundFile(iodevice, fileType));
-}
-
-void QSoundPlayerJob::_q_start()
-{
-    bool check;
-    Q_UNUSED(check);
-
-    if (!d->reader)
-        return;
-
-    qDebug("QSoundPlayer(%i) starting audio", d->id);
-    d->audioOutput = new QAudioOutput(d->player->outputDevice(), d->reader->format(), this);
-    check = connect(d->audioOutput, SIGNAL(stateChanged(QAudio::State)),
-                    this, SLOT(_q_stateChanged(QAudio::State)));
-    Q_ASSERT(check);
-
-    d->audioOutput->start(d->reader);
-
-    d->state = PlayingState;
-    emit stateChanged();
 }
 
 void QSoundPlayerJob::_q_stateChanged(QAudio::State state)

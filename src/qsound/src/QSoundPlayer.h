@@ -59,7 +59,6 @@ public slots:
 private slots:
     void _q_download();
     void _q_downloadFinished();
-    void _q_start();
     void _q_stateChanged(QAudio::State state);
 
 private:
