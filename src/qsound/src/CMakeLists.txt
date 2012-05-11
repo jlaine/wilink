@@ -16,19 +16,15 @@ if(MAD_LIBRARY)
 endif()
 
 # vorbisfile support
-find_library(VORBISFILE_LIBRARY vorbisfile)
-if(VORBISFILE_LIBRARY)
-  check_include_files(vorbis/vorbisfile.h HAVE_VORBISFILE_H)
-  if(HAVE_VORBISFILE_H)
-    message(STATUS "Found vorbisfile library")
+pkg_check_modules(VORBISFILE vorbisfile)
+if(VORBISFILE_FOUND)
     add_definitions(-DQSOUND_USE_VORBISFILE)
-    list(APPEND qsound_LIBRARIES ${VORBISFILE_LIBRARY})
-  endif()
+    list(APPEND qsound_LIBRARIES ${VORBISFILE_LIBRARIES})
 endif()
 
 # DirectShow support
 if(WIN32)
-  list(APPEND qsound_LIBRARIES -lole32 -loleaut32 -lwinmm -luuid)
+    list(APPEND qsound_LIBRARIES -lole32 -loleaut32 -lwinmm -luuid)
 endif()
 
 # QTKit support

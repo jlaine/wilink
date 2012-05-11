@@ -97,7 +97,6 @@ if(APPLE)
     list(APPEND plugin_SOURCES idle/idle_mac.cpp)
 elseif (UNIX)
     # libnotify support
-    find_package(PkgConfig)
     pkg_check_modules(LIBNOTIFY "libnotify")
     if(LIBNOTIFY_FOUND)
         message(STATUS "Found libnotify library")
