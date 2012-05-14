@@ -31,10 +31,11 @@ static QSet<AccountModel*> globalInstances;
 class AccountItem : public ChatModelItem
 {
 public:
-    AccountItem(const QString &type, const QString &username);
+    AccountItem(const QString &type, const QString &realm, const QString &username);
     QString provider() const;
 
     const QString type;
+    const QString realm;
     const QString username;
     QString changedPassword;
 };
@@ -50,8 +51,9 @@ static QString realm(const QString &jid)
         return domain;
 }
 
-AccountItem::AccountItem(const QString &type_, const QString &username_)
+AccountItem::AccountItem(const QString &type_, const QString &realm_, const QString &username_)
     : type(type_)
+    , realm(realm_)
     , username(username_)
 {
 }
@@ -91,21 +93,21 @@ AccountModel::~AccountModel()
 
 void AccountModel::append(const QVariantMap &obj)
 {
-    const QString username = obj.value("username").toString();
-    const QString password = obj.value("password").toString();
     const QString type = obj.value("type").toString();
-
     if (type != "chat") {
         qWarning("Invalid account type specified");
         return;
     }
 
-    if (username.isEmpty() || password.isEmpty()) {
-        qWarning("Username and password are required to add an account");
+    const QString realm = obj.value("realm").toString();
+    const QString username = obj.value("username").toString();
+    const QString password = obj.value("password").toString();
+    if (realm.isEmpty() || username.isEmpty() || password.isEmpty()) {
+        qWarning("Realm, username and password are required to add an account");
         return;
     }
 
-    AccountItem *item = new AccountItem(type, username);
+    AccountItem *item = new AccountItem(type, realm, username);
     item->changedPassword = password;
     addItem(item, rootItem);
 }
@@ -215,7 +217,7 @@ void AccountModel::_q_reload()
     const QStringList chatJids = QSettings().value("ChatAccounts").toStringList();
     foreach (const QString &jid, chatJids) {
         if (QRegExp("^[^@/ ]+@[^@/ ]+$").exactMatch(jid)) {
-            AccountItem *item = new AccountItem("chat", jid);
+            AccountItem *item = new AccountItem("chat", realm(jid), jid);
             item->parent = rootItem;
             rootItem->children.append(item);
         }
