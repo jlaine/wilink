@@ -36,8 +36,10 @@ Panel {
 
         onAuthenticationFailed: {
             console.log("Failed to authenticate with chat server");
-            var jid = Utils.jidToBareJid(appClient.jid);
-            dialogSwapper.showPanel('AccountPasswordDialog.qml', {client: appClient, jid: jid});
+            if (Utils.jidToDomain(appClient.jid) != 'wifirst.net') {
+                var jid = Utils.jidToBareJid(appClient.jid);
+                dialogSwapper.showPanel('AccountPasswordDialog.qml', {client: appClient, jid: jid});
+            }
         }
 
         onConflictReceived: {
