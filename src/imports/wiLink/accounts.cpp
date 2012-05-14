@@ -31,11 +31,11 @@ static QSet<AccountModel*> globalInstances;
 class AccountItem : public ChatModelItem
 {
 public:
-    AccountItem(const QString &jid);
+    AccountItem(const QString &type, const QString &username);
     QString provider() const;
-    QString username() const;
 
-    const QString jid;
+    const QString type;
+    const QString username;
     QString changedPassword;
 };
 
@@ -50,25 +50,21 @@ static QString realm(const QString &jid)
         return domain;
 }
 
-AccountItem::AccountItem(const QString &jid_)
-    : jid(jid_)
+AccountItem::AccountItem(const QString &type_, const QString &username_)
+    : type(type_)
+    , username(username_)
 {
 }
 
 QString AccountItem::provider() const
 {
-    const QString domain = QXmppUtils::jidToDomain(jid);
+    const QString domain = QXmppUtils::jidToDomain(username);
     if (domain == QLatin1String("wifirst.net"))
         return QLatin1String("wifirst");
     else if (domain == QLatin1String("gmail.com"))
         return QLatin1String("google");
     else
         return domain;
-}
-
-QString AccountItem::username() const
-{
-    return jid;
 }
 
 AccountModel::AccountModel(QObject *parent)
@@ -79,6 +75,7 @@ AccountModel::AccountModel(QObject *parent)
     names.insert(UsernameRole, "username");
     names.insert(PasswordRole, "password");
     names.insert(ProviderRole, "provider");
+    names.insert(TypeRole, "type");
     setRoleNames(names);
 
     // load accounts
@@ -94,14 +91,21 @@ AccountModel::~AccountModel()
 
 void AccountModel::append(const QVariantMap &obj)
 {
-    const QString jid = obj.value("jid").toString();
+    const QString username = obj.value("username").toString();
     const QString password = obj.value("password").toString();
-    if (jid.isEmpty() || password.isEmpty()) {
-        qWarning("JID and password are required to add an account");
+    const QString type = obj.value("type").toString();
+
+    if (type != "chat") {
+        qWarning("Invalid account type specified");
         return;
     }
 
-    AccountItem *item = new AccountItem(jid);
+    if (username.isEmpty() || password.isEmpty()) {
+        qWarning("Username and password are required to add an account");
+        return;
+    }
+
+    AccountItem *item = new AccountItem(type, username);
     item->changedPassword = password;
     addItem(item, rootItem);
 }
@@ -113,13 +117,22 @@ QVariant AccountModel::data(const QModelIndex &index, int role) const
         return QVariant();
 
     if (role == JidRole) {
-        return item->jid;
+        return item->username;
     } else if (role == PasswordRole) {
-        return getPassword(item->jid);
+        const QString key = realm(item->username);
+        if (!key.isEmpty()) {
+            QString tmpUsername(item->username);
+            QString tmpPassword;
+
+            if (QNetIO::Wallet::instance()->getCredentials(key, tmpUsername, tmpPassword))
+                return tmpPassword;
+        }
     } else if (role == ProviderRole) {
         return item->provider();
     } else if (role == UsernameRole) {
-        return item->username();
+        return item->username;
+    } else if (role == UsernameRole) {
+        return item->type;
     }
 
     return QVariant();
@@ -138,11 +151,13 @@ bool AccountModel::submit()
     // save passwords for new accounts
     foreach (ChatModelItem *ptr, rootItem->children) {
         AccountItem *item = static_cast<AccountItem*>(ptr);
-        if (!item->changedPassword.isEmpty()) {
-            setPassword(item->jid, item->changedPassword);
-            item->changedPassword = QString();
+        if (item->type == "chat") {
+            if (!item->changedPassword.isEmpty()) {
+                setPassword(item->username, item->changedPassword);
+                item->changedPassword = QString();
+            }
+            newJids << item->username;
         }
-        newJids << item->jid;
     }
 
     // remove password for removed accounts
@@ -200,7 +215,7 @@ void AccountModel::_q_reload()
     const QStringList chatJids = QSettings().value("ChatAccounts").toStringList();
     foreach (const QString &jid, chatJids) {
         if (QRegExp("^[^@/ ]+@[^@/ ]+$").exactMatch(jid)) {
-            AccountItem *item = new AccountItem(jid);
+            AccountItem *item = new AccountItem("chat", jid);
             item->parent = rootItem;
             rootItem->children.append(item);
         }

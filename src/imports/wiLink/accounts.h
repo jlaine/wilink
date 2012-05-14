@@ -57,6 +57,7 @@ private:
         UsernameRole,
         PasswordRole,
         ProviderRole,
+        TypeRole
     };
 
     AccountModelPrivate *d;
