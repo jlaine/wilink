@@ -31,7 +31,7 @@ Plugin {
             if (account.type == 'xmpp') {
                 var title = qsTr('Chat');
                 if (accountModel.count > 1)
-                    title += '<br/><small>' + account.provider + '</small>';
+                    title += '<br/><small>' + account.realm + '</small>';
                 dock.model.add({
                     'iconSource': 'image://icon/dock-chat',
                     'iconPress': 'image://icon/chat',

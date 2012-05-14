@@ -28,17 +28,20 @@ Plugin {
         for (var i = 0; i < accountModel.count; ++i) {
             var account = accountModel.get(i);
             if (account.type == 'web') {
-                var url;
-                if (account.realm == 'www.wifirst.net')
+                var url, accountTitle;
+                if (account.realm == 'www.wifirst.net') {
                     url = 'wifirst://default';
-                else if (account.realm == 'www.google.com')
+                    accountTitle = 'Wifirst';
+                } else if (account.realm == 'www.google.com') {
                     url = 'picasa://default';
-                else
+                    accountTitle = 'Picasa';
+                } else {
                     continue;
+                }
 
                 var title = qsTr('Photos');
                 if (accountModel.count > 1)
-                    title += '<br/><small>' + account.provider + '</small>';
+                    title += '<br/><small>' + accountTitle + '</small>';
 
                 dock.model.add({
                     'iconSource': 'image://icon/dock-photo',

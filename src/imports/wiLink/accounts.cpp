@@ -100,6 +100,8 @@ QVariant AccountModel::data(const QModelIndex &index, int role) const
         }
     } else if (role == UsernameRole) {
         return item->username;
+    } else if (role == RealmRole) {
+        return item->realm;
     } else if (role == TypeRole) {
         return item->type;
     }
