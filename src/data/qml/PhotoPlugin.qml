@@ -27,28 +27,29 @@ Plugin {
     onLoaded: {
         for (var i = 0; i < accountModel.count; ++i) {
             var account = accountModel.get(i);
+            if (account.type == 'web') {
+                var url;
+                if (account.realm == 'www.wifirst.net')
+                    url = 'wifirst://default';
+                else if (account.realm == 'www.google.com')
+                    url = 'picasa://default';
+                else
+                    continue;
 
-            var url;
-            if (account.provider == 'wifirst')
-                url = 'wifirst://default';
-            else if (account.provider == 'google')
-                url = 'picasa://default';
-            else
-                continue;
+                var title = qsTr('Photos');
+                if (accountModel.count > 1)
+                    title += '<br/><small>' + account.provider + '</small>';
 
-            var title = qsTr('Photos');
-            if (accountModel.count > 1)
-                title += '<br/><small>' + account.provider + '</small>';
-
-            dock.model.add({
-                'iconSource': 'image://icon/dock-photo',
-                'iconPress': 'image://icon/photos',
-                'panelSource': 'PhotoPanel.qml',
-                'panelProperties': {'url': url},
-                'priority': 7,
-                'shortcut': Qt.ControlModifier + Qt.Key_P,
-                'text': title,
-                'visible': true});
+                dock.model.add({
+                    'iconSource': 'image://icon/dock-photo',
+                    'iconPress': 'image://icon/photos',
+                    'panelSource': 'PhotoPanel.qml',
+                    'panelProperties': {'url': url},
+                    'priority': 7,
+                    'shortcut': Qt.ControlModifier + Qt.Key_P,
+                    'text': title,
+                    'visible': true});
+            }
         }
     }
 

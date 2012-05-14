@@ -149,7 +149,7 @@ Dialog {
                         }
                     }
                     if (jid && password) {
-                        accountModel.append({type: 'chat', username: jid, password: password, realm: Utils.jidToDomain(jid)});
+                        accountModel.append({type: 'xmpp', username: jid, password: password, realm: Utils.jidToDomain(jid)});
                         accountModel.append({type: 'web', username: webUsername, password: webPassword, realm: 'www.wifirst.net'});
                         accountModel.submit();
                         dialog.close();

@@ -28,19 +28,21 @@ Plugin {
     onLoaded: {
         for (var i = 0; i < accountModel.count; ++i) {
             var account = accountModel.get(i);
-            var title = qsTr('Chat');
-            if (accountModel.count > 1)
-                title += '<br/><small>' + account.provider + '</small>';
-            dock.model.add({
-                'iconSource': 'image://icon/dock-chat',
-                'iconPress': 'image://icon/chat',
-                'notified': false,
-                'panelProperties': {'accountJid': account.username},
-                'panelSource': 'ChatPanel.qml',
-                'priority': 10,
-                'text': title,
-                'visible': true});
-            swapper.showPanel('ChatPanel.qml', {'accountJid': account.username});
+            if (account.type == 'xmpp') {
+                var title = qsTr('Chat');
+                if (accountModel.count > 1)
+                    title += '<br/><small>' + account.provider + '</small>';
+                dock.model.add({
+                    'iconSource': 'image://icon/dock-chat',
+                    'iconPress': 'image://icon/chat',
+                    'notified': false,
+                    'panelProperties': {'accountJid': account.username},
+                    'panelSource': 'ChatPanel.qml',
+                    'priority': 10,
+                    'text': title,
+                    'visible': true});
+                swapper.showPanel('ChatPanel.qml', {'accountJid': account.username});
+            }
         }
     }
 

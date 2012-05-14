@@ -55,7 +55,7 @@ Panel {
             opacity: 0
 
             onAccepted: {
-                listPanel.model.append({type: 'chat', username: jid, password: password, realm: Utils.jidToDomain(jid)});
+                listPanel.model.append({type: 'xmpp', username: jid, password: password, realm: Utils.jidToDomain(jid)});
                 addPanel.close();
             }
             onClose: panel.state = ''
