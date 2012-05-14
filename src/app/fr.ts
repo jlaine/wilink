@@ -87,20 +87,8 @@
         <translation>Vous avez déjà un compte pour &apos;%1&apos;.</translation>
     </message>
     <message>
-        <source>Username</source>
-        <translation>Identifiant</translation>
-    </message>
-    <message>
-        <source>Enter the username and password for your &apos;%1&apos; account.</source>
-        <translation>Saisissez l&apos;identifiant et le mot de passe de votre compte &apos;%1&apos;.</translation>
-    </message>
-    <message>
         <source>Cancel</source>
         <translation>Annuler</translation>
-    </message>
-    <message>
-        <source>Please enter a valid username.</source>
-        <translation>Veuillez saisir un identifiant valide.</translation>
     </message>
     <message>
         <source>Please enter a valid address.</source>
@@ -1144,7 +1132,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>This plugin allows you to access the web.</source>
-        <translation>Ce module vous permet d'accéder au web.</translation>
+        <translation>Ce module vous permet d&apos;accéder au web.</translation>
     </message>
 </context>
 <context>

@@ -24,7 +24,6 @@ import 'utils.js' as Utils
 FocusScope {
     id: panel
 
-    property string domain: ''
     property QtObject model
     property string testJid
     property string testPassword
@@ -38,7 +37,7 @@ FocusScope {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        text: panel.domain != '' ? qsTr("Enter the username and password for your '%1' account.").replace('%1', panel.domain) : qsTr('Enter the address and password for the account you want to add.')
+        text: qsTr('Enter the address and password for the account you want to add.')
     }
 
     Item {
@@ -57,7 +56,7 @@ FocusScope {
             anchors.verticalCenter: parent.verticalCenter
             elide: Text.ElideRight
             font.bold: true
-            text: panel.domain != '' ? qsTr('Username') : qsTr('Address')
+            text: qsTr('Address')
             width: 100
         }
 
@@ -69,7 +68,7 @@ FocusScope {
             anchors.leftMargin: appStyle.spacing.horizontal
             anchors.right: parent.right
             validator: RegExpValidator {
-                regExp: panel.domain != '' ? /^[^@/ ]+$/ : /^[^@/ ]+@[^@/ ]+$/
+                regExp: /^[^@/ ]+@[^@/ ]+$/
             }
 
             onTextChanged: {
@@ -123,7 +122,7 @@ FocusScope {
     Label {
         id: statusLabel
 
-        property string badJidText: panel.domain != '' ? qsTr('Please enter a valid username.') : qsTr('Please enter a valid address.')
+        property string badJidText: qsTr('Please enter a valid address.')
         property string badPasswordText: qsTr('Please enter your password.')
         property string dupeText: qsTr("You already have an account for '%1'.").replace('%1', Utils.jidToDomain(jidInput.text));
         property string failedText: qsTr('Could not connect, please check your username and password.')
@@ -159,8 +158,6 @@ FocusScope {
                 }
 
                 var jid = jidInput.text;
-                if (panel.domain != '')
-                    jid += '@' + panel.domain;
 
                 // check for duplicate account
                 for (var i = 0; i < panel.model.count; i++) {
