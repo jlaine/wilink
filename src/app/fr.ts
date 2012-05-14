@@ -145,13 +145,6 @@
     </message>
 </context>
 <context>
-    <name>Application</name>
-    <message>
-        <source>&amp;Quit</source>
-        <translation>&amp;Quitter</translation>
-    </message>
-</context>
-<context>
     <name>CallNotification</name>
     <message>
         <source>Call from %1</source>
@@ -749,52 +742,6 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>PlayerPanel</name>
-    <message>
-        <source>Stop</source>
-        <translation>Arrêter</translation>
-    </message>
-    <message>
-        <source>Add</source>
-        <translation>Ajouter</translation>
-    </message>
-    <message>
-        <source>Sound files</source>
-        <translation>Fichiers sons</translation>
-    </message>
-    <message>
-        <source>All files</source>
-        <translation>Tous les fichiers</translation>
-    </message>
-    <message>
-        <source>Add files</source>
-        <translation>Ajouter des fichiers</translation>
-    </message>
-    <message>
-        <source>Music player</source>
-        <translation>Lecteur de musique</translation>
-    </message>
-    <message>
-        <source>To add music to the player, simply drag and drop files to the playlist.</source>
-        <translation>Pour ajouter de la musique au lecteur, faites glisser des fichiers dans la fenêtre.</translation>
-    </message>
-    <message>
-        <source>Clear</source>
-        <translation>Effacer</translation>
-    </message>
-</context>
-<context>
-    <name>PlayerPlugin</name>
-    <message>
-        <source>Music</source>
-        <translation>Musique</translation>
-    </message>
-    <message>
-        <source>This plugin allows you to play music.</source>
-        <translation>Ce module vous permet de lire de la musique.</translation>
-    </message>
-</context>
-<context>
     <name>PluginPreferencePanel</name>
     <message>
         <source>Plugins</source>
@@ -825,6 +772,13 @@ Acceptez-vous?</translation>
     <message>
         <source>Plugins</source>
         <translation>Modules</translation>
+    </message>
+</context>
+<context>
+    <name>RoomConfigurationDialog</name>
+    <message>
+        <source>Chat room configuration</source>
+        <translation>Configuration du salon</translation>
     </message>
 </context>
 <context>
@@ -967,11 +921,39 @@ Acceptez-vous?</translation>
     <name>SetupDialog</name>
     <message>
         <source>If you need help, please refer to the &lt;a href=&quot;%1&quot;&gt;%2 FAQ&lt;/a&gt;.</source>
-        <translation>Si vous avez besoin d&apos;aide, merci de consulter la &lt;a href=&quot;%1&quot;&gt;FAQ %2&lt;/a&gt;.</translation>
+        <translation type="obsolete">Si vous avez besoin d&apos;aide, merci de consulter la &lt;a href=&quot;%1&quot;&gt;FAQ %2&lt;/a&gt;.</translation>
     </message>
     <message>
         <source>Add an account</source>
         <translation>Ajouter un compte</translation>
+    </message>
+    <message>
+        <source>Enter the username and password for your &apos;%1&apos; account.</source>
+        <translation>Saisissez l&apos;identifiant et le mot de passe de votre compte &apos;%1&apos;.</translation>
+    </message>
+    <message>
+        <source>Username</source>
+        <translation>Identifiant</translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation>Mot de passe</translation>
+    </message>
+    <message>
+        <source>Could not connect, please check your username and password.</source>
+        <translation>La connexion a échoué, merci de vérifier votre identifiant et mot de passe.</translation>
+    </message>
+    <message>
+        <source>An unknown error occured.</source>
+        <translation>Une erreur inconnue est survenue.</translation>
+    </message>
+    <message>
+        <source>Please enter a valid username and password.</source>
+        <translation>Veuillez saisir un identifiant et mot de passe valides.</translation>
+    </message>
+    <message>
+        <source>Checking your username and password..</source>
+        <translation>Vérification de votre identifiant et mot de passe..</translation>
     </message>
 </context>
 <context>
@@ -1155,10 +1137,14 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>WifirstPlugin</name>
+    <name>WebPlugin</name>
     <message>
-        <source>This plugin allows you to access Wifirst services.</source>
-        <translation>Ce module vous permet d&apos;accéder aux services Wifirst.</translation>
+        <source>Web</source>
+        <translation>Web</translation>
+    </message>
+    <message>
+        <source>This plugin allows you to access the web.</source>
+        <translation>Ce module vous permet d'accéder au web.</translation>
     </message>
 </context>
 <context>
