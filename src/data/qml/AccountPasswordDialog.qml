@@ -86,8 +86,15 @@ Dialog {
         if (!passwordInput.acceptableInput)
             return;
 
-        var password = passwordInput.text;
-        accountModel.setPassword(Utils.jidToDomain(dialog.jid), dialog.jid, password);
+        var domain = Utils.jidToDomain(dialog.jid);
+        for (var i = 0; i < accountModel.count; ++i) {
+            var account = accountModel.get(i);
+            if (account.type == 'xmpp' && account.realm == domain && account.username = dialog.jid) {
+                accountModel.setProperty(i, 'password', password);
+                accountModel.submit();
+                break;
+            }
+        }
         dialog.client.connectToServer(dialog.jid, password);
         dialog.close();
     }

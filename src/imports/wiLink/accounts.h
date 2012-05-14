@@ -40,12 +40,10 @@ public slots:
     // QML ListModel
     void append(const QVariantMap &obj);
     void remove(int index);
+    void setProperty(int index, const QString &property, const QVariant &value);
 
     // QAbstractItemModel
     bool submit();
-
-    // Wallet
-    bool setPassword(const QString &realm, const QString &username, const QString &password);
 
 private slots:
     void _q_reload();

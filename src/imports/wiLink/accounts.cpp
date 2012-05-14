@@ -129,6 +129,15 @@ void AccountModel::remove(int row)
     }
 }
 
+void AccountModel::setProperty(int row, const QString &property, const QVariant &value)
+{
+    const QModelIndex idx = index(row, 0);
+    if (idx.isValid() && property == "password") {
+        AccountItem *item = static_cast<AccountItem*>(idx.internalPointer());
+        item->changedPassword = value.toString();
+    }
+}
+
 bool AccountModel::submit()
 {
     QStringList newAccounts;
@@ -161,15 +170,6 @@ bool AccountModel::submit()
     }
 
     return true;
-}
-
-bool AccountModel::setPassword(const QString &realm, const QString &username, const QString &password)
-{
-    if (realm.isEmpty() || username.isEmpty())
-        return false;
-
-    qDebug("Setting password for %s (%s)", qPrintable(username), qPrintable(realm));
-    return QNetIO::Wallet::instance()->setCredentials(realm, username, password);
 }
 
 void AccountModel::_q_reload()
