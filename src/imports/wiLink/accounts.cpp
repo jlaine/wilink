@@ -46,8 +46,15 @@ AccountItem::AccountItem(const QString &type_, const QString &realm_, const QStr
 {
 }
 
+class AccountModelPrivate
+{
+public:
+    QSet<QPair<QString,QString> > removedCredentials;
+};
+
 AccountModel::AccountModel(QObject *parent)
     : ChatModel(parent)
+    , d(new AccountModelPrivate)
 {
     // set additionals role names
     QHash<int, QByteArray> names;
@@ -66,6 +73,7 @@ AccountModel::AccountModel(QObject *parent)
 AccountModel::~AccountModel()
 {
     globalInstances.remove(this);
+    delete d;
 }
 
 void AccountModel::append(const QVariantMap &obj)
@@ -82,6 +90,8 @@ void AccountModel::append(const QVariantMap &obj)
     AccountItem *item = new AccountItem(type, realm, username);
     item->changedPassword = password;
     addItem(item, rootItem);
+
+    d->removedCredentials.remove(qMakePair(realm, username));
 }
 
 QVariant AccountModel::data(const QModelIndex &index, int role) const
@@ -109,9 +119,14 @@ QVariant AccountModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-void AccountModel::remove(int index)
+void AccountModel::remove(int row)
 {
-    removeRows(index, 1);
+    const QModelIndex idx = index(row, 0);
+    if (idx.isValid()) {
+        AccountItem *item = static_cast<AccountItem*>(idx.internalPointer());
+        d->removedCredentials.insert(qMakePair(item->realm, item->username));
+        removeRows(row, 1);
+    }
 }
 
 bool AccountModel::submit()
@@ -129,17 +144,13 @@ bool AccountModel::submit()
         newAccounts << QString("%1:%2:%3").arg(item->type, item->realm, item->username);
     }
 
-#if 0
-    // FIXME: remove password for removed accounts
-    const QStringList oldJids = settings.value("ChatAccounts").toStringList();
-    foreach (const QString &jid, oldJids) {
-        if (!newJids.contains(jid)) {
-            const QString key = realm(jid);
-            qDebug("Removing password for %s (%s)", qPrintable(jid), qPrintable(key));
-            QNetIO::Wallet::instance()->deleteCredentials(key, jid);
-        }
+    // remove password for removed accounts
+    QSet<QPair<QString,QString> >::const_iterator it;
+    for (it = d->removedCredentials.constBegin(); it != d->removedCredentials.constEnd(); ++it) {
+        qDebug("Removing password for %s (%s)", qPrintable(it->second), qPrintable(it->first));
+        QNetIO::Wallet::instance()->deleteCredentials(it->first, it->second);
     }
-#endif
+    d->removedCredentials.clear();
 
     // save accounts
     settings.setValue("Accounts", newAccounts);
@@ -178,9 +189,11 @@ void AccountModel::_q_reload()
 {
     beginResetModel();
 
+    // clear data
     foreach (ChatModelItem *item, rootItem->children)
         delete item;
     rootItem->children.clear();
+    d->removedCredentials.clear();
 
     QSettings settings;
     if (!settings.contains("Accounts") && settings.contains("ChatAccounts")) {
