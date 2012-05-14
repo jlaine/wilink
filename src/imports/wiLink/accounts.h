@@ -56,7 +56,7 @@ private:
         NameRole = ChatModel::UserRole,
         UsernameRole,
         PasswordRole,
-        ProviderRole,
+        RealmRole,
         TypeRole
     };
 

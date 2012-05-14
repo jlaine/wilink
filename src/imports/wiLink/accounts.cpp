@@ -32,7 +32,6 @@ class AccountItem : public ChatModelItem
 {
 public:
     AccountItem(const QString &type, const QString &realm, const QString &username);
-    QString provider() const;
 
     const QString type;
     const QString realm;
@@ -47,25 +46,14 @@ AccountItem::AccountItem(const QString &type_, const QString &realm_, const QStr
 {
 }
 
-QString AccountItem::provider() const
-{
-    const QString domain = QXmppUtils::jidToDomain(username);
-    if (domain == QLatin1String("wifirst.net"))
-        return QLatin1String("wifirst");
-    else if (domain == QLatin1String("gmail.com"))
-        return QLatin1String("google");
-    else
-        return domain;
-}
-
 AccountModel::AccountModel(QObject *parent)
     : ChatModel(parent)
 {
     // set additionals role names
-    QHash<int, QByteArray> names = roleNames();
+    QHash<int, QByteArray> names;
     names.insert(UsernameRole, "username");
     names.insert(PasswordRole, "password");
-    names.insert(ProviderRole, "provider");
+    names.insert(RealmRole, "realm");
     names.insert(TypeRole, "type");
     setRoleNames(names);
 
@@ -110,8 +98,6 @@ QVariant AccountModel::data(const QModelIndex &index, int role) const
             if (QNetIO::Wallet::instance()->getCredentials(item->realm, tmpUsername, tmpPassword))
                 return tmpPassword;
         }
-    } else if (role == ProviderRole) {
-        return item->provider();
     } else if (role == UsernameRole) {
         return item->username;
     } else if (role == TypeRole) {

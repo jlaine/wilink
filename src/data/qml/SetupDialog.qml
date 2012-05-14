@@ -163,7 +163,6 @@ Dialog {
                 }
             }
         }
-        console.log("try u:" + webUsername + ", p:" + webPassword);
         xhr.open('GET', 'https://dev.wifirst.net/w/wilink/credentials', true, webUsername, webPassword);
         xhr.setRequestHeader('Accept', 'application/xml');
         xhr.send();

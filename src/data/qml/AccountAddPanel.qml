@@ -164,7 +164,8 @@ FocusScope {
 
                 // check for duplicate account
                 for (var i = 0; i < panel.model.count; i++) {
-                    if (Utils.jidToDomain(panel.model.getProperty(i, 'jid')) == Utils.jidToDomain(jid)) {
+                    var account = panel.model.get(i);
+                    if (account.type == 'xmpp' && account.realm == Utils.jidToDomain(jid)) {
                         panel.state = 'dupe';
                         return;
                     }
