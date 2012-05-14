@@ -55,7 +55,7 @@ Panel {
             opacity: 0
 
             onAccepted: {
-                listPanel.model.append({'jid': jid, 'password': password});
+                listPanel.model.append({type: 'chat', username: jid, password: password, realm: Utils.jidToDomain(jid)});
                 addPanel.close();
             }
             onClose: panel.state = ''

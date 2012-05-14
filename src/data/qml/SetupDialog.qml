@@ -147,7 +147,7 @@ Dialog {
                         }
                     }
                     if (jid && password) {
-                        accountModel.append({'jid': jid, 'password': password});
+                        accountModel.append({type: 'chat', username: jid, password: password, realm: Utils.jidToDomain(jid)});
                         accountModel.submit();
                         dialog.close();
                     } else {
