@@ -36,8 +36,10 @@ Panel {
 
         onAuthenticationFailed: {
             console.log("Failed to authenticate with chat server");
-            var jid = Utils.jidToBareJid(appClient.jid);
-            dialogSwapper.showPanel('AccountPasswordDialog.qml', {client: appClient, jid: jid});
+            if (Utils.jidToDomain(appClient.jid) != 'wifirst.net') {
+                var jid = Utils.jidToBareJid(appClient.jid);
+                dialogSwapper.showPanel('AccountPasswordDialog.qml', {client: appClient, jid: jid});
+            }
         }
 
         onConflictReceived: {
@@ -368,7 +370,15 @@ Panel {
 
     onAccountJidChanged: {
         var jid = chatPanel.accountJid;
-        var password = accountModel.getPassword(jid);
+        var domain = Utils.jidToDomain(jid);
+        var password = '';
+        for (var i = 0; i < accountModel.count; ++i) {
+            var account = accountModel.get(i);
+            if (account.type == 'xmpp' && account.realm == domain && account.username == jid) {
+                password = account.password;
+                break;
+            }
+        }
         appClient.connectToServer(jid, password);
     }
 
