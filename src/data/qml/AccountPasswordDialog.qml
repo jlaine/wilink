@@ -19,6 +19,7 @@
 
 import QtQuick 1.1
 import wiLink 2.0
+import 'utils.js' as Utils
 
 Dialog {
     id: dialog
@@ -86,7 +87,7 @@ Dialog {
             return;
 
         var password = passwordInput.text;
-        accountModel.setPassword(dialog.jid, password);
+        accountModel.setPassword(Utils.jidToDomain(dialog.jid), dialog.jid, password);
         dialog.client.connectToServer(dialog.jid, password);
         dialog.close();
     }

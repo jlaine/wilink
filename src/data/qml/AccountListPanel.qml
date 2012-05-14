@@ -72,7 +72,7 @@ Item {
                     anchors.right: parent.right
                     anchors.verticalCenter: parent.verticalCenter
                     elide: Text.ElideRight
-                    text: model.jid
+                    text: model.username
                 }
 
                 MouseArea {

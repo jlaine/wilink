@@ -132,6 +132,8 @@ Dialog {
         }
         dialog.state = 'testing';
 
+        var webUsername = usernameInput.text;
+        var webPassword = passwordInput.text;
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4) {
@@ -148,6 +150,7 @@ Dialog {
                     }
                     if (jid && password) {
                         accountModel.append({type: 'chat', username: jid, password: password, realm: Utils.jidToDomain(jid)});
+                        accountModel.append({type: 'web', username: webUsername, password: webPassword, realm: 'www.wifirst.net'});
                         accountModel.submit();
                         dialog.close();
                     } else {
@@ -160,7 +163,8 @@ Dialog {
                 }
             }
         }
-        xhr.open('GET', 'https://dev.wifirst.net/w/wilink/credentials', true, usernameInput.text, passwordInput.text);
+        console.log("try u:" + webUsername + ", p:" + webPassword);
+        xhr.open('GET', 'https://dev.wifirst.net/w/wilink/credentials', true, webUsername, webPassword);
         xhr.setRequestHeader('Accept', 'application/xml');
         xhr.send();
     }

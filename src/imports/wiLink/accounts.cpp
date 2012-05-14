@@ -40,17 +40,6 @@ public:
     QString changedPassword;
 };
 
-static QString realm(const QString &jid)
-{
-    const QString domain = QXmppUtils::jidToDomain(jid);
-    if (domain == QLatin1String("wifirst.net"))
-        return QLatin1String("www.wifirst.net");
-    else if (domain == QLatin1String("gmail.com"))
-        return QLatin1String("www.google.com");
-    else
-        return domain;
-}
-
 AccountItem::AccountItem(const QString &type_, const QString &realm_, const QString &username_)
     : type(type_)
     , realm(realm_)
@@ -94,16 +83,11 @@ AccountModel::~AccountModel()
 void AccountModel::append(const QVariantMap &obj)
 {
     const QString type = obj.value("type").toString();
-    if (type != "chat") {
-        qWarning("Invalid account type specified");
-        return;
-    }
-
     const QString realm = obj.value("realm").toString();
     const QString username = obj.value("username").toString();
     const QString password = obj.value("password").toString();
-    if (realm.isEmpty() || username.isEmpty() || password.isEmpty()) {
-        qWarning("Realm, username and password are required to add an account");
+    if (type.isEmpty() || realm.isEmpty() || username.isEmpty() || password.isEmpty()) {
+        qWarning("Type, realm, username and password are required to add an account");
         return;
     }
 
@@ -144,22 +128,21 @@ void AccountModel::remove(int index)
 
 bool AccountModel::submit()
 {
-    QStringList newJids;
+    QStringList newAccounts;
     QSettings settings;
 
     // save passwords for new accounts
     foreach (ChatModelItem *ptr, rootItem->children) {
         AccountItem *item = static_cast<AccountItem*>(ptr);
-        if (item->type == "chat") {
-            if (!item->changedPassword.isEmpty()) {
-                setPassword(item->realm, item->username, item->changedPassword);
-                item->changedPassword = QString();
-            }
-            newJids << item->username;
+        if (!item->changedPassword.isEmpty()) {
+            setPassword(item->realm, item->username, item->changedPassword);
+            item->changedPassword = QString();
         }
+        newAccounts << QString("%1:%2:%3").arg(item->type, item->realm, item->username);
     }
 
-    // remove password for removed accounts
+#if 0
+    // FIXME: remove password for removed accounts
     const QStringList oldJids = settings.value("ChatAccounts").toStringList();
     foreach (const QString &jid, oldJids) {
         if (!newJids.contains(jid)) {
@@ -168,9 +151,10 @@ bool AccountModel::submit()
             QNetIO::Wallet::instance()->deleteCredentials(key, jid);
         }
     }
+#endif
 
     // save accounts
-    settings.setValue("ChatAccounts", newJids);
+    settings.setValue("Accounts", newAccounts);
     foreach (AccountModel *other, globalInstances) {
         if (other != this)
             other->_q_reload();
@@ -181,7 +165,7 @@ bool AccountModel::submit()
 
 QString AccountModel::getPassword(const QString &jid) const
 {
-    const QString key = realm(jid);
+    const QString key = QXmppUtils::jidToDomain(jid);
 
     if (!key.isEmpty()) {
         QString tmpJid(jid);
@@ -210,10 +194,39 @@ void AccountModel::_q_reload()
         delete item;
     rootItem->children.clear();
 
-    const QStringList chatJids = QSettings().value("ChatAccounts").toStringList();
-    foreach (const QString &jid, chatJids) {
-        if (QRegExp("^[^@/ ]+@[^@/ ]+$").exactMatch(jid)) {
-            AccountItem *item = new AccountItem("chat", realm(jid), jid);
+    QSettings settings;
+    if (!settings.contains("Accounts")) {
+        QStringList accounts;
+        const QStringList chatJids = settings.value("ChatAccounts").toStringList();
+        qDebug("migrating accounts");
+        foreach (const QString &jid, chatJids) {
+            if (QRegExp("^[^@/ ]+@[^@/ ]+$").exactMatch(jid)) {
+                const QString domain = QXmppUtils::jidToDomain(jid);
+                if (domain == QLatin1String("wifirst.net")) {
+                    QString tmpJid(jid);
+                    QString tmpPassword;
+                    qDebug("Converting wifirst account %s", qPrintable(tmpJid));
+                    if (QNetIO::Wallet::instance()->getCredentials("www.wifirst.net", tmpJid, tmpPassword))
+                        QNetIO::Wallet::instance()->setCredentials("wifirst.net", tmpJid, tmpPassword);
+                    accounts << QString("web:www.wifirst.net:%1").arg(jid);
+                } else if (domain == QLatin1String("gmail.com")) {
+                    QString tmpJid(jid);
+                    QString tmpPassword;
+                    if (QNetIO::Wallet::instance()->getCredentials("www.google.com", tmpJid, tmpPassword))
+                        QNetIO::Wallet::instance()->setCredentials("gmail.com", tmpJid, tmpPassword);
+                    accounts << QString("web:www.google.com:%1").arg(jid);
+                }
+                accounts << QString("xmpp:%1:%2").arg(domain, jid);
+            }
+        }
+        settings.setValue("Accounts", accounts);
+    }
+
+    const QStringList accountStrings = settings.value("Accounts").toStringList();
+    foreach (const QString &accountStr, accountStrings) {
+        const QStringList bits = accountStr.split(":");
+        if (bits.size() == 3) {
+            AccountItem *item = new AccountItem(bits[0], bits[1], bits[2]);
             item->parent = rootItem;
             rootItem->children.append(item);
         }
