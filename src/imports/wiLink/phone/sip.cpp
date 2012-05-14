@@ -155,7 +155,7 @@ bool SipCallContext::handleAuthentication(const SipMessage &reply)
 }
 
 SipCallPrivate::SipCallPrivate(SipCall *qq)
-    : state(QXmppCall::ConnectingState)
+    : state(SipCall::ConnectingState)
     , activeTime("0 0")
     , invitePending(false)
     , inviteQueued(false)
@@ -228,7 +228,7 @@ void SipCallPrivate::handleReply(const SipMessage &reply)
             handleSdp(SdpMessage(reply.body())))
         {
             q->debug(QString("SIP call %1 established").arg(QString::fromUtf8(id)));
-            setState(QXmppCall::ActiveState);
+            setState(SipCall::ActiveState);
         } else {
             q->warning(QString("SIP call %1 does not have a valid SDP descriptor").arg(QString::fromUtf8(id)));
             errorString = QLatin1String("Invalid SDP descriptor");
@@ -241,7 +241,7 @@ void SipCallPrivate::handleReply(const SipMessage &reply)
             QString::fromUtf8(id)));
         timeoutTimer->stop();
         errorString = QString("%1: %2").arg(QString::number(reply.statusCode()), reply.reasonPhrase());
-        setState(QXmppCall::FinishedState);
+        setState(SipCall::FinishedState);
     }
 }
 
@@ -262,19 +262,19 @@ void SipCallPrivate::handleRequest(const SipMessage &request)
     SipMessage response = client->d->buildResponse(request);
     if (request.method() == "ACK") {
         if (audioChannel->isOpen())
-            setState(QXmppCall::ActiveState);
+            setState(SipCall::ActiveState);
         else
-            setState(QXmppCall::FinishedState);
+            setState(SipCall::FinishedState);
      } else if (request.method() == "BYE") {
         response.setStatusCode(200);
         response.setReasonPhrase("OK");
         client->sendMessage(response);
-        setState(QXmppCall::FinishedState);
+        setState(SipCall::FinishedState);
     } else if (request.method() == "CANCEL") {
         response.setStatusCode(200);
         response.setReasonPhrase("OK");
         client->sendMessage(response);
-        setState(QXmppCall::FinishedState);
+        setState(SipCall::FinishedState);
     } else if (request.method() == "INVITE") {
 
         if (request.headerField("Content-Type") == "application/sdp" &&
@@ -443,7 +443,7 @@ bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
             }
         } else if (field.first == 't') {
             // active time
-            if (direction == QXmppCall::IncomingDirection)
+            if (direction == SipCall::IncomingDirection)
                 activeTime = field.second;
             else if (field.second != activeTime)
                 q->warning(QString("Answerer replied with a different active time %1").arg(QString::fromUtf8(activeTime)));
@@ -489,17 +489,17 @@ void SipCallPrivate::sendInvite()
     timeoutTimer->start(64 * SIP_T1_TIMER);
 }
 
-void SipCallPrivate::setState(QXmppCall::State newState)
+void SipCallPrivate::setState(SipCall::State newState)
 {
     if (state != newState)
     {
         state = newState;
         emit q->stateChanged(state);
 
-        if (state == QXmppCall::ActiveState) {
+        if (state == SipCall::ActiveState) {
             startStamp = QDateTime::currentDateTime();
             emit q->connected();
-        } else if (state == QXmppCall::FinishedState) {
+        } else if (state == SipCall::FinishedState) {
             q->debug(QString("SIP call %1 finished").arg(QString::fromUtf8(id)));
             finishStamp = QDateTime::currentDateTime();
             emit q->finished();
@@ -507,7 +507,7 @@ void SipCallPrivate::setState(QXmppCall::State newState)
     }
 }
 
-SipCall::SipCall(const QString &recipient, QXmppCall::Direction direction, SipClient *parent)
+SipCall::SipCall(const QString &recipient, SipCall::Direction direction, SipClient *parent)
     : QXmppLoggable(parent)
 {
     bool check;
@@ -516,7 +516,7 @@ SipCall::SipCall(const QString &recipient, QXmppCall::Direction direction, SipCl
     d = new SipCallPrivate(this);
     d->client = parent;
     d->direction = direction;
-    d->inviteQueued = (direction == QXmppCall::OutgoingDirection);
+    d->inviteQueued = (direction == SipCall::OutgoingDirection);
     d->remoteRecipient = recipient.toUtf8();
     d->remoteUri = sipAddressToUri(recipient).toUtf8();
 
@@ -526,7 +526,7 @@ SipCall::SipCall(const QString &recipient, QXmppCall::Direction direction, SipCl
     d->iceConnection = new QXmppIceConnection(this);
     d->iceConnection->addComponent(RTP_COMPONENT);
     d->iceConnection->addComponent(RTCP_COMPONENT);
-    d->iceConnection->setIceControlling(d->direction == QXmppCall::OutgoingDirection);
+    d->iceConnection->setIceControlling(d->direction == SipCall::OutgoingDirection);
     d->iceConnection->setStunServer(d->client->d->stunServerAddress,
                                     d->client->d->stunServerPort);
     check = connect(d->iceConnection, SIGNAL(localCandidatesChanged()),
@@ -565,8 +565,7 @@ SipCall::~SipCall()
 
 void SipCall::accept()
 {
-    if (d->direction == QXmppCall::IncomingDirection && d->state == QXmppCall::ConnectingState)
-    {
+    if (d->direction == SipCall::IncomingDirection && d->state == SipCall::ConnectingState) {
 #if 0
         QByteArray rtcp;
         QDataStream stream(&rtcp, QIODevice::WriteOnly);
@@ -610,7 +609,7 @@ QXmppRtpAudioChannel *SipCall::audioChannel() const
 /// Returns the call's direction.
 ///
 
-QXmppCall::Direction SipCall::direction() const
+SipCall::Direction SipCall::direction() const
 {
     return d->direction;
 }
@@ -701,7 +700,7 @@ quint16 SipCall::remoteRtpPort() const
     return d->remoteRtpPort;
 }
 
-QXmppCall::State SipCall::state() const
+SipCall::State SipCall::state() const
 {
     return d->state;
 }
@@ -722,11 +721,11 @@ void SipCall::transactionFinished()
             request.removeHeaderField("Contact");
             d->transactions << new SipTransaction(request, d->client, this);
         } else {
-            d->setState(QXmppCall::FinishedState);
+            d->setState(SipCall::FinishedState);
         }
     }
     else if (method == "CANCEL") {
-        d->setState(QXmppCall::FinishedState);
+        d->setState(SipCall::FinishedState);
     }
 }
 
@@ -734,7 +733,7 @@ void SipCall::handleTimeout()
 {
     warning(QString("SIP call %1 timed out").arg(QString::fromUtf8(d->id)));
     d->errorString = QLatin1String("Outgoing call timed out");
-    d->setState(QXmppCall::FinishedState);
+    d->setState(SipCall::FinishedState);
 }
 
 /// Hangs up the call.
@@ -742,8 +741,8 @@ void SipCall::handleTimeout()
 
 void SipCall::hangup()
 {
-    if (d->state == QXmppCall::DisconnectingState ||
-        d->state == QXmppCall::FinishedState)
+    if (d->state == SipCall::DisconnectingState ||
+        d->state == SipCall::FinishedState)
         return;
 
     // check we are in the right thread
@@ -754,7 +753,7 @@ void SipCall::hangup()
 
     debug(QString("SIP call %1 hangup").arg(
             QString::fromUtf8(d->id)));
-    d->setState(QXmppCall::DisconnectingState);
+    d->setState(SipCall::DisconnectingState);
     d->iceConnection->close();
     d->timeoutTimer->stop();
 
@@ -957,7 +956,7 @@ SipCall *SipClient::call(const QString &recipient)
     }
 
     // construct call
-    SipCall *call = new SipCall(recipient, QXmppCall::OutgoingDirection, this);
+    SipCall *call = new SipCall(recipient, SipCall::OutgoingDirection, this);
     info(QString("SIP call %1 to %2").arg(call->id(), recipient));
 
     // register call
@@ -1104,7 +1103,7 @@ void SipClient::datagramReceived()
             info(QString("SIP call from %1").arg(QString::fromUtf8(from)));
 
             // construct call
-            currentCall = new SipCall(from, QXmppCall::IncomingDirection, this);
+            currentCall = new SipCall(from, SipCall::IncomingDirection, this);
             currentCall->d->id = reply.headerField("Call-ID");
 
             QMap<QByteArray, QByteArray> params = SipMessage::valueParameters(to);

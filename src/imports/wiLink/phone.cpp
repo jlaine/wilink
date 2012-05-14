@@ -491,7 +491,7 @@ void PhoneHistoryModel::addCall(SipCall *call)
     item->call = call;
     connect(item->call, SIGNAL(stateChanged(QXmppCall::State)),
             this, SLOT(callStateChanged(QXmppCall::State)));
-    if (item->call->direction() == QXmppCall::OutgoingDirection)
+    if (item->call->direction() == SipCall::OutgoingDirection)
         connect(item->call, SIGNAL(ringing()), this, SLOT(callRinging()));
 
     QNetworkRequest request(m_url);

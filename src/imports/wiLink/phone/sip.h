@@ -24,7 +24,6 @@
 #include <QObject>
 #include <QPair>
 
-#include "QXmppCallManager.h"
 #include "QXmppLogger.h"
 
 class QHostInfo;
@@ -149,20 +148,37 @@ private:
 class SipCall : public QXmppLoggable
 {
     Q_OBJECT
-    Q_PROPERTY(QXmppCall::Direction direction READ direction CONSTANT)
+    Q_ENUMS(Direction State)
+    Q_PROPERTY(Direction direction READ direction CONSTANT)
     Q_PROPERTY(QString errorString READ errorString NOTIFY stateChanged)
     Q_PROPERTY(QString recipient READ recipient CONSTANT)
-    Q_PROPERTY(QXmppCall::State state READ state NOTIFY stateChanged)
+    Q_PROPERTY(State state READ state NOTIFY stateChanged)
 
 public:
+    /// This enum is used to describe the direction of a call.
+    enum Direction
+    {
+        IncomingDirection, ///< The call is incoming.
+        OutgoingDirection, ///< The call is outgoing.
+    };
+
+    /// This enum is used to describe the state of a call.
+    enum State
+    {
+        ConnectingState = 0,    ///< The call is being connected.
+        ActiveState = 1,        ///< The call is active.
+        DisconnectingState = 2, ///< The call is being disconnected.
+        FinishedState = 3,      ///< The call is finished.
+    };
+
     ~SipCall();
 
-    QXmppCall::Direction direction() const;
+    SipCall::Direction direction() const;
     int duration() const;
     QString errorString() const;
     QByteArray id() const;
     QString recipient() const;
-    QXmppCall::State state() const;
+    SipCall::State state() const;
 
     QHostAddress localRtpAddress() const;
     void setLocalRtpAddress(const QHostAddress &address);
@@ -189,7 +205,7 @@ signals:
     void ringing();
 
     /// This signal is emitted when the call state changes.
-    void stateChanged(QXmppCall::State state);
+    void stateChanged(SipCall::State state);
 
 public slots:
     void accept();
@@ -201,7 +217,7 @@ private slots:
     void transactionFinished();
 
 private:
-    SipCall(const QString &recipient, QXmppCall::Direction direction, SipClient *parent);
+    SipCall(const QString &recipient, SipCall::Direction direction, SipClient *parent);
 
     SipCallPrivate *d;
     friend class SipCallPrivate;

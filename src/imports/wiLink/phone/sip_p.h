@@ -57,13 +57,13 @@ public:
     bool handleSdp(const SdpMessage &sdp);
     void onStateChanged();
     void sendInvite();
-    void setState(QXmppCall::State state);
+    void setState(SipCall::State state);
 
-    QXmppCall::Direction direction;
+    SipCall::Direction direction;
     QString errorString;
     QDateTime startStamp;
     QDateTime finishStamp;
-    QXmppCall::State state;
+    SipCall::State state;
     QByteArray activeTime;
     QXmppRtpAudioChannel *audioChannel;
     QXmppIceConnection *iceConnection;
