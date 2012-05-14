@@ -138,7 +138,8 @@ bool AccountModel::submit()
     foreach (ChatModelItem *ptr, rootItem->children) {
         AccountItem *item = static_cast<AccountItem*>(ptr);
         if (!item->changedPassword.isEmpty()) {
-            setPassword(item->realm, item->username, item->changedPassword);
+            qDebug("Setting password for %s (%s)", qPrintable(item->username), qPrintable(item->realm));
+            QNetIO::Wallet::instance()->setCredentials(item->realm, item->username, item->changedPassword);
             item->changedPassword = QString();
         }
         newAccounts << QString("%1:%2:%3").arg(item->type, item->realm, item->username);
@@ -160,20 +161,6 @@ bool AccountModel::submit()
     }
 
     return true;
-}
-
-QString AccountModel::getPassword(const QString &jid) const
-{
-    const QString key = QXmppUtils::jidToDomain(jid);
-
-    if (!key.isEmpty()) {
-        QString tmpJid(jid);
-        QString tmpPassword;
-
-        if (QNetIO::Wallet::instance()->getCredentials(key, tmpJid, tmpPassword))
-            return tmpPassword;
-    }
-    return QString();
 }
 
 bool AccountModel::setPassword(const QString &realm, const QString &username, const QString &password)

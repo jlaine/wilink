@@ -45,7 +45,6 @@ public slots:
     bool submit();
 
     // Wallet
-    QString getPassword(const QString &jid) const;
     bool setPassword(const QString &realm, const QString &username, const QString &password);
 
 private slots:

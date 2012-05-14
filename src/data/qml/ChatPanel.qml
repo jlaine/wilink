@@ -370,8 +370,15 @@ Panel {
 
     onAccountJidChanged: {
         var jid = chatPanel.accountJid;
-        var password = accountModel.getPassword(jid);
-        appClient.connectToServer(jid, password);
+        var domain = Utils.jidToDomain(jid);
+        for (var i = 0; i < accountModel.count; ++i) {
+            var account = accountModel.get(i);
+            if (account.type == 'xmpp' && account.realm == domain && account.username == jid) {
+                appClient.connectToServer(jid, account.password);
+                return;
+            }
+        }
+        console.log("Could not find password for account " + jid);
     }
 
     onDockClicked: {
