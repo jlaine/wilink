@@ -183,10 +183,9 @@ void AccountModel::_q_reload()
     rootItem->children.clear();
 
     QSettings settings;
-    if (!settings.contains("Accounts")) {
+    if (!settings.contains("Accounts") && settings.contains("ChatAccounts")) {
         QStringList accounts;
         const QStringList chatJids = settings.value("ChatAccounts").toStringList();
-        qDebug("migrating accounts");
         foreach (const QString &jid, chatJids) {
             if (QRegExp("^[^@/ ]+@[^@/ ]+$").exactMatch(jid)) {
                 const QString domain = QXmppUtils::jidToDomain(jid);
@@ -208,6 +207,7 @@ void AccountModel::_q_reload()
             }
         }
         settings.setValue("Accounts", accounts);
+        settings.remove("ChatAccounts");
     }
 
     const QStringList accountStrings = settings.value("Accounts").toStringList();

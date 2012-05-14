@@ -30,7 +30,6 @@
 #include <QStringList>
 
 #include "application.h"
-//#include "declarative.h"
 #include "window.h"
 
 class WindowPrivate
