@@ -69,8 +69,8 @@ Panel {
             if (!account)
                 return;
 
-            console.log("Exmining account: " + account.type);
-            if (account.type == 'wifirst') {
+            console.log("Examining account: " + account.provider);
+            if (account.provider == 'wifirst') {
                 loginView.url = 'https://www.wifirst.net/';
             } else {
                 doLogin();
@@ -95,7 +95,7 @@ Panel {
 
         onLoadFinished: {
             var account = accountModel.get(accountIndex);
-            if (account.type == 'wifirst') {
+            if (account.provider == 'wifirst') {
                 var data = "login=" + account.username + "&password=" + account.password;
                 var status = doXhr('POST', 'https://www.wifirst.net/sessions', data);
                 if (status == "200") {

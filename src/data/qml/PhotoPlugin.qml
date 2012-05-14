@@ -30,9 +30,9 @@ Plugin {
             var account = accountModel.get(i);
 
             var url;
-            if (account.type == 'wifirst')
+            if (account.provider == 'wifirst')
                 url = 'wifirst://default';
-            else if (account.type == 'google')
+            else if (account.provider == 'google')
                 url = 'picasa://default';
             else
                 continue;

@@ -27,7 +27,7 @@ Plugin {
     onLoaded: {
         for (var i = 0; i < accountModel.count; ++i) {
             var account = accountModel.get(i);
-            if (account.type == 'wifirst') {
+            if (account.provider == 'wifirst') {
                 dock.model.add({
                     'iconSource': 'image://icon/dock-diagnostics',
                     'iconPress': 'image://icon/diagnostics',

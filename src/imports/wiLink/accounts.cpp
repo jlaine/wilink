@@ -32,7 +32,7 @@ class AccountItem : public ChatModelItem
 {
 public:
     AccountItem(const QString &jid);
-    QString type() const;
+    QString provider() const;
     QString username() const;
 
     const QString jid;
@@ -55,7 +55,7 @@ AccountItem::AccountItem(const QString &jid_)
 {
 }
 
-QString AccountItem::type() const
+QString AccountItem::provider() const
 {
     const QString domain = QXmppUtils::jidToDomain(jid);
     if (domain == QLatin1String("wifirst.net"))
@@ -78,7 +78,7 @@ AccountModel::AccountModel(QObject *parent)
     QHash<int, QByteArray> names = roleNames();
     names.insert(UsernameRole, "username");
     names.insert(PasswordRole, "password");
-    names.insert(TypeRole, "type");
+    names.insert(ProviderRole, "provider");
     setRoleNames(names);
 
     // load accounts
@@ -116,8 +116,8 @@ QVariant AccountModel::data(const QModelIndex &index, int role) const
         return item->jid;
     } else if (role == PasswordRole) {
         return getPassword(item->jid);
-    } else if (role == TypeRole) {
-        return item->type();
+    } else if (role == ProviderRole) {
+        return item->provider();
     } else if (role == UsernameRole) {
         return item->username();
     }
