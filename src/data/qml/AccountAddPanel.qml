@@ -125,8 +125,8 @@ FocusScope {
         property string badJidText: qsTr('Please enter a valid address.')
         property string badPasswordText: qsTr('Please enter your password.')
         property string dupeText: qsTr("You already have an account for '%1'.").replace('%1', Utils.jidToDomain(jidInput.text));
-        property string failedText: qsTr('Could not connect, please check your username and password.')
-        property string testingText: qsTr('Checking your username and password..')
+        property string failedText: qsTr('Could not connect, please check your address and password.')
+        property string testingText: qsTr('Checking your address and password..')
 
         anchors.top: passwordRow.bottom
         anchors.topMargin: appStyle.spacing.vertical

@@ -75,14 +75,6 @@
         <translation>Mot de passe</translation>
     </message>
     <message>
-        <source>Checking your username and password..</source>
-        <translation>Vérification de votre identifiant et mot de passe..</translation>
-    </message>
-    <message>
-        <source>Could not connect, please check your username and password.</source>
-        <translation>La connexion a échoué, merci de vérifier votre identifiant et mot de passe.</translation>
-    </message>
-    <message>
         <source>You already have an account for &apos;%1&apos;.</source>
         <translation>Vous avez déjà un compte pour &apos;%1&apos;.</translation>
     </message>
@@ -97,6 +89,14 @@
     <message>
         <source>Please enter your password.</source>
         <translation>Veuillez saisir votre mot de passe.</translation>
+    </message>
+    <message>
+        <source>Could not connect, please check your address and password.</source>
+        <translation>La connexion a échoué, merci de vérifier votre adresse et mot de passe.</translation>
+    </message>
+    <message>
+        <source>Checking your address and password..</source>
+        <translation>Vérification de votre adresse et mot de passe..</translation>
     </message>
 </context>
 <context>
@@ -850,10 +850,6 @@ Acceptez-vous?</translation>
     <message>
         <source>Permissions</source>
         <translation>Permissions</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation type="obsolete">Fermer</translation>
     </message>
     <message>
         <source>Show this room</source>
