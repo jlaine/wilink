@@ -133,6 +133,10 @@ Dialog {
         dialog.state = 'testing';
 
         var webUsername = usernameInput.text;
+        if (webUsername.indexOf('@') < 0) {
+            webUsername += '@wifirst.net';
+        }
+
         var webPassword = passwordInput.text;
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
