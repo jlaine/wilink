@@ -31,7 +31,7 @@ Plugin {
                 dock.model.add({
                     'iconSource': 'image://icon/dock-diagnostics',
                     'iconPress': 'image://icon/diagnostics',
-                    'panelProperties': {accountJid: account.jid},
+                    'panelProperties': {accountJid: account.username},
                     'panelSource': 'DiagnosticPanel.qml',
                     'priority': 6,
                     'shortcut': Qt.ControlModifier + Qt.Key_I,

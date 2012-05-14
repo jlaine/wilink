@@ -31,7 +31,7 @@ Plugin {
                 dock.model.add({
                     'iconSource': 'image://icon/dock-rss',
                     'iconPress': 'image://icon/rss',
-                    'panelProperties': {accountJid: account.jid},
+                    'panelProperties': {accountJid: account.username},
                     'panelSource': 'NewsPanel.qml',
                     'shortcut': Qt.ControlModifier + Qt.Key_N,
                     'text': qsTr('News'),

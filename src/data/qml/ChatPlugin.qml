@@ -30,17 +30,17 @@ Plugin {
             var account = accountModel.get(i);
             var title = qsTr('Chat');
             if (accountModel.count > 1)
-                title += '<br/><small>' + Utils.jidToDomain(account.jid) + '</small>';
+                title += '<br/><small>' + account.provider + '</small>';
             dock.model.add({
                 'iconSource': 'image://icon/dock-chat',
                 'iconPress': 'image://icon/chat',
                 'notified': false,
-                'panelProperties': {'accountJid': account.jid},
+                'panelProperties': {'accountJid': account.username},
                 'panelSource': 'ChatPanel.qml',
                 'priority': 10,
                 'text': title,
                 'visible': true});
-            swapper.showPanel('ChatPanel.qml', {'accountJid': account.jid});
+            swapper.showPanel('ChatPanel.qml', {'accountJid': account.username});
         }
     }
 

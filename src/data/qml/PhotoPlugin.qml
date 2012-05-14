@@ -18,7 +18,6 @@
  */
 
 import QtQuick 1.1
-import 'utils.js' as Utils
 
 Plugin {
     name: qsTr('Photos')
@@ -39,7 +38,7 @@ Plugin {
 
             var title = qsTr('Photos');
             if (accountModel.count > 1)
-                title += '<br/><small>' + Utils.jidToDomain(account.jid) + '</small>';
+                title += '<br/><small>' + account.provider + '</small>';
 
             dock.model.add({
                 'iconSource': 'image://icon/dock-photo',

@@ -118,9 +118,7 @@ QVariant AccountModel::data(const QModelIndex &index, int role) const
     if (!index.isValid() || !item)
         return QVariant();
 
-    if (role == JidRole) {
-        return item->username;
-    } else if (role == PasswordRole) {
+    if (role == PasswordRole) {
         if (!item->realm.isEmpty()) {
             QString tmpUsername(item->username);
             QString tmpPassword;
@@ -132,7 +130,7 @@ QVariant AccountModel::data(const QModelIndex &index, int role) const
         return item->provider();
     } else if (role == UsernameRole) {
         return item->username;
-    } else if (role == UsernameRole) {
+    } else if (role == TypeRole) {
         return item->type;
     }
 
