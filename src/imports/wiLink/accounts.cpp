@@ -121,12 +121,11 @@ QVariant AccountModel::data(const QModelIndex &index, int role) const
     if (role == JidRole) {
         return item->username;
     } else if (role == PasswordRole) {
-        const QString key = realm(item->username);
-        if (!key.isEmpty()) {
+        if (!item->realm.isEmpty()) {
             QString tmpUsername(item->username);
             QString tmpPassword;
 
-            if (QNetIO::Wallet::instance()->getCredentials(key, tmpUsername, tmpPassword))
+            if (QNetIO::Wallet::instance()->getCredentials(item->realm, tmpUsername, tmpPassword))
                 return tmpPassword;
         }
     } else if (role == ProviderRole) {
