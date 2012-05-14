@@ -24,8 +24,6 @@ import 'utils.js' as Utils
 Panel {
     id: panel
 
-    property string accountJid
-
     PanelHeader {
         id: header
 
@@ -116,11 +114,17 @@ Panel {
         }
     }
 
-    onAccountJidChanged: {
-        var domain = Utils.jidToDomain(panel.accountJid);
-        var client = accountModel.clientForJid(panel.accountJid);
-        discoView.model.manager = client.discoveryManager;
-        crumbBar.push({'name': domain, 'jid': domain, 'node': ''})
+    Component.onCompleted: {
+        for (var i = 0; i < accountModel.count; ++i) {
+            var account = accountModel.get(i);
+            var client = accountModel.clientForJid(account.jid);
+            if (client) {
+                var domain = Utils.jidToDomain(account.jid);
+                discoView.model.manager = client.discoveryManager;
+                crumbBar.push({'name': domain, 'jid': domain, 'node': ''});
+                break;
+            }
+        }
     }
 }
 

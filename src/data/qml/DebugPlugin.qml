@@ -25,20 +25,14 @@ Plugin {
     imageSource: 'image://icon/debug'
 
     onLoaded: {
-        for (var i = 0; i < accountModel.count; ++i) {
-            var account = accountModel.get(i);
-            if (account.type == 'wifirst') {
-                dock.model.add({
-                    'iconSource': 'image://icon/dock-peer',
-                    'iconPress': 'image://icon/peer',
-                    'panelProperties': {accountJid: account.jid},
-                    'panelSource': 'DiscoveryPanel.qml',
-                    'priority': -1,
-                    'shortcut': Qt.ControlModifier + Qt.Key_B,
-                    'text': qsTr('Discovery'),
-                    'visible': true});
-                }
-            }
+        dock.model.add({
+            'iconSource': 'image://icon/dock-peer',
+            'iconPress': 'image://icon/peer',
+            'panelSource': 'DiscoveryPanel.qml',
+            'priority': -1,
+            'shortcut': Qt.ControlModifier + Qt.Key_B,
+            'text': qsTr('Discovery'),
+            'visible': true});
 
         dock.model.add({
             'iconSource': 'image://icon/dock-debug',
