@@ -36,6 +36,7 @@
 #include "QXmppRosterIq.h"
 #include "QXmppRosterManager.h"
 #include "QXmppUtils.h"
+#include "QXmppVCardIq.h"
 #include "QXmppVCardManager.h"
 
 #include "client.h"
