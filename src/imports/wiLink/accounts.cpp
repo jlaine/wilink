@@ -154,7 +154,7 @@ bool AccountModel::submit()
         AccountItem *item = static_cast<AccountItem*>(ptr);
         if (item->type == "chat") {
             if (!item->changedPassword.isEmpty()) {
-                setPassword(item->username, item->changedPassword);
+                setPassword(item->realm, item->username, item->changedPassword);
                 item->changedPassword = QString();
             }
             newJids << item->username;
@@ -167,7 +167,7 @@ bool AccountModel::submit()
         if (!newJids.contains(jid)) {
             const QString key = realm(jid);
             qDebug("Removing password for %s (%s)", qPrintable(jid), qPrintable(key));
-            QNetIO::Wallet::instance()->deleteCredentials(key);
+            QNetIO::Wallet::instance()->deleteCredentials(key, jid);
         }
     }
 
@@ -195,14 +195,13 @@ QString AccountModel::getPassword(const QString &jid) const
     return QString();
 }
 
-bool AccountModel::setPassword(const QString &jid, const QString &password)
+bool AccountModel::setPassword(const QString &realm, const QString &username, const QString &password)
 {
-    const QString key = realm(jid);
-    if (key.isEmpty())
+    if (realm.isEmpty() || username.isEmpty())
         return false;
 
-    qDebug("Setting password for %s (%s)", qPrintable(jid), qPrintable(key));
-    return QNetIO::Wallet::instance()->setCredentials(key, jid, password);
+    qDebug("Setting password for %s (%s)", qPrintable(username), qPrintable(realm));
+    return QNetIO::Wallet::instance()->setCredentials(realm, username, password);
 }
 
 void AccountModel::_q_reload()
