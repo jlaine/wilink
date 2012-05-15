@@ -68,7 +68,6 @@ Dialog {
                     accountModel.append({type: 'web', username: dialog.webUsername, password: dialog.webPassword, realm: dialog.webRealm});
                 accountModel.submit();
 
-                accountModel.submit();
                 dialog.close();
             }
         }
@@ -124,9 +123,9 @@ Dialog {
                 model: ListModel {}
 
                 Component.onCompleted: {
-                    model.append({text: 'Wifirst', type: 'wifirst'});
-                    model.append({text: 'Google', type: 'google'});
-                    model.append({text: qsTr('Other'), type: 'other'});
+                    model.append({icon: 'image://icon/wiLink', text: 'Wifirst', type: 'wifirst'});
+                    model.append({icon: 'image://icon/google', text: 'Google', type: 'google'});
+                    model.append({icon: 'image://icon/peer', text: qsTr('Other'), type: 'other'});
                     accountCombo.currentIndex = 0;
                 }
             }
@@ -249,7 +248,6 @@ Dialog {
                         }
                         if (jid && password) {
                             testClient.testCredentials(jid, passwordInput.text);
-                            dialog.close();
                         } else {
                             dialog.state = 'unknownError';
                         }
