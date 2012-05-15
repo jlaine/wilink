@@ -38,8 +38,8 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         opacity: menuItem.enabled ? 1 : 0.5
         source: model.iconSource ? model.iconSource : ''
-        width: model.iconSource ? appStyle.icon.tinySize : 0
-        height: appStyle.icon.tinySize
+        sourceSize.width: appStyle.icon.tinySize
+        sourceSize.height: appStyle.icon.tinySize
     }
 
     Label {
