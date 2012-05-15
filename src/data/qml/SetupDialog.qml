@@ -161,6 +161,7 @@ Dialog {
                 validator: RegExpValidator {
                     regExp: /.+/
                 }
+                onTextChanged: dialog.state = ''
             }
         }
 
@@ -195,6 +196,7 @@ Dialog {
                 validator: RegExpValidator {
                     regExp: /.+/
                 }
+                onTextChanged: dialog.state = ''
             }
         }
 
