@@ -690,10 +690,6 @@ Acceptez-vous?</translation>
         <translation>Annuler</translation>
     </message>
     <message>
-        <source>To upload your photos to wifirst.net, simply drag and drop them to an album.</source>
-        <translation>Pour transférer vos photos vers wifirst.net, il vous suffit de les faire glisser sur un album.</translation>
-    </message>
-    <message>
         <source>Upload photos</source>
         <translation>Envoi de photos</translation>
     </message>
@@ -716,6 +712,10 @@ Acceptez-vous?</translation>
     <message>
         <source>All files</source>
         <translation>Tous les fichiers</translation>
+    </message>
+    <message>
+        <source>To upload your photos, simply drag and drop them to an album.</source>
+        <translation>Pour transférer vos photos, il vous suffit de les faire glisser sur un album.</translation>
     </message>
 </context>
 <context>

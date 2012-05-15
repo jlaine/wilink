@@ -114,7 +114,7 @@ Panel {
         anchors.top: crumbBar.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        text: photoModel.canUpload ? qsTr('To upload your photos to wifirst.net, simply drag and drop them to an album.') : ''
+        text: photoModel.canUpload ? qsTr('To upload your photos, simply drag and drop them to an album.') : ''
         z: 2
     }
 
