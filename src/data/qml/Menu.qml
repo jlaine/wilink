@@ -52,6 +52,7 @@ Rectangle {
         anchors.leftMargin: 1
 
         Repeater {
+            id: repeater
             model: menu.model
 
             delegate: MenuDelegate {

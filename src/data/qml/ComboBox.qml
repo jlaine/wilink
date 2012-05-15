@@ -22,6 +22,7 @@ import QtQuick 1.1
 Item {
     id: block
 
+    property alias delegate: view.sourceComponent
     property variant model
     property int currentIndex: -1
 
@@ -31,6 +32,7 @@ Item {
         id: comboMenu
 
         Menu {
+            delegate: block.delegate
             model: block.model
             width: view.width
 
@@ -57,8 +59,12 @@ Item {
         smooth: true
     }
 
-    MenuDelegate {
+    Loader {
         id: view
+
+        sourceComponent: MenuDelegate {
+            onClicked: itemClicked(index)
+        }
 
         property QtObject model: emptyItem
 
