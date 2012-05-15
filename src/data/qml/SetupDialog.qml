@@ -167,7 +167,7 @@ Dialog {
                 }
             }
         }
-        xhr.open('GET', 'https://dev.wifirst.net/w/wilink/credentials', true, webUsername, webPassword);
+        xhr.open('GET', 'https://www.wifirst.net/w/wilink/credentials', true, webUsername, webPassword);
         xhr.setRequestHeader('Accept', 'application/xml');
         xhr.send();
     }
