@@ -26,7 +26,7 @@ Dialog {
 
     title: qsTr('Add an account')
 
-    property string accountType: 'wifirst'
+    property string accountType
     property string testJid
     property string testPassword
 
