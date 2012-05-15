@@ -1,107 +1,108 @@
 include(IconUtilities)
-generate_icns(icns scalable/wiLink.svg)
-generate_ico(ico scalable/wiLink.svg)
-generate_xpm(xpm scalable/wiLink.svg)
+generate_icns(icns images/scalable/wiLink.svg)
+generate_ico(ico images/scalable/wiLink.svg)
+generate_xpm(xpm images/scalable/wiLink.svg)
 
 # 10x10 images
-generate_png(png SIZE 11
-    scalable/down-arrow.svg
-    scalable/eject.svg
-    scalable/up-arrow.svg)
+generate_png(png SIZE 11 DESTINATION images
+    images/scalable/down-arrow.svg
+    images/scalable/eject.svg
+    images/scalable/up-arrow.svg)
 
-generate_png(png WIDTH 96 HEIGHT 32 scalable/tab.svg scalable/tab-active.svg)
+generate_png(png WIDTH 96 HEIGHT 32 DESTINATION images images/scalable/tab.svg images/scalable/tab-active.svg)
 
 set(SMALL_ICONS
-    scalable/checkbox.svg
-    scalable/checkbox-checked.svg)
+    images/scalable/checkbox.svg
+    images/scalable/checkbox-checked.svg)
 
 set(ICONS
-    scalable/add.svg
-    scalable/album.svg
-    scalable/audio-input.svg
-    scalable/audio-output.svg
-    scalable/back.svg
-    scalable/call.svg
-    scalable/call-incoming.svg
-    scalable/call-outgoing.svg
-    scalable/camera.svg
-    scalable/camera-active.svg
-    scalable/chat.svg
-    scalable/clear.svg
-    scalable/close.svg
-    scalable/copy.svg
-    scalable/cut.svg
-    scalable/debug.svg
-    scalable/diagnostics.svg
-    scalable/dock-chat.svg
-    scalable/dock-close.svg
-    scalable/dock-diagnostics.svg
-    scalable/dock-debug.svg
-    scalable/dock-options.svg
-    scalable/dock-peer.svg
-    scalable/dock-phone.svg
-    scalable/dock-photo.svg
-    scalable/dock-rss.svg
-    scalable/dock-share.svg
-    scalable/dock-start.svg
-    scalable/dock-web.svg
-    scalable/download.svg
-    scalable/favorite-active.svg
-    scalable/favorite-inactive.svg
-    scalable/file.svg
-    scalable/fire.svg
-    scalable/forward.svg
-    scalable/fullscreen.svg
-    scalable/hangup.svg
-    scalable/home.svg
-    scalable/information.svg
-    scalable/invite.svg
-    scalable/moderator.svg
-    scalable/options.svg
-    scalable/paste.svg
-    scalable/peer.svg
-    scalable/permissions.svg
-    scalable/phone.svg
-    scalable/photos.svg
-    scalable/plugin.svg
-    scalable/refresh.svg
-    scalable/remove.svg
-    scalable/resize.svg
-    scalable/rss.svg
-    scalable/search.svg
-    scalable/share.svg
-    scalable/start.svg
-    scalable/stop.svg
-    scalable/tip.svg
-    scalable/transfers.svg
-    scalable/upload.svg
-    scalable/web.svg
-    scalable/wiLink.svg
-    scalable/wiLink-black.svg)
+    images/scalable/add.svg
+    images/scalable/album.svg
+    images/scalable/audio-input.svg
+    images/scalable/audio-output.svg
+    images/scalable/back.svg
+    images/scalable/call.svg
+    images/scalable/call-incoming.svg
+    images/scalable/call-outgoing.svg
+    images/scalable/camera.svg
+    images/scalable/camera-active.svg
+    images/scalable/chat.svg
+    images/scalable/clear.svg
+    images/scalable/close.svg
+    images/scalable/copy.svg
+    images/scalable/cut.svg
+    images/scalable/debug.svg
+    images/scalable/diagnostics.svg
+    images/scalable/dock-chat.svg
+    images/scalable/dock-close.svg
+    images/scalable/dock-diagnostics.svg
+    images/scalable/dock-debug.svg
+    images/scalable/dock-options.svg
+    images/scalable/dock-peer.svg
+    images/scalable/dock-phone.svg
+    images/scalable/dock-photo.svg
+    images/scalable/dock-rss.svg
+    images/scalable/dock-share.svg
+    images/scalable/dock-start.svg
+    images/scalable/dock-web.svg
+    images/scalable/download.svg
+    images/scalable/favorite-active.svg
+    images/scalable/favorite-inactive.svg
+    images/scalable/file.svg
+    images/scalable/fire.svg
+    images/scalable/forward.svg
+    images/scalable/fullscreen.svg
+    images/scalable/google.svg
+    images/scalable/hangup.svg
+    images/scalable/home.svg
+    images/scalable/information.svg
+    images/scalable/invite.svg
+    images/scalable/moderator.svg
+    images/scalable/options.svg
+    images/scalable/paste.svg
+    images/scalable/peer.svg
+    images/scalable/permissions.svg
+    images/scalable/phone.svg
+    images/scalable/photos.svg
+    images/scalable/plugin.svg
+    images/scalable/refresh.svg
+    images/scalable/remove.svg
+    images/scalable/resize.svg
+    images/scalable/rss.svg
+    images/scalable/search.svg
+    images/scalable/share.svg
+    images/scalable/start.svg
+    images/scalable/stop.svg
+    images/scalable/tip.svg
+    images/scalable/transfers.svg
+    images/scalable/upload.svg
+    images/scalable/web.svg
+    images/scalable/wiLink.svg
+    images/scalable/wiLink-black.svg)
 
 set(LARGE_ICONS
-    scalable/album.svg
-    scalable/audio-x-generic.svgz
-    scalable/file.svg
-    scalable/image-x-generic.svgz
-    scalable/peer.svg
-    scalable/photos.svg
-    scalable/spinner.svg
-    scalable/text-x-generic.svgz
-    scalable/video-x-generic.svgz
-    scalable/wiLink.svg)
+    images/scalable/album.svg
+    images/scalable/audio-x-generic.svgz
+    images/scalable/file.svg
+    images/scalable/image-x-generic.svgz
+    images/scalable/peer.svg
+    images/scalable/photos.svg
+    images/scalable/spinner.svg
+    images/scalable/text-x-generic.svgz
+    images/scalable/video-x-generic.svgz
+    images/scalable/wiLink.svg)
 
 # 16x16 icons
-generate_png(png SIZE 16 DESTINATION 16x16 ${SMALL_ICONS})
+generate_png(png SIZE 16 DESTINATION images/16x16 ${SMALL_ICONS})
 
 # 32x32 icons
-generate_png(png SIZE 32 DESTINATION 32x32 ${ICONS} ${SMALL_ICONS})
+generate_png(png SIZE 32 DESTINATION images/32x32 ${ICONS} ${SMALL_ICONS})
 
 # 64x64 icons
-generate_png(png SIZE 64 DESTINATION 64x64 ${ICONS})
+generate_png(png SIZE 64 DESTINATION images/64x64 ${ICONS})
 
 # 128x128 icons
-generate_png(png SIZE 128 DESTINATION 128x128 ${LARGE_ICONS})
+generate_png(png SIZE 128 DESTINATION images/128x128 ${LARGE_ICONS})
 
 add_custom_target(icons DEPENDS ${icns} ${ico} ${png} ${xpm})
 if (UNIX AND NOT APPLE)

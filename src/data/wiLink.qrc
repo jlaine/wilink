@@ -74,6 +74,7 @@
     <file>images/32x32/fire.png</file>
     <file>images/32x32/forward.png</file>
     <file>images/32x32/fullscreen.png</file>
+    <file>images/32x32/google.png</file>
     <file>images/32x32/hangup.png</file>
     <file>images/32x32/home.png</file>
     <file>images/32x32/information.png</file>
@@ -136,6 +137,7 @@
     <file>images/64x64/fire.png</file>
     <file>images/64x64/forward.png</file>
     <file>images/64x64/fullscreen.png</file>
+    <file>images/64x64/google.png</file>
     <file>images/64x64/hangup.png</file>
     <file>images/64x64/home.png</file>
     <file>images/64x64/information.png</file>
