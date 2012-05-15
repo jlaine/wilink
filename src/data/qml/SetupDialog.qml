@@ -79,25 +79,19 @@ Dialog {
         }
     }
 
-    Item {
+    Column {
         anchors.fill: dialog.contents
         anchors.leftMargin: appStyle.margin.normal
         anchors.rightMargin: appStyle.margin.normal
+        spacing:  appStyle.spacing.vertical
 
         PanelHelp {
-            id: help
-
-            anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
             text: qsTr('Enter the address and password for your account.')
         }
 
         Item {
-            id: accountRow
-
-            anchors.top: help.bottom
-            anchors.topMargin: appStyle.spacing.vertical
             anchors.left: parent.left
             anchors.right: parent.right
             height: accountCombo.height
@@ -132,10 +126,6 @@ Dialog {
         }
 
         Item {
-            id: usernameRow
-
-            anchors.top: accountRow.bottom
-            anchors.topMargin: appStyle.spacing.vertical
             anchors.left: parent.left
             anchors.right: parent.right
             height: usernameInput.height
@@ -166,10 +156,6 @@ Dialog {
         }
 
         Item {
-            id: passwordRow
-
-            anchors.top: usernameRow.bottom
-            anchors.topMargin: appStyle.spacing.vertical
             anchors.left: parent.left
             anchors.right: parent.right
             height: passwordInput.height
@@ -209,11 +195,15 @@ Dialog {
             property string incompleteText: qsTr('Please enter a valid username and password.')
             property string testingText: qsTr('Checking your username and password..')
 
-            anchors.top: passwordRow.bottom
-            anchors.topMargin: appStyle.spacing.vertical
             anchors.left: parent.left
             anchors.right: parent.right
             wrapMode: Text.WordWrap
+        }
+
+        PanelHelp {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            text: qsTr('If you need help, please refer to the <a href="%1">%2 FAQ</a>.').replace('%1', 'https://www.wifirst.net/wilink/faq').replace('%2', application.applicationName)
         }
     }
 

@@ -862,7 +862,7 @@ Acceptez-vous?</translation>
     <name>SetupDialog</name>
     <message>
         <source>If you need help, please refer to the &lt;a href=&quot;%1&quot;&gt;%2 FAQ&lt;/a&gt;.</source>
-        <translation type="obsolete">Si vous avez besoin d&apos;aide, merci de consulter la &lt;a href=&quot;%1&quot;&gt;FAQ %2&lt;/a&gt;.</translation>
+        <translation>Si vous avez besoin d&apos;aide, merci de consulter la &lt;a href=&quot;%1&quot;&gt;FAQ %2&lt;/a&gt;.</translation>
     </message>
     <message>
         <source>Add an account</source>
