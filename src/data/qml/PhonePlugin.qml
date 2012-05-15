@@ -30,7 +30,8 @@ Plugin {
 
     onLoaded: {
         for (var i = 0; i < accountModel.count; ++i) {
-            if (accountModel.getProperty(i, 'type') == 'wifirst') {
+            var account = accountModel.get(i);
+            if (account.type == 'web' && account.realm == 'www.wifirst.net') {
                 dock.model.add({
                     'iconSource': 'image://icon/dock-phone',
                     'iconPress': 'image://icon/phone',
