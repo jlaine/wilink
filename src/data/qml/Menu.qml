@@ -42,7 +42,7 @@ Rectangle {
             property variant model
 
             smooth: true
-            source: model.icon ? model.icon : ''
+            source: model.iconSource ? model.iconSource : ''
             width: appStyle.icon.tinySize
             height: appStyle.icon.tinySize
         }

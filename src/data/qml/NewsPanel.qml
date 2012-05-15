@@ -158,11 +158,11 @@ Panel {
                 Component.onCompleted: {
                     menu.model.append({
                         'action': 'edit',
-                        'icon': 'image://icon/options',
+                        'iconSource': 'image://icon/options',
                         'text': qsTr('Modify')});
                     menu.model.append({
                         'action': 'remove',
-                        'icon': 'image://icon/remove',
+                        'iconSource': 'image://icon/remove',
                         'text': qsTr('Remove')});
                 }
             }

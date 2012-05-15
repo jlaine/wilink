@@ -38,15 +38,15 @@ Menu {
     Component.onCompleted: {
         menu.model.append({
             'action': 'cut',
-            'icon': 'image://icon/cut',
+            'iconSource': 'image://icon/cut',
             'text': qsTr('Cut')});
         menu.model.append({
             'action': 'copy',
-            'icon': 'image://icon/copy',
+            'iconSource': 'image://icon/copy',
             'text': qsTr('Copy')});
         menu.model.append({
             'action': 'paste',
-            'icon': 'image://icon/paste',
+            'iconSource': 'image://icon/paste',
             'text': qsTr('Paste')});
     }
 }

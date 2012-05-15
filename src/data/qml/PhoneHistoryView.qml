@@ -179,15 +179,15 @@ FocusScope {
             Component.onCompleted: {
                 menu.model.append({
                     'action': 'call',
-                    'icon': 'image://icon/call',
+                    'iconSource': 'image://icon/call',
                     'text': qsTr('Call')});
                 menu.model.append({
                     'action': 'contact',
-                    'icon': 'image://icon/add',
+                    'iconSource': 'image://icon/add',
                     'text': qsTr('Add to contacts')});
                 menu.model.append({
                     'action': 'remove',
-                    'icon': 'image://icon/remove',
+                    'iconSource': 'image://icon/remove',
                     'text': qsTr('Remove')});
             }
         }

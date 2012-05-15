@@ -352,16 +352,16 @@ Panel {
                 menu.model.append({
                     'action': 'profile',
                     'enabled': profileEnabled,
-                    'icon': 'image://icon/information',
+                    'iconSource': 'image://icon/information',
                     'text': qsTr('Show profile')});
                 menu.model.append({
                     'action': 'rename',
-                    'icon': 'image://icon/options',
+                    'iconSource': 'image://icon/options',
                     'name': model.name,
                     'text': qsTr('Rename contact')});
                 menu.model.append({
                     'action': 'remove',
-                    'icon': 'image://icon/remove',
+                    'iconSource': 'image://icon/remove',
                     'name': model.name,
                     'text': qsTr('Remove contact')});
             }
