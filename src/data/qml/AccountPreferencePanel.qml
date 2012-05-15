@@ -43,30 +43,9 @@ Panel {
             anchors.fill: accounts.contents
 
             onAddClicked: {
-                panel.state = 'edit';
+                panelSwapper.showPanel('SetupDialog.qml');
             }
         }
-
-        AccountAddPanel {
-            id: addPanel
-
-            anchors.fill: accounts.contents
-            model: listPanel.model
-            opacity: 0
-
-            onAccepted: {
-                listPanel.model.append({type: 'xmpp', username: jid, password: password, realm: Utils.jidToDomain(jid)});
-                addPanel.close();
-            }
-            onClose: panel.state = ''
-        }
-    }
-
-    states: State {
-        name: 'edit'
-        PropertyChanges { target: listPanel; opacity: 0 }
-        PropertyChanges { target: addPanel; opacity: 1 }
-        StateChangeScript { script: addPanel.forceActiveFocus() }
     }
 }
 

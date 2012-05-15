@@ -202,6 +202,10 @@ Dialog {
             xhr.send();
         } else {
             var jid = usernameInput.text;
+            if (jid.indexOf('@') < 0) {
+                dialog.state = 'incomplete';
+                return;
+            }
 
             // check for duplicate account
             for (var i = 0; i < accountModel.count; i++) {
