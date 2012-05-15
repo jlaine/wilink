@@ -26,16 +26,14 @@ Dialog {
 
     title: qsTr('Add an account')
 
-    property bool quitOnReject: false
+    property QtObject accountModel: AccountModel {}
+    property bool accountSlave: false
+
     property string webRealm
     property string webUsername
     property string webPassword
     property string xmppUsername
     property string xmppPassword
-
-    AccountModel {
-        id: accountModel
-    }
 
     Client {
         id: testClient
@@ -67,7 +65,9 @@ Dialog {
                 accountModel.append({type: 'xmpp', username: dialog.xmppUsername, password: dialog.xmppPassword, realm: Utils.jidToDomain(dialog.xmppUsername)});
                 if (dialog.webRealm)
                     accountModel.append({type: 'web', username: dialog.webUsername, password: dialog.webPassword, realm: dialog.webRealm});
-                accountModel.submit();
+
+                if (!dialog.accountSlave)
+                    accountModel.submit();
 
                 dialog.close();
             }
@@ -305,10 +305,10 @@ Dialog {
     }
 
     onRejected: {
-        if (dialog.quitOnReject)
-            application.quit()
-        else
+        if (dialog.accountSlave)
             dialog.close()
+        else
+            application.quit()
     }
 
     Keys.onReturnPressed: dialog.accepted()

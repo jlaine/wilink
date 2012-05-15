@@ -43,7 +43,7 @@ Panel {
             anchors.fill: accounts.contents
 
             onAddClicked: {
-                panelSwapper.showPanel('SetupDialog.qml');
+                panelSwapper.showPanel('SetupDialog.qml', {accountModel: listPanel.model, accountSlave: true});
             }
         }
     }
