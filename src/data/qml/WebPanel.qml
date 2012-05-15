@@ -62,9 +62,11 @@ Panel {
         opacity: 0
 
         property int accountIndex: -1
+        property int accountStep: 0
 
         function doLogin() {
             accountIndex += 1;
+            accountStep = 0;
             var account = accountModel.get(accountIndex);
             if (!account)
                 return;
@@ -72,40 +74,47 @@ Panel {
             console.log("Examining account: " + account.realm);
             if (account.type == 'web' && account.realm == 'www.wifirst.net') {
                 loginView.url = 'https://www.wifirst.net/';
+            } else if (account.type == 'web' && account.realm == 'www.google.com') {
+                loginView.url = 'https://accounts.google.com/ServiceLogin?service=mail';
             } else {
                 doLogin();
             }
         }
 
-        function doXhr(method, url, data) {
-            if (data)
-                data = "'" + data + "'";
-            else
-                data = 'null';
-
-            console.log('Request ' + method + ' ' + url);
-            var js = "var xhr = new XMLHttpRequest();";
-            js += "xhr.open('" + method + "', '" + url + "', false);";
-            if (method == 'POST')
-                js += "xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');";
-            js += "xhr.send(" + data + ");";
-            js += "xhr.status";
-            return loginView.evaluateJavaScript(js);
-        }
-
         onLoadFinished: {
             var account = accountModel.get(accountIndex);
+            if (!account)
+                return;
+
             if (account.type == 'web' && account.realm == 'www.wifirst.net') {
-                var data = "login=" + account.username + "&password=" + account.password;
-                var status = doXhr('POST', 'https://www.wifirst.net/sessions', data);
+                var js = "var xhr = new XMLHttpRequest();";
+                js += "xhr.open('POST', 'https://www.wifirst.net/sessions', false);";
+                js += "xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');";
+                js += "xhr.send('login=" + account.username + "&password=" + account.password + "');";
+                js += "xhr.status";
+
+                var status = loginView.evaluateJavaScript(js);
                 if (status == "200") {
                     console.log("Logged into wifirst account: " + account.username);
                     tabSwapper.addPanel('WebTab.qml', {'url': 'https://www.wifirst.net/'}, true)
                 } else {
                     console.log("Could not log into wifirst account: " + status);
                 }
+                doLogin();
+            } else if (account.type == 'web' && account.realm == 'www.google.com') {
+                if (accountStep) {
+                    console.log("Logged into google account: " + account.username);
+                    tabSwapper.addPanel('WebTab.qml', {'url': 'https://mail.google.com/mail/'}, true)
+                    doLogin();
+                } else {
+                    accountStep += 1;
+                    var js = "var f = document.getElementById('gaia_loginform');\n";
+                    js += "f.Email.value = '" + account.username + "';\n";
+                    js += "f.Passwd.value = '" + account.password + "';\n";
+                    js += "f.submit();";
+                    loginView.evaluateJavaScript(js);
+                }
             }
-            doLogin();
         }
     }
 
