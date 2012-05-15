@@ -45,7 +45,7 @@ Rectangle {
         Menu {
             id: menu
 
-            iconDelegate: pillDelegate
+            //iconDelegate: pillDelegate
 
             onItemClicked: {
                 var statusType = menu.model.get(index).status;

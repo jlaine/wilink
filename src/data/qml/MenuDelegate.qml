@@ -24,25 +24,22 @@ Rectangle {
 
     signal clicked
     property bool enabled: model.enabled != false
-    property Component iconDelegate
 
     color: 'transparent'
     height: appStyle.icon.tinySize + 4
     width: parent.width
     radius: 5
 
-    Loader {
+    Image {
         id: icon
 
         anchors.left: parent.left
-        anchors.leftMargin: sourceComponent ? 4 : 0
+        anchors.leftMargin: model.iconSource ? 4 : 0
         anchors.verticalCenter: parent.verticalCenter
         opacity: menuItem.enabled ? 1 : 0.5
-        sourceComponent: menuItem.iconDelegate
-        width: sourceComponent ? appStyle.icon.tinySize : 0
+        source: model.iconSource ? model.iconSource : ''
+        width: model.iconSource ? appStyle.icon.tinySize : 0
         height: appStyle.icon.tinySize
-
-        onLoaded: icon.item.model = model
     }
 
     Label {

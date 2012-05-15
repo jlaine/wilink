@@ -22,7 +22,6 @@ import QtQuick 1.1
 Rectangle {
     id: menu
 
-    property Component iconDelegate: imageDelegate
     property ListModel model: ListModel {}
     signal itemClicked(int index)
 
@@ -70,7 +69,6 @@ Rectangle {
             delegate: MenuDelegate {
                 id: menuItem
 
-                iconDelegate: menu.iconDelegate
                 onClicked: itemClicked(index)
             }
         }

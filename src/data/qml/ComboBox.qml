@@ -33,7 +33,6 @@ Item {
         Menu {
             model: block.model
             width: view.width
-            iconDelegate: view.iconDelegate
 
             onItemClicked: {
                 block.currentIndex = index;
