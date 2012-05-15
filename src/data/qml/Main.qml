@@ -39,7 +39,7 @@ FocusScope {
             if (accountModel.count) {
                 appPlugins.load();
             } else {
-                dialogSwapper.showPanel('SetupDialog.qml', {'accountType': 'wifirst'});
+                dialogSwapper.showPanel('SetupDialog.qml');
             }
         }
     }
@@ -193,7 +193,7 @@ FocusScope {
             if (accountModel.count) {
                 appPlugins.load();
             } else {
-                dialogSwapper.showPanel('SetupDialog.qml', {'accountType': 'wifirst'});
+                dialogSwapper.showPanel('SetupDialog.qml');
             }
         }
     }

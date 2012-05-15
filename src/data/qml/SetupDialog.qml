@@ -26,9 +26,11 @@ Dialog {
 
     title: qsTr('Add an account')
 
-    property string accountType
-    property string testJid
-    property string testPassword
+    property string webRealm
+    property string webUsername
+    property string webPassword
+    property string xmppUsername
+    property string xmppPassword
 
     AccountModel {
         id: accountModel
@@ -37,9 +39,35 @@ Dialog {
     Client {
         id: testClient
 
+        function testCredentials(jid, password) {
+            if (jid.indexOf('@') < 0) {
+                dialog.state = 'incomplete';
+                return;
+            }
+
+            // check for duplicate account
+            for (var i = 0; i < accountModel.count; i++) {
+                var account = accountModel.get(i);
+                if (account.type == 'xmpp' && account.realm == Utils.jidToDomain(jid)) {
+                    dialog.state = 'dupe';
+                    return;
+                }
+            }
+
+            dialog.state = 'testing';
+            dialog.xmppUsername = jid;
+            dialog.xmppPassword = password;
+            console.log("connecting: " + dialog.xmppUsername);
+            testClient.connectToServer(dialog.xmppUsername + '/AccountCheck', dialog.xmppPassword);
+        }
+
         onConnected: {
             if (dialog.state == 'testing') {
-                accountModel.append({type: 'xmpp', username: dialog.testJid, password: dialog.testPassword, realm: Utils.jidToDomain(dialog.testJid)});
+                accountModel.append({type: 'xmpp', username: dialog.xmppUsername, password: dialog.xmppPassword, realm: Utils.jidToDomain(dialog.xmppUsername)});
+                if (dialog.webRealm)
+                    accountModel.append({type: 'web', username: dialog.webUsername, password: dialog.webPassword, realm: dialog.webRealm});
+                accountModel.submit();
+
                 accountModel.submit();
                 dialog.close();
             }
@@ -54,6 +82,8 @@ Dialog {
 
     Item {
         anchors.fill: dialog.contents
+        anchors.leftMargin: appStyle.margin.normal
+        anchors.rightMargin: appStyle.margin.normal
 
         PanelHelp {
             id: help
@@ -61,18 +91,51 @@ Dialog {
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
-            text: {
-                if (accountType == 'wifirst')
-                    return qsTr("Enter the username and password for your Wifirst account.");
-                else
-                    return qsTr('Enter the address and password for the account you want to add.');
+            text: qsTr('Enter the address and password for your account.')
+        }
+
+        Item {
+            id: accountRow
+
+            anchors.top: help.bottom
+            anchors.topMargin: appStyle.spacing.vertical
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: accountCombo.height
+
+            Label {
+                id: accountLabel
+
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+                elide: Text.ElideRight
+                font.bold: true
+                text: qsTr('Account')
+                width: 100
+            }
+
+            ComboBox {
+                id: accountCombo
+
+                anchors.top: parent.top
+                anchors.left: accountLabel.right
+                anchors.leftMargin: appStyle.spacing.horizontal
+                anchors.right: parent.right
+                model: ListModel {}
+
+                Component.onCompleted: {
+                    model.append({text: 'Wifirst', type: 'wifirst'});
+                    model.append({text: 'Google', type: 'google'});
+                    model.append({text: qsTr('Other'), type: 'other'});
+                    accountCombo.currentIndex = 0;
+                }
             }
         }
 
         Item {
             id: usernameRow
 
-            anchors.top: help.bottom
+            anchors.top: accountRow.bottom
             anchors.topMargin: appStyle.spacing.vertical
             anchors.left: parent.left
             anchors.right: parent.right
@@ -160,14 +223,16 @@ Dialog {
         }
         dialog.state = 'testing';
 
-        if (dialog.accountType == 'wifirst') {
-            var webUsername = usernameInput.text;
-            if (webUsername.indexOf('@') < 0) {
-                webUsername += '@wifirst.net';
-                usernameInput.text = webUsername;
+        var accountType = accountCombo.model.get(accountCombo.currentIndex).type;
+        if (accountType == 'wifirst') {
+            dialog.webRealm = 'www.wifirst.net';
+            dialog.webUsername = usernameInput.text;
+            if (dialog.webUsername.indexOf('@') < 0) {
+                dialog.webUsername += '@wifirst.net';
+                usernameInput.text = dialog.webUsername;
             }
+            dialog.webPassword = passwordInput.text;
 
-            var webPassword = passwordInput.text;
             var xhr = new XMLHttpRequest();
             xhr.onreadystatechange = function() {
                 if (xhr.readyState == 4) {
@@ -183,9 +248,7 @@ Dialog {
                             }
                         }
                         if (jid && password) {
-                            accountModel.append({type: 'xmpp', username: jid, password: password, realm: Utils.jidToDomain(jid)});
-                            accountModel.append({type: 'web', username: webUsername, password: webPassword, realm: 'www.wifirst.net'});
-                            accountModel.submit();
+                            testClient.testCredentials(jid, passwordInput.text);
                             dialog.close();
                         } else {
                             dialog.state = 'unknownError';
@@ -197,30 +260,17 @@ Dialog {
                     }
                 }
             }
-            xhr.open('GET', 'https://www.wifirst.net/w/wilink/credentials', true, webUsername, webPassword);
+            xhr.open('GET', 'https://www.wifirst.net/w/wilink/credentials', true, dialog.webUsername, dialog.webPassword);
             xhr.setRequestHeader('Accept', 'application/xml');
             xhr.send();
+        } else if (accountType == 'google') {
+            dialog.webRealm = 'www.google.com';
+            dialog.webUsername = usernameInput.text;
+            dialog.webPassword = passwordInput.text;
+
+            testClient.testCredentials(usernameInput.text, passwordInput.text);
         } else {
-            var jid = usernameInput.text;
-            if (jid.indexOf('@') < 0) {
-                dialog.state = 'incomplete';
-                return;
-            }
-
-            // check for duplicate account
-            for (var i = 0; i < accountModel.count; i++) {
-                var account = accountModel.get(i);
-                if (account.type == 'xmpp' && account.realm == Utils.jidToDomain(jid)) {
-                    dialog.state = 'dupe';
-                    return;
-                }
-            }
-
-            dialog.state = 'testing';
-            dialog.testJid = jid;
-            dialog.testPassword = passwordInput.text;
-            console.log("connecting: " + dialog.testJid);
-            testClient.connectToServer(dialog.testJid + '/AccountCheck', dialog.testPassword);
+            testClient.testCredentials(usernameInput.text, passwordInput.text);
         }
     }
 
