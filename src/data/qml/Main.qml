@@ -39,7 +39,7 @@ FocusScope {
             if (accountModel.count) {
                 appPlugins.load();
             } else {
-                dialogSwapper.showPanel('SetupDialog.qml');
+                dialogSwapper.showPanel('SetupDialog.qml', {quitOnReject: true});
             }
         }
     }
@@ -193,7 +193,7 @@ FocusScope {
             if (accountModel.count) {
                 appPlugins.load();
             } else {
-                dialogSwapper.showPanel('SetupDialog.qml');
+                dialogSwapper.showPanel('SetupDialog.qml', {quitOnReject: true});
             }
         }
     }

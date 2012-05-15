@@ -26,6 +26,7 @@ Dialog {
 
     title: qsTr('Add an account')
 
+    property bool quitOnReject: false
     property string webRealm
     property string webUsername
     property string webPassword
@@ -303,7 +304,12 @@ Dialog {
         }
     }
 
-    onRejected: application.quit()
+    onRejected: {
+        if (dialog.quitOnReject)
+            application.quit()
+        else
+            dialog.close()
+    }
 
     Keys.onReturnPressed: dialog.accepted()
 
