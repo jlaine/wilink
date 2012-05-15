@@ -56,8 +56,6 @@ Rectangle {
             model: menu.model
 
             delegate: MenuDelegate {
-                id: menuItem
-
                 onClicked: itemClicked(index)
             }
         }

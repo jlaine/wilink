@@ -30,22 +30,14 @@ Rectangle {
     height: appStyle.icon.tinySize + 3 * appStyle.margin.normal
 
     Component {
-        id: pillDelegate
-
-        StatusPill {
-            property variant model
-
-            presenceStatus: model.status
-        }
-    }
-
-    Component {
         id: statusMenu
 
         Menu {
             id: menu
 
-            //iconDelegate: pillDelegate
+            delegate: StatusDelegate {
+                onClicked: itemClicked(index)
+            }
 
             onItemClicked: {
                 var statusType = menu.model.get(index).status;

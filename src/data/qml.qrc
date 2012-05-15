@@ -96,6 +96,7 @@
     <file>qml/SoundPreferencePanel.qml</file>
     <file>qml/Spinner.qml</file>
     <file>qml/StatusBar.qml</file>
+    <file>qml/StatusDelegate.qml</file>
     <file>qml/StatusPill.qml</file>
     <file>qml/Style.qml</file>
     <file>qml/TabView.qml</file>
