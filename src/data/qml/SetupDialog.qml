@@ -216,12 +216,12 @@ Dialog {
 
         var accountType = accountCombo.model.get(accountCombo.currentIndex).type;
         if (accountType == 'wifirst') {
+            if (usernameInput.text.indexOf('@') < 0) {
+                usernameInput.text += '@wifirst.net';
+            }
+
             dialog.webRealm = 'www.wifirst.net';
             dialog.webUsername = usernameInput.text;
-            if (dialog.webUsername.indexOf('@') < 0) {
-                dialog.webUsername += '@wifirst.net';
-                usernameInput.text = dialog.webUsername;
-            }
             dialog.webPassword = passwordInput.text;
 
             var xhr = new XMLHttpRequest();
@@ -254,6 +254,10 @@ Dialog {
             xhr.setRequestHeader('Accept', 'application/xml');
             xhr.send();
         } else if (accountType == 'google') {
+            if (usernameInput.text.indexOf('@') < 0) {
+                usernameInput.text += '@gmail.com';
+            }
+
             dialog.webRealm = 'www.google.com';
             dialog.webUsername = usernameInput.text;
             dialog.webPassword = passwordInput.text;
