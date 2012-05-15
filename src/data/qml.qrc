@@ -2,7 +2,6 @@
 <qresource>
     <file>qml/utils.js</file>
     <file>qml/AboutDialog.qml</file>
-    <file>qml/AccountAddPanel.qml</file>
     <file>qml/AccountListPanel.qml</file>
     <file>qml/AccountPasswordDialog.qml</file>
     <file>qml/AccountPreferencePanel.qml</file>

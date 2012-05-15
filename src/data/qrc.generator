@@ -54,4 +54,8 @@ def write_qrc(path, file_paths):
 
 write_qrc('wiLink.qrc', image_files + sound_files)
 write_qrc('qml.qrc', js_files + qml_files)
-
+fp = open('qml/qmldir', 'w')
+for qml_path in qml_files:
+    qml_name = os.path.basename(qml_path).split('.')[0]
+    fp.write("%s 1.0 %s.qml\n" % (qml_name, qml_name));
+fp.close()

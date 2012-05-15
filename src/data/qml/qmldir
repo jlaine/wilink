@@ -1,5 +1,4 @@
 AboutDialog 1.0 AboutDialog.qml
-AccountAddPanel 1.0 AccountAddPanel.qml
 AccountListPanel 1.0 AccountListPanel.qml
 AccountPasswordDialog 1.0 AccountPasswordDialog.qml
 AccountPreferencePanel 1.0 AccountPreferencePanel.qml
@@ -93,6 +92,7 @@ ShareView 1.0 ShareView.qml
 SoundPreferencePanel 1.0 SoundPreferencePanel.qml
 Spinner 1.0 Spinner.qml
 StatusBar 1.0 StatusBar.qml
+StatusDelegate 1.0 StatusDelegate.qml
 StatusPill 1.0 StatusPill.qml
 Style 1.0 Style.qml
 TabView 1.0 TabView.qml
@@ -103,4 +103,3 @@ TransferWidget 1.0 TransferWidget.qml
 WebPanel 1.0 WebPanel.qml
 WebPlugin 1.0 WebPlugin.qml
 WebTab 1.0 WebTab.qml
-WifirstPlugin 1.0 WifirstPlugin.qml
