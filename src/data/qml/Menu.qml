@@ -22,6 +22,7 @@ import QtQuick 1.1
 Rectangle {
     id: menu
 
+    property alias delegate: repeater.delegate
     property ListModel model: ListModel {}
     signal itemClicked(int index)
 
@@ -33,19 +34,6 @@ Rectangle {
     height: model.count * (appStyle.icon.tinySize + 4) + 1
     width: 150
     z: 10
-
-    Component {
-        id: imageDelegate
-
-        Image {
-            property variant model
-
-            smooth: true
-            source: model.iconSource ? model.iconSource : ''
-            width: appStyle.icon.tinySize
-            height: appStyle.icon.tinySize
-        }
-    }
 
     // FIXME: this is a hack waiting 'blur' or 'shadow' attribute in qml
     BorderImage {
