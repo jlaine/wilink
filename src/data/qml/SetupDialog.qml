@@ -26,8 +26,30 @@ Dialog {
 
     title: qsTr('Add an account')
 
+    property string accountType: 'wifirst'
+    property string testJid
+    property string testPassword
+
     AccountModel {
         id: accountModel
+    }
+
+    Client {
+        id: testClient
+
+        onConnected: {
+            if (dialog.state == 'testing') {
+                accountModel.append({type: 'xmpp', username: dialog.testJid, password: dialog.testPassword, realm: Utils.jidToDomain(dialog.testJid)});
+                accountModel.submit();
+                dialog.close();
+            }
+        }
+
+        onDisconnected: {
+            if (dialog.state == 'testing') {
+                dialog.state = 'authError';
+            }
+        }
     }
 
     Item {
@@ -39,7 +61,12 @@ Dialog {
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
-            text: qsTr("Enter the username and password for your '%1' account.").replace('%1', 'wifirst.net')
+            text: {
+                if (accountType == 'wifirst')
+                    return qsTr("Enter the username and password for your Wifirst account.");
+                else
+                    return qsTr('Enter the address and password for the account you want to add.');
+            }
         }
 
         Item {
@@ -58,7 +85,7 @@ Dialog {
                 anchors.verticalCenter: parent.verticalCenter
                 elide: Text.ElideRight
                 font.bold: true
-                text: qsTr('Username')
+                text: qsTr('Address')
                 width: 100
             }
 
@@ -114,6 +141,7 @@ Dialog {
 
             property string authErrorText: qsTr('Could not connect, please check your username and password.')
             property string unknownErrorText: qsTr('An unknown error occured.')
+            property string dupeText: qsTr("You already have an account for '%1'.").replace('%1', Utils.jidToDomain(usernameInput.text));
             property string incompleteText: qsTr('Please enter a valid username and password.')
             property string testingText: qsTr('Checking your username and password..')
 
@@ -132,44 +160,64 @@ Dialog {
         }
         dialog.state = 'testing';
 
-        var webUsername = usernameInput.text;
-        if (webUsername.indexOf('@') < 0) {
-            webUsername += '@wifirst.net';
-        }
+        if (dialog.accountType == 'wifirst') {
+            var webUsername = usernameInput.text;
+            if (webUsername.indexOf('@') < 0) {
+                webUsername += '@wifirst.net';
+                usernameInput.text = webUsername;
+            }
 
-        var webPassword = passwordInput.text;
-        var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState == 4) {
-                if (xhr.status == 200) {
-                    var jid, password;
-                    var doc = xhr.responseXML.documentElement;
-                    for (var i = 0; i < doc.childNodes.length; ++i) {
-                        var node = doc.childNodes[i];
-                        if (node.nodeName == 'id') {
-                            jid = node.firstChild.nodeValue;
-                        } else if (node.nodeName == 'password') {
-                            password = node.firstChild.nodeValue;
+            var webPassword = passwordInput.text;
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4) {
+                    if (xhr.status == 200) {
+                        var jid, password;
+                        var doc = xhr.responseXML.documentElement;
+                        for (var i = 0; i < doc.childNodes.length; ++i) {
+                            var node = doc.childNodes[i];
+                            if (node.nodeName == 'id') {
+                                jid = node.firstChild.nodeValue;
+                            } else if (node.nodeName == 'password') {
+                                password = node.firstChild.nodeValue;
+                            }
                         }
-                    }
-                    if (jid && password) {
-                        accountModel.append({type: 'xmpp', username: jid, password: password, realm: Utils.jidToDomain(jid)});
-                        accountModel.append({type: 'web', username: webUsername, password: webPassword, realm: 'www.wifirst.net'});
-                        accountModel.submit();
-                        dialog.close();
+                        if (jid && password) {
+                            accountModel.append({type: 'xmpp', username: jid, password: password, realm: Utils.jidToDomain(jid)});
+                            accountModel.append({type: 'web', username: webUsername, password: webPassword, realm: 'www.wifirst.net'});
+                            accountModel.submit();
+                            dialog.close();
+                        } else {
+                            dialog.state = 'unknownError';
+                        }
+                    } else if (xhr.status == 401) {
+                        dialog.state = 'authError';
                     } else {
                         dialog.state = 'unknownError';
                     }
-                } else if (xhr.status == 401) {
-                    dialog.state = 'authError';
-                } else {
-                    dialog.state = 'unknownError';
                 }
             }
+            xhr.open('GET', 'https://www.wifirst.net/w/wilink/credentials', true, webUsername, webPassword);
+            xhr.setRequestHeader('Accept', 'application/xml');
+            xhr.send();
+        } else {
+            var jid = usernameInput.text;
+
+            // check for duplicate account
+            for (var i = 0; i < accountModel.count; i++) {
+                var account = accountModel.get(i);
+                if (account.type == 'xmpp' && account.realm == Utils.jidToDomain(jid)) {
+                    dialog.state = 'dupe';
+                    return;
+                }
+            }
+
+            dialog.state = 'testing';
+            dialog.testJid = jid;
+            dialog.testPassword = passwordInput.text;
+            console.log("connecting: " + dialog.testJid);
+            testClient.connectToServer(dialog.testJid + '/AccountCheck', dialog.testPassword);
         }
-        xhr.open('GET', 'https://www.wifirst.net/w/wilink/credentials', true, webUsername, webPassword);
-        xhr.setRequestHeader('Accept', 'application/xml');
-        xhr.send();
     }
 
     states: [
@@ -181,6 +229,11 @@ Dialog {
         State {
             name: 'unknownError'
             PropertyChanges { target: statusLabel; color: 'red'; text: statusLabel.unknownErrorText }
+        },
+
+        State {
+            name: 'dupe'
+            PropertyChanges { target: statusLabel; color: 'red'; text: statusLabel.dupeText }
         },
 
         State {
