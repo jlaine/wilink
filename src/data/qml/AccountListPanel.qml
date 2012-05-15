@@ -61,7 +61,7 @@ Item {
 
                     anchors.top: parent.top
                     anchors.left: parent.left
-                    source: (model.realm == 'www.wifirst.net' || model.realm == 'wifirst.net') ? 'image://icon/wiLink' : 'image://icon/peer'
+                    source: model.type == 'web' ? 'image://icon/web' : 'image://icon/chat'
                     sourceSize.height: appStyle.icon.smallSize
                     sourceSize.width: appStyle.icon.smallSize
                 }
