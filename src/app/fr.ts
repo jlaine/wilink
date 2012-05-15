@@ -57,49 +57,6 @@
     </message>
 </context>
 <context>
-    <name>AccountAddPanel</name>
-    <message>
-        <source>Enter the address and password for the account you want to add.</source>
-        <translation>Saisissez l&apos;adresse et le mot de passe du compte que vous souhaitez ajouter.</translation>
-    </message>
-    <message>
-        <source>Add</source>
-        <translation>Ajouter</translation>
-    </message>
-    <message>
-        <source>Address</source>
-        <translation>Adresse</translation>
-    </message>
-    <message>
-        <source>Password</source>
-        <translation>Mot de passe</translation>
-    </message>
-    <message>
-        <source>You already have an account for &apos;%1&apos;.</source>
-        <translation>Vous avez déjà un compte pour &apos;%1&apos;.</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Annuler</translation>
-    </message>
-    <message>
-        <source>Please enter a valid address.</source>
-        <translation>Veuillez saisir une adresse valide.</translation>
-    </message>
-    <message>
-        <source>Please enter your password.</source>
-        <translation>Veuillez saisir votre mot de passe.</translation>
-    </message>
-    <message>
-        <source>Could not connect, please check your address and password.</source>
-        <translation>La connexion a échoué, merci de vérifier votre adresse et mot de passe.</translation>
-    </message>
-    <message>
-        <source>Checking your address and password..</source>
-        <translation>Vérification de votre adresse et mot de passe..</translation>
-    </message>
-</context>
-<context>
     <name>AccountListPanel</name>
     <message>
         <source>In addition to your %1 account, %2 can connect to additional chat accounts such as Google Talk and Facebook.</source>
@@ -932,9 +889,6 @@ Acceptez-vous?</translation>
         <translation>Vérification de votre identifiant et mot de passe..</translation>
     </message>
     <message>
-        <source>Enter the address and password for the account you want to add.</source>
-    </message>
-    <message>
         <source>Address</source>
         <translation>Adresse</translation>
     </message>
@@ -949,6 +903,10 @@ Acceptez-vous?</translation>
     <message>
         <source>Account</source>
         <translation>Compte</translation>
+    </message>
+    <message>
+        <source>Other</source>
+        <translation>Autre</translation>
     </message>
 </context>
 <context>
