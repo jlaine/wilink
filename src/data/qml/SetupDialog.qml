@@ -123,9 +123,9 @@ Dialog {
                 model: ListModel {}
 
                 Component.onCompleted: {
-                    model.append({icon: 'image://icon/wiLink', text: 'Wifirst', type: 'wifirst'});
-                    model.append({icon: 'image://icon/google', text: 'Google', type: 'google'});
-                    model.append({icon: 'image://icon/peer', text: qsTr('Other'), type: 'other'});
+                    model.append({iconSource: 'image://icon/wiLink', text: 'Wifirst', type: 'wifirst'});
+                    model.append({iconSource: 'image://icon/google', text: 'Google', type: 'google'});
+                    model.append({iconSource: 'image://icon/peer', text: qsTr('Other'), type: 'other'});
                     accountCombo.currentIndex = 0;
                 }
             }
