@@ -912,14 +912,6 @@ Acceptez-vous?</translation>
         <translation>Ajouter un compte</translation>
     </message>
     <message>
-        <source>Enter the username and password for your &apos;%1&apos; account.</source>
-        <translation>Saisissez l&apos;identifiant et le mot de passe de votre compte &apos;%1&apos;.</translation>
-    </message>
-    <message>
-        <source>Username</source>
-        <translation>Identifiant</translation>
-    </message>
-    <message>
         <source>Password</source>
         <translation>Mot de passe</translation>
     </message>
@@ -938,6 +930,22 @@ Acceptez-vous?</translation>
     <message>
         <source>Checking your username and password..</source>
         <translation>Vérification de votre identifiant et mot de passe..</translation>
+    </message>
+    <message>
+        <source>Enter the username and password for your Wifirst account.</source>
+        <translation>Saisissez l&apos;identifiant et le mot de passe de votre compte Wifirst.</translation>
+    </message>
+    <message>
+        <source>Enter the address and password for the account you want to add.</source>
+        <translation>Saisissez l&apos;adresse et le mot de passe du compte que vous souhaitez ajouter.</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>Adresse</translation>
+    </message>
+    <message>
+        <source>You already have an account for &apos;%1&apos;.</source>
+        <translation>Vous avez déjà un compte pour &apos;%1&apos;.</translation>
     </message>
 </context>
 <context>
