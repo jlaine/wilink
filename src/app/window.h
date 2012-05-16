@@ -30,7 +30,6 @@ class WindowPrivate;
 class Window : public QMainWindow
 {
     Q_OBJECT
-    Q_PROPERTY(bool isActiveWindow READ isActiveWindow NOTIFY windowStateChanged)
     Q_PROPERTY(bool fullScreen READ isFullScreen WRITE setFullScreen NOTIFY windowStateChanged)
     Q_PROPERTY(QUrl source READ source WRITE setSource NOTIFY sourceChanged)
 
