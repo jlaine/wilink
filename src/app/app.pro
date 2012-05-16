@@ -26,14 +26,8 @@ android|symbian|contains(MEEGO_EDITION,harmattan) {
 }
 
 RESOURCES += app.qrc ../data/qml.qrc
-SOURCES += \
-    application.cpp \
-    main.cpp \
-    window.cpp
-
-HEADERS += \
-    application.h \
-    window.h \
+SOURCES += main.cpp window.cpp
+HEADERS += window.h
 
 mac {
     SOURCES += application_mac.mm

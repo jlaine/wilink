@@ -20,7 +20,7 @@
 #include <AppKit/AppKit.h>
 #include <Foundation/NSAutoreleasePool.h>
 
-#include "application.h"
+#include <QApplication>
 #include "window.h"
 
 static inline CFStringRef qstringToCFStringRef(const QString &string)

@@ -79,7 +79,7 @@ Dialog {
     }
 
     minimumHeight: 280
-    title: qsTr('About %1').replace('%1', application.applicationName)
+    title: qsTr('About %1').replace('%1', appUpdater.applicationName)
 
     Item {
         anchors.fill: dialog.contents
@@ -109,7 +109,7 @@ Dialog {
                 anchors.leftMargin: appStyle.spacing.horizontal
                 font.bold: true
                 font.pixelSize: appStyle.font.largeSize
-                text: application.applicationName
+                text: appUpdater.applicationName
             }
 
             Label {
@@ -119,7 +119,7 @@ Dialog {
                 anchors.leftMargin: appStyle.spacing.horizontal
                 anchors.top: appName.bottom
                 anchors.topMargin: appStyle.spacing.vertical
-                text: qsTr('version %1').replace('%1', application.applicationVersion)
+                text: qsTr('version %1').replace('%1', appUpdater.applicationVersion)
             }
         }
 
@@ -143,7 +143,7 @@ Dialog {
                         + "the Free Software Foundation, either version 3 of the License, or "
                         + "(at your option) any later version.</p>";
                     } else if (appUpdater.error == Updater.NoUpdateError) {
-                        return qsTr('Your version of %1 is up to date.').replace('%1', application.applicationName);
+                        return qsTr('Your version of %1 is up to date.').replace('%1', appUpdater.applicationName);
                     } else {
                         var text = '<p>' + qsTr('Could not run software update, please try again later.') + '</p>'
                         text += '<pre>' + appUpdater.errorString + '</pre>';
@@ -157,7 +157,7 @@ Dialog {
                 case Updater.PromptState: {
                     var text = "<p>" + qsTr('Version %1 of %2 is ready to be installed.')
                                 .replace('%1', appUpdater.updateVersion)
-                                .replace('%2', application.applicationName) + "</p>";
+                                .replace('%2', appUpdater.applicationName) + "</p>";
                     text += "<p><b>" + qsTr('Changes') + "</b></p>";
                     text += "<pre>" + appUpdater.updateChanges + "</pre>";
                     return text;

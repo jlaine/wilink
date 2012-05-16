@@ -20,6 +20,7 @@
 #include <cstdlib>
 #include <signal.h>
 
+#include <QApplication>
 #include <QLocale>
 #include <QSslSocket>
 #include <QTranslator>
@@ -32,7 +33,6 @@ void mac_init();
 #include <windows.h>
 #endif
 
-#include "application.h"
 #include "window.h"
 
 static int aborted = 0;
@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
 #endif
 
     /* Create application */
-    Application app(argc, argv);
+    QApplication app(argc, argv);
 
     /* Set application properties */
     app.setApplicationName("wiLink");
