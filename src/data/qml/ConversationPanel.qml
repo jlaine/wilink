@@ -198,7 +198,7 @@ Panel {
                         }
                     }
 
-                    // alert window
+                    // notify alert
                     appNotifier.alert();
 
                     // play a sound

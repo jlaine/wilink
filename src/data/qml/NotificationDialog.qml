@@ -56,7 +56,7 @@ Dialog {
     }
 
     Component.onCompleted: {
-        // alert window
+        // notify alert
         appNotifier.alert();
     }
 }
