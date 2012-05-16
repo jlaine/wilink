@@ -21,6 +21,7 @@
 #include <Foundation/NSAutoreleasePool.h>
 
 #include "application.h"
+#include "window.h"
 
 static inline CFStringRef qstringToCFStringRef(const QString &string)
 {
@@ -42,7 +43,12 @@ static inline CFStringRef qstringToCFStringRef(const QString &string)
     Q_UNUSED(app);
     Q_UNUSED(flag);
 
-    QMetaObject::invokeMethod(wApp, "showWindows");
+    foreach (QWidget *widget, QApplication::topLevelWidgets()) {
+        Window *window = qobject_cast<Window*>(widget);
+        if (window)
+            window->showAndRaise();
+    }
+
     return NO;
 }
 

@@ -38,9 +38,6 @@ public:
     static void alert(QWidget *widget);
     static void platformInit();
 
-signals:
-    void showWindows();
-
 public slots:
     QUrl resolvedUrl(const QUrl &url, const QUrl &base);
 };
