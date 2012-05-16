@@ -54,11 +54,11 @@ Window::Window(QWidget *parent)
     Q_ASSERT(check);
 
     check = connect(d->view->engine(), SIGNAL(quit()),
-                    wApp, SLOT(quit()));
+                    qApp, SLOT(quit()));
     Q_ASSERT(check);
 
     QDeclarativeContext *context = d->view->rootContext();
-    context->setContextProperty("application", wApp);
+    context->setContextProperty("application", qApp);
     context->setContextProperty("window", this);
 
     setCentralWidget(d->view);

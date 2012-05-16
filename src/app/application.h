@@ -21,8 +21,6 @@
 #define __APPLICATION_H__
 
 #include <QApplication>
-#include <QString>
-#include <QUrl>
 
 class Application : public QApplication
 {
@@ -34,13 +32,6 @@ class Application : public QApplication
 public:
     Application(int &argc, char **argv);
     ~Application();
-
-    static void platformInit();
-
-public slots:
-    QUrl resolvedUrl(const QUrl &url, const QUrl &base);
 };
-
-extern Application *wApp;
 
 #endif

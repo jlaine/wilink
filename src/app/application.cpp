@@ -17,31 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QIcon>
-#include <QUrl>
-
 #include "application.h"
-
-Application *wApp = 0;
 
 Application::Application(int &argc, char **argv)
     : QApplication(argc, argv)
 {
-    wApp = this;
 }
 
 Application::~Application()
 {
-}
-
-#ifndef Q_OS_MAC
-void Application::platformInit()
-{
-}
-#endif
-
-QUrl Application::resolvedUrl(const QUrl &url, const QUrl &base)
-{
-    return base.resolved(url);
 }
 

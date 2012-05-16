@@ -24,6 +24,10 @@
 #include <QSslSocket>
 #include <QTranslator>
 
+#ifdef Q_OS_MAC
+void mac_init();
+#endif
+
 #ifdef Q_OS_WIN
 #include <windows.h>
 #endif
@@ -45,8 +49,11 @@ static void signal_handler(int sig)
 
 int main(int argc, char *argv[])
 {
+#ifdef Q_OS_MAC
+    mac_init();
+#endif
+
     /* Create application */
-    Application::platformInit();
     Application app(argc, argv);
 
     /* Set application properties */

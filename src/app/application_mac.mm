@@ -63,7 +63,7 @@ static inline CFStringRef qstringToCFStringRef(const QString &string)
 
 @end
 
-void Application::platformInit()
+void mac_init()
 {
     NSAutoreleasePool *autoreleasepool = [[NSAutoreleasePool alloc] init];
     NSApplication *cocoaApp = [NSApplication sharedApplication];

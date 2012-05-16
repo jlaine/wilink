@@ -195,6 +195,11 @@ Panel {
 
             property QtObject soundJob
 
+            function resolvedUrl(url) {
+                // FIXME: handle relative urls
+                return url;
+            }
+
             anchors.top: header.bottom
             anchors.bottom: parent.bottom
             anchors.left: parent.left
@@ -219,9 +224,9 @@ Panel {
                     smooth: true
                     source: {
                         if (model.thumbnailSource)
-                            return application.resolvedUrl(model.thumbnailSource, mainView.model.source);
+                            return resolvedUrl(model.thumbnailSource);
                         else if (model.imageSource)
-                            return application.resolvedUrl(model.imageSource, mainView.model.source);
+                            return resolvedUrl(model.imageSource);
                         else
                             return 'image://icon/rss';
                     }
@@ -333,7 +338,7 @@ Panel {
                         text: {
                             // resolve urls to absolute urls
                             var text = model.description.replace(/src=(['"])([^'"]+)(['"])/, function(match, quote, url) {
-                                return 'src=' + quote + application.resolvedUrl(url, mainView.model.source) + quote;
+                                return 'src=' + quote + resolvedUrl(url) + quote;
                             });
 
                             return '<p>' + text + '</p>';
