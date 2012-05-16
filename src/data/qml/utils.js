@@ -99,8 +99,10 @@ function equalProperties(a, b) {
 
 function dumpProperties(a) {
     var dump = '';
-    for (var key in a)
-        dump += (dump.length > 0 ? ', ' : '') + key + ': ' + a[key];
+    for (var key in a) {
+        if (key != 'loadScript')
+            dump += (dump.length > 0 ? ', ' : '') + key + ': ' + a[key];
+    }
     return '{' + dump + '}';
 }
 
