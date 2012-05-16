@@ -23,12 +23,6 @@
 #include <QApplication>
 #include "window.h"
 
-static inline CFStringRef qstringToCFStringRef(const QString &string)
-{
-    return CFStringCreateWithCharacters(0, reinterpret_cast<const UniChar *>(string.unicode()),
-                                        string.length());
-}
-
 @interface AppController : NSObject <NSApplicationDelegate>
 - (BOOL)applicationShouldHandleReopen: (NSApplication *)app hasVisibleWindows: (BOOL) flag;
 - (NSApplicationTerminateReply)applicationShouldTerminate: (NSApplication *)sender;
