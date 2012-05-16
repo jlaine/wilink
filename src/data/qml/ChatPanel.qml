@@ -82,7 +82,7 @@ Panel {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: parent.top
-            currentJid: (window.isActiveWindow && swapper.currentItem == chatPanel && Qt.isQtObject(chatSwapper.currentItem) && chatSwapper.currentItem.jid != undefined) ? chatSwapper.currentItem.jid : ''
+            currentJid: (Qt.application.active && swapper.currentItem == chatPanel && Qt.isQtObject(chatSwapper.currentItem) && chatSwapper.currentItem.jid != undefined) ? chatSwapper.currentItem.jid : ''
             enabled: appClient.mucServer != ''
             iconSource: 'image://icon/chat'
             model: RoomListModel {
@@ -194,7 +194,7 @@ Panel {
             anchors.right: parent.right
             anchors.top: splitter.bottom
             anchors.bottom: statusBar.top
-            currentJid: (window.isActiveWindow && swapper.currentItem == chatPanel && Qt.isQtObject(chatSwapper.currentItem) && chatSwapper.currentItem.jid != undefined) ? chatSwapper.currentItem.jid : ''
+            currentJid: (Qt.application.active && swapper.currentItem == chatPanel && Qt.isQtObject(chatSwapper.currentItem) && chatSwapper.currentItem.jid != undefined) ? chatSwapper.currentItem.jid : ''
             model: sortedContacts
             title: qsTr('My contacts')
 
