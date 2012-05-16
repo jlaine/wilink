@@ -308,7 +308,7 @@ Dialog {
         if (dialog.accountSlave)
             dialog.close()
         else
-            application.quit()
+            Qt.quit()
     }
 
     Keys.onReturnPressed: dialog.accepted()

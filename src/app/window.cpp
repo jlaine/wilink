@@ -53,12 +53,9 @@ Window::Window(QWidget *parent)
                     this, SLOT(_q_statusChanged()));
     Q_ASSERT(check);
 
-#if 0
-    // load plugin
-    Plugin plugin;
-    plugin.registerTypes("wiLink");
-    plugin.initializeEngine(d->view->engine(), "wiLink");
-#endif
+    check = connect(d->view->engine(), SIGNAL(quit()),
+                    wApp, SLOT(quit()));
+    Q_ASSERT(check);
 
     QDeclarativeContext *context = d->view->rootContext();
     context->setContextProperty("application", wApp);

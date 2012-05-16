@@ -44,7 +44,7 @@ Panel {
 
         onConflictReceived: {
             console.log("Received a resource conflict from chat server");
-            application.quit();
+            Qt.quit();
         }
     }
 

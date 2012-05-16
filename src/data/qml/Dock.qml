@@ -136,7 +136,7 @@ Rectangle {
             text: qsTr('Quit')
             visible: appStyle.isMobile
             onClicked: {
-                application.quit();
+                Qt.quit();
             }
         }
     }
