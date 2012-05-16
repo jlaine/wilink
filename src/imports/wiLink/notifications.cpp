@@ -145,8 +145,8 @@ Notification *Notifier::showMessage(const QString &title, const QString &message
 #ifdef USE_SYSTRAY
 void Notifier::_q_trayActivated(QSystemTrayIcon::ActivationReason reason)
 {
-//    if (reason != QSystemTrayIcon::Context)
-//        emit showWindows();
+    if (reason != QSystemTrayIcon::Context)
+        QMetaObject::invokeMethod(qApp, "showWindows");
 }
 
 void Notifier::_q_trayClicked()
