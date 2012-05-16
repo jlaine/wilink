@@ -31,21 +31,17 @@ class Window : public QMainWindow
 {
     Q_OBJECT
     Q_PROPERTY(bool fullScreen READ isFullScreen WRITE setFullScreen NOTIFY windowStateChanged)
-    Q_PROPERTY(QUrl source READ source WRITE setSource NOTIFY sourceChanged)
 
 public:
     Window(QWidget *parent = 0);
     ~Window();
     void setFullScreen(bool fullScreen);
-
-    QUrl source() const;
     void setSource(const QUrl &source);
 
 signals:
     void showAbout();
     void showHelp();
     void showPreferences();
-    void sourceChanged();
     void windowStateChanged();
 
 public slots:

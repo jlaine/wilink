@@ -149,17 +149,9 @@ void Window::showAndRaise()
     activateWindow();
 }
 
-QUrl Window::source() const
-{
-    return d->view->source();
-}
-
 void Window::setSource(const QUrl &source)
 {
-    if (source != d->view->source()) {
-        d->view->setSource(source);
-        emit sourceChanged();
-    }
+    d->view->setSource(source);
 }
 
 void Window::_q_statusChanged()
