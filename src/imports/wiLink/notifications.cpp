@@ -25,7 +25,8 @@
 #include "notifications.h"
 #endif
 
-#include <QCoreApplication>
+#include <QApplication>
+#include <QMainWindow>
 #include <QMenu>
 #include <QSystemTrayIcon>
 
@@ -145,8 +146,13 @@ Notification *Notifier::showMessage(const QString &title, const QString &message
 #ifdef USE_SYSTRAY
 void Notifier::_q_trayActivated(QSystemTrayIcon::ActivationReason reason)
 {
-    if (reason != QSystemTrayIcon::Context)
-        QMetaObject::invokeMethod(qApp, "showWindows");
+    if (reason != QSystemTrayIcon::Context) {
+        foreach (QWidget *widget, QApplication::topLevelWidgets()) {
+            if (qobject_cast<QMainWindow*>(widget)) {
+                QMetaObject::invokeMethod(widget, "showAndRaise");
+            }
+        }
+    }
 }
 
 void Notifier::_q_trayClicked()
