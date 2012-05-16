@@ -100,8 +100,30 @@ Item {
         Button {
             iconSource: 'image://icon/remove'
             onClicked: {
+                function provider(a) {
+                    if (a.realm == 'gmail.com' || a.realm == 'www.google.com')
+                        return 'google';
+                    else if (a.realm == 'wifirst.net' || a.realm == 'www.wifirst.net')
+                        return 'wifirst';
+                    else
+                        return 'other';
+                }
+
                 if (accountView.currentIndex >= 0) {
+                    var oldAccount = accountView.model.get(accountView.currentIndex);
+                    var oldProvider = provider(oldAccount);
                     accountView.model.remove(accountView.currentIndex);
+
+                    // cleanup linked accounts
+                    if (oldProvider != 'other') {
+                        for (var i = 0; i < accountView.model.count; ++i) {
+                            var account = accountView.model.get(i);
+                            if (provider(account) == oldProvider) {
+                                accountView.model.remove(i);
+                                break;
+                            }
+                        }
+                    }
                 }
             }
         }
