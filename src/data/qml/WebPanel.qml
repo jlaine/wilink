@@ -18,7 +18,6 @@
  */
 
 import QtQuick 1.1
-import QtWebKit 1.0
 import wiLink 2.0
 
 Panel {
@@ -57,68 +56,25 @@ Panel {
         focus: true
     }
 
-    WebView {
-        id: loginView
-        opacity: 0
-
-        property int accountIndex: -1
-        property int accountStep: 0
-
-        function doLogin() {
-            accountIndex += 1;
-            accountStep = 0;
-            var account = accountModel.get(accountIndex);
-            if (!account)
-                return;
-
-            console.log("Examining account: " + account.realm);
-            if (account.type == 'web' && account.realm == 'www.wifirst.net') {
-                loginView.url = 'https://www.wifirst.net/';
-            } else if (account.type == 'web' && account.realm == 'www.google.com') {
-                loginView.url = 'https://accounts.google.com/ServiceLogin?service=mail';
-            } else {
-                doLogin();
-            }
-        }
-
-        onLoadFinished: {
-            var account = accountModel.get(accountIndex);
-            if (!account)
-                return;
+    Component.onCompleted: {
+        for (var i = 0; i < accountModel.count; ++i) {
+            var account = accountModel.get(i);
 
             if (account.type == 'web' && account.realm == 'www.wifirst.net') {
-                var js = "var xhr = new XMLHttpRequest();";
-                js += "xhr.open('POST', 'https://www.wifirst.net/sessions', false);";
-                js += "xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');";
-                js += "xhr.send('login=" + account.username + "&password=" + account.password + "');";
-                js += "xhr.status";
-
-                var status = loginView.evaluateJavaScript(js);
-                if (status == "200") {
-                    console.log("Logged into wifirst account: " + account.username);
-                    tabSwapper.addPanel('WebTab.qml', {'url': 'https://www.wifirst.net/'}, true)
-                } else {
-                    console.log("Could not log into wifirst account: " + status);
-                }
-                doLogin();
+                var js = "var f = document.getElementsByTagName('form')[0];\n";
+                js += "f.login.value = '" + account.username + "';\n";
+                js += "f.password.value = '" + account.password + "';\n";
+                js += "f.submit();";
+                tabSwapper.addPanel('WebTab.qml', {url: 'https://www.wifirst.net/', loadScript: js}, true)
             } else if (account.type == 'web' && account.realm == 'www.google.com') {
-                if (accountStep) {
-                    console.log("Logged into google account: " + account.username);
-                    tabSwapper.addPanel('WebTab.qml', {'url': 'https://mail.google.com/mail/'}, true)
-                    doLogin();
-                } else {
-                    accountStep += 1;
-                    var js = "var f = document.getElementById('gaia_loginform');\n";
-                    js += "f.Email.value = '" + account.username + "';\n";
-                    js += "f.Passwd.value = '" + account.password + "';\n";
-                    js += "f.submit();";
-                    loginView.evaluateJavaScript(js);
-                }
+                var js = "var f = document.getElementById('gaia_loginform');\n";
+                js += "f.Email.value = '" + account.username + "';\n";
+                js += "f.Passwd.value = '" + account.password + "';\n";
+                js += "f.submit();";
+                tabSwapper.addPanel('WebTab.qml', {url: 'https://mail.google.com/mail/', loadScript: js}, true)
             }
         }
     }
-
-    Component.onCompleted: loginView.doLogin()
 
     Keys.onPressed: {
         if (event.modifiers == Qt.ControlModifier && event.key == Qt.Key_T) {

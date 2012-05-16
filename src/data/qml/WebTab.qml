@@ -25,6 +25,7 @@ Panel {
     id: panel
 
     property string iconSource: 'image://icon/web'
+    property string loadScript: ''
     property alias title: webView.title
     property alias url: webView.url
     clip: true
@@ -134,13 +135,20 @@ Panel {
                 preferredHeight: webFlickable.height
                 preferredWidth: webFlickable.width
 
-
                 onAlert: {
                     console.log("Alert: " + message);
                 }
 
                 onLoadFailed: {
                     webView.html = '<html><head><title>Error loading page</title></head><body>There was an error loading the page.</body></html>';
+                }
+
+                onLoadFinished: {
+                    if (panel.loadScript) {
+                        var js = panel.loadScript;
+                        panel.loadScript = '';
+                        webView.evaluateJavaScript(js);
+                    }
                 }
             }
         }
