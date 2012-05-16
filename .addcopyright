@@ -1,9 +1,10 @@
 {
 'directories': [
-    'src',
+    'src/app',
     'src/data',
-    'src/plugins',
-    'src/plugins/phone',
+    'src/data/qml',
+    'src/data/qml/dummydata',
+    'src/imports/wiLink',
     'src/qsound/src',
     'src/qsound/tests',
     'src/tests',
