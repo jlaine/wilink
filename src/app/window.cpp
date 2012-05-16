@@ -20,16 +20,13 @@
 #include <QApplication>
 #include <QDeclarativeContext>
 #include <QDeclarativeEngine>
-#include <QDeclarativeItem>
 #include <QDeclarativeView>
 #include <QDesktopWidget>
-#include <QFileDialog>
 #include <QMenuBar>
 #include <QSettings>
 #include <QShortcut>
 #include <QStringList>
 
-#include "application.h"
 #include "window.h"
 
 class WindowPrivate
@@ -58,7 +55,6 @@ Window::Window(QWidget *parent)
     Q_ASSERT(check);
 
     QDeclarativeContext *context = d->view->rootContext();
-    context->setContextProperty("application", qApp);
     context->setContextProperty("window", this);
 
     setCentralWidget(d->view);
