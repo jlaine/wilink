@@ -125,25 +125,6 @@ Window::~Window()
     delete d;
 }
 
-void Window::alert()
-{
-    // show the chat window
-    if (!isVisible()) {
-#ifdef Q_OS_MAC
-        show();
-#else
-        showMinimized();
-#endif
-    }
-
-    /* NOTE : in Qt built for Mac OS X using Cocoa, QApplication::alert
-     * only causes the dock icon to bounce for one second, instead of
-     * bouncing until the user focuses the window. To work around this
-     * we implement our own version.
-     */
-    wApp->alert(this);
-}
-
 void Window::changeEvent(QEvent *event)
 {
     QWidget::changeEvent(event);

@@ -63,16 +63,6 @@ static inline CFStringRef qstringToCFStringRef(const QString &string)
 
 @end
 
-void Application::alert(QWidget *widget)
-{
-    Q_UNUSED(widget);
-
-    NSApplicationLoad();
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    [[NSApplication sharedApplication] requestUserAttention:NSCriticalRequest];
-    [pool release];
-}
-
 void Application::platformInit()
 {
     NSAutoreleasePool *autoreleasepool = [[NSAutoreleasePool alloc] init];

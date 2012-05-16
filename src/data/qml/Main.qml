@@ -93,7 +93,7 @@ FocusScope {
             // when an update is ready to install, prompt user
             if (appUpdater.state == Updater.PromptState) {
                 dialogSwapper.showPanel('AboutDialog.qml');
-                window.alert();
+                appNotifier.alert();
             }
         }
     }

@@ -66,6 +66,14 @@ NotifierBackendGrowl::NotifierBackendGrowl(Notifier *qq)
     [autoreleasepool release];
 }
 
+void NotifierBackendGrowl::alert()
+{
+    NSApplicationLoad();
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    [[NSApplication sharedApplication] requestUserAttention:NSCriticalRequest];
+    [pool release];
+}
+
 Notification *NotifierBackendGrowl::showMessage(const QString &title, const QString &message, const QString &action)
 {
     Notification *handle = new Notification(q);

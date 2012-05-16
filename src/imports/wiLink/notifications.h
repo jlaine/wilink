@@ -69,6 +69,7 @@ public:
     ~Notifier();
 
 public slots:
+    void alert();
     QFileDialog *fileDialog();
     Notification *showMessage(const QString &title, const QString &message, const QString &action);
 

@@ -23,6 +23,7 @@ class NotifierBackendGrowl : public NotifierBackend
 {
 public:
     NotifierBackendGrowl(Notifier *qq);
+    static void alert();
     Notification *showMessage(const QString &title, const QString &message, const QString &action);
 
 private:

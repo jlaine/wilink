@@ -35,11 +35,6 @@ Application::~Application()
 }
 
 #ifndef Q_OS_MAC
-void Application::alert(QWidget *widget)
-{
-    QApplication::alert(widget);
-}
-
 void Application::platformInit()
 {
 }

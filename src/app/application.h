@@ -35,7 +35,6 @@ public:
     Application(int &argc, char **argv);
     ~Application();
 
-    static void alert(QWidget *widget);
     static void platformInit();
 
 public slots:

@@ -199,7 +199,7 @@ Panel {
                     }
 
                     // alert window
-                    window.alert();
+                    appNotifier.alert();
 
                     // play a sound
                     appSoundPlayer.play(appSettings.incomingMessageSound);

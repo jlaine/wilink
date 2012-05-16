@@ -49,7 +49,6 @@ signals:
     void windowStateChanged();
 
 public slots:
-    void alert();
     void showAndRaise();
 
 private slots:

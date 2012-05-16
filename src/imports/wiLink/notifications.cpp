@@ -125,6 +125,37 @@ QFileDialog *Notifier::fileDialog()
     return dialog;
 }
 
+void Notifier::alert()
+{
+    QWidget *window = 0;
+    foreach (QWidget *widget, QApplication::topLevelWidgets()) {
+        if (qobject_cast<QMainWindow*>(widget)) {
+            window = widget;
+            break;
+        }
+    }
+
+    // show the chat window
+    if (window && !window->isVisible()) {
+#ifdef Q_OS_MAC
+        window->show();
+#else
+        window->showMinimized();
+#endif
+    }
+
+    /* NOTE : in Qt built for Mac OS X using Cocoa, QApplication::alert
+     * only causes the dock icon to bounce for one second, instead of
+     * bouncing until the user focuses the window. To work around this
+     * we implement our own version.
+     */
+#if defined(USE_GROWL)
+    NotifierBackendGrowl::alert();
+#else
+    QApplication::alert(window);
+#endif
+}
+
 Notification *Notifier::showMessage(const QString &title, const QString &message, const QString &action)
 {
     if (d->backend) {
