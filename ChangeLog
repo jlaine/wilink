@@ -1,6 +1,8 @@
 wiLink 2.3.0 (UNRELEASED)
  * Application:
   - Show all accounts in a single window.
+ * Chat:
+  - Use a tabbed view to display conversations.
  * Shares:
   - Display icons based on MIME type.
  * Web:

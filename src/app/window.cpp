@@ -103,10 +103,6 @@ Window::Window(QWidget *parent)
     Q_ASSERT(check);
 #endif
 
-    /* set up keyboard shortcuts */
-    QShortcut *shortcut = new QShortcut(QKeySequence(Qt::ControlModifier + Qt::Key_W), this);
-    connect(shortcut, SIGNAL(activated()), this, SLOT(close()));
-
     // restore geometry
     const QByteArray geometry = QSettings().value("WindowGeometry").toByteArray();
     if (!geometry.isEmpty()) {
