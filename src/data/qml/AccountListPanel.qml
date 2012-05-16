@@ -34,7 +34,7 @@ Item {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        text: qsTr('In addition to your %1 account, %2 can connect to additional chat accounts such as Google Talk and Facebook.').replace('%1', application.organizationName).replace('%2', application.applicationName)
+        text: qsTr('In addition to your Wifirst account, you can use additional chat accounts such as Google Talk and Facebook.')
     }
 
     ScrollView {

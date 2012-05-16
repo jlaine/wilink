@@ -59,8 +59,8 @@
 <context>
     <name>AccountListPanel</name>
     <message>
-        <source>In addition to your %1 account, %2 can connect to additional chat accounts such as Google Talk and Facebook.</source>
-        <translation>Outre votre compte %1, %2 peut se connecter à des comptes de chat supplémentaires tels que Google Talk ou Facebook.</translation>
+        <source>In addition to your Wifirst account, you can use additional chat accounts such as Google Talk and Facebook.</source>
+        <translation>Outre votre compte Wifirst, vous pouvez utiliser des comptes de chat supplémentaires tels que Google Talk ou Facebook.</translation>
     </message>
 </context>
 <context>
@@ -78,8 +78,8 @@
         <translation>Mot de passe</translation>
     </message>
     <message>
-        <source>If you need help, please refer to the &lt;a href=&quot;%1&quot;&gt;%2 FAQ&lt;/a&gt;.</source>
-        <translation>Si vous avez besoin d&apos;aide, merci de consulter la &lt;a href=&quot;%1&quot;&gt;FAQ %2&lt;/a&gt;.</translation>
+        <source>If you need help, please refer to the &lt;a href=&quot;%1&quot;&gt;wiLink FAQ&lt;/a&gt;.</source>
+        <translation>Si vous avez besoin d&apos;aide, merci de consulter la &lt;a href=&quot;%1&quot;&gt;FAQ wiLink&lt;/a&gt;.</translation>
     </message>
 </context>
 <context>
@@ -861,10 +861,6 @@ Acceptez-vous?</translation>
 <context>
     <name>SetupDialog</name>
     <message>
-        <source>If you need help, please refer to the &lt;a href=&quot;%1&quot;&gt;%2 FAQ&lt;/a&gt;.</source>
-        <translation>Si vous avez besoin d&apos;aide, merci de consulter la &lt;a href=&quot;%1&quot;&gt;FAQ %2&lt;/a&gt;.</translation>
-    </message>
-    <message>
         <source>Add an account</source>
         <translation>Ajouter un compte</translation>
     </message>
@@ -907,6 +903,10 @@ Acceptez-vous?</translation>
     <message>
         <source>Other</source>
         <translation>Autre</translation>
+    </message>
+    <message>
+        <source>If you need help, please refer to the &lt;a href=&quot;%1&quot;&gt;wiLink FAQ&lt;/a&gt;.</source>
+        <translation>Si vous avez besoin d&apos;aide, merci de consulter la &lt;a href=&quot;%1&quot;&gt;FAQ wiLink&lt;/a&gt;.</translation>
     </message>
 </context>
 <context>
