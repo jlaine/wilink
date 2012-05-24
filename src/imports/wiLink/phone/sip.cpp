@@ -37,6 +37,8 @@
 static const int RTP_COMPONENT = 1;
 static const int RTCP_COMPONENT = 2;
 
+static int typeId = qRegisterMetaType<SipCall::State>();
+
 #define QXMPP_DEBUG_SIP
 #define QXMPP_DEBUG_STUN
 

@@ -24,7 +24,7 @@
 #include <QList>
 #include <QUrl>
 
-#include "QXmppCallManager.h"
+#include "phone/sip.h"
 
 class QAuthenticator;
 class QNetworkAccessManager;
@@ -97,6 +97,7 @@ class PhoneHistoryModel : public QAbstractListModel
     Q_PROPERTY(int inputVolume READ inputVolume NOTIFY inputVolumeChanged)
     Q_PROPERTY(int maximumVolume READ maximumVolume CONSTANT)
     Q_PROPERTY(int outputVolume READ outputVolume NOTIFY outputVolumeChanged)
+    Q_PROPERTY(QUrl url READ url WRITE setUrl NOTIFY urlChanged)
 
 public:
     enum Role {
@@ -148,7 +149,7 @@ public slots:
 
 private slots:
     void callRinging();
-    void callStateChanged(QXmppCall::State state);
+    void callStateChanged(SipCall::State state);
     void callTick();
     void _q_getSettings();
     void _q_handleCreate();

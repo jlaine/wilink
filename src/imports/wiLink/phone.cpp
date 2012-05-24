@@ -489,8 +489,8 @@ void PhoneHistoryModel::addCall(SipCall *call)
     item->address = call->recipient();
     item->flags = call->direction();
     item->call = call;
-    connect(item->call, SIGNAL(stateChanged(QXmppCall::State)),
-            this, SLOT(callStateChanged(QXmppCall::State)));
+    connect(item->call, SIGNAL(stateChanged(SipCall::State)),
+            this, SLOT(callStateChanged(SipCall::State)));
     if (item->call->direction() == SipCall::OutgoingDirection)
         connect(item->call, SIGNAL(ringing()), this, SLOT(callRinging()));
 
@@ -538,7 +538,7 @@ void PhoneHistoryModel::callRinging()
     }
 }
 
-void PhoneHistoryModel::callStateChanged(QXmppCall::State state)
+void PhoneHistoryModel::callStateChanged(SipCall::State state)
 {
     SipCall *call = qobject_cast<SipCall*>(sender());
     Q_ASSERT(call);
@@ -556,13 +556,13 @@ void PhoneHistoryModel::callStateChanged(QXmppCall::State state)
 
     PhoneHistoryItem *item = m_items[row];
 
-    if (item->soundJob && state != QXmppCall::ConnectingState) {
+    if (item->soundJob && state != SipCall::ConnectingState) {
         item->soundJob->stop();
         item->soundJob = 0;
     }
 
     // update the item
-    if (state == QXmppCall::ActiveState) {
+    if (state == SipCall::ActiveState) {
 
         // start audio input / output
         if (!item->audioStream) {
@@ -584,7 +584,7 @@ void PhoneHistoryModel::callStateChanged(QXmppCall::State state)
             QMetaObject::invokeMethod(item->audioStream, "startInput");
         }
 
-    } else if (state == QXmppCall::FinishedState) {
+    } else if (state == SipCall::FinishedState) {
         // stop audio input / output
         if (item->audioStream) {
             item->audioStream->stopInput();
@@ -817,6 +817,25 @@ void PhoneHistoryModel::stopTone(int toneValue)
         call->audioChannel()->stopTone(tone);
 }
 
+QUrl PhoneHistoryModel::url() const
+{
+    return m_url;
+}
+
+void PhoneHistoryModel::setUrl(const QUrl &url)
+{
+    if (url != m_url) {
+        m_url = url;
+
+        QNetworkRequest request(m_url);
+        request.setRawHeader("Accept", "application/xml");
+        QNetworkReply *reply = m_network->get(request);
+        connect(reply, SIGNAL(finished()), this, SLOT(_q_handleList()));
+
+        emit urlChanged(m_url);
+    }
+}
+
 /** Requests VoIP settings from the server.
  */
 void PhoneHistoryModel::_q_getSettings()
@@ -844,44 +863,10 @@ void PhoneHistoryModel::_q_handleSettings()
     doc.setContent(reply);
     QDomElement settings = doc.documentElement();
 
-    // parse settings from server
-    const bool enabled = settings.firstChildElement("enabled").text() == QLatin1String("true");
-    const QString domain = settings.firstChildElement("domain").text();
-    const QString username = settings.firstChildElement("username").text();
-    const QString password = settings.firstChildElement("password").text();
-    const QString number = settings.firstChildElement("number").text();
-    const QString callsUrl = settings.firstChildElement("calls-url").text();
-    const QUrl contactsUrl = QUrl(settings.firstChildElement("contacts-url").text());
-
-    // update contacts url
-    m_contactsModel->setUrl(contactsUrl);
-
     // check service is activated
     const bool wasEnabled = m_enabled;
-    if (enabled && !domain.isEmpty() && !username.isEmpty() && !password.isEmpty()) {
-        // connect to SIP server
-        if (m_client->displayName() != number ||
-            m_client->domain() != domain ||
-            m_client->username() != username ||
-            m_client->password() != password)
-        {
-            m_client->setDisplayName(number);
-            m_client->setDomain(domain);
-            m_client->setUsername(username);
-            m_client->setPassword(password);
-            QMetaObject::invokeMethod(m_client, "connectToServer");
-        }
-
-        // retrieve call history
-        if (!callsUrl.isEmpty()) {
-            m_url = callsUrl;
-
-            QNetworkRequest request(m_url);
-            request.setRawHeader("Accept", "application/xml");
-            QNetworkReply *reply = m_network->get(request);
-            connect(reply, SIGNAL(finished()), this, SLOT(_q_handleList()));
-        }
-
+    const bool enabled = settings.firstChildElement("enabled").text() == QLatin1String("true");
+    if (enabled) {
         // register URL handler
         if (!m_registeredHandler) {
             HistoryMessage::addTransform(QRegExp("^(.*\\s)?(\\+?[0-9]{4,})(\\s.*)?$"),
@@ -889,7 +874,6 @@ void PhoneHistoryModel::_q_handleSettings()
             QDesktopServices::setUrlHandler("sip", this, "_q_openUrl");
             m_registeredHandler = true;
         }
-
         m_enabled = true;
     } else { 
         m_enabled = false;

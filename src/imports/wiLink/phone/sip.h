@@ -313,4 +313,6 @@ private:
     friend class SipClientPrivate;
 };
 
+Q_DECLARE_METATYPE(SipCall::State)
+
 #endif

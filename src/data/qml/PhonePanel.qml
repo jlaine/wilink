@@ -68,16 +68,33 @@ Panel {
             if (xhr.readyState == 4) {
                 if (xhr.status == 200) {
                     console.log("voip ok");
+                    var enabled = false;
                     var doc = xhr.responseXML.documentElement;
                     for (var i = 0; i < doc.childNodes.length; ++i) {
                         var node = doc.childNodes[i];
-                        if (node.nodeName == 'number') {
+                        if (node.nodeName == 'calls-url') {
+                            historyModel.url = node.firstChild.nodeValue;
+                        } else if (node.nodeName == 'contacts-url') {
+                            historyModel.contactsModel.url = node.firstChild.nodeValue;
+                        } else if (node.nodeName == 'domain') {
+                            historyModel.client.domain = node.firstChild.nodeValue;
+                        } else if (node.nodeName == 'enabled') {
+                            enabled = (node.firstChild.nodeValue == 'true');
+                        } else if (node.nodeName == 'number') {
+                            historyModel.client.displayName = node.firstChild.nodeValue;
                             panel.phoneNumber = node.firstChild.nodeValue;
+                        } else if (node.nodeName == 'password') {
+                            historyModel.client.password = node.firstChild.nodeValue;
                         } else if (node.nodeName == 'selfcare-url') {
                             panel.selfcareUrl = node.firstChild.nodeValue;
+                        } else if (node.nodeName == 'username') {
+                            historyModel.client.username = node.firstChild.nodeValue;
                         } else if (node.nodeName == 'voicemail-number') {
                             panel.voicemailNumber = node.firstChild.nodeValue;
                         }
+                    }
+                    if (enabled) {
+                        historyModel.client.connectToServer();
                     }
                 } else {
                     console.log("voip fail");
