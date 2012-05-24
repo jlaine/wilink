@@ -924,7 +924,7 @@ SipClient::SipClient(QObject *parent)
 
     d->connectTimer = new QTimer(this);
     check = connect(d->connectTimer, SIGNAL(timeout()),
-                    this, SLOT(connectToServer()));
+                    this, SLOT(_q_connectToServer()));
     Q_ASSERT(check);
 
     d->stunTimer = new QTimer(this);
@@ -977,6 +977,13 @@ void SipClient::callDestroyed(QObject *object)
 
 void SipClient::connectToServer()
 {
+    d->connectTimer->start(0);
+}
+
+void SipClient::_q_connectToServer()
+{
+    qDebug("Connect to server..");
+
     // schedule retry
     d->connectTimer->start(60000);
 

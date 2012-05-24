@@ -300,6 +300,7 @@ private slots:
     void datagramReceived();
     void registerWithServer();
     void sendStun();
+    void _q_connectToServer();
     void _q_sipDnsLookupFinished();
     void _q_sipHostInfoFinished(const QHostInfo &info);
     void _q_stunDnsLookupFinished();

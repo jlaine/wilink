@@ -23,6 +23,7 @@ import wiLink 2.0
 Panel {
     id: panel
 
+    property bool phoneEnabled: false
     property string phoneNumber
     property string selfcareUrl
     property string voicemailNumber
@@ -63,12 +64,13 @@ Panel {
     // Retrieves phone settings.
     function fetchSettings()
     {
+        console.log("Phone fetching settings");
+
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4) {
                 if (xhr.status == 200) {
                     console.log("voip ok");
-                    var enabled = false;
                     var doc = xhr.responseXML.documentElement;
                     for (var i = 0; i < doc.childNodes.length; ++i) {
                         var node = doc.childNodes[i];
@@ -79,7 +81,7 @@ Panel {
                         } else if (node.nodeName == 'domain') {
                             historyModel.client.domain = node.firstChild.nodeValue;
                         } else if (node.nodeName == 'enabled') {
-                            enabled = (node.firstChild.nodeValue == 'true');
+                            panel.phoneEnabled = (node.firstChild.nodeValue == 'true');
                         } else if (node.nodeName == 'number') {
                             historyModel.client.displayName = node.firstChild.nodeValue;
                             panel.phoneNumber = node.firstChild.nodeValue;
@@ -93,8 +95,10 @@ Panel {
                             panel.voicemailNumber = node.firstChild.nodeValue;
                         }
                     }
-                    if (enabled) {
+                    if (panel.phoneEnabled) {
                         historyModel.client.connectToServer();
+                    } else {
+                        historyModel.client.disconnectFromServer();
                     }
                 } else {
                     console.log("voip fail");
@@ -205,7 +209,7 @@ Panel {
             anchors.top: header.bottom
             anchors.left: parent.left
             anchors.right: parent.right
-            text: (historyModel.enabled ? qsTr('You can view your phone bills and your call history at the following address:') : qsTr('You can subscribe to the phone service at the following address:')) + ' <a href="' + panel.selfcareUrl + '">' + panel.selfcareUrl + '</a>';
+            text: (panel.phoneEnabled ? qsTr('You can view your phone bills and your call history at the following address:') : qsTr('You can subscribe to the phone service at the following address:')) + ' <a href="' + panel.selfcareUrl + '">' + panel.selfcareUrl + '</a>';
             visible: panel.selfcareUrl != ''
         }
 
