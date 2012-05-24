@@ -977,7 +977,7 @@ void SipClient::callDestroyed(QObject *object)
 
 void SipClient::connectToServer()
 {
-    d->connectTimer->start(0);
+    QMetaObject::invokeMethod(this, "_q_connectToServer");
 }
 
 void SipClient::_q_connectToServer()
