@@ -750,13 +750,6 @@ int PhoneHistoryModel::outputVolume() const
     return 0;
 }
 
-/** Returns the user's own phone number.
- */
-QString PhoneHistoryModel::phoneNumber() const
-{
-    return m_phoneNumber;
-}
-
 /** Removes the call with the given \a id.
  *
  * @param id
@@ -831,13 +824,6 @@ void PhoneHistoryModel::stopTone(int toneValue)
         call->audioChannel()->stopTone(tone);
 }
 
-/** Returns the voicemail service phone number.
- */
-QString PhoneHistoryModel::voicemailNumber() const
-{
-    return m_voicemailNumber;
-}
-
 /** Requests VoIP settings from the server.
  */
 void PhoneHistoryModel::_q_getSettings()
@@ -874,27 +860,14 @@ void PhoneHistoryModel::_q_handleSettings()
     const QString callsUrl = settings.firstChildElement("calls-url").text();
     const QUrl contactsUrl = QUrl(settings.firstChildElement("contacts-url").text());
     const QUrl selfcareUrl = QUrl(settings.firstChildElement("selfcare-url").text());
-    const QString voicemailNumber = settings.firstChildElement("voicemail-number").text();
 
     // update contacts url
     m_contactsModel->setUrl(contactsUrl);
-
-    // update phone number
-    if (number != m_phoneNumber) {
-        m_phoneNumber = number;
-        emit phoneNumberChanged(m_phoneNumber);
-    }
 
     // update selfcare url
     if (selfcareUrl != m_selfcareUrl) {
         m_selfcareUrl = selfcareUrl;
         emit selfcareUrlChanged(m_selfcareUrl);
-    }
-
-    // update voicemail number
-    if (voicemailNumber != m_voicemailNumber) {
-        m_voicemailNumber = voicemailNumber;
-        emit voicemailNumberChanged(m_voicemailNumber);
     }
 
     // check service is activated

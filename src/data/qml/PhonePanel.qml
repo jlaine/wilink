@@ -23,6 +23,11 @@ import wiLink 2.0
 Panel {
     id: panel
 
+    property string phoneNumber
+    property string voicemailNumber
+    property string webUsername
+    property string webPassword
+
     // Builds a full SIP address from a short recipient
     function buildAddress(recipient, sipDomain)
     {
@@ -52,6 +57,33 @@ Panel {
             return bits[0];
         else
             return recipient;
+    }
+
+    // Retrieves phone settings.
+    function fetchSettings()
+    {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4) {
+                if (xhr.status == 200) {
+                    console.log("voip ok");
+                    var doc = xhr.responseXML.documentElement;
+                    for (var i = 0; i < doc.childNodes.length; ++i) {
+                        var node = doc.childNodes[i];
+                        if (node.nodeName == 'number') {
+                            panel.phoneNumber = node.firstChild.nodeValue;
+                        } else if (node.nodeName == 'voicemail-number') {
+                            panel.voicemailNumber = node.firstChild.nodeValue;
+                        }
+                    }
+                } else {
+                    console.log("voip fail");
+                }
+            }
+        }
+        xhr.open('GET', 'https://www.wifirst.net/wilink/voip', true, panel.webUsername, panel.webPassword);
+        xhr.setRequestHeader('Accept', 'application/xml');
+        xhr.send();
     }
 
     PhoneHistoryModel {
@@ -121,15 +153,15 @@ Panel {
             anchors.top: parent.top
             iconSource: 'image://icon/phone'
             title: qsTr('Phone')
-            subTitle: historyModel.phoneNumber ? qsTr('Your number is %1').replace('%1', historyModel.phoneNumber) : ''
+            subTitle: panel.phoneNumber ? qsTr('Your number is %1').replace('%1', panel.phoneNumber) : ''
             toolBar: ToolBar {
                 ToolButton {
                     iconSource: 'image://icon/call'
                     text: qsTr('Voicemail')
-                    visible: historyModel.voicemailNumber != ''
+                    visible: panel.voicemailNumber != ''
 
                     onClicked: {
-                        var address = buildAddress(historyModel.voicemailNumber, historyModel.client.domain);
+                        var address = buildAddress(panel.voicemailNumber, historyModel.client.domain);
                         historyModel.call(address);
                         if (panel.singlePanel)
                             panel.state = 'no-sidebar';
@@ -362,6 +394,18 @@ Panel {
                 'caller': parseAddress(call.recipient),
                 'swapper': swapper,
             });
+        }
+    }
+
+    Component.onCompleted: {
+        for (var i = 0; i < accountModel.count; ++i) {
+            var account = accountModel.get(i);
+            if (account.type == 'web' && account.realm == 'www.wifirst.net') {
+                panel.webUsername = account.username;
+                panel.webPassword = account.password;
+                fetchSettings();
+                break;
+            }
         }
     }
 
