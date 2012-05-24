@@ -24,6 +24,7 @@ Panel {
     id: panel
 
     property string phoneNumber
+    property string selfcareUrl
     property string voicemailNumber
     property string webUsername
     property string webPassword
@@ -72,6 +73,8 @@ Panel {
                         var node = doc.childNodes[i];
                         if (node.nodeName == 'number') {
                             panel.phoneNumber = node.firstChild.nodeValue;
+                        } else if (node.nodeName == 'selfcare-url') {
+                            panel.selfcareUrl = node.firstChild.nodeValue;
                         } else if (node.nodeName == 'voicemail-number') {
                             panel.voicemailNumber = node.firstChild.nodeValue;
                         }
@@ -185,8 +188,8 @@ Panel {
             anchors.top: header.bottom
             anchors.left: parent.left
             anchors.right: parent.right
-            text: (historyModel.enabled ? qsTr('You can view your phone bills and your call history at the following address:') : qsTr('You can subscribe to the phone service at the following address:')) + ' <a href="' + historyModel.selfcareUrl + '">' + historyModel.selfcareUrl + '</a>';
-            visible: historyModel.selfcareUrl != ''
+            text: (historyModel.enabled ? qsTr('You can view your phone bills and your call history at the following address:') : qsTr('You can subscribe to the phone service at the following address:')) + ' <a href="' + panel.selfcareUrl + '">' + panel.selfcareUrl + '</a>';
+            visible: panel.selfcareUrl != ''
         }
 
         Item {

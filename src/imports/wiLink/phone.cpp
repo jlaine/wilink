@@ -790,13 +790,6 @@ int PhoneHistoryModel::rowCount(const QModelIndex& parent) const
     return m_items.size();
 }
 
-/** Returns the selfcare URL.
- */
-QUrl PhoneHistoryModel::selfcareUrl() const
-{
-    return m_selfcareUrl;
-}
-
 /** Starts sending a tone.
  *
  * @param tone
@@ -859,16 +852,9 @@ void PhoneHistoryModel::_q_handleSettings()
     const QString number = settings.firstChildElement("number").text();
     const QString callsUrl = settings.firstChildElement("calls-url").text();
     const QUrl contactsUrl = QUrl(settings.firstChildElement("contacts-url").text());
-    const QUrl selfcareUrl = QUrl(settings.firstChildElement("selfcare-url").text());
 
     // update contacts url
     m_contactsModel->setUrl(contactsUrl);
-
-    // update selfcare url
-    if (selfcareUrl != m_selfcareUrl) {
-        m_selfcareUrl = selfcareUrl;
-        emit selfcareUrlChanged(m_selfcareUrl);
-    }
 
     // check service is activated
     const bool wasEnabled = m_enabled;

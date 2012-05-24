@@ -97,7 +97,6 @@ class PhoneHistoryModel : public QAbstractListModel
     Q_PROPERTY(int inputVolume READ inputVolume NOTIFY inputVolumeChanged)
     Q_PROPERTY(int maximumVolume READ maximumVolume CONSTANT)
     Q_PROPERTY(int outputVolume READ outputVolume NOTIFY outputVolumeChanged)
-    Q_PROPERTY(QUrl selfcareUrl READ selfcareUrl NOTIFY selfcareUrlChanged)
 
 public:
     enum Role {
@@ -122,7 +121,6 @@ public:
     int inputVolume() const;
     int maximumVolume() const;
     int outputVolume() const;
-    QUrl selfcareUrl() const;
     QUrl url() const;
     void setUrl(const QUrl &url);
 
@@ -137,7 +135,6 @@ signals:
     void error(const QString &error);
     void inputVolumeChanged(int inputVolume);
     void outputVolumeChanged(int outputVolume);
-    void selfcareUrlChanged(const QUrl &selfcareUrl);
     void urlChanged(const QUrl &url);
 
 public slots:
@@ -171,7 +168,6 @@ private:
     QNetworkAccessManager *m_network;
     QSoundPlayer *m_player;
     bool m_registeredHandler;
-    QUrl m_selfcareUrl;
     QTimer *m_ticker;
     QTimer *m_timer;
     QUrl m_url;
