@@ -37,7 +37,7 @@
 static const int RTP_COMPONENT = 1;
 static const int RTCP_COMPONENT = 2;
 
-static int typeId = qRegisterMetaType<SipCall::State>();
+Q_DECLARE_METATYPE(SipCall::State)
 
 #define QXMPP_DEBUG_SIP
 #define QXMPP_DEBUG_STUN
@@ -514,6 +514,8 @@ SipCall::SipCall(const QString &recipient, SipCall::Direction direction, SipClie
 {
     bool check;
     Q_UNUSED(check);
+
+    qRegisterMetaType<SipCall::State>();
 
     d = new SipCallPrivate(this);
     d->client = parent;
