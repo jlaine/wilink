@@ -407,9 +407,8 @@ void PhoneHistoryItem::parse(const QDomElement &element)
  * @param parent
  */
 PhoneHistoryModel::PhoneHistoryModel(QObject *parent)
-    : QAbstractListModel(parent),
-    m_enabled(false),
-    m_registeredHandler(false)
+    : QAbstractListModel(parent)
+    , m_registeredHandler(false)
 {
     bool check;
     Q_UNUSED(check);
@@ -451,18 +450,18 @@ PhoneHistoryModel::PhoneHistoryModel(QObject *parent)
     connect(m_ticker, SIGNAL(timeout()),
             this, SLOT(callTick()));
 
-    // periodic settings retrieval
-    m_timer = new QTimer(this);
-    m_timer->setSingleShot(true);
-    connect(m_timer, SIGNAL(timeout()),
-            this, SLOT(_q_getSettings()));
-    m_timer->start(0);
+    // register URL handler
+    if (!m_registeredHandler) {
+        HistoryMessage::addTransform(QRegExp("^(.*\\s)?(\\+?[0-9]{4,})(\\s.*)?$"),
+            QString("\\1<a href=\"sip:\\2@%1\">\\2</a>\\3").arg(m_client->domain()));
+        QDesktopServices::setUrlHandler("sip", this, "_q_openUrl");
+        m_registeredHandler = true;
+    }
 }
 
 PhoneHistoryModel::~PhoneHistoryModel()
 {
     m_ticker->stop();
-    m_timer->stop();
 
     // try to exit SIP client cleanly
     if (m_client->state() == SipClient::ConnectedState)
@@ -711,13 +710,6 @@ QVariant PhoneHistoryModel::data(const QModelIndex &index, int role) const
     }
 }
 
-/** Returns true if the service is active.
- */
-bool PhoneHistoryModel::enabled() const
-{
-    return m_enabled;
-}
-
 /** Hangs up all active calls.
  */
 void PhoneHistoryModel::hangup()
@@ -834,52 +826,6 @@ void PhoneHistoryModel::setUrl(const QUrl &url)
 
         emit urlChanged(m_url);
     }
-}
-
-/** Requests VoIP settings from the server.
- */
-void PhoneHistoryModel::_q_getSettings()
-{
-    qDebug("Phone fetching settings");
-    QNetworkRequest req(QUrl("https://www.wifirst.net/wilink/voip"));
-    req.setRawHeader("Accept", "application/xml");
-    QNetworkReply *reply = m_network->get(req);
-    connect(reply, SIGNAL(finished()), this, SLOT(_q_handleSettings()));
-}
-
-void PhoneHistoryModel::_q_handleSettings()
-{
-    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
-    Q_ASSERT(reply);
-
-    if (reply->error() != QNetworkReply::NoError) {
-        qWarning("Phone failed to retrieve settings: %s", qPrintable(reply->errorString()));
-        // retry in 5mn
-        m_timer->start(300000);
-        return;
-    }
-
-    QDomDocument doc;
-    doc.setContent(reply);
-    QDomElement settings = doc.documentElement();
-
-    // check service is activated
-    const bool wasEnabled = m_enabled;
-    const bool enabled = settings.firstChildElement("enabled").text() == QLatin1String("true");
-    if (enabled) {
-        // register URL handler
-        if (!m_registeredHandler) {
-            HistoryMessage::addTransform(QRegExp("^(.*\\s)?(\\+?[0-9]{4,})(\\s.*)?$"),
-                QString("\\1<a href=\"sip:\\2@%1\">\\2</a>\\3").arg(m_client->domain()));
-            QDesktopServices::setUrlHandler("sip", this, "_q_openUrl");
-            m_registeredHandler = true;
-        }
-        m_enabled = true;
-    } else { 
-        m_enabled = false;
-    }
-    if (m_enabled != wasEnabled)
-        emit enabledChanged(m_enabled);
 }
 
 void PhoneHistoryModel::_q_handleCreate()

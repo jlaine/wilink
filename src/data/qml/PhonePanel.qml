@@ -70,7 +70,6 @@ Panel {
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4) {
                 if (xhr.status == 200) {
-                    console.log("voip ok");
                     var doc = xhr.responseXML.documentElement;
                     for (var i = 0; i < doc.childNodes.length; ++i) {
                         var node = doc.childNodes[i];
@@ -101,7 +100,7 @@ Panel {
                         historyModel.client.disconnectFromServer();
                     }
                 } else {
-                    console.log("voip fail");
+                    console.log("Phone failed to retrieve settings");
                 }
             }
         }

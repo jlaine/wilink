@@ -93,7 +93,6 @@ class PhoneHistoryModel : public QAbstractListModel
     Q_PROPERTY(SipClient* client READ client CONSTANT)
     Q_PROPERTY(PhoneContactModel* contactsModel READ contactsModel CONSTANT)
     Q_PROPERTY(int currentCalls READ currentCalls NOTIFY currentCallsChanged)
-    Q_PROPERTY(bool enabled READ enabled NOTIFY enabledChanged)
     Q_PROPERTY(int inputVolume READ inputVolume NOTIFY inputVolumeChanged)
     Q_PROPERTY(int maximumVolume READ maximumVolume CONSTANT)
     Q_PROPERTY(int outputVolume READ outputVolume NOTIFY outputVolumeChanged)
@@ -118,7 +117,6 @@ public:
     SipClient *client() const;
     PhoneContactModel* contactsModel() const;
     int currentCalls() const;
-    bool enabled() const;
     int inputVolume() const;
     int maximumVolume() const;
     int outputVolume() const;
@@ -151,10 +149,8 @@ private slots:
     void callRinging();
     void callStateChanged(SipCall::State state);
     void callTick();
-    void _q_getSettings();
     void _q_handleCreate();
     void _q_handleList();
-    void _q_handleSettings();
     void _q_nameChanged(const QString &phone);
     void _q_openUrl(const QUrl &url);
 
@@ -164,13 +160,11 @@ private:
 
     SipClient *m_client;
     PhoneContactModel *m_contactsModel;
-    bool m_enabled;
     QList<PhoneHistoryItem*> m_items;
     QNetworkAccessManager *m_network;
     QSoundPlayer *m_player;
     bool m_registeredHandler;
     QTimer *m_ticker;
-    QTimer *m_timer;
     QUrl m_url;
 };
 
