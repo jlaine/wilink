@@ -726,6 +726,18 @@ int PhoneHistoryModel::outputVolume() const
     return 0;
 }
 
+void PhoneHistoryModel::reload()
+{
+    if (m_url.isValid()) {
+        qDebug("PhoneHistoryModel reload");
+
+        QNetworkRequest request(m_url);
+        request.setRawHeader("Accept", "application/xml");
+        QNetworkReply *reply = m_network->get(request);
+        connect(reply, SIGNAL(finished()), this, SLOT(_q_handleList()));
+    }
+}
+
 /** Removes the call with the given \a id.
  *
  * @param id
@@ -802,13 +814,33 @@ void PhoneHistoryModel::setUrl(const QUrl &url)
 {
     if (url != m_url) {
         m_url = url;
+        emit urlChanged();
+    }
+}
 
-        QNetworkRequest request(m_url);
-        request.setRawHeader("Accept", "application/xml");
-        QNetworkReply *reply = m_network->get(request);
-        connect(reply, SIGNAL(finished()), this, SLOT(_q_handleList()));
+QString PhoneHistoryModel::username() const
+{
+    return m_username;
+}
 
-        emit urlChanged(m_url);
+void PhoneHistoryModel::setUsername(const QString &username)
+{
+    if (username != m_username) {
+        m_username = username;
+        emit usernameChanged();
+    }
+}
+
+QString PhoneHistoryModel::password() const
+{
+    return m_password;
+}
+
+void PhoneHistoryModel::setPassword(const QString &password)
+{
+    if (password != m_password) {
+        m_password = password;
+        emit passwordChanged();
     }
 }
 

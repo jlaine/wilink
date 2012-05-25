@@ -49,6 +49,8 @@ class PhoneHistoryModel : public QAbstractListModel
     Q_PROPERTY(int maximumVolume READ maximumVolume CONSTANT)
     Q_PROPERTY(int outputVolume READ outputVolume NOTIFY outputVolumeChanged)
     Q_PROPERTY(QUrl url READ url WRITE setUrl NOTIFY urlChanged)
+    Q_PROPERTY(QString username READ username WRITE setUsername NOTIFY usernameChanged)
+    Q_PROPERTY(QString password READ password WRITE setUsername NOTIFY passwordChanged)
 
 public:
     enum Role {
@@ -70,8 +72,15 @@ public:
     int inputVolume() const;
     int maximumVolume() const;
     int outputVolume() const;
+
     QUrl url() const;
     void setUrl(const QUrl &url);
+
+    QString username() const;
+    void setUsername(const QString &username);
+
+    QString password() const;
+    void setPassword(const QString &password);
 
     // QAbstractListModel
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
@@ -84,13 +93,16 @@ signals:
     void error(const QString &error);
     void inputVolumeChanged(int inputVolume);
     void outputVolumeChanged(int outputVolume);
-    void urlChanged(const QUrl &url);
+    void urlChanged();
+    void usernameChanged();
+    void passwordChanged();
 
 public slots:
     void addCall(SipCall *call);
     bool call(const QString &address);
     void clear();
     void hangup();
+    void reload();
     void removeCall(int id);
     void startTone(int tone);
     void stopTone(int tone);
@@ -114,6 +126,8 @@ private:
     bool m_registeredHandler;
     QTimer *m_ticker;
     QUrl m_url;
+    QString m_username;
+    QString m_password;
 };
 
 #endif

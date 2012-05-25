@@ -75,7 +75,10 @@ Panel {
                     for (var i = 0; i < doc.childNodes.length; ++i) {
                         var node = doc.childNodes[i];
                         if (node.nodeName == 'calls-url') {
-                            historyModel.url = node.firstChild.nodeValue;
+                            historyView.model.url = node.firstChild.nodeValue;
+                            historyView.model.username = panel.webUsername;
+                            historyView.model.password = panel.webPassword;
+                            historyView.model.reload();
                         } else if (node.nodeName == 'contacts-url') {
                             sidebar.model.url = node.firstChild.nodeValue;
                             sidebar.model.username = panel.webUsername;
