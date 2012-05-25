@@ -383,7 +383,7 @@ Panel {
             anchors.topMargin: appStyle.spacing.vertical
             anchors.bottom: parent.bottom
             contactModel: sidebar.model
-            model: historyModel
+            model: PhoneCallModel {}
 
             onAddressClicked: {
                 numberEdit.text = parseAddress(address, sipClient.domain);
@@ -407,7 +407,6 @@ Panel {
                 return;
             }
 
-            historyModel.addCall(call);
             dialogSwapper.showPanel('PhoneNotification.qml', {
                 'call': call,
                 'caller': parseAddress(call.recipient),

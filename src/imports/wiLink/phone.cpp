@@ -116,8 +116,8 @@ PhoneHistoryModel::PhoneHistoryModel(QObject *parent)
 
     // sip
     m_client = new SipClient;
-    check = connect(m_client, SIGNAL(callDialled(SipCall*)),
-                    this, SLOT(addCall(SipCall*)));
+    check = connect(m_client, SIGNAL(callStarted(SipCall*)),
+                    this, SLOT(_q_callStarted(SipCall*)));
     Q_ASSERT(check);
     m_client->moveToThread(m_player->soundThread());
 
@@ -150,44 +150,6 @@ PhoneHistoryModel::~PhoneHistoryModel()
         delete item;
 }
 
-QList<SipCall*> PhoneHistoryModel::activeCalls() const
-{
-    QList<SipCall*> calls;
-    for (int i = m_items.size() - 1; i >= 0; --i)
-        if (m_items[i]->call)
-            calls << m_items[i]->call;
-    return calls;
-}
-
-void PhoneHistoryModel::addCall(SipCall *call)
-{
-    PhoneHistoryItem *item = new PhoneHistoryItem;
-    item->address = call->recipient();
-    item->flags = call->direction();
-    item->call = call;
-    connect(item->call, SIGNAL(stateChanged(SipCall::State)),
-            this, SLOT(callStateChanged(SipCall::State)));
-
-    QNetworkRequest request(m_url);
-    request.setRawHeader("Accept", "application/xml");
-    request.setRawHeader("Connection", "close");
-    request.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
-    item->reply = m_network->post(request, item->data());
-    connect(item->reply, SIGNAL(finished()),
-            this, SLOT(_q_handleCreate()));
-
-    beginInsertRows(QModelIndex(), 0, 0);
-    m_items.prepend(item);
-    endInsertRows();
-
-    // schedule periodic refresh
-    if (!m_ticker->isActive())
-        m_ticker->start();
-
-    // notify change
-    emit currentCallsChanged();
-}
-
 bool PhoneHistoryModel::call(const QString &address)
 {
     if (m_client->state() == SipClient::ConnectedState &&
@@ -196,82 +158,6 @@ bool PhoneHistoryModel::call(const QString &address)
         return true;
     }
     return false;
-}
-
-void PhoneHistoryModel::callStateChanged(SipCall::State state)
-{
-    SipCall *call = qobject_cast<SipCall*>(sender());
-    Q_ASSERT(call);
-
-    // find the call
-    int row = -1;
-    for (int i = 0; i < m_items.size(); ++i) {
-        if (m_items[i]->call == call) {
-            row = i;
-            break;
-        }
-    }
-    if (row < 0)
-        return;
-
-    PhoneHistoryItem *item = m_items[row];
-
-    // update the item
-    if (state == SipCall::ActiveState) {
-
-        // start audio input / output
-        if (!item->audioStream) {
-            QXmppRtpAudioChannel *channel = item->call->audioChannel();
-
-            item->audioStream = new QSoundStream(m_player);
-            item->audioStream->setDevice(channel);
-            item->audioStream->setFormat(
-                channel->payloadType().channels(),
-                channel->payloadType().clockrate());
-
-            connect(item->audioStream, SIGNAL(inputVolumeChanged(int)),
-                    this, SIGNAL(inputVolumeChanged(int)));
-            connect(item->audioStream, SIGNAL(outputVolumeChanged(int)),
-                    this, SIGNAL(outputVolumeChanged(int)));
-
-            item->audioStream->moveToThread(m_player->soundThread());
-            QMetaObject::invokeMethod(item->audioStream, "startOutput");
-            QMetaObject::invokeMethod(item->audioStream, "startInput");
-        }
-
-    } else if (state == SipCall::FinishedState) {
-        // stop audio input / output
-        if (item->audioStream) {
-            item->audioStream->stopInput();
-            item->audioStream->stopOutput();
-            delete item->audioStream;
-            item->audioStream = 0;
-        }
-
-        call->disconnect(this);
-        item->call = 0;
-        item->duration = call->duration();
-        if (!call->errorString().isEmpty()) {
-            item->flags |= FLAGS_ERROR;
-            emit error(call->errorString());
-        }
-        emit currentCallsChanged();
-        emit inputVolumeChanged(0);
-        emit outputVolumeChanged(0);
-
-        QUrl url = m_url;
-        url.setPath(url.path() + QString::number(item->id) + "/");
-
-        QNetworkRequest request(url);
-        request.setRawHeader("Accept", "application/xml");
-        request.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
-        m_network->put(request, item->data());
-
-        // FIXME: ugly workaround for a race condition causing a crash in
-        // PhoneNotification.qml
-        QTimer::singleShot(1000, call, SLOT(deleteLater()));
-    }
-    emit dataChanged(createIndex(item), createIndex(item));
 }
 
 void PhoneHistoryModel::callTick()
@@ -322,7 +208,7 @@ QModelIndex PhoneHistoryModel::createIndex(PhoneHistoryItem *item)
 
 int PhoneHistoryModel::currentCalls() const
 {
-    return activeCalls().size();
+    return m_activeCalls.size();
 }
 
 QVariant PhoneHistoryModel::data(const QModelIndex &index, int role) const
@@ -436,9 +322,8 @@ void PhoneHistoryModel::startTone(int toneValue)
     if (toneValue < QXmppRtpAudioChannel::Tone_0 || toneValue > QXmppRtpAudioChannel::Tone_D)
         return;
     QXmppRtpAudioChannel::Tone tone = static_cast<QXmppRtpAudioChannel::Tone>(toneValue);
-    foreach (SipCall *call, activeCalls()) {
+    foreach (SipCall *call, m_activeCalls.keys())
         call->audioChannel()->startTone(tone);
-    }
 }
 
 /** Stops sending a tone.
@@ -450,7 +335,7 @@ void PhoneHistoryModel::stopTone(int toneValue)
     if (toneValue < QXmppRtpAudioChannel::Tone_0 || toneValue > QXmppRtpAudioChannel::Tone_D)
         return;
     QXmppRtpAudioChannel::Tone tone = static_cast<QXmppRtpAudioChannel::Tone>(toneValue);
-    foreach (SipCall *call, activeCalls())
+    foreach (SipCall *call, m_activeCalls.keys())
         call->audioChannel()->stopTone(tone);
 }
 
@@ -490,6 +375,63 @@ void PhoneHistoryModel::setPassword(const QString &password)
     if (password != m_password) {
         m_password = password;
         emit passwordChanged();
+    }
+}
+
+void PhoneHistoryModel::_q_callStarted(SipCall *sipCall)
+{
+    m_activeCalls.insert(sipCall, 0);
+    connect(sipCall, SIGNAL(stateChanged(SipCall::State)),
+            this, SLOT(_q_callStateChanged(SipCall::State)));
+    emit currentCallsChanged();
+}
+
+void PhoneHistoryModel::_q_callStateChanged(SipCall::State state)
+{
+    SipCall *call = qobject_cast<SipCall*>(sender());
+    Q_ASSERT(call);
+
+    // update the item
+    if (state == SipCall::ActiveState) {
+
+        // start audio input / output
+        if (!m_activeCalls.value(call)) {
+            QXmppRtpAudioChannel *channel = call->audioChannel();
+
+            QSoundStream *audioStream = new QSoundStream(m_player);
+            audioStream->setDevice(channel);
+            audioStream->setFormat(
+                channel->payloadType().channels(),
+                channel->payloadType().clockrate());
+
+            connect(audioStream, SIGNAL(inputVolumeChanged(int)),
+                    this, SIGNAL(inputVolumeChanged(int)));
+            connect(audioStream, SIGNAL(outputVolumeChanged(int)),
+                    this, SIGNAL(outputVolumeChanged(int)));
+
+            audioStream->moveToThread(m_player->soundThread());
+            QMetaObject::invokeMethod(audioStream, "startOutput");
+            QMetaObject::invokeMethod(audioStream, "startInput");
+        }
+
+    } else if (state == SipCall::FinishedState) {
+        // stop audio input / output
+        QSoundStream *audioStream = m_activeCalls.value(call);
+        if (audioStream) {
+            audioStream->stopInput();
+            audioStream->stopOutput();
+        }
+
+        call->disconnect(this);
+        m_activeCalls.remove(call);
+
+        emit currentCallsChanged();
+        emit inputVolumeChanged(0);
+        emit outputVolumeChanged(0);
+
+        // FIXME: ugly workaround for a race condition causing a crash in
+        // PhoneNotification.qml
+        QTimer::singleShot(1000, call, SLOT(deleteLater()));
     }
 }
 

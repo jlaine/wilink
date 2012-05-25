@@ -31,8 +31,8 @@ class QNetworkAccessManager;
 class QNetworkReply;
 class QNetworkRequest;
 class QSoundPlayer;
+class QSoundStream;
 class QTimer;
-class PhoneContactItem;
 class PhoneHistoryItem;
 class SipCall;
 class SipClient;
@@ -97,7 +97,6 @@ signals:
     void passwordChanged();
 
 public slots:
-    void addCall(SipCall *call);
     bool call(const QString &address);
     void clear();
     void reload();
@@ -106,14 +105,14 @@ public slots:
     void stopTone(int tone);
 
 private slots:
-    void callStateChanged(SipCall::State state);
     void callTick();
+    void _q_callStarted(SipCall *call);
+    void _q_callStateChanged(SipCall::State state);
     void _q_handleCreate();
     void _q_handleList();
     void _q_openUrl(const QUrl &url);
 
 private:
-    QList<SipCall*> activeCalls() const;
     QModelIndex createIndex(PhoneHistoryItem *item);
 
     SipClient *m_client;
@@ -125,6 +124,8 @@ private:
     QUrl m_url;
     QString m_username;
     QString m_password;
+
+    QMap<SipCall*, QSoundStream*> m_activeCalls;
 };
 
 #endif
