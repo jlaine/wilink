@@ -337,7 +337,6 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterType<NewsListModel>(uri, 2, 0, "NewsListModel");
     qmlRegisterType<Notifier>(uri, 2, 0, "Notifier");
     qmlRegisterUncreatableType<Notification>(uri, 2, 0, "Notification", "");
-    qmlRegisterType<PhoneContactModel>(uri, 2, 0, "PhoneContactModel");
     qmlRegisterType<PhoneHistoryModel>(uri, 2, 0, "PhoneHistoryModel");
     qmlRegisterUncreatableType<SipClient>(uri, 2, 0, "SipClient", "");
     qmlRegisterUncreatableType<SipCall>(uri, 2, 0, "SipCall", "");

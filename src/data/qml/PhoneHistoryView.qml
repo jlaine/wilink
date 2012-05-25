@@ -24,8 +24,18 @@ import 'utils.js' as Utils
 FocusScope {
     id: block
 
+    property QtObject contactModel
     property alias model: historyView.model
     signal addressClicked(string address)
+
+    function contactName(phone) {
+        for (var i = 0; i < contactModel.count; ++i) {
+            var contact = contactModel.get(i);
+            if (contact.phone == phone)
+                return contact.name;
+        }
+        return phone;
+    }
 
     Rectangle {
         id: header
@@ -91,7 +101,7 @@ FocusScope {
                     anchors.rightMargin: appStyle.spacing.horizontal
                     anchors.verticalCenter: parent.verticalCenter
                     elide: Text.ElideRight
-                    text: model.name
+                    text: contactName(model.phone)
                 }
 
                 Label {
@@ -165,11 +175,11 @@ FocusScope {
                             'contactId': contact.id,
                             'contactName': contact.name,
                             'contactPhone': contact.phone,
-                            'model': historyView.model.contactsModel});
+                            'model': contactModel});
                     } else {
                         dialogSwapper.showPanel('PhoneContactDialog.qml', {
                             'contactPhone': callPhone,
-                            'model': historyView.model.contactsModel});
+                            'model': contactModel});
                     }
                 } else if (item.action == 'remove') {
                     historyView.model.removeCall(callId);

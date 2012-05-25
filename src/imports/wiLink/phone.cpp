@@ -75,6 +75,7 @@ void PhoneContactItem::parse(const QDomElement &element)
     phone = element.firstChildElement("phone").text();
 }
 
+#if 0
 PhoneContactModel::PhoneContactModel(QObject *parent)
     : QAbstractListModel(parent)
 {
@@ -341,6 +342,7 @@ void PhoneContactModel::_q_handleList()
         element = element.nextSiblingElement("contact");
     }
 }
+#endif
 
 class PhoneHistoryItem
 {
@@ -421,15 +423,9 @@ PhoneHistoryModel::PhoneHistoryModel(QObject *parent)
     roleNames.insert(DirectionRole, "direction");
     roleNames.insert(DurationRole, "duration");
     roleNames.insert(IdRole, "id");
-    roleNames.insert(NameRole, "name");
     roleNames.insert(PhoneRole, "phone");
     roleNames.insert(StateRole, "state");
     setRoleNames(roleNames);
-
-    // contacts
-    m_contactsModel = new PhoneContactModel(this);
-    connect(m_contactsModel, SIGNAL(nameChanged(QString)),
-            this, SLOT(_q_nameChanged(QString)));
 
     // http
     m_network = new AuthenticatedNetworkAccessManager(this);
@@ -656,11 +652,6 @@ int PhoneHistoryModel::columnCount(const QModelIndex &parent) const
     return 1;
 }
 
-PhoneContactModel* PhoneHistoryModel::contactsModel() const
-{
-    return m_contactsModel;
-}
-
 QModelIndex PhoneHistoryModel::createIndex(PhoneHistoryItem *item)
 {
     const int row = m_items.indexOf(item);
@@ -696,13 +687,6 @@ QVariant PhoneHistoryModel::data(const QModelIndex &index, int role) const
         return item->call ? item->call->duration() : item->duration;
     case IdRole:
         return item->id;
-    case NameRole: {
-        const QString name = m_contactsModel->name(item->number());
-        if (!name.isEmpty())
-            return name;
-        else
-            return sipAddressToName(item->address);
-    }
     case PhoneRole:
         return item->number();
     default:
@@ -884,14 +868,6 @@ void PhoneHistoryModel::_q_handleList()
             endInsertRows();
         }
         element = element.nextSiblingElement("call");
-    }
-}
-
-void PhoneHistoryModel::_q_nameChanged(const QString &phone)
-{
-    foreach (PhoneHistoryItem *item, m_items) {
-        if (item->number() == phone)
-            emit dataChanged(createIndex(item), createIndex(item));
     }
 }
 

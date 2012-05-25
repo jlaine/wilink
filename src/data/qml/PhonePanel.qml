@@ -77,9 +77,9 @@ Panel {
                             historyModel.url = node.firstChild.nodeValue;
                         } else if (node.nodeName == 'contacts-url') {
                             sidebar.model.url = node.firstChild.nodeValue;
-                            //sidebar.model.username = panel.webUsername;
-                            //sidebar.model.password = panel.webPassword;
-                            //sidebar.model.reload();
+                            sidebar.model.username = panel.webUsername;
+                            sidebar.model.password = panel.webPassword;
+                            sidebar.model.reload();
                         } else if (node.nodeName == 'domain') {
                             historyModel.client.domain = node.firstChild.nodeValue;
                         } else if (node.nodeName == 'enabled') {
@@ -150,7 +150,7 @@ Panel {
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.left: parent.left
-        model: historyModel.contactsModel
+        model: PhoneContactModel {}
         visible: width > 0
         width: panel.singlePanel ? parent.width : appStyle.sidebarWidth
         z: 1
@@ -390,6 +390,7 @@ Panel {
             anchors.top: controls.bottom
             anchors.topMargin: appStyle.spacing.vertical
             anchors.bottom: parent.bottom
+            contactModel: sidebar.model
             model: historyModel
 
             onAddressClicked: {

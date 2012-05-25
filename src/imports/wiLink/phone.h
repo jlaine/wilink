@@ -37,53 +37,6 @@ class PhoneHistoryItem;
 class SipCall;
 class SipClient;
 
-/** The PhoneContactModel class represents the user's phone contacts.
- */
-class PhoneContactModel : public QAbstractListModel
-{
-    Q_OBJECT
-    Q_ENUMS(Role)
-    Q_PROPERTY(QUrl url READ url WRITE setUrl NOTIFY urlChanged)
-
-public:
-    enum Role {
-        IdRole = Qt::UserRole,
-        NameRole,
-        PhoneRole,
-    };
-
-    PhoneContactModel(QObject *parent = 0);
-
-    QString name(const QString &number) const;
-    QUrl url() const;
-    void setUrl(const QUrl &url);
-
-    // QAbstractListModel
-    int columnCount(const QModelIndex &parent = QModelIndex()) const;
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-    int rowCount(const QModelIndex &parent = QModelIndex()) const;
-
-signals:
-    void nameChanged(const QString &number);
-    void urlChanged(const QUrl &url);
-
-public slots:
-    void addContact(const QString &name, const QString &phone);
-    QVariant getContact(int id);
-    QVariant getContactByPhone(const QString &phone);
-    void removeContact(int id);
-    void updateContact(int id, const QString &name, const QString &phone);
-
-private slots:
-    void _q_handleCreate();
-    void _q_handleList();
-
-private:
-    QList<PhoneContactItem*> m_items;
-    QNetworkAccessManager *m_network;
-    QUrl m_url;
-};
-
 /** The PhoneHistoryModel class represents the user's phone call history.
  */
 class PhoneHistoryModel : public QAbstractListModel
@@ -91,7 +44,6 @@ class PhoneHistoryModel : public QAbstractListModel
     Q_OBJECT
     Q_ENUMS(Role)
     Q_PROPERTY(SipClient* client READ client CONSTANT)
-    Q_PROPERTY(PhoneContactModel* contactsModel READ contactsModel CONSTANT)
     Q_PROPERTY(int currentCalls READ currentCalls NOTIFY currentCallsChanged)
     Q_PROPERTY(int inputVolume READ inputVolume NOTIFY inputVolumeChanged)
     Q_PROPERTY(int maximumVolume READ maximumVolume CONSTANT)
@@ -106,7 +58,6 @@ public:
         DateRole,
         DurationRole,
         IdRole,
-        NameRole,
         PhoneRole,
         StateRole,
     };
@@ -115,7 +66,6 @@ public:
     ~PhoneHistoryModel();
 
     SipClient *client() const;
-    PhoneContactModel* contactsModel() const;
     int currentCalls() const;
     int inputVolume() const;
     int maximumVolume() const;
@@ -151,7 +101,6 @@ private slots:
     void callTick();
     void _q_handleCreate();
     void _q_handleList();
-    void _q_nameChanged(const QString &phone);
     void _q_openUrl(const QUrl &url);
 
 private:
@@ -159,7 +108,6 @@ private:
     QModelIndex createIndex(PhoneHistoryItem *item);
 
     SipClient *m_client;
-    PhoneContactModel *m_contactsModel;
     QList<PhoneHistoryItem*> m_items;
     QNetworkAccessManager *m_network;
     QSoundPlayer *m_player;
