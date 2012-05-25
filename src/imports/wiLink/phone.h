@@ -39,7 +39,7 @@ class SipClient;
 
 /** The PhoneHistoryModel class represents the user's phone call history.
  */
-class PhoneHistoryModel : public QAbstractListModel
+class PhoneHistoryModel : public QObject
 {
     Q_OBJECT
     Q_ENUMS(Role)
@@ -98,18 +98,12 @@ signals:
 
 public slots:
     bool call(const QString &address);
-    void clear();
-    void reload();
-    void removeItem(int id);
     void startTone(int tone);
     void stopTone(int tone);
 
 private slots:
-    void callTick();
     void _q_callStarted(SipCall *call);
     void _q_callStateChanged(SipCall::State state);
-    void _q_handleCreate();
-    void _q_handleList();
     void _q_openUrl(const QUrl &url);
 
 private:
@@ -120,7 +114,6 @@ private:
     QNetworkAccessManager *m_network;
     QSoundPlayer *m_player;
     bool m_registeredHandler;
-    QTimer *m_ticker;
     QUrl m_url;
     QString m_username;
     QString m_password;

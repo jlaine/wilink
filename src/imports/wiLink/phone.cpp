@@ -91,22 +91,11 @@ void PhoneHistoryItem::parse(const QDomElement &element)
  * @param parent
  */
 PhoneHistoryModel::PhoneHistoryModel(QObject *parent)
-    : QAbstractListModel(parent)
+    : QObject(parent)
     , m_registeredHandler(false)
 {
     bool check;
     Q_UNUSED(check);
-
-    // set role names
-    QHash<int, QByteArray> roleNames;
-    roleNames.insert(ActiveRole, "active");
-    roleNames.insert(AddressRole, "address");
-    roleNames.insert(DateRole, "date");
-    roleNames.insert(DurationRole, "duration");
-    roleNames.insert(FlagsRole, "flags");
-    roleNames.insert(IdRole, "id");
-    roleNames.insert(StateRole, "state");
-    setRoleNames(roleNames);
 
     // http
     m_network = new AuthenticatedNetworkAccessManager(this);
@@ -121,12 +110,6 @@ PhoneHistoryModel::PhoneHistoryModel(QObject *parent)
     Q_ASSERT(check);
     m_client->moveToThread(m_player->soundThread());
 
-    // ticker for call durations
-    m_ticker = new QTimer(this);
-    m_ticker->setInterval(1000);
-    connect(m_ticker, SIGNAL(timeout()),
-            this, SLOT(callTick()));
-
     // register URL handler
     if (!m_registeredHandler) {
         HistoryMessage::addTransform(QRegExp("^(.*\\s)?(\\+?[0-9]{4,})(\\s.*)?$"),
@@ -138,8 +121,6 @@ PhoneHistoryModel::PhoneHistoryModel(QObject *parent)
 
 PhoneHistoryModel::~PhoneHistoryModel()
 {
-    m_ticker->stop();
-
     // try to exit SIP client cleanly
     if (m_client->state() == SipClient::ConnectedState)
         QMetaObject::invokeMethod(m_client, "disconnectFromServer");
@@ -160,25 +141,6 @@ bool PhoneHistoryModel::call(const QString &address)
     return false;
 }
 
-void PhoneHistoryModel::callTick()
-{
-    bool active = false;
-    foreach (PhoneHistoryItem *item, m_items) {
-        if (item->call) {
-            active = true;
-            emit dataChanged(createIndex(item), createIndex(item));
-        }
-    }
-    if (!active)
-        m_ticker->stop();
-}
-
-void PhoneHistoryModel::clear()
-{
-    foreach (PhoneHistoryItem *item, m_items)
-        removeItem(item->id);
-}
-
 /** Returns the underlying SIP client.
  *
  * \note Use with care as the SIP client lives in a different thread!
@@ -188,61 +150,16 @@ SipClient *PhoneHistoryModel::client() const
     return m_client;
 }
 
-/** Returns the number of columns under the given \a parent.
- *
- * @param parent
- */
-int PhoneHistoryModel::columnCount(const QModelIndex &parent) const
-{
-    Q_UNUSED(parent);
-    return 1;
-}
-
-QModelIndex PhoneHistoryModel::createIndex(PhoneHistoryItem *item)
-{
-    const int row = m_items.indexOf(item);
-    if (row >= 0)
-        return QAbstractItemModel::createIndex(row, 0);
-    return QModelIndex();
-}
-
 int PhoneHistoryModel::currentCalls() const
 {
     return m_activeCalls.size();
 }
 
-QVariant PhoneHistoryModel::data(const QModelIndex &index, int role) const
-{
-    const int row = index.row();
-    if (row < 0 || row > m_items.size())
-        return QVariant();
-    PhoneHistoryItem *item = m_items[row];
-
-    switch (role) {
-    case Qt::ToolTipRole:
-        return item->address;
-    case AddressRole:
-        return item->address;
-    case ActiveRole:
-        return item->call != 0;
-    case DateRole:
-        return item->date;
-    case DurationRole:
-        return item->call ? item->call->duration() : item->duration;
-    case FlagsRole:
-         return item->flags;
-    case IdRole:
-        return item->id;
-    default:
-        return QVariant();
-    }
-}
-
 int PhoneHistoryModel::inputVolume() const
 {
-    for (int i = m_items.size() - 1; i >= 0; --i) {
-        if (m_items[i]->audioStream)
-            return m_items[i]->audioStream->inputVolume();
+    foreach (QSoundStream *audioStream, m_activeCalls.values()) {
+        if (audioStream)
+            return audioStream->inputVolume();
     }
     return 0;
 }
@@ -254,63 +171,11 @@ int PhoneHistoryModel::maximumVolume() const
 
 int PhoneHistoryModel::outputVolume() const
 {
-    for (int i = m_items.size() - 1; i >= 0; --i) {
-        if (m_items[i]->audioStream)
-            return m_items[i]->audioStream->outputVolume();
+    foreach (QSoundStream *audioStream, m_activeCalls.values()) {
+        if (audioStream)
+            return audioStream->outputVolume();
     }
     return 0;
-}
-
-void PhoneHistoryModel::reload()
-{
-    if (m_url.isValid()) {
-        qDebug("PhoneHistoryModel reload");
-
-        QNetworkRequest request(m_url);
-        request.setRawHeader("Accept", "application/xml");
-        QNetworkReply *reply = m_network->get(request);
-        connect(reply, SIGNAL(finished()), this, SLOT(_q_handleList()));
-    }
-}
-
-/** Removes the call with the given \a id.
- *
- * @param id
- */
-void PhoneHistoryModel::removeItem(int id)
-{
-    for (int row = 0; row < m_items.size(); ++row) {
-        PhoneHistoryItem *item = m_items[row];
-        if (item->id == id) {
-            // removing active calls is not allowed
-            if (item->call)
-                return;
-
-            beginRemoveRows(QModelIndex(), row, row);
-
-            QUrl url = m_url;
-            url.setPath(url.path() + QString::number(item->id) + "/");
-
-            QNetworkRequest request(url);
-            request.setRawHeader("Accept", "application/xml");
-            m_network->deleteResource(request);
-            m_items.removeAt(row);
-            delete item;
-
-            endRemoveRows();
-            break;
-        }
-    }
-}
-
-/** Returns the number of rows under the given \a parent.
- *
- * @param parent
- */
-int PhoneHistoryModel::rowCount(const QModelIndex& parent) const
-{
-    Q_UNUSED(parent);
-    return m_items.size();
 }
 
 /** Starts sending a tone.
@@ -432,65 +297,6 @@ void PhoneHistoryModel::_q_callStateChanged(SipCall::State state)
         // FIXME: ugly workaround for a race condition causing a crash in
         // PhoneNotification.qml
         QTimer::singleShot(1000, call, SLOT(deleteLater()));
-    }
-}
-
-void PhoneHistoryModel::_q_handleCreate()
-{
-    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
-    Q_ASSERT(reply);
-
-    // find the item
-    PhoneHistoryItem *item = 0;
-    for (int i = 0; i < m_items.size(); ++i) {
-        if (m_items[i]->reply == reply) {
-            item = m_items[i];
-            item->reply = 0;
-            break;
-        }
-    }
-    if (!item)
-        return;
-
-    // update the item
-    QDomDocument doc;
-    if (reply->error() != QNetworkReply::NoError || !doc.setContent(reply)) {
-        qWarning("Failed to create phone call: %s", qPrintable(reply->errorString()));
-        return;
-    }
-    item->parse(doc.documentElement());
-    emit dataChanged(createIndex(item), createIndex(item));
-}
-
-void PhoneHistoryModel::_q_handleList()
-{
-    QNetworkReply *reply = qobject_cast<QNetworkReply*>(sender());
-    Q_ASSERT(reply);
-
-    QDomDocument doc;
-    if (reply->error() != QNetworkReply::NoError || !doc.setContent(reply)) {
-        qWarning("Failed to retrieve phone calls: %s", qPrintable(reply->errorString()));
-        return;
-    }
-
-    QDomElement element = doc.documentElement().firstChildElement("call");
-    while (!element.isNull()) {
-        int id = element.firstChildElement("id").text().toInt();
-        foreach (PhoneHistoryItem *item, m_items) {
-            if (item->id == id) {
-                id = 0;
-                break;
-            }
-        }
-        if (id > 0) {
-            PhoneHistoryItem *item = new PhoneHistoryItem;
-            item->parse(element);
-
-            beginInsertRows(QModelIndex(), 0, 0);
-            m_items.prepend(item);
-            endInsertRows();
-        }
-        element = element.nextSiblingElement("call");
     }
 }
 
