@@ -234,7 +234,7 @@ class SipClient : public QXmppLoggable
     Q_PROPERTY(QXmppLogger* logger READ logger WRITE setLogger NOTIFY loggerChanged)
     Q_PROPERTY(State state READ state NOTIFY stateChanged)
     Q_PROPERTY(QString displayName READ displayName WRITE setDisplayName)
-    Q_PROPERTY(QString domain READ domain WRITE setDomain)
+    Q_PROPERTY(QString domain READ domain WRITE setDomain NOTIFY domainChanged)
     Q_PROPERTY(QString password READ password WRITE setPassword)
     Q_PROPERTY(QString username READ username WRITE setUsername)
 
@@ -285,6 +285,9 @@ signals:
 
     /// This signal is emitted when a call (incoming or outgoing) is started.
     void callStarted(SipCall *call);
+
+    /// This signal is emitted when the domain changes.
+    void domainChanged(const QString domain);
 
     /// This signal is emitted when the logger changes.
     void loggerChanged(QXmppLogger *logger);

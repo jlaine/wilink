@@ -1371,7 +1371,10 @@ QString SipClient::domain() const
 
 void SipClient::setDomain(const QString &domain)
 {
-    d->domain = domain;
+    if (domain != d->domain) {
+        d->domain = domain;
+        emit domainChanged(d->domain);
+    }
 }
 
 QHostAddress SipClient::localAddress() const
