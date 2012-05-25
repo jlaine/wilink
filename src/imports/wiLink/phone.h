@@ -20,15 +20,11 @@
 #ifndef __WILINK_PHONE_H__
 #define __WILINK_PHONE_H__
 
-#include <QAbstractListModel>
-#include <QList>
-#include <QUrl>
-
 #include "phone/sip.h"
 
-class QAuthenticator;
 class QSoundPlayer;
 class QSoundStream;
+class QUrl;
 class SipCall;
 class SipClient;
 
@@ -37,27 +33,13 @@ class SipClient;
 class PhoneHistoryModel : public QObject
 {
     Q_OBJECT
-    Q_ENUMS(Role)
     Q_PROPERTY(SipClient* client READ client CONSTANT)
     Q_PROPERTY(int currentCalls READ currentCalls NOTIFY currentCallsChanged)
     Q_PROPERTY(int inputVolume READ inputVolume NOTIFY inputVolumeChanged)
     Q_PROPERTY(int maximumVolume READ maximumVolume CONSTANT)
     Q_PROPERTY(int outputVolume READ outputVolume NOTIFY outputVolumeChanged)
-    Q_PROPERTY(QUrl url READ url WRITE setUrl NOTIFY urlChanged)
-    Q_PROPERTY(QString username READ username WRITE setUsername NOTIFY usernameChanged)
-    Q_PROPERTY(QString password READ password WRITE setUsername NOTIFY passwordChanged)
 
 public:
-    enum Role {
-        AddressRole = Qt::UserRole,
-        ActiveRole,
-        DateRole,
-        FlagsRole,
-        DurationRole,
-        IdRole,
-        StateRole,
-    };
-
     PhoneHistoryModel(QObject *parent = 0);
     ~PhoneHistoryModel();
 
@@ -67,29 +49,12 @@ public:
     int maximumVolume() const;
     int outputVolume() const;
 
-    QUrl url() const;
-    void setUrl(const QUrl &url);
-
-    QString username() const;
-    void setUsername(const QString &username);
-
-    QString password() const;
-    void setPassword(const QString &password);
-
-    // QAbstractListModel
-    int columnCount(const QModelIndex &parent = QModelIndex()) const;
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-    int rowCount(const QModelIndex &parent = QModelIndex()) const;
-
 signals:
     void currentCallsChanged();
     void enabledChanged(bool enabled);
     void error(const QString &error);
     void inputVolumeChanged(int inputVolume);
     void outputVolumeChanged(int outputVolume);
-    void urlChanged();
-    void usernameChanged();
-    void passwordChanged();
 
 public slots:
     bool call(const QString &address);
@@ -102,14 +67,10 @@ private slots:
     void _q_openUrl(const QUrl &url);
 
 private:
+    QMap<SipCall*, QSoundStream*> m_activeCalls;
     SipClient *m_client;
     QSoundPlayer *m_player;
     bool m_registeredHandler;
-    QUrl m_url;
-    QString m_username;
-    QString m_password;
-
-    QMap<SipCall*, QSoundStream*> m_activeCalls;
 };
 
 #endif

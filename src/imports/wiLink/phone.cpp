@@ -18,8 +18,6 @@
  */
 
 #include <QDesktopServices>
-#include <QDomDocument>
-#include <QDomElement>
 #include <QTimer>
 #include <QUrl>
 
@@ -143,45 +141,6 @@ void PhoneHistoryModel::stopTone(int toneValue)
     QXmppRtpAudioChannel::Tone tone = static_cast<QXmppRtpAudioChannel::Tone>(toneValue);
     foreach (SipCall *call, m_activeCalls.keys())
         call->audioChannel()->stopTone(tone);
-}
-
-QUrl PhoneHistoryModel::url() const
-{
-    return m_url;
-}
-
-void PhoneHistoryModel::setUrl(const QUrl &url)
-{
-    if (url != m_url) {
-        m_url = url;
-        emit urlChanged();
-    }
-}
-
-QString PhoneHistoryModel::username() const
-{
-    return m_username;
-}
-
-void PhoneHistoryModel::setUsername(const QString &username)
-{
-    if (username != m_username) {
-        m_username = username;
-        emit usernameChanged();
-    }
-}
-
-QString PhoneHistoryModel::password() const
-{
-    return m_password;
-}
-
-void PhoneHistoryModel::setPassword(const QString &password)
-{
-    if (password != m_password) {
-        m_password = password;
-        emit passwordChanged();
-    }
 }
 
 void PhoneHistoryModel::_q_callStarted(SipCall *sipCall)
