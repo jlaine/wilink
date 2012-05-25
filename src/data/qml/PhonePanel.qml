@@ -119,16 +119,6 @@ Panel {
     PhoneHistoryModel {
         id: historyModel
 
-        onCurrentCallsChanged: {
-            if (historyModel.currentCalls) {
-                callButton.visible = false;
-                hangupButton.visible = true;
-            } else {
-                hangupButton.visible = false;
-                callButton.visible = true;
-            }
-        }
-
         onError: {
             dialogSwapper.showPanel('ErrorNotification.qml', {
                 'iconSource': 'image://icon/phone',
@@ -270,7 +260,7 @@ Panel {
 
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
-                    enabled: sipClient.state == SipClient.ConnectedState
+                    enabled: sipClient.state == SipClient.ConnectedState && !historyModel.currentCalls
                     iconSource: 'image://icon/call'
                     text: qsTr('Call')
 
@@ -285,18 +275,6 @@ Panel {
                         if (panel.singlePanel)
                             panel.state = 'no-sidebar';
                     }
-                }
-
-                Button {
-                    id: hangupButton
-
-                    anchors.top: parent.top
-                    anchors.bottom: parent.bottom
-                    iconSource: 'image://icon/hangup'
-                    text: qsTr('Hangup')
-                    visible: false
-
-                    onClicked: historyModel.hangup()
                 }
             }
         }
