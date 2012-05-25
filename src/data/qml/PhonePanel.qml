@@ -29,6 +29,7 @@ Panel {
     property string voicemailNumber
     property string webUsername
     property string webPassword
+    property alias sipClient: historyModel.client
 
     // Builds a full SIP address from a short recipient
     function buildAddress(recipient, sipDomain)
@@ -81,26 +82,26 @@ Panel {
                             sidebar.model.password = panel.webPassword;
                             sidebar.model.reload();
                         } else if (node.nodeName == 'domain') {
-                            historyModel.client.domain = node.firstChild.nodeValue;
+                            sipClient.domain = node.firstChild.nodeValue;
                         } else if (node.nodeName == 'enabled') {
                             panel.phoneEnabled = (node.firstChild.nodeValue == 'true');
                         } else if (node.nodeName == 'number') {
-                            historyModel.client.displayName = node.firstChild.nodeValue;
+                            sipClient.displayName = node.firstChild.nodeValue;
                             panel.phoneNumber = node.firstChild.nodeValue;
                         } else if (node.nodeName == 'password') {
-                            historyModel.client.password = node.firstChild.nodeValue;
+                            sipClient.password = node.firstChild.nodeValue;
                         } else if (node.nodeName == 'selfcare-url') {
                             panel.selfcareUrl = node.firstChild.nodeValue;
                         } else if (node.nodeName == 'username') {
-                            historyModel.client.username = node.firstChild.nodeValue;
+                            sipClient.username = node.firstChild.nodeValue;
                         } else if (node.nodeName == 'voicemail-number') {
                             panel.voicemailNumber = node.firstChild.nodeValue;
                         }
                     }
                     if (panel.phoneEnabled) {
-                        historyModel.client.connectToServer();
+                        sipClient.connectToServer();
                     } else {
-                        historyModel.client.disconnectFromServer();
+                        sipClient.disconnectFromServer();
                     }
                 } else {
                     console.log("Phone failed to retrieve settings");
@@ -156,7 +157,7 @@ Panel {
         z: 1
 
         onItemClicked: {
-            var address = buildAddress(model.phone, historyModel.client.domain);
+            var address = buildAddress(model.phone, sipClient.domain);
             historyModel.call(address);
             if (panel.singlePanel)
                 panel.state = 'no-sidebar';
@@ -187,7 +188,7 @@ Panel {
                     visible: panel.voicemailNumber != ''
 
                     onClicked: {
-                        var address = buildAddress(panel.voicemailNumber, historyModel.client.domain);
+                        var address = buildAddress(panel.voicemailNumber, sipClient.domain);
                         historyModel.call(address);
                         if (panel.singlePanel)
                             panel.state = 'no-sidebar';
@@ -266,7 +267,7 @@ Panel {
 
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
-                    enabled: historyModel.client.state == SipClient.ConnectedState
+                    enabled: sipClient.state == SipClient.ConnectedState
                     iconSource: 'image://icon/call'
                     text: qsTr('Call')
 
@@ -275,7 +276,7 @@ Panel {
                         if (!recipient.length)
                             return;
 
-                        var address = buildAddress(recipient, historyModel.client.domain);
+                        var address = buildAddress(recipient, sipClient.domain);
                         if (historyModel.call(address))
                             numberEdit.text = '';
                         if (panel.singlePanel)
