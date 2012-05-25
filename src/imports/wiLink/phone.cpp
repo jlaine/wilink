@@ -17,7 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QDateTime>
 #include <QDesktopServices>
 #include <QDomDocument>
 #include <QDomElement>
@@ -31,7 +30,6 @@
 #include "QSoundPlayer.h"
 #include "QSoundStream.h"
 #include "QXmppRtpChannel.h"
-#include "QXmppUtils.h"
 
 #include "declarative.h"
 #include "history.h"
@@ -353,7 +351,7 @@ public:
 
     int id;
     QString address;
-    QDateTime date;
+    QString date;
     int duration;
     int flags;
 
@@ -387,7 +385,7 @@ void PhoneHistoryItem::parse(const QDomElement &element)
 {
     id = element.firstChildElement("id").text().toInt();
     address = element.firstChildElement("address").text();
-    date = QXmppUtils::datetimeFromString(element.firstChildElement("date").text());
+    date = element.firstChildElement("date").text();
     duration = element.firstChildElement("duration").text().toInt();
     flags = element.firstChildElement("flags").text().toInt();
 }

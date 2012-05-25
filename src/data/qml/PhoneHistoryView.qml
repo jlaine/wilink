@@ -113,7 +113,7 @@ FocusScope {
                     anchors.right: duration.left
                     anchors.rightMargin: appStyle.spacing.horizontal
                     anchors.verticalCenter: parent.verticalCenter
-                    text: Utils.formatDateTime(model.date)
+                    text: Utils.formatDateTime(Utils.datetimeFromString(model.date))
                     width: appStyle.font.normalSize * 8
                 }
 
