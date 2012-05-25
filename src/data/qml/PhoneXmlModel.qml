@@ -28,12 +28,13 @@ XmlListModel {
     property string password
 
     function reload() {
-        console.log("PhoneXmlModel reload " + xmlModel.url);
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4) {
                 if (xhr.status == 200) {
                     xmlModel.xml = xhr.responseText;
+                } else {
+                    console.log("PhoneXmlModel failed to load " + xmlModel.url + ": " + xhr.status + "/" + xhr.statusText);
                 }
             }
         };
@@ -53,10 +54,14 @@ XmlListModel {
 
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
-            console.log("addItem readyState " + xhr.readyState);
             // FIXME: for some reason, we never get past this state
             if (xhr.readyState == 3) {
                 xhr.abort();
+                return;
+            }
+
+            if (xhr.readyState == 4) {
+                console.log("PhoneXmlModel added item: " + xhr.status + "/" + xhr.statusText);
                 xmlModel.reload();
             }
         };
@@ -109,7 +114,7 @@ XmlListModel {
                 }
             }
         };
-        xhr.open('POST', url, true, xmlModel.username, xmlModel.password);
+        xhr.open('PUT', url, true, xmlModel.username, xmlModel.password);
         xhr.setRequestHeader("Accept", "application/xml");
         xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         xhr.send(data);

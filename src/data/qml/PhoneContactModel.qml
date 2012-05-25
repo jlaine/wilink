@@ -33,7 +33,7 @@ PhoneXmlModel {
 
     query: '/contacts/contact'
 
-    XmlRole { name: 'id'; query: 'id/string()'; isKey: true }
+    XmlRole { name: 'id'; query: 'id/string()' }
     XmlRole { name: 'name'; query: 'name/string()' }
     XmlRole { name: 'phone'; query: 'phone/string()' }
 }
