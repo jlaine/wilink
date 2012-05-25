@@ -352,15 +352,6 @@ QVariant PhoneHistoryModel::data(const QModelIndex &index, int role) const
     }
 }
 
-/** Hangs up all active calls.
- */
-void PhoneHistoryModel::hangup()
-{
-    for (int i = m_items.size() - 1; i >= 0; --i)
-        if (m_items[i]->call)
-            m_items[i]->call->hangup();
-}
-
 int PhoneHistoryModel::inputVolume() const
 {
     for (int i = m_items.size() - 1; i >= 0; --i) {

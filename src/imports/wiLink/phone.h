@@ -100,7 +100,6 @@ public slots:
     void addCall(SipCall *call);
     bool call(const QString &address);
     void clear();
-    void hangup();
     void reload();
     void removeItem(int id);
     void startTone(int tone);
