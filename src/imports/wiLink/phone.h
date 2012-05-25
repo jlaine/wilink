@@ -107,7 +107,6 @@ public slots:
     void stopTone(int tone);
 
 private slots:
-    void callRinging();
     void callStateChanged(SipCall::State state);
     void callTick();
     void _q_handleCreate();

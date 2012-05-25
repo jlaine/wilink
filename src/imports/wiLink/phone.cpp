@@ -55,7 +55,6 @@ public:
     QSoundStream *audioStream;
     SipCall *call;
     QNetworkReply *reply;
-    QSoundPlayerJob *soundJob;
 };
 
 PhoneHistoryItem::PhoneHistoryItem()
@@ -64,8 +63,7 @@ PhoneHistoryItem::PhoneHistoryItem()
     flags(0),
     audioStream(0),
     call(0),
-    reply(0),
-    soundJob(0)
+    reply(0)
 {
 }
 
@@ -169,8 +167,6 @@ void PhoneHistoryModel::addCall(SipCall *call)
     item->call = call;
     connect(item->call, SIGNAL(stateChanged(SipCall::State)),
             this, SLOT(callStateChanged(SipCall::State)));
-    if (item->call->direction() == SipCall::OutgoingDirection)
-        connect(item->call, SIGNAL(ringing()), this, SLOT(callRinging()));
 
     QNetworkRequest request(m_url);
     request.setRawHeader("Accept", "application/xml");
@@ -202,20 +198,6 @@ bool PhoneHistoryModel::call(const QString &address)
     return false;
 }
 
-void PhoneHistoryModel::callRinging()
-{
-    SipCall *call = qobject_cast<SipCall*>(sender());
-    Q_ASSERT(call);
-
-    // find the call
-    foreach (PhoneHistoryItem *item, m_items) {
-        if (item->call == call && !item->soundJob) {
-            item->soundJob = m_player->play(QUrl(":/sounds/call-outgoing.ogg"), true);
-            break;
-        }
-    }
-}
-
 void PhoneHistoryModel::callStateChanged(SipCall::State state)
 {
     SipCall *call = qobject_cast<SipCall*>(sender());
@@ -233,11 +215,6 @@ void PhoneHistoryModel::callStateChanged(SipCall::State state)
         return;
 
     PhoneHistoryItem *item = m_items[row];
-
-    if (item->soundJob && state != SipCall::ConnectingState) {
-        item->soundJob->stop();
-        item->soundJob = 0;
-    }
 
     // update the item
     if (state == SipCall::ActiveState) {

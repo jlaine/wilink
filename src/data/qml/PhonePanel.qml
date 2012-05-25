@@ -457,13 +457,13 @@ Panel {
     Connections {
         target: sipClient
         onCallStarted: {
-            var component = Qt.createComponent('CallWidget.qml');
+            var component = Qt.createComponent('PhoneCallWidget.qml');
 
             function finishCreation() {
                 if (component.status != Component.Ready)
                     return;
 
-                var widget = component.createObject(widgetBar);
+                var widget = component.createObject(widgetBar, {audio: historyModel});
                 widget.call = call;
             }
 
