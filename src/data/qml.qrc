@@ -1,5 +1,6 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
+    <file>qml/sip.js</file>
     <file>qml/utils.js</file>
     <file>qml/AboutDialog.qml</file>
     <file>qml/AccountListPanel.qml</file>
@@ -54,6 +55,7 @@
     <file>qml/PanelHeader.qml</file>
     <file>qml/PanelHelp.qml</file>
     <file>qml/PanelSwapper.qml</file>
+    <file>qml/PhoneCallModel.qml</file>
     <file>qml/PhoneContactDialog.qml</file>
     <file>qml/PhoneContactModel.qml</file>
     <file>qml/PhoneContactView.qml</file>

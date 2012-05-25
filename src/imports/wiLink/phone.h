@@ -60,7 +60,6 @@ public:
         DateRole,
         DurationRole,
         IdRole,
-        PhoneRole,
         StateRole,
     };
 

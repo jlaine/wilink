@@ -19,16 +19,19 @@
 
 import QtQuick 1.1
 import wiLink 2.0
+import 'sip.js' as Sip
 import 'utils.js' as Utils
 
 FocusScope {
     id: block
 
+    property string domain: 'wifirst.net'
     property QtObject contactModel
     property alias model: historyView.model
     signal addressClicked(string address)
 
-    function contactName(phone) {
+    function contactName(address) {
+        var phone = Sip.parseAddress(address, block.domain);
         for (var i = 0; i < contactModel.count; ++i) {
             var contact = contactModel.get(i);
             if (contact.phone == phone)
@@ -101,7 +104,7 @@ FocusScope {
                     anchors.rightMargin: appStyle.spacing.horizontal
                     anchors.verticalCenter: parent.verticalCenter
                     elide: Text.ElideRight
-                    text: contactName(model.phone)
+                    text: contactName(model.address)
                 }
 
                 Label {
@@ -140,7 +143,6 @@ FocusScope {
                             menuLoader.sourceComponent = phoneHistoryMenu;
                             menuLoader.item.callAddress = model.address;
                             menuLoader.item.callId = model.id;
-                            menuLoader.item.callPhone = model.phone;
                             menuLoader.show(pos.x, pos.y);
                         }
                     }
@@ -162,14 +164,14 @@ FocusScope {
 
             property string callAddress
             property int callId
-            property string callPhone
 
             onItemClicked: {
                 var item = menu.model.get(index);
                 if (item.action == 'call') {
                     historyView.model.call(callAddress)
                 } else if (item.action == 'contact') {
-                    var contact = historyView.model.contactsModel.getContactByPhone(callPhone);
+                    var callPhone = Sip.parseAddress(callAddress, block.domain);
+                    var contact = contactModel.getContactByPhone(callPhone);
                     if (contact) {
                         dialogSwapper.showPanel('PhoneContactDialog.qml', {
                             'contactId': contact.id,

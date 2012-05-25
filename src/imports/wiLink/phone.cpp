@@ -349,7 +349,6 @@ class PhoneHistoryItem
 public:
     PhoneHistoryItem();
     QByteArray data() const;
-    QString number() const;
     void parse(const QDomElement &element);
 
     int id;
@@ -384,16 +383,6 @@ QByteArray PhoneHistoryItem::data() const
     return data.encodedQuery();
 }
 
-QString PhoneHistoryItem::number() const
-{
-    const QString uri = sipAddressToUri(address);
-    const QStringList bits = uri.split('@');
-    if (bits.size() == 2) {
-        return bits[0].mid(4);
-    }
-    return QString();
-}
-
 void PhoneHistoryItem::parse(const QDomElement &element)
 {
     id = element.firstChildElement("id").text().toInt();
@@ -423,7 +412,6 @@ PhoneHistoryModel::PhoneHistoryModel(QObject *parent)
     roleNames.insert(DirectionRole, "direction");
     roleNames.insert(DurationRole, "duration");
     roleNames.insert(IdRole, "id");
-    roleNames.insert(PhoneRole, "phone");
     roleNames.insert(StateRole, "state");
     setRoleNames(roleNames);
 
@@ -687,8 +675,6 @@ QVariant PhoneHistoryModel::data(const QModelIndex &index, int role) const
         return item->call ? item->call->duration() : item->duration;
     case IdRole:
         return item->id;
-    case PhoneRole:
-        return item->number();
     default:
         return QVariant();
     }
