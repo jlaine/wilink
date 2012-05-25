@@ -76,7 +76,10 @@ Panel {
                         if (node.nodeName == 'calls-url') {
                             historyModel.url = node.firstChild.nodeValue;
                         } else if (node.nodeName == 'contacts-url') {
-                            historyModel.contactsModel.url = node.firstChild.nodeValue;
+                            sidebar.model.url = node.firstChild.nodeValue;
+                            //sidebar.model.username = panel.webUsername;
+                            //sidebar.model.password = panel.webPassword;
+                            //sidebar.model.reload();
                         } else if (node.nodeName == 'domain') {
                             historyModel.client.domain = node.firstChild.nodeValue;
                         } else if (node.nodeName == 'enabled') {
@@ -147,7 +150,7 @@ Panel {
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.left: parent.left
-        contactsModel: historyModel.contactsModel
+        model: historyModel.contactsModel
         visible: width > 0
         width: panel.singlePanel ? parent.width : appStyle.sidebarWidth
         z: 1

@@ -23,19 +23,9 @@ import wiLink 2.0
 ContactView {
     id: block
 
-    property QtObject contactsModel
-
     signal itemClicked(variant model)
 
     title: qsTr('My contacts')
-
-    model: SortFilterProxyModel {
-        dynamicSortFilter: true
-        sortCaseSensitivity: Qt.CaseInsensitive
-        sortRole: PhoneContactModel.NameRole
-        sourceModel: contactsModel
-        Component.onCompleted: sort(0)
-    }
 
     delegate: Item {
         id: item
@@ -112,6 +102,8 @@ ContactView {
                     var pos = mapToItem(menuLoader.parent, mouse.x, mouse.y);
                     menuLoader.sourceComponent = phoneContactMenu;
                     menuLoader.item.contactId = model.id;
+                    menuLoader.item.contactName = model.name;
+                    menuLoader.item.contactPhone = model.phone;
                     menuLoader.show(pos.x, pos.y);
                 }
             }
@@ -138,7 +130,7 @@ ContactView {
     }
 
     onAddClicked: {
-        dialogSwapper.showPanel('PhoneContactDialog.qml', {'model': contactsModel});
+        dialogSwapper.showPanel('PhoneContactDialog.qml', {'model': block.model});
     }
 
     Component {
@@ -148,18 +140,19 @@ ContactView {
             id: menu
 
             property int contactId
+            property string contactName
+            property string contactPhone
 
             onItemClicked: {
                 var item = menu.model.get(index);
                 if (item.action == 'edit') {
-                    var contact = contactsModel.getContact(contactId);
                     dialogSwapper.showPanel('PhoneContactDialog.qml', {
                         'contactId': contactId,
-                        'contactName': contact.name,
-                        'contactPhone': contact.phone,
-                        'model': contactsModel});
+                        'contactName': contactName,
+                        'contactPhone': contactPhone,
+                        'model': block.model});
                 } else if (item.action == 'remove') {
-                    contactsModel.removeContact(contactId);
+                    block.model.removeContact(contactId);
                 }
             }
 
