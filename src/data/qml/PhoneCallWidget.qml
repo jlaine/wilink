@@ -137,10 +137,10 @@ Item {
                 callWidget.soundJob.stop();
                 callWidget.soundJob = null;
             }
-            console.log("call state: " + call.state);
             if (call.state == QXmppCall.FinishedState) {
-                console.log("call finished");
-                historyView.model.addItem({address: call.recipient, duration: 123, flags: call.direction});
+                // FIXME: get id!
+                var id = historyView.model.get(historyView.model.count-1).id;
+                historyView.model.updateItem(id, {address: call.recipient, duration: call.duration, flags: call.direction});
             }
         }
     }
@@ -151,6 +151,9 @@ Item {
             callWidget.call.state == QXmppCall.ConnectingState) {
             callWidget.soundJob = appSoundPlayer.play(":/sounds/call-outgoing.ogg", true);
         }
+
+        // log call
+        historyView.model.addItem({address: call.recipient, duration: 0, flags: call.direction});
     }
 
     states: [

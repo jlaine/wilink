@@ -150,6 +150,7 @@ class SipCall : public QXmppLoggable
     Q_OBJECT
     Q_ENUMS(Direction State)
     Q_PROPERTY(Direction direction READ direction CONSTANT)
+    Q_PROPERTY(int duration READ duration)
     Q_PROPERTY(QString errorString READ errorString NOTIFY stateChanged)
     Q_PROPERTY(QString recipient READ recipient CONSTANT)
     Q_PROPERTY(State state READ state NOTIFY stateChanged)

@@ -209,6 +209,7 @@ void PhoneHistoryModel::_q_callStateChanged(SipCall::State state)
             audioStream->setFormat(
                 channel->payloadType().channels(),
                 channel->payloadType().clockrate());
+            m_activeCalls.insert(call, audioStream);
 
             connect(audioStream, SIGNAL(inputVolumeChanged(int)),
                     this, SIGNAL(inputVolumeChanged(int)));
