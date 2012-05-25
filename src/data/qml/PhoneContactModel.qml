@@ -65,27 +65,47 @@ XmlListModel {
     }
 
     function removeContact(id) {
+        var url = xmlModel.url + id + '/';
+        var data = '_method=delete';
+
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4) {
                 if (xhr.status == 200) {
-                    console.log("done");
+                    console.log("Deleted contact: " + url);
                     xmlModel.reload();
                 } else {
-                    console.log("Failed to delete contact: " + id + " " + xhr.status + "/" + xhr.statusText);
+                    console.log("Failed to delete contact: " + url + " " + xhr.status + "/" + xhr.statusText);
                 }
             }
         }
         // FIXME: why does QML not like the "DELETE" method?
-        var url = xmlModel.url + id + '?_method=delete';
-        console.log("POST url: " + url);
         xhr.open('POST', url, true, xmlModel.username, xmlModel.password);
         xhr.setRequestHeader('Accept', 'application/xml');
-        xhr.send();
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.send(data);
     }
 
     function updateContact(id, name, phone) {
-        console.log("update contact " +id + " '" + name + "' (" + phone + ")");
+        var url = xmlModel.url + id + '/';
+        var data = 'name=' + encodeURIComponent(name);
+        data += '&phone=' + encodeURIComponent(phone);
+
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4) {
+                if (xhr.status == 200) {
+                    console.log("Updated contact: " + url);
+                    xmlModel.reload();
+                } else {
+                    console.log("Failed to update contact: " + url + " " + xhr.status + "/" + xhr.statusText);
+                }
+            }
+        };
+        xhr.open('POST', url, true, xmlModel.username, xmlModel.password);
+        xhr.setRequestHeader("Accept", "application/xml");
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.send(data);
     }
 
     query: '/contacts/contact'
