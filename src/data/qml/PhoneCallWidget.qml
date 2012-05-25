@@ -137,6 +137,11 @@ Item {
                 callWidget.soundJob.stop();
                 callWidget.soundJob = null;
             }
+            console.log("call state: " + call.state);
+            if (call.state == QXmppCall.FinishedState) {
+                console.log("call finished");
+                historyView.model.addItem({address: call.recipient, duration: 123, flags: call.direction});
+            }
         }
     }
 
