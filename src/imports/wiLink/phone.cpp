@@ -20,9 +20,6 @@
 #include <QDesktopServices>
 #include <QDomDocument>
 #include <QDomElement>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
-#include <QNetworkRequest>
 #include <QTimer>
 #include <QUrl>
 
@@ -31,59 +28,10 @@
 #include "QSoundStream.h"
 #include "QXmppRtpChannel.h"
 
-#include "declarative.h"
 #include "history.h"
 #include "phone.h"
 #include "phone/sip.h"
 
-#define FLAGS_DIRECTION 0x1
-#define FLAGS_ERROR 0x2
-
-class PhoneHistoryItem
-{
-public:
-    PhoneHistoryItem();
-    QByteArray data() const;
-    void parse(const QDomElement &element);
-
-    int id;
-    QString address;
-    QString date;
-    int duration;
-    int flags;
-
-    QSoundStream *audioStream;
-    SipCall *call;
-    QNetworkReply *reply;
-};
-
-PhoneHistoryItem::PhoneHistoryItem()
-    : id(0),
-    duration(0),
-    flags(0),
-    audioStream(0),
-    call(0),
-    reply(0)
-{
-}
-
-QByteArray PhoneHistoryItem::data() const
-{
-    QUrl data;
-    data.addQueryItem("address", address);
-    data.addQueryItem("duration", QString::number(duration));
-    data.addQueryItem("flags", QString::number(flags));
-    return data.encodedQuery();
-}
-
-void PhoneHistoryItem::parse(const QDomElement &element)
-{
-    id = element.firstChildElement("id").text().toInt();
-    address = element.firstChildElement("address").text();
-    date = element.firstChildElement("date").text();
-    duration = element.firstChildElement("duration").text().toInt();
-    flags = element.firstChildElement("flags").text().toInt();
-}
 
 /** Constructs a new model representing the call history.
  *
@@ -96,9 +44,6 @@ PhoneHistoryModel::PhoneHistoryModel(QObject *parent)
 {
     bool check;
     Q_UNUSED(check);
-
-    // http
-    m_network = new AuthenticatedNetworkAccessManager(this);
 
     // sound
     m_player = QSoundPlayer::instance();
@@ -125,10 +70,6 @@ PhoneHistoryModel::~PhoneHistoryModel()
     if (m_client->state() == SipClient::ConnectedState)
         QMetaObject::invokeMethod(m_client, "disconnectFromServer");
     m_client->deleteLater();
-
-    // delete items
-    foreach (PhoneHistoryItem *item, m_items)
-        delete item;
 }
 
 bool PhoneHistoryModel::call(const QString &address)

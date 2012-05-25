@@ -27,13 +27,8 @@
 #include "phone/sip.h"
 
 class QAuthenticator;
-class QNetworkAccessManager;
-class QNetworkReply;
-class QNetworkRequest;
 class QSoundPlayer;
 class QSoundStream;
-class QTimer;
-class PhoneHistoryItem;
 class SipCall;
 class SipClient;
 
@@ -107,11 +102,7 @@ private slots:
     void _q_openUrl(const QUrl &url);
 
 private:
-    QModelIndex createIndex(PhoneHistoryItem *item);
-
     SipClient *m_client;
-    QList<PhoneHistoryItem*> m_items;
-    QNetworkAccessManager *m_network;
     QSoundPlayer *m_player;
     bool m_registeredHandler;
     QUrl m_url;
