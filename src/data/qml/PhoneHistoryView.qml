@@ -92,7 +92,7 @@ FocusScope {
                     anchors.left: parent.left
                     anchors.leftMargin: appStyle.margin.normal
                     anchors.verticalCenter: parent.verticalCenter
-                    source: model.direction == SipCall.OutgoingDirection ? 'image://icon/call-outgoing' : 'image://icon/call-incoming'
+                    source: (model.flags & 1) == SipCall.OutgoingDirection ? 'image://icon/call-outgoing' : 'image://icon/call-incoming'
                     sourceSize.width: appStyle.icon.smallSize
                     sourceSize.height: appStyle.icon.smallSize
                 }

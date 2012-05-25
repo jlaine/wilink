@@ -407,8 +407,8 @@ PhoneHistoryModel::PhoneHistoryModel(QObject *parent)
     roleNames.insert(ActiveRole, "active");
     roleNames.insert(AddressRole, "address");
     roleNames.insert(DateRole, "date");
-    roleNames.insert(DirectionRole, "direction");
     roleNames.insert(DurationRole, "duration");
+    roleNames.insert(FlagsRole, "flags");
     roleNames.insert(IdRole, "id");
     roleNames.insert(StateRole, "state");
     setRoleNames(roleNames);
@@ -667,10 +667,10 @@ QVariant PhoneHistoryModel::data(const QModelIndex &index, int role) const
         return item->call != 0;
     case DateRole:
         return item->date;
-    case DirectionRole:
-        return item->flags & FLAGS_DIRECTION;
     case DurationRole:
         return item->call ? item->call->duration() : item->duration;
+    case FlagsRole:
+         return item->flags;
     case IdRole:
         return item->id;
     default:

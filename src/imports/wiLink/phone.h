@@ -56,8 +56,8 @@ public:
     enum Role {
         AddressRole = Qt::UserRole,
         ActiveRole,
-        DirectionRole,
         DateRole,
+        FlagsRole,
         DurationRole,
         IdRole,
         StateRole,
