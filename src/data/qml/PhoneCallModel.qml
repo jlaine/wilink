@@ -20,32 +20,13 @@
 import QtQuick 1.1
 import wiLink 2.0
 
-XmlListModel {
+PhoneXmlModel {
     id: xmlModel
-
-    property url url
-    property string username
-    property string password
-
-    function reload() {
-        console.log("PhoneCallModel reload");
-        var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState == 4) {
-                if (xhr.status == 200) {
-                    console.log(xhr.responseText);
-                    xmlModel.xml = xhr.responseText;
-                }
-            }
-        };
-        xhr.open('GET', xmlModel.url, true, xmlModel.username, xmlModel.password);
-        xhr.setRequestHeader('Accept', 'application/xml');
-        xhr.send();
-    }
 
     query: '/calls/call'
 
     XmlRole { name: 'id'; query: 'id/string()'; isKey: true }
     XmlRole { name: 'address'; query: 'address/string()' }
+    XmlRole { name: 'date'; query: 'date/string()' }
     XmlRole { name: 'duration'; query: 'duration/string()' }
 }

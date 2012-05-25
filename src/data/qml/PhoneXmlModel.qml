@@ -20,38 +20,54 @@
 import QtQuick 1.1
 import wiLink 2.0
 
-PhoneXmlModel {
+XmlListModel {
     id: xmlModel
 
-    function addContact(name, phone) {
-        var data = 'name=' + encodeURIComponent(name);
-        data += '&phone=' + encodeURIComponent(phone);
+    property url url
+    property string username
+    property string password
+
+    function reload() {
+        console.log("PhoneXmlModel reload " + xmlModel.url);
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4) {
+                if (xhr.status == 200) {
+                    xmlModel.xml = xhr.responseText;
+                }
+            }
+        };
+        xhr.open('GET', xmlModel.url, true, xmlModel.username, xmlModel.password);
+        xhr.setRequestHeader('Accept', 'application/xml');
+        xhr.send();
+    }
+
+    function addItem(props) {
+        var url = xmlModel.url;
+        var data = '';
+        for (var name in props) {
+            if (data.length)
+                data += '&';
+            data += name + '=' + encodeURIComponent(props[name]);
+        }
 
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
-            console.log("addContact readyState " + xhr.readyState);
+            console.log("addItem readyState " + xhr.readyState);
             // FIXME: for some reason, we never get past this state
             if (xhr.readyState == 3) {
                 xhr.abort();
                 xmlModel.reload();
             }
         };
-        xhr.open('POST', xmlModel.url, true, xmlModel.username, xmlModel.password);
+        xhr.open('POST', url, true, xmlModel.username, xmlModel.password);
         xhr.setRequestHeader("Accept", "application/xml");
         xhr.setRequestHeader("Connection", "close");
         xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         xhr.send(data);
     }
 
-    function getContactByPhone(phone) {
-        for (var i = 0; i < xmlModel.count; ++i) {
-            var contact = xmlModel.get(i);
-            if (contact.phone == phone)
-                return contact;
-        }
-    }
-
-    function removeContact(id) {
+    function removeItem(id) {
         var url = xmlModel.url + id + '/';
         var data = '_method=delete';
 
@@ -59,10 +75,10 @@ PhoneXmlModel {
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4) {
                 if (xhr.status == 200) {
-                    console.log("Deleted contact: " + url);
+                    console.log("Deleted item: " + url);
                     xmlModel.reload();
                 } else {
-                    console.log("Failed to delete contact: " + url + " " + xhr.status + "/" + xhr.statusText);
+                    console.log("Failed to delete item: " + url + " " + xhr.status + "/" + xhr.statusText);
                 }
             }
         }
@@ -73,10 +89,14 @@ PhoneXmlModel {
         xhr.send(data);
     }
 
-    function updateContact(id, name, phone) {
+    function updateItem(id, props) {
         var url = xmlModel.url + id + '/';
-        var data = 'name=' + encodeURIComponent(name);
-        data += '&phone=' + encodeURIComponent(phone);
+        var data = '';
+        for (var name in props) {
+            if (data.length)
+                data += '&';
+            data += name + '=' + encodeURIComponent(props[name]);
+        }
 
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
@@ -94,10 +114,4 @@ PhoneXmlModel {
         xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         xhr.send(data);
     }
-
-    query: '/contacts/contact'
-
-    XmlRole { name: 'id'; query: 'id/string()'; isKey: true }
-    XmlRole { name: 'name'; query: 'name/string()' }
-    XmlRole { name: 'phone'; query: 'phone/string()' }
 }

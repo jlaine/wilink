@@ -63,6 +63,7 @@
     <file>qml/PhoneNotification.qml</file>
     <file>qml/PhonePanel.qml</file>
     <file>qml/PhonePlugin.qml</file>
+    <file>qml/PhoneXmlModel.qml</file>
     <file>qml/PhotoAlbumDialog.qml</file>
     <file>qml/PhotoDelegate.qml</file>
     <file>qml/PhotoDeleteDialog.qml</file>
