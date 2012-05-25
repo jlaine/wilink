@@ -140,7 +140,16 @@ Item {
             if (call.state == QXmppCall.FinishedState) {
                 // FIXME: get id!
                 var id = historyView.model.get(historyView.model.count-1).id;
-                historyView.model.updateItem(id, {address: call.recipient, duration: call.duration, flags: call.direction});
+                var flags = call.direction;
+                if (call.errorString) {
+                    flags += 2;
+                    dialogSwapper.showPanel('ErrorNotification.qml', {
+                        'iconSource': 'image://icon/phone',
+                        'title': qsTr('Call failed'),
+                        'text': qsTr('Sorry, but the call could not be completed.') + '\n\n' + call.errorString,
+                    });
+                }
+                historyView.model.updateItem(id, {address: call.recipient, duration: call.duration, flags: flags});
             }
         }
     }

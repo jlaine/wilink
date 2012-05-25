@@ -51,8 +51,6 @@ public:
 
 signals:
     void currentCallsChanged();
-    void enabledChanged(bool enabled);
-    void error(const QString &error);
     void inputVolumeChanged(int inputVolume);
     void outputVolumeChanged(int outputVolume);
 
