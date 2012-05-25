@@ -28,12 +28,11 @@ XmlListModel {
     property string password
 
     function reload() {
-        console.log("reload");
+        console.log("PhoneContactModel reload");
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4) {
                 if (xhr.status == 200) {
-                    console.log(xhr.responseText);
                     xmlModel.xml = xhr.responseText;
                 }
             }
@@ -44,13 +43,12 @@ XmlListModel {
     }
 
     function addContact(name, phone) {
-        console.log("add contact '" + name + "' (" + phone + ")");
         var data = 'name=' + encodeURIComponent(name);
         data += '&phone=' + encodeURIComponent(phone);
 
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
-            console.log("xhr.readyState " + xhr.readyState);
+            console.log("addContact readyState " + xhr.readyState);
             // FIXME: for some reason, we never get past this state
             if (xhr.readyState == 3) {
                 xhr.abort();
@@ -113,8 +111,4 @@ XmlListModel {
     XmlRole { name: 'id'; query: 'id/string()'; isKey: true }
     XmlRole { name: 'name'; query: 'name/string()' }
     XmlRole { name: 'phone'; query: 'phone/string()' }
-
-    onStatusChanged: {
-        console.log("status:" + xmlModel.status + " " + xmlModel.errorString());
-    }
 }
