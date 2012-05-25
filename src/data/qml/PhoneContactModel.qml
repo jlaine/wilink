@@ -62,6 +62,14 @@ XmlListModel {
         xhr.send(data);
     }
 
+    function getContactByPhone(phone) {
+        for (var i = 0; i < xmlModel.count; ++i) {
+            var contact = xmlModel.get(i);
+            if (contact.phone == phone)
+                return contact;
+        }
+    }
+
     function removeContact(id) {
         var url = xmlModel.url + id + '/';
         var data = '_method=delete';
