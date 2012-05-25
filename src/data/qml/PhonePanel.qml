@@ -193,7 +193,7 @@ Panel {
                     text: qsTr('Clear')
 
                     onClicked: {
-                        historyModel.clear();
+                        historyView.model.clear();
                     }
                 }
             }
