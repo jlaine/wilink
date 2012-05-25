@@ -602,6 +602,9 @@ void SipCall::accept()
         response.setHeaderField("Content-Type", "application/sdp");
         response.setBody(sdp.toByteArray());
         d->client->sendMessage(response);
+
+        // notify user
+        d->client->callStarted(this);
     }
 }
 
@@ -969,6 +972,8 @@ SipCall *SipClient::call(const QString &recipient)
     d->calls << call;
 
     emit callDialled(call);
+    emit callStarted(call);
+
     return call;
 }
 

@@ -283,6 +283,9 @@ signals:
     /// To refuse the call, invoke the call's SipCall::hangup() method.
     void callReceived(SipCall *call);
 
+    /// This signal is emitted when a call (incoming or outgoing) is started.
+    void callStarted(SipCall *call);
+
     /// This signal is emitted when the logger changes.
     void loggerChanged(QXmppLogger *logger);
 

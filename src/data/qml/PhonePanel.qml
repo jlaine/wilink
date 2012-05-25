@@ -386,12 +386,22 @@ Panel {
             }
         }
 
+        Column {
+            id: widgetBar
+            objectName: 'widgetBar'
+
+            anchors.top: controls.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            z: 1
+        }
+
         PhoneHistoryView {
             id: historyView
 
             anchors.left: parent.left
             anchors.right: parent.right
-            anchors.top: controls.bottom
+            anchors.top: widgetBar.bottom
             anchors.topMargin: appStyle.spacing.vertical
             anchors.bottom: parent.bottom
             contactModel: sidebar.model
@@ -442,6 +452,26 @@ Panel {
 
     onDockClicked: {
         panel.state = (panel.state == 'no-sidebar') ? '' : 'no-sidebar';
+    }
+
+    Connections {
+        target: sipClient
+        onCallStarted: {
+            var component = Qt.createComponent('CallWidget.qml');
+
+            function finishCreation() {
+                if (component.status != Component.Ready)
+                    return;
+
+                var widget = component.createObject(widgetBar);
+                widget.call = call;
+            }
+
+            if (component.status == Component.Loading)
+                component.statusChanged.connect(finishCreation);
+            else
+                finishCreation();
+        }
     }
 
     states: State {
