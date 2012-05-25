@@ -408,19 +408,19 @@ Panel {
             model: historyModel
 
             onAddressClicked: {
-                numberEdit.text = parseAddress(address, historyModel.client.domain);
+                numberEdit.text = parseAddress(address, sipClient.domain);
             }
         }
     }
 
     Binding {
-        target: historyModel.client
+        target: sipClient
         property: 'logger'
         value: appLogger
     }
 
     Connections {
-        target: historyModel.client
+        target: sipClient
 
         onCallReceived: {
             if (historyModel.currentCalls) {
@@ -435,6 +435,23 @@ Panel {
                 'caller': parseAddress(call.recipient),
                 'swapper': swapper,
             });
+        }
+
+        onCallStarted: {
+            var component = Qt.createComponent('PhoneCallWidget.qml');
+
+            function finishCreation() {
+                if (component.status != Component.Ready)
+                    return;
+
+                var widget = component.createObject(widgetBar, {audio: historyModel});
+                widget.call = call;
+            }
+
+            if (component.status == Component.Loading)
+                component.statusChanged.connect(finishCreation);
+            else
+                finishCreation();
         }
     }
 
@@ -452,26 +469,6 @@ Panel {
 
     onDockClicked: {
         panel.state = (panel.state == 'no-sidebar') ? '' : 'no-sidebar';
-    }
-
-    Connections {
-        target: sipClient
-        onCallStarted: {
-            var component = Qt.createComponent('PhoneCallWidget.qml');
-
-            function finishCreation() {
-                if (component.status != Component.Ready)
-                    return;
-
-                var widget = component.createObject(widgetBar, {audio: historyModel});
-                widget.call = call;
-            }
-
-            if (component.status == Component.Loading)
-                component.statusChanged.connect(finishCreation);
-            else
-                finishCreation();
-        }
     }
 
     states: State {
