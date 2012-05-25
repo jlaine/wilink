@@ -75,10 +75,10 @@ XmlListModel {
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4) {
                 if (xhr.status == 200) {
-                    console.log("Deleted item: " + url);
+                    console.log("PhoneXmlModel deleted item " + url);
                     xmlModel.reload();
                 } else {
-                    console.log("Failed to delete item: " + url + " " + xhr.status + "/" + xhr.statusText);
+                    console.log("PhoneXmlModel failed to delete item " + url + ": " + xhr.status + "/" + xhr.statusText);
                 }
             }
         }
@@ -102,10 +102,10 @@ XmlListModel {
         xhr.onreadystatechange = function() {
             if (xhr.readyState == 4) {
                 if (xhr.status == 200) {
-                    console.log("Updated contact: " + url);
+                    console.log("PhoneXmlModel updated item " + url);
                     xmlModel.reload();
                 } else {
-                    console.log("Failed to update contact: " + url + " " + xhr.status + "/" + xhr.statusText);
+                    console.log("PhoneXmlModel failed to update item " + url + ": " + xhr.status + "/" + xhr.statusText);
                 }
             }
         };

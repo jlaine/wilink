@@ -184,7 +184,7 @@ FocusScope {
                             'model': contactModel});
                     }
                 } else if (item.action == 'remove') {
-                    historyView.model.removeCall(callId);
+                    historyView.model.removeItem(callId);
                 }
             }
 

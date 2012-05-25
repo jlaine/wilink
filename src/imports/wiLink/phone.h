@@ -102,7 +102,7 @@ public slots:
     void clear();
     void hangup();
     void reload();
-    void removeCall(int id);
+    void removeItem(int id);
     void startTone(int tone);
     void stopTone(int tone);
 

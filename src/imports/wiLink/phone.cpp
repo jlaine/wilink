@@ -618,7 +618,7 @@ void PhoneHistoryModel::callTick()
 void PhoneHistoryModel::clear()
 {
     foreach (PhoneHistoryItem *item, m_items)
-        removeCall(item->id);
+        removeItem(item->id);
 }
 
 /** Returns the underlying SIP client.
@@ -728,7 +728,7 @@ void PhoneHistoryModel::reload()
  *
  * @param id
  */
-void PhoneHistoryModel::removeCall(int id)
+void PhoneHistoryModel::removeItem(int id)
 {
     for (int row = 0; row < m_items.size(); ++row) {
         PhoneHistoryItem *item = m_items[row];

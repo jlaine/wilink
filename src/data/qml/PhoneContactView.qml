@@ -152,7 +152,7 @@ ContactView {
                         'contactPhone': contactPhone,
                         'model': block.model});
                 } else if (item.action == 'remove') {
-                    block.model.removeContact(contactId);
+                    block.model.removeItem(contactId);
                 }
             }
 

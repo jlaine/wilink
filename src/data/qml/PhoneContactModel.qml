@@ -23,76 +23,12 @@ import wiLink 2.0
 PhoneXmlModel {
     id: xmlModel
 
-    function addContact(name, phone) {
-        var data = 'name=' + encodeURIComponent(name);
-        data += '&phone=' + encodeURIComponent(phone);
-
-        var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function() {
-            console.log("addContact readyState " + xhr.readyState);
-            // FIXME: for some reason, we never get past this state
-            if (xhr.readyState == 3) {
-                xhr.abort();
-                xmlModel.reload();
-            }
-        };
-        xhr.open('POST', xmlModel.url, true, xmlModel.username, xmlModel.password);
-        xhr.setRequestHeader("Accept", "application/xml");
-        xhr.setRequestHeader("Connection", "close");
-        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        xhr.send(data);
-    }
-
     function getContactByPhone(phone) {
         for (var i = 0; i < xmlModel.count; ++i) {
             var contact = xmlModel.get(i);
             if (contact.phone == phone)
                 return contact;
         }
-    }
-
-    function removeContact(id) {
-        var url = xmlModel.url + id + '/';
-        var data = '_method=delete';
-
-        var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState == 4) {
-                if (xhr.status == 200) {
-                    console.log("Deleted contact: " + url);
-                    xmlModel.reload();
-                } else {
-                    console.log("Failed to delete contact: " + url + " " + xhr.status + "/" + xhr.statusText);
-                }
-            }
-        }
-        // FIXME: why does QML not like the "DELETE" method?
-        xhr.open('POST', url, true, xmlModel.username, xmlModel.password);
-        xhr.setRequestHeader('Accept', 'application/xml');
-        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        xhr.send(data);
-    }
-
-    function updateContact(id, name, phone) {
-        var url = xmlModel.url + id + '/';
-        var data = 'name=' + encodeURIComponent(name);
-        data += '&phone=' + encodeURIComponent(phone);
-
-        var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState == 4) {
-                if (xhr.status == 200) {
-                    console.log("Updated contact: " + url);
-                    xmlModel.reload();
-                } else {
-                    console.log("Failed to update contact: " + url + " " + xhr.status + "/" + xhr.statusText);
-                }
-            }
-        };
-        xhr.open('POST', url, true, xmlModel.username, xmlModel.password);
-        xhr.setRequestHeader("Accept", "application/xml");
-        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        xhr.send(data);
     }
 
     query: '/contacts/contact'

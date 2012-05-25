@@ -117,9 +117,9 @@ Dialog {
             return;
 
         if (dialog.contactId >= 0) {
-            dialog.model.updateContact(dialog.contactId, nameInput.text, phoneInput.text);
+            dialog.model.updateItem(dialog.contactId, {name: nameInput.text, phone: phoneInput.text});
         } else {
-            dialog.model.addContact(nameInput.text, phoneInput.text);
+            dialog.model.addItem({name: nameInput.text, phone: phoneInput.text});
         }
         dialog.close();
     }
