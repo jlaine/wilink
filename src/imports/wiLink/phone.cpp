@@ -132,9 +132,6 @@ PhoneHistoryModel::PhoneHistoryModel(QObject *parent)
     bool check;
     Q_UNUSED(check);
 
-    // sound
-    m_player = QSoundPlayer::instance();
-
     // sip
     m_client = new SipClient;
     check = connect(m_client, SIGNAL(callStarted(SipCall*)),
@@ -182,29 +179,6 @@ int PhoneHistoryModel::currentCalls() const
     return m_activeCalls.size();
 }
 
-int PhoneHistoryModel::inputVolume() const
-{
-    foreach (QSoundStream *audioStream, m_activeCalls.values()) {
-        if (audioStream)
-            return audioStream->inputVolume();
-    }
-    return 0;
-}
-
-int PhoneHistoryModel::maximumVolume() const
-{
-    return QSoundMeter::maximum();
-}
-
-int PhoneHistoryModel::outputVolume() const
-{
-    foreach (QSoundStream *audioStream, m_activeCalls.values()) {
-        if (audioStream)
-            return audioStream->outputVolume();
-    }
-    return 0;
-}
-
 /** Starts sending a tone.
  *
  * @param tone
@@ -214,7 +188,7 @@ void PhoneHistoryModel::startTone(int toneValue)
     if (toneValue < QXmppRtpAudioChannel::Tone_0 || toneValue > QXmppRtpAudioChannel::Tone_D)
         return;
     QXmppRtpAudioChannel::Tone tone = static_cast<QXmppRtpAudioChannel::Tone>(toneValue);
-    foreach (SipCall *call, m_activeCalls.keys())
+    foreach (SipCall *call, m_activeCalls)
         call->audioChannel()->startTone(tone);
 }
 
@@ -227,13 +201,13 @@ void PhoneHistoryModel::stopTone(int toneValue)
     if (toneValue < QXmppRtpAudioChannel::Tone_0 || toneValue > QXmppRtpAudioChannel::Tone_D)
         return;
     QXmppRtpAudioChannel::Tone tone = static_cast<QXmppRtpAudioChannel::Tone>(toneValue);
-    foreach (SipCall *call, m_activeCalls.keys())
+    foreach (SipCall *call, m_activeCalls)
         call->audioChannel()->stopTone(tone);
 }
 
 void PhoneHistoryModel::_q_callStarted(SipCall *sipCall)
 {
-    m_activeCalls.insert(sipCall, 0);
+    m_activeCalls.insert(sipCall);
     connect(sipCall, SIGNAL(stateChanged(SipCall::State)),
             this, SLOT(_q_callStateChanged(SipCall::State)));
     emit currentCallsChanged();

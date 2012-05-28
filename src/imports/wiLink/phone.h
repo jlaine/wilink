@@ -72,9 +72,6 @@ class PhoneHistoryModel : public QObject
     Q_OBJECT
     Q_PROPERTY(SipClient* client READ client CONSTANT)
     Q_PROPERTY(int currentCalls READ currentCalls NOTIFY currentCallsChanged)
-    Q_PROPERTY(int inputVolume READ inputVolume NOTIFY inputVolumeChanged)
-    Q_PROPERTY(int maximumVolume READ maximumVolume CONSTANT)
-    Q_PROPERTY(int outputVolume READ outputVolume NOTIFY outputVolumeChanged)
 
 public:
     PhoneHistoryModel(QObject *parent = 0);
@@ -82,14 +79,9 @@ public:
 
     SipClient *client() const;
     int currentCalls() const;
-    int inputVolume() const;
-    int maximumVolume() const;
-    int outputVolume() const;
 
 signals:
     void currentCallsChanged();
-    void inputVolumeChanged(int inputVolume);
-    void outputVolumeChanged(int outputVolume);
 
 public slots:
     bool call(const QString &address);
@@ -102,9 +94,8 @@ private slots:
     void _q_openUrl(const QUrl &url);
 
 private:
-    QMap<SipCall*, QSoundStream*> m_activeCalls;
+    QSet<SipCall*> m_activeCalls;
     SipClient *m_client;
-    QSoundPlayer *m_player;
     bool m_registeredHandler;
 };
 

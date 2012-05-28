@@ -298,62 +298,6 @@ Panel {
                     }
                 }
             }
-
-            Item {
-                anchors.top: keypad.top
-                anchors.bottom: keypad.bottom
-                width: 32
-
-                ProgressBar {
-                    id: inputVolume
-
-                    anchors.top: parent.top
-                    anchors.bottom: inputIcon.top
-                    anchors.bottomMargin: appStyle.spacing.vertical
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    orientation: Qt.Vertical
-                    maximumValue: Qt.isQtObject(historyModel) ? historyModel.maximumVolume : 100
-                    value: Qt.isQtObject(historyModel) ? historyModel.inputVolume : 0
-                }
-
-                Image {
-                    id: inputIcon
-
-                    anchors.bottom: parent.bottom
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    source: 'image://icon/audio-input'
-                    sourceSize.height: 32
-                    sourceSize.width: 32
-                }
-            }
-
-            Item {
-                anchors.top: keypad.top
-                anchors.bottom: keypad.bottom
-                width: 32
-
-                ProgressBar {
-                    id: outputVolume
-
-                    anchors.top: parent.top
-                    anchors.bottom: outputIcon.top
-                    anchors.bottomMargin: appStyle.spacing.vertical
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    orientation: Qt.Vertical
-                    maximumValue: Qt.isQtObject(historyModel) ? historyModel.maximumVolume : 100
-                    value: Qt.isQtObject(historyModel) ? historyModel.outputVolume : 0
-                }
-
-                Image {
-                    id: outputIcon
-
-                    anchors.bottom: parent.bottom
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    source: 'image://icon/audio-output'
-                    sourceSize.height: 32
-                    sourceSize.width: 32
-                }
-            }
         }
 
         Column {
