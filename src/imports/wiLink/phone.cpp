@@ -244,46 +244,10 @@ void PhoneHistoryModel::_q_callStateChanged(SipCall::State state)
     SipCall *call = qobject_cast<SipCall*>(sender());
     Q_ASSERT(call);
 
-    // update the item
-    if (state == SipCall::ActiveState) {
-
-        // start audio input / output
-        if (!m_activeCalls.value(call)) {
-            QXmppRtpAudioChannel *channel = call->audioChannel();
-            channel->setParent(0);
-            channel->moveToThread(m_player->soundThread());
-
-            QSoundStream *audioStream = new QSoundStream(m_player);
-            audioStream->setDevice(channel);
-            audioStream->setFormat(
-                channel->payloadType().channels(),
-                channel->payloadType().clockrate());
-            m_activeCalls.insert(call, audioStream);
-
-            connect(audioStream, SIGNAL(inputVolumeChanged(int)),
-                    this, SIGNAL(inputVolumeChanged(int)));
-            connect(audioStream, SIGNAL(outputVolumeChanged(int)),
-                    this, SIGNAL(outputVolumeChanged(int)));
-
-            audioStream->moveToThread(m_player->soundThread());
-            QMetaObject::invokeMethod(audioStream, "startOutput");
-            QMetaObject::invokeMethod(audioStream, "startInput");
-        }
-
-    } else if (state == SipCall::FinishedState) {
-        // stop audio input / output
-        QSoundStream *audioStream = m_activeCalls.value(call);
-        if (audioStream) {
-            audioStream->stopInput();
-            audioStream->stopOutput();
-        }
-
+    if (state == SipCall::FinishedState) {
         call->disconnect(this);
         m_activeCalls.remove(call);
-
         emit currentCallsChanged();
-        emit inputVolumeChanged(0);
-        emit outputVolumeChanged(0);
 
         // FIXME: ugly workaround for a race condition causing a crash in
         // PhoneNotification.qml

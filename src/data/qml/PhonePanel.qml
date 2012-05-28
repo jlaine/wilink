@@ -413,7 +413,7 @@ Panel {
                 if (component.status != Component.Ready)
                     return;
 
-                var widget = component.createObject(widgetBar, {audio: historyModel});
+                var widget = component.createObject(widgetBar);
                 widget.call = call;
             }
 

@@ -23,7 +23,6 @@ import wiLink 2.0
 Item {
     id: callWidget
 
-    property QtObject audio
     property QtObject call: null
     property QtObject soundJob
 
@@ -32,6 +31,12 @@ Item {
     clip: true
     height: frame.height
     z: 5
+
+    PhoneAudioHelper {
+        id: audio
+
+        call: callWidget.call
+    }
 
     Rectangle {
         id: background
