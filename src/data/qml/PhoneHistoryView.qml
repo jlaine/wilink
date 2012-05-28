@@ -154,6 +154,16 @@ FocusScope {
                 }
             }
         }
+
+        model: PhoneXmlModel {
+            query: '/calls/call'
+
+            XmlRole { name: 'id'; query: 'id/string()'; isKey: true }
+            XmlRole { name: 'address'; query: 'address/string()' }
+            XmlRole { name: 'date'; query: 'date/string()' }
+            XmlRole { name: 'duration'; query: 'duration/string()' }
+            XmlRole { name: 'flags'; query: 'flags/string()' }
+        }
     }
 
     Component {

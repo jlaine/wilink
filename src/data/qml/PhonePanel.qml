@@ -168,7 +168,6 @@ Panel {
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.left: parent.left
-        model: PhoneContactModel {}
         visible: width > 0
         width: panel.singlePanel ? parent.width : appStyle.sidebarWidth
         z: 1
@@ -347,7 +346,6 @@ Panel {
             anchors.topMargin: appStyle.spacing.vertical
             anchors.bottom: parent.bottom
             contactModel: sidebar.model
-            model: PhoneCallModel {}
 
             onAddressClicked: {
                 numberEdit.text = parseAddress(address, sipClient.domain);

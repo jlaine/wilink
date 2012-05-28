@@ -18,7 +18,6 @@
  */
 
 #include <QDesktopServices>
-#include <QTimer>
 #include <QUrl>
 
 #include "QSoundMeter.h"
@@ -124,24 +123,7 @@ void PhoneAudioHelper::_q_callStateChanged(SipCall::State state)
     }
 }
 
-/** Constructs a new model representing the call history.
- *
- * @param network
- * @param parent
- */
-PhoneHistoryModel::PhoneHistoryModel(QObject *parent)
-    : QObject(parent)
-    , m_registeredHandler(false)
-{
-    bool check;
-    Q_UNUSED(check);
-
-    // sip
-    m_client = new SipClient;
-    check = connect(m_client, SIGNAL(callStarted(SipCall*)),
-                    this, SLOT(_q_callStarted(SipCall*)));
-    Q_ASSERT(check);
-
+#if 0
     // register URL handler
     if (!m_registeredHandler) {
         HistoryMessage::addTransform(QRegExp("^(.*\\s)?(\\+?[0-9]{4,})(\\s.*)?$"),
@@ -149,90 +131,12 @@ PhoneHistoryModel::PhoneHistoryModel(QObject *parent)
         QDesktopServices::setUrlHandler("sip", this, "_q_openUrl");
         m_registeredHandler = true;
     }
-}
 
-PhoneHistoryModel::~PhoneHistoryModel()
-{
-    // try to exit SIP client cleanly
-    if (m_client->state() == SipClient::ConnectedState)
-        m_client->disconnectFromServer();
-    m_client->deleteLater();
-}
-
-/** Returns the underlying SIP client.
- *
- * \note Use with care as the SIP client lives in a different thread!
- */
-SipClient *PhoneHistoryModel::client() const
-{
-    return m_client;
-}
-
-int PhoneHistoryModel::currentCalls() const
-{
-    return m_activeCalls.size();
-}
-
-/** Starts sending a tone.
- *
- * @param tone
- */
-void PhoneHistoryModel::startTone(int toneValue)
-{
-    if (toneValue < QXmppRtpAudioChannel::Tone_0 || toneValue > QXmppRtpAudioChannel::Tone_D)
-        return;
-    QXmppRtpAudioChannel::Tone tone = static_cast<QXmppRtpAudioChannel::Tone>(toneValue);
-    foreach (SipCall *call, m_activeCalls)
-        call->audioChannel()->startTone(tone);
-}
-
-/** Stops sending a tone.
- *
- * @param tone
- */
-void PhoneHistoryModel::stopTone(int toneValue)
-{
-    if (toneValue < QXmppRtpAudioChannel::Tone_0 || toneValue > QXmppRtpAudioChannel::Tone_D)
-        return;
-    QXmppRtpAudioChannel::Tone tone = static_cast<QXmppRtpAudioChannel::Tone>(toneValue);
-    foreach (SipCall *call, m_activeCalls)
-        call->audioChannel()->stopTone(tone);
-}
-
-void PhoneHistoryModel::_q_callStarted(SipCall *sipCall)
-{
-    m_activeCalls.insert(sipCall);
-    connect(sipCall, SIGNAL(stateChanged(SipCall::State)),
-            this, SLOT(_q_callStateChanged(SipCall::State)));
-    emit currentCallsChanged();
-}
-
-void PhoneHistoryModel::_q_callStateChanged(SipCall::State state)
-{
-    SipCall *call = qobject_cast<SipCall*>(sender());
-    Q_ASSERT(call);
-
-    if (state == SipCall::FinishedState) {
-        call->disconnect(this);
-        m_activeCalls.remove(call);
-        emit currentCallsChanged();
-    }
-}
-
-void PhoneHistoryModel::_q_openUrl(const QUrl &url)
-{
-    if (url.scheme() != "sip") {
-        qWarning("PhoneHistoryModel got a non-SIP URL!");
-        return;
-    }
-
-    if (!url.path().isEmpty()) {
+    // response to URL
+    if (url.scheme() == "sip" && !url.path().isEmpty()) {
         const QString phoneNumber = url.path().split('@').first();
         const QString recipient = QString("\"%1\" <%2>").arg(phoneNumber, url.toString());
         m_client->call(recipient);
     }
-    // FIXME
-    //emit showPanel();
-}
-
+#endif
 

@@ -65,37 +65,4 @@ private:
     QSoundStream *m_stream;
 };
 
-/** The PhoneHistoryModel class represents the user's phone call history.
- */
-class PhoneHistoryModel : public QObject
-{
-    Q_OBJECT
-    Q_PROPERTY(SipClient* client READ client CONSTANT)
-    Q_PROPERTY(int currentCalls READ currentCalls NOTIFY currentCallsChanged)
-
-public:
-    PhoneHistoryModel(QObject *parent = 0);
-    ~PhoneHistoryModel();
-
-    SipClient *client() const;
-    int currentCalls() const;
-
-signals:
-    void currentCallsChanged();
-
-public slots:
-    void startTone(int tone);
-    void stopTone(int tone);
-
-private slots:
-    void _q_callStarted(SipCall *call);
-    void _q_callStateChanged(SipCall::State state);
-    void _q_openUrl(const QUrl &url);
-
-private:
-    QSet<SipCall*> m_activeCalls;
-    SipClient *m_client;
-    bool m_registeredHandler;
-};
-
 #endif

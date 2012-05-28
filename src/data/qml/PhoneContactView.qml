@@ -129,6 +129,24 @@ ContactView {
         ]
     }
 
+    model: PhoneXmlModel {
+        id: xmlModel
+
+        function getContactByPhone(phone) {
+            for (var i = 0; i < xmlModel.count; ++i) {
+                var contact = xmlModel.get(i);
+                if (contact.phone == phone)
+                    return contact;
+            }
+        }
+
+        query: '/contacts/contact'
+
+        XmlRole { name: 'id'; query: 'id/string()' }
+        XmlRole { name: 'name'; query: 'name/string()' }
+        XmlRole { name: 'phone'; query: 'phone/string()' }
+    }
+
     onAddClicked: {
         dialogSwapper.showPanel('PhoneContactDialog.qml', {'model': block.model});
     }

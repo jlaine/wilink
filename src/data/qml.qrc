@@ -55,10 +55,8 @@
     <file>qml/PanelHeader.qml</file>
     <file>qml/PanelHelp.qml</file>
     <file>qml/PanelSwapper.qml</file>
-    <file>qml/PhoneCallModel.qml</file>
     <file>qml/PhoneCallWidget.qml</file>
     <file>qml/PhoneContactDialog.qml</file>
-    <file>qml/PhoneContactModel.qml</file>
     <file>qml/PhoneContactView.qml</file>
     <file>qml/PhoneHistoryView.qml</file>
     <file>qml/PhoneNotification.qml</file>
