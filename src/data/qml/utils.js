@@ -21,15 +21,19 @@
 
 function datetimeFromString(text)
 {
+    function parseZeroInt(txt) {
+        return parseInt(txt.replace(/^0/, ''));
+    }
+
     var cap = text.match(/([0-9]{4})-([0-9]{2})-([0-9]{2})T([0-9]{2}):([0-9]{2}):([0-9]{2})Z/);
     if (cap) {
         var dt = new Date();
         dt.setUTCFullYear(parseInt(cap[1]));
-        dt.setUTCMonth(parseInt(cap[2]) - 1);
-        dt.setUTCDate(parseInt(cap[3]));
-        dt.setUTCHours(parseInt(cap[4]));
-        dt.setUTCMinutes(parseInt(cap[5]));
-        dt.setUTCSeconds(parseInt(cap[6]));
+        dt.setUTCMonth(parseZeroInt(cap[2]) - 1);
+        dt.setUTCDate(parseZeroInt(cap[3]));
+        dt.setUTCHours(parseZeroInt(cap[4]));
+        dt.setUTCMinutes(parseZeroInt(cap[5]));
+        dt.setUTCSeconds(parseZeroInt(cap[6]));
         return dt;
     }
 }
