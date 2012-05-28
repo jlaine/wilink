@@ -28,6 +28,43 @@ class QUrl;
 class SipCall;
 class SipClient;
 
+class PhoneAudioHelper : public QObject
+{
+    Q_OBJECT
+    Q_PROPERTY(SipCall* call READ call WRITE setCall NOTIFY callChanged)
+    Q_PROPERTY(int inputVolume READ inputVolume NOTIFY inputVolumeChanged)
+    Q_PROPERTY(int maximumVolume READ maximumVolume CONSTANT)
+    Q_PROPERTY(int outputVolume READ outputVolume NOTIFY outputVolumeChanged)
+
+public:
+    PhoneAudioHelper(QObject *parent = 0);
+    ~PhoneAudioHelper();
+
+    SipCall *call() const;
+    void setCall(SipCall *call);
+
+    int inputVolume() const;
+    int maximumVolume() const;
+    int outputVolume() const;
+
+signals:
+    // This signal is emitted when the call changes.
+    void callChanged();
+
+    // This signal is emitted when the input volume changes.
+    void inputVolumeChanged(int volume);
+
+    // This signal is emitted when the output volume changes.
+    void outputVolumeChanged(int volume);
+
+private slots:
+    void _q_callStateChanged(SipCall::State state);
+
+private:
+    SipCall *m_call;
+    QSoundStream *m_stream;
+};
+
 /** The PhoneHistoryModel class represents the user's phone call history.
  */
 class PhoneHistoryModel : public QObject

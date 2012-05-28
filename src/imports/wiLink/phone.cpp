@@ -30,6 +30,95 @@
 #include "phone.h"
 #include "phone/sip.h"
 
+PhoneAudioHelper::PhoneAudioHelper(QObject *parent)
+    : QObject(parent)
+    , m_call(0)
+{
+    QSoundPlayer *player = QSoundPlayer::instance();
+    m_stream = new QSoundStream(player);
+    connect(m_stream, SIGNAL(inputVolumeChanged(int)),
+            this, SIGNAL(inputVolumeChanged(int)));
+    connect(m_stream, SIGNAL(outputVolumeChanged(int)),
+            this, SIGNAL(outputVolumeChanged(int)));
+    m_stream->moveToThread(player->soundThread());
+}
+
+PhoneAudioHelper::~PhoneAudioHelper()
+{
+}
+
+SipCall *PhoneAudioHelper::call() const
+{
+    return m_call;
+}
+
+void PhoneAudioHelper::setCall(SipCall *call)
+{
+    if (call != m_call) {
+        // disconnect old signals
+        if (m_call)
+            m_call->disconnect(this);
+
+        // connect new signals
+        m_call = call;
+        if (m_call) {
+            bool check;
+
+            m_call->audioChannel()->setParent(0);
+            m_call->audioChannel()->moveToThread(m_stream->thread());
+
+            check = connect(m_call, SIGNAL(stateChanged(SipCall::State)),
+                            this, SLOT(_q_callStateChanged(SipCall::State)));
+            Q_ASSERT(check);
+            Q_UNUSED(check);
+
+            _q_callStateChanged(m_call->state());
+        }
+
+        // change call
+        emit callChanged();
+    }
+}
+
+int PhoneAudioHelper::inputVolume() const
+{
+    return m_stream->inputVolume();
+}
+
+int PhoneAudioHelper::maximumVolume() const
+{
+    return m_stream->maximumVolume();
+}
+
+int PhoneAudioHelper::outputVolume() const
+{
+    return m_stream->outputVolume();
+}
+
+void PhoneAudioHelper::_q_callStateChanged(SipCall::State state)
+{
+    Q_ASSERT(m_call);
+
+    if (state == SipCall::ActiveState) {
+        // start audio input / output
+        QXmppRtpAudioChannel *channel = m_call->audioChannel();
+        m_stream->setDevice(channel);
+        m_stream->setFormat(
+            m_call->audioChannel()->payloadType().channels(),
+            m_call->audioChannel()->payloadType().clockrate());
+
+        QMetaObject::invokeMethod(m_stream, "startOutput");
+        QMetaObject::invokeMethod(m_stream, "startInput");
+
+    } else if (state == SipCall::FinishedState) {
+        // stop audio input / output
+        QMetaObject::invokeMethod(m_stream, "stopInput");
+        QMetaObject::invokeMethod(m_stream, "stopOutput");
+
+        emit inputVolumeChanged(0);
+        emit outputVolumeChanged(0);
+    }
+}
 
 /** Constructs a new model representing the call history.
  *
