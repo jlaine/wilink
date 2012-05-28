@@ -132,18 +132,26 @@ QString HistoryMessage::html(const QString &meName) const
     if (!meName.isEmpty() && re.exactMatch(body))
         return QString("<b>%1 %2</b>").arg(meName, Qt::escape(re.cap(1)));
 
-    const QStringList input = body.split(QRegExp("[ \t]+"));
-    QStringList output;
-    foreach (const QString &token, input) {
-        QString tokenHtml = transformToken(token);
-        foreach (const TextTransform &transform, textTransforms)
-            tokenHtml.replace(transform.first, transform.second);
-        output << tokenHtml;
+    // remove trailing whitespace
+    int pos = body.size() - 1;
+    while (pos >= 0 && body.at(pos).isSpace())
+        pos--;
+
+    // transform each line into HTML
+    QStringList htmlLines;
+    foreach (const QString &textLine, body.left(pos+1).split('\n')) {
+        QStringList output;
+        const QStringList input = textLine.split(QRegExp("[ \t]+"));
+        foreach (const QString &token, input) {
+            QString tokenHtml = transformToken(token);
+            foreach (const TextTransform &transform, textTransforms)
+                tokenHtml.replace(transform.first, transform.second);
+            output << tokenHtml;
+        }
+        htmlLines << output.join(" ");
     }
 
-    QString bodyHtml = output.join(" ");
-    bodyHtml.replace("\n", "<br/>");
-    return bodyHtml;
+    return htmlLines.join("<br/>");
 }
 
 /** Returns true if the message is an "action" message, such
