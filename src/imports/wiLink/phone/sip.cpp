@@ -1114,9 +1114,9 @@ void SipClient::datagramReceived()
             emitCall = true;
         }
         if (currentCall) {
+            currentCall->d->handleRequest(reply);
             if (emitCall)
                 emit callReceived(currentCall);
-            currentCall->d->handleRequest(reply);
         }
     } else if (reply.isReply()) {
         if (currentCall)
