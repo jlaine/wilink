@@ -50,29 +50,14 @@ Q_DECLARE_METATYPE(SipCall::State)
 #define SIP_T1_TIMER 500
 #define SIP_T2_TIMER 4000
 
-const char *sipAddressPattern = "(.*)<(sip:([^>]+))>(;.+)?";
-
 enum StunStep {
     StunConnectivity = 0,
     StunChangeServer,
 };
 
-QString sipAddressToName(const QString &address)
+static QString sipAddressToUri(const QString &address)
 {
-    QRegExp rx(sipAddressPattern);
-    if (!rx.exactMatch(address)) {
-        qWarning("Bad address %s", qPrintable(address));
-        return QString();
-    }
-    QString name = rx.cap(1).trimmed();
-    if (name.startsWith('"') && name.endsWith('"'))
-        name = name.mid(1, name.size() - 2);
-    return name.isEmpty() ? rx.cap(3).split('@').first() : name;
-}
-
-QString sipAddressToUri(const QString &address)
-{
-    QRegExp rx(sipAddressPattern);
+    QRegExp rx("(.*)<(sip:([^>]+))>(;.+)?");
     if (!rx.exactMatch(address)) {
         qWarning("Bad address %s", qPrintable(address));
         return QString();
@@ -984,8 +969,6 @@ void SipClient::callDestroyed(QObject *object)
 
 void SipClient::connectToServer()
 {
-    qDebug("Connect to server..");
-
     // schedule retry
     d->connectTimer->start(60000);
 
