@@ -130,8 +130,8 @@ void QSoundStream::startInput()
         d->audioInput->setBufferSize(bufferSize);
         d->audioInput->start(d->audioInputMeter);
 
-        qDebug("Audio input initialized in %i ms", tm.elapsed());
-        qDebug("Audio input buffer size %i (asked for %i)", d->audioInput->bufferSize(), bufferSize);
+        qDebug("QSoundStream audio input initialized in %i ms", tm.elapsed());
+        qDebug("QSoundStream audio input buffer size %i (asked for %i)", d->audioInput->bufferSize(), bufferSize);
     }
 }
 
@@ -177,8 +177,8 @@ void QSoundStream::startOutput()
         d->audioOutput->setBufferSize(bufferSize);
         d->audioOutput->start(d->audioOutputMeter);
 
-        qDebug("Audio output initialized in %i ms", tm.elapsed());
-        qDebug("Audio output buffer size %i (asked for %i)", d->audioOutput->bufferSize(), bufferSize);
+        qDebug("QSoundStream audio output initialized in %i ms", tm.elapsed());
+        qDebug("QSoundStream audio output buffer size %i (asked for %i)", d->audioOutput->bufferSize(), bufferSize);
     }
 }
 
@@ -225,7 +225,7 @@ void QSoundStream::_q_audioInputStateChanged()
     // NOTE: seen on Mac OS X 10.6
     if (d->audioInput->state() == QAudio::IdleState &&
             d->audioInput->error() == QAudio::UnderrunError) {
-        qWarning("Audio input needs restart due to buffer underrun");
+        qWarning("QSoundStream audio input needs restart due to buffer underrun");
         d->audioInput->start(d->audioInputMeter);
     }
 }
@@ -243,7 +243,7 @@ void QSoundStream::_q_audioOutputStateChanged()
     // NOTE: seen on Linux with pulseaudio
     if (d->audioOutput->state() == QAudio::IdleState &&
             d->audioOutput->error() == QAudio::UnderrunError) {
-        qWarning("Audio output needs restart due to buffer underrun");
+        qWarning("QSoundStream audio output needs restart due to buffer underrun");
         d->audioOutput->start(d->audioOutputMeter);
     }
 }
