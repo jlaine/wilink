@@ -142,10 +142,12 @@ Panel {
         z: 1
 
         onItemClicked: {
-            var address = buildAddress(model.phone, sipClient.domain);
-            sipClient.call(address);
-            if (panel.singlePanel)
-                panel.state = 'no-sidebar';
+            if (callButton.enabled) {
+                var address = buildAddress(model.phone, sipClient.domain);
+                sipClient.call(address);
+                if (panel.singlePanel)
+                    panel.state = 'no-sidebar';
+            }
         }
     }
 
@@ -168,6 +170,7 @@ Panel {
             subTitle: panel.phoneNumber ? qsTr('Your number is %1').replace('%1', panel.phoneNumber) : ''
             toolBar: ToolBar {
                 ToolButton {
+                    enabled: callButton.enabled
                     iconSource: 'image://icon/call'
                     text: qsTr('Voicemail')
                     visible: panel.voicemailNumber != ''
@@ -252,7 +255,7 @@ Panel {
 
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
-                    enabled: sipClient.state == SipClient.ConnectedState && !historyModel.currentCalls
+                    enabled: sipClient.state == SipClient.ConnectedState && !sipClient.activeCalls
                     iconSource: 'image://icon/call'
                     text: qsTr('Call')
 
@@ -283,12 +286,12 @@ Panel {
                 id: keypad
 
                 onKeyPressed: {
-                    if (historyModel.currentCalls)
+                    if (sipClient.activeCalls)
                         historyModel.startTone(key.tone);
                 }
 
                 onKeyReleased: {
-                    if (historyModel.currentCalls)
+                    if (sipClient.activeCalls)
                         historyModel.stopTone(key.tone);
                     else {
                         var oldPos = numberEdit.cursorPosition;
@@ -324,6 +327,12 @@ Panel {
             onAddressClicked: {
                 numberEdit.text = parseAddress(address, sipClient.domain);
             }
+
+            onAddressDoubleClicked: {
+                if (callButton.enabled) {
+                    sipClient.call(address);
+                }
+            }
         }
     }
 
@@ -337,7 +346,7 @@ Panel {
         target: sipClient
 
         onCallReceived: {
-            if (historyModel.currentCalls) {
+            if (sipClient.activeCalls) {
                 // if already busy, refuse call
                 call.hangup();
                 return;

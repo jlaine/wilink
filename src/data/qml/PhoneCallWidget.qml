@@ -175,6 +175,9 @@ Item {
             name: 'inactive'
             when: Qt.isQtObject(call) && call.state == QXmppCall.FinishedState
             PropertyChanges { target: callWidget; opacity: 0 }
+            StateChangeScript {
+                script: callWidget.destroy(1000)
+            }
         }
     ]
 

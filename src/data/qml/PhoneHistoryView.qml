@@ -28,6 +28,7 @@ FocusScope {
     property QtObject contactModel
     property alias model: historyView.model
     signal addressClicked(string address)
+    signal addressDoubleClicked(string address)
 
     function contactName(address) {
         var phone = Sip.parseAddress(address, sipClient.domain);
@@ -148,7 +149,7 @@ FocusScope {
                 }
                 onDoubleClicked: {
                     if (mouse.button == Qt.LeftButton) {
-                        sipClient.call(address);
+                        block.addressDoubleClicked(model.address);
                     }
                 }
             }
@@ -167,7 +168,7 @@ FocusScope {
             onItemClicked: {
                 var item = menu.model.get(index);
                 if (item.action == 'call') {
-                    sipClient.call(callAddress)
+                    block.addressDoubleClicked(callAddress);
                 } else if (item.action == 'contact') {
                     var callPhone = Sip.parseAddress(callAddress, sipClient.domain);
                     var contact = contactModel.getContactByPhone(callPhone);

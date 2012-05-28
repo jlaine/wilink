@@ -232,6 +232,7 @@ class SipClient : public QXmppLoggable
 {
     Q_OBJECT
     Q_ENUMS(State)
+    Q_PROPERTY(int activeCalls READ activeCalls NOTIFY activeCallsChanged)
     Q_PROPERTY(QXmppLogger* logger READ logger WRITE setLogger NOTIFY loggerChanged)
     Q_PROPERTY(State state READ state NOTIFY stateChanged)
     Q_PROPERTY(QString displayName READ displayName WRITE setDisplayName)
@@ -252,7 +253,7 @@ public:
     SipClient(QObject *parent = 0);
     ~SipClient();
 
-    SipClient::State state() const;
+    int activeCalls() const;
 
     QString displayName() const;
     void setDisplayName(const QString &displayName);
@@ -268,12 +269,17 @@ public:
     QString password() const;
     void setPassword(const QString &password);
 
+    SipClient::State state() const;
+
     QString username() const;
     void setUsername(const QString &user);
 
 signals:
     void connected();
     void disconnected();
+
+    /// This signal is emitted when the number of active calls changes.
+    void activeCallsChanged(int calls);
 
     /// This signal is emitted when a new incoming call is received.
     ///

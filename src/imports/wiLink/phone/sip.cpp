@@ -949,6 +949,11 @@ SipClient::~SipClient()
     delete d;
 }
 
+int SipClient::activeCalls() const
+{
+    return d->calls.size();
+}
+
 SipCall *SipClient::call(const QString &recipient)
 {
     if (d->state != ConnectedState) {
@@ -965,6 +970,7 @@ SipCall *SipClient::call(const QString &recipient)
             this, SLOT(callDestroyed(QObject*)));
     d->calls << call;
 
+    emit activeCallsChanged(d->calls.size());
     emit callStarted(call);
 
     return call;
@@ -973,6 +979,7 @@ SipCall *SipClient::call(const QString &recipient)
 void SipClient::callDestroyed(QObject *object)
 {
     d->calls.removeAll(static_cast<SipCall*>(object));
+    emit activeCallsChanged(d->calls.size());
 }
 
 void SipClient::connectToServer()
