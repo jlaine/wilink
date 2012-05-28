@@ -51,7 +51,6 @@ PhoneHistoryModel::PhoneHistoryModel(QObject *parent)
     check = connect(m_client, SIGNAL(callStarted(SipCall*)),
                     this, SLOT(_q_callStarted(SipCall*)));
     Q_ASSERT(check);
-    m_client->moveToThread(m_player->soundThread());
 
     // register URL handler
     if (!m_registeredHandler) {
@@ -66,7 +65,7 @@ PhoneHistoryModel::~PhoneHistoryModel()
 {
     // try to exit SIP client cleanly
     if (m_client->state() == SipClient::ConnectedState)
-        QMetaObject::invokeMethod(m_client, "disconnectFromServer");
+        m_client->disconnectFromServer();
     m_client->deleteLater();
 }
 
@@ -74,7 +73,7 @@ bool PhoneHistoryModel::call(const QString &address)
 {
     if (m_client->state() == SipClient::ConnectedState &&
         !currentCalls()) {
-        QMetaObject::invokeMethod(m_client, "call", Q_ARG(QString, address));
+        m_client->call(address);
         return true;
     }
     return false;
@@ -162,6 +161,8 @@ void PhoneHistoryModel::_q_callStateChanged(SipCall::State state)
         // start audio input / output
         if (!m_activeCalls.value(call)) {
             QXmppRtpAudioChannel *channel = call->audioChannel();
+            channel->setParent(0);
+            channel->moveToThread(m_player->soundThread());
 
             QSoundStream *audioStream = new QSoundStream(m_player);
             audioStream->setDevice(channel);
