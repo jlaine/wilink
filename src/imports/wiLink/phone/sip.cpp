@@ -752,12 +752,6 @@ void SipCall::hangup()
         d->state == SipCall::FinishedState)
         return;
 
-    // check we are in the right thread
-    if (QThread::currentThread() != thread()) {
-        QMetaObject::invokeMethod(this, "hangup", Qt::QueuedConnection);
-        return;
-    }
-
     debug(QString("SIP call %1 hangup").arg(
             QString::fromUtf8(d->id)));
     d->setState(SipCall::DisconnectingState);
@@ -929,7 +923,7 @@ SipClient::SipClient(QObject *parent)
 
     d->connectTimer = new QTimer(this);
     check = connect(d->connectTimer, SIGNAL(timeout()),
-                    this, SLOT(_q_connectToServer()));
+                    this, SLOT(connectToServer()));
     Q_ASSERT(check);
 
     d->stunTimer = new QTimer(this);
@@ -971,7 +965,6 @@ SipCall *SipClient::call(const QString &recipient)
             this, SLOT(callDestroyed(QObject*)));
     d->calls << call;
 
-    emit callDialled(call);
     emit callStarted(call);
 
     return call;
@@ -983,11 +976,6 @@ void SipClient::callDestroyed(QObject *object)
 }
 
 void SipClient::connectToServer()
-{
-    QMetaObject::invokeMethod(this, "_q_connectToServer");
-}
-
-void SipClient::_q_connectToServer()
 {
     qDebug("Connect to server..");
 

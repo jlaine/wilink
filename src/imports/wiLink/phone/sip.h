@@ -275,9 +275,6 @@ signals:
     void connected();
     void disconnected();
 
-    /// This signal is emitted when a new outgoing call is dialled.
-    void callDialled(SipCall *call);
-
     /// This signal is emitted when a new incoming call is received.
     ///
     /// To accept the call, invoke the call's SipCall::accept() method.
@@ -307,7 +304,6 @@ private slots:
     void datagramReceived();
     void registerWithServer();
     void sendStun();
-    void _q_connectToServer();
     void _q_sipDnsLookupFinished();
     void _q_sipHostInfoFinished(const QHostInfo &info);
     void _q_stunDnsLookupFinished();
