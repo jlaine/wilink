@@ -146,6 +146,8 @@ void QSoundStream::stopInput()
         delete d->audioInputMeter;
         d->audioInputMeter = 0;
 
+        qDebug("QSoundStream audio input stopped");
+
         emit inputVolumeChanged(0);
     }
 }
@@ -192,6 +194,8 @@ void QSoundStream::stopOutput()
         d->audioOutput = 0;
         delete d->audioOutputMeter;
         d->audioOutputMeter = 0;
+
+        qDebug("QSoundStream audio output stopped");
 
         emit outputVolumeChanged(0);
     }
