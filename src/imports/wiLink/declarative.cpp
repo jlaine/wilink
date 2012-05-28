@@ -339,7 +339,7 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterUncreatableType<Notification>(uri, 2, 0, "Notification", "");
     qmlRegisterType<PhoneAudioHelper>(uri, 2, 0, "PhoneAudioHelper");
     qmlRegisterType<PhoneHistoryModel>(uri, 2, 0, "PhoneHistoryModel");
-    qmlRegisterUncreatableType<SipClient>(uri, 2, 0, "SipClient", "");
+    qmlRegisterType<SipClient>(uri, 2, 0, "SipClient");
     qmlRegisterUncreatableType<SipCall>(uri, 2, 0, "SipCall", "");
     qmlRegisterUncreatableType<FolderQueueModel>(uri, 2, 0, "FolderQueueModel", "");
     qmlRegisterType<PlaceModel>(uri, 2, 0, "PlaceModel");

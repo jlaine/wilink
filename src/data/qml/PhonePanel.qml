@@ -29,7 +29,6 @@ Panel {
     property string voicemailNumber
     property string webUsername
     property string webPassword
-    property alias sipClient: historyModel.client
 
     // Builds a full SIP address from a short recipient
     function buildAddress(recipient, sipDomain)
@@ -116,8 +115,41 @@ Panel {
         xhr.send();
     }
 
-    PhoneHistoryModel {
-        id: historyModel
+    SipClient {
+        id: sipClient
+
+        logger: appLogger
+
+        onCallReceived: {
+            if (sipClient.activeCalls) {
+                // if already busy, refuse call
+                call.hangup();
+                return;
+            }
+
+            dialogSwapper.showPanel('PhoneNotification.qml', {
+                'call': call,
+                'caller': parseAddress(call.recipient),
+                'swapper': swapper,
+            });
+        }
+
+        onCallStarted: {
+            var component = Qt.createComponent('PhoneCallWidget.qml');
+
+            function finishCreation() {
+                if (component.status != Component.Ready)
+                    return;
+
+                var widget = component.createObject(widgetBar);
+                widget.call = call;
+            }
+
+            if (component.status == Component.Loading)
+                component.statusChanged.connect(finishCreation);
+            else
+                finishCreation();
+        }
     }
 
     Rectangle {
@@ -333,47 +365,6 @@ Panel {
                     sipClient.call(address);
                 }
             }
-        }
-    }
-
-    Binding {
-        target: sipClient
-        property: 'logger'
-        value: appLogger
-    }
-
-    Connections {
-        target: sipClient
-
-        onCallReceived: {
-            if (sipClient.activeCalls) {
-                // if already busy, refuse call
-                call.hangup();
-                return;
-            }
-
-            dialogSwapper.showPanel('PhoneNotification.qml', {
-                'call': call,
-                'caller': parseAddress(call.recipient),
-                'swapper': swapper,
-            });
-        }
-
-        onCallStarted: {
-            var component = Qt.createComponent('PhoneCallWidget.qml');
-
-            function finishCreation() {
-                if (component.status != Component.Ready)
-                    return;
-
-                var widget = component.createObject(widgetBar);
-                widget.call = call;
-            }
-
-            if (component.status == Component.Loading)
-                component.statusChanged.connect(finishCreation);
-            else
-                finishCreation();
         }
     }
 
