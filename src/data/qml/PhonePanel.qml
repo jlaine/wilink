@@ -317,15 +317,8 @@ Panel {
             KeyPad {
                 id: keypad
 
-                onKeyPressed: {
-                    if (sipClient.activeCalls)
-                        historyModel.startTone(key.tone);
-                }
-
                 onKeyReleased: {
-                    if (sipClient.activeCalls)
-                        historyModel.stopTone(key.tone);
-                    else {
+                    if (!sipClient.activeCalls) {
                         var oldPos = numberEdit.cursorPosition;
                         var oldText = numberEdit.text;
                         numberEdit.text = oldText.substr(0, oldPos) + key.name + oldText.substr(oldPos);

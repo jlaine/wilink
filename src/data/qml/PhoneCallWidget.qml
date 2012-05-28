@@ -159,6 +159,18 @@ Item {
         }
     }
 
+    Connections {
+        target: keypad
+
+        onKeyPressed: {
+            call.audioChannel.startTone(key.tone);
+        }
+
+        onKeyReleased: {
+            call.audioChannel.stopTone(key.tone);
+        }
+    }
+
     onCallChanged: {
         // play a sound
         if (callWidget.call.direction == QXmppCall.OutgoingDirection &&
