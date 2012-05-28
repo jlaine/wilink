@@ -144,7 +144,7 @@ Item {
             }
             if (call.state == QXmppCall.FinishedState) {
                 // FIXME: get id!
-                var id = historyView.model.get(historyView.model.count-1).id;
+                var id = historyView.model.get(0).id;
                 var flags = call.direction;
                 if (call.errorString) {
                     flags += 2;
