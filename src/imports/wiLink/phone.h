@@ -84,7 +84,6 @@ signals:
     void currentCallsChanged();
 
 public slots:
-    bool call(const QString &address);
     void startTone(int tone);
     void stopTone(int tone);
 

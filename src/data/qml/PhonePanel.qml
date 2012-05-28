@@ -143,7 +143,7 @@ Panel {
 
         onItemClicked: {
             var address = buildAddress(model.phone, sipClient.domain);
-            historyModel.call(address);
+            sipClient.call(address);
             if (panel.singlePanel)
                 panel.state = 'no-sidebar';
         }
@@ -174,7 +174,7 @@ Panel {
 
                     onClicked: {
                         var address = buildAddress(panel.voicemailNumber, sipClient.domain);
-                        historyModel.call(address);
+                        sipClient.call(address);
                         if (panel.singlePanel)
                             panel.state = 'no-sidebar';
                     }
@@ -262,7 +262,7 @@ Panel {
                             return;
 
                         var address = buildAddress(recipient, sipClient.domain);
-                        if (historyModel.call(address))
+                        if (sipClient.call(address))
                             numberEdit.text = '';
                         if (panel.singlePanel)
                             panel.state = 'no-sidebar';

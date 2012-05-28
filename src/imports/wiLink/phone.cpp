@@ -45,6 +45,10 @@ PhoneAudioHelper::PhoneAudioHelper(QObject *parent)
 
 PhoneAudioHelper::~PhoneAudioHelper()
 {
+    if (m_call) {
+        m_call->hangup();
+        m_call->deleteLater();
+    }
 }
 
 SipCall *PhoneAudioHelper::call() const
@@ -155,16 +159,6 @@ PhoneHistoryModel::~PhoneHistoryModel()
     m_client->deleteLater();
 }
 
-bool PhoneHistoryModel::call(const QString &address)
-{
-    if (m_client->state() == SipClient::ConnectedState &&
-        !currentCalls()) {
-        m_client->call(address);
-        return true;
-    }
-    return false;
-}
-
 /** Returns the underlying SIP client.
  *
  * \note Use with care as the SIP client lives in a different thread!
@@ -222,10 +216,6 @@ void PhoneHistoryModel::_q_callStateChanged(SipCall::State state)
         call->disconnect(this);
         m_activeCalls.remove(call);
         emit currentCallsChanged();
-
-        // FIXME: ugly workaround for a race condition causing a crash in
-        // PhoneNotification.qml
-        QTimer::singleShot(1000, call, SLOT(deleteLater()));
     }
 }
 
@@ -239,7 +229,7 @@ void PhoneHistoryModel::_q_openUrl(const QUrl &url)
     if (!url.path().isEmpty()) {
         const QString phoneNumber = url.path().split('@').first();
         const QString recipient = QString("\"%1\" <%2>").arg(phoneNumber, url.toString());
-        call(recipient);
+        m_client->call(recipient);
     }
     // FIXME
     //emit showPanel();

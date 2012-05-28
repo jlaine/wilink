@@ -25,13 +25,12 @@ import 'utils.js' as Utils
 FocusScope {
     id: block
 
-    property string domain: 'wifirst.net'
     property QtObject contactModel
     property alias model: historyView.model
     signal addressClicked(string address)
 
     function contactName(address) {
-        var phone = Sip.parseAddress(address, block.domain);
+        var phone = Sip.parseAddress(address, sipClient.domain);
         for (var i = 0; i < contactModel.count; ++i) {
             var contact = contactModel.get(i);
             if (contact.phone == phone)
@@ -149,7 +148,7 @@ FocusScope {
                 }
                 onDoubleClicked: {
                     if (mouse.button == Qt.LeftButton) {
-                        historyView.model.call(address);
+                        sipClient.call(address);
                     }
                 }
             }
@@ -168,9 +167,9 @@ FocusScope {
             onItemClicked: {
                 var item = menu.model.get(index);
                 if (item.action == 'call') {
-                    historyView.model.call(callAddress)
+                    sipClient.call(callAddress)
                 } else if (item.action == 'contact') {
-                    var callPhone = Sip.parseAddress(callAddress, block.domain);
+                    var callPhone = Sip.parseAddress(callAddress, sipClient.domain);
                     var contact = contactModel.getContactByPhone(callPhone);
                     if (contact) {
                         dialogSwapper.showPanel('PhoneContactDialog.qml', {
