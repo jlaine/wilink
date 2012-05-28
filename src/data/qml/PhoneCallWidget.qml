@@ -155,6 +155,10 @@ Item {
                     });
                 }
                 historyView.model.updateItem(id, {address: call.recipient, duration: call.duration, flags: flags});
+
+                // make widget go away
+                callWidget.opacity = 0;
+                callWidget.destroy(1000);
             }
         }
     }
@@ -182,27 +186,11 @@ Item {
         historyView.model.addItem({address: call.recipient, duration: 0, flags: call.direction});
     }
 
-    states: [
-        State {
-            name: 'inactive'
-            when: Qt.isQtObject(call) && call.state == QXmppCall.FinishedState
-            PropertyChanges { target: callWidget; opacity: 0 }
-            StateChangeScript {
-                script: callWidget.destroy(1000)
-            }
-        }
-    ]
-
     transitions: Transition {
         PropertyAnimation {
             target: callWidget
             properties: 'opacity'
             duration: appStyle.animation.longDuration
-        }
-        PropertyAnimation {
-            target: callWidget
-            properties: 'x,y,height,width'
-            duration: appStyle.animation.normalDuration
         }
     }
 }
