@@ -24,6 +24,7 @@ Item {
     id: callWidget
 
     property QtObject call: null
+    property string caller
     property int callId: 0
     property QtObject soundJob
 
@@ -51,10 +52,21 @@ Item {
         }
 
         Label {
-            id: status
+            id: info
 
             anchors.left: parent.left
             anchors.leftMargin: appStyle.margin.normal
+            anchors.top: parent.top
+            height: frame.height
+            verticalAlignment: Text.AlignVCenter
+            text: callWidget.caller
+        }
+
+        Label {
+            id: status
+
+            anchors.left: info.right
+            anchors.leftMargin: appStyle.spacing.horizontal
             anchors.top: parent.top
             anchors.right: controls.left
             elide: Text.ElideRight
