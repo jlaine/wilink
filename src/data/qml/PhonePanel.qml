@@ -77,12 +77,23 @@ Panel {
                     }
                 } else {
                     console.log("Phone failed to retrieve settings");
+                    if (xhr.status != 401) {
+                        settingsTimer.start();
+                    }
                 }
             }
         }
         xhr.open('GET', 'https://www.wifirst.net/wilink/voip', true, panel.webUsername, panel.webPassword);
         xhr.setRequestHeader('Accept', 'application/xml');
         xhr.send();
+    }
+
+    Timer {
+        id: settingsTimer
+
+        interval: 60000
+        repeat: false
+        onTriggered: fetchSettings()
     }
 
     SipClient {
