@@ -189,15 +189,6 @@ Panel {
                             panel.state = 'no-sidebar';
                     }
                 }
-
-                ToolButton {
-                    iconSource: 'image://icon/clear'
-                    text: qsTr('Clear')
-
-                    onClicked: {
-                        historyView.model.clear();
-                    }
-                }
             }
         }
 
