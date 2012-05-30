@@ -280,24 +280,19 @@ Panel {
             }
         }
 
-        Row {
-            id: controls
+        KeyPad {
+            id: keypad
 
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: numberRow.bottom
             anchors.topMargin: appStyle.spacing.vertical
-            spacing: appStyle.spacing.horizontal
 
-            KeyPad {
-                id: keypad
-
-                onKeyReleased: {
-                    if (!sipClient.activeCalls) {
-                        var oldPos = numberEdit.cursorPosition;
-                        var oldText = numberEdit.text;
-                        numberEdit.text = oldText.substr(0, oldPos) + key.name + oldText.substr(oldPos);
-                        numberEdit.cursorPosition = oldPos + 1;
-                    }
+            onKeyReleased: {
+                if (!sipClient.activeCalls) {
+                    var oldPos = numberEdit.cursorPosition;
+                    var oldText = numberEdit.text;
+                    numberEdit.text = oldText.substr(0, oldPos) + key.name + oldText.substr(oldPos);
+                    numberEdit.cursorPosition = oldPos + 1;
                 }
             }
         }
@@ -306,7 +301,7 @@ Panel {
             id: widgetBar
             objectName: 'widgetBar'
 
-            anchors.top: controls.bottom
+            anchors.top: keypad.bottom
             anchors.left: parent.left
             anchors.right: parent.right
             z: 1
