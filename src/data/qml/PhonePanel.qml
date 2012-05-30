@@ -19,6 +19,7 @@
 
 import QtQuick 1.1
 import wiLink 2.0
+import 'sip.js' as Sip
 
 Panel {
     id: panel
@@ -29,37 +30,6 @@ Panel {
     property string voicemailNumber
     property string webUsername
     property string webPassword
-
-    // Builds a full SIP address from a short recipient
-    function buildAddress(recipient, sipDomain)
-    {
-        var address;
-        var name;
-        var bits = recipient.split('@');
-        if (bits.length > 1) {
-            name = bits[0];
-            address = recipient;
-        } else {
-            name = recipient;
-            address = recipient + "@" + sipDomain;
-        }
-        return '"' + name + '" <sip:' + address + '>';
-    }
-
-    // Extracts the shortest possible recipient from a full SIP address.
-    function parseAddress(sipAddress, sipDomain)
-    {
-        var cap = sipAddress.match(/(.*)<(sip:([^>]+))>(;.+)?/);
-        if (!cap)
-            return '';
-
-        var recipient = cap[2].substr(4);
-        var bits = recipient.split('@');
-        if (bits[1] == sipDomain || bits[1].match(/^[0-9]+/))
-            return bits[0];
-        else
-            return recipient;
-    }
 
     // Retrieves phone settings.
     function fetchSettings()
@@ -132,7 +102,7 @@ Panel {
 
             dialogSwapper.showPanel('PhoneNotification.qml', {
                 'call': call,
-                'caller': parseAddress(call.recipient, sipClient.domain),
+                'caller': Sip.parseAddress(call.recipient, sipClient.domain),
                 'swapper': swapper,
             });
         }
@@ -146,7 +116,7 @@ Panel {
 
                 var widget = component.createObject(widgetBar);
                 widget.call = call;
-                widget.caller = parseAddress(call.recipient, sipClient.domain);
+                widget.caller = Sip.parseAddress(call.recipient, sipClient.domain);
             }
 
             if (component.status == Component.Loading)
@@ -178,7 +148,7 @@ Panel {
 
         onItemClicked: {
             if (callButton.enabled) {
-                var address = buildAddress(model.phone, sipClient.domain);
+                var address = Sip.buildAddress(model.phone, sipClient.domain);
                 sipClient.call(address);
                 if (panel.singlePanel)
                     panel.state = 'no-sidebar';
@@ -211,7 +181,7 @@ Panel {
                     visible: panel.voicemailNumber != ''
 
                     onClicked: {
-                        var address = buildAddress(panel.voicemailNumber, sipClient.domain);
+                        var address = Sip.buildAddress(panel.voicemailNumber, sipClient.domain);
                         sipClient.call(address);
                         if (panel.singlePanel)
                             panel.state = 'no-sidebar';
@@ -299,7 +269,7 @@ Panel {
                         if (!recipient.length)
                             return;
 
-                        var address = buildAddress(recipient, sipClient.domain);
+                        var address = Sip.buildAddress(recipient, sipClient.domain);
                         if (sipClient.call(address))
                             numberEdit.text = '';
                         if (panel.singlePanel)
@@ -352,7 +322,7 @@ Panel {
             contactModel: sidebar.model
 
             onAddressClicked: {
-                numberEdit.text = parseAddress(address, sipClient.domain);
+                numberEdit.text = Sip.parseAddress(address, sipClient.domain);
             }
 
             onAddressDoubleClicked: {
