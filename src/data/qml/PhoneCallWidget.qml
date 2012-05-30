@@ -52,21 +52,21 @@ Item {
             GradientStop { position: 1; color: '#cbdaf1' }
         }
 
-        Label {
-            id: info
+        Image {
+            id: image
 
             anchors.left: parent.left
             anchors.leftMargin: appStyle.margin.normal
-            anchors.top: parent.top
-            height: frame.height
-            verticalAlignment: Text.AlignVCenter
-            text: callWidget.caller
+            anchors.verticalCenter: parent.verticalCenter
+            source: (call && call.direction == SipCall.IncomingDirection) ? 'image://icon/call-incoming' : 'image://icon/call-outgoing'
+            sourceSize.width: appStyle.icon.smallSize
+            sourceSize.height: appStyle.icon.smallSize
         }
 
         Label {
             id: status
 
-            anchors.left: info.right
+            anchors.left: image.right
             anchors.leftMargin: appStyle.spacing.horizontal
             anchors.top: parent.top
             anchors.right: controls.left
@@ -74,15 +74,17 @@ Item {
             height: frame.height
             verticalAlignment: Text.AlignVCenter
             text: {
+                var status;
                 if (!call || call.state == QXmppCall.ConnectingState) {
-                    return qsTr('Connecting..');
+                    status = qsTr('Connecting..');
                 } else if (call.state == QXmppCall.ActiveState) {
-                    return Utils.formatDuration(call.duration);
+                    status = Utils.formatDuration(call.duration);
                 } else if (call.state == QXmppCall.DisconnectingState) {
-                    return qsTr('Disconnecting..');
+                    status = qsTr('Disconnecting..');
                 } else if (call.state == QXmppCall.FinishedState) {
-                    return qsTr('Call finished.');
+                    status = qsTr('Call finished.');
                 }
+                return caller + '<br/><small>' + status + '</small>';
             }
         }
 
