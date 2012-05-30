@@ -43,7 +43,7 @@ XmlListModel {
         xhr.send();
     }
 
-    function addItem(props) {
+    function addItem(props, onSuccess) {
         var url = xmlModel.url;
         var data = '';
         for (var name in props) {
@@ -57,6 +57,16 @@ XmlListModel {
             if (xhr.readyState == 4) {
                 if (xhr.status == 201) {
                     console.log("PhoneXmlModel added item " + url);
+                    if (onSuccess) {
+                        var doc = xhr.responseXML.documentElement;
+                        for (var i = 0; i < doc.childNodes.length; ++i) {
+                            if (doc.childNodes[i].nodeName == 'id') {
+                                var id = parseInt(doc.childNodes[i].firstChild.nodeValue);
+                                onSuccess(id);
+                                break;
+                            }
+                        }
+                    }
                     xmlModel.reload();
                 } else {
                     console.log("PhoneXmlModel failed to add item " + url + ": " + xhr.status + "/" + xhr.statusText);

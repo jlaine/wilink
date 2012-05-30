@@ -24,6 +24,7 @@ Item {
     id: callWidget
 
     property QtObject call: null
+    property int callId: 0
     property QtObject soundJob
 
     anchors.left: parent ? parent.left : undefined
@@ -143,18 +144,18 @@ Item {
                 callWidget.soundJob = null;
             }
             if (call.state == QXmppCall.FinishedState) {
-                // FIXME: get id!
-                var id = historyView.model.get(0).id;
-                var flags = call.direction;
-                if (call.errorString) {
-                    flags += 2;
-                    dialogSwapper.showPanel('ErrorNotification.qml', {
-                        'iconSource': 'image://icon/phone',
-                        'title': qsTr('Call failed'),
-                        'text': qsTr('Sorry, but the call could not be completed.') + '\n\n' + call.errorString,
-                    });
+                if (callWidget.callId) {
+                    var flags = call.direction;
+                    if (call.errorString) {
+                        flags += 2;
+                        dialogSwapper.showPanel('ErrorNotification.qml', {
+                            'iconSource': 'image://icon/phone',
+                            'title': qsTr('Call failed'),
+                            'text': qsTr('Sorry, but the call could not be completed.') + '\n\n' + call.errorString,
+                        });
+                    }
+                    historyView.model.updateItem(callWidget.callId, {address: call.recipient, duration: call.duration, flags: flags});
                 }
-                historyView.model.updateItem(id, {address: call.recipient, duration: call.duration, flags: flags});
 
                 // destroy call
                 call.destroyLater();
@@ -180,6 +181,9 @@ Item {
     }
 
     onCallChanged: {
+        if (!callWidget.call)
+            return;
+
         // play a sound
         if (callWidget.call.direction == QXmppCall.OutgoingDirection &&
             callWidget.call.state == QXmppCall.ConnectingState) {
@@ -187,7 +191,9 @@ Item {
         }
 
         // log call
-        historyView.model.addItem({address: call.recipient, duration: 0, flags: call.direction});
+        historyView.model.addItem({address: call.recipient, duration: 0, flags: call.direction}, function(id) {
+            callId = id;
+        });
     }
 
     transitions: Transition {
