@@ -1105,7 +1105,9 @@ void SipClient::datagramReceived()
     // check whether it's a request or a response
     if (reply.isRequest()) {
         bool emitCall = false;
-        if (!currentCall && reply.method() == "INVITE") {
+        if (currentCall) {
+            currentCall->d->handleRequest(reply);
+        } else if (!currentCall && reply.method() == "INVITE") {
             const QByteArray from = reply.headerField("From");
             const QByteArray to = reply.headerField("To");
             info(QString("SIP call from %1").arg(QString::fromUtf8(from)));
@@ -1125,12 +1127,10 @@ void SipClient::datagramReceived()
             connect(currentCall, SIGNAL(destroyed(QObject*)),
                     this, SLOT(callDestroyed(QObject*)));
             d->calls << currentCall;
-            emitCall = true;
-        }
-        if (currentCall) {
+            emit activeCallsChanged(d->calls.size());
+
             currentCall->d->handleRequest(reply);
-            if (emitCall)
-                emit callReceived(currentCall);
+            emit callReceived(currentCall);
         }
     } else if (reply.isReply()) {
         if (currentCall)

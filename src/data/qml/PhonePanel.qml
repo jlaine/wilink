@@ -158,6 +158,7 @@ Panel {
     }
 
     Item {
+        id: rightColumn
 
         anchors.top: parent.top
         anchors.bottom: parent.bottom
@@ -280,11 +281,21 @@ Panel {
             }
         }
 
+        Column {
+            id: widgetBar
+            objectName: 'widgetBar'
+
+            anchors.top: numberRow.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            z: 1
+        }
+
         KeyPad {
             id: keypad
 
             anchors.horizontalCenter: parent.horizontalCenter
-            anchors.top: numberRow.bottom
+            anchors.top: widgetBar.bottom
             anchors.topMargin: appStyle.spacing.vertical
 
             onKeyReleased: {
@@ -297,22 +308,12 @@ Panel {
             }
         }
 
-        Column {
-            id: widgetBar
-            objectName: 'widgetBar'
-
-            anchors.top: keypad.bottom
-            anchors.left: parent.left
-            anchors.right: parent.right
-            z: 1
-        }
-
         PhoneHistoryView {
             id: historyView
 
             anchors.left: parent.left
             anchors.right: parent.right
-            anchors.top: widgetBar.bottom
+            anchors.top: keypad.bottom
             anchors.topMargin: appStyle.spacing.vertical
             anchors.bottom: parent.bottom
             contactModel: sidebar.model
@@ -325,6 +326,17 @@ Panel {
                 if (callButton.enabled) {
                     sipClient.call(address);
                 }
+            }
+        }
+
+        states: State {
+            name: 'inCall'
+            when: sipClient.activeCalls
+
+            PropertyChanges {
+                target: numberRow
+                height: 0
+                visible: false
             }
         }
     }
