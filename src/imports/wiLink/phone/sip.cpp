@@ -485,10 +485,13 @@ void SipCallPrivate::setState(SipCall::State newState)
 
         if (state == SipCall::ActiveState) {
             startStamp = QDateTime::currentDateTime();
+            durationTimer->start();
             emit q->connected();
         } else if (state == SipCall::FinishedState) {
             q->debug(QString("SIP call %1 finished").arg(QString::fromUtf8(id)));
             finishStamp = QDateTime::currentDateTime();
+            durationTimer->stop();
+            emit q->durationChanged();
             emit q->finished();
         }
     }
@@ -538,6 +541,12 @@ SipCall::SipCall(const QString &recipient, SipCall::Direction direction, SipClie
     check = connect(d->timeoutTimer, SIGNAL(timeout()),
                     this, SLOT(handleTimeout()));
     Q_ASSERT(check);
+
+    // Duration timer
+    d->durationTimer = new QTimer(this);
+    d->durationTimer->setInterval(1000);
+    check = connect(d->durationTimer, SIGNAL(timeout()),
+                    this, SIGNAL(durationChanged()));
 
     // start ICE
     if (!d->iceConnection->bind(QList<QHostAddress>() << d->client->d->localAddress))

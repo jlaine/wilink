@@ -147,7 +147,7 @@ class SipCall : public QXmppLoggable
     Q_ENUMS(Direction State)
     Q_PROPERTY(QXmppRtpAudioChannel* audioChannel READ audioChannel CONSTANT)
     Q_PROPERTY(Direction direction READ direction CONSTANT)
-    Q_PROPERTY(int duration READ duration)
+    Q_PROPERTY(int duration READ duration NOTIFY durationChanged)
     Q_PROPERTY(QString errorString READ errorString NOTIFY stateChanged)
     Q_PROPERTY(QString recipient READ recipient CONSTANT)
     Q_PROPERTY(State state READ state NOTIFY stateChanged)
@@ -192,6 +192,9 @@ public:
 signals:
     /// This signal is emitted when a call is connected.
     void connected();
+
+    /// This signal is emitted when the call duration changes.
+    void durationChanged();
 
     /// This signal is emitted when a call is finished.
     ///

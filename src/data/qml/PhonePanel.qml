@@ -102,7 +102,7 @@ Panel {
 
             dialogSwapper.showPanel('PhoneNotification.qml', {
                 'call': call,
-                'caller': Sip.parseAddress(call.recipient, sipClient.domain),
+                'caller': historyView.contactName(call.recipient),
                 'swapper': swapper,
             });
         }
@@ -114,9 +114,10 @@ Panel {
                 if (component.status != Component.Ready)
                     return;
 
-                var widget = component.createObject(widgetBar);
-                widget.call = call;
-                widget.caller = Sip.parseAddress(call.recipient, sipClient.domain);
+                var widget = component.createObject(widgetBar, {
+                    'call': call,
+                    'caller': historyView.contactName(call.recipient),
+                });
             }
 
             if (component.status == Component.Loading)

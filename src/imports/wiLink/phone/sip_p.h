@@ -79,6 +79,7 @@ public:
     QByteArray remoteUri;
 
     SipClient *client;
+    QTimer *durationTimer;
     QTimer *timeoutTimer;
 
 private:
