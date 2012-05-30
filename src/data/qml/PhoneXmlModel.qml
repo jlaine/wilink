@@ -54,12 +54,6 @@ XmlListModel {
 
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
-            // FIXME: for some reason, we never get past this state
-            if (xhr.readyState == 3) {
-                xhr.abort();
-                return;
-            }
-
             if (xhr.readyState == 4) {
                 if (xhr.status == 201) {
                     console.log("PhoneXmlModel added item " + url);
@@ -71,7 +65,6 @@ XmlListModel {
         };
         xhr.open('POST', url, true, xmlModel.username, xmlModel.password);
         xhr.setRequestHeader("Accept", "application/xml");
-        xhr.setRequestHeader("Connection", "close");
         xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         xhr.send(data);
     }
