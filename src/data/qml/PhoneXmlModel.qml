@@ -61,8 +61,12 @@ XmlListModel {
             }
 
             if (xhr.readyState == 4) {
-                console.log("PhoneXmlModel added item: " + xhr.status + "/" + xhr.statusText);
-                xmlModel.reload();
+                if (xhr.status == 201) {
+                    console.log("PhoneXmlModel added item " + url);
+                    xmlModel.reload();
+                } else {
+                    console.log("PhoneXmlModel failed to add item " + url + ": " + xhr.status + "/" + xhr.statusText);
+                }
             }
         };
         xhr.open('POST', url, true, xmlModel.username, xmlModel.password);
