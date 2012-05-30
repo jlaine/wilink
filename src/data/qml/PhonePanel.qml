@@ -121,9 +121,12 @@ Panel {
         logger: appLogger
 
         onCallReceived: {
-            if (sipClient.activeCalls) {
+            if (sipClient.activeCalls > 1) {
+                console.log("Too many active calls, refusing call from " + call.recipient);
+
                 // if already busy, refuse call
                 call.hangup();
+                call.destroyLater();
                 return;
             }
 

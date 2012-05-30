@@ -156,6 +156,10 @@ Item {
                 }
                 historyView.model.updateItem(id, {address: call.recipient, duration: call.duration, flags: flags});
 
+                // destroy call
+                call.destroyLater();
+                callWidget.call = null;
+
                 // make widget go away
                 callWidget.opacity = 0;
                 callWidget.destroy(1000);

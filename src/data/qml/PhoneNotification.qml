@@ -37,7 +37,10 @@ NotificationDialog {
         dialog.close();
     }
 
-    onRejected: dialog.call.hangup()
+    onRejected: {
+        dialog.call.hangup();
+        dialog.call.destroyLater();
+    }
 
     Component.onCompleted: {
         // play a sound
@@ -46,7 +49,10 @@ NotificationDialog {
 
     Connections {
         target: call
-        onFinished: dialog.close()
+        onFinished: {
+            call.destroyLater();
+            dialog.close();
+        }
     }
 }
 

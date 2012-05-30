@@ -697,6 +697,11 @@ SipCall::State SipCall::state() const
     return d->state;
 }
 
+void SipCall::destroyLater()
+{
+    deleteLater();
+}
+
 void SipCall::transactionFinished()
 {
     SipTransaction *transaction = qobject_cast<SipTransaction*>(sender());

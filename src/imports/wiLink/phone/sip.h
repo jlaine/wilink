@@ -208,6 +208,7 @@ signals:
 public slots:
     void accept();
     void hangup();
+    void destroyLater();
 
 private slots:
     void handleTimeout();
