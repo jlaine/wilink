@@ -46,6 +46,10 @@ function formatDateTime(dateTime) {
     return Qt.formatDateTime(dateTime, 'dd MMM hh:mm');
 }
 
+function formatDuration(duration) {
+    return duration + 's';
+}
+
 function formatNumber(size) {
     var KILO = 1000;
     var MEGA = KILO * 1000;

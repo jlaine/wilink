@@ -122,7 +122,7 @@ FocusScope {
 
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: parent.right
-                    text: model.duration + 's'
+                    text: Utils.formatDuration(model.duration);
                     width: appStyle.font.normalSize * 3
                 }
             }

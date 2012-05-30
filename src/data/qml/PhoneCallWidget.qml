@@ -19,6 +19,7 @@
 
 import QtQuick 1.1
 import wiLink 2.0
+import 'utils.js' as Utils
 
 Item {
     id: callWidget
@@ -76,7 +77,7 @@ Item {
                 if (!call || call.state == QXmppCall.ConnectingState) {
                     return qsTr('Connecting..');
                 } else if (call.state == QXmppCall.ActiveState) {
-                    return qsTr('Call connected.');
+                    return Utils.formatDuration(call.duration);
                 } else if (call.state == QXmppCall.DisconnectingState) {
                     return qsTr('Disconnecting..');
                 } else if (call.state == QXmppCall.FinishedState) {
