@@ -109,10 +109,6 @@ Dialog {
         }
     }
 
-    Component.onCompleted: {
-        nameInput.forceActiveFocus();
-    }
-
     onAccepted: {
         if (!nameInput.acceptableInput || !phoneInput.acceptableInput)
             return;
