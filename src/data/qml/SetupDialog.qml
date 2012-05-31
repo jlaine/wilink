@@ -158,6 +158,7 @@ Dialog {
                     anchors.left: usernameLabel.right
                     anchors.leftMargin: appStyle.spacing.horizontal
                     anchors.right: parent.right
+                    focus: true
                     validator: RegExpValidator {
                         regExp: /.+/
                     }
