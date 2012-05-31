@@ -485,6 +485,29 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>PhoneCallWidget</name>
+    <message>
+        <source>Connecting..</source>
+        <translation>Connexion..</translation>
+    </message>
+    <message>
+        <source>Disconnecting..</source>
+        <translation>Déconnexion..</translation>
+    </message>
+    <message>
+        <source>Call finished.</source>
+        <translation>Appel terminé.</translation>
+    </message>
+    <message>
+        <source>Call failed</source>
+        <translation>L&apos;appel a échoué</translation>
+    </message>
+    <message>
+        <source>Sorry, but the call could not be completed.</source>
+        <translation>Désolé, mais l&apos;appel n&apos;a pas pu être établi.</translation>
+    </message>
+</context>
+<context>
     <name>PhoneContactDialog</name>
     <message>
         <source>Add a contact</source>
@@ -571,28 +594,12 @@ Acceptez-vous?</translation>
         <translation>Appeler</translation>
     </message>
     <message>
-        <source>Hangup</source>
-        <translation>Raccrocher</translation>
-    </message>
-    <message>
-        <source>Sorry, but the call could not be completed.</source>
-        <translation>Désolé, mais l&apos;appel n&apos;a pas pu être établi.</translation>
-    </message>
-    <message>
-        <source>Call failed</source>
-        <translation>L&apos;appel a échoué</translation>
-    </message>
-    <message>
         <source>Enter the number you want to call</source>
         <translation>Saisissez le numéro à appeler</translation>
     </message>
     <message>
         <source>Voicemail</source>
         <translation>Messagerie</translation>
-    </message>
-    <message>
-        <source>Clear</source>
-        <translation>Effacer</translation>
     </message>
     <message>
         <source>You can view your phone bills and your call history at the following address:</source>
