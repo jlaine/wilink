@@ -233,9 +233,9 @@ Dialog {
                         var doc = xhr.responseXML.documentElement;
                         for (var i = 0; i < doc.childNodes.length; ++i) {
                             var node = doc.childNodes[i];
-                            if (node.nodeName == 'id') {
+                            if (node.nodeName == 'id' && node.firstChild) {
                                 jid = node.firstChild.nodeValue;
-                            } else if (node.nodeName == 'password') {
+                            } else if (node.nodeName == 'password' && node.firstChild) {
                                 password = node.firstChild.nodeValue;
                             }
                         }
