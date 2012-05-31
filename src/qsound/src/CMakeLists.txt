@@ -8,12 +8,13 @@ set(qsound_LIBRARIES)
 
 # needed for Qt >= 4.7 on Debian/Ubuntu
 find_library(QTMULTIMEDIAKIT_LIBRARY QtMultimediaKit)
-if(QTMULTIMEDIAKIT_LIBRARY)
+if(QTMULTIMEDIAKIT_LIBRARY AND NOT APPLE)
     message(STATUS "Found QtMultimediaKit library")
     include_directories(/usr/include/QtMobility)
     include_directories(/usr/include/QtMultimediaKit)
     list(APPEND qsound_LIBRARIES ${QTMULTIMEDIAKIT_LIBRARY})
 else()
+    message(STATUS "Using QtMultimedia library")
     set(QT_USE_QTMULTIMEDIA 1)
 endif()
 
