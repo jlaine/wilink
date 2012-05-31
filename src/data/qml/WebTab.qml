@@ -96,7 +96,7 @@ Panel {
             anchors.top: parent.top
             anchors.left: toolBar.right
             anchors.right: parent.right
-            focus: true
+            focus: webView.url == ''
             text: webView.url
 
             onAccepted: {
@@ -113,11 +113,12 @@ Panel {
         }
     }
 
-    Item {
+    FocusScope {
         anchors.top: topBar.bottom
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
+        focus: webView.url != ''
 
         Flickable {
             id: webFlickable
@@ -186,5 +187,7 @@ Panel {
             anchors.top: verticalScrollBar.bottom
             anchors.bottom: parent.bottom
         }
+
+        Keys.forwardTo: [verticalScrollBar, horizontalScrollBar]
     }
 }
