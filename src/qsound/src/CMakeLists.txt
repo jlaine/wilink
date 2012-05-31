@@ -13,6 +13,8 @@ if(QTMULTIMEDIAKIT_LIBRARY)
     include_directories(/usr/include/QtMobility)
     include_directories(/usr/include/QtMultimediaKit)
     list(APPEND qsound_LIBRARIES ${QTMULTIMEDIAKIT_LIBRARY})
+else()
+    set(QT_USE_QTMULTIMEDIA 1)
 endif()
 
 # mad support
@@ -42,6 +44,10 @@ if(QTKIT_LIBRARY)
     message(STATUS "Found QTKit library: ${QTKIT_LIBRARY}")
     list(APPEND qsound_LIBRARIES ${QTKIT_LIBRARY} ${QUARTZCORE_LIBRARY} ${COCOA_LIBRARY})
 endif()
+
+# Qt
+set(QT_USE_QTNETWORK 1)
+include(${QT_USE_FILE})
 
 SET(qsound_SOURCES QSoundFile.cpp QSoundMeter.cpp QSoundPlayer.cpp QSoundStream.cpp QSoundTester.cpp QVideoGrabber.cpp)
 if(WIN32)

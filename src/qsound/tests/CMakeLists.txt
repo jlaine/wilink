@@ -1,3 +1,5 @@
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../src)
+
 # fftw support
 qt4_add_resources(qsound-echo_RCC_SOURCES echo.qrc)
 qt4_wrap_cpp(qsound-echo_MOC_SOURCES echo.h)
