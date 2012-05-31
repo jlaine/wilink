@@ -43,6 +43,11 @@ Panel {
                     var doc = xhr.responseXML.documentElement;
                     for (var i = 0; i < doc.childNodes.length; ++i) {
                         var node = doc.childNodes[i];
+
+                        // skip empty elements
+                        if (!node.firstChild)
+                            continue;
+
                         if (node.nodeName == 'calls-url') {
                             historyView.model.url = node.firstChild.nodeValue;
                             historyView.model.username = panel.webUsername;
