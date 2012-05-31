@@ -27,7 +27,7 @@ FocusScope {
     property alias helpText: help.text
     property alias title: label.text
     property int minimumWidth: 360
-    property int minimumHeight: 250
+    property int minimumHeight: 240
     height: appStyle.isMobile ? root.height : minimumHeight
     width: appStyle.isMobile ? root.width : minimumWidth
 
