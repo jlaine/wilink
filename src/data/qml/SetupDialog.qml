@@ -240,7 +240,7 @@ Dialog {
                             }
                         }
                         if (jid && password) {
-                            testClient.testCredentials(jid, passwordInput.text);
+                            testClient.testCredentials(jid, password);
                         } else {
                             dialog.state = 'unknownError';
                         }
