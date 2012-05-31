@@ -236,6 +236,9 @@ Item {
     }
 
     Keys.onPressed: {
+        if (event.modifiers != Qt.NoModifier && event.modifiers != Qt.KeypadModifier)
+            return;
+
         if (scrollBar.orientation == Qt.Horizontal) {
             if (event.key == Qt.Key_Left) {
                 scrollBar.moveBy(-defaultQuantity);
