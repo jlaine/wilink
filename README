@@ -53,14 +53,6 @@ generate the Debian package for wiLink by running:
 
 $ dpkg-buildpackage
 
-On Mac OS X
------------
-
-If you are running MacOS/X and want to build specifically for i386 on an
-x86_64 machine, invoke cmake as:
-
-$ cmake .. -DCMAKE_CXX_FLAGS="-arch i386"
-
 Cross compiling for win32
 -------------------------
 
