@@ -1,5 +1,5 @@
 WILINK_INCLUDE_DIR = $$PWD/src
-WILINK_VERSION = 2.2.909
+WILINK_VERSION = 2.3.0
 
 isEmpty(PREFIX) {
     contains(MEEGO_EDITION,harmattan) {
