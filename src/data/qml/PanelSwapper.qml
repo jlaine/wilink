@@ -150,40 +150,44 @@ FocusScope {
             panels.remove(i);
             if (panels.count == 0) {
                 panelSwapper.currentIndex = -1;
-            } else if (i <= panelSwapper.currentIndex) {
+            } else if (i < panelSwapper.currentIndex) {
                 panelSwapper.currentIndex -= 1;
+            } else {
+                d.updateCurrentItem();
             }
 
             // destroy panel
             panel.destroy();
         }
-    }
 
-    onCurrentIndexChanged: {
-        var panel = null;
+        function updateCurrentItem() {
+            var panel = null;
 
-        if (panelSwapper.currentIndex >= 0 && panelSwapper.currentIndex < panels.count) {
-            var item = panels.get(panelSwapper.currentIndex);
-            panel = item.panel;
-        }
-
-        if (panel != panelSwapper.currentItem) {
-            // show new item
-            if (panel) {
-                panel = panel;
-                panel.opacity = 1;
-                panel.focus = true;
-                panel.z = 1;
+            if (panelSwapper.currentIndex >= 0 && panelSwapper.currentIndex < panels.count) {
+                var item = panels.get(panelSwapper.currentIndex);
+                panel = item.panel;
             }
 
-            // hide old item
-            if (panelSwapper.currentItem) {
-                panelSwapper.currentItem.opacity = 0;
-                panelSwapper.currentItem.z = -1;
-            }
+            if (panel != panelSwapper.currentItem) {
+                // show new item
+                if (panel) {
+                    panel = panel;
+                    panel.opacity = 1;
+                    panel.focus = true;
+                    panel.z = 1;
+                }
 
-            panelSwapper.currentItem = panel;
+                // hide old item
+                if (panelSwapper.currentItem) {
+                    panelSwapper.currentItem.opacity = 0;
+                    panelSwapper.currentItem.z = -1;
+                }
+
+                panelSwapper.currentItem = panel;
+            }
         }
     }
+
+    onCurrentIndexChanged: d.updateCurrentItem()
 }
 
