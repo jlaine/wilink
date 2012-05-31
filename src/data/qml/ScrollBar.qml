@@ -236,18 +236,28 @@ Item {
     }
 
     Keys.onPressed: {
-        if (event.key == Qt.Key_Up) {
-            scrollBar.moveBy(-defaultQuantity);
-            event.accepted = true;
-        } else if (event.key == Qt.Key_Down) {
-            scrollBar.moveBy(defaultQuantity);
-            event.accepted = true;
-        } else if (event.key == Qt.Key_PageUp) {
-            scrollBar.moveBy(-flickableItem.height);
-            event.accepted = true;
-        } else if (event.key == Qt.Key_PageDown) {
-            scrollBar.moveBy(flickableItem.height);
-            event.accepted = true;
+        if (scrollBar.orientation == Qt.Horizontal) {
+            if (event.key == Qt.Key_Left) {
+                scrollBar.moveBy(-defaultQuantity);
+                event.accepted = true;
+            } else if (event.key == Qt.Key_Right) {
+                scrollBar.moveBy(defaultQuantity);
+                event.accepted = true;
+            }
+        } else {
+            if (event.key == Qt.Key_Up) {
+                scrollBar.moveBy(-defaultQuantity);
+                event.accepted = true;
+            } else if (event.key == Qt.Key_Down) {
+                scrollBar.moveBy(defaultQuantity);
+                event.accepted = true;
+            } else if (event.key == Qt.Key_PageUp) {
+                scrollBar.moveBy(-flickableItem.height);
+                event.accepted = true;
+            } else if (event.key == Qt.Key_PageDown) {
+                scrollBar.moveBy(flickableItem.height);
+                event.accepted = true;
+            }
         }
     }
 }
