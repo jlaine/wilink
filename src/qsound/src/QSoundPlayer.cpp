@@ -114,7 +114,7 @@ void QSoundPlayerJob::setFile(QSoundFile *soundFile)
     d->audioOutput = new QAudioOutput(d->player->outputDevice(), soundFile->format());
 
     check = connect(d->audioOutput, SIGNAL(stateChanged(QAudio::State)),
-                    this, SLOT(_q_stateChanged(QAudio::State)));
+                    this, SLOT(_q_stateChanged()));
     Q_ASSERT(check);
 
     d->audioOutput->moveToThread(d->player->soundThread());
@@ -191,9 +191,9 @@ void QSoundPlayerJob::_q_downloadFinished()
     setFile(new QSoundFile(iodevice, fileType));
 }
 
-void QSoundPlayerJob::_q_stateChanged(QAudio::State state)
+void QSoundPlayerJob::_q_stateChanged()
 {
-    if (state != QAudio::ActiveState) {
+    if (d->audioOutput->state() != QAudio::ActiveState) {
         qDebug("QSoundPlayer(%i) audio stopped", d->id);
         d->finish();
     }

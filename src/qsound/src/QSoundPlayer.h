@@ -20,10 +20,10 @@
 #ifndef __WILINK_SOUND_PLAYER_H__
 #define __WILINK_SOUND_PLAYER_H__
 
-#include <QAudioDeviceInfo>
 #include <QStringList>
 #include <QUrl>
 
+class QAudioDeviceInfo;
 class QNetworkAccessManager;
 class QSoundFile;
 class QSoundPlayer;
@@ -57,7 +57,7 @@ public slots:
 private slots:
     void _q_download();
     void _q_downloadFinished();
-    void _q_stateChanged(QAudio::State state);
+    void _q_stateChanged();
 
 private:
     QSoundPlayerJob(QSoundPlayer *player, int id);
