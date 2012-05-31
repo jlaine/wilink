@@ -150,7 +150,7 @@ FocusScope {
             panels.remove(i);
             if (panels.count == 0) {
                 panelSwapper.currentIndex = -1;
-            } else if (i < panelSwapper.currentIndex) {
+            } else if (i < panelSwapper.currentIndex || panelSwapper.currentIndex == panels.count) {
                 panelSwapper.currentIndex -= 1;
             } else {
                 d.updateCurrentItem();
@@ -171,7 +171,6 @@ FocusScope {
             if (panel != panelSwapper.currentItem) {
                 // show new item
                 if (panel) {
-                    panel = panel;
                     panel.opacity = 1;
                     panel.focus = true;
                     panel.z = 1;
