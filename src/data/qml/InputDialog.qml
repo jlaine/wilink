@@ -52,6 +52,7 @@ Dialog {
             anchors.topMargin: 8
             anchors.left: parent.left
             anchors.right: parent.right
+            focus: true
         }
     }
 }
