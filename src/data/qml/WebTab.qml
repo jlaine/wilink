@@ -191,7 +191,8 @@ Panel {
         Keys.forwardTo: [verticalScrollBar, horizontalScrollBar]
 
         Keys.onPressed: {
-            if ((event.modifiers & Qt.ControlModifier) && event.key == Qt.Key_R) {
+            if (((event.modifiers & Qt.ControlModifier) && event.key == Qt.Key_R)
+             || ((event.modifiers == Qt.NoModifier) && event.key == Qt.Key_F5)) {
                 webView.reload.triggered()
             }
         }
