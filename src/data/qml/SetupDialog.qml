@@ -35,7 +35,7 @@ Dialog {
 
     title: qsTr('Add an account')
     minimumWidth: 440
-    minimumHeight: 250
+    minimumHeight: 270
 
     Client {
         id: testClient
