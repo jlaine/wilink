@@ -47,6 +47,7 @@ Dialog {
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
+            focus: true
             text: "Let's talk"
         }
 

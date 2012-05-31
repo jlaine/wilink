@@ -102,6 +102,7 @@ Panel {
             anchors.rightMargin: 8
             anchors.verticalCenter: parent.verticalCenter
             anchors.margins: 8
+            focus: true
             hintText: qsTr('Enter the name of the file you are looking for.')
             state: (view.model.count == 0 && !view.model.busy && searchEdit.text.length > 0) ? 'error' : ''
 

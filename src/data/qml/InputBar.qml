@@ -32,8 +32,6 @@ FocusScope {
 
     signal accepted
 
-    focus: true
-
     function backspacePressed() {
         var oldPos = edit.cursorPosition;
         var oldText = edit.text;

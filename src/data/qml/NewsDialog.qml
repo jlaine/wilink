@@ -76,6 +76,7 @@ Dialog {
 
                     anchors.left: nameLabel.right
                     anchors.right: parent.right
+                    focus: true
                     validator: RegExpValidator {
                         regExp: /.{1,30}/
                     }
@@ -109,10 +110,6 @@ Dialog {
                 }
             }
         }
-    }
-
-    Component.onCompleted: {
-        nameInput.forceActiveFocus();
     }
 
     onAccepted: {

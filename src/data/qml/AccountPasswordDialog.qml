@@ -66,6 +66,7 @@ Dialog {
                 anchors.leftMargin: appStyle.spacing.horizontal
                 anchors.right: parent.right
                 echoMode: TextInput.Password
+                focus: true
                 validator: RegExpValidator {
                     regExp: /.+/
                 }

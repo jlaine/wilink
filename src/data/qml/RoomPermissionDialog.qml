@@ -137,6 +137,7 @@ Dialog {
                 anchors.left: parent.left
                 anchors.right: combo.left
                 anchors.rightMargin: appStyle.spacing.horizontal
+                focus: true
                 validator: RegExpValidator {
                     regExp: /^[^@/ ]+@[^@/ ]+$/
                 }

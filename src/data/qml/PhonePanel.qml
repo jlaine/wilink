@@ -237,6 +237,7 @@ Panel {
                 anchors.left: parent.left
                 anchors.right: buttonBox.left
                 anchors.rightMargin: appStyle.spacing.horizontal
+                focus: true
                 hintText: qsTr('Enter the number you want to call')
 
                 Keys.onReturnPressed: {

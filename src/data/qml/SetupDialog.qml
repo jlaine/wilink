@@ -313,12 +313,6 @@ Dialog {
         }
     ]
 
-    onActiveFocusChanged: {
-        if (activeFocus && !usernameInput.activeFocus) {
-            usernameInput.forceActiveFocus();
-        }
-    }
-
     onRejected: {
         if (dialog.accountSlave)
             dialog.close()
