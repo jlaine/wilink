@@ -24,8 +24,6 @@ import 'utils.js' as Utils
 Dialog {
     id: dialog
 
-    title: qsTr('Add an account')
-
     property QtObject accountModel: AccountModel {}
     property bool accountSlave: false
 
@@ -34,6 +32,10 @@ Dialog {
     property string webPassword
     property string xmppUsername
     property string xmppPassword
+
+    title: qsTr('Add an account')
+    minimumWidth: 440
+    minimumHeight: 250
 
     Client {
         id: testClient
@@ -80,130 +82,142 @@ Dialog {
         }
     }
 
-    Column {
+    Item {
         anchors.fill: dialog.contents
         anchors.leftMargin: appStyle.margin.normal
         anchors.rightMargin: appStyle.margin.normal
-        spacing:  appStyle.spacing.vertical
 
         PanelHelp {
+            id: topHelp
+
             anchors.left: parent.left
             anchors.right: parent.right
             text: qsTr('Enter the address and password for your account.')
         }
 
-        Item {
+        Column {
             anchors.left: parent.left
             anchors.right: parent.right
-            height: accountCombo.height
+            anchors.verticalCenter: parent.verticalCenter
+            spacing:  appStyle.spacing.vertical
 
-            Label {
-                id: accountLabel
-
+            Item {
                 anchors.left: parent.left
-                anchors.verticalCenter: parent.verticalCenter
-                elide: Text.ElideRight
-                font.bold: true
-                text: qsTr('Account')
-                width: 100
-            }
-
-            ComboBox {
-                id: accountCombo
-
-                anchors.top: parent.top
-                anchors.left: accountLabel.right
-                anchors.leftMargin: appStyle.spacing.horizontal
                 anchors.right: parent.right
-                model: ListModel {}
+                height: accountCombo.height
 
-                Component.onCompleted: {
-                    model.append({iconSource: 'image://icon/wiLink', text: 'Wifirst', type: 'wifirst'});
-                    model.append({iconSource: 'image://icon/google', text: 'Google', type: 'google'});
-                    model.append({iconSource: 'image://icon/peer', text: qsTr('Other'), type: 'other'});
-                    accountCombo.currentIndex = 0;
+                Label {
+                    id: accountLabel
+
+                    anchors.left: parent.left
+                    anchors.verticalCenter: parent.verticalCenter
+                    elide: Text.ElideRight
+                    font.bold: true
+                    text: qsTr('Account')
+                    width: 100
+                }
+
+                ComboBox {
+                    id: accountCombo
+
+                    anchors.top: parent.top
+                    anchors.left: accountLabel.right
+                    anchors.leftMargin: appStyle.spacing.horizontal
+                    anchors.right: parent.right
+                    model: ListModel {}
+
+                    Component.onCompleted: {
+                        model.append({iconSource: 'image://icon/wiLink', text: 'Wifirst', type: 'wifirst'});
+                        model.append({iconSource: 'image://icon/google', text: 'Google', type: 'google'});
+                        model.append({iconSource: 'image://icon/peer', text: qsTr('Other'), type: 'other'});
+                        accountCombo.currentIndex = 0;
+                    }
                 }
             }
-        }
 
-        Item {
-            anchors.left: parent.left
-            anchors.right: parent.right
-            height: usernameInput.height
+            Item {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                height: usernameInput.height
+
+                Label {
+                    id: usernameLabel
+
+                    anchors.left: parent.left
+                    anchors.verticalCenter: parent.verticalCenter
+                    elide: Text.ElideRight
+                    font.bold: true
+                    text: qsTr('Address')
+                    width: 100
+                }
+
+                InputBar {
+                    id: usernameInput
+
+                    anchors.top: parent.top
+                    anchors.left: usernameLabel.right
+                    anchors.leftMargin: appStyle.spacing.horizontal
+                    anchors.right: parent.right
+                    validator: RegExpValidator {
+                        regExp: /.+/
+                    }
+                    onTextChanged: dialog.state = ''
+                }
+            }
+
+            Item {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                height: passwordInput.height
+
+                Label {
+                    id: passwordLabel
+
+                    anchors.left: parent.left
+                    anchors.verticalCenter: parent.verticalCenter
+                    elide: Text.ElideRight
+                    font.bold: true
+                    text: qsTr('Password')
+                    width: 100
+                }
+
+                InputBar {
+                    id: passwordInput
+
+                    anchors.top: parent.top
+                    anchors.left: passwordLabel.right
+                    anchors.leftMargin: appStyle.spacing.horizontal
+                    anchors.right: parent.right
+                    echoMode: TextInput.Password
+                    validator: RegExpValidator {
+                        regExp: /.+/
+                    }
+                    onTextChanged: dialog.state = ''
+                }
+            }
 
             Label {
-                id: usernameLabel
+                id: statusLabel
+
+                property string authErrorText: qsTr('Could not connect, please check your username and password.')
+                property string unknownErrorText: qsTr('An unknown error occured.')
+                property string dupeText: qsTr("You already have an account for '%1'.").replace('%1', Utils.jidToDomain(usernameInput.text));
+                property string incompleteText: qsTr('Please enter a valid username and password.')
+                property string testingText: qsTr('Checking your username and password..')
 
                 anchors.left: parent.left
-                anchors.verticalCenter: parent.verticalCenter
-                elide: Text.ElideRight
-                font.bold: true
-                text: qsTr('Address')
-                width: 100
-            }
-
-            InputBar {
-                id: usernameInput
-
-                anchors.top: parent.top
-                anchors.left: usernameLabel.right
-                anchors.leftMargin: appStyle.spacing.horizontal
                 anchors.right: parent.right
-                validator: RegExpValidator {
-                    regExp: /.+/
-                }
-                onTextChanged: dialog.state = ''
+                visible: text != ''
+                wrapMode: Text.WordWrap
             }
-        }
-
-        Item {
-            anchors.left: parent.left
-            anchors.right: parent.right
-            height: passwordInput.height
-
-            Label {
-                id: passwordLabel
-
-                anchors.left: parent.left
-                anchors.verticalCenter: parent.verticalCenter
-                elide: Text.ElideRight
-                font.bold: true
-                text: qsTr('Password')
-                width: 100
-            }
-
-            InputBar {
-                id: passwordInput
-
-                anchors.top: parent.top
-                anchors.left: passwordLabel.right
-                anchors.leftMargin: appStyle.spacing.horizontal
-                anchors.right: parent.right
-                echoMode: TextInput.Password
-                validator: RegExpValidator {
-                    regExp: /.+/
-                }
-                onTextChanged: dialog.state = ''
-            }
-        }
-
-        Label {
-            id: statusLabel
-
-            property string authErrorText: qsTr('Could not connect, please check your username and password.')
-            property string unknownErrorText: qsTr('An unknown error occured.')
-            property string dupeText: qsTr("You already have an account for '%1'.").replace('%1', Utils.jidToDomain(usernameInput.text));
-            property string incompleteText: qsTr('Please enter a valid username and password.')
-            property string testingText: qsTr('Checking your username and password..')
-
-            anchors.left: parent.left
-            anchors.right: parent.right
-            wrapMode: Text.WordWrap
         }
 
         PanelHelp {
+            id: bottomHelp
+
             anchors.left: parent.left
             anchors.right: parent.right
+            anchors.bottom: parent.bottom
             text: qsTr('If you need help, please refer to the <a href="%1">wiLink FAQ</a>.').replace('%1', 'https://www.wifirst.net/wilink/faq')
         }
     }
