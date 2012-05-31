@@ -1,6 +1,5 @@
 set(QT_USE_QTDECLARATIVE 1)
 set(QT_USE_QTNETWORK 1)
-set(QT_USE_QTMULTIMEDIA 1)
 set(QT_USE_QTSQL 1)
 set(QT_USE_QTXML 1)
 include(${QT_USE_FILE})
@@ -14,14 +13,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../qxmpp-extra/shares)
 
 add_definitions(-DQT_PLUGIN)
 add_definitions(-DQT_SHARED)
-
-# Needed for Qt >= 4.7 on Debian/Ubuntu
-find_library(QTMULTIMEDIAKIT_LIBRARY QtMultimediaKit)
-if(QTMULTIMEDIAKIT_LIBRARY)
-    message(STATUS "Found QtMultimediaKit library")
-    include_directories(/usr/include/QtMobility)
-    include_directories(/usr/include/QtMultimediaKit)
-endif()
 
 if(WILINK_EMBEDDED)
     add_definitions(-DWILINK_EMBEDDED)
