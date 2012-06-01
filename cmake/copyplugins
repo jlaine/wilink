@@ -55,9 +55,11 @@ cp -R $QT_INSTALL_LIBS/Resources/qt_menu.nib $DEPLOY_RESOURCES/
 for framework in $FRAMEWORKS; do
     src="/Library/Frameworks/$framework.framework"
     dst="$DEPLOY_LIBS/$framework.framework"
-    echo "Copying framework $framework"
-    rm -rf $dst
-    cp -a $src $dst
+    if [ -e $src ]; then
+        echo "Copying framework $framework"
+        rm -rf $dst
+        cp -a $src $dst
+    fi
 done
 
 # copy imports
