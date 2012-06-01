@@ -17,9 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <AppKit/AppKit.h>
-#include <Foundation/NSAutoreleasePool.h>
-
 #include <QApplication>
 #include "window.h"
 
