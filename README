@@ -31,7 +31,7 @@ $ sudo apt-get install cmake libmad0-dev libqdjango-dev libqt4-dev libqt4-sql-sq
 On Mac OS X
 -----------
 
-$ sudo port install cmake libmad qdjango qt4-mac qxmpp libvorbis
+$ sudo port install cmake libmad pkgconfig qdjango qt4-mac qxmpp libvorbis
 
 Building wiLink
 ===============
