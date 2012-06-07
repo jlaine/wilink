@@ -57,6 +57,10 @@ signals:
     // This signal is emitted when the output volume changes.
     void outputVolumeChanged(int volume);
 
+public slots:
+    void startTone(int tone);
+    void stopTone(int tone);
+
 private slots:
     void _q_callStateChanged(SipCall::State state);
 

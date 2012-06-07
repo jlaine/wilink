@@ -1,4 +1,6 @@
 wiLink 2.3.4 (UNRELEASED)
+ * Phone:
+  - Fix sending DTMF during calls.
  * Transfers:
   - Fix receiving files.
 

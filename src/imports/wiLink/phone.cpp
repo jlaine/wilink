@@ -98,6 +98,20 @@ int PhoneAudioHelper::outputVolume() const
     return m_stream->outputVolume();
 }
 
+void PhoneAudioHelper::startTone(int tone)
+{
+    if (m_call && tone >= QXmppRtpAudioChannel::Tone_0 && tone <= QXmppRtpAudioChannel::Tone_D) {
+        m_call->audioChannel()->startTone(static_cast<QXmppRtpAudioChannel::Tone>(tone));
+    }
+}
+
+void PhoneAudioHelper::stopTone(int tone)
+{
+    if (m_call && tone >= QXmppRtpAudioChannel::Tone_0 && tone <= QXmppRtpAudioChannel::Tone_D) {
+        m_call->audioChannel()->stopTone(static_cast<QXmppRtpAudioChannel::Tone>(tone));
+    }
+}
+
 void PhoneAudioHelper::_q_callStateChanged(SipCall::State state)
 {
     Q_ASSERT(m_call);

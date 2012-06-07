@@ -187,11 +187,11 @@ Item {
         target: keypad
 
         onKeyPressed: {
-            call.audioChannel.startTone(key.tone);
+            audio.startTone(key.tone);
         }
 
         onKeyReleased: {
-            call.audioChannel.stopTone(key.tone);
+            audio.stopTone(key.tone);
         }
     }
 
