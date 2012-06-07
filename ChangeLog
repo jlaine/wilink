@@ -1,4 +1,4 @@
-wiLink 2.3.4 (UNRELEASED)
+wiLink 2.3.4 (2012-06-07)
  * Phone:
   - Fix sending DTMF during calls.
  * Transfers:
