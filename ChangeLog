@@ -1,3 +1,7 @@
+wiLink 2.3.4 (UNRELEASED)
+ * Transfers:
+  - Fix receiving files.
+
 wiLink 2.3.3 (2012-05-31)
  * Application:
   - Show all chat accounts in a single window.
