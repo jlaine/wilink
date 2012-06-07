@@ -51,6 +51,7 @@ SOURCES += \
     history.cpp \
     icons.cpp \
     idle/idle.cpp \
+    menubar.cpp \
     model.cpp \
     news.cpp \
     notifications.cpp \
@@ -78,6 +79,7 @@ HEADERS += \
     history.h \
     icons.h \
     idle/idle.h \
+    menubar.h \
     model.h \
     news.h \
     notifications.h \

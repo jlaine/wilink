@@ -33,6 +33,7 @@ set(plugin_SOURCES
     history.cpp
     icons.cpp
     idle/idle.cpp
+    menubar.cpp
     model.cpp
     news.cpp
     notifications.cpp
@@ -60,6 +61,7 @@ set(plugin_MOC_HEADERS
     discovery.h
     history.h
     idle/idle.h
+    menubar.h
     model.h
     news.h
     notifications.h
