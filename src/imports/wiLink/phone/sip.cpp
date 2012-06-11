@@ -1104,7 +1104,6 @@ void SipClient::datagramReceived()
 
     // check whether it's a request or a response
     if (reply.isRequest()) {
-        bool emitCall = false;
         if (currentCall) {
             currentCall->d->handleRequest(reply);
         } else if (!currentCall && reply.method() == "INVITE") {
