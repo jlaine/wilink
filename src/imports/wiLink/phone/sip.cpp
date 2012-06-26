@@ -1,20 +1,18 @@
 /*
- * wiLink
- * Copyright (C) 2009-2012 Wifirst
- * See AUTHORS file for a full list of contributors.
+ * Copyright (C) 2010-2012 Jeremy Lainé
+ * Contact: http://code.google.com/p/qsip/
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This file is a part of the QSip library.
  *
- * This program is distributed in the hope that it will be useful,
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
  */
 
 #include <QByteArrayMatcher>
@@ -39,8 +37,9 @@ static const int RTCP_COMPONENT = 2;
 
 Q_DECLARE_METATYPE(SipCall::State)
 
-#define QXMPP_DEBUG_SIP
-#define QXMPP_DEBUG_STUN
+#define SIP_DEBUG_SIP
+#define SIP_DEBUG_STUN
+#define SIP_USE_ICE
 
 #define EXPIRE_SECONDS 120
 
@@ -304,9 +303,11 @@ SdpMessage SipCallPrivate::buildSdp(const QList<QXmppJinglePayloadType> &payload
     sdp.addField('c', addressToSdp(localRtpAddress).toUtf8());
     sdp.addField('t', activeTime);
 
+#ifdef SIP_USE_ICE
     // ICE credentials
     sdp.addField('a', "ice-ufrag:" + iceConnection->localUser().toUtf8());
     sdp.addField('a', "ice-pwd:" + iceConnection->localPassword().toUtf8());
+#endif
 
     // RTP profile
     QByteArray profiles = "RTP/AVP";
@@ -328,6 +329,7 @@ SdpMessage SipCallPrivate::buildSdp(const QList<QXmppJinglePayloadType> &payload
     foreach (const QByteArray &attr, attrs)
         sdp.addField('a', attr);
 
+#ifdef SIP_USE_ICE
     // ICE candidates
     foreach (const QXmppJingleCandidate &candidate, iceConnection->localCandidates()) {
         QByteArray ba = "candidate:" + QByteArray::number(candidate.foundation()) + " ";
@@ -339,6 +341,7 @@ SdpMessage SipCallPrivate::buildSdp(const QList<QXmppJinglePayloadType> &payload
         ba += "typ " + QXmppJingleCandidate::typeToString(candidate.type()).toAscii();
         sdp.addField('a', ba);
     }
+#endif
     return sdp;
 }
 
@@ -379,28 +382,7 @@ bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
             const QByteArray attrName = field.second.left(pos);
             const QByteArray attrValue = field.second.mid(pos+1);
 
-            if (attrName == "ice-ufrag") {
-                // ICE user
-                iceConnection->setRemoteUser(QString::fromUtf8(attrValue));
-            } else if (attrName == "ice-pwd") {
-                // ICE password
-                iceConnection->setRemotePassword(QString::fromUtf8(attrValue));
-            } else if (attrName == "candidate") {
-                // ICE candidate
-                QList<QByteArray> bits = attrValue.split(' ');
-                QXmppJingleCandidate candidate;
-                if (bits.size() == 8 && bits[6] == "typ") {
-                    candidate.setFoundation(bits[0].toInt());
-                    candidate.setComponent(bits[1].toInt());
-                    candidate.setProtocol(QString::fromAscii(bits[2]).toLower());
-                    candidate.setPriority(bits[3].toInt());
-                    candidate.setHost(QHostAddress(QString::fromAscii(bits[4])));
-                    candidate.setPort(bits[5].toInt());
-                    candidate.setType(QXmppJingleCandidate::typeFromString(QString::fromAscii(bits[7])));
-
-                    iceConnection->addRemoteCandidate(candidate);
-                }
-            } else if (attrName == "ptime") {
+            if (attrName == "ptime") {
                 // packetization time
                 bool ok = false;
                 int ptime = attrValue.toInt(&ok);
@@ -427,6 +409,29 @@ bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
                             payloads[i].setClockrate(args[1].toInt());
                     }
                 }
+#ifdef SIP_USE_ICE
+            else if (attrName == "ice-ufrag") {
+                // ICE user
+                iceConnection->setRemoteUser(QString::fromUtf8(attrValue));
+            } else if (attrName == "ice-pwd") {
+                // ICE password
+                iceConnection->setRemotePassword(QString::fromUtf8(attrValue));
+            } else if (attrName == "candidate") {
+                // ICE candidate
+                QList<QByteArray> bits = attrValue.split(' ');
+                QXmppJingleCandidate candidate;
+                if (bits.size() == 8 && bits[6] == "typ") {
+                    candidate.setFoundation(bits[0].toInt());
+                    candidate.setComponent(bits[1].toInt());
+                    candidate.setProtocol(QString::fromAscii(bits[2]).toLower());
+                    candidate.setPriority(bits[3].toInt());
+                    candidate.setHost(QHostAddress(QString::fromAscii(bits[4])));
+                    candidate.setPort(bits[5].toInt());
+                    candidate.setType(QXmppJingleCandidate::typeFromString(QString::fromAscii(bits[7])));
+
+                    iceConnection->addRemoteCandidate(candidate);
+                }
+#endif
             }
         } else if (field.first == 't') {
             // active time
@@ -605,6 +610,11 @@ void SipCall::accept()
 QXmppRtpAudioChannel *SipCall::audioChannel() const
 {
     return d->audioChannel;
+}
+
+QXmppIceConnection *SipCall::audioConnection() const
+{
+    return d->iceConnection;
 }
 
 /// Returns the call's direction.
@@ -1030,7 +1040,7 @@ void SipClient::datagramReceived()
         if (!message.decode(buffer))
             return;
 
-#ifdef QXMPP_DEBUG_STUN
+#ifdef SIP_DEBUG_STUN
         logReceived(QString("STUN packet from %1 port %2\n%3").arg(
             remoteHost.toString(),
             QString::number(remotePort),
@@ -1080,7 +1090,7 @@ void SipClient::datagramReceived()
         return;
     }
 
-#ifdef QXMPP_DEBUG_SIP
+#ifdef SIP_DEBUG_SIP
     logReceived(QString("SIP packet from %1\n%2").arg(remoteHost.toString(), QString::fromUtf8(buffer)));
 #endif
 
@@ -1189,7 +1199,7 @@ void SipClient::registerWithServer()
  */
 void SipClient::sendMessage(const SipMessage &message)
 {
-#ifdef QXMPP_DEBUG_SIP
+#ifdef SIP_DEBUG_SIP
     logSent(QString("SIP packet to %1:%2\n%3").arg(
             d->serverAddress.toString(),
             QString::number(d->serverPort),
@@ -1208,7 +1218,7 @@ void SipClient::sendStun()
     d->stunCookie = request.cookie();
     d->stunId = request.id();
 
-#ifdef QXMPP_DEBUG_STUN
+#ifdef SIP_DEBUG_STUN
     logSent(QString("STUN packet to %1 port %2\n%3").arg(d->stunServerAddress.toString(),
             QString::number(d->stunServerPort), request.toString()));
 #endif

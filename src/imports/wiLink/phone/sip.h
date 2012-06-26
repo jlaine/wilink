@@ -1,24 +1,22 @@
 /*
- * wiLink
- * Copyright (C) 2009-2012 Wifirst
- * See AUTHORS file for a full list of contributors.
+ * Copyright (C) 2010-2012 Jeremy Lainé
+ * Contact: http://code.google.com/p/qsip/
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * This file is a part of the QSip library.
  *
- * This program is distributed in the hope that it will be useful,
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
  */
 
-#ifndef __WILINK_PHONE_SIP_H__
-#define __WILINK_PHONE_SIP_H__
+#ifndef __SIP_H__
+#define __SIP_H__
 
 #include <QHostAddress>
 #include <QObject>
@@ -29,6 +27,7 @@
 class QHostInfo;
 class QUdpSocket;
 class QTimer;
+class QXmppIceConnection;
 class QXmppRtpAudioChannel;
 
 class SipCallContext;
@@ -188,6 +187,7 @@ public:
     quint16 remoteRtpPort() const;
 
     QXmppRtpAudioChannel *audioChannel() const;
+    QXmppIceConnection *audioConnection() const;
 
 signals:
     /// This signal is emitted when a call is connected.
