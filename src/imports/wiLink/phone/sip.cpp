@@ -410,7 +410,7 @@ bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
                     }
                 }
 #ifdef SIP_USE_ICE
-            else if (attrName == "ice-ufrag") {
+            } else if (attrName == "ice-ufrag") {
                 // ICE user
                 iceConnection->setRemoteUser(QString::fromUtf8(attrValue));
             } else if (attrName == "ice-pwd") {
