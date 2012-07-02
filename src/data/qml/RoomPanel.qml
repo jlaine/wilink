@@ -24,6 +24,7 @@ import 'utils.js' as Utils
 Panel {
     id: panel
 
+    property string accountJid
     property string iconSource: 'image://icon/chat'
     property alias jid: participantModel.jid
     property alias room: participantModel.room

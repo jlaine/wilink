@@ -68,9 +68,11 @@ Panel {
                 // FIXME : this is a hack to replay received messages after
                 // adding the appropriate conversation
                 onMessageReceived: {
-                    var jid = Utils.jidToBareJid(from);
-                    if (!chatSwapper.findPanel('ConversationPanel.qml', {'jid': jid})) {
-                        chatSwapper.addPanel('ConversationPanel.qml', {'jid': jid});
+                    var opts = {
+                        accountJid: Utils.jidToBareJid(item.client.jid),
+                        jid: Utils.jidToBareJid(from) };
+                    if (!chatSwapper.findPanel('ConversationPanel.qml', opts)) {
+                        chatSwapper.addPanel('ConversationPanel.qml', opts);
                         item.client.replayMessage();
                     }
                 }
@@ -143,7 +145,7 @@ Panel {
      */
     function showConversation(jid) {
         swapper.showPanel('ChatPanel.qml');
-        chatSwapper.showPanel('ConversationPanel.qml', {'jid': Utils.jidToBareJid(jid)});
+        chatSwapper.showPanel('ConversationPanel.qml', {'accountJid': Utils.jidToBareJid(appClient.jid), 'jid': Utils.jidToBareJid(jid)});
         if (chatPanel.singlePanel)
             chatPanel.state = 'no-sidebar';
     }
@@ -152,7 +154,7 @@ Panel {
      */
     function showRoom(jid) {
         swapper.showPanel('ChatPanel.qml');
-        chatSwapper.showPanel('RoomPanel.qml', {'jid': jid})
+        chatSwapper.showPanel('RoomPanel.qml', {'accountJid': Utils.jidToBareJid(appClient.jid), 'jid': jid})
         if (chatPanel.singlePanel)
             chatPanel.state = 'no-sidebar';
     }
@@ -179,11 +181,14 @@ Panel {
                 id: roomListModel
 
                 onRoomAdded: {
-                    if (!chatSwapper.findPanel('RoomPanel.qml', {'jid': jid})) {
+                    var opts = {
+                        accountJid: Utils.jidToBareJid(appClient.jid),
+                        jid: jid};
+                    if (!chatSwapper.findPanel('RoomPanel.qml', opts)) {
                         if (chatSwapper.currentItem) {
-                            chatSwapper.addPanel('RoomPanel.qml', {'jid': jid});
+                            chatSwapper.addPanel('RoomPanel.qml', opts);
                         } else {
-                            chatSwapper.showPanel('RoomPanel.qml', {'jid': jid});
+                            chatSwapper.showPanel('RoomPanel.qml', opts);
                         }
                     }
                 }

@@ -24,6 +24,7 @@ import 'utils.js' as Utils
 Panel {
     id: panel
 
+    property string accountJid
     property alias iconSource: vcard.avatar
     property alias jid: conversation.jid
     property alias title: vcard.name
@@ -31,7 +32,13 @@ Panel {
     Conversation {
         id: conversation
 
-        client: appClient
+        client: {
+            var client = accountModel.clientForJid(panel.accountJid);
+            if (client)
+                return client;
+            else
+                return null;
+        }
     }
 
     PanelHeader {
@@ -70,11 +77,11 @@ Panel {
 
                 onClicked: {
                     var fullJid = vcard.jidForFeature(VCard.VoiceFeature);
-                    appClient.callManager.call(fullJid);
+                    conversation.client.callManager.call(fullJid);
                 }
 
                 Connections {
-                    target: appClient.callManager
+                    target: conversation.client.callManager
                     onCallStarted: {
                         if (Utils.jidToBareJid(call.jid) == conversation.jid) {
                             var component = Qt.createComponent('CallWidget.qml');
@@ -109,13 +116,13 @@ Panel {
                         for (var i in dialog.selectedFiles) {
                             var filePath = dialog.selectedFiles[i];
                             var fullJid = vcard.jidForFeature(VCard.FileTransferFeature);
-                            appClient.transferManager.sendFile(fullJid, filePath);
+                            conversation.client.transferManager.sendFile(fullJid, filePath);
                         }
                     }
                 }
 
                 Connections {
-                    target: appClient.transferManager
+                    target: conversation.client.transferManager
                     onJobStarted: {
                         if (Utils.jidToBareJid(job.jid) == conversation.jid) {
                             var component = Qt.createComponent('TransferWidget.qml');
@@ -218,7 +225,7 @@ Panel {
             onFilesDropped: {
                 for (var i in files) {
                     var fullJid = vcard.jidForFeature(VCard.FileTransferFeature);
-                    appClient.transferManager.sendFile(fullJid, files[i]);
+                    conversation.client.transferManager.sendFile(fullJid, files[i]);
                 }
             }
         }
