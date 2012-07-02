@@ -87,7 +87,6 @@ Panel {
             iconSource: 'image://icon/chat'
             model: RoomListModel {
                 id: roomListModel
-                client: appClient
 
                 onRoomAdded: {
                     if (!chatSwapper.findPanel('RoomPanel.qml', {'jid': jid})) {
@@ -379,7 +378,9 @@ Panel {
             }
         }
         appClient.connectToServer(jid, password);
+
         rosterModel.addClient(appClient);
+        roomListModel.addClient(appClient);
     }
 
     onDockClicked: {

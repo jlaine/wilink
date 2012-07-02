@@ -20,6 +20,8 @@
 #ifndef __WILINK_ROOMS_H__
 #define __WILINK_ROOMS_H__
 
+#include <QSet>
+
 #include "QXmppDataForm.h"
 #include "QXmppMucIq.h"
 #include "model.h"
@@ -27,6 +29,7 @@
 class ChatClient;
 class HistoryModel;
 class QModelIndex;
+class QXmppBookmarkManager;
 class QXmppMessage;
 class QXmppMucManager;
 class QXmppMucRoom;
@@ -73,25 +76,21 @@ private:
 class RoomListModel : public ChatModel
 {
     Q_OBJECT
-    Q_PROPERTY(ChatClient* client READ client WRITE setClient NOTIFY clientChanged)
     Q_PROPERTY(int pendingMessages READ pendingMessages NOTIFY pendingMessagesChanged)
 
 public:
     RoomListModel(QObject *parent = 0);
-
-    ChatClient *client() const;
-    void setClient(ChatClient *client);
 
     int pendingMessages() const;
 
     QVariant data(const QModelIndex &index, int role) const;
 
 signals:
-    void clientChanged(ChatClient *client);
     void pendingMessagesChanged();
     void roomAdded(const QString &jid);
 
 public slots:
+    void addClient(ChatClient *client);
     void addPendingMessage(const QString &jid);
     void clearPendingMessages(const QString &jid);
 
@@ -104,10 +103,12 @@ private slots:
     void _q_roomAdded(QXmppMucRoom *room);
 
 private:
+    void _q_bookmarksReceived(QXmppBookmarkManager *bookmarkManager);
+
     enum Role {
         ParticipantsRole = ChatModel::UserRole,
     };
-    ChatClient *m_client;
+    QSet<ChatClient*> m_clients;
 };
 
 class RoomModel : public ChatModel
