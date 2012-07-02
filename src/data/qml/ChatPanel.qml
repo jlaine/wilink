@@ -141,7 +141,6 @@ Panel {
      */
     function showConversation(jid) {
         swapper.showPanel('ChatPanel.qml');
-        var client = rosterModel.client(jid);
         chatSwapper.showPanel('ConversationPanel.qml', {
             client: rosterModel.client(jid),
             jid: Utils.jidToBareJid(jid)});
