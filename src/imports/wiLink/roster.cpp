@@ -164,7 +164,6 @@ public:
     void clientConnected(ChatClient* client);
     RosterItem* find(const QString &id, ChatModelItem *parent = 0);
     void itemAdded(QXmppRosterManager *rosterManager, const QString &jid);
-    void itemRemoved(QXmppRosterManager *rosterManager, const QString &jid);
     void rosterReceived(QXmppRosterManager *rosterManager);
 
     QSet<ChatClient*> clients;
@@ -226,39 +225,27 @@ void RosterModelPrivate::itemAdded(QXmppRosterManager *rosterManager, const QStr
     q->addItem(item, q->rootItem);
 }
 
-/** Handles an item being removed to the roster.
- */
-void RosterModelPrivate::itemRemoved(QXmppRosterManager *rosterManager, const QString &jid)
-{
-    RosterItem *item = find(jid);
-    if (item) {
-        item->rosterManagers.remove(rosterManager);
-        if (item->rosterManagers.isEmpty())
-            q->removeItem(item);
-    }
-}
-
 /** Handles roster reception.
  */
 void RosterModelPrivate::rosterReceived(QXmppRosterManager *rosterManager)
 {
     // make a note of existing contacts
-    QStringList oldJids;
+    QList<RosterItem*> affected;
     foreach (ChatModelItem *item, q->rootItem->children) {
         RosterItem *child = static_cast<RosterItem*>(item);
-        if (child->rosterManagers.contains(rosterManager))
-            oldJids << child->jid;
+        if (child->rosterManagers.remove(rosterManager))
+            affected << child;
     }
 
     // process received entries
-    foreach (const QString &jid, rosterManager->getRosterBareJids()) {
+    foreach (const QString &jid, rosterManager->getRosterBareJids())
         itemAdded(rosterManager, jid);
-        oldJids.removeAll(jid);
-    }
 
     // remove obsolete entries
-    foreach (const QString &jid, oldJids)
-        itemRemoved(rosterManager, jid);
+    foreach (RosterItem *item, affected) {
+        if (item->rosterManagers.isEmpty())
+            q->removeItem(item);
+    }
 }
 
 RosterModel::RosterModel(QObject *parent)
@@ -286,6 +273,10 @@ void RosterModel::addClient(ChatClient *client)
         d->clients << client;
 
         VCardCache::instance()->addClient(client);
+
+        check = connect(client, SIGNAL(destroyed(QObject*)),
+                        this, SLOT(_q_clientDestroyed(QObject*)));
+        Q_ASSERT(check);
 
         check = connect(client, SIGNAL(connected()),
                         this, SLOT(_q_connected()));
@@ -364,6 +355,28 @@ bool RosterModel::setData(const QModelIndex &index, const QVariant &value, int r
     return false;
 }
 
+void RosterModel::_q_clientDestroyed(QObject *object)
+{
+    ChatClient *client = static_cast<ChatClient*>(object);
+    if (!d->clients.remove(client))
+        return;
+
+    // mark affected contacts
+    QXmppRosterManager *rosterManager = client->rosterManager();
+    QList<RosterItem*> affected;
+    foreach (ChatModelItem *item, rootItem->children) {
+        RosterItem *child = static_cast<RosterItem*>(item);
+        if (child->rosterManagers.remove(rosterManager))
+            affected << child;
+    }
+
+    // remove obsolete entries
+    foreach (RosterItem *item, affected) {
+        if (item->rosterManagers.isEmpty())
+            removeItem(item);
+    }
+}
+
 void RosterModel::_q_connected()
 {
     ChatClient *client = qobject_cast<ChatClient*>(sender());
@@ -404,8 +417,15 @@ void RosterModel::_q_itemChanged(const QString &jid)
 void RosterModel::_q_itemRemoved(const QString &jid)
 {
     QXmppRosterManager *rosterManager = qobject_cast<QXmppRosterManager*>(sender());
-    if (rosterManager)
-        d->itemRemoved(rosterManager, jid);
+    if (!rosterManager)
+        return;
+
+    RosterItem *item = find(jid);
+    if (item) {
+        item->rosterManagers.remove(rosterManager);
+        if (item->rosterManagers.isEmpty())
+            q->removeItem(item);
+    }
 }
 
 void RosterModel::_q_rosterReceived()

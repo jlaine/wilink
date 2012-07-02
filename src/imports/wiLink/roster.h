@@ -78,6 +78,7 @@ public slots:
     void clearPendingMessages(const QString &bareJid);
 
 private slots:
+    void _q_clientDestroyed(QObject *object);
     void _q_connected();
     void _q_disconnected();
     void _q_itemAdded(const QString &jid);
