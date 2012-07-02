@@ -159,11 +159,29 @@ QPixmap RosterImageProvider::requestPixmap(const QString &id, QSize *size, const
 class RosterModelPrivate
 {
 public:
+    RosterModelPrivate(RosterModel *qq);
+    void clientConnected(ChatClient* client);
     RosterItem* find(const QString &id, ChatModelItem *parent = 0);
+    void rosterReceived(QXmppRosterManager *rosterManager);
 
-    RosterModel *q;
     ChatClient *client;
+    QSet<ChatClient*> clients;
+
+private:
+    RosterModel *q;
 };
+
+RosterModelPrivate::RosterModelPrivate(RosterModel *qq)
+    : client(0)
+    , q(qq)
+{
+}
+
+void RosterModelPrivate::clientConnected(ChatClient *client)
+{
+    // request own vCard
+    VCardCache::instance()->get(client->configuration().jidBare());
+}
 
 RosterItem *RosterModelPrivate::find(const QString &id, ChatModelItem *parent)
 {
@@ -187,12 +205,33 @@ RosterItem *RosterModelPrivate::find(const QString &id, ChatModelItem *parent)
     return 0;
 }
 
-RosterModel::RosterModel(QObject *parent)
-    : ChatModel(parent),
-    d(new RosterModelPrivate)
+void RosterModelPrivate::rosterReceived(QXmppRosterManager *rosterManager)
 {
-    d->client = 0;
-    d->q = this;
+    // make a note of existing contacts
+    QStringList oldJids;
+    foreach (ChatModelItem *item, q->rootItem->children) {
+        RosterItem *child = static_cast<RosterItem*>(item);
+        oldJids << child->jid;
+    }
+
+    // process received entries
+    foreach (const QString &jid, rosterManager->getRosterBareJids()) {
+        q->_q_itemAdded(jid);
+        oldJids.removeAll(jid);
+    }
+
+    // remove obsolete entries
+    foreach (const QString &jid, oldJids) {
+        RosterItem *item = find(jid);
+        if (item)
+            q->removeItem(item);
+    }
+}
+
+RosterModel::RosterModel(QObject *parent)
+    : ChatModel(parent)
+{
+    d = new RosterModelPrivate(this);
 
     // set additionals role names
     QHash<int, QByteArray> names = roleNames();
@@ -217,26 +256,27 @@ void RosterModel::setClient(ChatClient *client)
 
     if (client != d->client) {
         d->client = client;
+        d->clients << client;
 
-        VCardCache::instance()->addClient(d->client);
+        VCardCache::instance()->addClient(client);
 
-        check = connect(d->client, SIGNAL(connected()),
+        check = connect(client, SIGNAL(connected()),
                         this, SLOT(_q_connected()));
         Q_ASSERT(check);
 
-        check = connect(d->client, SIGNAL(disconnected()),
+        check = connect(client, SIGNAL(disconnected()),
                         this, SLOT(_q_disconnected()));
         Q_ASSERT(check);
 
-        check = connect(d->client->rosterManager(), SIGNAL(itemAdded(QString)),
+        check = connect(client->rosterManager(), SIGNAL(itemAdded(QString)),
                         this, SLOT(_q_itemAdded(QString)));
         Q_ASSERT(check);
 
-        check = connect(d->client->rosterManager(), SIGNAL(itemRemoved(QString)),
+        check = connect(client->rosterManager(), SIGNAL(itemRemoved(QString)),
                         this, SLOT(_q_itemRemoved(QString)));
         Q_ASSERT(check);
 
-        check = connect(d->client->rosterManager(), SIGNAL(presenceChanged(QString,QString)),
+        check = connect(client->rosterManager(), SIGNAL(presenceChanged(QString,QString)),
                         this, SLOT(_q_itemChanged(QString)));
         Q_ASSERT(check);
 
@@ -245,17 +285,17 @@ void RosterModel::setClient(ChatClient *client)
                         this, SLOT(_q_itemChanged(QString)), Qt::QueuedConnection);
         Q_ASSERT(check);
 
-        check = connect(d->client->rosterManager(), SIGNAL(rosterReceived()),
+        check = connect(client->rosterManager(), SIGNAL(rosterReceived()),
                         this, SLOT(_q_rosterReceived()));
         Q_ASSERT(check);
 
         if (client->state() == QXmppClient::ConnectedState)
-            _q_connected();
+            d->clientConnected(client);
 
         if (client->rosterManager()->isRosterReceived())
-            QMetaObject::invokeMethod(this, "_q_rosterReceived", Qt::QueuedConnection);
+            d->rosterReceived(client->rosterManager());
 
-        emit clientChanged(d->client);
+        emit clientChanged(client);
     }
 }
 
@@ -301,8 +341,9 @@ bool RosterModel::setData(const QModelIndex &index, const QVariant &value, int r
 
 void RosterModel::_q_connected()
 {
-    // request own vCard
-    VCardCache::instance()->get(d->client->configuration().jidBare());
+    ChatClient *client = qobject_cast<ChatClient*>(sender());
+    if (d->clients.contains(client))
+        d->clientConnected(client);
 }
 
 void RosterModel::_q_disconnected()
@@ -351,25 +392,9 @@ void RosterModel::_q_itemRemoved(const QString &jid)
 
 void RosterModel::_q_rosterReceived()
 {
-    // make a note of existing contacts
-    QStringList oldJids;
-    foreach (ChatModelItem *item, rootItem->children) {
-        RosterItem *child = static_cast<RosterItem*>(item);
-        oldJids << child->jid;
-    }
-
-    // process received entries
-    foreach (const QString &jid, d->client->rosterManager()->getRosterBareJids()) {
-        _q_itemAdded(jid);
-        oldJids.removeAll(jid);
-    }
-
-    // remove obsolete entries
-    foreach (const QString &jid, oldJids) {
-        RosterItem *item = d->find(jid);
-        if (item)
-            removeItem(item);
-    }
+    QXmppRosterManager *rosterManager = qobject_cast<QXmppRosterManager*>(sender());
+    if (rosterManager)
+        d->rosterReceived(rosterManager);
 }
 
 void RosterModel::addPendingMessage(const QString &bareJid)

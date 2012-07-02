@@ -91,7 +91,7 @@ private slots:
 
 private:
     friend class RosterModelPrivate;
-    RosterModelPrivate * const d;
+    RosterModelPrivate *d;
 };
 
 class VCard : public QObject
