@@ -148,10 +148,7 @@ Panel {
      */
     function showRoom(jid) {
         swapper.showPanel('ChatPanel.qml');
-        var client = rosterModel.client(jid);
-        chatSwapper.showPanel('RoomPanel.qml', {
-            client: client,
-            jid: jid});
+        chatSwapper.showPanel('RoomPanel.qml', { jid: jid });
         if (chatPanel.singlePanel)
             chatPanel.state = 'no-sidebar';
     }
@@ -178,9 +175,7 @@ Panel {
                 id: roomListModel
 
                 onRoomAdded: {
-                    var opts = {
-                        client: rosterModel.client(jid),
-                        jid: jid};
+                    var opts = { jid: jid };
                     if (!chatSwapper.findPanel('RoomPanel.qml', opts)) {
                         if (chatSwapper.currentItem) {
                             chatSwapper.addPanel('RoomPanel.qml', opts);

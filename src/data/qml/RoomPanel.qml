@@ -33,7 +33,10 @@ Panel {
     RoomModel {
         id: participantModel
 
-        manager: Qt.isQtObject(client) ? client.mucManager : null
+        onJidChanged: {
+            panel.client = rosterModel.client(jid);
+            manager = client.mucManager;
+        }
     }
 
     VCard {
