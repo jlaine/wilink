@@ -27,14 +27,6 @@ Panel {
     property alias rooms: roomListModel
     property bool pendingMessages: (roomListModel.pendingMessages + rosterModel.pendingMessages) > 0
 
-    function clientForJid(jid) {
-        for (var i = 0; i < chatClients.count; ++i) {
-            if (chatClients.model.get(i).jid == jid) {
-                return chatClients.itemAt(i).client;
-            }
-        }
-    }
-
     Repeater {
         id: chatClients
 
