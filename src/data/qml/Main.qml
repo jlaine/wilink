@@ -30,7 +30,7 @@ FocusScope {
         id: accountModel
 
         function clientForJid(jid) {
-            var panel = swapper.findPanel('ChatPanel.qml', {accountJid: jid});
+            var panel = swapper.findPanel('ChatPanel.qml');
             return panel.clientForJid(jid);
         }
 

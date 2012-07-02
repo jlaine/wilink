@@ -142,7 +142,7 @@ Panel {
     /** Convenience method to show a conversation panel.
      */
     function showConversation(jid) {
-        swapper.showPanel('ChatPanel.qml', {accountJid: chatPanel.accountJid});
+        swapper.showPanel('ChatPanel.qml');
         chatSwapper.showPanel('ConversationPanel.qml', {'jid': Utils.jidToBareJid(jid)});
         if (chatPanel.singlePanel)
             chatPanel.state = 'no-sidebar';
@@ -151,7 +151,7 @@ Panel {
     /** Convenience method to show a chat room panel.
      */
     function showRoom(jid) {
-        swapper.showPanel('ChatPanel.qml', {accountJid: chatPanel.accountJid});
+        swapper.showPanel('ChatPanel.qml');
         chatSwapper.showPanel('RoomPanel.qml', {'jid': jid})
         if (chatPanel.singlePanel)
             chatPanel.state = 'no-sidebar';
@@ -334,8 +334,7 @@ Panel {
 
     onPendingMessagesChanged: {
         for (var i = 0; i < dock.model.count; i++) {
-            if (dock.model.get(i).panelSource == 'ChatPanel.qml' &&
-                dock.model.get(i).panelProperties.accountJid == chatPanel.accountJid) {
+            if (dock.model.get(i).panelSource == 'ChatPanel.qml') {
                 dock.model.setProperty(i, 'notified', pendingMessages);
                 break;
             }
@@ -397,20 +396,17 @@ Panel {
         }
     }
 
-    onAccountJidChanged: {
-        var jid = chatPanel.accountJid;
-        var domain = Utils.jidToDomain(jid);
-        for (var i = 0; i < accountModel.count; ++i) {
-            var account = accountModel.get(i);
-            if (account.type == 'xmpp' && account.realm == domain && account.username == jid) {
-                chatClients.model.append({jid: jid, password: account.password});
-                break;
-            }
-        }
-    }
-
     onDockClicked: {
         chatPanel.state = (chatPanel.state == 'no-sidebar') ? '' : 'no-sidebar';
+    }
+
+    Component.onCompleted: {
+        for (var i = 0; i < accountModel.count; ++i) {
+            var account = accountModel.get(i);
+            if (account.type == 'xmpp') {
+                chatClients.model.append({jid: account.username, password: account.password});
+            }
+        }
     }
 
     Keys.onPressed: {

@@ -127,7 +127,8 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         color: 'white'
         text: {
-            switch (statusBar.client.state) {
+            var clientState = Qt.isQtObject(statusBar.client) ? statusBar.client.state : QXmppClient.DisconnectedState;
+            switch (clientState) {
             case QXmppClient.ConnectedState:
                 return qsTr('Connected');
             case QXmppClient.ConnectingState:

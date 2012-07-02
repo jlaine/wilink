@@ -26,24 +26,15 @@ Plugin {
     imageSource: 'image://icon/chat'
 
     onLoaded: {
-        for (var i = 0; i < accountModel.count; ++i) {
-            var account = accountModel.get(i);
-            if (account.type == 'xmpp') {
-                var title = qsTr('Chat');
-                if (accountModel.count > 1)
-                    title += '<br/><small>' + account.realm + '</small>';
-                dock.model.add({
-                    'iconSource': 'image://icon/dock-chat',
-                    'iconPress': 'image://icon/chat',
-                    'notified': false,
-                    'panelProperties': {'accountJid': account.username},
-                    'panelSource': 'ChatPanel.qml',
-                    'priority': 10,
-                    'text': title,
-                    'visible': true});
-                swapper.showPanel('ChatPanel.qml', {'accountJid': account.username});
-            }
-        }
+        dock.model.add({
+            'iconSource': 'image://icon/dock-chat',
+            'iconPress': 'image://icon/chat',
+            'notified': false,
+            'panelSource': 'ChatPanel.qml',
+            'priority': 10,
+            'text': qsTr('Chat'),
+            'visible': true});
+        swapper.showPanel('ChatPanel.qml');
     }
 
     onUnloaded: {

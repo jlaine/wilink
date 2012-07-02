@@ -37,7 +37,7 @@ Dialog {
             var jid = roomEdit.text;
             if (jid.indexOf('@') < 0)
                 jid += '@' + roomView.model.rootJid;
-            var panel = swapper.findPanel('ChatPanel.qml', {'accountJid': Utils.jidToBareJid(dialog.client.jid)});
+            var panel = swapper.findPanel('ChatPanel.qml');
             panel.showRoom(jid);
             dialog.close();
         }
