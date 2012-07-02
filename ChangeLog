@@ -1,3 +1,7 @@
+wiLink 2.4.0 (UNRELEASED)
+ * Chat:
+  - Display all chat accounts in a single view.
+
 wiLink 2.3.4 (2012-06-07)
  * Phone:
   - Fix sending DTMF during calls.
