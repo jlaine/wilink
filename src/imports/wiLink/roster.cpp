@@ -86,6 +86,7 @@ public:
 
     QString jid;
     int messages;
+    QSet<QXmppRosterManager*> rosterManagers;
 
 private:
     VCard *m_vcard;
@@ -163,6 +164,7 @@ public:
     void clientConnected(ChatClient* client);
     RosterItem* find(const QString &id, ChatModelItem *parent = 0);
     void itemAdded(QXmppRosterManager *rosterManager, const QString &jid);
+    void itemRemoved(QXmppRosterManager *rosterManager, const QString &jid);
     void rosterReceived(QXmppRosterManager *rosterManager);
 
     QSet<ChatClient*> clients;
@@ -210,15 +212,30 @@ void RosterModelPrivate::itemAdded(QXmppRosterManager *rosterManager, const QStr
 {
     // check the item does not exist yet
     RosterItem *item = find(jid);
-    if (item)
+    if (item) {
+        item->rosterManagers << rosterManager;
         return;
+    }
 
     // add a new entry
     const QXmppRosterIq::Item entry = rosterManager->getRosterEntry(jid);
     item = new RosterItem;
     item->jid = jid;
     item->messages = 0;
+    item->rosterManagers << rosterManager;
     q->addItem(item, q->rootItem);
+}
+
+/** Handles an item being removed to the roster.
+ */
+void RosterModelPrivate::itemRemoved(QXmppRosterManager *rosterManager, const QString &jid)
+{
+    RosterItem *item = find(jid);
+    if (item) {
+        item->rosterManagers.remove(rosterManager);
+        if (item->rosterManagers.isEmpty())
+            q->removeItem(item);
+    }
 }
 
 /** Handles roster reception.
@@ -229,7 +246,8 @@ void RosterModelPrivate::rosterReceived(QXmppRosterManager *rosterManager)
     QStringList oldJids;
     foreach (ChatModelItem *item, q->rootItem->children) {
         RosterItem *child = static_cast<RosterItem*>(item);
-        oldJids << child->jid;
+        if (child->rosterManagers.contains(rosterManager))
+            oldJids << child->jid;
     }
 
     // process received entries
@@ -239,11 +257,8 @@ void RosterModelPrivate::rosterReceived(QXmppRosterManager *rosterManager)
     }
 
     // remove obsolete entries
-    foreach (const QString &jid, oldJids) {
-        RosterItem *item = find(jid);
-        if (item)
-            q->removeItem(item);
-    }
+    foreach (const QString &jid, oldJids)
+        itemRemoved(rosterManager, jid);
 }
 
 RosterModel::RosterModel(QObject *parent)
@@ -398,9 +413,9 @@ void RosterModel::_q_itemChanged(const QString &jid)
  */
 void RosterModel::_q_itemRemoved(const QString &jid)
 {
-    RosterItem *item = d->find(jid);
-    if (item)
-        removeItem(item);
+    QXmppRosterManager *rosterManager = qobject_cast<QXmppRosterManager*>(sender());
+    if (rosterManager)
+        d->itemRemoved(rosterManager, jid);
 }
 
 void RosterModel::_q_rosterReceived()
