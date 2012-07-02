@@ -25,6 +25,7 @@ Panel {
     id: chatPanel
 
     property string accountJid
+    property QtObject appClient
     property alias rooms: roomListModel
     property bool pendingMessages: (roomListModel.pendingMessages + rosterModel.pendingMessages) > 0
 
@@ -33,25 +34,6 @@ Panel {
             if (chatClients.model.get(i).jid == jid) {
                 return chatClients.itemAt(i).client;
             }
-        }
-    }
-
-    Client {
-        id: appClient
-
-        logger: appLogger
-
-        onAuthenticationFailed: {
-            console.log("Failed to authenticate with chat server");
-            if (Utils.jidToDomain(appClient.jid) != 'wifirst.net') {
-                var jid = Utils.jidToBareJid(appClient.jid);
-                dialogSwapper.showPanel('AccountPasswordDialog.qml', {client: appClient, jid: jid});
-            }
-        }
-
-        onConflictReceived: {
-            console.log("Received a resource conflict from chat server");
-            Qt.quit();
         }
     }
 
@@ -148,6 +130,12 @@ Panel {
             item.client.connectToServer(data.jid, data.password);
             rosterModel.addClient(item.client);
             roomListModel.addClient(item.client);
+
+            // FIXME: legacy support
+            if (!Qt.isQtObject(chatPanel.appClient)) {
+                chatPanel.appClient = item.client;
+                statusBar.client = item.client;
+            }
         }
     }
 
@@ -314,7 +302,6 @@ Panel {
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.right: parent.right
-            client: appClient
         }
 
         // FIXME : this is a hack to make sure ConversationPanel loads fast
