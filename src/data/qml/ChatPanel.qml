@@ -83,7 +83,6 @@ Panel {
             anchors.right: parent.right
             anchors.top: parent.top
             currentJid: (Qt.application.active && swapper.currentItem == chatPanel && Qt.isQtObject(chatSwapper.currentItem) && chatSwapper.currentItem.jid != undefined) ? chatSwapper.currentItem.jid : ''
-            enabled: appClient.mucServer != ''
             iconSource: 'image://icon/chat'
             model: RoomListModel {
                 id: roomListModel
@@ -113,16 +112,6 @@ Panel {
 
             onItemClicked: showRoom(model.jid)
 
-            Connections {
-                target: appClient.mucManager
-
-                onInvitationReceived: {
-                    dialogSwapper.showPanel('RoomInviteNotification.qml', {
-                        'jid': Utils.jidToBareJid(inviter),
-                        'panel': chatPanel,
-                        'roomJid': roomJid});
-                }
-            }
         }
 
         Rectangle {
@@ -215,23 +204,6 @@ Panel {
                 menuLoader.show(pos.x, pos.y);
             }
 
-            Connections {
-                target: appClient.rosterManager
-                onSubscriptionReceived: {
-                    // If we have a subscription to the requester, accept
-                    // reciprocal subscription.
-                    //
-                    // FIXME: use QXmppRosterIq::Item::To and QXmppRosterIq::Item::Both
-                    var subscription = appClient.subscriptionType(bareJid);
-                    if (subscription == 2 || subscription == 3) {
-                        // accept subscription
-                        appClient.rosterManager.acceptSubscription(bareJid);
-                        return;
-                    }
-
-                    dialogSwapper.showPanel('ContactAddNotification.qml', {jid: bareJid, rosterManager: appClient.rosterManager});
-                }
-            }
         }
 
         StatusBar {
@@ -267,6 +239,35 @@ Panel {
                 dialogSwapper.showPanel('CallNotification.qml', {
                     'call': call,
                     'panel': chatPanel});
+            }
+        }
+
+        Connections {
+            target: appClient.mucManager
+
+            onInvitationReceived: {
+                dialogSwapper.showPanel('RoomInviteNotification.qml', {
+                    'jid': Utils.jidToBareJid(inviter),
+                    'panel': chatPanel,
+                    'roomJid': roomJid});
+            }
+        }
+
+        Connections {
+            target: appClient.rosterManager
+            onSubscriptionReceived: {
+                // If we have a subscription to the requester, accept
+                // reciprocal subscription.
+                //
+                // FIXME: use QXmppRosterIq::Item::To and QXmppRosterIq::Item::Both
+                var subscription = appClient.subscriptionType(bareJid);
+                if (subscription == 2 || subscription == 3) {
+                    // accept subscription
+                    appClient.rosterManager.acceptSubscription(bareJid);
+                    return;
+                }
+
+                dialogSwapper.showPanel('ContactAddNotification.qml', {jid: bareJid, rosterManager: appClient.rosterManager});
             }
         }
 
