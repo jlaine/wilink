@@ -454,24 +454,6 @@ void RosterModel::clearPendingMessages(const QString &bareJid)
     }
 }
 
-ChatClient *RosterModel::client(const QString &jid) const
-{
-    if (d->clients.isEmpty())
-        return 0;
-
-    if (!jid.isEmpty()) {
-        RosterItem *item = d->find(jid);
-        if (item && !item->rosterManagers.isEmpty()) {
-            QXmppRosterManager *rosterManager = *item->rosterManagers.begin();
-            ChatClient *client = qobject_cast<ChatClient*>(rosterManager->parent());
-            if (client)
-                return client;
-        }
-    }
-
-    return *d->clients.begin();
-}
-
 /** Returns the total number of pending messages.
  */
 int RosterModel::pendingMessages() const

@@ -34,7 +34,7 @@ Panel {
         id: participantModel
 
         onJidChanged: {
-            panel.client = rosterModel.client(jid);
+            panel.client = accountModel.clientForJid(jid);
             manager = client.mucManager;
         }
     }

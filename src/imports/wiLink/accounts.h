@@ -38,7 +38,7 @@ public:
     /// \endcond
 
 public slots:
-    ChatClient *clientForJid(const QString &jid);
+    ChatClient *clientForJid(const QString &jid = QString());
 
     // QML ListModel
     void append(const QVariantMap &obj);

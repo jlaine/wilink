@@ -32,7 +32,7 @@ Panel {
         id: conversation
 
         onJidChanged: {
-            conversation.client = rosterModel.client(jid);
+            conversation.client = accountModel.clientForJid(jid);
 
             conversation.client.callManager.callStarted.connect(function() {
                 if (Utils.jidToBareJid(call.jid) == conversation.jid) {

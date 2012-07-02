@@ -192,7 +192,7 @@ Panel {
 
             onAddClicked: {
                 // FIXME: we only support default client
-                dialogSwapper.showPanel('RoomJoinDialog.qml', {client: rosterModel.client()});
+                dialogSwapper.showPanel('RoomJoinDialog.qml', {client: accountModel.clientForJid()});
             }
 
             onCurrentJidChanged: {
@@ -275,7 +275,7 @@ Panel {
 
             onAddClicked: {
                 // FIXME: we only support default client
-                dialogSwapper.showPanel('ContactAddDialog.qml', {client: rosterModel.client()});
+                dialogSwapper.showPanel('ContactAddDialog.qml', {client: accountModel.clientForJid()});
             }
 
             onCurrentJidChanged: {
@@ -366,7 +366,7 @@ Panel {
 
             onItemClicked: {
                 var item = menu.model.get(index);
-                var client = rosterModel.client(jid);
+                var client = accountModel.clientForJid(jid);
                 if (item.action == 'profile') {
                     Qt.openUrlExternally(vcard.url);
                 } else if (item.action == 'rename') {

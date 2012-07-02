@@ -76,7 +76,6 @@ public slots:
     void addClient(ChatClient *client);
     void addPendingMessage(const QString &bareJid);
     void clearPendingMessages(const QString &bareJid);
-    ChatClient *client(const QString &jid = QString()) const;
 
 private slots:
     void _q_clientDestroyed(QObject *object);
