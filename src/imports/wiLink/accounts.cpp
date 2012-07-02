@@ -25,6 +25,7 @@
 #include "client.h"
 #include "wallet.h"
 
+#include "QXmppRosterManager.h"
 #include "QXmppUtils.h"
 
 static QSet<AccountModel*> globalInstances;
@@ -100,11 +101,19 @@ ChatClient* AccountModel::clientForJid(const QString &jid)
     const QString bareJid = QXmppUtils::jidToBareJid(jid);
     QList<ChatClient*> clients = ChatClient::instances();
 
+    // look for own jid
     foreach (ChatClient *client, clients) {
-        if (QXmppUtils::jidToBareJid(client->jid()) == jid)
+        if (QXmppUtils::jidToBareJid(client->jid()) == bareJid)
             return client;
     }
 
+    // look for jid in contacts
+    foreach (ChatClient *client, clients) {
+        if (client->rosterManager()->getRosterBareJids().contains(bareJid))
+            return client;
+    }
+
+    // return first client
     return clients.isEmpty() ? 0 : clients.first();
 }
 
