@@ -66,9 +66,7 @@ Panel {
                 // FIXME : this is a hack to replay received messages after
                 // adding the appropriate conversation
                 onMessageReceived: {
-                    var opts = {
-                        client: item.client,
-                        jid: Utils.jidToBareJid(from) };
+                    var opts = { jid: Utils.jidToBareJid(from) };
                     if (!chatSwapper.findPanel('ConversationPanel.qml', opts)) {
                         chatSwapper.addPanel('ConversationPanel.qml', opts);
                         item.client.replayMessage();
@@ -141,9 +139,7 @@ Panel {
      */
     function showConversation(jid) {
         swapper.showPanel('ChatPanel.qml');
-        chatSwapper.showPanel('ConversationPanel.qml', {
-            client: rosterModel.client(jid),
-            jid: Utils.jidToBareJid(jid)});
+        chatSwapper.showPanel('ConversationPanel.qml', { jid: Utils.jidToBareJid(jid) });
         if (chatPanel.singlePanel)
             chatPanel.state = 'no-sidebar';
     }

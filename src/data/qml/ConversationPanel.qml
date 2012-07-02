@@ -24,13 +24,16 @@ import 'utils.js' as Utils
 Panel {
     id: panel
 
-    property alias client: conversation.client
     property alias iconSource: vcard.avatar
     property alias jid: conversation.jid
     property alias title: vcard.name
 
     Conversation {
         id: conversation
+
+        onJidChanged: {
+            conversation.client = rosterModel.client(jid);
+        }
     }
 
     PanelHeader {
