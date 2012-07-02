@@ -176,7 +176,10 @@ Panel {
                 filterRegExp: /^(?!offline)/
                 sourceModel: RosterModel {
                     id: rosterModel
-                    client: appClient
+
+                    Component.onCompleted: {
+                        rosterModel.addClient(appClient);
+                    }
                 }
             }
 

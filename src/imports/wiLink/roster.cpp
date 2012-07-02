@@ -277,20 +277,12 @@ RosterModel::~RosterModel()
     delete d;
 }
 
-ChatClient *RosterModel::client() const
-{
-    if (d->clients.isEmpty())
-        return 0;
-
-    return *d->clients.begin();
-}
-
-void RosterModel::setClient(ChatClient *client)
+void RosterModel::addClient(ChatClient *client)
 {
     bool check;
     Q_UNUSED(check);
 
-    if (!d->clients.contains(client)) {
+    if (client && !d->clients.contains(client)) {
         d->clients << client;
 
         VCardCache::instance()->addClient(client);
@@ -329,8 +321,6 @@ void RosterModel::setClient(ChatClient *client)
 
         if (client->rosterManager()->isRosterReceived())
             d->rosterReceived(client->rosterManager());
-
-        emit clientChanged(client);
     }
 }
 

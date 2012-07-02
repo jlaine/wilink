@@ -50,7 +50,6 @@ class RosterModel : public ChatModel
 {
     Q_OBJECT
     Q_ENUMS(Role)
-    Q_PROPERTY(ChatClient* client READ client WRITE setClient NOTIFY clientChanged)
     Q_PROPERTY(int pendingMessages READ pendingMessages NOTIFY pendingMessagesChanged)
 
 public:
@@ -64,9 +63,6 @@ public:
     RosterModel(QObject *parent = 0);
     ~RosterModel();
 
-    ChatClient *client() const;
-    void setClient(ChatClient *client);
-
     int pendingMessages() const;
 
     // QAbstractItemModel interface
@@ -74,10 +70,10 @@ public:
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
 
 signals:
-    void clientChanged(ChatClient *client);
     void pendingMessagesChanged();
 
 public slots:
+    void addClient(ChatClient *client);
     void addPendingMessage(const QString &bareJid);
     void clearPendingMessages(const QString &bareJid);
 
