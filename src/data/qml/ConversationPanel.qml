@@ -33,6 +33,44 @@ Panel {
 
         onJidChanged: {
             conversation.client = rosterModel.client(jid);
+
+            conversation.client.callManager.callStarted.connect(function() {
+                if (Utils.jidToBareJid(call.jid) == conversation.jid) {
+                    var component = Qt.createComponent('CallWidget.qml');
+
+                    function finishCreation() {
+                        if (component.status != Component.Ready)
+                            return;
+
+                        var widget = component.createObject(widgetBar);
+                        widget.call = call;
+                    }
+
+                    if (component.status == Component.Loading)
+                        component.statusChanged.connect(finishCreation);
+                    else
+                        finishCreation();
+                }
+            });
+
+            conversation.client.transferManager.jobStarted.connect(function() {
+                if (Utils.jidToBareJid(job.jid) == conversation.jid) {
+                    var component = Qt.createComponent('TransferWidget.qml');
+
+                    function finishCreation() {
+                        if (component.status != Component.Ready)
+                            return;
+
+                        var widget = component.createObject(widgetBar);
+                        widget.job = job;
+                    }
+
+                    if (component.status == Component.Loading)
+                        component.statusChanged.connect(finishCreation);
+                    else
+                        finishCreation();
+                }
+            });
         }
     }
 
@@ -74,28 +112,6 @@ Panel {
                     var fullJid = vcard.jidForFeature(VCard.VoiceFeature);
                     conversation.client.callManager.call(fullJid);
                 }
-
-                Connections {
-                    target: conversation.client.callManager
-                    onCallStarted: {
-                        if (Utils.jidToBareJid(call.jid) == conversation.jid) {
-                            var component = Qt.createComponent('CallWidget.qml');
-
-                            function finishCreation() {
-                                if (component.status != Component.Ready)
-                                    return;
-
-                                var widget = component.createObject(widgetBar);
-                                widget.call = call;
-                            }
-
-                            if (component.status == Component.Loading)
-                                component.statusChanged.connect(finishCreation);
-                            else
-                                finishCreation();
-                        }
-                    }
-                }
             }
 
             ToolButton {
@@ -112,28 +128,6 @@ Panel {
                             var filePath = dialog.selectedFiles[i];
                             var fullJid = vcard.jidForFeature(VCard.FileTransferFeature);
                             conversation.client.transferManager.sendFile(fullJid, filePath);
-                        }
-                    }
-                }
-
-                Connections {
-                    target: conversation.client.transferManager
-                    onJobStarted: {
-                        if (Utils.jidToBareJid(job.jid) == conversation.jid) {
-                            var component = Qt.createComponent('TransferWidget.qml');
-
-                            function finishCreation() {
-                                if (component.status != Component.Ready)
-                                    return;
-
-                                var widget = component.createObject(widgetBar);
-                                widget.job = job;
-                            }
-
-                            if (component.status == Component.Loading)
-                                component.statusChanged.connect(finishCreation);
-                            else
-                                finishCreation();
                         }
                     }
                 }
