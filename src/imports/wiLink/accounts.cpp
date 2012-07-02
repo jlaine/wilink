@@ -22,6 +22,7 @@
 #include <QStringList>
 
 #include "accounts.h"
+#include "client.h"
 #include "wallet.h"
 
 #include "QXmppUtils.h"
@@ -92,6 +93,19 @@ void AccountModel::append(const QVariantMap &obj)
     addItem(item, rootItem);
 
     d->removedCredentials.remove(qMakePair(realm, username));
+}
+
+ChatClient* AccountModel::clientForJid(const QString &jid)
+{
+    const QString bareJid = QXmppUtils::jidToBareJid(jid);
+    QList<ChatClient*> clients = ChatClient::instances();
+
+    foreach (ChatClient *client, clients) {
+        if (QXmppUtils::jidToBareJid(client->jid()) == jid)
+            return client;
+    }
+
+    return clients.isEmpty() ? 0 : clients.first();
 }
 
 QVariant AccountModel::data(const QModelIndex &index, int role) const

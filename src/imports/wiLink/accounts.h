@@ -23,6 +23,7 @@
 #include "model.h"
 
 class AccountModelPrivate;
+class ChatClient;
 
 class AccountModel : public ChatModel
 {
@@ -37,6 +38,8 @@ public:
     /// \endcond
 
 public slots:
+    ChatClient *clientForJid(const QString &jid);
+
     // QML ListModel
     void append(const QVariantMap &obj);
     void remove(int index);

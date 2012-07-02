@@ -29,14 +29,6 @@ FocusScope {
     AccountModel {
         id: accountModel
 
-        function clientForJid(jid) {
-            var panel = swapper.findPanel('ChatPanel.qml');
-            if (panel)
-                return panel.clientForJid(jid);
-            else
-                return null;
-        }
-
         onModelReset: {
             appPlugins.unload();
             if (accountModel.count) {
