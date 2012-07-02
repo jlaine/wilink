@@ -67,7 +67,7 @@ Panel {
                 // adding the appropriate conversation
                 onMessageReceived: {
                     var opts = {
-                        client: item.client.jid,
+                        client: item.client,
                         jid: Utils.jidToBareJid(from) };
                     if (!chatSwapper.findPanel('ConversationPanel.qml', opts)) {
                         chatSwapper.addPanel('ConversationPanel.qml', opts);
