@@ -176,10 +176,6 @@ Panel {
                 filterRegExp: /^(?!offline)/
                 sourceModel: RosterModel {
                     id: rosterModel
-
-                    Component.onCompleted: {
-                        rosterModel.addClient(appClient);
-                    }
                 }
             }
 
@@ -383,6 +379,7 @@ Panel {
             }
         }
         appClient.connectToServer(jid, password);
+        rosterModel.addClient(appClient);
     }
 
     onDockClicked: {

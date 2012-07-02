@@ -417,14 +417,12 @@ void RosterModel::_q_itemChanged(const QString &jid)
 void RosterModel::_q_itemRemoved(const QString &jid)
 {
     QXmppRosterManager *rosterManager = qobject_cast<QXmppRosterManager*>(sender());
-    if (!rosterManager)
-        return;
 
-    RosterItem *item = find(jid);
+    RosterItem *item = d->find(jid);
     if (item) {
         item->rosterManagers.remove(rosterManager);
         if (item->rosterManagers.isEmpty())
-            q->removeItem(item);
+            removeItem(item);
     }
 }
 
