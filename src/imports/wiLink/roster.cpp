@@ -162,9 +162,9 @@ public:
     RosterModelPrivate(RosterModel *qq);
     void clientConnected(ChatClient* client);
     RosterItem* find(const QString &id, ChatModelItem *parent = 0);
+    void itemAdded(QXmppRosterManager *rosterManager, const QString &jid);
     void rosterReceived(QXmppRosterManager *rosterManager);
 
-    ChatClient *client;
     QSet<ChatClient*> clients;
 
 private:
@@ -172,8 +172,7 @@ private:
 };
 
 RosterModelPrivate::RosterModelPrivate(RosterModel *qq)
-    : client(0)
-    , q(qq)
+    : q(qq)
 {
 }
 
@@ -205,6 +204,25 @@ RosterItem *RosterModelPrivate::find(const QString &id, ChatModelItem *parent)
     return 0;
 }
 
+/** Handles an item being added to the roster.
+ */
+void RosterModelPrivate::itemAdded(QXmppRosterManager *rosterManager, const QString &jid)
+{
+    // check the item does not exist yet
+    RosterItem *item = find(jid);
+    if (item)
+        return;
+
+    // add a new entry
+    const QXmppRosterIq::Item entry = rosterManager->getRosterEntry(jid);
+    item = new RosterItem;
+    item->jid = jid;
+    item->messages = 0;
+    q->addItem(item, q->rootItem);
+}
+
+/** Handles roster reception.
+ */
 void RosterModelPrivate::rosterReceived(QXmppRosterManager *rosterManager)
 {
     // make a note of existing contacts
@@ -216,7 +234,7 @@ void RosterModelPrivate::rosterReceived(QXmppRosterManager *rosterManager)
 
     // process received entries
     foreach (const QString &jid, rosterManager->getRosterBareJids()) {
-        q->_q_itemAdded(jid);
+        itemAdded(rosterManager, jid);
         oldJids.removeAll(jid);
     }
 
@@ -246,7 +264,10 @@ RosterModel::~RosterModel()
 
 ChatClient *RosterModel::client() const
 {
-    return d->client;
+    if (d->clients.isEmpty())
+        return 0;
+
+    return *d->clients.begin();
 }
 
 void RosterModel::setClient(ChatClient *client)
@@ -254,8 +275,7 @@ void RosterModel::setClient(ChatClient *client)
     bool check;
     Q_UNUSED(check);
 
-    if (client != d->client) {
-        d->client = client;
+    if (!d->clients.contains(client)) {
         d->clients << client;
 
         VCardCache::instance()->addClient(client);
@@ -360,16 +380,9 @@ void RosterModel::_q_disconnected()
  */
 void RosterModel::_q_itemAdded(const QString &jid)
 {
-    RosterItem *item = d->find(jid);
-    if (item)
-        return;
-
-    // add a new entry
-    const QXmppRosterIq::Item entry = d->client->rosterManager()->getRosterEntry(jid);
-    item = new RosterItem;
-    item->jid = jid;
-    item->messages = 0;
-    ChatModel::addItem(item, rootItem);
+    QXmppRosterManager *rosterManager = qobject_cast<QXmppRosterManager*>(sender());
+    if (rosterManager)
+        d->itemAdded(rosterManager, jid);
 }
 
 /** Handles an item being changed in the roster.
