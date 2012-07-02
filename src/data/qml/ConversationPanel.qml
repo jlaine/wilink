@@ -24,21 +24,13 @@ import 'utils.js' as Utils
 Panel {
     id: panel
 
-    property string accountJid
+    property alias client: conversation.client
     property alias iconSource: vcard.avatar
     property alias jid: conversation.jid
     property alias title: vcard.name
 
     Conversation {
         id: conversation
-
-        client: {
-            var client = accountModel.clientForJid(panel.accountJid);
-            if (client)
-                return client;
-            else
-                return null;
-        }
     }
 
     PanelHeader {

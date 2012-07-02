@@ -454,6 +454,14 @@ void RosterModel::clearPendingMessages(const QString &bareJid)
     }
 }
 
+ChatClient *RosterModel::client(const QString &jid) const
+{
+    if (d->clients.isEmpty()) {
+        return 0;
+    }
+    return *d->clients.begin();
+}
+
 /** Returns the total number of pending messages.
  */
 int RosterModel::pendingMessages() const

@@ -24,7 +24,7 @@ import 'utils.js' as Utils
 Panel {
     id: panel
 
-    property string accountJid
+    property QtObject client
     property string iconSource: 'image://icon/chat'
     property alias jid: participantModel.jid
     property alias room: participantModel.room
@@ -32,6 +32,8 @@ Panel {
 
     RoomModel {
         id: participantModel
+
+        manager: Qt.isQtObject(client) ? client.mucManager : null
     }
 
     VCard {
@@ -39,7 +41,7 @@ Panel {
 
         // NOTE: this is a hack so that we don't join the room before
         // the room object was created
-        jid: Qt.isQtObject(room) ? Utils.jidToBareJid(accountJid) : ''
+        jid: Qt.isQtObject(room) ? Utils.jidToBareJid(client.jid) : ''
 
         onNickNameChanged: {
             room.nickName = nickName;
@@ -204,15 +206,14 @@ Panel {
         }
     }
 
-    onAccountJidChanged: {
-        var client = accountModel.clientForJid(panel.accountJid);
-        participantModel.manager = client.mucManager;
-        client.connected.connect(function() {
+    Connections {
+        target: client
+        onConnected: {
             // re-join after disconnect
             if (room.nickName.length > 0 && !room.isJoined) {
                 room.join();
             }
-        });
+        }
     }
 
     onClose: {

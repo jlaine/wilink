@@ -24,8 +24,6 @@ import 'utils.js' as Utils
 Panel {
     id: chatPanel
 
-    property string accountJid
-    property QtObject appClient
     property alias rooms: roomListModel
     property bool pendingMessages: (roomListModel.pendingMessages + rosterModel.pendingMessages) > 0
 
@@ -69,7 +67,7 @@ Panel {
                 // adding the appropriate conversation
                 onMessageReceived: {
                     var opts = {
-                        accountJid: Utils.jidToBareJid(item.client.jid),
+                        client: item.client.jid,
                         jid: Utils.jidToBareJid(from) };
                     if (!chatSwapper.findPanel('ConversationPanel.qml', opts)) {
                         chatSwapper.addPanel('ConversationPanel.qml', opts);
@@ -133,11 +131,9 @@ Panel {
             rosterModel.addClient(item.client);
             roomListModel.addClient(item.client);
 
-            // FIXME: legacy support
-            if (!Qt.isQtObject(chatPanel.appClient)) {
-                chatPanel.appClient = item.client;
+            // FIXME: display status of all clients!
+            if (!Qt.isQtObject(statusBar.client))
                 statusBar.client = item.client;
-            }
         }
     }
 
@@ -145,7 +141,10 @@ Panel {
      */
     function showConversation(jid) {
         swapper.showPanel('ChatPanel.qml');
-        chatSwapper.showPanel('ConversationPanel.qml', {'accountJid': Utils.jidToBareJid(appClient.jid), 'jid': Utils.jidToBareJid(jid)});
+        var client = rosterModel.client(jid);
+        chatSwapper.showPanel('ConversationPanel.qml', {
+            client: rosterModel.client(jid),
+            jid: Utils.jidToBareJid(jid)});
         if (chatPanel.singlePanel)
             chatPanel.state = 'no-sidebar';
     }
@@ -154,7 +153,10 @@ Panel {
      */
     function showRoom(jid) {
         swapper.showPanel('ChatPanel.qml');
-        chatSwapper.showPanel('RoomPanel.qml', {'accountJid': Utils.jidToBareJid(appClient.jid), 'jid': jid})
+        var client = rosterModel.client(jid);
+        chatSwapper.showPanel('RoomPanel.qml', {
+            client: client,
+            jid: jid});
         if (chatPanel.singlePanel)
             chatPanel.state = 'no-sidebar';
     }
@@ -182,7 +184,7 @@ Panel {
 
                 onRoomAdded: {
                     var opts = {
-                        accountJid: Utils.jidToBareJid(appClient.jid),
+                        client: rosterModel.client(jid),
                         jid: jid};
                     if (!chatSwapper.findPanel('RoomPanel.qml', opts)) {
                         if (chatSwapper.currentItem) {
@@ -199,7 +201,8 @@ Panel {
             height: headerHeight + 4 + rowHeight * (appStyle.isMobile ? 2 : 4)
 
             onAddClicked: {
-                dialogSwapper.showPanel('RoomJoinDialog.qml', {client: appClient});
+                // FIXME: we only support default client
+                dialogSwapper.showPanel('RoomJoinDialog.qml', {client: rosterModel.client()});
             }
 
             onCurrentJidChanged: {
@@ -281,7 +284,8 @@ Panel {
             title: qsTr('My contacts')
 
             onAddClicked: {
-                dialogSwapper.showPanel('ContactAddDialog.qml', {client: appClient});
+                // FIXME: we only support default client
+                dialogSwapper.showPanel('ContactAddDialog.qml', {client: rosterModel.client()});
             }
 
             onCurrentJidChanged: {
@@ -372,12 +376,13 @@ Panel {
 
             onItemClicked: {
                 var item = menu.model.get(index);
+                var client = rosterModel.client(jid);
                 if (item.action == 'profile') {
                     Qt.openUrlExternally(vcard.url);
                 } else if (item.action == 'rename') {
-                    dialogSwapper.showPanel('ContactRenameDialog.qml', {jid: jid, rosterManager: appClient.rosterManager});
+                    dialogSwapper.showPanel('ContactRenameDialog.qml', {jid: jid, rosterManager: client.rosterManager});
                 } else if (item.action == 'remove') {
-                    dialogSwapper.showPanel('ContactRemoveDialog.qml', {jid: jid, rosterManager: appClient.rosterManager});
+                    dialogSwapper.showPanel('ContactRemoveDialog.qml', {jid: jid, rosterManager: client.rosterManager});
                 }
             }
 
