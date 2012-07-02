@@ -32,13 +32,14 @@ Panel {
 
     RoomModel {
         id: participantModel
-        manager: appClient.mucManager
     }
 
     VCard {
+        id: ownCard
+
         // NOTE: this is a hack so that we don't join the room before
         // the room object was created
-        jid: Qt.isQtObject(room) ? Utils.jidToBareJid(appClient.jid) : ''
+        jid: Qt.isQtObject(room) ? Utils.jidToBareJid(accountJid) : ''
 
         onNickNameChanged: {
             room.nickName = nickName;
@@ -203,14 +204,15 @@ Panel {
         }
     }
 
-    Connections {
-        target: appClient
-        onConnected: {
+    onAccountJidChanged: {
+        var client = accountModel.clientForJid(panel.accountJid);
+        participantModel.manager = client.mucManager;
+        client.connected.connect(function() {
             // re-join after disconnect
             if (room.nickName.length > 0 && !room.isJoined) {
                 room.join();
             }
-        }
+        });
     }
 
     onClose: {
