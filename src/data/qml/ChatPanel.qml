@@ -25,9 +25,16 @@ Panel {
     id: chatPanel
 
     property string accountJid
-    property alias client: appClient
     property alias rooms: roomListModel
     property bool pendingMessages: (roomListModel.pendingMessages + rosterModel.pendingMessages) > 0
+
+    function clientForJid(jid) {
+        for (var i = 0; i < chatClients.count; ++i) {
+            if (chatClients.model.get(i).jid == jid) {
+                return chatClients.itemAt(i).client;
+            }
+        }
+    }
 
     Client {
         id: appClient
@@ -45,6 +52,102 @@ Panel {
         onConflictReceived: {
             console.log("Received a resource conflict from chat server");
             Qt.quit();
+        }
+    }
+
+    Repeater {
+        id: chatClients
+
+        model: ListModel {}
+
+        Item {
+            id: item
+
+            property QtObject client: Client {
+                logger: appLogger
+            }
+
+            Connections {
+                target: item.client
+
+                onAuthenticationFailed: {
+                    console.log("Failed to authenticate with chat server");
+                    if (Utils.jidToDomain(item.client.jid) != 'wifirst.net') {
+                        var jid = Utils.jidToBareJid(item.client.jid);
+                        dialogSwapper.showPanel('AccountPasswordDialog.qml', {client: item.client, jid: jid});
+                    }
+                }
+
+                onConflictReceived: {
+                    console.log("Received a resource conflict from chat server");
+                    Qt.quit();
+                }
+
+                // FIXME : this is a hack to replay received messages after
+                // adding the appropriate conversation
+                onMessageReceived: {
+                    var jid = Utils.jidToBareJid(from);
+                    if (!chatSwapper.findPanel('ConversationPanel.qml', {'jid': jid})) {
+                        chatSwapper.addPanel('ConversationPanel.qml', {'jid': jid});
+                        item.client.replayMessage();
+                    }
+                }
+            }
+
+            Connections {
+                target: item.client.callManager
+                onCallReceived: {
+                    dialogSwapper.showPanel('CallNotification.qml', {
+                        'call': call,
+                        'panel': chatPanel});
+                }
+            }
+
+            Connections {
+                target: item.client.mucManager
+
+                onInvitationReceived: {
+                    dialogSwapper.showPanel('RoomInviteNotification.qml', {
+                        'jid': Utils.jidToBareJid(inviter),
+                        'panel': chatPanel,
+                        'roomJid': roomJid});
+                }
+            }
+
+            Connections {
+                target: item.client.rosterManager
+                onSubscriptionReceived: {
+                    // If we have a subscription to the requester, accept
+                    // reciprocal subscription.
+                    //
+                    // FIXME: use QXmppRosterIq::Item::To and QXmppRosterIq::Item::Both
+                    var subscription = item.client.subscriptionType(bareJid);
+                    if (subscription == 2 || subscription == 3) {
+                        // accept subscription
+                        item.client.rosterManager.acceptSubscription(bareJid);
+                        return;
+                    }
+
+                    dialogSwapper.showPanel('ContactAddNotification.qml', {jid: bareJid, rosterManager: item.lient.rosterManager});
+                }
+            }
+
+            Connections {
+                target: item.client.transferManager
+                onFileReceived: {
+                    dialogSwapper.showPanel('TransferNotification.qml', {
+                        'job': job,
+                        'panel': chatPanel});
+                }
+            }
+        }
+
+        onItemAdded: {
+            var data = model.get(index);
+            console.log("connecting to: " + data.jid);
+            item.client.connectToServer(data.jid, data.password);
+            rosterModel.addClient(item.client);
+            roomListModel.addClient(item.client);
         }
     }
 
@@ -111,7 +214,6 @@ Panel {
             }
 
             onItemClicked: showRoom(model.jid)
-
         }
 
         Rectangle {
@@ -220,65 +322,6 @@ Panel {
             opacity: 0
         }
 
-        // FIXME : this is a hack to replay received messages after
-        // adding the appropriate conversation
-        Connections {
-            target: appClient
-            onMessageReceived: {
-                var jid = Utils.jidToBareJid(from);
-                if (!chatSwapper.findPanel('ConversationPanel.qml', {'jid': jid})) {
-                    chatSwapper.addPanel('ConversationPanel.qml', {'jid': jid});
-                    appClient.replayMessage();
-                }
-            }
-        }
-
-        Connections {
-            target: appClient.callManager
-            onCallReceived: {
-                dialogSwapper.showPanel('CallNotification.qml', {
-                    'call': call,
-                    'panel': chatPanel});
-            }
-        }
-
-        Connections {
-            target: appClient.mucManager
-
-            onInvitationReceived: {
-                dialogSwapper.showPanel('RoomInviteNotification.qml', {
-                    'jid': Utils.jidToBareJid(inviter),
-                    'panel': chatPanel,
-                    'roomJid': roomJid});
-            }
-        }
-
-        Connections {
-            target: appClient.rosterManager
-            onSubscriptionReceived: {
-                // If we have a subscription to the requester, accept
-                // reciprocal subscription.
-                //
-                // FIXME: use QXmppRosterIq::Item::To and QXmppRosterIq::Item::Both
-                var subscription = appClient.subscriptionType(bareJid);
-                if (subscription == 2 || subscription == 3) {
-                    // accept subscription
-                    appClient.rosterManager.acceptSubscription(bareJid);
-                    return;
-                }
-
-                dialogSwapper.showPanel('ContactAddNotification.qml', {jid: bareJid, rosterManager: appClient.rosterManager});
-            }
-        }
-
-        Connections {
-            target: appClient.transferManager
-            onFileReceived: {
-                dialogSwapper.showPanel('TransferNotification.qml', {
-                    'job': job,
-                    'panel': chatPanel});
-            }
-        }
     }
 
     TabView {
@@ -370,18 +413,13 @@ Panel {
     onAccountJidChanged: {
         var jid = chatPanel.accountJid;
         var domain = Utils.jidToDomain(jid);
-        var password = '';
         for (var i = 0; i < accountModel.count; ++i) {
             var account = accountModel.get(i);
             if (account.type == 'xmpp' && account.realm == domain && account.username == jid) {
-                password = account.password;
+                chatClients.model.append({jid: jid, password: account.password});
                 break;
             }
         }
-        appClient.connectToServer(jid, password);
-
-        rosterModel.addClient(appClient);
-        roomListModel.addClient(appClient);
     }
 
     onDockClicked: {
