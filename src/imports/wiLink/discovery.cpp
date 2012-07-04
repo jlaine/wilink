@@ -164,6 +164,11 @@ QXmppDiscoveryManager *DiscoveryModel::manager() const
 void DiscoveryModel::setManager(QXmppDiscoveryManager *manager)
 {
     if (manager != m_manager) {
+        if (m_manager) {
+            m_manager->disconnect(this);
+            m_manager->parent()->disconnect(this);
+        }
+
         m_manager = manager;
         if (m_manager) {
             bool check;
