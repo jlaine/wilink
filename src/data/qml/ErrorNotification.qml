@@ -28,9 +28,8 @@ NotificationDialog {
         iconSource: 'image://icon/close'
         text: qsTr('Close')
         onClicked: dialog.rejected()
-
-        Keys.onEnterPressed: rejectButton.clicked()
-        Keys.onReturnPressed: rejectButton.clicked()
     }
+
+    onAccepted: dialog.close()
 }
 
