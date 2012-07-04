@@ -20,24 +20,49 @@
 import QtQuick 1.1
 import 'utils.js' as Utils
 
-InputDialog {
+Dialog {
     id: dialog
 
     property QtObject client
     property string domain: Qt.isQtObject(client) ? Utils.jidToDomain(client.jid) : ''
 
     helpText: domain == 'wifirst.net' ? qsTr('Your wAmis are automatically added to your chat contacts, so the easiest way to add Wifirst contacts is to <a href=\"%1\">add them as wAmis</a>').replace('%1', 'https://www.wifirst.net/w/friends?from=wiLink') : ''
-    labelText: qsTr('Enter the address of the contact you want to add.')
     title: qsTr('Add a contact')
-    validator: RegExpValidator {
-        regExp: /^[^@/ ]+@[^@/ ]+$/
+
+    Item {
+        anchors.fill: contents
+
+        Label {
+            id: label
+
+            anchors.top: parent.top
+            anchors.left:  parent.left
+            anchors.right: parent.right
+            text: qsTr('Enter the address of the contact you want to add.')
+            wrapMode: Text.WordWrap
+
+            onLinkActivated: Qt.openUrlExternally(link)
+        }
+
+        InputBar {
+            id: bar
+
+            anchors.top: label.bottom
+            anchors.topMargin: 8
+            anchors.left: parent.left
+            anchors.right: parent.right
+            focus: true
+            validator: RegExpValidator {
+                regExp: /^[^@/ ]+@[^@/ ]+$/
+            }
+        }
     }
 
     onAccepted: {
-        if (!dialog.acceptableInput)
+        if (!bar.acceptableInput)
             return;
 
-        var jid = textValue;
+        var jid = bar.text;
         console.log("Add contact " + jid);
         dialog.client.rosterManager.subscribe(jid);
         dialog.close();
@@ -45,8 +70,8 @@ InputDialog {
 
     Component.onCompleted: {
         if (dialog.domain != '') {
-            dialog.textValue = '@' + domain;
-            textCursorPosition = 0;
+            bar.text = '@' + domain;
+            bar.cursorPosition = 0;
         }
     }
 }
