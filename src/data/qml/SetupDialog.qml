@@ -322,8 +322,6 @@ Dialog {
 
     Keys.onReturnPressed: dialog.accepted()
 
-    Keys.onEscapePressed: dialog.rejected()
-
     Keys.onTabPressed: {
         if (usernameInput.activeFocus)
             passwordInput.forceActiveFocus();

@@ -30,7 +30,6 @@ NotificationDialog {
         onClicked: dialog.rejected()
 
         Keys.onEnterPressed: rejectButton.clicked()
-        Keys.onEscapePressed: rejectButton.clicked()
         Keys.onReturnPressed: rejectButton.clicked()
     }
 }

@@ -76,7 +76,6 @@ FocusScope {
                 }
 
                 Keys.onEnterPressed: acceptButton.clicked()
-                Keys.onEscapePressed: rejectButton.clicked()
                 Keys.onReturnPressed: acceptButton.clicked()
             }
         }
@@ -238,5 +237,6 @@ FocusScope {
     onRejected: dialog.close()
 
     Keys.forwardTo: footer.item
+    Keys.onEscapePressed: dialog.rejected()
 }
 
