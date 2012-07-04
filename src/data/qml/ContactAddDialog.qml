@@ -43,7 +43,7 @@ Dialog {
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
                 text: qsTr('Account')
-                width: 128
+                width: 96
             }
 
             ComboBox {
