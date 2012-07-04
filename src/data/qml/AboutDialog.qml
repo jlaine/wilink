@@ -56,24 +56,7 @@ Dialog {
 
                 iconSource: 'image://icon/close'
                 text: prompting ? qsTr('Cancel') : qsTr('Close')
-                onClicked: {
-                    if (prompting)
-                        appUpdater.refuse();
-                    dialog.rejected();
-                }
-            }
-
-            Keys.onPressed: {
-                if (event.key == Qt.Key_Enter ||
-                    event.key == Qt.Key_Return) {
-                    if (installButton.visible && installButton.enabled)
-                        installButton.clicked();
-                    else if (refreshButton.visible && refreshButton.enabled)
-                        refreshButton.clicked();
-                }
-                else if (event.key == Qt.Key_Escape) {
-                    rejectButton.clicked()
-                }
+                onClicked: dialog.rejected()
             }
         }
     }
@@ -177,6 +160,18 @@ Dialog {
             value: Qt.isQtObject(appUpdater) ? appUpdater.progressValue : 0
             visible: Qt.isQtObject(appUpdater) && appUpdater.state == Updater.DownloadState
         }
+    }
+
+    onAccepted: {
+        if (prompting)
+            appUpdater.install();
+        else if (Qt.isQtObject(appUpdater) && appUpdater.state == Updater.IdleState)
+            appUpdater.check();
+    }
+
+    onRejected: {
+        if (prompting)
+            appUpdater.refuse();
     }
 }
 
