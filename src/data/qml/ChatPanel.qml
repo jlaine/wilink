@@ -264,8 +264,7 @@ Panel {
             title: qsTr('My contacts')
 
             onAddClicked: {
-                // FIXME: we only support default client
-                dialogSwapper.showPanel('ContactAddDialog.qml', {client: accountModel.clientForJid()});
+                dialogSwapper.showPanel('ContactAddDialog.qml');
             }
 
             onCurrentJidChanged: {

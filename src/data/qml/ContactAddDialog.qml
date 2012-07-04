@@ -23,37 +23,84 @@ import 'utils.js' as Utils
 Dialog {
     id: dialog
 
-    property QtObject client
-    property string domain: Qt.isQtObject(client) ? Utils.jidToDomain(client.jid) : ''
+    property string accountJid
 
-    helpText: domain == 'wifirst.net' ? qsTr('Your wAmis are automatically added to your chat contacts, so the easiest way to add Wifirst contacts is to <a href=\"%1\">add them as wAmis</a>').replace('%1', 'https://www.wifirst.net/w/friends?from=wiLink') : ''
+    helpText: qsTr('Enter the address of the contact you want to add.')
     title: qsTr('Add a contact')
 
-    Item {
+    Column {
         anchors.fill: contents
+        spacing: 8
 
-        Label {
-            id: label
-
-            anchors.top: parent.top
-            anchors.left:  parent.left
-            anchors.right: parent.right
-            text: qsTr('Enter the address of the contact you want to add.')
-            wrapMode: Text.WordWrap
-
-            onLinkActivated: Qt.openUrlExternally(link)
-        }
-
-        InputBar {
-            id: bar
-
-            anchors.top: label.bottom
-            anchors.topMargin: 8
+        Item {
             anchors.left: parent.left
             anchors.right: parent.right
-            focus: true
-            validator: RegExpValidator {
-                regExp: /^[^@/ ]+@[^@/ ]+$/
+            height: accountCombo.height
+
+            Label {
+                id: accountLabel
+
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+                text: qsTr('Account')
+                width: 128
+            }
+
+            ComboBox {
+                id: accountCombo
+
+                anchors.left: accountLabel.right
+                anchors.leftMargin: appStyle.spacing.horizontal
+                anchors.right: parent.right
+                model: ListModel {}
+
+                onCurrentIndexChanged: {
+                    var wasDefault = (bar.text == bar.defaultText);
+                    accountJid = model.get(currentIndex).text;
+                    bar.defaultText = '@' + Utils.jidToDomain(accountJid);
+                    if (wasDefault) {
+                        bar.text = bar.defaultText;
+                        bar.cursorPosition = 0;
+                    }
+                }
+
+                Component.onCompleted: {
+                    for (var i = 0; i < accountModel.count; ++i) {
+                        var account = accountModel.get(i);
+                        if (account.type == 'xmpp')
+                            model.append({iconSource: 'image://icon/chat', text: account.username});
+                    }
+                    accountCombo.currentIndex = 0;
+                }
+            }
+        }
+
+        Item {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: bar.height
+
+            Label {
+                id: contactLabel
+
+                anchors.left:  parent.left
+                anchors.verticalCenter: parent.verticalCenter
+                text: qsTr('Contact')
+                width: 96
+            }
+
+            InputBar {
+                id: bar
+
+                property string defaultText
+
+                anchors.left: contactLabel.right
+                anchors.leftMargin: appStyle.spacing.horizontal
+                anchors.right: parent.right
+                focus: true
+                validator: RegExpValidator {
+                    regExp: /^[^@/ ]+@[^@/ ]+$/
+                }
             }
         }
     }
@@ -62,17 +109,11 @@ Dialog {
         if (!bar.acceptableInput)
             return;
 
+        var client = accountModel.clientForJid(accountJid);
         var jid = bar.text;
-        console.log("Add contact " + jid);
-        dialog.client.rosterManager.subscribe(jid);
+        console.log("Add contact " + jid + " to account " + accountJid);
+        client.rosterManager.subscribe(jid);
         dialog.close();
-    }
-
-    Component.onCompleted: {
-        if (dialog.domain != '') {
-            bar.text = '@' + domain;
-            bar.cursorPosition = 0;
-        }
     }
 }
 
