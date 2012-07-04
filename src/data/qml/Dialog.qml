@@ -74,9 +74,6 @@ FocusScope {
                     text: qsTr('Cancel')
                     onClicked: dialog.rejected()
                 }
-
-                Keys.onEnterPressed: acceptButton.clicked()
-                Keys.onReturnPressed: acceptButton.clicked()
             }
         }
     }
@@ -236,7 +233,8 @@ FocusScope {
     onClose: fakeInput.closeSoftwareInputPanel()
     onRejected: dialog.close()
 
-    Keys.forwardTo: footer.item
+    Keys.onEnterPressed: dialog.accepted()
     Keys.onEscapePressed: dialog.rejected()
+    Keys.onReturnPressed: dialog.accepted()
 }
 

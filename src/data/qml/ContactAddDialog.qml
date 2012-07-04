@@ -74,7 +74,5 @@ Dialog {
             bar.cursorPosition = 0;
         }
     }
-
-    Keys.onReturnPressed: dialog.accepted()
 }
 

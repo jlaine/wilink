@@ -320,8 +320,6 @@ Dialog {
             Qt.quit()
     }
 
-    Keys.onReturnPressed: dialog.accepted()
-
     Keys.onTabPressed: {
         if (usernameInput.activeFocus)
             passwordInput.forceActiveFocus();
