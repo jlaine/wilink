@@ -32,6 +32,8 @@
 #include <windows.h>
 #endif
 
+#include "QXmppArchiveManager.h"
+#include "QXmppBookmarkManager.h"
 #include "QXmppCallManager.h"
 #include "QXmppDiscoveryManager.h"
 #include "QXmppMucManager.h"
@@ -357,6 +359,8 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterType<WheelArea>(uri, 2, 0, "WheelArea");
 
     // QXmpp
+    qmlRegisterUncreatableType<QXmppBookmarkManager>(uri, 2, 0, "QXmppBookmarkManager", "");
+    qmlRegisterUncreatableType<QXmppArchiveManager>(uri, 2, 0, "QXmppArchiveManager", "");
     qmlRegisterUncreatableType<QXmppClient>(uri, 2, 0, "QXmppClient", "");
     qmlRegisterUncreatableType<QXmppCall>(uri, 2, 0, "QXmppCall", "");
     qmlRegisterUncreatableType<QXmppCallManager>(uri, 2, 0, "QXmppCallManager", "");
