@@ -93,6 +93,7 @@ public slots:
     void addClient(ChatClient *client);
     void addPendingMessage(const QString &jid);
     void clearPendingMessages(const QString &jid);
+    void removeClient(ChatClient *client);
 
     void addRoom(const QString &jid);
     void removeRoom(const QString &jid);

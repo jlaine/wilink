@@ -304,6 +304,12 @@ void RoomListModel::addRoom(const QString &jid)
     }
 }
 
+void RoomListModel::removeClient(ChatClient *client)
+{
+    // TODO
+    Q_UNUSED(client);
+}
+
 void RoomListModel::removeRoom(const QString &jid)
 {
     if (jid.isEmpty())

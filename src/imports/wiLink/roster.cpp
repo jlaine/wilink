@@ -264,6 +264,8 @@ RosterModel::~RosterModel()
     delete d;
 }
 
+/** Adds a client to the monitored list.
+ */
 void RosterModel::addClient(ChatClient *client)
 {
     bool check;
@@ -355,9 +357,43 @@ bool RosterModel::setData(const QModelIndex &index, const QVariant &value, int r
     return false;
 }
 
-void RosterModel::_q_clientDestroyed(QObject *object)
+void RosterModel::addPendingMessage(const QString &bareJid)
 {
-    ChatClient *client = static_cast<ChatClient*>(object);
+    RosterItem *item = d->find(bareJid);
+    if (item)
+    {
+        item->messages++;
+        emit dataChanged(createIndex(item), createIndex(item));
+        emit pendingMessagesChanged();
+    }
+}
+
+void RosterModel::clearPendingMessages(const QString &bareJid)
+{
+    RosterItem *item = d->find(bareJid);
+    if (item && item->messages) {
+        item->messages = 0;
+        emit dataChanged(createIndex(item), createIndex(item));
+        emit pendingMessagesChanged();
+    }
+}
+
+/** Returns the total number of pending messages.
+ */
+int RosterModel::pendingMessages() const
+{
+    int pending = 0;
+    foreach (ChatModelItem *item, rootItem->children) {
+        RosterItem *child = static_cast<RosterItem*>(item);
+        pending += child->messages;
+    }
+    return pending;
+}
+
+/** Removes a client to the monitored list.
+ */
+void RosterModel::removeClient(ChatClient *client)
+{
     if (!d->clients.remove(client))
         return;
 
@@ -375,6 +411,11 @@ void RosterModel::_q_clientDestroyed(QObject *object)
         if (item->rosterManagers.isEmpty())
             removeItem(item);
     }
+}
+
+void RosterModel::_q_clientDestroyed(QObject *object)
+{
+    removeClient(static_cast<ChatClient*>(object));
 }
 
 void RosterModel::_q_connected()
@@ -431,39 +472,6 @@ void RosterModel::_q_rosterReceived()
     QXmppRosterManager *rosterManager = qobject_cast<QXmppRosterManager*>(sender());
     if (rosterManager)
         d->rosterReceived(rosterManager);
-}
-
-void RosterModel::addPendingMessage(const QString &bareJid)
-{
-    RosterItem *item = d->find(bareJid);
-    if (item)
-    {
-        item->messages++;
-        emit dataChanged(createIndex(item), createIndex(item));
-        emit pendingMessagesChanged();
-    }
-}
-
-void RosterModel::clearPendingMessages(const QString &bareJid)
-{
-    RosterItem *item = d->find(bareJid);
-    if (item && item->messages) {
-        item->messages = 0;
-        emit dataChanged(createIndex(item), createIndex(item));
-        emit pendingMessagesChanged();
-    }
-}
-
-/** Returns the total number of pending messages.
- */
-int RosterModel::pendingMessages() const
-{
-    int pending = 0;
-    foreach (ChatModelItem *item, rootItem->children) {
-        RosterItem *child = static_cast<RosterItem*>(item);
-        pending += child->messages;
-    }
-    return pending;
 }
 
 class VCardCachePrivate
