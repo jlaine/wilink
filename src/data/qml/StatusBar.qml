@@ -29,6 +29,35 @@ Rectangle {
     color: '#567dbc'
     height: appStyle.icon.tinySize + 3 * appStyle.margin.normal
 
+    function addClient(client) {
+        clients.append({client: client});
+        if (!Qt.isQtObject(statusBar.client)) {
+            statusBar.client = client;
+        }
+    }
+
+    function removeClient(client) {
+        for (var i = 0; i < clients.count; ++i) {
+            var chatClient = clients.get(i).client;
+            if (chatClient == client) {
+                clients.remove(i);
+                break;
+            }
+        }
+    }
+
+    function setPresenceStatus(statusType) {
+        statusPill.presenceStatus =  statusType;
+        for (var i = 0; i < clients.count; ++i) {
+            var chatClient = clients.get(i).client;
+            chatClient.statusType = statusType;
+        }
+    }
+
+    ListModel {
+        id: clients
+    }
+
     Component {
         id: statusMenu
 
@@ -40,8 +69,7 @@ Rectangle {
             }
 
             onItemClicked: {
-                var statusType = menu.model.get(index).status;
-                statusBar.client.statusType = statusType;
+                setPresenceStatus(menu.model.get(index).status);
             }
 
             Component.onCompleted: {
@@ -81,7 +109,7 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             height: appStyle.icon.tinySize
             width: appStyle.icon.tinySize
-            presenceStatus: statusBar.client.statusType
+            presenceStatus: QXmppPresence.Online
         }
 
         Image {
@@ -144,13 +172,13 @@ Rectangle {
 
         onIdleTimeChanged: {
             if (idle.idleTime >= 300) {
-                if (statusBar.client.statusType == QXmppPresence.Online) {
+                if (statusPill.presenceStatus == QXmppPresence.Online) {
                     autoAway = true;
-                    statusBar.client.statusType = QXmppPresence.Away;
+                    setPresenceStatus(QXmppPresence.Away);
                 }
             } else if (autoAway) {
                 autoAway = false;
-                statusBar.client.statusType = QXmppPresence.Online;
+                setPresenceStatus(QXmppPresence.Online);
             }
         }
 
