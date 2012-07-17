@@ -116,6 +116,17 @@ ChatClient::~ChatClient()
     delete d;
 }
 
+void ChatClient::connectToFacebook(const QString &appId, const QString &accessToken)
+{
+    QXmppConfiguration config;
+    config.setResource(qApp->applicationName());
+    config.setFacebookAppId(appId);
+    config.setFacebookAccessToken(accessToken);
+    config.setDomain("chat.facebook.com");
+    config.setHost("chat.facebook.com");
+    QXmppClient::connectToServer(config);
+}
+
 void ChatClient::connectToServer(const QString &jid, const QString &password)
 {
     QXmppConfiguration config;
