@@ -68,6 +68,7 @@
     <file>images/32x32/face-surprise.png</file>
     <file>images/32x32/face-uncertain.png</file>
     <file>images/32x32/face-wink.png</file>
+    <file>images/32x32/facebook.png</file>
     <file>images/32x32/favorite-active.png</file>
     <file>images/32x32/favorite-inactive.png</file>
     <file>images/32x32/file.png</file>
@@ -131,6 +132,7 @@
     <file>images/64x64/dock-start.png</file>
     <file>images/64x64/dock-web.png</file>
     <file>images/64x64/download.png</file>
+    <file>images/64x64/facebook.png</file>
     <file>images/64x64/favorite-active.png</file>
     <file>images/64x64/favorite-inactive.png</file>
     <file>images/64x64/file.png</file>

@@ -46,6 +46,7 @@ set(ICONS
     images/scalable/dock-start.svg
     images/scalable/dock-web.svg
     images/scalable/download.svg
+    images/scalable/facebook.svg
     images/scalable/favorite-active.svg
     images/scalable/favorite-inactive.svg
     images/scalable/file.svg
