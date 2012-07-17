@@ -117,8 +117,13 @@ Panel {
 
         onItemAdded: {
             var data = model.get(index);
-            console.log("connecting to: " + data.jid);
-            item.client.connectToServer(data.jid, data.password);
+            if (data.facebookAppId) {
+                console.log("connecting to facebook: " + data.facebookAppId);
+                item.client.connectToFacebook(data.facebookAppId, data.facebookAccessToken);
+            } else {
+                console.log("connecting to: " + data.jid);
+                item.client.connectToServer(data.jid, data.password);
+            }
             rosterModel.addClient(item.client);
             roomListModel.addClient(item.client);
             statusBar.addClient(item.client);
@@ -397,7 +402,9 @@ Panel {
     Component.onCompleted: {
         for (var i = 0; i < accountModel.count; ++i) {
             var account = accountModel.get(i);
-            if (account.type == 'xmpp') {
+            if (account.type == 'facebook') {
+                chatClients.model.append({facebookAppId: account.username, facebookAccessToken: account.password});
+            } else if (account.type == 'xmpp') {
                 chatClients.model.append({jid: account.username, password: account.password});
             }
         }

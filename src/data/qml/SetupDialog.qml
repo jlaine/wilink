@@ -27,9 +27,12 @@ Dialog {
     property QtObject accountModel: AccountModel {}
     property bool accountSlave: false
 
+    property string facebookAppId
+    property string facebookAccessToken
     property string webRealm
     property string webUsername
     property string webPassword
+    property string xmppRealm
     property string xmppUsername
     property string xmppPassword
 
@@ -56,15 +59,30 @@ Dialog {
             }
 
             dialog.state = 'testing';
+            dialog.xmppRealm = Utils.jidToDomain(jid);
             dialog.xmppUsername = jid;
             dialog.xmppPassword = password;
             console.log("connecting: " + dialog.xmppUsername);
             testClient.connectToServer(dialog.xmppUsername + '/AccountCheck', dialog.xmppPassword);
         }
 
+        function testFacebook(appId, accessToken) {
+            dialog.facebookAppId = appId;
+            dialog.facebookAccessToken = accessToken;
+            console.log("connecting to facebook: " + dialog.facebookAppId);
+            testClient.connectToFacebook(dialog.facebookAppId, dialog.facebookAccessToken);
+        }
+
+        logger: QXmppLogger {
+            loggingType: QXmppLogger.StdoutLogging
+        }
+
         onConnected: {
             if (dialog.state == 'testing') {
-                accountModel.append({type: 'xmpp', username: dialog.xmppUsername, password: dialog.xmppPassword, realm: Utils.jidToDomain(dialog.xmppUsername)});
+                if (dialog.facebookAppId)
+                    accountModel.append({type: 'facebook', username: dialog.facebookAppId, password: dialog.facebookAccessToken, realm: 'chat.facebook.com'});
+                if (dialog.xmppRealm)
+                    accountModel.append({type: 'xmpp', username: dialog.xmppUsername, password: dialog.xmppPassword, realm: dialog.xmppRealm});
                 if (dialog.webRealm)
                     accountModel.append({type: 'web', username: dialog.webUsername, password: dialog.webPassword, realm: dialog.webRealm});
 
@@ -129,6 +147,7 @@ Dialog {
                     Component.onCompleted: {
                         model.append({iconSource: 'image://icon/wiLink', text: 'Wifirst', type: 'wifirst'});
                         model.append({iconSource: 'image://icon/google', text: 'Google', type: 'google'});
+                        model.append({iconSource: 'image://icon/peer', text: 'Facebook', type: 'facebook'});
                         model.append({iconSource: 'image://icon/peer', text: qsTr('Other'), type: 'other'});
                         accountCombo.currentIndex = 0;
                     }
@@ -279,6 +298,9 @@ Dialog {
             dialog.webPassword = passwordInput.text;
 
             testClient.testCredentials(usernameInput.text, passwordInput.text);
+        } else if (accountType == 'facebook') {
+            dialog.state = 'testing';
+            testClient.testFacebook(usernameInput.text, passwordInput.text);
         } else {
             testClient.testCredentials(usernameInput.text, passwordInput.text);
         }

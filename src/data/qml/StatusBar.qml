@@ -24,16 +24,12 @@ Rectangle {
     id: statusBar
 
     property bool autoAway: false
-    property QtObject client
 
     color: '#567dbc'
     height: appStyle.icon.tinySize + 3 * appStyle.margin.normal
 
     function addClient(client) {
         clients.append({client: client});
-        if (!Qt.isQtObject(statusBar.client)) {
-            statusBar.client = client;
-        }
     }
 
     function removeClient(client) {
@@ -155,15 +151,25 @@ Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         color: 'white'
         text: {
-            var clientState = Qt.isQtObject(statusBar.client) ? statusBar.client.state : QXmppClient.DisconnectedState;
-            switch (clientState) {
-            case QXmppClient.ConnectedState:
-                return qsTr('Connected');
-            case QXmppClient.ConnectingState:
-                return qsTr('Connecting..');
-            case QXmppClient.DisconnectedState:
-                return qsTr('Offline');
+            var connected = 0;
+            var connecting = 0;
+            for (var i = 0; i < clients.count; ++i) {
+                var clientState = clients.get(i).client.state;
+                switch (clientState) {
+                case QXmppClient.ConnectedState:
+                    connected++;
+                    break;
+                case QXmppClient.ConnectingState:
+                    connecting++;
+                    break;
+                }
             }
+            if (connecting)
+                return qsTr('Connecting..');
+            else if (connected)
+                return qsTr('Connected');
+            else
+                return qsTr('Offline');
         }
     }
 
