@@ -147,7 +147,7 @@ Dialog {
                     Component.onCompleted: {
                         model.append({iconSource: 'image://icon/wiLink', text: 'Wifirst', type: 'wifirst'});
                         model.append({iconSource: 'image://icon/google', text: 'Google', type: 'google'});
-                        model.append({iconSource: 'image://icon/peer', text: 'Facebook', type: 'facebook'});
+                        model.append({iconSource: 'image://icon/facebook', text: 'Facebook', type: 'facebook'});
                         model.append({iconSource: 'image://icon/peer', text: qsTr('Other'), type: 'other'});
                         accountCombo.currentIndex = 0;
                     }
