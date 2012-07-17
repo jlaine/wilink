@@ -505,6 +505,7 @@ void HistoryModel::_q_archiveListReceived(const QList<QXmppArchiveChat> &chats)
 
     for (int i = chats.size() - 1; i >= 0; i--)
         if (QXmppUtils::jidToBareJid(chats[i].with()) == d->jid)
-            d->client->archiveManager()->retrieveCollection(chats[i].with(), chats[i].start());
+            // FIXME: setting max to 0 is a hack!
+            d->client->archiveManager()->retrieveCollection(chats[i].with(), chats[i].start(), 0);
 }
 
