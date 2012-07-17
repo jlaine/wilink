@@ -120,15 +120,13 @@ Panel {
             if (data.facebookAppId) {
                 console.log("connecting to facebook: " + data.facebookAppId);
                 item.client.connectToFacebook(data.facebookAppId, data.facebookAccessToken);
-                rosterModel.addClient(item.client);
-                roomListModel.addClient(item.client);
             } else {
                 console.log("connecting to: " + data.jid);
                 item.client.connectToServer(data.jid, data.password);
-                rosterModel.addClient(item.client);
-                roomListModel.addClient(item.client);
-                statusBar.addClient(item.client);
             }
+            rosterModel.addClient(item.client);
+            roomListModel.addClient(item.client);
+            statusBar.addClient(item.client);
         }
 
         onItemRemoved: {
