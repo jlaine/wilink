@@ -88,6 +88,7 @@ Panel {
 
             Connections {
                 target: item.client.rosterManager
+
                 onSubscriptionReceived: {
                     // If we have a subscription to the requester, accept
                     // reciprocal subscription.
@@ -100,7 +101,7 @@ Panel {
                         return;
                     }
 
-                    dialogSwapper.showPanel('ContactAddNotification.qml', {jid: bareJid, rosterManager: item.lient.rosterManager});
+                    dialogSwapper.showPanel('ContactAddNotification.qml', {jid: bareJid, rosterManager: item.client.rosterManager});
                 }
             }
 
