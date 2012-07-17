@@ -124,6 +124,7 @@ void ChatClient::connectToFacebook(const QString &appId, const QString &accessTo
     config.setFacebookAccessToken(accessToken);
     config.setDomain("chat.facebook.com");
     config.setHost("chat.facebook.com");
+    config.setSASLAuthMechanism(QXmppConfiguration::SASLXFacebookPlatform);
     QXmppClient::connectToServer(config);
 }
 
