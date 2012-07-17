@@ -162,13 +162,22 @@ bool HistoryMessage::isAction() const
     return meRegex.exactMatch(body);
 }
 
+class HistoryQueueItem
+{
+public:
+    QString with;
+    QDateTime start;
+};
+
 class HistoryModelPrivate
 {
 public:
     HistoryModelPrivate();
     void fetchArchives();
+    void fetchMessages();
 
     bool archivesFetched;
+    QList<HistoryQueueItem> archivesQueue;
     ChatClient *client;
     QString jid;
     QMap<QString, VCard*> rosterCards;
@@ -188,6 +197,17 @@ void HistoryModelPrivate::fetchArchives()
     client->archiveManager()->listCollections(jid,
         client->serverTime().addDays(-HISTORY_DAYS));
     archivesFetched = true;
+    archivesQueue.clear();
+}
+
+void HistoryModelPrivate::fetchMessages()
+{
+    if (archivesQueue.isEmpty())
+        return;
+
+    HistoryQueueItem item = archivesQueue.takeFirst();
+    // FIXME: setting max to -2 is a hack!
+    client->archiveManager()->retrieveCollection(item.with, item.start, -2);
 }
 
 /** Constructs a new HistoryModel.
@@ -497,15 +517,21 @@ void HistoryModel::_q_archiveChatReceived(const QXmppArchiveChat &chat)
         message.received = msg.isReceived();
         addMessage(message);
     }
+    d->fetchMessages();
 }
 
 void HistoryModel::_q_archiveListReceived(const QList<QXmppArchiveChat> &chats)
 {
     Q_ASSERT(d->client);
 
-    for (int i = chats.size() - 1; i >= 0; i--)
-        if (QXmppUtils::jidToBareJid(chats[i].with()) == d->jid)
-            // FIXME: setting max to -2 is a hack!
-            d->client->archiveManager()->retrieveCollection(chats[i].with(), chats[i].start(), -2);
+    for (int i = chats.size() - 1; i >= 0; i--) {
+        if (QXmppUtils::jidToBareJid(chats[i].with()) == d->jid) {
+            HistoryQueueItem item;
+            item.with = chats[i].with();
+            item.start = chats[i].start();
+            d->archivesQueue << item;
+        }
+    }
+    d->fetchMessages();
 }
 
