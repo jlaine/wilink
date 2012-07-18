@@ -68,22 +68,6 @@ public:
     };
 };
 
-class QXmppDeclarativePresence : public QObject
-{
-    Q_OBJECT
-    Q_ENUMS(Status)
-
-public:
-    enum Status {
-        Offline = -1,
-        Online = QXmppPresence::Status::Online,
-        Away = QXmppPresence::Status::Away,
-        XA = QXmppPresence::Status::XA,
-        DND = QXmppPresence::Status::DND,
-        Chat = QXmppPresence::Status::Chat,
-    };
-};
-
 class QXmppDeclarativeMucItem : public QObject
 {
     Q_OBJECT

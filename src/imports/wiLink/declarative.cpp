@@ -371,7 +371,6 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterType<QXmppDeclarativeMucItem>(uri, 2, 0, "QXmppMucItem");
     qmlRegisterUncreatableType<QXmppMucManager>(uri, 2, 0, "QXmppMucManager", "");
     qmlRegisterUncreatableType<QXmppMucRoom>(uri, 2, 0, "QXmppMucRoom", "");
-    qmlRegisterType<QXmppDeclarativePresence>(uri, 2, 0, "QXmppPresence");
     qmlRegisterUncreatableType<QXmppRosterManager>(uri, 2, 0, "QXmppRosterManager", "");
     qmlRegisterUncreatableType<QXmppRtpAudioChannel>(uri, 2, 0, "QXmppRtpAudioChannel", "");
     qmlRegisterUncreatableType<QXmppTransferJob>(uri, 2, 0, "QXmppTransferJob", "");
