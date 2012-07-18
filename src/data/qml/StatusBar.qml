@@ -69,10 +69,10 @@ Rectangle {
             }
 
             Component.onCompleted: {
-                menu.model.append({'text': qsTr('Available'), 'status': QXmppPresence.Online});
-                menu.model.append({'text': qsTr('Away'), 'status': QXmppPresence.Away});
-                menu.model.append({'text': qsTr('Busy'), 'status': QXmppPresence.DND});
-                menu.model.append({'text': qsTr('Offline'), 'status': -1});
+                menu.model.append({'text': qsTr('Available'), 'status': 'available'});
+                menu.model.append({'text': qsTr('Away'), 'status': 'away'});
+                menu.model.append({'text': qsTr('Busy'), 'status': 'busy'});
+                menu.model.append({'text': qsTr('Offline'), 'status': 'offline'});
             }
         }
     }
@@ -105,7 +105,7 @@ Rectangle {
             anchors.verticalCenter: parent.verticalCenter
             height: appStyle.icon.tinySize
             width: appStyle.icon.tinySize
-            presenceStatus: QXmppPresence.Online
+            presenceStatus: 'available'
         }
 
         Image {
@@ -178,13 +178,13 @@ Rectangle {
 
         onIdleTimeChanged: {
             if (idle.idleTime >= 300) {
-                if (statusPill.presenceStatus == QXmppPresence.Online) {
+                if (statusPill.presenceStatus == 'available') {
                     autoAway = true;
-                    setPresenceStatus(QXmppPresence.Away);
+                    setPresenceStatus('busy');
                 }
             } else if (autoAway) {
                 autoAway = false;
-                setPresenceStatus(QXmppPresence.Online);
+                setPresenceStatus('available');
             }
         }
 

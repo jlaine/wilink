@@ -158,24 +158,23 @@ QDateTime ChatClient::serverTime() const
     return QDateTime::currentDateTime().addSecs(d->timeOffset);
 }
 
-int ChatClient::statusType() const
+QString ChatClient::statusType() const
 {
     if (clientPresence().type() == QXmppPresence::Available)
-        return clientPresence().status().type();
+        return statusToString(clientPresence().status().type());
     else
-        return -1;
+        return "offline";
 }
 
-void ChatClient::setStatusType(int statusType)
+void ChatClient::setStatusType(const QString &statusType)
 {
     if (statusType != this->statusType()) {
         QXmppPresence presence = clientPresence();
-        if (statusType >= 0) {
-            const QXmppPresence::Status::Type newType = static_cast<QXmppPresence::Status::Type>(statusType);
-            presence.setType(QXmppPresence::Available);
-            presence.status().setType(newType);
-        } else {
+        if (statusType == "offline") {
             presence.setType(QXmppPresence::Unavailable);
+        } else {
+            presence.setType(QXmppPresence::Available);
+            presence.status().setType(stringToStatus(statusType));
         }
         setClientPresence(presence);
 
@@ -410,5 +409,26 @@ void ChatClient::_q_timeReceived(const QXmppEntityTimeIq &time)
 
     if (time.type() == QXmppIq::Result && time.utc().isValid())
         d->timeOffset = QDateTime::currentDateTime().secsTo(time.utc());
+}
+
+QString ChatClient::statusToString(QXmppPresence::Status::Type type)
+{
+    if (type == QXmppPresence::Status::Online || type == QXmppPresence::Status::Chat)
+        return "available";
+    else if (type == QXmppPresence::Status::Away || type == QXmppPresence::Status::XA)
+        return "away";
+    else
+        return "busy";
+}
+
+QXmppPresence::Status::Type ChatClient::stringToStatus(const QString& str)
+{
+    if (str == "available") {
+        return QXmppPresence::Status::Online;
+    } else if (str == "away") {
+        return QXmppPresence::Status::Away;
+    } else {
+        return QXmppPresence::Status::DND;
+    }
 }
 

@@ -21,25 +21,12 @@ import QtQuick 1.1
 import wiLink 2.0
 
 Item {
-    property variant presenceStatus
+    id: item
+
+    property alias presenceStatus: item.state
     property alias smooth: status.smooth
 
-    opacity: (presenceStatus != undefined) ? 1 : 0
-    state: {
-        switch(presenceStatus) {
-            case QXmppPresence.Online:
-            case QXmppPresence.Chat:
-                return 'available';
-            case QXmppPresence.Away:
-            case QXmppPresence.XA:
-                return 'away';
-            case QXmppPresence.DND:
-                return 'busy';
-            case QXmppPresence.Offline:
-            default:
-                return 'offline';
-        }
-    }
+    //opacity: (presenceStatus != undefined) ? 1 : 0
 
     Gradient { // Available
         id: availableGradient

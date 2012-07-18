@@ -114,15 +114,7 @@ VCard *RosterItem::vcard()
 
 QString RosterItem::statusName() const
 {
-    int type = VCardCache::instance()->presenceStatus(jid);
-    if (type < 0)
-        return "offline";
-    else if (type == QXmppPresence::Status::Online || type == QXmppPresence::Status::Chat)
-        return "available";
-    else if (type == QXmppPresence::Status::Away || type == QXmppPresence::Status::XA)
-        return "away";
-    else
-        return "busy";
+    return VCardCache::instance()->presenceStatus(jid);
 }
 
 RosterImageProvider::RosterImageProvider()
@@ -551,12 +543,12 @@ QString VCard::nickName() const
     return m_nickName;
 }
 
-int VCard::status() const
+QString VCard::status() const
 {
     if (!m_jid.isEmpty())
         return VCardCache::instance()->presenceStatus(m_jid);
     else
-        return -1;
+        return "offline";
 }
 
 QUrl VCard::url() const
@@ -772,9 +764,9 @@ void VCardCache::addClient(ChatClient *client)
     d->clients << client;
 }
 
-int VCardCache::presenceStatus(const QString &jid) const
+QString VCardCache::presenceStatus(const QString &jid) const
 {
-    int statusType = -1;
+    QString statusType = "offline";
 
     foreach (ChatClient *client, d->clients) {
         // NOTE : we test the connection status, otherwise we encounter a race
@@ -786,10 +778,10 @@ int VCardCache::presenceStatus(const QString &jid) const
             if (presence.type() != QXmppPresence::Available)
                 continue;
 
-            QXmppPresence::Status::Type type = presence.status().type();
             // FIXME : we should probably be using the priority rather than
             // stop at the first available contact
-            if (type == QXmppPresence::Status::Online || type == QXmppPresence::Status::Chat)
+            const QString type = ChatClient::statusToString(presence.status().type());
+            if (type == "available")
                 return type;
             else
                 statusType = type;

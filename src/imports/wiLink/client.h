@@ -40,7 +40,7 @@ class ChatClient : public QXmppClient
 {
     Q_OBJECT
     Q_PROPERTY(QString jid READ jid NOTIFY jidChanged)
-    Q_PROPERTY(int statusType READ statusType WRITE setStatusType NOTIFY statusTypeChanged)
+    Q_PROPERTY(QString statusType READ statusType WRITE setStatusType NOTIFY statusTypeChanged)
     Q_PROPERTY(QXmppArchiveManager* archiveManager READ archiveManager CONSTANT)
     Q_PROPERTY(QXmppBookmarkManager* bookmarkManager READ bookmarkManager CONSTANT)
     Q_PROPERTY(QXmppCallManager* callManager READ callManager CONSTANT)
@@ -59,8 +59,8 @@ public:
     QString jid() const;
     QDateTime serverTime() const;
 
-    int statusType() const;
-    void setStatusType(int statusType);
+    QString statusType() const;
+    void setStatusType(const QString &statusType);
 
     QXmppArchiveManager *archiveManager();
     QXmppBookmarkManager *bookmarkManager();
@@ -76,6 +76,9 @@ public:
 
     static QList<ChatClient*> instances();
 
+    static QString statusToString(QXmppPresence::Status::Type type);
+    static QXmppPresence::Status::Type stringToStatus(const QString& str);
+
 signals:
     void authenticationFailed();
     void conflictReceived();
@@ -84,7 +87,7 @@ signals:
     void messageReceived(const QString &from);
     void mucServerChanged(const QString &mucServer);
     void shareServerChanged(const QString &shareServer);
-    void statusTypeChanged(int statusType);
+    void statusTypeChanged(const QString &statusType);
 
 public slots:
     void connectToFacebook(const QString &appId, const QString &accessToken);

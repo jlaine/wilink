@@ -101,7 +101,7 @@ class VCard : public QObject
     Q_PROPERTY(QString jid READ jid WRITE setJid NOTIFY jidChanged)
     Q_PROPERTY(QString name READ name NOTIFY nameChanged)
     Q_PROPERTY(QString nickName READ nickName NOTIFY nickNameChanged)
-    Q_PROPERTY(int status READ status NOTIFY statusChanged)
+    Q_PROPERTY(QString status READ status NOTIFY statusChanged)
     Q_PROPERTY(QUrl url READ url NOTIFY urlChanged)
 
 public:
@@ -122,7 +122,7 @@ public:
     void setJid(const QString &jid);
     QString name() const;
     QString nickName() const;
-    int status() const;
+    QString status() const;
     QUrl url() const;
 
 signals:
@@ -163,7 +163,7 @@ public:
     ~VCardCache();
     
     QUrl imageUrl(const QString &jid);
-    int presenceStatus(const QString &jid) const;
+    QString presenceStatus(const QString &jid) const;
 
 signals:
     void cardChanged(const QString &jid);
