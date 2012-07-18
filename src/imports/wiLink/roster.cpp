@@ -114,8 +114,8 @@ VCard *RosterItem::vcard()
 
 QString RosterItem::statusName() const
 {
-    const QXmppPresence::Status::Type type = VCardCache::instance()->presenceStatus(jid);
-    if (type == QXmppPresence::Status::Offline)
+    int type = VCardCache::instance()->presenceStatus(jid);
+    if (type < 0)
         return "offline";
     else if (type == QXmppPresence::Status::Online || type == QXmppPresence::Status::Chat)
         return "available";
@@ -556,7 +556,7 @@ int VCard::status() const
     if (!m_jid.isEmpty())
         return VCardCache::instance()->presenceStatus(m_jid);
     else
-        return QXmppPresence::Status::Offline;
+        return -1;
 }
 
 QUrl VCard::url() const
@@ -772,9 +772,9 @@ void VCardCache::addClient(ChatClient *client)
     d->clients << client;
 }
 
-QXmppPresence::Status::Type VCardCache::presenceStatus(const QString &jid) const
+int VCardCache::presenceStatus(const QString &jid) const
 {
-    QXmppPresence::Status::Type statusType = QXmppPresence::Status::Offline;
+    int statusType = -1;
 
     foreach (ChatClient *client, d->clients) {
         // NOTE : we test the connection status, otherwise we encounter a race
@@ -783,13 +783,13 @@ QXmppPresence::Status::Type VCardCache::presenceStatus(const QString &jid) const
             continue;
 
         foreach (const QXmppPresence &presence, client->rosterManager()->getAllPresencesForBareJid(jid)) {
-            QXmppPresence::Status::Type type = presence.status().type();
-            if (type == QXmppPresence::Status::Offline)
+            if (presence.type() != QXmppPresence::Available)
                 continue;
+
+            QXmppPresence::Status::Type type = presence.status().type();
             // FIXME : we should probably be using the priority rather than
             // stop at the first available contact
-            else if (type == QXmppPresence::Status::Online ||
-                     type == QXmppPresence::Status::Chat)
+            if (type == QXmppPresence::Status::Online || type == QXmppPresence::Status::Chat)
                 return type;
             else
                 statusType = type;

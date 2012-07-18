@@ -124,7 +124,7 @@ void ChatClient::connectToFacebook(const QString &appId, const QString &accessTo
     config.setFacebookAccessToken(accessToken);
     config.setDomain("chat.facebook.com");
     config.setHost("chat.facebook.com");
-    config.setSASLAuthMechanism(QXmppConfiguration::SASLXFacebookPlatform);
+    config.setSaslAuthMechanism("X-FACEBOOK-PLATFORM");
     QXmppClient::connectToServer(config);
 }
 
@@ -160,22 +160,26 @@ QDateTime ChatClient::serverTime() const
 
 int ChatClient::statusType() const
 {
-    return clientPresence().status().type();
+    if (clientPresence().type() == QXmppPresence::Available)
+        return clientPresence().status().type();
+    else
+        return -1;
 }
 
 void ChatClient::setStatusType(int statusType)
 {
-    const QXmppPresence::Status::Type newType = static_cast<QXmppPresence::Status::Type>(statusType);
-    QXmppPresence presence = clientPresence();
-    if (newType != presence.status().type()) {
-        if (newType == QXmppPresence::Status::Offline)
-            presence.setType(QXmppPresence::Unavailable);
-        else
+    if (statusType != this->statusType()) {
+        QXmppPresence presence = clientPresence();
+        if (statusType >= 0) {
+            const QXmppPresence::Status::Type newType = static_cast<QXmppPresence::Status::Type>(statusType);
             presence.setType(QXmppPresence::Available);
-        presence.status().setType(newType);
+            presence.status().setType(newType);
+        } else {
+            presence.setType(QXmppPresence::Unavailable);
+        }
         setClientPresence(presence);
 
-        emit statusTypeChanged(newType);
+        emit statusTypeChanged(statusType);
     }
 }
 

@@ -72,7 +72,7 @@ Rectangle {
                 menu.model.append({'text': qsTr('Available'), 'status': QXmppPresence.Online});
                 menu.model.append({'text': qsTr('Away'), 'status': QXmppPresence.Away});
                 menu.model.append({'text': qsTr('Busy'), 'status': QXmppPresence.DND});
-                menu.model.append({'text': qsTr('Offline'), 'status': QXmppPresence.Offline});
+                menu.model.append({'text': qsTr('Offline'), 'status': -1});
             }
         }
     }

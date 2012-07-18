@@ -75,7 +75,7 @@ class QXmppDeclarativePresence : public QObject
 
 public:
     enum Status {
-        Offline = QXmppPresence::Status::Offline,
+        Offline = -1,
         Online = QXmppPresence::Status::Online,
         Away = QXmppPresence::Status::Away,
         XA = QXmppPresence::Status::XA,

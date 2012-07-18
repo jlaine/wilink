@@ -163,7 +163,7 @@ public:
     ~VCardCache();
     
     QUrl imageUrl(const QString &jid);
-    QXmppPresence::Status::Type presenceStatus(const QString &jid) const;
+    int presenceStatus(const QString &jid) const;
 
 signals:
     void cardChanged(const QString &jid);
