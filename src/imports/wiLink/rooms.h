@@ -108,6 +108,7 @@ private:
 
     enum Role {
         ParticipantsRole = ChatModel::UserRole,
+        StatusRole
     };
     QSet<ChatClient*> m_clients;
 };

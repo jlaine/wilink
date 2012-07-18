@@ -248,7 +248,7 @@ Panel {
                 id: onlineContacts
 
                 dynamicSortFilter: true
-                filterRole: RosterModel.StatusFilterRole
+                filterRole: RosterModel.StatusRole
                 filterRegExp: /^(?!offline)/
                 sourceModel: RosterModel {
                     id: rosterModel

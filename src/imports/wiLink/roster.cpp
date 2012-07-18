@@ -81,7 +81,6 @@ class RosterItem : public ChatModelItem
 public:
     RosterItem();
     ~RosterItem();
-    QString statusName() const;
     VCard* vcard();
 
     QString jid;
@@ -110,11 +109,6 @@ VCard *RosterItem::vcard()
         m_vcard->setJid(jid);
     }
     return m_vcard;
-}
-
-QString RosterItem::statusName() const
-{
-    return VCardCache::instance()->presenceStatus(jid);
 }
 
 RosterImageProvider::RosterImageProvider()
@@ -325,10 +319,8 @@ QVariant RosterModel::data(const QModelIndex &index, int role) const
         return item->vcard()->name();
     } else if (role == StatusRole) {
         return VCardCache::instance()->presenceStatus(item->jid);
-    } else if (role == StatusFilterRole) {
-        return item->statusName();
     } else if (role == StatusSortRole) {
-        return item->statusName() + sortSeparator + item->vcard()->name().toLower() + sortSeparator + item->jid.toLower();
+        return VCardCache::instance()->presenceStatus(item->jid) + sortSeparator + item->vcard()->name().toLower() + sortSeparator + item->jid.toLower();
     }
 
     return QVariant();

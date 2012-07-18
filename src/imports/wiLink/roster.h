@@ -56,7 +56,6 @@ public:
     enum Role {
         NameRole = ChatModel::NameRole,
         StatusRole = ChatModel::UserRole,
-        StatusFilterRole,
         StatusSortRole,
     };
 

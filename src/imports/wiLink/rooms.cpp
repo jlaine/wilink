@@ -166,6 +166,7 @@ RoomListModel::RoomListModel(QObject *parent)
     names.insert(MessagesRole, "messages");
     names.insert(NameRole, "name");
     names.insert(ParticipantsRole, "participants");
+    names.insert(StatusRole, "status");
     setRoleNames(names);
 }
 
@@ -190,6 +191,8 @@ QVariant RoomListModel::data(const QModelIndex &index, int role) const
             }
         }
         return 0;
+    } else if (role == StatusRole) {
+        return "";
     }
 
     return QVariant();
