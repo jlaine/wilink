@@ -27,8 +27,6 @@ Dialog {
     property QtObject accountModel: AccountModel {}
     property bool accountSlave: false
 
-    property string facebookAppId
-    property string facebookAccessToken
     property string webRealm
     property string webUsername
     property string webPassword
@@ -66,21 +64,12 @@ Dialog {
             testClient.connectToServer(dialog.xmppUsername + '/AccountCheck', dialog.xmppPassword);
         }
 
-        function testFacebook(appId, accessToken) {
-            dialog.facebookAppId = appId;
-            dialog.facebookAccessToken = accessToken;
-            console.log("connecting to facebook: " + dialog.facebookAppId);
-            testClient.connectToFacebook(dialog.facebookAppId, dialog.facebookAccessToken);
-        }
-
         logger: QXmppLogger {
             loggingType: QXmppLogger.StdoutLogging
         }
 
         onConnected: {
             if (dialog.state == 'testing') {
-                if (dialog.facebookAppId)
-                    accountModel.append({type: 'facebook', username: dialog.facebookAppId, password: dialog.facebookAccessToken, realm: 'chat.facebook.com'});
                 if (dialog.xmppRealm)
                     accountModel.append({type: 'xmpp', username: dialog.xmppUsername, password: dialog.xmppPassword, realm: dialog.xmppRealm});
                 if (dialog.webRealm)
@@ -147,7 +136,6 @@ Dialog {
                     Component.onCompleted: {
                         model.append({iconSource: 'image://icon/wiLink', text: 'Wifirst', type: 'wifirst'});
                         model.append({iconSource: 'image://icon/google', text: 'Google', type: 'google'});
-                        model.append({iconSource: 'image://icon/facebook', text: 'Facebook', type: 'facebook'});
                         model.append({iconSource: 'image://icon/peer', text: qsTr('Other'), type: 'other'});
                         accountCombo.currentIndex = 0;
                     }
@@ -298,9 +286,6 @@ Dialog {
             dialog.webPassword = passwordInput.text;
 
             testClient.testCredentials(usernameInput.text, passwordInput.text);
-        } else if (accountType == 'facebook') {
-            dialog.state = 'testing';
-            testClient.testFacebook(usernameInput.text, passwordInput.text);
         } else {
             testClient.testCredentials(usernameInput.text, passwordInput.text);
         }
