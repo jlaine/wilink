@@ -36,7 +36,6 @@ public:
     Window(QWidget *parent = 0);
     ~Window();
     void setFullScreen(bool fullScreen);
-    void setSource(const QUrl &source);
 
 signals:
     void showAbout();
@@ -45,6 +44,7 @@ signals:
     void windowStateChanged();
 
 public slots:
+    void setSource(const QUrl &source);
     void showAndRaise();
 
 private slots:

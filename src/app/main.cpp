@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
 #endif
     if (argc > 1)
         qmlSource = QUrl(QString::fromLocal8Bit(argv[1]));
-    window.setSource(qmlSource);
+    QMetaObject::invokeMethod(&window, "setSource", Qt::QueuedConnection, Q_ARG(QUrl, qmlSource));
 
     /* Run application */
     return app.exec();
