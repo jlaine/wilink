@@ -402,7 +402,7 @@ Panel {
     Component.onCompleted: {
         for (var i = 0; i < accountModel.count; ++i) {
             var account = accountModel.get(i);
-            if (account.type == 'xmpp' && account.realm != 'wifirst.net') {
+            if (account.type == 'xmpp') {
                 chatClients.model.append({jid: account.username, password: account.password});
             } else if (account.type == 'web' && account.realm == 'www.wifirst.net') {
                 var xhr = new XMLHttpRequest();
