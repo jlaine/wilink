@@ -439,7 +439,7 @@ Panel {
                             }
 
                             // connect to facebook
-                            if (facebookAppId && facebookAccessToken && false) {
+                            if (facebookAppId && facebookAccessToken) {
                                 chatClients.model.append({
                                     facebookAppId: facebookAppId,
                                     facebookAccessToken: facebookAccessToken});
