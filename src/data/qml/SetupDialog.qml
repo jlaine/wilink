@@ -243,6 +243,15 @@ Dialog {
                 usernameInput.text += '@wifirst.net';
             }
 
+            // check for duplicate account
+            for (var i = 0; i < accountModel.count; i++) {
+                var account = accountModel.get(i);
+                if (account.type == 'web' && account.realm == 'www.wifirst.net') {
+                    dialog.state = 'dupe';
+                    return;
+                }
+            }
+
             dialog.webRealm = 'www.wifirst.net';
             dialog.webUsername = usernameInput.text;
             dialog.webPassword = passwordInput.text;
@@ -251,21 +260,12 @@ Dialog {
             xhr.onreadystatechange = function() {
                 if (xhr.readyState == 4) {
                     if (xhr.status == 200) {
-                        var jid, password;
-                        var doc = xhr.responseXML.documentElement;
-                        for (var i = 0; i < doc.childNodes.length; ++i) {
-                            var node = doc.childNodes[i];
-                            if (node.nodeName == 'id' && node.firstChild) {
-                                jid = node.firstChild.nodeValue;
-                            } else if (node.nodeName == 'password' && node.firstChild) {
-                                password = node.firstChild.nodeValue;
-                            }
-                        }
-                        if (jid && password) {
-                            testClient.testCredentials(jid, password);
-                        } else {
-                            dialog.state = 'unknownError';
-                        }
+                        accountModel.append({type: 'web', username: dialog.webUsername, password: dialog.webPassword, realm: dialog.webRealm});
+
+                        if (!dialog.accountSlave)
+                            accountModel.submit();
+
+                        dialog.close();
                     } else if (xhr.status == 401) {
                         dialog.state = 'authError';
                     } else {
