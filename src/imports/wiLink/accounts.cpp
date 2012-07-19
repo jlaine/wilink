@@ -206,6 +206,8 @@ void AccountModel::_q_reload()
     d->removedCredentials.clear();
 
     QSettings settings;
+
+    // migrate from wiLink < 2.3
     if (!settings.contains("Accounts") && settings.contains("ChatAccounts")) {
         QStringList accounts;
         const QStringList chatJids = settings.value("ChatAccounts").toStringList();
@@ -237,6 +239,12 @@ void AccountModel::_q_reload()
     foreach (const QString &accountStr, accountStrings) {
         const QStringList bits = accountStr.split(":");
         if (bits.size() == 3) {
+            // migrate from wiLink < 2.4
+            if (bits[0] == "xmpp" && bits[1] == "wifirst.net") {
+                QNetIO::Wallet::instance()->deleteCredentials(bits[1], bits[2]);
+                continue;
+            }
+
             AccountItem *item = new AccountItem(bits[0], bits[1], bits[2]);
             item->parent = rootItem;
             rootItem->children.append(item);
