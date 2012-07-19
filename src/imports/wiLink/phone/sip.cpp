@@ -785,31 +785,40 @@ SipClientPrivate::SipClientPrivate(SipClient *qq)
 {
 }
 
-QByteArray SipClientPrivate::authorization(const SipMessage &request, const QMap<QByteArray, QByteArray> &challenge) const
+QByteArray SipClientPrivate::authorization(const SipMessage &request, const QMap<QByteArray, QByteArray> &input) const
 {
-    QXmppSaslDigestMd5 digest;
-    digest.setCnonce(digest.generateNonce());
-    digest.setNc("00000001");
-    digest.setNonce(challenge.value("nonce"));
-    digest.setQop(challenge.value("qop"));
+    QXmppSaslDigestMd5 m_saslDigest;
 
-    const QByteArray A1 = username.toUtf8() + ':' + challenge.value("realm") + ':' + password.toUtf8();
+    // determine realm
+    const QByteArray realm = input.value("realm");
+
+    // determine quality of protection
+    const QList<QByteArray> qops = input.value("qop").split(',');
+    if (qops.contains("auth")) {
+        m_saslDigest.setQop("auth");
+        m_saslDigest.setCnonce(QXmppSaslDigestMd5::generateNonce());
+        m_saslDigest.setNc("00000001");
+    }
+    m_saslDigest.setNonce(input.value("nonce"));
+
+    const QByteArray A1 = username.toUtf8() + ':' + realm + ':' + password.toUtf8();
     const QByteArray A2 = request.method() + ':' + request.uri();
 
     QMap<QByteArray, QByteArray> response;
     response["username"] = username.toUtf8();
-    response["realm"] = challenge.value("realm");
-    response["nonce"] = digest.nonce();
+    if (!realm.isEmpty())
+        response["realm"] = realm;
+    response["nonce"] = m_saslDigest.nonce();
     response["uri"] = request.uri();
-    response["response"] = digest.calculateDigest(A1, A2);
-    if (challenge.contains("qop")) {
-        response["qop"] = digest.qop();
-        response["cnonce"] = digest.cnonce();
-        response["nc"] = digest.nc();
+    response["response"] = m_saslDigest.calculateDigest(A1, A2);
+    if (!m_saslDigest.qop().isEmpty()) {
+        response["qop"] = m_saslDigest.qop();
+        response["cnonce"] = m_saslDigest.cnonce();
+        response["nc"] = m_saslDigest.nc();
     }
     response["algorithm"] = "MD5";
-    if (challenge.contains("opaque"))
-        response["opaque"] = challenge.value("opaque");
+    if (input.contains("opaque"))
+        response["opaque"] = input.value("opaque");
 
     return QByteArray("Digest ") + QXmppSaslDigestMd5::serializeMessage(response);
 }
