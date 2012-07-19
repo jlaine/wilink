@@ -402,10 +402,54 @@ Panel {
     Component.onCompleted: {
         for (var i = 0; i < accountModel.count; ++i) {
             var account = accountModel.get(i);
-            if (account.type == 'facebook') {
-                chatClients.model.append({facebookAppId: account.username, facebookAccessToken: account.password});
-            } else if (account.type == 'xmpp') {
+            if (account.type == 'xmpp' && account.realm != 'wifirst.net') {
                 chatClients.model.append({jid: account.username, password: account.password});
+            } else if (account.type == 'web' && account.realm == 'www.wifirst.net') {
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState == 4) {
+                        if (xhr.status == 200) {
+                            var facebookAppId = '',
+                                facebookAccessToken = '',
+                                xmppJid = '',
+                                xmppPassword = '';
+                            var doc = xhr.responseXML.documentElement;
+                            for (var i = 0; i < doc.childNodes.length; ++i) {
+                                var node = doc.childNodes[i];
+                                if (node.nodeName == 'id' && node.firstChild) {
+                                    xmppJid = node.firstChild.nodeValue;
+                                } else if (node.nodeName == 'password' && node.firstChild) {
+                                    xmppPassword = node.firstChild.nodeValue;
+                                } else if (node.nodeName == 'facebook') {
+                                    for (var j = 0; j < node.childNodes.length; ++j) {
+                                        var child = node.childNodes[j];
+                                        if (child.nodeName == 'app-id' && child.firstChild)
+                                            facebookAppId = child.firstChild.nodeValue;
+                                        else if (child.nodeName == 'access-token' && child.firstChild)
+                                            facebookAccessToken = child.firstChild.nodeValue;
+                                    }
+                                }
+                            }
+
+                            // connect to XMPP
+                            if (xmppJid && xmppPassword) {
+                                chatClients.model.append({
+                                    jid: xmppJid,
+                                    password: xmppPassword});
+                            }
+
+                            // connect to facebook
+                            if (facebookAppId && facebookAccessToken && false) {
+                                chatClients.model.append({
+                                    facebookAppId: facebookAppId,
+                                    facebookAccessToken: facebookAccessToken});
+                            }
+                        }
+                    }
+                };
+                xhr.open('GET', 'https://apps-dev.wifirst.net/wilink/credentials', true, account.username, account.password);
+                xhr.setRequestHeader('Accept', 'application/xml');
+                xhr.send();
             }
         }
     }
