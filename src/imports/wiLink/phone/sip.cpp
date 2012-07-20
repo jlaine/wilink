@@ -800,10 +800,10 @@ QByteArray SipClientPrivate::authorization(const SipMessage &request, const QMap
         qop = "auth";
     const QByteArray nonce = input.value("nonce");
     const QByteArray nc = "00000001";
-    const QByteArray cnonce = QXmppSaslDigestMd5::generateNonce();
-
+    const QByteArray cnonce = QXmppUtils::generateRandomBytes(32).toBase64();
     const QByteArray A1 = username.toUtf8() + ':' + realm + ':' + password.toUtf8();
     const QByteArray A2 = request.method() + ':' + request.uri();
+
     QByteArray HA1 = QCryptographicHash::hash(A1, QCryptographicHash::Md5).toHex();
     QByteArray HA2 = QCryptographicHash::hash(A2, QCryptographicHash::Md5).toHex();
     QByteArray KD;
