@@ -61,7 +61,14 @@ Item {
 
                     anchors.top: parent.top
                     anchors.left: parent.left
-                    source: model.type == 'web' ? 'image://icon/web' : 'image://icon/chat'
+                    source: {
+                        if (model.realm == 'www.wifirst.net')
+                            return 'image://icon/wiLink';
+                        else if (model.realm == 'www.google.com')
+                            return 'image://icon/google';
+                        else
+                            return 'image://icon/chat';
+                    }
                     sourceSize.height: appStyle.icon.smallSize
                     sourceSize.width: appStyle.icon.smallSize
                 }
