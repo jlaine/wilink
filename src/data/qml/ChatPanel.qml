@@ -447,7 +447,7 @@ Panel {
                         }
                     }
                 };
-                xhr.open('GET', 'https://apps-dev.wifirst.net/wilink/credentials', true, account.username, account.password);
+                xhr.open('GET', 'https://www.wifirst.net/w/wilink/credentials', true, account.username, account.password);
                 xhr.setRequestHeader('Accept', 'application/xml');
                 xhr.send();
             }
