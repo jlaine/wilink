@@ -27,7 +27,6 @@
 #include <QTimer>
 
 #include "QXmppRtpChannel.h"
-#include "QXmppSaslAuth.h"
 #include "QXmppStun.h"
 #include "QXmppUtils.h"
 
@@ -54,6 +53,66 @@ enum StunStep {
     StunConnectivity = 0,
     StunChangeServer,
 };
+
+QMap<QByteArray, QByteArray> parseDigestMessage(const QByteArray &ba)
+{
+    QMap<QByteArray, QByteArray> map;
+    int startIndex = 0;
+    int pos = 0;
+    while ((pos = ba.indexOf("=", startIndex)) >= 0)
+    {
+        // key get name and skip equals
+        const QByteArray key = ba.mid(startIndex, pos - startIndex).trimmed();
+        pos++;
+
+        // check whether string is quoted
+        if (ba.at(pos) == '"')
+        {
+            // skip opening quote
+            pos++;
+            int endPos = ba.indexOf('"', pos);
+            // skip quoted quotes
+            while (endPos >= 0 && ba.at(endPos - 1) == '\\')
+                endPos = ba.indexOf('"', endPos + 1);
+            if (endPos < 0)
+            {
+                qWarning("Unfinished quoted string");
+                return map;
+            }
+            // unquote
+            QByteArray value = ba.mid(pos, endPos - pos);
+            value.replace("\\\"", "\"");
+            value.replace("\\\\", "\\");
+            map[key] = value;
+            // skip closing quote and comma
+            startIndex = endPos + 2;
+        } else {
+            // non-quoted string
+            int endPos = ba.indexOf(',', pos);
+            if (endPos < 0)
+                endPos = ba.size();
+            map[key] = ba.mid(pos, endPos - pos);
+            // skip comma
+            startIndex = endPos + 1;
+        }
+    }
+    return map;
+}
+
+QByteArray serializeDigestMessage(const QMap<QByteArray, QByteArray> &map)
+{
+    QByteArray ba;
+    foreach (const QByteArray &key, map.keys()) {
+        if (!ba.isEmpty())
+            ba.append(',');
+        ba.append(key + "=");
+        QByteArray value = map[key];
+        value.replace("\\", "\\\\");
+        value.replace("\"", "\\\"");
+        ba.append("\"" + value + "\"");
+    }
+    return ba;
+}
 
 static QString sipAddressToUri(const QString &address)
 {
@@ -131,7 +190,9 @@ bool SipCallContext::handleAuthentication(const SipMessage &reply)
         qWarning("Unsupported authentication method");
         return false;
     }
-    QMap<QByteArray, QByteArray> challenge = QXmppSaslDigestMd5::parseMessage(auth.mid(spacePos + 1));
+
+
+    QMap<QByteArray, QByteArray> challenge = parseDigestMessage(auth.mid(spacePos + 1));
     if (lastChallenge->value("realm") == challenge.value("realm") &&
         lastChallenge->value("nonce") == challenge.value("nonce")) {
         qWarning("Authentication failed");
@@ -788,8 +849,6 @@ SipClientPrivate::SipClientPrivate(SipClient *qq)
 
 QByteArray SipClientPrivate::authorization(const SipMessage &request, const QMap<QByteArray, QByteArray> &input) const
 {
-    QXmppSaslDigestMd5 m_saslDigest;
-
     // determine realm
     const QByteArray realm = input.value("realm");
 
@@ -828,7 +887,7 @@ QByteArray SipClientPrivate::authorization(const SipMessage &request, const QMap
     if (input.contains("opaque"))
         response["opaque"] = input.value("opaque");
 
-    return QByteArray("Digest ") + QXmppSaslDigestMd5::serializeMessage(response);
+    return QByteArray("Digest ") + serializeDigestMessage(response);
 }
 
 SipMessage SipClientPrivate::buildRequest(const QByteArray &method, const QByteArray &uri, SipCallContext *ctx, int seqNum)
