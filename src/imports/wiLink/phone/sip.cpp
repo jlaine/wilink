@@ -17,6 +17,7 @@
 
 #include <QByteArrayMatcher>
 #include <QCoreApplication>
+#include <QCryptographicHash>
 #include <QDateTime>
 #include <QHostInfo>
 #include <QNetworkInterface>
@@ -794,27 +795,34 @@ QByteArray SipClientPrivate::authorization(const SipMessage &request, const QMap
 
     // determine quality of protection
     const QList<QByteArray> qops = input.value("qop").split(',');
-    if (qops.contains("auth")) {
-        m_saslDigest.setQop("auth");
-        m_saslDigest.setCnonce(QXmppSaslDigestMd5::generateNonce());
-        m_saslDigest.setNc("00000001");
-    }
-    m_saslDigest.setNonce(input.value("nonce"));
+    QByteArray qop;
+    if (qops.contains("auth"))
+        qop = "auth";
+    const QByteArray nonce = input.value("nonce");
+    const QByteArray nc = "00000001";
+    const QByteArray cnonce = QXmppSaslDigestMd5::generateNonce();
 
     const QByteArray A1 = username.toUtf8() + ':' + realm + ':' + password.toUtf8();
     const QByteArray A2 = request.method() + ':' + request.uri();
+    QByteArray HA1 = QCryptographicHash::hash(A1, QCryptographicHash::Md5).toHex();
+    QByteArray HA2 = QCryptographicHash::hash(A2, QCryptographicHash::Md5).toHex();
+    QByteArray KD;
+    if (qop == "auth")
+        KD = HA1 + ':' + nonce + ':' + nc + ':' + cnonce + ':' + qop + ':' + HA2;
+    else
+        KD = HA1 + ':' + nonce + ':' + HA2;
 
     QMap<QByteArray, QByteArray> response;
     response["username"] = username.toUtf8();
     if (!realm.isEmpty())
         response["realm"] = realm;
-    response["nonce"] = m_saslDigest.nonce();
+    response["nonce"] = nonce;
     response["uri"] = request.uri();
-    response["response"] = m_saslDigest.calculateDigest(A1, A2);
-    if (!m_saslDigest.qop().isEmpty()) {
-        response["qop"] = m_saslDigest.qop();
-        response["cnonce"] = m_saslDigest.cnonce();
-        response["nc"] = m_saslDigest.nc();
+    response["response"] = QCryptographicHash::hash(KD, QCryptographicHash::Md5).toHex();
+    if (qop == "auth") {
+        response["qop"] = qop;
+        response["cnonce"] = cnonce;
+        response["nc"] = nc;
     }
     response["algorithm"] = "MD5";
     if (input.contains("opaque"))
