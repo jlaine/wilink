@@ -390,7 +390,7 @@ class ChatRoomItem : public ChatModelItem
 {
 public:
     QString jid;
-    QXmppPresence::Status::Type status;
+    QXmppPresence::AvailableStatusType status;
     QXmppMucItem::Affiliation affiliation;
 };
 
@@ -530,7 +530,7 @@ void RoomModel::_q_participantChanged(const QString &jid)
                 removeRow(item->row());
                 _q_participantAdded(jid);
             } else {
-                item->status = m_room->participantPresence(jid).status().type();
+                item->status = m_room->participantPresence(jid).availableStatusType();
                 emit dataChanged(createIndex(item), createIndex(item));
             }
             break;

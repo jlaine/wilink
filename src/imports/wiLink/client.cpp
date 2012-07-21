@@ -161,7 +161,7 @@ QDateTime ChatClient::serverTime() const
 QString ChatClient::statusType() const
 {
     if (clientPresence().type() == QXmppPresence::Available)
-        return statusToString(clientPresence().status().type());
+        return statusToString(clientPresence().availableStatusType());
     else
         return "offline";
 }
@@ -174,7 +174,7 @@ void ChatClient::setStatusType(const QString &statusType)
             presence.setType(QXmppPresence::Unavailable);
         } else {
             presence.setType(QXmppPresence::Available);
-            presence.status().setType(stringToStatus(statusType));
+            presence.setAvailableStatusType(stringToStatus(statusType));
         }
         setClientPresence(presence);
 
@@ -411,24 +411,24 @@ void ChatClient::_q_timeReceived(const QXmppEntityTimeIq &time)
         d->timeOffset = QDateTime::currentDateTime().secsTo(time.utc());
 }
 
-QString ChatClient::statusToString(QXmppPresence::Status::Type type)
+QString ChatClient::statusToString(QXmppPresence::AvailableStatusType type)
 {
-    if (type == QXmppPresence::Status::Online || type == QXmppPresence::Status::Chat)
+    if (type == QXmppPresence::Online || type == QXmppPresence::Chat)
         return "available";
-    else if (type == QXmppPresence::Status::Away || type == QXmppPresence::Status::XA)
+    else if (type == QXmppPresence::Away || type == QXmppPresence::XA)
         return "away";
     else
         return "busy";
 }
 
-QXmppPresence::Status::Type ChatClient::stringToStatus(const QString& str)
+QXmppPresence::AvailableStatusType ChatClient::stringToStatus(const QString& str)
 {
     if (str == "available") {
-        return QXmppPresence::Status::Online;
+        return QXmppPresence::Online;
     } else if (str == "away") {
-        return QXmppPresence::Status::Away;
+        return QXmppPresence::Away;
     } else {
-        return QXmppPresence::Status::DND;
+        return QXmppPresence::DND;
     }
 }
 

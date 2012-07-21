@@ -76,8 +76,8 @@ public:
 
     static QList<ChatClient*> instances();
 
-    static QString statusToString(QXmppPresence::Status::Type type);
-    static QXmppPresence::Status::Type stringToStatus(const QString& str);
+    static QString statusToString(QXmppPresence::AvailableStatusType type);
+    static QXmppPresence::AvailableStatusType stringToStatus(const QString& str);
 
 signals:
     void authenticationFailed();

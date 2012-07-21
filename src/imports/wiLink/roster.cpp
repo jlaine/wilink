@@ -772,7 +772,7 @@ QString VCardCache::presenceStatus(const QString &jid) const
 
             // FIXME : we should probably be using the priority rather than
             // stop at the first available contact
-            const QString type = ChatClient::statusToString(presence.status().type());
+            const QString type = ChatClient::statusToString(presence.availableStatusType());
             if (type == "available")
                 return type;
             else
