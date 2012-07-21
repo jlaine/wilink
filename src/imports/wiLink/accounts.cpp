@@ -218,17 +218,14 @@ void AccountModel::_q_reload()
                     QString tmpJid(jid);
                     QString tmpPassword;
                     qDebug("Converting wifirst account %s", qPrintable(tmpJid));
-                    if (QNetIO::Wallet::instance()->getCredentials("www.wifirst.net", tmpJid, tmpPassword))
-                        QNetIO::Wallet::instance()->setCredentials("wifirst.net", tmpJid, tmpPassword);
                     accounts << QString("web:www.wifirst.net:%1").arg(jid);
                 } else if (domain == QLatin1String("gmail.com")) {
                     QString tmpJid(jid);
                     QString tmpPassword;
-                    if (QNetIO::Wallet::instance()->getCredentials("www.google.com", tmpJid, tmpPassword))
-                        QNetIO::Wallet::instance()->setCredentials("gmail.com", tmpJid, tmpPassword);
                     accounts << QString("web:www.google.com:%1").arg(jid);
+                } else {
+                    accounts << QString("xmpp:%1:%2").arg(domain, jid);
                 }
-                accounts << QString("xmpp:%1:%2").arg(domain, jid);
             }
         }
         settings.setValue("Accounts", accounts);
@@ -240,7 +237,7 @@ void AccountModel::_q_reload()
         const QStringList bits = accountStr.split(":");
         if (bits.size() == 3) {
             // migrate from wiLink < 2.4
-            if (bits[0] == "xmpp" && bits[1] == "wifirst.net") {
+            if (bits[0] == "xmpp" && (bits[1] == "wifirst.net" || bits[1] == "gmail.com")) {
                 QNetIO::Wallet::instance()->deleteCredentials(bits[1], bits[2]);
                 continue;
             }

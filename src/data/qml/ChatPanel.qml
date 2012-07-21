@@ -404,6 +404,8 @@ Panel {
             var account = accountModel.get(i);
             if (account.type == 'xmpp') {
                 chatClients.model.append({jid: account.username, password: account.password});
+            } else if (account.type == 'web' && account.realm == 'www.google.com') {
+                chatClients.model.append({jid: account.username, password: account.password});
             } else if (account.type == 'web' && account.realm == 'www.wifirst.net') {
                 var xhr = new XMLHttpRequest();
                 xhr.onreadystatechange = function() {

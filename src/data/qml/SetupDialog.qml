@@ -260,10 +260,6 @@ Dialog {
             testClient.connectToServer(username + '/AccountCheck', password);
             testClient.connected.connect(function() {
                 console.log("google ok");
-                accountModel.append({type: 'xmpp',
-                    username: username,
-                    password: password,
-                    realm: Utils.jidToDomain(username)});
                 accountModel.append({type: 'web',
                     username: username,
                     password: password,
