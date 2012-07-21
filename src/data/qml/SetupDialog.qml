@@ -27,59 +27,22 @@ Dialog {
     property QtObject accountModel: AccountModel {}
     property bool accountSlave: false
 
-    property string webRealm
-    property string webUsername
-    property string webPassword
-    property string xmppRealm
-    property string xmppUsername
-    property string xmppPassword
-
     title: qsTr('Add an account')
     minimumWidth: 440
     minimumHeight: 270
 
+    function save() {
+        if (!dialog.accountSlave)
+            accountModel.submit();
+
+        dialog.close();
+    }
+
     Client {
         id: testClient
 
-        function testCredentials(jid, password) {
-            if (jid.indexOf('@') < 0) {
-                dialog.state = 'incomplete';
-                return;
-            }
-
-            // check for duplicate account
-            for (var i = 0; i < accountModel.count; i++) {
-                var account = accountModel.get(i);
-                if (account.type == 'xmpp' && account.realm == Utils.jidToDomain(jid)) {
-                    dialog.state = 'dupe';
-                    return;
-                }
-            }
-
-            dialog.state = 'testing';
-            dialog.xmppRealm = Utils.jidToDomain(jid);
-            dialog.xmppUsername = jid;
-            dialog.xmppPassword = password;
-            console.log("connecting: " + dialog.xmppUsername);
-            testClient.connectToServer(dialog.xmppUsername + '/AccountCheck', dialog.xmppPassword);
-        }
-
         logger: QXmppLogger {
             loggingType: QXmppLogger.StdoutLogging
-        }
-
-        onConnected: {
-            if (dialog.state == 'testing') {
-                if (dialog.xmppRealm)
-                    accountModel.append({type: 'xmpp', username: dialog.xmppUsername, password: dialog.xmppPassword, realm: dialog.xmppRealm});
-                if (dialog.webRealm)
-                    accountModel.append({type: 'web', username: dialog.webUsername, password: dialog.webPassword, realm: dialog.webRealm});
-
-                if (!dialog.accountSlave)
-                    accountModel.submit();
-
-                dialog.close();
-            }
         }
 
         onDisconnected: {
@@ -239,9 +202,12 @@ Dialog {
 
         var accountType = accountCombo.model.get(accountCombo.currentIndex).type;
         if (accountType == 'wifirst') {
+            // validate input
             if (usernameInput.text.indexOf('@') < 0) {
                 usernameInput.text += '@wifirst.net';
             }
+            var username = usernameInput.text;
+            var password = passwordInput.text;
 
             // check for duplicate account
             for (var i = 0; i < accountModel.count; i++) {
@@ -252,20 +218,15 @@ Dialog {
                 }
             }
 
-            dialog.webRealm = 'www.wifirst.net';
-            dialog.webUsername = usernameInput.text;
-            dialog.webPassword = passwordInput.text;
-
             var xhr = new XMLHttpRequest();
             xhr.onreadystatechange = function() {
                 if (xhr.readyState == 4) {
                     if (xhr.status == 200) {
-                        accountModel.append({type: 'web', username: dialog.webUsername, password: dialog.webPassword, realm: dialog.webRealm});
-
-                        if (!dialog.accountSlave)
-                            accountModel.submit();
-
-                        dialog.close();
+                        accountModel.append({type: 'web',
+                            username: username,
+                            password: password,
+                            realm: 'www.wifirst.net'});
+                        dialog.save();
                     } else if (xhr.status == 401) {
                         dialog.state = 'authError';
                     } else {
@@ -273,21 +234,71 @@ Dialog {
                     }
                 }
             }
-            xhr.open('GET', 'https://www.wifirst.net/w/wilink/credentials', true, dialog.webUsername, dialog.webPassword);
+            xhr.open('GET', 'https://www.wifirst.net/w/wilink/credentials', true, username, password);
             xhr.setRequestHeader('Accept', 'application/xml');
             xhr.send();
         } else if (accountType == 'google') {
+            // validate input
             if (usernameInput.text.indexOf('@') < 0) {
                 usernameInput.text += '@gmail.com';
             }
+            var username = usernameInput.text;
+            var password = passwordInput.text;
 
-            dialog.webRealm = 'www.google.com';
-            dialog.webUsername = usernameInput.text;
-            dialog.webPassword = passwordInput.text;
+            // check for duplicate account
+            for (var i = 0; i < accountModel.count; i++) {
+                var account = accountModel.get(i);
+                if (account.type == 'web' && account.realm == 'www.google.com') {
+                    dialog.state = 'dupe';
+                    return;
+                }
+            }
 
-            testClient.testCredentials(usernameInput.text, passwordInput.text);
+            // test credentials
+            dialog.state = 'testing';
+            console.log("connecting: " + username);
+            testClient.connectToServer(username + '/AccountCheck', password);
+            testClient.connected.connect(function() {
+                console.log("google ok");
+                accountModel.append({type: 'xmpp',
+                    username: username,
+                    password: password,
+                    realm: Utils.jidToDomain(username)});
+                accountModel.append({type: 'web',
+                    username: username,
+                    password: password,
+                    realm: 'www.google.com'});
+                dialog.save();
+            });
         } else {
-            testClient.testCredentials(usernameInput.text, passwordInput.text);
+            // validate input
+            if (usernameInput.text.indexOf('@') < 0) {
+                dialog.state = 'incomplete';
+                return;
+            }
+            var username = usernameInput.text;
+            var password = passwordInput.text;
+
+            // check for duplicate account
+            for (var i = 0; i < accountModel.count; i++) {
+                var account = accountModel.get(i);
+                if (account.type == 'xmpp' && account.realm == Utils.jidToDomain(username)) {
+                    dialog.state = 'dupe';
+                    return;
+                }
+            }
+
+            // test credentials
+            console.log("connecting: " + username);
+            testClient.connectToServer(username + '/AccountCheck', password);
+            testClient.connected.connect(function() {
+                console.log("other ok");
+                accountModel.append({type: 'xmpp',
+                    username: username,
+                    password: password,
+                    realm: Utils.jidToDomain(username)});
+                dialog.save();
+            });
         }
     }
 
