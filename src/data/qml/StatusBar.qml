@@ -180,7 +180,7 @@ Rectangle {
             if (idle.idleTime >= 300) {
                 if (statusPill.presenceStatus == 'available') {
                     autoAway = true;
-                    setPresenceStatus('busy');
+                    setPresenceStatus('away');
                 }
             } else if (autoAway) {
                 autoAway = false;
