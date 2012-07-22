@@ -390,11 +390,14 @@ void RosterModel::removeClient(ChatClient *client)
             affected << child;
     }
 
+    // FIXME: for some reason this causes a crash a shutdown
+#if 0
     // remove obsolete entries
     foreach (RosterItem *item, affected) {
         if (item->rosterManagers.isEmpty())
             removeItem(item);
     }
+#endif
 }
 
 void RosterModel::_q_clientDestroyed(QObject *object)
