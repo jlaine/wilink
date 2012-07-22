@@ -27,6 +27,7 @@
 #include "model.h"
 
 class QXmppArchiveChat;
+class QXmppResultSetReply;
 class QUrl;
 
 class ChatClient;
@@ -95,12 +96,14 @@ signals:
 
 public slots:
     void clear();
+    void fetchNextPage();
+    void fetchPreviousPage();
     void select(int from, int to);
 
 private slots:
     void _q_cardChanged();
-    void _q_archiveChatReceived(const QXmppArchiveChat &chat);
-    void _q_archiveListReceived(const QList<QXmppArchiveChat> &chats);
+    void _q_archiveChatReceived(const QXmppArchiveChat &chat, const QXmppResultSetReply &rsmReply);
+    void _q_archiveListReceived(const QList<QXmppArchiveChat> &chats, const QXmppResultSetReply &rsmReply);
 
 private:
     friend class HistoryModelPrivate;

@@ -27,18 +27,23 @@
 #include "history.h"
 #include "roster.h"
 
+#define HISTORY_DAYS 365
+#define HISTORY_PAGE 4
 #ifdef WILINK_EMBEDDED
 #define SMILEY_ROOT ":/images/32x32"
-#define HISTORY_DAYS 7
 #else
 #define SMILEY_ROOT ":/images/16x16"
-#define HISTORY_DAYS 14
 #endif
 
 typedef QPair<QRegExp, QString> TextTransform;
 static QList<TextTransform> textTransforms;
 
 static const QRegExp meRegex = QRegExp("^/me[ \t]+(.*)");
+
+enum PageDirection {
+    PageForwards = 0,
+    PageBackwards
+};
 
 class HistoryItem : public ChatModelItem
 {
@@ -176,16 +181,20 @@ public:
     void fetchArchives();
     void fetchMessages();
 
+    QString archiveFirst;
+    QString archiveLast;
+    PageDirection pageDirection;
     bool archivesFetched;
-    QList<HistoryQueueItem> archivesQueue;
+    QList<HistoryQueueItem> messageQueue;
     ChatClient *client;
     QString jid;
     QMap<QString, VCard*> rosterCards;
 };
 
 HistoryModelPrivate::HistoryModelPrivate()
-    : archivesFetched(false),
-    client(0)
+    : archivesFetched(false)
+    , client(0)
+    , pageDirection(PageBackwards)
 {
 }
 
@@ -194,18 +203,22 @@ void HistoryModelPrivate::fetchArchives()
     if (archivesFetched || !client || jid.isEmpty())
         return;
 
+    // fetch last page
+    QXmppResultSetQuery rsmQuery;
+    rsmQuery.setBefore("");
+    rsmQuery.setMax(HISTORY_PAGE);
     client->archiveManager()->listCollections(jid,
-        client->serverTime().addDays(-HISTORY_DAYS));
+        client->serverTime().addDays(-HISTORY_DAYS), QDateTime(), rsmQuery);
     archivesFetched = true;
-    archivesQueue.clear();
+    messageQueue.clear();
 }
 
 void HistoryModelPrivate::fetchMessages()
 {
-    if (archivesQueue.isEmpty())
+    if (messageQueue.isEmpty())
         return;
 
-    HistoryQueueItem item = archivesQueue.takeFirst();
+    HistoryQueueItem item = messageQueue.takeFirst();
     // FIXME: setting max to -2 is a hack!
     client->archiveManager()->retrieveCollection(item.with, item.start, -2);
 }
@@ -357,6 +370,30 @@ void HistoryModel::clear()
         d->client->archiveManager()->removeCollections(d->jid);
 }
 
+/** Fetches the next page.
+ */
+void HistoryModel::fetchNextPage()
+{
+    d->pageDirection = PageForwards;
+    QXmppResultSetQuery rsmQuery;
+    rsmQuery.setAfter(d->archiveLast);
+    rsmQuery.setMax(HISTORY_PAGE);
+    d->client->archiveManager()->listCollections(d->jid,
+        d->client->serverTime().addDays(-HISTORY_DAYS), QDateTime(), rsmQuery);
+}
+
+/** Fetches the previous page.
+ */
+void HistoryModel::fetchPreviousPage()
+{
+    d->pageDirection = PageBackwards;
+    QXmppResultSetQuery rsmQuery;
+    rsmQuery.setBefore(d->archiveFirst);
+    rsmQuery.setMax(HISTORY_PAGE);
+    d->client->archiveManager()->listCollections(d->jid,
+        d->client->serverTime().addDays(-HISTORY_DAYS), QDateTime(), rsmQuery);
+}
+
 ChatClient *HistoryModel::client() const
 {
     return d->client;
@@ -371,12 +408,12 @@ void HistoryModel::setClient(ChatClient *client)
         return;
 
     if (client) {
-        check = connect(client->archiveManager(), SIGNAL(archiveChatReceived(QXmppArchiveChat)),
-                        this, SLOT(_q_archiveChatReceived(QXmppArchiveChat)));
+        check = connect(client->archiveManager(), SIGNAL(archiveChatReceived(QXmppArchiveChat,QXmppResultSetReply)),
+                        this, SLOT(_q_archiveChatReceived(QXmppArchiveChat,QXmppResultSetReply)));
         Q_ASSERT(check);
 
-        check = connect(client->archiveManager(), SIGNAL(archiveListReceived(QList<QXmppArchiveChat>)),
-                        this, SLOT(_q_archiveListReceived(QList<QXmppArchiveChat>)));
+        check = connect(client->archiveManager(), SIGNAL(archiveListReceived(QList<QXmppArchiveChat>,QXmppResultSetReply)),
+                        this, SLOT(_q_archiveListReceived(QList<QXmppArchiveChat>,QXmppResultSetReply)));
         Q_ASSERT(check);
     }
 
@@ -501,7 +538,7 @@ void HistoryModel::_q_cardChanged()
     }
 }
 
-void HistoryModel::_q_archiveChatReceived(const QXmppArchiveChat &chat)
+void HistoryModel::_q_archiveChatReceived(const QXmppArchiveChat &chat, const QXmppResultSetReply &rsmReply)
 {
     Q_ASSERT(d->client);
 
@@ -520,16 +557,23 @@ void HistoryModel::_q_archiveChatReceived(const QXmppArchiveChat &chat)
     d->fetchMessages();
 }
 
-void HistoryModel::_q_archiveListReceived(const QList<QXmppArchiveChat> &chats)
+void HistoryModel::_q_archiveListReceived(const QList<QXmppArchiveChat> &chats, const QXmppResultSetReply &rsmReply)
 {
     Q_ASSERT(d->client);
 
+    // update boundaries
+    if (d->archiveFirst.isEmpty() || d->pageDirection == PageBackwards)
+        d->archiveFirst = rsmReply.first();
+    if (d->archiveLast.isEmpty() || d->pageDirection == PageForwards)
+        d->archiveLast = rsmReply.last();
+
+    // request messages
     for (int i = chats.size() - 1; i >= 0; i--) {
         if (QXmppUtils::jidToBareJid(chats[i].with()) == d->jid) {
             HistoryQueueItem item;
             item.with = chats[i].with();
             item.start = chats[i].start();
-            d->archivesQueue << item;
+            d->messageQueue << item;
         }
     }
     d->fetchMessages();
