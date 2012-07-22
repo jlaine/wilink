@@ -1,6 +1,7 @@
 wiLink 2.4.0 (UNRELEASED)
  * Chat:
   - Display all chat accounts in a single view.
+  - Make it possible to navigate to older messages in history.
 
 wiLink 2.3.4 (2012-06-07)
  * Phone:
