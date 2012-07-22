@@ -236,13 +236,29 @@ Panel {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.top
             anchors.topMargin: appStyle.margin.normal
-            height: 32
-            width: 200
+            height: appStyle.icon.normalSize + 2*appStyle.margin.normal
+            width: appStyle.icon.normalSize + 2*appStyle.margin.normal + appStyle.spacing.horizontal + fetchLabel.width
+            radius: appStyle.margin.large
             color: 'pink'
             opacity: 0
 
+            Image {
+                id: fetchIcon
+
+                anchors.left: parent.left
+                anchors.leftMargin: appStyle.margin.normal
+                anchors.verticalCenter: parent.verticalCenter
+                source: 'image://icon/information'
+                sourceSize.height: appStyle.icon.normalSize
+                sourceSize.width: appStyle.icon.normalSize
+            }
+
             Label {
-                anchors.centerIn: parent
+                id: fetchLabel
+
+                anchors.left: fetchIcon.right
+                anchors.leftMargin: appStyle.spacing.horizontal
+                anchors.verticalCenter: parent.verticalCenter
                 text: qsTr('Fetch older messages')
             }
 
