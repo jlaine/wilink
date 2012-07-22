@@ -24,6 +24,9 @@ import 'utils.js' as Utils
 Item {
     id: block
 
+    property alias atYBeginning: historyView.atYBeginning
+    property alias atYEnd: historyView.atYEnd
+    property alias count: historyView.count
     property alias model: historyView.model
     signal participantClicked(string participant)
 

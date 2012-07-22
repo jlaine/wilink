@@ -228,6 +228,43 @@ Panel {
                 }
             }
         }
+
+        // Button to fetch older messages.
+        Rectangle {
+            id: fetchPrevious
+
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top: parent.top
+            anchors.topMargin: appStyle.margin.normal
+            height: 32
+            width: 200
+            color: 'pink'
+            opacity: 0
+
+            Label {
+                anchors.centerIn: parent
+                text: qsTr('Fetch older messages')
+            }
+
+            MouseArea {
+                id: fetchArea
+
+                anchors.fill: parent
+                hoverEnabled: true
+
+                onClicked: {
+                    if (fetchPrevious.state == 'active') {
+                        conversation.historyModel.fetchPreviousPage();
+                    }
+                }
+            }
+
+            state: (historyView.count && historyView.atYBeginning) ? 'active' : ''
+            states: State {
+                name: 'active'
+                PropertyChanges { target: fetchPrevious; opacity: 1 }
+            }
+        }
     }
 
     ChatEdit {
