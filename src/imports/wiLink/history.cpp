@@ -183,9 +183,10 @@ public:
 
     QString archiveFirst;
     QString archiveLast;
-    PageDirection pageDirection;
     bool archivesFetched;
+    bool hasPreviousPage;
     QList<HistoryQueueItem> messageQueue;
+    PageDirection pageDirection;
     ChatClient *client;
     QString jid;
     QMap<QString, VCard*> rosterCards;
@@ -193,6 +194,7 @@ public:
 
 HistoryModelPrivate::HistoryModelPrivate()
     : archivesFetched(false)
+    , hasPreviousPage(false)
     , client(0)
     , pageDirection(PageBackwards)
 {
@@ -424,6 +426,11 @@ void HistoryModel::setClient(ChatClient *client)
     d->fetchArchives();
 }
 
+bool HistoryModel::hasPreviousPage() const
+{
+    return d->hasPreviousPage;
+}
+
 QString HistoryModel::jid() const
 {
     return d->jid;
@@ -566,6 +573,11 @@ void HistoryModel::_q_archiveListReceived(const QList<QXmppArchiveChat> &chats, 
         d->archiveFirst = rsmReply.first();
     if (d->archiveLast.isEmpty() || d->pageDirection == PageForwards)
         d->archiveLast = rsmReply.last();
+    const bool hasPreviousPage = rsmReply.index() > 0;
+    if (hasPreviousPage != d->hasPreviousPage) {
+        d->hasPreviousPage = hasPreviousPage;
+        emit pagesChanged();
+    }
 
     // request messages
     for (int i = chats.size() - 1; i >= 0; i--) {

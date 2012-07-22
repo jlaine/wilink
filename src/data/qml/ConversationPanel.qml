@@ -230,17 +230,27 @@ Panel {
         }
 
         // Button to fetch older messages.
-        Rectangle {
+        Item {
             id: fetchPrevious
 
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.top
             anchors.topMargin: appStyle.margin.normal
-            height: appStyle.icon.normalSize + 2*appStyle.margin.normal
-            width: appStyle.icon.normalSize + 2*appStyle.margin.normal + appStyle.spacing.horizontal + fetchLabel.width
-            radius: appStyle.margin.large
-            color: 'pink'
+            height: appStyle.icon.smallSize + 2*appStyle.margin.normal
+            width: appStyle.icon.smallSize + 2*appStyle.margin.normal + appStyle.spacing.horizontal + fetchLabel.width
             opacity: 0
+
+            Rectangle {
+                anchors.fill: parent
+                color: 'pink'
+                opacity: 0.8
+                radius: appStyle.margin.large
+                smooth: true
+                gradient: Gradient {
+                    GradientStop { position: 0; color: '#9bbdf4' }
+                    GradientStop { position: 1; color: '#90acd8' }
+                }
+            }
 
             Image {
                 id: fetchIcon
@@ -249,8 +259,8 @@ Panel {
                 anchors.leftMargin: appStyle.margin.normal
                 anchors.verticalCenter: parent.verticalCenter
                 source: 'image://icon/information'
-                sourceSize.height: appStyle.icon.normalSize
-                sourceSize.width: appStyle.icon.normalSize
+                sourceSize.height: appStyle.icon.smallSize
+                sourceSize.width: appStyle.icon.smallSize
             }
 
             Label {
@@ -275,7 +285,7 @@ Panel {
                 }
             }
 
-            state: (historyView.count && historyView.atYBeginning) ? 'active' : ''
+            state: (conversation.historyModel.hasPreviousPage && historyView.atYBeginning) ? 'active' : ''
             states: State {
                 name: 'active'
                 PropertyChanges { target: fetchPrevious; opacity: 1 }

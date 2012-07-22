@@ -59,6 +59,7 @@ public:
 class HistoryModel : public ChatModel
 {
     Q_OBJECT
+    Q_PROPERTY(bool hasPreviousPage READ hasPreviousPage NOTIFY pagesChanged)
     Q_PROPERTY(ChatClient* client READ client WRITE setClient NOTIFY clientChanged)
     Q_PROPERTY(QString jid READ jid WRITE setJid NOTIFY jidChanged)
 
@@ -79,6 +80,8 @@ public:
     ChatClient *client() const;
     void setClient(ChatClient *client);
 
+    bool hasPreviousPage() const;
+
     QString jid() const;
     void setJid(const QString &jid);
 
@@ -92,6 +95,7 @@ signals:
     void clientChanged(ChatClient *client);
     void jidChanged(const QString &jid);
     void messageReceived(const QString &jid, const QString &text);
+    void pagesChanged();
     void participantModelChanged(QObject *participantModel);
 
 public slots:
