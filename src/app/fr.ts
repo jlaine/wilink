@@ -254,6 +254,10 @@ Acceptez-vous?</translation>
         <source>Clear</source>
         <translation>Effacer</translation>
     </message>
+    <message>
+        <source>Fetch older messages</source>
+        <translation>Messages plus anciens</translation>
+    </message>
 </context>
 <context>
     <name>DebugPlugin</name>
