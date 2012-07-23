@@ -40,8 +40,8 @@ Item {
         width: parent.height
         height: parent.width
         anchors.top: parent.top
-        anchors.left: parent.left
         anchors.topMargin: -parent.width
+        anchors.left: parent.left
 
         gradient: Gradient {
             GradientStop { id: backgroundStop1; position: 0.0; color: '#e7effd' }
@@ -59,7 +59,9 @@ Item {
         id: header
 
         anchors.top: parent.top
+        anchors.topMargin: -1
         anchors.left: parent.left
+        anchors.leftMargin: -1
         anchors.right: parent.right
         gradient: Gradient {
             GradientStop { position:0.0; color: '#9fb7dd' }
