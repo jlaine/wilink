@@ -29,6 +29,7 @@ Rectangle {
         GradientStop { position: 0; color: '#e7effd' }
         GradientStop { position: 1; color: '#cbdaf1' }
     }
+    smooth: true
     height: visible ? label.height + 2 * label.anchors.margins : 0
     visible: label.text != ''
 
