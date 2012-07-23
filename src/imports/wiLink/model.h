@@ -21,6 +21,7 @@
 #define CHAT_MODEL_H
 
 #include <QAbstractItemModel>
+#include <QSet>
 
 class ChatModelItem
 {
@@ -77,7 +78,17 @@ protected:
     QModelIndex createIndex(ChatModelItem *item, int column = 0) const;
     void removeItem(ChatModelItem *item);
 
+    void beginBuffering();
+    void endBuffering();
+
     ChatModelItem *rootItem;
+
+private:
+    void emitChanges();
+
+    bool m_buffering;
+    int m_changedCount;
+    QSet<ChatModelItem*> m_changedItems;
 };
 
 #endif

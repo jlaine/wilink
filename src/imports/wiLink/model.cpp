@@ -39,6 +39,8 @@ int ChatModelItem::row() const
 
 ChatModel::ChatModel(QObject *parent)
     : QAbstractItemModel(parent)
+    , m_buffering(false)
+    , m_changedCount(0)
 {
     bool check;
     Q_UNUSED(check);
@@ -76,6 +78,10 @@ ChatModel::~ChatModel()
 void ChatModel::addItem(ChatModelItem *item, ChatModelItem *parentItem, int pos)
 {
     Q_ASSERT(!item->parent);
+
+    // emit any pending changes
+    emitChanges();
+
     if (pos < 0 || pos > parentItem->children.size())
         pos = parentItem->children.size();
     beginInsertRows(createIndex(parentItem, 0), pos, pos);
@@ -84,10 +90,41 @@ void ChatModel::addItem(ChatModelItem *item, ChatModelItem *parentItem, int pos)
     endInsertRows();
 }
 
+void ChatModel::beginBuffering()
+{
+    m_buffering = true;
+}
+
+void ChatModel::emitChanges()
+{
+    if (!m_changedItems.isEmpty()) {
+        //qDebug("combined %i changes into %i", m_changedCount, m_changedItems.size());
+        foreach (ChatModelItem *item, m_changedItems) {
+            const QModelIndex index = createIndex(item);
+            emit dataChanged(index, index);
+        }
+        m_changedCount = 0;
+        m_changedItems.clear();
+    }
+}
+
+void ChatModel::endBuffering()
+{
+    // emit any pending changes
+    emitChanges();
+
+    m_buffering = false;
+}
+
 void ChatModel::changeItem(ChatModelItem *item)
 {
-    const QModelIndex index = createIndex(item);
-    emit dataChanged(index, index);
+    if (m_buffering) {
+        m_changedCount++;
+        m_changedItems << item;
+    } else {
+        const QModelIndex index = createIndex(item);
+        emit dataChanged(index, index);
+    }
 }
 
 int ChatModel::columnCount(const QModelIndex &parent) const
@@ -151,6 +188,9 @@ QModelIndex ChatModel::parent(const QModelIndex &index) const
 bool ChatModel::removeRows(int row, int count, const QModelIndex &parent)
 {
     ChatModelItem *parentItem = parent.isValid() ? static_cast<ChatModelItem*>(parent.internalPointer()) : rootItem;
+
+    // emit any pending changes
+    emitChanges();
 
     const int minIndex = qMax(0, row);
     const int maxIndex = qMin(row + count, parentItem->children.size()) - 1;

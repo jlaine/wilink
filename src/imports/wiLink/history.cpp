@@ -563,6 +563,7 @@ void HistoryModel::_q_archiveChatReceived(const QXmppArchiveChat &chat, const QX
     // notify bottom is about to change
     emit bottomAboutToChange();
 
+    beginBuffering();
     foreach (const QXmppArchiveMessage &msg, chat.messages()) {
         if (msg.body().isEmpty())
             continue;
@@ -575,6 +576,7 @@ void HistoryModel::_q_archiveChatReceived(const QXmppArchiveChat &chat, const QX
         message.received = msg.isReceived();
         addMessage_worker(message);
     }
+    endBuffering();
 
     // notify bottom change
     emit bottomChanged();
