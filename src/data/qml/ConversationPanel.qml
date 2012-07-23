@@ -240,9 +240,12 @@ Panel {
             width: appStyle.icon.smallSize + 2*appStyle.margin.normal + appStyle.spacing.horizontal + fetchLabel.width
             opacity: 0
 
+            Behavior on opacity {
+                NumberAnimation { duration: appStyle.animation.normalDuration }
+            }
+
             Rectangle {
                 anchors.fill: parent
-                color: 'pink'
                 opacity: 0.8
                 radius: appStyle.margin.large
                 smooth: true
@@ -285,9 +288,9 @@ Panel {
                 }
             }
 
-            state: (conversation.historyModel.hasPreviousPage && historyView.atYBeginning) ? 'active' : ''
             states: State {
                 name: 'active'
+                when: conversation.historyModel.hasPreviousPage && historyView.atYBeginning
                 PropertyChanges { target: fetchPrevious; opacity: 1 }
             }
         }
