@@ -210,13 +210,10 @@ void HistoryModelPrivate::fetchArchives()
         return;
 
     // fetch last page
-    QXmppResultSetQuery rsmQuery;
-    rsmQuery.setBefore("");
-    rsmQuery.setMax(HISTORY_PAGE);
-    client->archiveManager()->listCollections(jid,
-        client->serverTime().addDays(-HISTORY_DAYS), QDateTime(), rsmQuery);
     archivesFetched = true;
+    archiveFirst = QString("");
     messageQueue.clear();
+    q->fetchPreviousPage();
 }
 
 void HistoryModelPrivate::fetchMessages()
@@ -396,6 +393,11 @@ void HistoryModel::fetchNextPage()
  */
 void HistoryModel::fetchPreviousPage()
 {
+    if (d->hasPreviousPage) {
+        d->hasPreviousPage = false;
+        emit pagesChanged();
+    }
+
     d->pageDirection = PageBackwards;
     QXmppResultSetQuery rsmQuery;
     rsmQuery.setBefore(d->archiveFirst);
