@@ -177,7 +177,7 @@ public:
 class HistoryModelPrivate
 {
 public:
-    HistoryModelPrivate();
+    HistoryModelPrivate(HistoryModel *qq);
     void fetchArchives();
     void fetchMessages();
 
@@ -190,13 +190,17 @@ public:
     ChatClient *client;
     QString jid;
     QMap<QString, VCard*> rosterCards;
+
+private:
+    HistoryModel *q;
 };
 
-HistoryModelPrivate::HistoryModelPrivate()
+HistoryModelPrivate::HistoryModelPrivate(HistoryModel *qq)
     : archivesFetched(false)
     , hasPreviousPage(false)
     , client(0)
     , pageDirection(PageBackwards)
+    , q(qq)
 {
 }
 
@@ -232,7 +236,7 @@ void HistoryModelPrivate::fetchMessages()
 HistoryModel::HistoryModel(QObject *parent)
     : ChatModel(parent)
 {
-    d = new HistoryModelPrivate;
+    d = new HistoryModelPrivate(this);
 
     // set role names
     QHash<int, QByteArray> roleNames;
