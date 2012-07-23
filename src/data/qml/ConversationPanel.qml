@@ -240,10 +240,6 @@ Panel {
             width: appStyle.icon.smallSize + 2*appStyle.margin.normal + appStyle.spacing.horizontal + fetchLabel.width
             opacity: 0
 
-            Behavior on opacity {
-                NumberAnimation { duration: appStyle.animation.normalDuration }
-            }
-
             Rectangle {
                 anchors.fill: parent
                 opacity: 0.8
@@ -293,6 +289,20 @@ Panel {
                 when: conversation.historyModel.hasPreviousPage && historyView.atYBeginning
                 PropertyChanges { target: fetchPrevious; opacity: 1 }
             }
+
+            transitions: [
+                Transition {
+                    to: 'active'
+                    SequentialAnimation {
+                        PauseAnimation { duration: 500 }
+                        NumberAnimation { properties: 'opacity'; duration: appStyle.animation.normalDuration }
+                    }
+                },
+                Transition {
+                    from: 'active'
+                    NumberAnimation { properties: 'opacity'; duration: appStyle.animation.normalDuration }
+                }
+            ]
         }
     }
 
