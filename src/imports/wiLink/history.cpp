@@ -589,11 +589,16 @@ void HistoryModel::_q_archiveListReceived(const QList<QXmppArchiveChat> &chats, 
 {
     Q_ASSERT(d->client);
 
+    if (chats.isEmpty() || QXmppUtils::jidToBareJid(chats.first().with()) != d->jid)
+        return;
+
     // update boundaries
     if (d->archiveFirst.isEmpty() || d->pageDirection == PageBackwards)
         d->archiveFirst = rsmReply.first();
     if (d->archiveLast.isEmpty() || d->pageDirection == PageForwards)
         d->archiveLast = rsmReply.last();
+
+    //qDebug("received page %i - %i (of 0 - %i)", rsmReply.index(), rsmReply.index() + chats.size() - 1, rsmReply.count() - 1);
     const bool hasPreviousPage = rsmReply.index() > 0;
     if (hasPreviousPage != d->hasPreviousPage) {
         d->hasPreviousPage = hasPreviousPage;
