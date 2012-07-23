@@ -136,7 +136,7 @@ void Conversation::messageReceived(const QXmppMessage &msg)
 
 bool Conversation::sendMessage(const QString &body)
 {
-    if (m_jid.isEmpty() || !m_client || !m_client->isConnected())
+    if (body.isEmpty() || m_jid.isEmpty() || !m_client || !m_client->isConnected())
         return false;
 
     // send message

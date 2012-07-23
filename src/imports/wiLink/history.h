@@ -110,6 +110,7 @@ private slots:
     void _q_archiveListReceived(const QList<QXmppArchiveChat> &chats, const QXmppResultSetReply &rsmReply);
 
 private:
+    void addMessage_worker(const HistoryMessage &message);
     friend class HistoryModelPrivate;
     HistoryModelPrivate *d;
 };

@@ -264,9 +264,17 @@ HistoryModel::HistoryModel(QObject *parent)
  */
 void HistoryModel::addMessage(const HistoryMessage &message)
 {
-    if (message.body.isEmpty())
-        return;
+    // notify bottom is about to change
+    emit bottomAboutToChange();
 
+    addMessage_worker(message);
+
+    // notify bottom change
+    emit bottomChanged();
+}
+
+void HistoryModel::addMessage_worker(const HistoryMessage &message)
+{
     // position cursor
     HistoryItem *prevBubble = 0;
     HistoryItem *nextBubble = 0;
@@ -297,9 +305,6 @@ void HistoryModel::addMessage(const HistoryMessage &message)
 
     // prepare message
     HistoryMessage *msg = new HistoryMessage(message);
-
-    // notify bottom is about to change
-    emit bottomAboutToChange();
 
     if (prevMsg && prevMsg->groupWith(message) &&
         nextMsg && nextMsg->groupWith(message) &&
@@ -356,8 +361,7 @@ void HistoryModel::addMessage(const HistoryMessage &message)
         addItem(bubble, rootItem, bubblePos);
     }
 
-    // notify bottom change
-    emit bottomChanged();
+    // notify message
     if (msg->received && !msg->archived)
         emit messageReceived(msg->jid, msg->body);
 }
@@ -556,15 +560,26 @@ void HistoryModel::_q_archiveChatReceived(const QXmppArchiveChat &chat, const QX
     if (QXmppUtils::jidToBareJid(chat.with()) != d->jid)
         return;
 
+    // notify bottom is about to change
+    emit bottomAboutToChange();
+
     foreach (const QXmppArchiveMessage &msg, chat.messages()) {
+        if (msg.body().isEmpty())
+            continue;
+
         HistoryMessage message;
         message.archived = true;
         message.body = msg.body();
         message.date = msg.date();
         message.jid = msg.isReceived() ? QXmppUtils::jidToBareJid(chat.with()) : d->client->configuration().jidBare();
         message.received = msg.isReceived();
-        addMessage(message);
+        addMessage_worker(message);
     }
+
+    // notify bottom change
+    emit bottomChanged();
+
+    // process queue
     d->fetchMessages();
 }
 
