@@ -309,21 +309,21 @@ void HistoryModel::addMessage(const HistoryMessage &message)
             prevBubble->messages.insert(row, item);
         }
         removeRow(nextBubble->row());
-        emit dataChanged(createIndex(prevBubble), createIndex(prevBubble));
+        changeItem(prevBubble);
     }
     else if (prevMsg && prevMsg->groupWith(message))
     {
         // message belongs to the same bubble as previous message
         const int row = prevBubble->messages.indexOf(prevMsg) + 1;
         prevBubble->messages.insert(row, msg);
-        emit dataChanged(createIndex(prevBubble), createIndex(prevBubble));
+        changeItem(prevBubble);
     }
     else if (nextMsg && nextMsg->groupWith(message))
     {
         // message belongs to the same bubble as next message
         const int row = nextBubble->messages.indexOf(nextMsg);
         nextBubble->messages.insert(row, msg);
-        emit dataChanged(createIndex(nextBubble), createIndex(nextBubble));
+        changeItem(nextBubble);
     }
     else
     {
@@ -526,7 +526,7 @@ void HistoryModel::select(int from, int to)
         const bool selected = (i >= lo && i <= hi);
         if (selected != item->selected) {
             item->selected = selected;
-            emit dataChanged(createIndex(item), createIndex(item));
+            changeItem(item);
         }
         ++i;
     }
@@ -541,7 +541,7 @@ void HistoryModel::_q_cardChanged()
     foreach (ChatModelItem *it, rootItem->children) {
         HistoryItem *item = static_cast<HistoryItem*>(it);
         if (item->messages.first()->jid == jid)
-            emit dataChanged(createIndex(it), createIndex(it));
+            changeItem(item);
     }
 }
 

@@ -84,6 +84,12 @@ void ChatModel::addItem(ChatModelItem *item, ChatModelItem *parentItem, int pos)
     endInsertRows();
 }
 
+void ChatModel::changeItem(ChatModelItem *item)
+{
+    const QModelIndex index = createIndex(item);
+    emit dataChanged(index, index);
+}
+
 int ChatModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);

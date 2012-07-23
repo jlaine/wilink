@@ -73,6 +73,7 @@ public slots:
 
 protected:
     void addItem(ChatModelItem *item, ChatModelItem *parentItem, int pos = -1);
+    void changeItem(ChatModelItem *item);
     QModelIndex createIndex(ChatModelItem *item, int column = 0) const;
     void removeItem(ChatModelItem *item);
 
