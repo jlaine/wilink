@@ -44,7 +44,8 @@ Panel {
 
                 onAuthenticationFailed: {
                     console.log("Failed to authenticate with chat server");
-                    if (Utils.jidToDomain(item.client.jid) != 'wifirst.net') {
+                    var domain = Utils.jidToDomain(item.client.jid);
+                    if (domain != 'wifirst.net' && domain != 'chat.facebook.com') {
                         var jid = Utils.jidToBareJid(item.client.jid);
                         dialogSwapper.showPanel('AccountPasswordDialog.qml', {client: item.client, jid: jid});
                     }
