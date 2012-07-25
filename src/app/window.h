@@ -37,6 +37,7 @@ public:
     Window(QtLocalPeer *peer, QWidget *parent = 0);
     ~Window();
     void setFullScreen(bool fullScreen);
+    void setInitialMessage(const QString &message);
 
 signals:
     void messageReceived(const QString &message);

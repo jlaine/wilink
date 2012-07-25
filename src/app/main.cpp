@@ -66,10 +66,16 @@ int main(int argc, char *argv[])
     app.setWindowIcon(QIcon(":/app.png"));
 #endif
 
+    /* Parse command line arguments */
+    const QString firstArgument = (argc > 1) ? QString::fromLocal8Bit(argv[1]) : QString();
+
     /* Open RPC socket */
     QtLocalPeer *peer = new QtLocalPeer(&app, "wiLink");
     if (peer->isClient()) {
-        peer->sendMessage("SHOW", 1000);
+        if (firstArgument.isEmpty())
+            peer->sendMessage("SHOW", 1000);
+        else
+            peer->sendMessage("OPEN " + firstArgument, 1000);
         return EXIT_SUCCESS;
     }
 
@@ -100,8 +106,8 @@ int main(int argc, char *argv[])
     //QUrl qmlSource("https://download.wifirst.net/wiLink/2.3/Main.qml");
     QUrl qmlSource("qrc:/qml/Main.qml");
 #endif
-    if (argc > 1)
-        qmlSource = QUrl(QString::fromLocal8Bit(argv[1]));
+    if (!firstArgument.isEmpty())
+        window.setInitialMessage("OPEN " + firstArgument);
     QMetaObject::invokeMethod(&window, "setSource", Qt::QueuedConnection, Q_ARG(QUrl, qmlSource));
 
     /* Run application */

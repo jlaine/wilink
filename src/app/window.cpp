@@ -33,6 +33,7 @@
 class WindowPrivate
 {
 public:
+    QString initialMessage;
     QtLocalPeer *peer;
     QDeclarativeView *view;
 };
@@ -140,6 +141,11 @@ void Window::setFullScreen(bool fullScreen)
         setWindowState(windowState() & ~Qt::WindowFullScreen);
 }
 
+void Window::setInitialMessage(const QString &message)
+{
+    d->initialMessage = message;
+}
+
 void Window::showAndRaise()
 {
     setWindowState(windowState() & ~Qt::WindowMinimized);
@@ -162,4 +168,9 @@ void Window::_q_statusChanged()
     d->view->setAttribute(Qt::WA_NoSystemBackground);
     d->view->viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
     d->view->viewport()->setAttribute(Qt::WA_NoSystemBackground);
+
+    if (!d->initialMessage.isEmpty()) {
+        emit messageReceived(d->initialMessage);
+        d->initialMessage = QString();
+    }
 }
