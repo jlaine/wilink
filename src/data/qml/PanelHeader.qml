@@ -39,7 +39,6 @@ Item {
         id: background
 
         anchors.fill: parent
-        opacity: 0.8
         gradient: Gradient {
             GradientStop { position: 0; color: '#9bbdf4' }
             GradientStop { position: 1; color: '#90acd8' }
