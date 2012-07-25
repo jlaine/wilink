@@ -35,13 +35,13 @@ Item {
 
     clip: true
     state: pageSize == 1 ? 'collapsed' : ''
-    height: orientation == Qt.Horizontal ? 11 : 100
-    width: orientation == Qt.Horizontal ? 100 : 11
+    height: orientation == Qt.Horizontal ? 7 : 100
+    width: orientation == Qt.Horizontal ? 100 : 7
 
     Item {
         id: container
 
-        x: orientation == Qt.Horizontal ? 0 : 11
+        x: orientation == Qt.Horizontal ? 0 : 7
         width: orientation == Qt.Horizontal ? parent.width : parent.height
         height: orientation == Qt.Horizontal ? parent.height : parent.width
 
@@ -49,70 +49,18 @@ Item {
             angle: orientation == Qt.Horizontal ? 0: 90
         }
 
-        Image {
-            id: buttonLeft
-
-            anchors.left: parent.left
-            anchors.verticalCenter: parent.verticalCenter
-            source: 'image://icon/left-arrow'
-
-            MouseArea {
-                anchors.fill: parent
-
-                onPressed: {
-                    moveAction = 'up';
-                    moveQuantity = -defaultQuantity;
-                    scrollBar.moveBy(moveQuantity);
-                }
-
-                onReleased: {
-                    moveAction = '';
-                    moveRepeat = false;
-                }
-            }
-        }
-
-        Rectangle {
+        Item {
             id: track
 
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.left: buttonLeft.right
-            anchors.right: buttonRight.left
-            border.color: '#c5c5c5'
-            border.width: 1
-            gradient: Gradient {
-                GradientStop {position: 0.0; color: '#ffffff'}
-                GradientStop {position: 1.0; color: '#d0d0d0'}
-            }
-            z: -1
+            anchors.fill: parent
 
             Rectangle {
                 id: handle
 
                 property int desiredWidth: Math.ceil(scrollBar.pageSize * (track.width - 2))
 
-                Rectangle {
-                    id: handleReflect
-
-                    anchors.left: parent.left
-                    anchors.leftMargin: 3
-                    anchors.right: parent.right
-                    anchors.rightMargin: 3
-                    anchors.bottom: parent.bottom
-                    anchors.bottomMargin: 1
-                    color: '#9cc6ec'
-                    height: Math.round(parent.height / 2 - 2)
-                    radius: parent.radius
-                    smooth: parent.smooth
-                }
-
-                border.color: '#2A85d9'
-                border.width: 1
-                gradient: Gradient {
-                    GradientStop { position: 1.0; color: '#2061c0' }
-                    GradientStop { position: 0.2; color: '#afebff' }
-                }
+                color: '#7f7f7f'
+                opacity: 0.8
                 radius: 10
                 smooth: true
 
@@ -123,7 +71,7 @@ Item {
 
                 states: State {
                     name: 'pressed'
-                    PropertyChanges { target: handle; border.color: '#4e9de6' }
+                    PropertyChanges { target: handle; opacity: 1 }
                 }
             }
 
@@ -169,30 +117,6 @@ Item {
                 }
             }
         }
-
-        Image {
-            id: buttonRight
-
-            anchors.right: parent.right
-            anchors.verticalCenter: parent.verticalCenter
-            source: 'image://icon/right-arrow'
-
-            MouseArea {
-                anchors.fill: parent
-
-                onPressed: {
-                    moveAction = 'down';
-                    moveQuantity = defaultQuantity;
-                    scrollBar.moveBy(moveQuantity);
-                }
-
-                onReleased: {
-                    moveAction = '';
-                    moveRepeat = false;
-                }
-            }
-        }
-
     }
 
     Timer {
