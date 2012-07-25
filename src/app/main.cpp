@@ -69,9 +69,8 @@ int main(int argc, char *argv[])
     /* Open RPC socket */
     QtLocalPeer *peer = new QtLocalPeer(&app, "wiLink");
     if (peer->isClient()) {
-        qDebug("client");
-    } else {
-        qDebug("server");
+        peer->sendMessage("SHOW", 1000);
+        return EXIT_SUCCESS;
     }
 
     /* Add SSL root CA for wifirst.net and download.wifirst.net */
@@ -93,7 +92,7 @@ int main(int argc, char *argv[])
     signal(SIGTERM, signal_handler);
 
     /* Create window */
-    Window window;
+    Window window(peer);
 #ifdef MEEGO_EDITION_HARMATTAN
     //QUrl qmlSource("https://download.wifirst.net/wiLink/2.3/MeegoMain.qml");
     QUrl qmlSource("qrc:/qml/MeegoMain.qml");

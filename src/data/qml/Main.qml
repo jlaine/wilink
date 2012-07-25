@@ -203,6 +203,17 @@ FocusScope {
     Connections {
         target: window
 
+        /** Handles a message received over RPC socket.
+         */
+        onMessageReceived: {
+            console.log("received RPC message: " + message);
+            if (message == 'SHOW') {
+                window.showAndRaise();
+            } else if (message == 'QUIT') {
+                Qt.quit();
+            }
+        }
+
         onShowAbout: {
             dialogSwapper.showPanel('AboutDialog.qml');
         }

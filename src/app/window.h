@@ -23,6 +23,7 @@
 #include <QMainWindow>
 #include <QUrl>
 
+class QtLocalPeer;
 class WindowPrivate;
 
 /** Chat represents the user interface's main window.
@@ -33,11 +34,12 @@ class Window : public QMainWindow
     Q_PROPERTY(bool fullScreen READ isFullScreen WRITE setFullScreen NOTIFY windowStateChanged)
 
 public:
-    Window(QWidget *parent = 0);
+    Window(QtLocalPeer *peer, QWidget *parent = 0);
     ~Window();
     void setFullScreen(bool fullScreen);
 
 signals:
+    void messageReceived(const QString &message);
     void showAbout();
     void showHelp();
     void showPreferences();

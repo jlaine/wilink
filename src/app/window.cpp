@@ -27,21 +27,27 @@
 #include <QShortcut>
 #include <QStringList>
 
+#include "qtlocalpeer.h"
 #include "window.h"
 
 class WindowPrivate
 {
 public:
+    QtLocalPeer *peer;
     QDeclarativeView *view;
 };
 
-Window::Window(QWidget *parent)
+Window::Window(QtLocalPeer *peer, QWidget *parent)
     : QMainWindow(parent)
 {
     bool check;
     Q_UNUSED(check);
 
     d = new WindowPrivate;
+    d->peer = peer;
+    check = connect(d->peer, SIGNAL(messageReceived(QString)),
+                    this, SIGNAL(messageReceived(QString)));
+    Q_ASSERT(check);
 
     // create declarative view
     d->view = new QDeclarativeView;
