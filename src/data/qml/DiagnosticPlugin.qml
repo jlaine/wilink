@@ -25,21 +25,15 @@ Plugin {
     imageSource: 'image://icon/diagnostics'
 
     onLoaded: {
-        for (var i = 0; i < accountModel.count; ++i) {
-            var account = accountModel.get(i);
-            if (account.type == 'xmpp' && account.realm == 'wifirst.net') {
-                dock.model.add({
-                    'iconSource': 'image://icon/dock-diagnostics',
-                    'iconPress': 'image://icon/diagnostics',
-                    'panelProperties': {accountJid: account.username},
-                    'panelSource': 'DiagnosticPanel.qml',
-                    'priority': 6,
-                    'shortcut': Qt.ControlModifier + Qt.Key_I,
-                    'text': qsTr('Diagnostics'),
-                    'visible': true,
-                });
-            }
-        }
+        dock.model.add({
+            'iconSource': 'image://icon/dock-diagnostics',
+            'iconPress': 'image://icon/diagnostics',
+            'panelSource': 'DiagnosticPanel.qml',
+            'priority': 6,
+            'shortcut': Qt.ControlModifier + Qt.Key_I,
+            'text': qsTr('Diagnostics'),
+            'visible': true,
+        });
     }
 
     onUnloaded: {

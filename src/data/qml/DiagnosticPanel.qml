@@ -23,7 +23,6 @@ import wiLink 2.0
 Panel {
     id: panel
 
-    property string accountJid
     property bool busy: Qt.isQtObject(client) && client.diagnosticManager.running
     property QtObject client
 
@@ -88,8 +87,8 @@ Panel {
         busy: panel.busy
     }
 
-    onAccountJidChanged: {
-        panel.client = accountModel.clientForJid(panel.accountJid);
+    Component.onCompleted: {
+        panel.client = accountModel.clientForJid('wifirst.net');
         panel.client.diagnosticManager.refresh()
     }
 
