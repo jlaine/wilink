@@ -21,6 +21,7 @@
 #include <signal.h>
 
 #include <QApplication>
+#include <QFileOpenEvent>
 #include <QLocale>
 #include <QSslSocket>
 #include <QTranslator>
@@ -49,6 +50,33 @@ static void signal_handler(int sig)
     aborted = 1;
 }
 
+class CustomApplication : public QApplication
+{
+public:
+    CustomApplication(int argc, char *argv[])
+        : QApplication(argc, argv)
+    {
+    }
+
+protected:
+    bool event(QEvent *event);
+};
+
+bool CustomApplication::event(QEvent *event)
+{
+    switch (event->type()) {
+    case QEvent::FileOpen:
+        foreach (QWidget *widget, QApplication::topLevelWidgets()) {
+            Window *window = qobject_cast<Window*>(widget);
+            if (window)
+                QMetaObject::invokeMethod(window, "messageReceived", Q_ARG(QString, "OPEN " + static_cast<QFileOpenEvent *>(event)->url().toString()));
+        }
+        return true;
+    default:
+        return QApplication::event(event);
+    }
+}
+
 int main(int argc, char *argv[])
 {
 #ifdef Q_OS_MAC
@@ -56,7 +84,7 @@ int main(int argc, char *argv[])
 #endif
 
     /* Create application */
-    QApplication app(argc, argv);
+    CustomApplication app(argc, argv);
     app.setApplicationName("wiLink");
     app.setApplicationVersion(WILINK_VERSION);
     app.setOrganizationDomain("wifirst.net");
