@@ -1,15 +1,10 @@
 include(${QT_USE_FILE})
 
-qt4_wrap_cpp(MOC_SOURCES
-    qtlocalpeer.h
-    qtsingleapplication.h
-    qtsinglecoreapplication.h)
+qt4_wrap_cpp(MOC_SOURCES qtlocalpeer.h)
 
 set(SOURCES
     qtlocalpeer.cpp
-    qtlockedfile.cpp
-    qtsingleapplication.cpp
-    qtsinglecoreapplication.cpp)
+    qtlockedfile.cpp)
 if(WIN32)
     list(APPEND SOURCES qtlockedfile_win.cpp)
 else()
