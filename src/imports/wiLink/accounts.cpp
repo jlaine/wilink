@@ -101,9 +101,10 @@ ChatClient* AccountModel::clientForJid(const QString &jid)
     const QString bareJid = QXmppUtils::jidToBareJid(jid);
     QList<ChatClient*> clients = ChatClient::instances();
 
-    // look for own jid
+    // look for own jid or domain
     foreach (ChatClient *client, clients) {
-        if (QXmppUtils::jidToBareJid(client->jid()) == bareJid)
+        if (QXmppUtils::jidToBareJid(client->jid()) == bareJid
+            || QXmppUtils::jidToDomain(client->jid()) == QXmppUtils::jidToDomain(bareJid))
             return client;
     }
 
