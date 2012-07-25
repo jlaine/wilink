@@ -25,7 +25,8 @@ FocusScope {
 
     focus: !appSettings.isMobile
 
-    // A model representing the user's accounts.
+    /** A model representing the user's accounts.
+     */
     AccountModel {
         id: accountModel
 
@@ -39,23 +40,28 @@ FocusScope {
         }
     }
 
-    // Logger which records debugging and protocol (XMPP, SIP) information.
-    //
-    // Its data can be viewed using the debugging plugin.
+    /** Logger which records debugging and protocol (XMPP, SIP) information.
+     *
+     * Its data can be viewed using the debugging plugin.
+     */
     QXmppLogger {
         id: appLogger
         loggingType: QXmppLogger.SignalLogging
     }
 
-    // Notifier for displaying desktop notifications.
+    /** Notifier for displaying desktop notifications.
+     *
+     * It is used to display incoming chat messages.
+     */
     Notifier {
         id: appNotifier
     }
 
-    // Manager for loading and unloading plugins.
-    //
-    // The plugins contain the bulk of the application logic,
-    // they control which panels are displayed, etc..
+    /** Manager for loading and unloading plugins.
+     *
+     * The plugins contain the bulk of the application logic,
+     * they control which panels are displayed, etc..
+     */
     PluginLoader {
         id: appPlugins
     }
@@ -80,7 +86,11 @@ FocusScope {
         isMobile: appSettings.isMobile
     }
 
-    // The application updater.
+    /** The application updater.
+     *
+     * It periodically checks for application updates, and if an update
+     * is available, the user is prompted to install it.
+     */
     Updater {
         id: appUpdater
 
@@ -93,13 +103,15 @@ FocusScope {
         }
     }
 
-    // The window background.
+    /** The window background.
+     */
     Rectangle {
         anchors.fill: parent
         color: 'white'
     }
 
-    // The left-hand dock.
+    /** The left-hand dock.
+     */
     Dock {
         id: dock
 
@@ -109,7 +121,8 @@ FocusScope {
         z: 1
     }
 
-    // The main display area.
+    /** The main display area.
+     */
     PanelSwapper {
         id: swapper
 
@@ -120,7 +133,8 @@ FocusScope {
         focus: true
     }
 
-    // The overlay for displaying dialogs.
+    /** The overlay for displaying dialogs.
+     */
     PanelSwapper {
         id: dialogSwapper
 
@@ -140,7 +154,8 @@ FocusScope {
         }
     }
 
-    // The mouse area used to cancel menus by clicking outside the menu.
+    /** The mouse area used to cancel menus by clicking outside the menu.
+     */
     MouseArea {
         id: menuCancelArea
 
@@ -151,7 +166,8 @@ FocusScope {
         onClicked: menuLoader.hide()
     }
 
-    // The overlay for displaying popup menus and combo boxes.
+    /** The overlay for displaying popup menus and combo boxes.
+     */
     Loader {
         id: menuLoader
 
@@ -175,10 +191,11 @@ FocusScope {
         }
     }
 
-    // A timer to delay the application startup.
-    //
-    // This allows the window to be painted before accessing the
-    // system wallet, which is blocking on OS X.
+    /** A timer to delay the application startup.
+     *
+     * This allows the window to be painted before accessing the
+     * system wallet, which is blocking on OS X.
+     */
     Timer {
         interval: 100
         repeat: false
@@ -193,6 +210,8 @@ FocusScope {
         }
     }
 
+    /** Once the QML file finishes loading, show the application window.
+     */
     Component.onCompleted: {
         window.minimumWidth = 360;
         window.minimumHeight = 360;
@@ -214,14 +233,20 @@ FocusScope {
             }
         }
 
+        /** Show the "about" dialog.
+         */
         onShowAbout: {
             dialogSwapper.showPanel('AboutDialog.qml');
         }
 
+        /** Shows the FAQ page in the browser.
+         */
         onShowHelp: {
             Qt.openUrlExternally('https://www.wifirst.net/wilink/faq');
         }
 
+        /** Shows the "preferences" dialog.
+         */
         onShowPreferences: {
             dialogSwapper.showPanel('PreferenceDialog.qml');
         }
