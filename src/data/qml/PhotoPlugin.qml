@@ -27,27 +27,15 @@ Plugin {
     onLoaded: {
         for (var i = 0; i < accountModel.count; ++i) {
             var account = accountModel.get(i);
-            if (account.type == 'web') {
-                var url, accountTitle;
-                if (account.realm == 'www.wifirst.net') {
-                    url = 'wifirst://default';
-                    accountTitle = 'Wifirst';
-                } else if (account.realm == 'www.google.com') {
-                    url = 'picasa://default';
-                    accountTitle = 'Picasa';
-                } else {
-                    continue;
-                }
-
+            if (account.type == 'web' && account.realm == 'www.google.com') {
                 var title = qsTr('Photos');
-                if (accountModel.count > 1)
-                    title += '<br/><small>' + accountTitle + '</small>';
+                title += '<br/><small>Picasa</small>';
 
                 dock.model.add({
                     'iconSource': 'image://icon/dock-photo',
                     'iconPress': 'image://icon/photos',
                     'panelSource': 'PhotoPanel.qml',
-                    'panelProperties': {'url': url},
+                    'panelProperties': {'url': 'picasa://default'},
                     'priority': 7,
                     'shortcut': Qt.ControlModifier + Qt.Key_P,
                     'text': title,
