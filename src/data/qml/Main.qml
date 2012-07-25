@@ -30,8 +30,20 @@ FocusScope {
     AccountModel {
         id: accountModel
 
+        /** Reload plugins after accounts were modified.
+         */
         onModelReset: {
             appPlugins.unload();
+            if (accountModel.count) {
+                appPlugins.load();
+            } else {
+                dialogSwapper.showPanel('SetupDialog.qml');
+            }
+        }
+
+        /** Load plugins at startup.
+         */
+        Component.onCompleted: {
             if (accountModel.count) {
                 appPlugins.load();
             } else {
@@ -188,25 +200,6 @@ FocusScope {
         Connections {
             target: menuLoader.item
             onItemClicked: menuLoader.hide()
-        }
-    }
-
-    /** A timer to delay the application startup.
-     *
-     * This allows the window to be painted before accessing the
-     * system wallet, which is blocking on OS X.
-     */
-    Timer {
-        interval: 100
-        repeat: false
-        running: true
-
-        onTriggered: {
-            if (accountModel.count) {
-                appPlugins.load();
-            } else {
-                dialogSwapper.showPanel('SetupDialog.qml');
-            }
         }
     }
 

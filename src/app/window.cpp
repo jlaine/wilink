@@ -170,7 +170,7 @@ void Window::_q_statusChanged()
     d->view->viewport()->setAttribute(Qt::WA_NoSystemBackground);
 
     if (!d->initialMessage.isEmpty()) {
-        emit messageReceived(d->initialMessage);
+        QMetaObject::invokeMethod(this, "messageReceived", Q_ARG(QString, d->initialMessage));
         d->initialMessage = QString();
     }
 }
