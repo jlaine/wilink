@@ -39,6 +39,8 @@
 
 #include "qtlockedfile.h"
 
+using namespace QtLP_Private;
+
 /*!
     \class QtLockedFile
 

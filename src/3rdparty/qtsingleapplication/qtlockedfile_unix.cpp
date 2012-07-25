@@ -44,6 +44,8 @@
 
 #include "qtlockedfile.h"
 
+using namespace QtLP_Private;
+
 bool QtLockedFile::lock(LockMode mode, bool block)
 {
     if (!isOpen()) {

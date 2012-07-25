@@ -8,6 +8,7 @@ include_directories(${QXMPP_INCLUDE_DIRS})
 link_directories(${QDJANGO_LIBRARY_DIRS})
 link_directories(${QDXMPP_LIBRARY_DIRS})
 
+add_subdirectory(3rdparty)
 add_subdirectory(data)
 add_subdirectory(qnetio)
 add_subdirectory(qsound)
