@@ -32,16 +32,16 @@
 	<true/>
 	<key>NSHumanReadableCopyright</key>
 	<string>${MACOSX_BUNDLE_COPYRIGHT}</string>
-    <key>CFBundleURLTypes</key>
-    <array>
-    <dict>
-    <key>CFBundleURLName</key>
-    <string>${MACOSX_BUNDLE_BUNDLE_NAME} URL</string>
-    <key>CFBundleURLSchemes</key>
-    <array>
-    <string>wilink</string>
-    </array>
-    </dict>
-    </array>
+	<key>CFBundleURLTypes</key>
+	<array>
+	<dict>
+	<key>CFBundleURLName</key>
+	<string>${MACOSX_BUNDLE_BUNDLE_NAME} URL</string>
+	<key>CFBundleURLSchemes</key>
+	<array>
+	<string>wilink</string>
+	</array>
+	</dict>
+	</array>
 </dict>
 </plist>
