@@ -59,8 +59,8 @@
 <context>
     <name>AccountListPanel</name>
     <message>
-        <source>In addition to your Wifirst account, you can use additional chat accounts such as Google Talk and Facebook.</source>
-        <translation>Outre votre compte Wifirst, vous pouvez utiliser des comptes de chat supplémentaires tels que Google Talk ou Facebook.</translation>
+        <source>In addition to your Wifirst account, you can use additional chat accounts such as Google Talk.</source>
+        <translation>Outre votre compte Wifirst, vous pouvez utiliser des comptes de chat supplémentaires tels que Google Talk.</translation>
     </message>
 </context>
 <context>
