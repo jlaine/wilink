@@ -25,6 +25,8 @@
 #include <QSslSocket>
 #include <QTranslator>
 
+#include "QtSingleApplication"
+
 #ifdef Q_OS_MAC
 void mac_init();
 #endif
