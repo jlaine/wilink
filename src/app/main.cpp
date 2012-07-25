@@ -25,7 +25,7 @@
 #include <QSslSocket>
 #include <QTranslator>
 
-#include "QtSingleApplication"
+#include "qtlocalpeer.h"
 
 #ifdef Q_OS_MAC
 void mac_init();
@@ -57,8 +57,6 @@ int main(int argc, char *argv[])
 
     /* Create application */
     QApplication app(argc, argv);
-
-    /* Set application properties */
     app.setApplicationName("wiLink");
     app.setApplicationVersion(WILINK_VERSION);
     app.setOrganizationDomain("wifirst.net");
@@ -67,6 +65,14 @@ int main(int argc, char *argv[])
 #ifndef Q_OS_MAC
     app.setWindowIcon(QIcon(":/app.png"));
 #endif
+
+    /* Open RPC socket */
+    QtLocalPeer *peer = new QtLocalPeer(&app, "wiLink");
+    if (peer->isClient()) {
+        qDebug("client");
+    } else {
+        qDebug("server");
+    }
 
     /* Add SSL root CA for wifirst.net and download.wifirst.net */
     QSslSocket::addDefaultCaCertificates(":/app.pem");
@@ -102,4 +108,3 @@ int main(int argc, char *argv[])
     /* Run application */
     return app.exec();
 }
-
