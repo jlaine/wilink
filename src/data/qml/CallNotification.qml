@@ -30,11 +30,13 @@ NotificationDialog {
     text: qsTr('%1 wants to talk to you.\n\nDo you accept?').replace('%1', vcard.name)
     title: qsTr('Call from %1').replace('%1', vcard.name)
 
-    VCard {
-        id: vcard
+    resources: [
+        VCard {
+            id: vcard
 
-        jid: Qt.isQtObject(call) ? call.jid : ''
-    }
+            jid: Qt.isQtObject(call) ? call.jid : ''
+        }
+    ]
 
     onAccepted: {
         panel.showConversation(call.jid);
