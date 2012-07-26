@@ -97,7 +97,7 @@ FocusScope {
             anchors.fill: parent
             gradient: Gradient {
                 GradientStop { position: 0; color: '#FAFAFA' }
-                GradientStop { position: 1; color: '#F5F5F5' }
+                GradientStop { position: 1; color: '#E9E9E9' }
             }
             radius: box.radius
             visible: box.headerBackground
@@ -107,7 +107,7 @@ FocusScope {
                 anchors.right: parent.right
                 anchors.bottom: parent.bottom
                 anchors.bottomMargin: 1
-                color: '#F5F5F5'
+                color: '#E9E9E9'
                 height: box.radius
             }
         }
