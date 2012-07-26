@@ -31,7 +31,7 @@ Dialog {
     title: qsTr('Password required')
 
     Column {
-        anchors.fill: contents
+        anchors.fill: parent
         spacing: appStyle.spacing.vertical
 
         PanelHelp {

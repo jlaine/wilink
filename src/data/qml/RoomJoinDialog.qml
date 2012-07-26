@@ -43,7 +43,7 @@ Dialog {
     }
 
     Item {
-        anchors.fill: contents
+        anchors.fill: parent
 
         PanelHelp {
             id: help

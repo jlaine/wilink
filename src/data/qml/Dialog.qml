@@ -22,7 +22,6 @@ import QtQuick 1.1
 GroupBox {
     id: dialog
 
-    property alias contents: item
     property int minimumWidth: 360
     property int minimumHeight: 240
 
@@ -100,14 +99,9 @@ GroupBox {
         }
     }
 
-    Item {
-        id: item
-
-        anchors.fill: parent
-    }
-
     Image {
         id: resizeButton
+
         anchors.bottom: dialog.bottom
         anchors.right: dialog.right
         anchors.margins: 2

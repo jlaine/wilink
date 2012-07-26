@@ -67,7 +67,7 @@ Dialog {
     title: qsTr('About %1').replace('%1', appUpdater.applicationName)
 
     Item {
-        anchors.fill: dialog.contents
+        anchors.fill: parent
 
         Item {
             id: appBanner

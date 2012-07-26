@@ -36,7 +36,7 @@ Dialog {
     ScrollView {
         id: view
 
-        anchors.fill: contents
+        anchors.fill: parent
         clip: true
         model: configurationModel
         delegate: Item {

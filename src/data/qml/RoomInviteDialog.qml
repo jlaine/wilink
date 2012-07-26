@@ -39,7 +39,7 @@ Dialog {
     }
 
     Item {
-        anchors.fill: contents
+        anchors.fill: parent
 
         InputBar {
             id: reasonEdit

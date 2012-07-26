@@ -28,7 +28,7 @@ Dialog {
     title: qsTr('Add a contact')
 
     Column {
-        anchors.fill: contents
+        anchors.fill: parent
         spacing: 8
 
         PanelHelp {

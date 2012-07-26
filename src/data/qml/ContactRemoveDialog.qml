@@ -34,7 +34,7 @@ Dialog {
     }
 
     Item {
-        anchors.fill: contents
+        anchors.fill: parent
 
         Image {
             id: image
