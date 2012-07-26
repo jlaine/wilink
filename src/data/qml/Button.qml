@@ -64,6 +64,21 @@ Rectangle {
         elide: Text.ElideRight
         horizontalAlignment: Text.AlignHCenter
         text: button.text
+
+        Label {
+            id: labelShadow
+
+            property int yOffset: 1
+
+            anchors.fill: parent
+            anchors.topMargin: yOffset
+            anchors.bottomMargin: yOffset
+            color: Qt.rgba(255, 255, 255, 0.75)
+            elide: Text.ElideRight
+            horizontalAlignment: Text.AlignHCenter
+            text: button.text
+            z: -1
+        }
     }
 
     Label {
@@ -111,7 +126,8 @@ Rectangle {
         State {
             name: 'primary'
             PropertyChanges { target: button; border.color: '#0074cc' }
-            PropertyChanges { target: label; color: 'white'; style: Text.Sunken; styleColor: Qt.rgba(0, 0, 0, 0.25) }
+            PropertyChanges { target: label; color: 'white' }
+            PropertyChanges { target: labelShadow; color: Qt.rgba(0, 0, 0, 0.25); yOffset: -1 }
             PropertyChanges { target: stop1; color: '#0088cc' }
             PropertyChanges { target: stop2; color: '#0055cc' }
         }
