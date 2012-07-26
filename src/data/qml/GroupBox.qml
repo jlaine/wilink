@@ -32,12 +32,19 @@ FocusScope {
     Component {
         id: boxHeader
 
-        Label {
-            id: textItem
+        Item {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.top
+            height: appStyle.font.normalSize + 2 * appStyle.margin.large
 
-            anchors.centerIn: parent
-            font.bold: true
-            text: box.title
+            Label {
+                id: textItem
+
+                anchors.centerIn: parent
+                font.bold: true
+                text: box.title
+            }
         }
     }
 
