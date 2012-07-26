@@ -156,6 +156,16 @@ Panel {
             }
         }
 
+        Rectangle {
+            id: border
+
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            anchors.right: participantView.left
+            color: '#597fbe'
+            width: 1
+        }
+
         RoomParticipantView {
             id: participantView
 

@@ -267,16 +267,6 @@ Item {
 
     }
 
-    Rectangle {
-        id: border
-
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-        anchors.right: parent.right
-        color: '#597fbe'
-        width: 1
-    }
-
     ScrollBar {
         id: scrollBar
 
