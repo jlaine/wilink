@@ -231,10 +231,6 @@ Acceptez-vous?</translation>
         <translation>Envoyer un fichier</translation>
     </message>
     <message>
-        <source>Sorry, but you cannot send files bigger than %1.</source>
-        <translation type="obsolete">Désolé, mais vous ne pouvez pas envoyer des fichiers de taille supérieure à %1.</translation>
-    </message>
-    <message>
         <source>is composing a message</source>
         <translation>compose un message</translation>
     </message>
@@ -257,6 +253,33 @@ Acceptez-vous?</translation>
     <message>
         <source>Fetch older messages</source>
         <translation>Messages plus anciens</translation>
+    </message>
+</context>
+<context>
+    <name>CustomWindow</name>
+    <message>
+        <source>&amp;File</source>
+        <translation>&amp;Fichier</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences</source>
+        <translation>&amp;Préférences</translation>
+    </message>
+    <message>
+        <source>&amp;Quit</source>
+        <translation>&amp;Quitter</translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation>&amp;Aide</translation>
+    </message>
+    <message>
+        <source>%1 FAQ</source>
+        <translation>FAQ %1</translation>
+    </message>
+    <message>
+        <source>About %1</source>
+        <translation>À propos de %1</translation>
     </message>
 </context>
 <context>
@@ -996,6 +1019,10 @@ Acceptez-vous?</translation>
         <source>My computer</source>
         <translation>Poste de travail</translation>
     </message>
+    <message>
+        <source>Browse..</source>
+        <translation>Parcourir..</translation>
+    </message>
 </context>
 <context>
     <name>ShareView</name>
@@ -1113,33 +1140,6 @@ Acceptez-vous?</translation>
     <message>
         <source>This plugin allows you to access the web.</source>
         <translation>Ce module vous permet d&apos;accéder au web.</translation>
-    </message>
-</context>
-<context>
-    <name>Window</name>
-    <message>
-        <source>&amp;Quit</source>
-        <translation>&amp;Quitter</translation>
-    </message>
-    <message>
-        <source>&amp;File</source>
-        <translation>&amp;Fichier</translation>
-    </message>
-    <message>
-        <source>&amp;Help</source>
-        <translation>&amp;Aide</translation>
-    </message>
-    <message>
-        <source>About %1</source>
-        <translation>À propos de %1</translation>
-    </message>
-    <message>
-        <source>%1 FAQ</source>
-        <translation>FAQ %1</translation>
-    </message>
-    <message>
-        <source>&amp;Preferences</source>
-        <translation>&amp;Préférences</translation>
     </message>
 </context>
 </TS>
