@@ -99,33 +99,35 @@ ContactView {
     }
     onCurrentJidChanged: timer.restart()
 
-    ListHelper {
-        id: listHelper
-        model: block.model
-    }
+    resources: [
+        ListHelper {
+            id: listHelper
+            model: block.model
+        },
 
-    Timer {
-        id: timer
+        Timer {
+            id: timer
 
-        interval: 100
+            interval: 100
 
-        onTriggered: {
-            // Update the currently selected item after delay.
-            for (var i = 0; i < listHelper.count; i++) {
-                if (listHelper.getProperty(i, 'jid') == currentJid) {
-                    block.currentIndex = i;
-                    return;
+            onTriggered: {
+                // Update the currently selected item after delay.
+                for (var i = 0; i < listHelper.count; i++) {
+                    if (listHelper.getProperty(i, 'jid') == currentJid) {
+                        block.currentIndex = i;
+                        return;
+                    }
                 }
+                block.currentIndex = -1;
             }
-            block.currentIndex = -1;
+        },
+
+        Connections {
+            target: block.model
+
+            onDataChanged: timer.restart()
+            onRowsInserted: timer.restart()
+            onRowsRemoved: timer.restart()
         }
-    }
-
-    Connections {
-        target: block.model
-
-        onDataChanged: timer.restart()
-        onRowsInserted: timer.restart()
-        onRowsRemoved: timer.restart()
-    }
+    ]
 }

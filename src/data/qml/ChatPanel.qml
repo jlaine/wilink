@@ -189,7 +189,7 @@ Panel {
                 }
             }
             title: qsTr('My rooms')
-            height: headerHeight + 4 + rowHeight * (appStyle.isMobile ? 2 : 4)
+            height: 32 + rowHeight * (appStyle.isMobile ? 2 : 4)
 
             onAddClicked: {
                 // FIXME: we only support default client
@@ -245,27 +245,6 @@ Panel {
         ChatContactView {
             id: contacts
 
-            SortFilterProxyModel {
-                id: onlineContacts
-
-                dynamicSortFilter: true
-                filterRole: RosterModel.StatusRole
-                filterRegExp: /^(?!offline)/
-                sourceModel: RosterModel {
-                    id: rosterModel
-                }
-            }
-
-            SortFilterProxyModel {
-                id: sortedContacts
-
-                dynamicSortFilter: true
-                sortCaseSensitivity: Qt.CaseInsensitive
-                sortRole: appSettings.sortContactsByStatus ? RosterModel.StatusSortRole : RosterModel.NameRole
-                sourceModel: appSettings.showOfflineContacts ? rosterModel : onlineContacts
-                Component.onCompleted: sort(0)
-            }
-
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: splitter.bottom
@@ -292,6 +271,7 @@ Panel {
                 menuLoader.item.jid = model.jid;
                 menuLoader.show(pos.x, pos.y);
             }
+
 
         }
 
@@ -339,6 +319,29 @@ Panel {
             }
         }
     }
+
+    resources: [
+        SortFilterProxyModel {
+            id: onlineContacts
+
+            dynamicSortFilter: true
+            filterRole: RosterModel.StatusRole
+            filterRegExp: /^(?!offline)/
+            sourceModel: RosterModel {
+                id: rosterModel
+            }
+        },
+
+        SortFilterProxyModel {
+            id: sortedContacts
+
+            dynamicSortFilter: true
+            sortCaseSensitivity: Qt.CaseInsensitive
+            sortRole: appSettings.sortContactsByStatus ? RosterModel.StatusSortRole : RosterModel.NameRole
+            sourceModel: appSettings.showOfflineContacts ? rosterModel : onlineContacts
+            Component.onCompleted: sort(0)
+        }
+    ]
 
     states: State {
         name: 'no-sidebar'
