@@ -22,13 +22,15 @@ import wiLink 2.0
 import 'sip.js' as Sip
 import 'utils.js' as Utils
 
-FocusScope {
+GroupBox {
     id: block
 
     property QtObject contactModel
     property alias model: historyView.model
     signal addressClicked(string address)
     signal addressDoubleClicked(string address)
+
+    title: qsTr('Call history')
 
     function contactName(address) {
         var phone = Sip.parseAddress(address, sipClient.domain);
@@ -40,38 +42,10 @@ FocusScope {
         return phone;
     }
 
-    Rectangle {
-        id: header
-        anchors.left: parent.left
-        anchors.right: parent.right
-        border.color: '#88a4d1'
-        border.width: 1
-        gradient: Gradient {
-            GradientStop { position:0.0; color: '#9fb7dd' }
-            GradientStop { position:0.5; color: '#597fbe' }
-            GradientStop { position:1.0; color: '#9fb7dd' }
-        }
-        height: textHeader.height
-        z: 1
-
-        Label {
-            id: textHeader
-            anchors.left: parent.left
-            anchors.verticalCenter: parent.verticalCenter
-            anchors.margins: 4
-            color: '#ffffff'
-            font.bold: true
-            text: qsTr('Call history')
-        }
-    }
-
     ScrollView {
         id: historyView
 
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: header.bottom
+        anchors.fill: parent
         clip: true
         focus: true
 
@@ -164,53 +138,53 @@ FocusScope {
             XmlRole { name: 'duration'; query: 'duration/string()' }
             XmlRole { name: 'flags'; query: 'flags/string()' }
         }
-    }
 
-    Component {
-        id: phoneHistoryMenu
+        Component {
+            id: phoneHistoryMenu
 
-        Menu {
-            id: menu
+            Menu {
+                id: menu
 
-            property string callAddress
-            property int callId
+                property string callAddress
+                property int callId
 
-            onItemClicked: {
-                var item = menu.model.get(index);
-                if (item.action == 'call') {
-                    block.addressDoubleClicked(callAddress);
-                } else if (item.action == 'contact') {
-                    var callPhone = Sip.parseAddress(callAddress, sipClient.domain);
-                    var contact = contactModel.getContactByPhone(callPhone);
-                    if (contact) {
-                        dialogSwapper.showPanel('PhoneContactDialog.qml', {
-                            'contactId': contact.id,
-                            'contactName': contact.name,
-                            'contactPhone': contact.phone,
-                            'model': contactModel});
-                    } else {
-                        dialogSwapper.showPanel('PhoneContactDialog.qml', {
-                            'contactPhone': callPhone,
-                            'model': contactModel});
+                onItemClicked: {
+                    var item = menu.model.get(index);
+                    if (item.action == 'call') {
+                        block.addressDoubleClicked(callAddress);
+                    } else if (item.action == 'contact') {
+                        var callPhone = Sip.parseAddress(callAddress, sipClient.domain);
+                        var contact = contactModel.getContactByPhone(callPhone);
+                        if (contact) {
+                            dialogSwapper.showPanel('PhoneContactDialog.qml', {
+                                'contactId': contact.id,
+                                'contactName': contact.name,
+                                'contactPhone': contact.phone,
+                                'model': contactModel});
+                        } else {
+                            dialogSwapper.showPanel('PhoneContactDialog.qml', {
+                                'contactPhone': callPhone,
+                                'model': contactModel});
+                        }
+                    } else if (item.action == 'remove') {
+                        historyView.model.removeItem(callId);
                     }
-                } else if (item.action == 'remove') {
-                    historyView.model.removeItem(callId);
                 }
-            }
 
-            Component.onCompleted: {
-                menu.model.append({
-                    'action': 'call',
-                    'iconSource': 'image://icon/call',
-                    'text': qsTr('Call')});
-                menu.model.append({
-                    'action': 'contact',
-                    'iconSource': 'image://icon/add',
-                    'text': qsTr('Add to contacts')});
-                menu.model.append({
-                    'action': 'remove',
-                    'iconSource': 'image://icon/remove',
-                    'text': qsTr('Remove')});
+                Component.onCompleted: {
+                    menu.model.append({
+                        'action': 'call',
+                        'iconSource': 'image://icon/call',
+                        'text': qsTr('Call')});
+                    menu.model.append({
+                        'action': 'contact',
+                        'iconSource': 'image://icon/add',
+                        'text': qsTr('Add to contacts')});
+                    menu.model.append({
+                        'action': 'remove',
+                        'iconSource': 'image://icon/remove',
+                        'text': qsTr('Remove')});
+                }
             }
         }
     }
