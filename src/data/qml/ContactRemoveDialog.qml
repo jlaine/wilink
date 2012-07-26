@@ -29,10 +29,6 @@ Dialog {
     minimumHeight: 150
     title: qsTr('Remove contact');
 
-    VCard {
-        id: vcard
-    }
-
     Item {
         anchors.fill: parent
 
@@ -53,6 +49,12 @@ Dialog {
             wrapMode: Text.WordWrap
         }
     }
+
+    resources: [
+        VCard {
+            id: vcard
+        }
+    ]
 
     onAccepted: {
         console.log("Remove contact " + vcard.jid);

@@ -29,10 +29,6 @@ Dialog {
     minimumHeight: 150
     title: qsTr('Rename contact')
 
-    VCard {
-        id: vcard
-    }
-
     Item {
         anchors.fill: parent
 
@@ -66,6 +62,12 @@ Dialog {
             text: vcard.name
         }
     }
+
+    resources: [
+        VCard {
+            id: vcard
+        }
+    ]
 
     onAccepted: {
         var name = bar.text;
