@@ -219,9 +219,16 @@ FocusScope {
          */
         onMessageReceived: {
             console.log("received RPC message: " + message);
-            if (message == 'SHOW') {
+            var bits = message.split(' ');
+            var command = bits[0];
+            if (command == 'OPEN') {
+                // TODO
+                console.log("open " + bits[1]);
+                dialogSwapper.showPanel('NotificationDialog.qml', {text: bits[1], title: 'Open a link'});
                 window.showAndRaise();
-            } else if (message == 'QUIT') {
+            } else if (command == 'SHOW') {
+                window.showAndRaise();
+            } else if (command == 'QUIT') {
                 Qt.quit();
             }
         }
