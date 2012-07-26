@@ -131,6 +131,7 @@ GroupBox {
         anchors.bottom: dialog.bottom
         anchors.right: dialog.right
         anchors.margins: 2
+        parent: dialog
         opacity: 0.5
         source: 'image://icon/resize'
         sourceSize.height: appStyle.icon.tinySize
