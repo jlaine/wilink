@@ -24,9 +24,33 @@ FocusScope {
 
     default property alias content: item.children
     property Component footerComponent
-    property alias header: textItem
+    property Component headerComponent: boxHeader
+    property color headerColor: 'white'
     property int radius: appStyle.margin.small
     property string title
+
+    Component {
+        id: boxHeader
+
+        Label {
+            id: textItem
+
+            anchors.centerIn: parent
+            font.bold: true
+            text: box.title
+        }
+    }
+
+    // FIXME: this is a hack waiting 'blur' or 'shadow' attribute in qml
+    BorderImage {
+        id: shadow
+        anchors.fill: box
+        anchors { leftMargin: -5; topMargin: -5; rightMargin: -8; bottomMargin: -9 }
+        border { left: 10; top: 10; right: 10; bottom: 10 }
+        source: 'image://icon/shadow'
+        smooth: true
+        z: -1
+    }
 
     Rectangle {
         id: background
@@ -45,9 +69,10 @@ FocusScope {
         anchors.fill: parent
         border.color: '#888888'
         border.width: 1
-        color: '#F5F5F5'
+        color: 'transparent'
         radius: box.radius
         smooth: true
+        z: 1
     }
 
     Item {
@@ -58,12 +83,10 @@ FocusScope {
         anchors.top: parent.top
         height: appStyle.font.normalSize + 2 * appStyle.margin.normal
 
-        Label {
-            id: textItem
-
-            anchors.centerIn: parent
-            font.bold: true
-            text: box.title
+        Rectangle {
+            anchors.fill: parent
+            color: '#F5F5F5'
+            radius: box.radius
         }
 
         Rectangle {
@@ -82,6 +105,12 @@ FocusScope {
             anchors.bottom: parent.bottom
             height: 1
             color: '#DDDDDD'
+        }
+
+        Loader {
+            anchors.fill: parent
+            anchors.margins: appStyle.margin.large
+            sourceComponent: headerComponent
         }
     }
 

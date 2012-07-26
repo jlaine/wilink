@@ -152,6 +152,12 @@ FocusScope {
         color: '#44000000'
         opacity: 0
         z: 9
+
+        // This MouseArea prevents clicks on items behind dialog
+        MouseArea {
+            anchors.fill: parent
+            hoverEnabled: true
+        }
     }
 
     /** The overlay for displaying dialogs.

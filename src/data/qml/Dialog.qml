@@ -19,94 +19,19 @@
 
 import QtQuick 1.1
 
-FocusScope {
+GroupBox {
     id: dialog
 
     property alias contents: item
-    property Component footerComponent: dialogFooter
     property alias helpText: help.text
-    property alias title: label.text
     property int minimumWidth: 360
     property int minimumHeight: 240
+
     height: appStyle.isMobile ? root.height : minimumHeight
     width: appStyle.isMobile ? root.width : minimumWidth
+    radius: appStyle.margin.large
 
-    signal accepted
-    signal close
-    signal rejected
-
-    opacity: 0
-
-    Rectangle {
-        id: background
-
-        anchors.fill: parent
-        border.color: '#888888'
-        border.width: 1
-        color: 'white'
-        radius: appStyle.margin.large
-        smooth: true
-    }
-
-    Rectangle {
-        id: frame
-
-        anchors.fill: parent
-        border.color: '#888888'
-        border.width: 1
-        color: 'transparent'
-        radius: background.radius
-        smooth: true
-
-        z: 1
-    }
-
-    Component {
-        id: dialogFooter
-
-        Item {
-            anchors.fill: parent
-
-            Row {
-                anchors.centerIn: parent
-                spacing: appStyle.margin.large
-
-                Button {
-                    id: acceptButton
-
-                    style: 'primary'
-                    text: qsTr('OK')
-                    onClicked: dialog.accepted()
-                }
-
-                Button {
-                    id: rejectButton
-
-                    text: qsTr('Cancel')
-                    onClicked: dialog.rejected()
-                }
-            }
-        }
-    }
-
-    // FIXME: this is a hack waiting 'blur' or 'shadow' attribute in qml
-    BorderImage {
-        id: shadow
-        anchors.fill: dialog
-        anchors { leftMargin: -5; topMargin: -5; rightMargin: -8; bottomMargin: -9 }
-        border { left: 10; top: 10; right: 10; bottom: 10 }
-        source: 'image://icon/shadow'
-        smooth: true
-        z: -1
-    }
-
-    // This MouseArea prevents clicks on items behind dialog
-    MouseArea {
-        anchors.fill: parent
-        hoverEnabled: true
-    }
-
-    Item {
+    headerComponent: Item {
         id: header
 
         anchors.left: parent.left
@@ -119,14 +44,7 @@ FocusScope {
 
             anchors.centerIn: parent
             font.bold: true
-        }
-
-        Rectangle {
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
-            color: '#EEEEEE'
-            height: 1
+            text: dialog.title
         }
 
         MouseArea {
@@ -156,10 +74,41 @@ FocusScope {
         }
     }
 
+
+    footerComponent: Item {
+        anchors.fill: parent
+
+        Row {
+            anchors.centerIn: parent
+            spacing: appStyle.margin.large
+
+            Button {
+                id: acceptButton
+
+                style: 'primary'
+                text: qsTr('OK')
+                onClicked: dialog.accepted()
+            }
+
+            Button {
+                id: rejectButton
+
+                text: qsTr('Cancel')
+                onClicked: dialog.rejected()
+            }
+        }
+    }
+
+    signal accepted
+    signal close
+    signal rejected
+
+    opacity: 0
+
     PanelHelp {
         id: help
 
-        anchors.top: header.bottom
+        anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.margins: appStyle.margin.large
@@ -170,55 +119,17 @@ FocusScope {
     Item {
         id: item
 
-        anchors.top: (help.opacity == 1) ? help.bottom : header.bottom
-        anchors.bottom: footer.top
+        anchors.top: (help.opacity == 1) ? help.bottom : parent.top
+        anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.margins: appStyle.margin.normal
     }
 
-    Item {
-        id: footer
-
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        height: 45
-
-        Rectangle {
-            anchors.fill: parent
-            color: '#F5F5F5'
-            radius: background.radius
-        }
-
-        Rectangle {
-            id: footerBorder
-            anchors.left: parent.left
-            anchors.right: parent.right
-            height: 1
-            color: '#DDDDDD'
-        }
-
-        Rectangle {
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.top: parent.top
-            anchors.topMargin: 1
-            color: '#F5F5F5'
-            height: background.radius
-        }
-
-        Loader {
-            anchors.fill: parent
-            anchors.margins: appStyle.margin.large
-            sourceComponent: footerComponent
-        }
-    }
-
     Image {
         id: resizeButton
-        anchors.bottom: parent.bottom
-        anchors.right: parent.right
+        anchors.bottom: dialog.bottom
+        anchors.right: dialog.right
         anchors.margins: 2
         opacity: 0.5
         source: 'image://icon/resize'
