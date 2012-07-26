@@ -40,7 +40,7 @@ Panel {
         AccountListPanel {
             id: listPanel
 
-            anchors.fill: accounts.contents
+            anchors.fill: parent
 
             onAddClicked: {
                 panelSwapper.showPanel('SetupDialog.qml', {accountModel: listPanel.model, accountSlave: true});

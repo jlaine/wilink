@@ -93,19 +93,4 @@ ListView {
             }
         }
     }
-
-    Rectangle {
-        id: background
-
-        anchors.margins: -1
-        anchors.bottomMargin: 0.5
-        anchors.fill: parent
-        border.color: '#8499bd'
-        border.width: 1
-        gradient: Gradient {
-            GradientStop { position: 0; color: '#9bbdf4' }
-            GradientStop { position: 1; color: '#90acd8' }
-        }
-        z: -1
-    }
 }

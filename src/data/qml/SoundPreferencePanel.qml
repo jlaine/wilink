@@ -63,7 +63,7 @@ Panel {
         title: qsTr('Sound devices')
 
         Column {
-            anchors.fill: devices.contents
+            anchors.fill: parent
             spacing: appStyle.spacing.vertical
 
             Item {
@@ -230,7 +230,7 @@ Panel {
         title: qsTr('Sound notifications')
 
         Column {
-            anchors.fill: notifications.contents
+            anchors.fill: parent
             spacing: appStyle.spacing.vertical
 
             CheckBox {

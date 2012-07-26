@@ -22,7 +22,7 @@ import QtQuick 1.1
 FocusScope {
     id: box
 
-    property alias contents: item
+    default property alias content: item.children
     property alias header: textItem
     property string title
 

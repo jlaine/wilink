@@ -37,7 +37,7 @@ Panel {
         title: qsTr('General options')
 
         Column {
-            anchors.fill: general.contents
+            anchors.fill: parent
             spacing: appStyle.spacing.vertical
 
             CheckBox {

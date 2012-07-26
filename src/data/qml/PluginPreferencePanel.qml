@@ -45,7 +45,7 @@ Panel {
         ScrollView {
             id: view
 
-            anchors.fill: parent.contents
+            anchors.fill: parent
             clip: true
             delegate: pluginDelegate
             model: ListModel {}

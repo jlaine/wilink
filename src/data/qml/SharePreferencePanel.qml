@@ -33,6 +33,55 @@ Panel {
         appSettings.sharesDirectories = urls;
     }
 
+    ListModel {
+        id: selectionModel
+
+        function getState(url) {
+            for (var i = 0; i < selectionModel.count; ++i) {
+                if (selectionModel.get(i).url == url)
+                    return true;
+            }
+            return false;
+        }
+
+        function setState(url, checked) {
+            // FIXME: disallow change on root
+            //if (changedPath == m_forced || changedPath.startsWith(m_forced + "/"))
+            //    return;
+
+            if (checked) {
+                var changedUrl = '' + url;
+                var found = false;
+                for (var i = selectionModel.count - 1; i >= 0; --i) {
+                    var currentUrl = '' + selectionModel.get(i).url;
+                    if (currentUrl == changedUrl) {
+                        found = true;
+                    } else if ((currentUrl.indexOf(changedUrl + '/') == 0) ||
+                               (changedUrl.indexOf(currentUrl + '/') == 0)) {
+                        // unselect any children or parents
+                        selectionModel.remove(i);
+                    }
+                }
+                if (!found)
+                    selectionModel.append({'url': url});
+            } else {
+                for (var i = selectionModel.count - 1; i >= 0; --i) {
+                    if (selectionModel.get(i).url == url) {
+                        selectionModel.remove(i);
+                        break;
+                    }
+                }
+            }
+        }
+
+        Component.onCompleted: {
+            var urls = appSettings.sharesDirectories;
+            for (var i in urls) {
+                selectionModel.append({'url': urls[i]});
+            }
+        }
+    }
+
     GroupBox {
         id: places
 
@@ -43,57 +92,8 @@ Panel {
         anchors.right: parent.right
         title: qsTr('Shared folders')
 
-        ListModel {
-            id: selectionModel
-
-            function getState(url) {
-                for (var i = 0; i < selectionModel.count; ++i) {
-                    if (selectionModel.get(i).url == url)
-                        return true;
-                }
-                return false;
-            }
-
-            function setState(url, checked) {
-                // FIXME: disallow change on root
-                //if (changedPath == m_forced || changedPath.startsWith(m_forced + "/"))
-                //    return;
-
-                if (checked) {
-                    var changedUrl = '' + url;
-                    var found = false;
-                    for (var i = selectionModel.count - 1; i >= 0; --i) {
-                        var currentUrl = '' + selectionModel.get(i).url;
-                        if (currentUrl == changedUrl) {
-                            found = true;
-                        } else if ((currentUrl.indexOf(changedUrl + '/') == 0) ||
-                                   (changedUrl.indexOf(currentUrl + '/') == 0)) {
-                            // unselect any children or parents
-                            selectionModel.remove(i);
-                        }
-                    }
-                    if (!found)
-                        selectionModel.append({'url': url});
-                } else {
-                    for (var i = selectionModel.count - 1; i >= 0; --i) {
-                        if (selectionModel.get(i).url == url) {
-                            selectionModel.remove(i);
-                            break;
-                        }
-                    }
-                }
-            }
-
-            Component.onCompleted: {
-                var urls = appSettings.sharesDirectories;
-                for (var i in urls) {
-                    selectionModel.append({'url': urls[i]});
-                }
-            }
-        }
-
         Item {
-            anchors.fill: places.contents
+            anchors.fill: parent
 
             PanelHelp {
                 id: help
@@ -257,7 +257,7 @@ Panel {
         title: qsTr('Downloads folder')
 
         Column {
-            anchors.fill: downloads.contents
+            anchors.fill: parent
             spacing: appStyle.spacing.vertical
 
             PanelHelp {
