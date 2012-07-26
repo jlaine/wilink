@@ -25,6 +25,7 @@ Plugin {
     imageSource: 'image://icon/debug'
 
     onLoaded: {
+        /*
         dock.model.add({
             'iconSource': 'image://icon/dock-peer',
             'iconPress': 'image://icon/peer',
@@ -33,7 +34,7 @@ Plugin {
             'shortcut': Qt.ControlModifier + Qt.Key_B,
             'text': qsTr('Discovery'),
             'visible': true});
-
+        */
         dock.model.add({
             'iconSource': 'image://icon/dock-debug',
             'iconPress': 'image://icon/debug',
@@ -45,7 +46,7 @@ Plugin {
     }
 
     onUnloaded: {
-        dock.model.removePanel('DiscoveryPanel.qml');
+        //dock.model.removePanel('DiscoveryPanel.qml');
         dock.model.removePanel('LogPanel.qml');
     }
 }
