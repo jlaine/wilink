@@ -26,6 +26,7 @@ Rectangle {
     property int iconSize: iconSource != '' ? appStyle.icon.smallSize : 0
     property alias iconSource: image.source
     property int margins: (text != '') ? appStyle.margin.large : appStyle.margin.normal;
+    property string style: ''
     property string text: ''
 
     signal clicked
@@ -105,5 +106,16 @@ Rectangle {
         onPressed: button.pressed()
         onReleased: button.released()
     }
+
+    state: button.style
+    states: [
+        State {
+            name: 'primary'
+            PropertyChanges { target: button; border.color: '#0074cc' }
+            PropertyChanges { target: label; color: 'white'; style: Text.Sunken; styleColor: Qt.rgba(0, 0, 0, 0.25) }
+            PropertyChanges { target: stop1; color: '#0088cc' }
+            PropertyChanges { target: stop2; color: '#0055cc' }
+        }
+    ]
 }
 

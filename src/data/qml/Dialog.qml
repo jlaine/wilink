@@ -64,6 +64,7 @@ FocusScope {
                 Button {
                     id: acceptButton
 
+                    style: 'primary'
                     text: qsTr('OK')
                     onClicked: dialog.accepted()
                 }
