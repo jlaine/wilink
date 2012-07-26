@@ -32,7 +32,7 @@ Dialog {
     minimumHeight: (helpText.length > 0) ? 270 : 150
 
     Item {
-        anchors.fill: contents
+        anchors.fill: parent
 
         Label {
             id: label

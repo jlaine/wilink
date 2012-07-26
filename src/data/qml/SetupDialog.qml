@@ -39,7 +39,7 @@ Dialog {
     }
 
     Item {
-        anchors.fill: dialog.contents
+        anchors.fill: parent
         anchors.leftMargin: appStyle.margin.normal
         anchors.rightMargin: appStyle.margin.normal
 

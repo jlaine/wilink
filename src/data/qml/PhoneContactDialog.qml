@@ -32,7 +32,7 @@ Dialog {
     title: contactId >= 0 ? qsTr('Modify a contact') : qsTr('Add a contact')
 
     Item {
-        anchors.fill: contents
+        anchors.fill: parent
 
         Image {
             id: image
