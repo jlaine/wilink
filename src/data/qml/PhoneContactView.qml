@@ -151,39 +151,41 @@ ContactView {
         dialogSwapper.showPanel('PhoneContactDialog.qml', {'model': block.model});
     }
 
-    Component {
-        id: phoneContactMenu
+    resources: [
+        Component {
+            id: phoneContactMenu
 
-        Menu {
-            id: menu
+            Menu {
+                id: menu
 
-            property int contactId
-            property string contactName
-            property string contactPhone
+                property int contactId
+                property string contactName
+                property string contactPhone
 
-            onItemClicked: {
-                var item = menu.model.get(index);
-                if (item.action == 'edit') {
-                    dialogSwapper.showPanel('PhoneContactDialog.qml', {
-                        'contactId': contactId,
-                        'contactName': contactName,
-                        'contactPhone': contactPhone,
-                        'model': block.model});
-                } else if (item.action == 'remove') {
-                    block.model.removeItem(contactId);
+                onItemClicked: {
+                    var item = menu.model.get(index);
+                    if (item.action == 'edit') {
+                        dialogSwapper.showPanel('PhoneContactDialog.qml', {
+                            'contactId': contactId,
+                            'contactName': contactName,
+                            'contactPhone': contactPhone,
+                            'model': block.model});
+                    } else if (item.action == 'remove') {
+                        block.model.removeItem(contactId);
+                    }
+                }
+
+                Component.onCompleted: {
+                    menu.model.append({
+                        'action': 'edit',
+                        'iconSource': 'image://icon/options',
+                        'text': qsTr('Modify')});
+                    menu.model.append({
+                        'action': 'remove',
+                        'iconSource': 'image://icon/remove',
+                        'text': qsTr('Remove')});
                 }
             }
-
-            Component.onCompleted: {
-                menu.model.append({
-                    'action': 'edit',
-                    'iconSource': 'image://icon/options',
-                    'text': qsTr('Modify')});
-                menu.model.append({
-                    'action': 'remove',
-                    'iconSource': 'image://icon/remove',
-                    'text': qsTr('Remove')});
-            }
         }
-    }
+    ]
 }

@@ -20,76 +20,33 @@
 import QtQuick 1.1
 import wiLink 2.0
 
-Item {
+GroupBox {
     id: block
     clip: true
 
     property alias count: view.count
     property alias currentIndex: view.currentIndex
     property alias delegate: view.delegate
-    property alias headerHeight: header.height
     property alias model: view.model
     property alias moving: view.moving
-    property alias title: titleText.text
 
     signal addClicked
 
-    Rectangle {
-        id: header
-
+    Button {
+        parent: block
         anchors.top: parent.top
-        anchors.topMargin: -1
-        anchors.left: parent.left
-        anchors.leftMargin: -1
         anchors.right: parent.right
-        gradient: Gradient {
-            GradientStop { position:0.0; color: '#9fb7dd' }
-            GradientStop { position:0.5; color: '#597fbe' }
-            GradientStop { position:1.0; color: '#9fb7dd' }
-        }
-        border.color: '#88a4d1'
-        border.width: 1
-        height: appStyle.icon.tinySize + 2 * appStyle.margin.normal
-        z: 1
+        anchors.rightMargin: 2
+        iconSize: appStyle.icon.tinySize
+        iconSource: 'image://icon/add'
 
-        Label {
-            id: titleText
-
-            anchors.left: parent.left
-            anchors.leftMargin: 8
-            anchors.verticalCenter: parent.verticalCenter
-            color: '#ffffff'
-            font.bold: true
-        }
-
-        Button {
-            anchors.right: parent.right
-            anchors.rightMargin: 2
-            anchors.verticalCenter: parent.verticalCenter
-            iconSize: appStyle.icon.tinySize
-            iconSource: 'image://icon/add'
-
-            onClicked: block.addClicked()
-        }
+        onClicked: block.addClicked()
     }
 
     ScrollView {
         id: view
 
-        anchors.top: header.bottom
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
+        anchors.fill: parent
         focus: true
-    }
-
-    Rectangle {
-        id: border
-
-        anchors.bottom: parent.bottom
-        anchors.right: parent.right
-        anchors.top: parent.top
-        color: '#597fbe'
-        width: 1
     }
 }
