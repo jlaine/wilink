@@ -38,20 +38,6 @@ Dialog {
         dialog.close();
     }
 
-    Client {
-        id: testClient
-
-        logger: QXmppLogger {
-            loggingType: QXmppLogger.StdoutLogging
-        }
-
-        onDisconnected: {
-            if (dialog.state == 'testing') {
-                dialog.state = 'authError';
-            }
-        }
-    }
-
     Item {
         anchors.fill: dialog.contents
         anchors.leftMargin: appStyle.margin.normal
@@ -297,6 +283,22 @@ Dialog {
             });
         }
     }
+
+    resources: [
+        Client {
+            id: testClient
+
+            logger: QXmppLogger {
+                loggingType: QXmppLogger.StdoutLogging
+            }
+
+            onDisconnected: {
+                if (dialog.state == 'testing') {
+                    dialog.state = 'authError';
+                }
+            }
+        }
+    ]
 
     states: [
         State {
