@@ -149,6 +149,7 @@ Panel {
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.left: parent.left
+        anchors.margins: appStyle.margin.normal
         visible: width > 0
         width: panel.singlePanel ? parent.width : appStyle.sidebarWidth
         z: 1
@@ -170,6 +171,7 @@ Panel {
         anchors.bottom: parent.bottom
         anchors.left: panel.singlePanel ? parent.left : sidebar.right
         anchors.right: parent.right
+        anchors.margins: appStyle.margin.normal
         visible: width > 0
 
         PanelHeader {
@@ -212,9 +214,7 @@ Panel {
             id: numberRow
 
             anchors.left: parent.left
-            anchors.leftMargin: appStyle.spacing.horizontal
             anchors.right: parent.right
-            anchors.rightMargin: appStyle.spacing.horizontal
             anchors.top: help.bottom
             anchors.topMargin: appStyle.spacing.vertical
             height: 32
@@ -312,8 +312,8 @@ Panel {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: keypad.bottom
+            anchors.topMargin: appStyle.spacing.vertical
             anchors.bottom: parent.bottom
-            anchors.margins: appStyle.margin.normal
             contactModel: sidebar.model
 
             onAddressClicked: {

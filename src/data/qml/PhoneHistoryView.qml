@@ -46,6 +46,7 @@ GroupBox {
         id: historyView
 
         anchors.fill: parent
+        clip: true
         focus: true
 
         delegate: Item {

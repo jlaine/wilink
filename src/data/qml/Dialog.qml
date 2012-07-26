@@ -33,16 +33,14 @@ GroupBox {
 
     height: appStyle.isMobile ? root.height : minimumHeight
     width: appStyle.isMobile ? root.width : minimumWidth
+    borderColor: '#888888'
     opacity: 0
     radius: appStyle.margin.large
     shadowOpacity: 0.8
 
     headerColor: 'white'
     headerComponent: Item {
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.top: parent.top
-        height: appStyle.font.normalSize + 2 * appStyle.margin.large
+        anchors.fill: parent
 
         Label {
             id: label

@@ -162,6 +162,7 @@ Panel {
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
+        anchors.margins: appStyle.margin.normal
         visible: width > 0
         width: chatPanel.singlePanel ? parent.width : appStyle.sidebarWidth
         z: 2
@@ -209,8 +210,8 @@ Panel {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: rooms.bottom
-            color: '#567dbc'
-            height: 5
+            color: 'transparent'
+            height: appStyle.spacing.vertical
 
             MouseArea {
                 property int mousePressY
@@ -296,6 +297,7 @@ Panel {
         anchors.top: parent.top
         anchors.left: chatPanel.singlePanel ? parent.left : sidebar.right
         anchors.right: parent.right
+        anchors.margins: appStyle.margin.normal
         panelSwapper: chatSwapper
         z: 1
     }
@@ -305,8 +307,11 @@ Panel {
 
         anchors.top: chatTabs.bottom
         anchors.bottom: parent.bottom
+        anchors.bottomMargin: appStyle.margin.normal
         anchors.left: chatPanel.singlePanel ? parent.left : sidebar.right
+        anchors.leftMargin: appStyle.margin.normal
         anchors.right: parent.right
+        anchors.rightMargin: appStyle.margin.normal
         focus: true
         visible: width > 0
     }

@@ -23,6 +23,7 @@ FocusScope {
     id: box
 
     default property alias content: item.children
+    property color borderColor: '#DDDDDD'
     property color headerColor: '#F5F5F5'
     property Component footerComponent
     property color footerColor: '#F5F5F5'
@@ -35,10 +36,7 @@ FocusScope {
         id: boxHeader
 
         Item {
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.top: parent.top
-            height: appStyle.font.normalSize + 2 * appStyle.margin.large
+            anchors.fill: parent
 
             Label {
                 id: textItem
@@ -67,7 +65,7 @@ FocusScope {
         id: background
 
         anchors.fill: parent
-        border.color: '#888888'
+        border.color: box.borderColor
         border.width: 1
         color: 'white'
         radius: box.radius
@@ -78,7 +76,7 @@ FocusScope {
         id: frame
 
         anchors.fill: parent
-        border.color: '#888888'
+        border.color: box.borderColor
         border.width: 1
         color: 'transparent'
         radius: box.radius
@@ -92,7 +90,7 @@ FocusScope {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        height: appStyle.font.normalSize + 2 * appStyle.margin.normal
+        height: appStyle.font.largeSize + 2 * appStyle.margin.large
 
         Rectangle {
             anchors.fill: parent
