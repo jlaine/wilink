@@ -44,6 +44,12 @@ Panel {
 
             onClicked: tabSwapper.addPanel('WebTab.qml', {}, true);
         }
+
+        states: State {
+            name: 'singleTab'
+            when: tabView.model.count <= 1
+            PropertyChanges { target: tabView; visible: false; height: 0 }
+        }
     }
 
     PanelSwapper {

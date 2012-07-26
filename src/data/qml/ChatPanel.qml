@@ -293,7 +293,7 @@ Panel {
     }
 
     TabView {
-        id: chatTabs
+        id: tabView
 
         anchors.top: parent.top
         anchors.left: chatPanel.singlePanel ? parent.left : sidebar.right
@@ -301,12 +301,18 @@ Panel {
         anchors.right: parent.right
         panelSwapper: chatSwapper
         z: 1
+
+        states: State {
+            name: 'singleTab'
+            when: tabView.model.count <= 1
+            PropertyChanges { target: tabView; visible: false; height: 0 }
+        }
     }
 
     PanelSwapper {
         id: chatSwapper
 
-        anchors.top: chatTabs.bottom
+        anchors.top: tabView.bottom
         anchors.bottom: parent.bottom
         anchors.left: chatPanel.singlePanel ? parent.left : sidebar.right
         anchors.leftMargin: appStyle.margin.normal
