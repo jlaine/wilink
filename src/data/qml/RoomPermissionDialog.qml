@@ -29,23 +29,6 @@ Dialog {
     minimumHeight: 150
     title: qsTr('Chat room permissions')
 
-    RoomPermissionModel {
-        id: permissionModel
-    }
-
-    ListModel {
-        id: affiliationModel
-
-        Component.onCompleted: {
-            append({'text': qsTr('member'), 'value': QXmppMucItem.MemberAffiliation});
-            append({'text': qsTr('administrator'), 'value': QXmppMucItem.AdminAffiliation});
-            append({'text': qsTr('owner'), 'value': QXmppMucItem.OwnerAffiliation});
-            append({'text': qsTr('banned'), 'value': QXmppMucItem.OutcastAffiliation});
-
-            combo.currentIndex = 0;
-        }
-    }
-
     Item {
         anchors.fill: parent
 
@@ -170,6 +153,24 @@ Dialog {
             }
         }
     }
+
+    resources: [
+        RoomPermissionModel {
+            id: permissionModel
+        },
+        ListModel {
+            id: affiliationModel
+
+            Component.onCompleted: {
+                append({'text': qsTr('member'), 'value': QXmppMucItem.MemberAffiliation});
+                append({'text': qsTr('administrator'), 'value': QXmppMucItem.AdminAffiliation});
+                append({'text': qsTr('owner'), 'value': QXmppMucItem.OwnerAffiliation});
+                append({'text': qsTr('banned'), 'value': QXmppMucItem.OutcastAffiliation});
+
+                combo.currentIndex = 0;
+            }
+        }
+    ]
 
     onAccepted: {
         permissionModel.submit();

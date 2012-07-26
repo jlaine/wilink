@@ -29,10 +29,6 @@ Dialog {
     minimumWidth: 300
     minimumHeight: 220
 
-    RoomConfigurationModel {
-        id: configurationModel
-    }
-
     ScrollView {
         id: view
 
@@ -85,6 +81,12 @@ Dialog {
             }
         }
     }
+
+    resources: [
+        RoomConfigurationModel {
+            id: configurationModel
+        }
+    ]
 
     onAccepted: {
         configurationModel.submit();

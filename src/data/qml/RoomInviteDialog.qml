@@ -29,15 +29,6 @@ Dialog {
 
     title: qsTr('Invite your contacts')
 
-    SortFilterProxyModel {
-        id: sortedContacts
-
-        dynamicSortFilter: true
-        sortCaseSensitivity: Qt.CaseInsensitive
-        sortRole: appSettings.sortContactsByStatus ? RosterModel.StatusSortRole : RosterModel.NameRole
-        Component.onCompleted: sort(0)
-    }
-
     Item {
         anchors.fill: parent
 
@@ -134,6 +125,17 @@ Dialog {
             }
         }
     }
+
+    resources: [
+        SortFilterProxyModel {
+            id: sortedContacts
+
+            dynamicSortFilter: true
+            sortCaseSensitivity: Qt.CaseInsensitive
+            sortRole: appSettings.sortContactsByStatus ? RosterModel.StatusSortRole : RosterModel.NameRole
+            Component.onCompleted: sort(0)
+        }
+    ]
 
     onAccepted: {
         var reason = reasonEdit.text;
