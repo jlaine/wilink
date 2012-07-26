@@ -23,7 +23,6 @@ GroupBox {
     id: dialog
 
     property alias contents: item
-    property alias helpText: help.text
     property int minimumWidth: 360
     property int minimumHeight: 240
 
@@ -101,25 +100,10 @@ GroupBox {
         }
     }
 
-    PanelHelp {
-        id: help
-
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.margins: appStyle.margin.large
-        iconSize: 32
-        opacity: text.length > 0 ? 1 : 0
-    }
-
     Item {
         id: item
 
-        anchors.top: (help.opacity == 1) ? help.bottom : parent.top
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.margins: appStyle.margin.normal
+        anchors.fill: parent
     }
 
     Image {

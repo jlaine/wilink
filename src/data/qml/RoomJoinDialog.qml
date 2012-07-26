@@ -27,7 +27,6 @@ Dialog {
     property QtObject client
     property alias model: roomView.model
 
-    helpText: qsTr('Enter the name of the chat room you want to join. If the chat room does not exist yet, it will be created for you.')
     title: qsTr('Join or create a chat room')
     minimumWidth: 360
     minimumHeight: 300
@@ -46,10 +45,21 @@ Dialog {
     Item {
         anchors.fill: contents
 
+        PanelHelp {
+            id: help
+
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.right: parent.right
+            iconSize: 32
+            text: qsTr('Enter the name of the chat room you want to join. If the chat room does not exist yet, it will be created for you.')
+        }
+
         InputBar {
             id: roomEdit
 
-            anchors.top: parent.top
+            anchors.top: help.bottom
+            anchors.topMargin: appStyle.margin.normal
             anchors.left: parent.left
             anchors.right: parent.right
             focus: true
@@ -59,7 +69,7 @@ Dialog {
             id: roomView
 
             anchors.top: roomEdit.bottom
-            anchors.topMargin: 8
+            anchors.topMargin: appStyle.margin.normal
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.right: parent.right

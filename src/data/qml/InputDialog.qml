@@ -29,7 +29,7 @@ Dialog {
     property alias validator: bar.validator
 
     minimumWidth: 280
-    minimumHeight: (helpText.length > 0) ? 270 : 150
+    minimumHeight: 150
 
     Item {
         anchors.fill: contents

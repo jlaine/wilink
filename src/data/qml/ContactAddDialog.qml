@@ -25,12 +25,20 @@ Dialog {
 
     property string accountJid
 
-    helpText: qsTr('Enter the address of the contact you want to add.')
     title: qsTr('Add a contact')
 
     Column {
         anchors.fill: contents
         spacing: 8
+
+        PanelHelp {
+            id: help
+
+            anchors.left: parent.left
+            anchors.right: parent.right
+            iconSize: 32
+            text: qsTr('Enter the address of the contact you want to add.')
+        }
 
         Item {
             anchors.left: parent.left
