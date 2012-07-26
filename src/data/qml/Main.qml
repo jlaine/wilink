@@ -145,6 +145,15 @@ FocusScope {
         focus: true
     }
 
+    Rectangle {
+        id: dialogOverlay
+
+        anchors.fill: parent
+        color: '#44000000'
+        opacity: 0
+        z: 9
+    }
+
     /** The overlay for displaying dialogs.
      */
     PanelSwapper {
@@ -159,9 +168,11 @@ FocusScope {
                 x = Math.max(0, Math.floor((parent.width - currentItem.width) / 2));
                 y = Math.max(0, Math.floor((parent.height - currentItem.height) / 2));
                 opacity = 1;
+                dialogOverlay.opacity = 1;
             } else {
                 swapper.forceActiveFocus();
                 opacity = 0;
+                dialogOverlay.opacity = 0;
             }
         }
     }

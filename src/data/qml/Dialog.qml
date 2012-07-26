@@ -41,12 +41,9 @@ FocusScope {
         id: background
 
         anchors.fill: parent
-        border.color: '#88a4d1'
+        border.color: Qt.rgba(0, 0, 0, 0.3)
         border.width: 1
-        gradient: Gradient {
-            GradientStop { id: backgroundStop1; position: 1.0; color: '#e7effd' }
-            GradientStop { id: backgroundStop2; position: 0.0; color: '#cbdaf1' }
-        }
+        color: 'white'
         radius: appStyle.margin.large
         smooth: true
     }

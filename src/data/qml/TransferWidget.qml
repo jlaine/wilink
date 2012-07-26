@@ -103,7 +103,6 @@ Item {
         anchors.right: closeButton.left
         anchors.rightMargin: appStyle.margin.normal
         anchors.verticalCenter: parent.verticalCenter
-        iconSource: 'image://icon/remove'
         text: qsTr('Cancel')
         visible: Qt.isQtObject(job) && job.state != QXmppTransferJob.FinishedState
 
@@ -116,7 +115,6 @@ Item {
         anchors.right: parent.right
         anchors.rightMargin: appStyle.margin.normal
         anchors.verticalCenter: parent.verticalCenter
-        iconSource: 'image://icon/close'
         text: qsTr('Close')
         visible: Qt.isQtObject(job) && job.state == QXmppTransferJob.FinishedState
 
