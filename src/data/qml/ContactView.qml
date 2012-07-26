@@ -22,7 +22,6 @@ import wiLink 2.0
 
 GroupBox {
     id: block
-    clip: true
 
     property alias count: view.count
     property alias currentIndex: view.currentIndex
@@ -47,6 +46,7 @@ GroupBox {
         id: view
 
         anchors.fill: parent
+        clip: true
         focus: true
     }
 }
