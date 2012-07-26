@@ -312,8 +312,8 @@ Panel {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: keypad.bottom
-            anchors.topMargin: appStyle.spacing.vertical
             anchors.bottom: parent.bottom
+            anchors.margins: appStyle.margin.normal
             contactModel: sidebar.model
 
             onAddressClicked: {
