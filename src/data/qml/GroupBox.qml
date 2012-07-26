@@ -31,24 +31,19 @@ FocusScope {
 
         anchors.fill: parent
         border.width: 1
-        border.color: '#7091c8'
+        border.color: Qt.rgba(0, 0, 0, 0.05)
         color: '#F5F5F5'
-        radius: appStyle.margin.large
+        radius: appStyle.margin.small
         smooth: true
     }
 
-    Rectangle {
+    Item {
         id: header
 
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        border.color: '#7091c8'
-        border.width: 1
-        color: '#9fb7dd'
-        height: appStyle.icon.tinySize
-        radius: appStyle.margin.large
-        smooth: true
+        height: appStyle.font.normalSize + 2 * appStyle.margin.normal
 
         Label {
             id: textItem

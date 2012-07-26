@@ -61,7 +61,6 @@ Rectangle {
         anchors.right: parent.right
         anchors.rightMargin: margins
         anchors.verticalCenter: parent.verticalCenter
-        color: '#333333'
         elide: Text.ElideRight
         horizontalAlignment: Text.AlignHCenter
         text: button.text

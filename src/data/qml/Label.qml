@@ -21,5 +21,6 @@ import QtQuick 1.1
 
 Text {
     id: label
+    color: '#333333'
     font.pixelSize: appStyle.font.normalSize
 }
