@@ -25,7 +25,7 @@ NotificationDialog {
     footerComponent: Button {
         id: rejectButton
 
-        iconSource: 'image://icon/close'
+        style: 'primary'
         text: qsTr('Close')
         onClicked: dialog.rejected()
     }
