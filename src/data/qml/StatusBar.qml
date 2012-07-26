@@ -25,7 +25,9 @@ Rectangle {
 
     property bool autoAway: false
 
-    color: '#567dbc'
+    border.color: '#DDDDDD'
+    border.width: 1
+    color: '#F5F5F5'
     height: appStyle.icon.tinySize + 3 * appStyle.margin.normal
 
     function addClient(client) {
@@ -149,7 +151,6 @@ Rectangle {
         anchors.right: parent.right
         anchors.rightMargin: appStyle.margin.normal
         anchors.verticalCenter: parent.verticalCenter
-        color: 'white'
         text: {
             var connected = 0;
             var connecting = 0;

@@ -25,8 +25,6 @@ ScrollView {
 
     signal participantClicked(string participant)
 
-    width: 95
-
     delegate: Item {
         id: item
 

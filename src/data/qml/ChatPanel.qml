@@ -211,7 +211,7 @@ Panel {
             anchors.right: parent.right
             anchors.top: rooms.bottom
             color: 'transparent'
-            height: appStyle.spacing.vertical
+            height: appStyle.margin.normal
 
             MouseArea {
                 property int mousePressY
@@ -232,7 +232,7 @@ Panel {
                     if (mouse.buttons & Qt.LeftButton) {
                         var position =  roomsPressHeight + mapToItem(sidebar, mouse.x, mouse.y).y - mousePressY
                         position = Math.max(position, 0)
-                        position = Math.min(position, sidebar.height - splitter.height - statusBar.height)
+                        position = Math.min(position, sidebar.height - splitter.height - statusBar.height - appStyle.margin.normal)
                         rooms.height = position
                     }
                 }
@@ -250,6 +250,7 @@ Panel {
             anchors.right: parent.right
             anchors.top: splitter.bottom
             anchors.bottom: statusBar.top
+            anchors.bottomMargin: appStyle.margin.normal
             currentJid: (Qt.application.active && swapper.currentItem == chatPanel && Qt.isQtObject(chatSwapper.currentItem) && chatSwapper.currentItem.jid != undefined) ? chatSwapper.currentItem.jid : ''
             model: sortedContacts
             title: qsTr('My contacts')
@@ -282,6 +283,7 @@ Panel {
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.right: parent.right
+            radius: appStyle.margin.normal
         }
 
         // FIXME : this is a hack to make sure ConversationPanel loads fast

@@ -20,7 +20,7 @@
 import QtQuick 1.1
 import wiLink 2.0
 
-Rectangle {
+Item {
     id: chatEdit
 
     property int chatState: QXmppMessage.None
@@ -54,7 +54,6 @@ Rectangle {
         input.cursorPosition = newText.length;
     }
 
-    color: '#dfdfdf'
     height: wrapper.height + 2 * wrapper.anchors.margins
 
     // This mousearea prevents hover effects on items behind ChatEdit
@@ -66,10 +65,10 @@ Rectangle {
     Rectangle {
         id: wrapper
 
-        anchors.margins: appStyle.margin.normal
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: sendButton.left
+        anchors.rightMargin: appStyle.margin.normal
         border.color: '#c3c3c3'
         border.width: 1
         color: 'white'
@@ -217,7 +216,6 @@ Rectangle {
     Button {
         id: sendButton
 
-        anchors.margins: appStyle.margin.normal
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.right: parent.right

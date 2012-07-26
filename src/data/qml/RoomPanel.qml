@@ -111,7 +111,9 @@ Panel {
 
     Item {
         anchors.top: header.bottom
+        anchors.topMargin: appStyle.margin.normal
         anchors.bottom: chatInput.top
+        anchors.bottomMargin: appStyle.margin.normal
         anchors.left: parent.left
         anchors.right: parent.right
     
@@ -156,25 +158,21 @@ Panel {
             }
         }
 
-        Rectangle {
-            id: border
-
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.right: participantView.left
-            color: '#597fbe'
-            width: 1
-        }
-
-        RoomParticipantView {
+        GroupBox {
             id: participantView
 
             anchors.top: parent.top
             anchors.bottom: parent.bottom
             anchors.right: parent.right
-            model: participantModel
+            headerComponent: null
+            width: 95
 
-            onParticipantClicked: chatInput.talkAt(participant)
+            RoomParticipantView {
+                anchors.fill: parent
+                model: participantModel
+
+                onParticipantClicked: chatInput.talkAt(participant)
+            }
         }
     }
 

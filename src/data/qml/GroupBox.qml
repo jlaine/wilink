@@ -90,7 +90,8 @@ FocusScope {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        height: appStyle.font.largeSize + 2 * appStyle.margin.large
+        height: headerComponent ? (appStyle.font.largeSize + 2 * appStyle.margin.large) : 0
+        visible: headerComponent ? true : false
 
         Rectangle {
             anchors.fill: parent
