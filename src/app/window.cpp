@@ -30,6 +30,12 @@
 #include "qtlocalpeer.h"
 #include "window.h"
 
+#ifdef Q_WS_X11
+#include <QX11Info>
+#include <X11/Xlib.h>
+#include <X11/Xatom.h>
+#endif
+
 class CustomWindowPrivate
 {
 public:
@@ -152,6 +158,24 @@ void CustomWindow::showAndRaise()
     show();
     raise();
     activateWindow();
+
+#ifdef Q_WS_X11
+    // tell window manager to activate window
+    XClientMessageEvent xev;
+    xev.type = ClientMessage;
+    xev.window = winId();
+    xev.message_type = XInternAtom(QX11Info::display(), "_NET_ACTIVE_WINDOW", False);
+    xev.format = 32;
+    xev.data.l[0] = 2;
+    xev.data.l[1] = CurrentTime;
+    xev.data.l[2] = 0;
+    xev.data.l[3] = 0;
+    xev.data.l[4] = 0;
+
+    XSendEvent(QX11Info::display(), QX11Info::appRootWindow(), False,
+          (SubstructureNotifyMask | SubstructureRedirectMask),
+          (XEvent *)&xev);
+#endif
 }
 
 void CustomWindow::setSource(const QUrl &source)
