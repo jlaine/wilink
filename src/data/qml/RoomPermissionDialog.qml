@@ -47,7 +47,7 @@ Dialog {
     }
 
     Item {
-        anchors.fill: parent
+        anchors.fill: contents
 
         ScrollView {
             id: view

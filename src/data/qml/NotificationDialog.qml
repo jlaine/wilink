@@ -29,7 +29,7 @@ Dialog {
     minimumHeight: 150
 
     Item {
-        anchors.fill: parent
+        anchors.fill: contents
 
         Image {
             id: image

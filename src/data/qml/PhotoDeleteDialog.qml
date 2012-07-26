@@ -32,7 +32,7 @@ Dialog {
     title: qsTr('Delete photo');
 
     Item {
-        anchors.fill: parent
+        anchors.fill: contents
 
         Image {
             id: image

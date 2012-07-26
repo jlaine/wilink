@@ -29,7 +29,7 @@ Dialog {
     title: qsTr('Add a contact')
 
     Column {
-        anchors.fill: parent
+        anchors.fill: contents
         spacing: 8
 
         Item {

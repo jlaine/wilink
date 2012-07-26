@@ -44,7 +44,7 @@ Dialog {
     }
 
     Item {
-        anchors.fill: parent
+        anchors.fill: contents
 
         InputBar {
             id: roomEdit
