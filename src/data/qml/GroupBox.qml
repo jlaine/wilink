@@ -28,6 +28,7 @@ FocusScope {
     property color footerColor: '#F5F5F5'
     property Component headerComponent: boxHeader
     property int radius: appStyle.margin.small
+    property real shadowOpacity: 0
     property string title
 
     Component {
@@ -52,9 +53,11 @@ FocusScope {
     // FIXME: this is a hack waiting 'blur' or 'shadow' attribute in qml
     BorderImage {
         id: shadow
+
         anchors.fill: box
         anchors { leftMargin: -5; topMargin: -5; rightMargin: -8; bottomMargin: -9 }
         border { left: 10; top: 10; right: 10; bottom: 10 }
+        opacity: shadowOpacity
         source: 'image://icon/shadow'
         smooth: true
         z: -1

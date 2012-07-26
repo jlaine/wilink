@@ -27,9 +27,15 @@ GroupBox {
     property int minimumWidth: 360
     property int minimumHeight: 240
 
+    signal accepted
+    signal close
+    signal rejected
+
     height: appStyle.isMobile ? root.height : minimumHeight
     width: appStyle.isMobile ? root.width : minimumWidth
+    opacity: 0
     radius: appStyle.margin.large
+    shadowOpacity: 0.8
 
     headerColor: 'white'
     headerComponent: Item {
@@ -73,7 +79,6 @@ GroupBox {
         }
     }
 
-
     footerComponent: Item {
         anchors.fill: parent
 
@@ -97,12 +102,6 @@ GroupBox {
             }
         }
     }
-
-    signal accepted
-    signal close
-    signal rejected
-
-    opacity: 0
 
     PanelHelp {
         id: help
