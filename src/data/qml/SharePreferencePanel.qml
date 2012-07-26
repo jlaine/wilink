@@ -287,7 +287,7 @@ Panel {
 
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.right: parent.right
-                    iconSource: 'image://icon/album'
+                    text: qsTr('Browse..')
 
                     onClicked: {
                         var dialog = appNotifier.fileDialog();
