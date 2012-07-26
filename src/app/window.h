@@ -24,18 +24,18 @@
 #include <QUrl>
 
 class QtLocalPeer;
-class WindowPrivate;
+class CustomWindowPrivate;
 
 /** Chat represents the user interface's main window.
  */
-class Window : public QMainWindow
+class CustomWindow : public QMainWindow
 {
     Q_OBJECT
     Q_PROPERTY(bool fullScreen READ isFullScreen WRITE setFullScreen NOTIFY windowStateChanged)
 
 public:
-    Window(QtLocalPeer *peer, QWidget *parent = 0);
-    ~Window();
+    CustomWindow(QtLocalPeer *peer, QWidget *parent = 0);
+    ~CustomWindow();
     void setFullScreen(bool fullScreen);
     void setInitialMessage(const QString &message);
 
@@ -57,7 +57,7 @@ protected:
     void changeEvent(QEvent *event);
 
 private:
-    WindowPrivate *d;
+    CustomWindowPrivate *d;
 };
 
 #endif

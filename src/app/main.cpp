@@ -67,7 +67,7 @@ bool CustomApplication::event(QEvent *event)
     switch (event->type()) {
     case QEvent::FileOpen:
         foreach (QWidget *widget, QApplication::topLevelWidgets()) {
-            Window *window = qobject_cast<Window*>(widget);
+            CustomWindow *window = qobject_cast<CustomWindow*>(widget);
             if (window)
                 QMetaObject::invokeMethod(window, "messageReceived", Q_ARG(QString, "OPEN " + static_cast<QFileOpenEvent *>(event)->url().toString()));
         }
@@ -126,7 +126,7 @@ int main(int argc, char *argv[])
     signal(SIGTERM, signal_handler);
 
     /* Create window */
-    Window window(peer);
+    CustomWindow window(peer);
 #ifdef MEEGO_EDITION_HARMATTAN
     //QUrl qmlSource("https://download.wifirst.net/wiLink/2.3/MeegoMain.qml");
     QUrl qmlSource("qrc:/qml/MeegoMain.qml");

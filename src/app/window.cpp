@@ -30,7 +30,7 @@
 #include "qtlocalpeer.h"
 #include "window.h"
 
-class WindowPrivate
+class CustomWindowPrivate
 {
 public:
     QString initialMessage;
@@ -38,13 +38,13 @@ public:
     QDeclarativeView *view;
 };
 
-Window::Window(QtLocalPeer *peer, QWidget *parent)
+CustomWindow::CustomWindow(QtLocalPeer *peer, QWidget *parent)
     : QMainWindow(parent)
 {
     bool check;
     Q_UNUSED(check);
 
-    d = new WindowPrivate;
+    d = new CustomWindowPrivate;
     d->peer = peer;
     check = connect(d->peer, SIGNAL(messageReceived(QString)),
                     this, SIGNAL(messageReceived(QString)));
@@ -117,15 +117,15 @@ Window::Window(QtLocalPeer *peer, QWidget *parent)
     }
 }
 
-Window::~Window()
+CustomWindow::~CustomWindow()
 {
     // save geometry
     QSettings settings;
-    settings.setValue("WindowGeometry", saveGeometry());
+    settings.setValue("CustomWindowGeometry", saveGeometry());
     delete d;
 }
 
-void Window::changeEvent(QEvent *event)
+void CustomWindow::changeEvent(QEvent *event)
 {
     QWidget::changeEvent(event);
     if (event->type() == QEvent::ActivationChange ||
@@ -133,7 +133,7 @@ void Window::changeEvent(QEvent *event)
         emit windowStateChanged();
 }
 
-void Window::setFullScreen(bool fullScreen)
+void CustomWindow::setFullScreen(bool fullScreen)
 {
     if (fullScreen)
         setWindowState(windowState() | Qt::WindowFullScreen);
@@ -141,12 +141,12 @@ void Window::setFullScreen(bool fullScreen)
         setWindowState(windowState() & ~Qt::WindowFullScreen);
 }
 
-void Window::setInitialMessage(const QString &message)
+void CustomWindow::setInitialMessage(const QString &message)
 {
     d->initialMessage = message;
 }
 
-void Window::showAndRaise()
+void CustomWindow::showAndRaise()
 {
     setWindowState(windowState() & ~Qt::WindowMinimized);
     show();
@@ -154,12 +154,12 @@ void Window::showAndRaise()
     activateWindow();
 }
 
-void Window::setSource(const QUrl &source)
+void CustomWindow::setSource(const QUrl &source)
 {
     d->view->setSource(source);
 }
 
-void Window::_q_statusChanged()
+void CustomWindow::_q_statusChanged()
 {
     if (d->view->status() != QDeclarativeView::Ready)
         return;
