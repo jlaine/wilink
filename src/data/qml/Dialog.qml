@@ -55,7 +55,7 @@ FocusScope {
         border.color: '#888888'
         border.width: 1
         color: 'transparent'
-        radius: appStyle.margin.large
+        radius: background.radius
         smooth: true
 
         z: 1
@@ -106,29 +106,27 @@ FocusScope {
         hoverEnabled: true
     }
 
-    Rectangle {
+    Item {
         id: header
 
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        border.color: '#88a4d1'
-        border.width: 1
-        gradient: Gradient {
-            GradientStop { position:0.0; color: '#9fb7dd' }
-            GradientStop { position:0.5; color: '#597fbe' }
-            GradientStop { position:1.0; color: '#9fb7dd' }
-        }
-        height: appStyle.font.normalSize + 2 * appStyle.margin.normal
-        radius: background.radius
-        smooth: true
+        height: appStyle.font.normalSize + 2 * appStyle.margin.large
 
         Label {
             id: label
 
             anchors.centerIn: parent
             font.bold: true
-            color: '#ffffff'
+        }
+
+        Rectangle {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            color: '#EEEEEE'
+            height: 1
         }
 
         MouseArea {
@@ -185,7 +183,7 @@ FocusScope {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        height: 50
+        height: 45
 
         Rectangle {
             anchors.fill: parent

@@ -32,7 +32,7 @@ FocusScope {
         anchors.fill: parent
         border.width: 1
         border.color: '#7091c8'
-        color: '#cbd9f0'
+        color: '#F5F5F5'
         radius: appStyle.margin.large
         smooth: true
     }
