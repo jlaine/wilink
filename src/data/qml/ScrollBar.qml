@@ -31,7 +31,7 @@ Item {
 
     property real contentPos: orientation == Qt.Horizontal ? flickableItem.contentX : flickableItem.contentY
     property real position: orientation == Qt.Horizontal ? flickableItem.visibleArea.xPosition : flickableItem.visibleArea.yPosition
-    property real pageSize: orientation == Qt.Horizontal ? flickableItem.visibleArea.widthRatio : flickableItem.visibleArea.heightRatio
+    property real pageSize: Math.min(1, orientation == Qt.Horizontal ? (flickableItem.visibleArea.widthRatio > 0 ? flickableItem.visibleArea.widthRatio : 1) : (flickableItem.visibleArea.heightRatio > 0 ? flickableItem.visibleArea.heightRatio : 1))
 
     clip: true
     state: pageSize == 1 ? 'collapsed' : ''
