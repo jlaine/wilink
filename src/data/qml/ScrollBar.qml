@@ -35,15 +35,15 @@ Item {
 
     clip: true
     state: pageSize == 1 ? 'collapsed' : ''
-    height: orientation == Qt.Horizontal ? 7 : 100
-    width: orientation == Qt.Horizontal ? 100 : 7
+    height: orientation == Qt.Horizontal ? 8 : 100
+    width: orientation == Qt.Horizontal ? 100 : 8
 
     Item {
         id: container
 
-        x: orientation == Qt.Horizontal ? 0 : 7
+        x: orientation == Qt.Horizontal ? 0 : 5
         width: orientation == Qt.Horizontal ? parent.width : parent.height
-        height: orientation == Qt.Horizontal ? parent.height : parent.width
+        height: 5
 
         transform: Rotation {
             angle: orientation == Qt.Horizontal ? 0: 90
