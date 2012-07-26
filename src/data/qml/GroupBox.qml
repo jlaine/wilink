@@ -23,17 +23,30 @@ FocusScope {
     id: box
 
     default property alias content: item.children
+    property Component footerComponent
     property alias header: textItem
+    property int radius: appStyle.margin.small
     property string title
+
+    Rectangle {
+        id: background
+
+        anchors.fill: parent
+        border.color: '#888888'
+        border.width: 1
+        color: 'white'
+        radius: box.radius
+        smooth: true
+    }
 
     Rectangle {
         id: frame
 
         anchors.fill: parent
+        border.color: '#888888'
         border.width: 1
-        border.color: Qt.rgba(0, 0, 0, 0.05)
         color: '#F5F5F5'
-        radius: appStyle.margin.small
+        radius: box.radius
         smooth: true
     }
 
@@ -52,15 +65,72 @@ FocusScope {
             font.bold: true
             text: box.title
         }
+
+        Rectangle {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            anchors.bottomMargin: 1
+            color: '#F5F5F5'
+            height: box.radius
+        }
+
+        Rectangle {
+            id: headerBorder
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            height: 1
+            color: '#DDDDDD'
+        }
     }
 
     Item {
         id: item
 
         anchors.top: header.bottom
-        anchors.bottom: parent.bottom
+        anchors.bottom: footer.top
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.margins: appStyle.margin.normal
+    }
+
+    Item {
+        id: footer
+
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        height: footerComponent ? 45 : 0
+        visible: footerComponent ? true : false
+
+        Rectangle {
+            anchors.fill: parent
+            color: '#F5F5F5'
+            radius: box.radius
+        }
+
+        Rectangle {
+            id: footerBorder
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: 1
+            color: '#DDDDDD'
+        }
+
+        Rectangle {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.topMargin: 1
+            color: '#F5F5F5'
+            height: box.radius
+        }
+
+        Loader {
+            anchors.fill: parent
+            anchors.margins: appStyle.margin.large
+            sourceComponent: footerComponent
+        }
     }
 }
