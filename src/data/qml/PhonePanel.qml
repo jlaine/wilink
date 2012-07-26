@@ -149,7 +149,6 @@ Panel {
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.left: parent.left
-        anchors.margins: appStyle.margin.normal
         visible: width > 0
         width: panel.singlePanel ? parent.width : appStyle.sidebarWidth
         z: 1
@@ -170,8 +169,8 @@ Panel {
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.left: panel.singlePanel ? parent.left : sidebar.right
+        anchors.leftMargin: appStyle.margin.normal
         anchors.right: parent.right
-        anchors.margins: appStyle.margin.normal
         visible: width > 0
 
         PanelHeader {
