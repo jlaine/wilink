@@ -41,11 +41,24 @@ FocusScope {
         id: background
 
         anchors.fill: parent
-        border.color: Qt.rgba(0, 0, 0, 0.3)
+        border.color: '#888888'
         border.width: 1
         color: 'white'
         radius: appStyle.margin.large
         smooth: true
+    }
+
+    Rectangle {
+        id: frame
+
+        anchors.fill: parent
+        border.color: '#888888'
+        border.width: 1
+        color: 'transparent'
+        radius: appStyle.margin.large
+        smooth: true
+
+        z: 1
     }
 
     Component {
@@ -166,15 +179,42 @@ FocusScope {
         anchors.margins: appStyle.margin.normal
     }
 
-    Loader {
+    Item {
         id: footer
 
-        anchors.margins: appStyle.margin.normal
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
-        height: appStyle.icon.smallSize + 2 * appStyle.margin.normal
-        sourceComponent: footerComponent
+        height: 50
+
+        Rectangle {
+            anchors.fill: parent
+            color: '#F5F5F5'
+            radius: background.radius
+        }
+
+        Rectangle {
+            id: footerBorder
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: 1
+            color: '#DDDDDD'
+        }
+
+        Rectangle {
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.top: parent.top
+            anchors.topMargin: 1
+            color: '#F5F5F5'
+            height: background.radius
+        }
+
+        Loader {
+            anchors.fill: parent
+            anchors.margins: appStyle.margin.large
+            sourceComponent: footerComponent
+        }
     }
 
     Image {

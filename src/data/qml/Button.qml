@@ -33,8 +33,8 @@ Rectangle {
     signal pressed
     signal released
 
-    height: button.visible ? (Math.max(iconSize, labelHelper.height) + 2 * appStyle.margin.normal) : 0
-    width: button.visible ? (labelHelper.width*1.2 + iconSize + ((iconSource != '' && text != '') ? 3 : 2) * margins) : 0
+    height: button.visible ? (Math.max(iconSize, Math.round(labelHelper.height*1.2)) + 2 * appStyle.margin.normal) : 0
+    width: button.visible ? Math.round(labelHelper.width*1.2 + iconSize + ((iconSource != '' && text != '') ? 3 : 2) * margins) : 0
     border.color: '#b3b3b3'
     gradient: Gradient {
         GradientStop { id: stop1; position: 0.0; color: '#ffffff' }
