@@ -143,16 +143,6 @@ Panel {
         }
     }
 
-    Rectangle {
-        id: background
-
-        anchors.fill: parent
-        gradient: Gradient {
-            GradientStop { position: 1.0; color: '#e7effd' }
-            GradientStop { position: 0.0; color: '#cbdaf1' }
-        }
-    }
-
     PhoneContactView {
         id: sidebar
 

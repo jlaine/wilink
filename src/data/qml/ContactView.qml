@@ -35,27 +35,6 @@ Item {
     signal addClicked
 
     Rectangle {
-        id: background
-
-        width: parent.height
-        height: parent.width
-        anchors.top: parent.top
-        anchors.topMargin: -parent.width
-        anchors.left: parent.left
-
-        gradient: Gradient {
-            GradientStop { id: backgroundStop1; position: 0.0; color: '#e7effd' }
-            GradientStop { id: backgroundStop2; position: 1.0; color: '#cbdaf1' }
-        }
-
-        transform: Rotation {
-            angle: 90
-            origin.x: 0
-            origin.y: background.height
-        }
-    }
-
-    Rectangle {
         id: header
 
         anchors.top: parent.top
