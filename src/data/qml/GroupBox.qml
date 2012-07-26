@@ -23,9 +23,10 @@ FocusScope {
     id: box
 
     default property alias content: item.children
+    property color headerColor: '#F5F5F5'
     property Component footerComponent
+    property color footerColor: '#F5F5F5'
     property Component headerComponent: boxHeader
-    property color headerColor: 'white'
     property int radius: appStyle.margin.small
     property string title
 
@@ -92,7 +93,7 @@ FocusScope {
 
         Rectangle {
             anchors.fill: parent
-            color: '#F5F5F5'
+            color: headerColor
             radius: box.radius
         }
 
@@ -101,7 +102,7 @@ FocusScope {
             anchors.right: parent.right
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 1
-            color: '#F5F5F5'
+            color: headerColor
             height: box.radius
         }
 
@@ -142,7 +143,7 @@ FocusScope {
 
         Rectangle {
             anchors.fill: parent
-            color: '#F5F5F5'
+            color: footerColor
             radius: box.radius
         }
 
@@ -151,7 +152,7 @@ FocusScope {
             anchors.right: parent.right
             anchors.top: parent.top
             anchors.topMargin: 1
-            color: '#F5F5F5'
+            color: footerColor
             height: box.radius
         }
 

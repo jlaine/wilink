@@ -31,6 +31,7 @@ GroupBox {
     width: appStyle.isMobile ? root.width : minimumWidth
     radius: appStyle.margin.large
 
+    headerColor: 'white'
     headerComponent: Item {
         anchors.left: parent.left
         anchors.right: parent.right
