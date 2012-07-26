@@ -24,10 +24,10 @@ FocusScope {
 
     default property alias content: item.children
     property color borderColor: '#DDDDDD'
-    property color headerColor: '#F5F5F5'
     property Component footerComponent
     property color footerColor: '#F5F5F5'
     property Component headerComponent: boxHeader
+    property bool headerBackground: true
     property int radius: appStyle.margin.small
     property real shadowOpacity: 0
     property string title
@@ -95,17 +95,21 @@ FocusScope {
 
         Rectangle {
             anchors.fill: parent
-            color: headerColor
+            gradient: Gradient {
+                GradientStop { position: 0; color: '#FAFAFA' }
+                GradientStop { position: 1; color: '#F5F5F5' }
+            }
             radius: box.radius
-        }
+            visible: box.headerBackground
 
-        Rectangle {
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
-            anchors.bottomMargin: 1
-            color: headerColor
-            height: box.radius
+            Rectangle {
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 1
+                color: '#F5F5F5'
+                height: box.radius
+            }
         }
 
         Rectangle {

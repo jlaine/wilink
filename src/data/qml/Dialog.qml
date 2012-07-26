@@ -36,7 +36,6 @@ GroupBox {
     radius: appStyle.margin.large
     shadowOpacity: 0.8
 
-    headerColor: 'white'
     headerComponent: Item {
         anchors.fill: parent
 
@@ -74,6 +73,7 @@ GroupBox {
             }
         }
     }
+    headerBackground: false
 
     footerComponent: Item {
         anchors.fill: parent
