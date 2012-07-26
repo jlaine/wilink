@@ -118,6 +118,13 @@ else(APPLE)
   ;Remove old files
   File /r \\\"\\\${INST_DIR}\\\\*.*\\\"")
         set(CPACK_NSIS_EXTRA_INSTALL_COMMANDS "
+  ;Add protocol handler
+  WriteRegStr HKCR \\\"wilink\\\" \\\"\\\" \\\"URL:wilink\\\"
+  WriteRegStr HKCR \\\"wilink\\\" \\\"URL Protocol\\\" \\\"\\\"
+  WriteRegStr HKCR \\\"wilink\\\\shell\\\" \\\"\\\" \\\"\\\"
+  WriteRegStr HKCR \\\"wilink\\\\shell\\\\open\\\" \\\"\\\" \\\"\\\"
+  WriteRegStr HKCR \\\"wilink\\\\shell\\\\open\\\\command\\\" \\\"\\\" \\\"$INSTDIR\\\\bin\\\\wiLink.exe %1\\\"
+
   ;In silent mode, automatically run program
   IfSilent 0 +2
   Exec \\\"$INSTDIR\\\\bin\\\\wiLink.exe\\\"")
@@ -127,7 +134,10 @@ else(APPLE)
   RMDir \\\"$LOCALAPPDATA\\\\Wifirst\\\"
   DeleteRegValue HKCU \\\"Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Run\\\" \\\"wiLink\\\"
   DeleteRegKey HKCU \\\"Software\\\\Wifirst\\\\wiLink\\\"
-  DeleteRegKey /ifempty HKCU \\\"Software\\\\Wifirst\\\"")
+  DeleteRegKey /ifempty HKCU \\\"Software\\\\Wifirst\\\"
+
+  ; Remove protocol handler
+  DeleteRegKey HKCR \\\"wilink\\\"")
     endif(WIN32)
     # Source package
     set(CPACK_SOURCE_GENERATOR "TBZ2")
