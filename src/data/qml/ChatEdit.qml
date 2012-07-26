@@ -221,6 +221,7 @@ Rectangle {
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.right: parent.right
+        style: 'primary'
         visible: parent.width > 0
         text: qsTr('Send')
         onClicked: chatEdit.returnPressed()

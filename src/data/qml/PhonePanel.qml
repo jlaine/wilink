@@ -261,7 +261,7 @@ Panel {
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
                     enabled: sipClient.state == SipClient.ConnectedState && !sipClient.activeCalls
-                    iconSource: 'image://icon/call'
+                    style: 'primary'
                     text: qsTr('Call')
 
                     onClicked: {

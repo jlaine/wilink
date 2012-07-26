@@ -37,6 +37,7 @@ Dialog {
 
                 enabled: Qt.isQtObject(appUpdater) && appUpdater.state == Updater.IdleState
                 iconSource: 'image://icon/refresh'
+                style: 'primary'
                 text: qsTr('Check for updates')
                 visible: !prompting
                 onClicked: appUpdater.check()
@@ -46,6 +47,7 @@ Dialog {
                 id: installButton
 
                 iconSource: 'image://icon/start'
+                style: 'primary'
                 text: qsTr('Install')
                 visible: prompting
                 onClicked: appUpdater.install()
