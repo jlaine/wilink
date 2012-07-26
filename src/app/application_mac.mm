@@ -35,7 +35,7 @@
     Q_UNUSED(flag);
 
     foreach (QWidget *widget, QApplication::topLevelWidgets()) {
-        Window *window = qobject_cast<Window*>(widget);
+        CustomWindow *window = qobject_cast<CustomWindow*>(widget);
         if (window)
             window->showAndRaise();
     }
