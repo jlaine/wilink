@@ -25,21 +25,21 @@ Rectangle {
     property bool enabled: true
     property int iconSize: iconSource != '' ? appStyle.icon.smallSize : 0
     property alias iconSource: image.source
-    property int margins: appStyle.margin.normal
+    property int margins: (text != '') ? appStyle.margin.large : appStyle.margin.normal;
     property string text: ''
 
     signal clicked
     signal pressed
     signal released
 
-    height: button.visible ? (Math.max(iconSize, labelHelper.height) + 2 * margins) : 0
+    height: button.visible ? (Math.max(iconSize, labelHelper.height) + 2 * appStyle.margin.normal) : 0
     width: button.visible ? (labelHelper.width*1.2 + iconSize + ((iconSource != '' && text != '') ? 3 : 2) * margins) : 0
-    border.color: '#84bde8'
+    border.color: '#b3b3b3'
     gradient: Gradient {
         GradientStop { id: stop1; position: 0.0; color: '#ffffff' }
-        GradientStop { id: stop2; position: 1.0; color: '#beceeb' }
+        GradientStop { id: stop2; position: 1.0; color: '#e6e6e6' }
     }
-    radius: margins
+    radius: appStyle.margin.normal
     smooth: true
 
     Image {
@@ -60,6 +60,7 @@ Rectangle {
         anchors.right: parent.right
         anchors.rightMargin: margins
         anchors.verticalCenter: parent.verticalCenter
+        color: '#333333'
         elide: Text.ElideRight
         horizontalAlignment: Text.AlignHCenter
         text: button.text
@@ -76,31 +77,33 @@ Rectangle {
         id: overlay
 
         anchors.fill: button
-        color: '#99ffffff'
-        visible: !button.enabled
         radius: button.radius
         smooth: true
+        visible: false
+
+        states: [
+            State {
+                name: 'disabled'
+                when: !button.enabled
+                PropertyChanges { target: overlay; color: '#99ffffff'; visible: true }
+            },
+            State {
+                name: 'pressed'
+                when: mouseArea.pressedButtons & Qt.LeftButton
+                PropertyChanges { target: overlay; color: '#33000000'; visible: true }
+            }
+        ]
     }
 
     MouseArea {
+        id: mouseArea
+
         anchors.fill: parent
         enabled: button.enabled
 
         onClicked: button.clicked()
-        onPressed: {
-            button.state = 'pressed';
-            button.pressed();
-        }
-        onReleased: {
-            button.state = '';
-            button.released();
-        }
-    }
-
-    states: State {
-        name: 'pressed'
-        PropertyChanges { target: stop1; color: '#d5e2f5' }
-        PropertyChanges { target: stop2; color: '#f5fafe' }
+        onPressed: button.pressed()
+        onReleased: button.released()
     }
 }
 
