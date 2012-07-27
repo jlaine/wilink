@@ -1,13 +1,11 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
-    <file>images/down-arrow.png</file>
     <file>images/eject.png</file>
     <file>images/left-arrow.png</file>
     <file>images/right-arrow.png</file>
     <file>images/shadow.png</file>
     <file>images/tab-active.png</file>
     <file>images/tab.png</file>
-    <file>images/up-arrow.png</file>
     <file>images/16x16/checkbox-checked.png</file>
     <file>images/16x16/checkbox.png</file>
     <file>images/16x16/face-angry.png</file>
