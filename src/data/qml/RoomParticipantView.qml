@@ -25,6 +25,7 @@ ScrollView {
 
     signal participantClicked(string participant)
 
+    clip: true
     delegate: Item {
         id: item
 

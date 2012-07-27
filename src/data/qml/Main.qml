@@ -142,7 +142,7 @@ FocusScope {
         anchors.bottom: parent.bottom
         anchors.left: dock.right
         anchors.right: parent.right
-        anchors.margins: appStyle.margin.normal
+        //anchors.margins: appStyle.margin.normal
         focus: true
     }
 

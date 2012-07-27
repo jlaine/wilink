@@ -164,7 +164,7 @@ Panel {
         objectName: 'widgetBar'
 
         anchors.top: parent.top
-        anchors.topMargin: 16
+        anchors.topMargin: appStyle.margin.large
         anchors.left: parent.left
         anchors.right: parent.right
         z: 1

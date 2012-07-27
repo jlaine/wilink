@@ -27,7 +27,7 @@ ListView {
     property QtObject panelSwapper
 
     currentIndex: Qt.isQtObject(panelSwapper) ? panelSwapper.currentIndex : -1
-    height: appStyle.icon.smallSize
+    height: (appStyle.font.largeSize + 2 * appStyle.margin.large)
     highlightMoveDuration: appStyle.highlightMoveDuration
     model: panelSwapper.model
     orientation: ListView.Horizontal
@@ -45,7 +45,8 @@ ListView {
 
             anchors.fill: parent
             border.color: '#DDDDDD'
-            border.width: 0
+            border.width: 1
+            opacity: 0
             radius: 4
             height: tabView.height
 
@@ -149,15 +150,10 @@ ListView {
             when: (model.index == tabView.currentIndex)
 
             PropertyChanges { target: column; anchors.margins: appStyle.margin.large }
-            PropertyChanges { target: frame; border.width: 1 }
+            PropertyChanges { target: frame; border.width: 1; opacity: 1 }
             PropertyChanges { target: statusPill; opacity: 1 }
             PropertyChanges { target: rect; height: 40; width: 250 }
             PropertyChanges { target: icon; height: appStyle.icon.normalSize; width: appStyle.icon.normalSize }
         }
-    }
-
-    Rectangle {
-        anchors.fill: parent
-        z: -1
     }
 }

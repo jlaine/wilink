@@ -109,7 +109,7 @@ Panel {
 
     Item {
         anchors.top: parent.top
-        anchors.topMargin: 16
+        anchors.topMargin: appStyle.margin.large
         anchors.bottom: chatInput.top
         anchors.bottomMargin: appStyle.margin.normal
         anchors.left: parent.left

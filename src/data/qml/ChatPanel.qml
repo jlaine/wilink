@@ -166,6 +166,7 @@ Panel {
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
+        anchors.margins: appStyle.margin.normal
         visible: width > 0
         width: chatPanel.singlePanel ? parent.width : appStyle.sidebarWidth
         z: 2
@@ -302,24 +303,36 @@ Panel {
 
     }
 
-    ChatTabs {
-        id: tabView
+    Rectangle {
+        id: tabBox
 
         anchors.top: parent.top
+        anchors.topMargin: appStyle.margin.normal
         anchors.left: chatPanel.singlePanel ? parent.left : sidebar.right
-        anchors.leftMargin: appStyle.margin.normal
         anchors.right: parent.right
-        panelSwapper: chatSwapper
-        z: 1
+        gradient: Gradient {
+            GradientStop { position: 0; color: '#FAFAFA' }
+            GradientStop { position: 1; color: '#E9E9E9' }
+        }
+        height: (appStyle.font.largeSize + 2 * appStyle.margin.large)
+        property int radius: appStyle.margin.small
+
+        ChatTabs {
+            id: tabView
+
+            anchors.fill: parent
+            panelSwapper: chatSwapper
+            z: 1
+        }
     }
 
     PanelSwapper {
         id: chatSwapper
 
-        anchors.top: tabView.bottom
+        anchors.top: tabBox.bottom
         anchors.bottom: parent.bottom
         anchors.left: chatPanel.singlePanel ? parent.left : sidebar.right
-        anchors.leftMargin: appStyle.margin.normal
+        anchors.margins: appStyle.margin.normal
         anchors.right: parent.right
         focus: true
         visible: width > 0
