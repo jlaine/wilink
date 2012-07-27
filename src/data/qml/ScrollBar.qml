@@ -34,16 +34,15 @@ Item {
     property real pageSize: Math.min(1, orientation == Qt.Horizontal ? (flickableItem.visibleArea.widthRatio > 0 ? flickableItem.visibleArea.widthRatio : 1) : (flickableItem.visibleArea.heightRatio > 0 ? flickableItem.visibleArea.heightRatio : 1))
 
     clip: true
-    state: pageSize == 1 ? 'collapsed' : ''
     height: orientation == Qt.Horizontal ? 8 : 100
     width: orientation == Qt.Horizontal ? 100 : 8
 
     Item {
         id: container
 
-        x: orientation == Qt.Horizontal ? 0 : 5
+        x: orientation == Qt.Horizontal ? 0 : 8
         width: orientation == Qt.Horizontal ? parent.width : parent.height
-        height: 5
+        height: 8
 
         transform: Rotation {
             angle: orientation == Qt.Horizontal ? 0: 90
@@ -64,10 +63,10 @@ Item {
                 radius: 10
                 smooth: true
 
-                height: parent.height
+                height: 5
                 width: Math.max(desiredWidth, 20)
                 x: Math.floor(scrollBar.position * (track.width + desiredWidth - width - 2)) + 1
-                y: 0
+                y: 2
 
                 states: State {
                     name: 'pressed'
@@ -84,6 +83,7 @@ Item {
 
                 anchors.fill: parent
                 drag.axis: Drag.YAxis
+                hoverEnabled: true
 
                 onPressed: {
                     if (mouse.x < handle.x) {
@@ -117,6 +117,10 @@ Item {
                 }
             }
         }
+    }
+
+    Behavior on opacity {
+        NumberAnimation { duration: appStyle.animation.normalDuration }
     }
 
     Timer {
@@ -156,6 +160,7 @@ Item {
 
     states: State {
         name: 'collapsed'
+        when: pageSize == 1
         PropertyChanges { target: scrollBar; width: 0; opacity: 0 }
     }
 
