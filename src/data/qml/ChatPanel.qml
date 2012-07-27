@@ -27,6 +27,10 @@ Panel {
     property alias rooms: roomListModel
     property bool pendingMessages: (roomListModel.pendingMessages + rosterModel.pendingMessages) > 0
 
+    function hasEditableRoster(client) {
+        return Utils.jidToDomain(client.jid) != 'chat.facebook.com';
+    }
+
     Repeater {
         id: chatClients
 
@@ -255,7 +259,13 @@ Panel {
             title: qsTr('My contacts')
 
             onAddClicked: {
-                dialogSwapper.showPanel('ContactAddDialog.qml');
+                var clients = [];
+                for (var i = 0; i < chatClients.count; ++i) {
+                    var client = chatClients.itemAt(i).client;
+                    if (hasEditableRoster(client))
+                        clients.push(client);
+                }
+                dialogSwapper.showPanel('ContactAddDialog.qml', {chatClients: clients});
             }
 
             onCurrentJidChanged: {

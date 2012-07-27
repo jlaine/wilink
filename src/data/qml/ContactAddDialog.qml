@@ -23,7 +23,7 @@ import 'utils.js' as Utils
 Dialog {
     id: dialog
 
-    property string accountJid
+    property variant clients
 
     title: qsTr('Add a contact')
 
@@ -64,21 +64,23 @@ Dialog {
 
                 onCurrentIndexChanged: {
                     var wasDefault = (bar.text == bar.defaultText);
-                    accountJid = model.get(currentIndex).text;
-                    bar.defaultText = '@' + Utils.jidToDomain(accountJid);
-                    if (wasDefault) {
-                        bar.text = bar.defaultText;
-                        bar.cursorPosition = 0;
+                    if (currentIndex >= 0) {
+                        var accountJid = model.get(currentIndex).text;
+                        bar.defaultText = '@' + Utils.jidToDomain(accountJid);
+                        if (wasDefault) {
+                            bar.text = bar.defaultText;
+                            bar.cursorPosition = 0;
+                        }
                     }
                 }
 
                 Component.onCompleted: {
-                    for (var i = 0; i < accountModel.count; ++i) {
-                        var account = accountModel.get(i);
-                        if (account.type == 'xmpp')
-                            model.append({iconSource: 'image://icon/chat', text: account.username});
+                    for (var i in clients) {
+                        var client = clients[i];
+                        model.append({iconSource: 'image://icon/chat', text: Utils.jidToBareJid(client.jid), client: client});
                     }
-                    accountCombo.currentIndex = 0;
+                    if (model.count > 0)
+                        accountCombo.currentIndex = 0;
                 }
             }
         }
@@ -117,9 +119,9 @@ Dialog {
         if (!bar.acceptableInput)
             return;
 
-        var client = accountModel.clientForJid(accountJid);
+        var client = accountCombo.model.get(accountCombo.currentIndex).client;
         var jid = bar.text;
-        console.log("Add contact " + jid + " to account " + accountJid);
+        console.log("Add contact " + jid + " to account " + client.jid);
         client.rosterManager.subscribe(jid);
         dialog.close();
     }
