@@ -41,6 +41,7 @@ class CustomWindowPrivate
 public:
     QString initialMessage;
     QtLocalPeer *peer;
+    QList<QUrl> qmlRoots;
     QDeclarativeView *view;
 };
 
@@ -55,6 +56,9 @@ CustomWindow::CustomWindow(QtLocalPeer *peer, QWidget *parent)
     check = connect(d->peer, SIGNAL(messageReceived(QString)),
                     this, SIGNAL(messageReceived(QString)));
     Q_ASSERT(check);
+
+    // declare QML roots
+    d->qmlRoots << QUrl("qrc:/qml/");
 
     // create declarative view
     d->view = new QDeclarativeView;
@@ -183,28 +187,32 @@ void CustomWindow::showAndRaise()
 
 void CustomWindow::_q_loadSource()
 {
+    if (d->qmlRoots.isEmpty())
+        return;
+
 #ifdef MEEGO_EDITION_HARMATTAN
-    //const QUrl qmlSource("https://download.wifirst.net/wiLink/2.3/MeegoMain.qml");
-    const QUrl qmlSource("qrc:/qml/MeegoMain.qml");
+    const QUrl qmlFile("MeegoMain.qml");
 #else
-    //const QUrl qmlSource("https://download.wifirst.net/wiLink/2.3/Main.qml");
-    const QUrl qmlSource("qrc:/qml/Main.qml");
+    const QUrl qmlFile("Main.qml");
 #endif
+    const QUrl qmlSource = d->qmlRoots.takeFirst().resolved(qmlFile);
+    qDebug("Window loading %s", qPrintable(qmlSource.toString()));
     d->view->setSource(qmlSource);
 }
 
 void CustomWindow::_q_statusChanged()
 {
-    if (d->view->status() != QDeclarativeView::Ready)
-        return;
+    if (d->view->status() == QDeclarativeView::Ready) {
+        d->view->setAttribute(Qt::WA_OpaquePaintEvent);
+        d->view->setAttribute(Qt::WA_NoSystemBackground);
+        d->view->viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
+        d->view->viewport()->setAttribute(Qt::WA_NoSystemBackground);
 
-    d->view->setAttribute(Qt::WA_OpaquePaintEvent);
-    d->view->setAttribute(Qt::WA_NoSystemBackground);
-    d->view->viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
-    d->view->viewport()->setAttribute(Qt::WA_NoSystemBackground);
-
-    if (!d->initialMessage.isEmpty()) {
-        QMetaObject::invokeMethod(this, "messageReceived", Q_ARG(QString, d->initialMessage));
-        d->initialMessage = QString();
+        if (!d->initialMessage.isEmpty()) {
+            QMetaObject::invokeMethod(this, "messageReceived", Q_ARG(QString, d->initialMessage));
+            d->initialMessage = QString();
+        }
+    } else if (d->view->status() == QDeclarativeView::Error) {
+        _q_loadSource();
     }
 }
