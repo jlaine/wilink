@@ -25,27 +25,42 @@ ListView {
 
     property QtObject panelSwapper
 
+    clip: true
     currentIndex: Qt.isQtObject(panelSwapper) ? panelSwapper.currentIndex : -1
     height: appStyle.icon.smallSize
     highlightMoveDuration: appStyle.highlightMoveDuration
     model: panelSwapper.model
     orientation: ListView.Horizontal
-    spacing: -8
+    spacing: 2
 
-    delegate: BorderImage {
+    delegate: Item {
         id: rect
 
-        border { left: 32; right: 32 }
         height: tabView.height
         width: 200
-        source: 'image://icon/tab'
         z: model.panel.z
+
+        Rectangle {
+            id: frame
+
+            anchors.fill: parent
+            anchors.bottomMargin: -radius
+            border.color: '#DDDDDD'
+            border.width: 1
+            opacity: 0
+            radius: 4
+            height: tabView.height
+
+            Behavior on opacity {
+                PropertyAnimation { duration: appStyle.animation.normalDuration }
+            }
+        }
 
         Image {
             id: icon
 
             anchors.left: parent.left
-            anchors.leftMargin: 12
+            anchors.leftMargin: appStyle.margin.large
             anchors.verticalCenter: parent.verticalCenter
             smooth: true
             source: model.panel.iconSource
@@ -63,7 +78,10 @@ ListView {
         }
 
         MouseArea {
+            id: mouseArea
+
             anchors.fill: parent
+            hoverEnabled: true
             onClicked: {
                 panelSwapper.currentIndex = model.index;
             }
@@ -73,7 +91,7 @@ ListView {
             id: closeButton
 
             anchors.right: parent.right
-            anchors.rightMargin: 12
+            anchors.rightMargin: appStyle.margin.large
             anchors.verticalCenter: parent.verticalCenter
             iconSize: appStyle.icon.tinySize
             iconSource: 'image://icon/close'
@@ -87,10 +105,7 @@ ListView {
             name: 'current'
             when: (model.index == tabView.currentIndex)
 
-            PropertyChanges {
-                target: rect
-                source: 'image://icon/tab-active'
-            }
+            PropertyChanges { target: frame; opacity: 1 }
         }
     }
 }

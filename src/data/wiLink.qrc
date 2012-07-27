@@ -2,8 +2,6 @@
 <qresource>
     <file>images/eject.png</file>
     <file>images/shadow.png</file>
-    <file>images/tab-active.png</file>
-    <file>images/tab.png</file>
     <file>images/16x16/checkbox-checked.png</file>
     <file>images/16x16/checkbox.png</file>
     <file>images/16x16/face-angry.png</file>
