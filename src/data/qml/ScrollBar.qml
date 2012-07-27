@@ -59,7 +59,7 @@ Item {
                 property int desiredWidth: Math.ceil(scrollBar.pageSize * (track.width - 2))
 
                 color: '#7f7f7f'
-                opacity: 0.8
+                opacity: 0.4
                 radius: 10
                 smooth: true
 
@@ -69,13 +69,14 @@ Item {
                 y: 2
 
                 states: State {
-                    name: 'pressed'
-                    PropertyChanges { target: handle; opacity: 1 }
+                    name: 'active'
+                    when: mouseArea.pressed || mouseArea.containsMouse || flickableItem.moving
+                    PropertyChanges { target: handle; opacity: 0.7 }
                 }
             }
 
             MouseArea {
-                id: clickableArea
+                id: mouseArea
 
                 property real pressContentPos
                 property real pressMouseX
@@ -95,7 +96,6 @@ Item {
                         moveQuantity = flickableItem.height;
                         scrollBar.moveBy(moveQuantity);
                     } else {
-                        handle.state = 'pressed';
                         moveAction = 'drag';
                         moveQuantity = 0;
                         pressContentPos = scrollBar.contentPos;
@@ -105,7 +105,6 @@ Item {
                 }
 
                 onReleased: {
-                    handle.state = '';
                     moveAction = '';
                     moveRepeat = false;
                 }
