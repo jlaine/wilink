@@ -59,7 +59,7 @@ Item {
                 property int desiredWidth: Math.ceil(scrollBar.pageSize * (track.width - 2))
 
                 color: '#7f7f7f'
-                opacity: 0.4
+                opacity: 0.3
                 radius: 10
                 smooth: true
 
@@ -72,6 +72,10 @@ Item {
                     name: 'active'
                     when: mouseArea.pressed || mouseArea.containsMouse || flickableItem.moving
                     PropertyChanges { target: handle; opacity: 0.7 }
+                }
+
+                Behavior on opacity {
+                    NumberAnimation { duration: 300 }
                 }
             }
 
@@ -116,10 +120,6 @@ Item {
                 }
             }
         }
-    }
-
-    Behavior on opacity {
-        NumberAnimation { duration: appStyle.animation.normalDuration }
     }
 
     Timer {
