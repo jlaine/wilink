@@ -164,10 +164,19 @@ FocusScope {
 
         Rectangle {
             id: footerBorder
+            anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
             height: 1
             color: '#DDDDDD'
+        }
+
+        Rectangle {
+            anchors.top: footerBorder.bottom
+            anchors.left: parent.left
+            anchors.right: parent.right
+            height: 1
+            color: 'white'
         }
 
         Loader {

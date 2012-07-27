@@ -225,9 +225,9 @@ Item {
                             anchors.left: parent.left
                             anchors.right: parent.right
                             height: parent.height
-                            border.color: model.received ? '#84bde8': '#ababab'
+                            border.color: model.received ? '#BCE8F1': '#E1E1E8'
                             border.width: model.action ? 0 : 1
-                            color: model.selected ? '#aa86abd9' : (model.action ? 'transparent' : (model.received ? '#e7f4fe' : '#fafafa'))
+                            color: model.selected ? '#aa86abd9' : (model.action ? 'transparent' : (model.received ? '#D9EDF7' : '#F7F7F9'))
                             radius: 8
 
                             Behavior on height {
