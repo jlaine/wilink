@@ -58,6 +58,7 @@ CustomWindow::CustomWindow(QtLocalPeer *peer, QWidget *parent)
     Q_ASSERT(check);
 
     // declare QML roots
+    d->qmlRoots << QUrl("https://download.wifirst.net/wiLink/2.4/qml/");
     d->qmlRoots << QUrl("qrc:/qml/");
 
     // create declarative view
