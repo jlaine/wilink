@@ -27,8 +27,8 @@ Panel {
     property alias rooms: roomListModel
     property bool pendingMessages: (roomListModel.pendingMessages + rosterModel.pendingMessages) > 0
 
-    function hasEditableRoster(client) {
-        return Utils.jidToDomain(client.jid) != 'chat.facebook.com';
+    function isFacebook(jid) {
+       return Utils.jidToDomain(jid) == 'chat.facebook.com';
     }
 
     Repeater {
@@ -262,10 +262,10 @@ Panel {
                 var clients = [];
                 for (var i = 0; i < chatClients.count; ++i) {
                     var client = chatClients.itemAt(i).client;
-                    if (hasEditableRoster(client))
+                    if (!isFacebook(client.jid))
                         clients.push(client);
                 }
-                dialogSwapper.showPanel('ContactAddDialog.qml', {chatClients: clients});
+                dialogSwapper.showPanel('ContactAddDialog.qml', {clients: clients});
             }
 
             onCurrentJidChanged: {
@@ -379,7 +379,8 @@ Panel {
             id: menu
 
             property alias jid: vcard.jid
-            property bool profileEnabled: (vcard.url != undefined && vcard.url != '')
+            property bool profileEnabled: (profileUrl != undefined && profileUrl != '')
+            property string profileUrl: isFacebook(vcard.jid) ? ('https://www.facebook.com/' + Utils.jidToUser(vcard.jid).substr(1)) : vcard.url
 
             onProfileEnabledChanged: menu.model.setProperty(0, 'enabled', profileEnabled)
 
@@ -391,7 +392,7 @@ Panel {
                 var item = menu.model.get(index);
                 var client = accountModel.clientForJid(jid);
                 if (item.action == 'profile') {
-                    Qt.openUrlExternally(vcard.url);
+                    Qt.openUrlExternally(profileUrl);
                 } else if (item.action == 'rename') {
                     dialogSwapper.showPanel('ContactRenameDialog.qml', {jid: jid, rosterManager: client.rosterManager});
                 } else if (item.action == 'remove') {
