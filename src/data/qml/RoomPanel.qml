@@ -29,8 +29,10 @@ Panel {
     property alias jid: participantModel.jid
     property alias room: participantModel.room
     property string title: Utils.jidToUser(jid)
-    property string subTitle
+    property string subTitle: Qt.isQtObject(room) ? room.subject : ''
     property string presenceStatus
+
+    clip: true
 
     RoomModel {
         id: participantModel
@@ -57,15 +59,10 @@ Panel {
         }
     }
 
+/*
     PanelHeader {
         id: header
 
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        iconSource: 'image://icon/chat'
-        title: Utils.jidToUser(jid)
-        subTitle: Qt.isQtObject(room) ? room.subject : ''
         toolBar: ToolBar {
             ToolButton {
                 iconSource: 'image://icon/invite'
@@ -110,10 +107,11 @@ Panel {
             }
         }
     }
+*/
 
     Item {
-        anchors.top: header.bottom
-        anchors.topMargin: appStyle.margin.normal
+        anchors.top: parent.top
+        anchors.topMargin: 16
         anchors.bottom: chatInput.top
         anchors.bottomMargin: appStyle.margin.normal
         anchors.left: parent.left

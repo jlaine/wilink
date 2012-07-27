@@ -30,8 +30,6 @@ Item {
     property alias model: historyView.model
     signal participantClicked(string participant)
 
-    clip: true
-
     Clipboard {
         id: clipboard
     }

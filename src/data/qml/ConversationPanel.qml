@@ -30,6 +30,8 @@ Panel {
     property alias presenceStatus: vcard.status
     property string subTitle
 
+    clip: true
+
     subTitle: {
         var domain = Utils.jidToDomain(vcard.jid);
         if (domain == 'wifirst.net') {
@@ -52,6 +54,7 @@ Panel {
         }
     }
 
+/*
     PanelHeader {
         id: header
 
@@ -66,6 +69,7 @@ Panel {
                 text += vcard.name + ' ' + qsTr('has closed the conversation');
             return text;
         }
+
         toolBar: ToolBar {
             ToolButton {
                 iconSource: 'image://icon/call'
@@ -156,12 +160,13 @@ Panel {
             }
         }
     }
-
+*/
     Column {
         id: widgetBar
         objectName: 'widgetBar'
 
-        anchors.top: header.bottom
+        anchors.top: parent.top
+        anchors.topMargin: 16
         anchors.left: parent.left
         anchors.right: parent.right
         z: 1
