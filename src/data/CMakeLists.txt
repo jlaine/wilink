@@ -4,10 +4,7 @@ generate_ico(ico images/scalable/wiLink.svg)
 generate_xpm(xpm images/scalable/wiLink.svg)
 
 # 10x10 images
-generate_png(png SIZE 11 DESTINATION images
-    images/scalable/eject.svg)
-
-generate_png(png WIDTH 96 HEIGHT 32 DESTINATION images images/scalable/tab.svg images/scalable/tab-active.svg)
+generate_png(png SIZE 11 DESTINATION images images/scalable/eject.svg)
 
 set(SMALL_ICONS
     images/scalable/checkbox.svg
