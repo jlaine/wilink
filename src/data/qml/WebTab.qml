@@ -19,7 +19,7 @@
 
 import QtQuick 1.1
 import QtWebKit 1.0
-import wiLink 2.0
+import wiLink 2.4
 
 Panel {
     id: panel

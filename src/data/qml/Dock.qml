@@ -18,7 +18,7 @@
  */
 
 import QtQuick 1.1
-import wiLink 2.0
+import wiLink 2.4
 import 'utils.js' as Utils
 
 Rectangle {

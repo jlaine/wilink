@@ -22,7 +22,7 @@ import 'utils.js' as Utils
 
 /*!
     \qmlclass PanelSwapper
-    \inqmlmodule wiLink 2.0
+    \inqmlmodule wiLink 2.4
     \brief A class for switching between panel.
 
     The PanelSwapper class manages a list of panels, and allows switching
