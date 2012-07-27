@@ -1,8 +1,6 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
     <file>images/eject.png</file>
-    <file>images/left-arrow.png</file>
-    <file>images/right-arrow.png</file>
     <file>images/shadow.png</file>
     <file>images/tab-active.png</file>
     <file>images/tab.png</file>
