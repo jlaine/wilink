@@ -121,6 +121,9 @@ CustomWindow::CustomWindow(QtLocalPeer *peer, QWidget *parent)
         resize(size);
         move((desktopSize.width() - width()) / 2, (desktopSize.height() - height()) / 2);
     }
+
+    // load source
+    QMetaObject::invokeMethod(this, "_q_loadSource", Qt::QueuedConnection);
 }
 
 CustomWindow::~CustomWindow()
@@ -178,9 +181,16 @@ void CustomWindow::showAndRaise()
 #endif
 }
 
-void CustomWindow::setSource(const QUrl &source)
+void CustomWindow::_q_loadSource()
 {
-    d->view->setSource(source);
+#ifdef MEEGO_EDITION_HARMATTAN
+    //const QUrl qmlSource("https://download.wifirst.net/wiLink/2.3/MeegoMain.qml");
+    const QUrl qmlSource("qrc:/qml/MeegoMain.qml");
+#else
+    //const QUrl qmlSource("https://download.wifirst.net/wiLink/2.3/Main.qml");
+    const QUrl qmlSource("qrc:/qml/Main.qml");
+#endif
+    d->view->setSource(qmlSource);
 }
 
 void CustomWindow::_q_statusChanged()

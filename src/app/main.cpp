@@ -127,16 +127,8 @@ int main(int argc, char *argv[])
 
     /* Create window */
     CustomWindow window(peer);
-#ifdef MEEGO_EDITION_HARMATTAN
-    //QUrl qmlSource("https://download.wifirst.net/wiLink/2.3/MeegoMain.qml");
-    QUrl qmlSource("qrc:/qml/MeegoMain.qml");
-#else
-    //QUrl qmlSource("https://download.wifirst.net/wiLink/2.3/Main.qml");
-    QUrl qmlSource("qrc:/qml/Main.qml");
-#endif
     if (!firstArgument.isEmpty())
         window.setInitialMessage("OPEN " + firstArgument);
-    QMetaObject::invokeMethod(&window, "setSource", Qt::QueuedConnection, Q_ARG(QUrl, qmlSource));
 
     /* Run application */
     return app.exec();

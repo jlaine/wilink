@@ -24,6 +24,7 @@ QtObject {
     property int minimumWidth
     property int minimumHeight
 
+    signal messageReceived
     signal showAbout
     signal showHelp
     signal showPreferences

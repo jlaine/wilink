@@ -47,10 +47,10 @@ signals:
     void windowStateChanged();
 
 public slots:
-    void setSource(const QUrl &source);
     void showAndRaise();
 
 private slots:
+    void _q_loadSource();
     void _q_statusChanged();
 
 protected:
