@@ -30,8 +30,6 @@ Panel {
     property alias presenceStatus: vcard.status
     property string subTitle
 
-    clip: true
-
     subTitle: {
         var domain = Utils.jidToDomain(vcard.jid);
         if (domain == 'wifirst.net') {

@@ -32,8 +32,6 @@ Panel {
     property string subTitle: Qt.isQtObject(room) ? room.subject : ''
     property string presenceStatus
 
-    clip: true
-
     RoomModel {
         id: participantModel
 
