@@ -26,9 +26,9 @@ Rectangle {
     property ListModel model: ListModel {}
     signal itemClicked(int index)
 
-    border.color: '#7997c1'
+    border.color: Qt.rgba(0, 0, 0, 0.2)
     border.width: 1
-    color: '#b0c4de'
+    color: 'white'
     opacity: 0
     radius: 5
     height: model.count * (appStyle.icon.tinySize + 4) + 1

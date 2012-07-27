@@ -57,7 +57,7 @@ Rectangle {
 
     states: State {
         name: 'hovered'
-        PropertyChanges { target: menuItem; color: '#eae7f4fe' }
+        PropertyChanges { target: menuItem; color: '#0088CC' }
     }
 
     MouseArea {
