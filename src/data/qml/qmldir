@@ -10,6 +10,7 @@ ChatContactView 1.0 ChatContactView.qml
 ChatEdit 1.0 ChatEdit.qml
 ChatPanel 1.0 ChatPanel.qml
 ChatPlugin 1.0 ChatPlugin.qml
+ChatTabs 1.0 ChatTabs.qml
 CheckBox 1.0 CheckBox.qml
 Clipboard 1.0 Clipboard.qml
 ComboBox 1.0 ComboBox.qml

@@ -29,6 +29,8 @@ Panel {
     property alias jid: participantModel.jid
     property alias room: participantModel.room
     property string title: Utils.jidToUser(jid)
+    property string subTitle
+    property string presenceStatus
 
     RoomModel {
         id: participantModel

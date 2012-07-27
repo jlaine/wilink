@@ -27,6 +27,22 @@ Panel {
     property alias iconSource: vcard.avatar
     property alias jid: conversation.jid
     property alias title: vcard.name
+    property alias presenceStatus: vcard.status
+    property string subTitle
+
+    subTitle: {
+        var domain = Utils.jidToDomain(vcard.jid);
+        if (domain == 'wifirst.net') {
+            // for wifirst accounts, return the nickname if it is
+            // different from the display name
+            if (vcard.name != vcard.nickName)
+                return vcard.nickName;
+            else
+                return '';
+        } else {
+            return vcard.jid;
+        }
+    }
 
     Conversation {
         id: conversation
@@ -42,27 +58,13 @@ Panel {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        iconSource: vcard.avatar
         title: {
-            var text = vcard.name;
+            var text = '';
             if (conversation.remoteState == QXmppMessage.Composing)
-                text += ' ' + qsTr('is composing a message');
+                text += vcard.name + ' ' + qsTr('is composing a message');
             else if (conversation.remoteState == QXmppMessage.Gone)
-                text += ' ' + qsTr('has closed the conversation');
+                text += vcard.name + ' ' + qsTr('has closed the conversation');
             return text;
-        }
-        subTitle: {
-            var domain = Utils.jidToDomain(vcard.jid);
-            if (domain == 'wifirst.net') {
-                // for wifirst accounts, return the nickname if it is
-                // different from the display name
-                if (vcard.name != vcard.nickName)
-                    return vcard.nickName;
-                else
-                    return '';
-            } else {
-                return vcard.jid;
-            }
         }
         toolBar: ToolBar {
             ToolButton {
@@ -152,19 +154,6 @@ Panel {
                     conversation.historyModel.clear();
                 }
             }
-        }
-
-        StatusPill {
-            property int iconOffset: header.iconMargin + header.iconSize - width * 0.75
-
-            anchors.left: parent.left
-            anchors.leftMargin: iconOffset
-            anchors.top: parent.top
-            anchors.topMargin: iconOffset
-            height: appStyle.icon.tinySize
-            width: appStyle.icon.tinySize
-            opacity: header.width < 400 ? 0.0 : 1.0
-            presenceStatus: vcard.status
         }
     }
 
