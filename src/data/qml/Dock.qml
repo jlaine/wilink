@@ -142,6 +142,11 @@ Rectangle {
     }
 
     Keys.onPressed: {
+        if (event.modifiers == Qt.ControlModifier && event.key == Qt.Key_K) {
+            window.reload();
+            return;
+        }
+
         var val = event.modifiers + event.key;
         for (var i = 0; i < control.children.length; i++) {
             var button = control.children[i];
