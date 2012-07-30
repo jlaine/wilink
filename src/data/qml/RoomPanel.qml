@@ -57,56 +57,6 @@ Panel {
         }
     }
 
-/*
-    PanelHeader {
-        id: header
-
-        toolBar: ToolBar {
-            ToolButton {
-                iconSource: 'image://icon/invite'
-                text: qsTr('Invite')
-
-                onClicked: {
-                    dialogSwapper.showPanel('RoomInviteDialog.qml', {
-                        'contacts': onlineContacts,
-                        'room': room,
-                    });
-                }
-            }
-
-            ToolButton {
-                iconSource: 'image://icon/chat'
-                text: qsTr('Subject')
-                visible: Qt.isQtObject(room) && (room.allowedActions & QXmppMucRoom.SubjectAction)
-
-                onClicked: {
-                    dialogSwapper.showPanel('RoomSubjectDialog.qml', {'room': room});
-                }
-            }
-
-            ToolButton {
-                iconSource: 'image://icon/options'
-                text: qsTr('Options')
-                visible: Qt.isQtObject(room) && (room.allowedActions & QXmppMucRoom.ConfigurationAction)
-
-                onClicked: {
-                    dialogSwapper.showPanel('RoomConfigurationDialog.qml', {'room': room});
-                }
-            }
-
-            ToolButton {
-                iconSource: 'image://icon/permissions'
-                text: qsTr('Permissions')
-                visible: Qt.isQtObject(room) && (room.allowedActions & QXmppMucRoom.PermissionsAction)
-
-                onClicked: {
-                    dialogSwapper.showPanel('RoomPermissionDialog.qml', {'room': room});
-                }
-            }
-        }
-    }
-*/
-
     Item {
         anchors.top: parent.top
         anchors.topMargin: appStyle.margin.large
@@ -180,6 +130,50 @@ Panel {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
+        menuComponent: Menu {
+            id: menu
+
+            onItemClicked: {
+                var item = menu.model.get(index);
+                if (item.action == 'invite') {
+                    dialogSwapper.showPanel('RoomInviteDialog.qml', {
+                        'contacts': onlineContacts,
+                        'room': room,
+                    });
+                } else if (item.action == 'subject') {
+                    dialogSwapper.showPanel('RoomSubjectDialog.qml', {'room': room});
+                } else if (item.action == 'configuration') {
+                    dialogSwapper.showPanel('RoomConfigurationDialog.qml', {'room': room});
+                } else if (item.action == 'permission') {
+                    dialogSwapper.showPanel('RoomPermissionDialog.qml', {'room': room});
+                }
+            }
+
+            Component.onCompleted: {
+                menu.model.append({
+                    action: 'invite',
+                    iconSource: 'image://icon/invite',
+                    text: qsTr('Invite')});
+                if (room.allowedActions & QXmppMucRoom.SubjectAction) {
+                    menu.model.append({
+                        action: 'subject',
+                        iconSource: 'image://icon/chat',
+                        text: qsTr('Subject')});
+                }
+                if (room.allowedActions & QXmppMucRoom.ConfigurationAction) {
+                    menu.model.append({
+                        action: 'configuration',
+                        iconSource: 'image://icon/options',
+                        text: qsTr('Options')});
+                }
+                if (room.allowedActions & QXmppMucRoom.PermissionsAction) {
+                    menu.model.append({
+                        action: 'permission',
+                        iconSource: 'image://icon/permissions',
+                        text: qsTr('Permissions')});
+                }
+            }
+        }
         model: participantModel
 
         onReturnPressed: {

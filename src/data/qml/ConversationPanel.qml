@@ -294,20 +294,20 @@ Panel {
             Component.onCompleted: {
                 if (vcard.features & VCard.VoiceFeature) {
                     menu.model.append({
-                        'action': 'call',
-                        'iconStyle': 'icon-phone',
-                        'text': qsTr('Call')});
+                        action: 'call',
+                        iconStyle: 'icon-phone',
+                        text: qsTr('Call')});
                 }
                 if (vcard.features & VCard.FileTransferFeature) {
                     menu.model.append({
-                        'action': 'send',
-                        'iconStyle': 'icon-upload',
-                        'text': qsTr('Send')});
+                        action: 'send',
+                        iconStyle: 'icon-upload',
+                        text: qsTr('Send')});
                 }
                 menu.model.append({
-                    'action': 'clear',
-                    'iconStyle': 'icon-remove',
-                    'text': qsTr('Clear')});
+                    action: 'clear',
+                    iconStyle: 'icon-remove',
+                    text: qsTr('Clear')});
             }
         }
 
