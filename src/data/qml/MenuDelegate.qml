@@ -50,6 +50,7 @@ Rectangle {
 
         Icon {
             anchors.centerIn: parent
+            color: menuItem.enabled ? '#333333' : '#888'
             style: model.iconStyle ? model.iconStyle : ''
         }
     }
@@ -62,7 +63,7 @@ Rectangle {
         anchors.right: parent.right
         anchors.rightMargin: 8
         anchors.verticalCenter: parent.verticalCenter
-        color: menuItem.enabled ? 'black' : '#888'
+        color: menuItem.enabled ? '#333333' : '#888'
         elide: Text.ElideRight
         text: model.text
     }
