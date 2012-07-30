@@ -36,7 +36,7 @@ Dialog {
                 id: refreshButton
 
                 enabled: Qt.isQtObject(appUpdater) && appUpdater.state == Updater.IdleState
-                iconSource: 'image://icon/refresh'
+                iconStyle: 'icon-refresh'
                 style: 'primary'
                 text: qsTr('Check for updates')
                 visible: !prompting
@@ -46,7 +46,7 @@ Dialog {
             Button {
                 id: installButton
 
-                iconSource: 'image://icon/start'
+                iconStyle: 'icon-play'
                 style: 'primary'
                 text: qsTr('Install')
                 visible: prompting
@@ -56,7 +56,7 @@ Dialog {
             Button {
                 id: rejectButton
 
-                iconSource: 'image://icon/close'
+                iconStyle: 'icon-remove'
                 text: prompting ? qsTr('Cancel') : qsTr('Close')
                 onClicked: dialog.rejected()
             }

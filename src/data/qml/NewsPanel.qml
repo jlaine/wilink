@@ -295,7 +295,7 @@ Panel {
                         spacing: appStyle.margin.normal
 
                         Button {
-                            iconSource: 'image://icon/start'
+                            iconStyle: 'icon-play'
                             text: qsTr('Play sound')
                             visible: model.audioSource ? (panel.soundUrl != model.audioSource) : false
 
@@ -303,7 +303,7 @@ Panel {
                         }
 
                         Button {
-                            iconSource: 'image://icon/stop'
+                            iconStyle: 'icon-stop'
                             text: qsTr('Stop sound')
                             visible: model.audioSource ? (panel.soundUrl == model.audioSource) : false
 

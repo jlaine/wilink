@@ -34,7 +34,7 @@ Panel {
         title: qsTr('Service discovery')
         toolBar: ToolBar {
             ToolButton {
-                iconSource: 'image://icon/back'
+                iconStyle: 'icon-chevron-left'
                 text: qsTr('Go back')
                 enabled: crumbBar.model.count > 1
 
@@ -42,17 +42,16 @@ Panel {
             }
 
             ToolButton {
-                iconSource: 'image://icon/refresh'
+                iconStyle: 'icon-refresh'
                 text: qsTr('Refresh')
 
-                onClicked: {
-                    discoView.model.refresh();
-                }
+                onClicked: discoView.model.refresh()
             }
 
             ToolButton {
-                iconSource: 'image://icon/close'
+                iconStyle: 'icon-close'
                 text: qsTr('Close')
+
                 onClicked: panel.close()
             }
         }

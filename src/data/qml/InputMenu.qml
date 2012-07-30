@@ -37,17 +37,17 @@ Menu {
 
     Component.onCompleted: {
         menu.model.append({
-            'action': 'cut',
-            'iconSource': 'image://icon/cut',
-            'text': qsTr('Cut')});
+            action: 'cut',
+            iconStyle: 'icon-cut',
+            text: qsTr('Cut')});
         menu.model.append({
-            'action': 'copy',
-            'iconSource': 'image://icon/copy',
-            'text': qsTr('Copy')});
+            action: 'copy',
+            iconStyle: 'icon-copy',
+            text: qsTr('Copy')});
         menu.model.append({
-            'action': 'paste',
-            'iconSource': 'image://icon/paste',
-            'text': qsTr('Paste')});
+            action: 'paste',
+            iconStyle: 'icon-paste',
+            text: qsTr('Paste')});
     }
 }
 
