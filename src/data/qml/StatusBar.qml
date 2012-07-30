@@ -115,11 +115,9 @@ Rectangle {
 
             anchors.right: parent.right
             anchors.rightMargin: appStyle.margin.normal
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
+            anchors.verticalCenter: parent.verticalCenter
             font.family: appStyle.icon.fontFamily
             text: '\uF052'
-            verticalAlignment: Text.AlignVCenter
             z: 1
         }
 

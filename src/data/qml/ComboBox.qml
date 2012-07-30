@@ -75,13 +75,13 @@ Item {
         anchors.rightMargin: 8
     }
 
-    Image {
+    Label {
         id: eject
 
         anchors.right: parent.right
         anchors.rightMargin: 8
         anchors.verticalCenter: parent.verticalCenter
-        source: 'image://icon/eject'
+        text: '\uF052'
         z: 1
     }
 
