@@ -1,5 +1,6 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
+    <file>qml/fontawesome-webfont.ttf</file>
     <file>qml/sip.js</file>
     <file>qml/utils.js</file>
     <file>qml/AboutDialog.qml</file>

@@ -23,6 +23,7 @@ import os
 import re
 
 # find files
+font_files = []
 image_files = []
 js_files = []
 qml_files = []
@@ -41,6 +42,8 @@ for dirname in ['.', 'images', 'images/16x16', 'images/32x32', 'images/64x64', '
             image_files.append(path)
         elif name.endswith('.qml'):
             qml_files.append(path)
+        elif name.endswith('.ttf'):
+            font_files.append(path)
 
 def write_qrc(path, file_paths):
     fp = open(path, 'w')
@@ -53,7 +56,7 @@ def write_qrc(path, file_paths):
     fp.close()
 
 write_qrc('wiLink.qrc', image_files + sound_files)
-write_qrc('qml.qrc', js_files + qml_files)
+write_qrc('qml.qrc', font_files + js_files + qml_files)
 fp = open('qml/qmldir', 'w')
 for qml_path in qml_files:
     qml_name = os.path.basename(qml_path).split('.')[0]
