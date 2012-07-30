@@ -384,10 +384,22 @@ Panel {
             id: menu
 
             property alias jid: vcard.jid
+            property bool changeEnabled: !isFacebook(jid)
             property bool profileEnabled: (profileUrl != undefined && profileUrl != '')
             property string profileUrl: isFacebook(vcard.jid) ? ('https://www.facebook.com/' + Utils.jidToUser(vcard.jid).substr(1)) : vcard.url
 
-            onProfileEnabledChanged: menu.model.setProperty(0, 'enabled', profileEnabled)
+            onProfileEnabledChanged: {
+                if (menu.model.count > 0) {
+                    menu.model.setProperty(0, 'enabled', profileEnabled);
+                }
+            }
+
+            onChangeEnabledChanged: {
+                if (menu.model.count > 0) {
+                    menu.model.setProperty(1, 'enabled', changeEnabled);
+                    menu.model.setProperty(2, 'enabled', changeEnabled);
+                }
+            }
 
             VCard {
                 id: vcard
@@ -413,11 +425,13 @@ Panel {
                     'text': qsTr('Show profile')});
                 menu.model.append({
                     'action': 'rename',
+                    'enabled': changeEnabled,
                     'iconStyle': 'icon-wrench',
                     'name': model.name,
                     'text': qsTr('Rename contact')});
                 menu.model.append({
                     'action': 'remove',
+                    'enabled': changeEnabled,
                     'iconStyle': 'icon-minus',
                     'name': model.name,
                     'text': qsTr('Remove contact')});
