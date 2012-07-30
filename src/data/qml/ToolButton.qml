@@ -22,8 +22,9 @@ import QtQuick 1.1
 Item {
     id: button
 
-    property int iconSize: iconSource != '' ? appStyle.icon.smallSize : 0
-    property alias iconSource: image.source
+    property int iconSize: (iconSource != '' || iconStyle != '') ? appStyle.icon.smallSize : 0
+    property string iconSource: ''
+    property string iconStyle: ''
     property alias text: label.text
     property bool enabled: true
     signal clicked
@@ -69,14 +70,25 @@ Item {
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
 
-        Image {
+        Item {
             id: image
-
             anchors.horizontalCenter: parent.horizontalCenter
-            opacity: button.enabled ? 1 : 0.5
-            smooth: true
-            sourceSize.width: iconSize
-            sourceSize.height: iconSize
+            width: iconSize
+            height: iconSize
+
+            Image {
+                anchors.centerIn: parent
+                opacity: button.enabled ? 1 : 0.5
+                smooth: true
+                source: iconSource
+                sourceSize.width: iconSize
+                sourceSize.height: iconSize
+            }
+
+            Icon {
+                anchors.centerIn: parent
+                style: iconStyle
+            }
         }
 
         Label {

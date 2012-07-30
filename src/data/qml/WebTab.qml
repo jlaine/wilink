@@ -57,7 +57,7 @@ Panel {
 
             ToolButton {
                 enabled: webView.back.enabled
-                iconSource: 'image://icon/back'
+                iconStyle: 'icon-chevron-left'
                 width: iconSize
 
                 onClicked: webView.back.triggered()
@@ -65,7 +65,7 @@ Panel {
 
             ToolButton {
                 enabled: webView.forward.enabled
-                iconSource: 'image://icon/forward'
+                iconStyle: 'icon-chevron-right'
                 width: iconSize
 
                 onClicked: webView.forward.triggered()
@@ -73,7 +73,7 @@ Panel {
 
             ToolButton {
                 enabled: webView.url != '' && webView.reload.enabled
-                iconSource: 'image://icon/refresh'
+                iconStyle: 'icon-refresh'
                 visible: !webView.stop.enabled
                 width: iconSize
 
@@ -81,7 +81,7 @@ Panel {
             }
 
             ToolButton {
-                iconSource: 'image://icon/stop'
+                iconStyle: 'icon-stop'
                 visible: webView.stop.enabled
                 width: iconSize
 
