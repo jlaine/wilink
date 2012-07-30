@@ -126,9 +126,9 @@ int main(int argc, char *argv[])
     signal(SIGTERM, signal_handler);
 
     /* Create window */
-    CustomWindow window(peer);
+    CustomWindow *window = new CustomWindow(peer);
     if (!firstArgument.isEmpty())
-        window.setInitialMessage("OPEN " + firstArgument);
+        window->setInitialMessage("OPEN " + firstArgument);
 
     /* Run application */
     return app.exec();
