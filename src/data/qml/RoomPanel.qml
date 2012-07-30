@@ -152,24 +152,24 @@ Panel {
             Component.onCompleted: {
                 menu.model.append({
                     action: 'invite',
-                    iconSource: 'image://icon/invite',
+                    iconStyle: 'icon-plus',
                     text: qsTr('Invite')});
                 if (room.allowedActions & QXmppMucRoom.SubjectAction) {
                     menu.model.append({
                         action: 'subject',
-                        iconSource: 'image://icon/chat',
+                        iconStyle: 'icon-comment',
                         text: qsTr('Subject')});
                 }
                 if (room.allowedActions & QXmppMucRoom.ConfigurationAction) {
                     menu.model.append({
                         action: 'configuration',
-                        iconSource: 'image://icon/options',
+                        iconStyle: 'icon-wrench',
                         text: qsTr('Options')});
                 }
                 if (room.allowedActions & QXmppMucRoom.PermissionsAction) {
                     menu.model.append({
                         action: 'permission',
-                        iconSource: 'image://icon/permissions',
+                        iconStyle: 'icon-lock',
                         text: qsTr('Permissions')});
                 }
             }

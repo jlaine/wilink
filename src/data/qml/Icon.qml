@@ -35,6 +35,10 @@ Label {
             return '\uF01A';
         case 'icon-upload':
             return '\uF01B';
+        case 'icon-refresh':
+            return '\uF021';
+        case 'icon-lock':
+            return '\uF023';
         case 'icon-play':
             return '\uF04B';
         case 'icon-pause':
@@ -51,6 +55,8 @@ Label {
             return '\uF067';
         case 'icon-minus':
             return '\uF068';
+        case 'icon-comment':
+            return '\uF075';
         case 'icon-chevron-up':
             return '\uF077';
         case 'icon-chevron-down':
@@ -69,8 +75,6 @@ Label {
             return '\uF0C5';
         case 'icon-reorder':
             return '\uF0C9';
-        case 'icon-refresh':
-            return '\uF0E2';
         case 'icon-paste':
             return '\uF0EA';
         default:
