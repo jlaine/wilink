@@ -51,10 +51,16 @@ Label {
             return '\uF053';
         case 'icon-chevron-right':
             return '\uF054';
+        case 'icon-question-sign':
+            return '\uF059';
+        case 'icon-info-sign':
+            return '\uF05A';
         case 'icon-plus':
             return '\uF067';
         case 'icon-minus':
             return '\uF068';
+        case 'icon-exclamation-sign':
+            return '\uF06A';
         case 'icon-comment':
             return '\uF075';
         case 'icon-chevron-up':

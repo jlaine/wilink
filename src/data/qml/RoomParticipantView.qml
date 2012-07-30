@@ -120,12 +120,12 @@ ScrollView {
                 menu.model.append({
                     'action': 'profile',
                     'enabled': profileEnabled,
-                    'iconSource': 'image://icon/information',
+                    'iconStyle': 'icon-info-sign',
                     'text': qsTr('Show profile')});
                 menu.model.append({
                     'action': 'kick',
                     'enabled': kickEnabled,
-                    'iconSource': 'image://icon/remove',
+                    'iconStyle': 'icon-minus',
                     'text': qsTr('Kick user')});
             }
         }
