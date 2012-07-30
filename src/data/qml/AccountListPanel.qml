@@ -100,12 +100,12 @@ Item {
         height: appStyle.icon.smallSize + 8
 
         Button {
-            iconSource: 'image://icon/add'
+            iconStyle: 'icon-plus'
             onClicked: panel.addClicked()
         }
 
         Button {
-            iconSource: 'image://icon/remove'
+            iconStyle: 'icon-minus'
             onClicked: {
                 if (accountView.currentIndex >= 0) {
                     accountView.model.remove(accountView.currentIndex);

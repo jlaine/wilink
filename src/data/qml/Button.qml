@@ -23,8 +23,9 @@ Rectangle {
     id: button
 
     property bool enabled: true
-    property int iconSize: iconSource != '' ? appStyle.icon.smallSize : 0
-    property alias iconSource: image.source
+    property int iconSize: (iconSource != '' || iconStyle != '') ? appStyle.icon.smallSize : 0
+    property string iconSource: ''
+    property string iconStyle: ''
     property int margins: (text != '') ? appStyle.margin.large : appStyle.margin.normal;
     property string style: ''
     property string text: ''
@@ -43,14 +44,26 @@ Rectangle {
     radius: appStyle.margin.normal
     smooth: true
 
-    Image {
+    Item {
         id: image
 
         anchors.left: parent.left
         anchors.leftMargin: margins
         anchors.verticalCenter: parent.verticalCenter
-        sourceSize.height: iconSize
-        sourceSize.width: iconSize
+        height: iconSize
+        width: iconSize
+
+        Image {
+            anchors.centerIn: parent
+            source: iconSource
+            sourceSize.height: iconSize
+            sourceSize.width: iconSize
+        }
+
+        Icon {
+            anchors.centerIn: parent
+            style: iconStyle
+        }
     }
 
     Label {

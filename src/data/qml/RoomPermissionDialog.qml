@@ -97,7 +97,7 @@ Dialog {
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
                     anchors.right: parent.right
-                    iconSource: 'image://icon/remove'
+                    iconStyle: 'icon-minus'
                     onClicked: {
                         permissionModel.removePermission(model.jid);
                     }
@@ -142,7 +142,7 @@ Dialog {
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
                 anchors.right: parent.right
-                iconSource: 'image://icon/add'
+                iconStyle: 'icon-plus'
 
                 onClicked: {
                     if (input.acceptableInput) {
