@@ -27,6 +27,12 @@ Label {
         switch (style) {
         case 'icon-remove':
             return '\uF00D';
+        case 'icon-home':
+            return '\uF015';
+        case 'icon-play':
+            return '\uF04B';
+        case 'icon-pause':
+            return '\uF04B';
         case 'icon-stop':
             return '\uF04D';
         case 'icon-eject':
@@ -39,8 +45,16 @@ Label {
             return '\uF067';
         case 'icon-minus':
             return '\uF068';
+        case 'icon-chevron-up':
+            return '\uF077';
+        case 'icon-chevron-down':
+            return '\uF078';
         case 'icon-phone':
             return '\uF095';
+        case 'icon-rss':
+            return '\uF09E';
+        case 'icon-wrench':
+            return '\uF0AD';
         case 'icon-refresh':
             return '\uF0E2';
         default:
