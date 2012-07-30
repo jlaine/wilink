@@ -25,10 +25,16 @@ Label {
     font.family: appStyle.icon.fontFamily
     text: {
         switch (style) {
+        case 'icon-search':
+            return '\uF002';
         case 'icon-remove':
             return '\uF00D';
         case 'icon-home':
             return '\uF015';
+        case 'icon-download':
+            return '\uF01A';
+        case 'icon-upload':
+            return '\uF01B';
         case 'icon-play':
             return '\uF04B';
         case 'icon-pause':
@@ -55,8 +61,16 @@ Label {
             return '\uF09E';
         case 'icon-wrench':
             return '\uF0AD';
+        case 'icon-fullscreen':
+            return '\uF0B2';
+        case 'icon-cut':
+            return '\uF0C4';
+        case 'icon-copy':
+            return '\uF0C5';
         case 'icon-refresh':
             return '\uF0E2';
+        case 'icon-paste':
+            return '\uF0EA';
         default:
             return '';
         }

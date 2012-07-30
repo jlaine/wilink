@@ -40,14 +40,14 @@ Panel {
         title: qsTr('Diagnostics')
         toolBar: ToolBar {
             ToolButton {
-                iconSource: 'image://icon/copy'
+                iconStyle: 'icon-copy'
                 enabled: !panel.busy
                 text: qsTr('Copy')
 
                 onClicked: clipboard.copy(diagnostic.text)
             }
             ToolButton {
-                iconSource: 'image://icon/refresh'
+                iconStyle: 'icon-refresh'
                 enabled: !panel.busy
                 text: qsTr('Refresh')
 

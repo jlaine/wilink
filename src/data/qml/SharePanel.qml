@@ -33,7 +33,7 @@ Panel {
         title: qsTr('Shares')
         toolBar: ToolBar {
             ToolButton {
-                iconSource: 'image://icon/back'
+                iconStyle: 'icon-chevron-left'
                 text: qsTr('Go back')
                 enabled: crumbBar.model.count > 1
 
@@ -43,7 +43,7 @@ Panel {
             ToolButton {
                 id: preferenceButton
 
-                iconSource: 'image://icon/options'
+                iconStyle: 'icon-wrench'
                 text: qsTr('Options')
 
                 onClicked: {

@@ -127,20 +127,17 @@ ListView {
             }
         }
 
-        Icon {
+        ToolButton {
             id: closeButton
 
             anchors.right: parent.right
             anchors.rightMargin: appStyle.margin.large
             anchors.verticalCenter: parent.verticalCenter
-            font.family: appStyle.icon.fontFamily
-            style: 'icon-remove'
+            iconStyle: 'icon-remove'
             visible: tabView.model.count > 1
+            width: iconSize
 
-            MouseArea {
-                anchors.fill: parent
-                onClicked: model.panel.close()
-            }
+            onClicked: model.panel.close()
         }
 
         Behavior on width {
