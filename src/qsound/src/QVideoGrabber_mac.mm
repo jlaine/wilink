@@ -98,7 +98,7 @@ inline CFStringRef qstringToCFStringRef(const QString &string)
                                         string.length());
 }
 
-inline NSString *qstringToNSString(const QString &qstr)
+inline const NSString *qstringToNSString(const QString &qstr)
 {
     return [reinterpret_cast<const NSString *>(qstringToCFStringRef(qstr)) autorelease];
 }
