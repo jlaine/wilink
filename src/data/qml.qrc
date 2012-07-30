@@ -113,5 +113,6 @@
     <file>qml/WebPlugin.qml</file>
     <file>qml/WebTab.qml</file>
     <file>qml/boot.qml</file>
+    <file>qml/i18n/fr.qm</file>
 </qresource>
 </RCC>
