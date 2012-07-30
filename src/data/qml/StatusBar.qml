@@ -110,13 +110,16 @@ Rectangle {
             presenceStatus: 'available'
         }
 
-        Image {
+        Label {
             id: eject
 
             anchors.right: parent.right
             anchors.rightMargin: appStyle.margin.normal
-            anchors.verticalCenter: parent.verticalCenter
-            source: 'image://icon/eject'
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+            font.family: appStyle.icon.fontFamily
+            text: '\uF052'
+            verticalAlignment: Text.AlignVCenter
             z: 1
         }
 

@@ -53,6 +53,8 @@ Item {
         property int smallSize: isMobile ? 48 : 24
         property int normalSize: isMobile ? 64 : 32
         property int largeSize: isMobile ? 128 : 64
+
+        property alias fontFamily: iconFont.name
     }
 
     Item {
@@ -72,6 +74,11 @@ Item {
 
     Text {
         id: textItem
+    }
+
+    FontLoader {
+        id: iconFont
+        source: "fontawesome-webfont.ttf"
     }
 }
 
