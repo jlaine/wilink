@@ -173,17 +173,17 @@ GroupBox {
 
                 Component.onCompleted: {
                     menu.model.append({
-                        'action': 'call',
-                        'iconSource': 'image://icon/call',
-                        'text': qsTr('Call')});
+                        action: 'call',
+                        iconStyle: 'icon-phone',
+                        text: qsTr('Call')});
                     menu.model.append({
-                        'action': 'contact',
-                        'iconSource': 'image://icon/add',
-                        'text': qsTr('Add to contacts')});
+                        action: 'contact',
+                        iconStyle: 'icon-plus',
+                        text: qsTr('Add to contacts')});
                     menu.model.append({
-                        'action': 'remove',
-                        'iconSource': 'image://icon/remove',
-                        'text': qsTr('Remove')});
+                        action: 'remove',
+                        iconStyle: 'icon-minus',
+                        text: qsTr('Remove')});
                 }
             }
         }

@@ -182,7 +182,7 @@ ContactView {
                         'text': qsTr('Modify')});
                     menu.model.append({
                         'action': 'remove',
-                        'iconSource': 'image://icon/remove',
+                        'iconStyle': 'icon-minus',
                         'text': qsTr('Remove')});
                 }
             }
