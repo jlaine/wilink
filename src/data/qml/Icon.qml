@@ -67,6 +67,8 @@ Label {
             return '\uF0C4';
         case 'icon-copy':
             return '\uF0C5';
+        case 'icon-reorder':
+            return '\uF0C9';
         case 'icon-refresh':
             return '\uF0E2';
         case 'icon-paste':

@@ -25,6 +25,7 @@ Item {
 
     property int chatState: QXmppMessage.None
     property alias text: input.text
+    property Component menuComponent
     property QtObject model
     signal returnPressed
     signal tabPressed
@@ -67,7 +68,7 @@ Item {
 
         anchors.top: parent.top
         anchors.left: parent.left
-        anchors.right: sendButton.left
+        anchors.right: menuButton.left
         anchors.rightMargin: appStyle.margin.normal
         border.color: '#c3c3c3'
         border.width: 1
@@ -210,6 +211,23 @@ Item {
                     showMenu(mouse);
                 }
             }
+        }
+    }
+
+    Button {
+        id: menuButton
+
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        anchors.right: sendButton.left
+        anchors.rightMargin: appStyle.margin.normal
+        iconStyle: 'icon-reorder'
+
+        onClicked: {
+            // show context menu
+            var pos = mapToItem(menuLoader.parent, width/2 - 80, height/2 - 80);
+            menuLoader.sourceComponent = menuComponent;
+            menuLoader.show(pos.x, pos.y);
         }
     }
 

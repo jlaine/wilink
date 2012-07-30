@@ -67,98 +67,9 @@ Panel {
                 text += vcard.name + ' ' + qsTr('has closed the conversation');
             return text;
         }
-
-        toolBar: ToolBar {
-            ToolButton {
-                iconSource: 'image://icon/call'
-                text: qsTr('Call')
-                visible: vcard.features & VCard.VoiceFeature
-
-                onClicked: {
-                    var fullJid = vcard.jidForFeature(VCard.VoiceFeature);
-                    conversation.client.callManager.call(fullJid);
-                }
-
-                Connections {
-                    ignoreUnknownSignals: true
-                    target: Qt.isQtObject(conversation.client) ? conversation.client.callManager : null
-
-                    onCallStarted: {
-                        if (Utils.jidToBareJid(call.jid) == conversation.jid) {
-                            var component = Qt.createComponent('CallWidget.qml');
-
-                            function finishCreation() {
-                                if (component.status != Component.Ready)
-                                    return;
-
-                                var widget = component.createObject(widgetBar);
-                                widget.call = call;
-                            }
-
-                            if (component.status == Component.Loading)
-                                component.statusChanged.connect(finishCreation);
-                            else
-                                finishCreation();
-                        }
-                    }
-                }
-            }
-
-            ToolButton {
-                iconSource: 'image://icon/upload'
-                text: qsTr('Send')
-                visible: vcard.features & VCard.FileTransferFeature
-
-                onClicked: {
-                    var dialog = appNotifier.fileDialog();
-                    dialog.windowTitle = qsTr('Send a file');
-                    dialog.fileMode = QFileDialog.ExistingFile;
-                    if (dialog.exec()) {
-                        for (var i in dialog.selectedFiles) {
-                            var filePath = dialog.selectedFiles[i];
-                            var fullJid = vcard.jidForFeature(VCard.FileTransferFeature);
-                            conversation.client.transferManager.sendFile(fullJid, filePath);
-                        }
-                    }
-                }
-
-                Connections {
-                    ignoreUnknownSignals: true
-                    target: Qt.isQtObject(conversation.client) ? conversation.client.transferManager : null
-
-                    onJobStarted: {
-                        if (Utils.jidToBareJid(job.jid) == conversation.jid) {
-                            var component = Qt.createComponent('TransferWidget.qml');
-
-                            function finishCreation() {
-                                if (component.status != Component.Ready)
-                                    return;
-
-                                var widget = component.createObject(widgetBar);
-                                widget.job = job;
-                            }
-
-                            if (component.status == Component.Loading)
-                                component.statusChanged.connect(finishCreation);
-                            else
-                                finishCreation();
-                        }
-                    }
-                }
-            }
-
-            ToolButton {
-                iconSource: 'image://icon/clear'
-                text: qsTr('Clear')
-                visible: true
-
-                onClicked: {
-                    conversation.historyModel.clear();
-                }
-            }
-        }
     }
 */
+
     Column {
         id: widgetBar
         objectName: 'widgetBar'
@@ -168,6 +79,58 @@ Panel {
         anchors.left: parent.left
         anchors.right: parent.right
         z: 1
+
+        /** Call widget.
+         */
+        Connections {
+            ignoreUnknownSignals: true
+            target: Qt.isQtObject(conversation.client) ? conversation.client.callManager : null
+
+            onCallStarted: {
+                if (Utils.jidToBareJid(call.jid) == conversation.jid) {
+                    var component = Qt.createComponent('CallWidget.qml');
+
+                    function finishCreation() {
+                        if (component.status != Component.Ready)
+                            return;
+
+                        var widget = component.createObject(widgetBar);
+                        widget.call = call;
+                    }
+
+                    if (component.status == Component.Loading)
+                        component.statusChanged.connect(finishCreation);
+                    else
+                        finishCreation();
+                }
+            }
+        }
+
+        /** File transfer widget.
+         */
+        Connections {
+            ignoreUnknownSignals: true
+            target: Qt.isQtObject(conversation.client) ? conversation.client.transferManager : null
+
+            onJobStarted: {
+                if (Utils.jidToBareJid(job.jid) == conversation.jid) {
+                    var component = Qt.createComponent('TransferWidget.qml');
+
+                    function finishCreation() {
+                        if (component.status != Component.Ready)
+                            return;
+
+                        var widget = component.createObject(widgetBar);
+                        widget.job = job;
+                    }
+
+                    if (component.status == Component.Loading)
+                        component.statusChanged.connect(finishCreation);
+                    else
+                        finishCreation();
+                }
+            }
+        }
     }
 
     HistoryView {
@@ -304,6 +267,49 @@ Panel {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
+        menuComponent: Menu {
+            id: menu
+
+            onItemClicked: {
+                var item = menu.model.get(index);
+                if (item.action == 'call') {
+                    var fullJid = vcard.jidForFeature(VCard.VoiceFeature);
+                    conversation.client.callManager.call(fullJid);
+                } else if (item.action == 'send') {
+                    var dialog = appNotifier.fileDialog();
+                    dialog.windowTitle = qsTr('Send a file');
+                    dialog.fileMode = QFileDialog.ExistingFile;
+                    if (dialog.exec()) {
+                        for (var i in dialog.selectedFiles) {
+                            var filePath = dialog.selectedFiles[i];
+                            var fullJid = vcard.jidForFeature(VCard.FileTransferFeature);
+                            conversation.client.transferManager.sendFile(fullJid, filePath);
+                        }
+                    }
+                } else if (item.action == 'clear') {
+                    conversation.historyModel.clear();
+                }
+            }
+
+            Component.onCompleted: {
+                if (vcard.features & VCard.VoiceFeature) {
+                    menu.model.append({
+                        'action': 'call',
+                        'iconStyle': 'icon-phone',
+                        'text': qsTr('Call')});
+                }
+                if (vcard.features & VCard.FileTransferFeature) {
+                    menu.model.append({
+                        'action': 'send',
+                        'iconStyle': 'icon-upload',
+                        'text': qsTr('Send')});
+                }
+                menu.model.append({
+                    'action': 'clear',
+                    'iconStyle': 'icon-remove',
+                    'text': qsTr('Clear')});
+            }
+        }
 
         onChatStateChanged: {
             conversation.localState = chatInput.chatState;
@@ -320,10 +326,12 @@ Panel {
         }
     }
 
-    VCard {
-        id: vcard
-        jid: conversation.jid
-    }
+    resources: [
+        VCard {
+            id: vcard
+            jid: conversation.jid
+        }
+    ]
 
     Keys.forwardTo: historyView
 }
