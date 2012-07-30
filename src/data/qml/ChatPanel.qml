@@ -283,8 +283,6 @@ Panel {
                 menuLoader.item.jid = model.jid;
                 menuLoader.show(pos.x, pos.y);
             }
-
-
         }
 
         StatusBar {
@@ -411,16 +409,16 @@ Panel {
                 menu.model.append({
                     'action': 'profile',
                     'enabled': profileEnabled,
-                    'iconSource': 'image://icon/information',
+                    'iconStyle': 'icon-info-sign',
                     'text': qsTr('Show profile')});
                 menu.model.append({
                     'action': 'rename',
-                    'iconSource': 'image://icon/options',
+                    'iconStyle': 'icon-wrench',
                     'name': model.name,
                     'text': qsTr('Rename contact')});
                 menu.model.append({
                     'action': 'remove',
-                    'iconSource': 'image://icon/remove',
+                    'iconStyle': 'icon-minus',
                     'name': model.name,
                     'text': qsTr('Remove contact')});
             }
