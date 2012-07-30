@@ -147,6 +147,11 @@ void CustomWindow::changeEvent(QEvent *event)
         emit windowStateChanged();
 }
 
+void CustomWindow::reload()
+{
+    QMetaObject::invokeMethod(this, "_q_reloadSource", Qt::QueuedConnection);
+}
+
 void CustomWindow::setFullScreen(bool fullScreen)
 {
     if (fullScreen)
@@ -199,6 +204,11 @@ void CustomWindow::_q_loadSource()
     const QUrl qmlSource = d->qmlRoots.takeFirst().resolved(qmlFile);
     qDebug("Window loading %s", qPrintable(qmlSource.toString()));
     d->view->setSource(qmlSource);
+}
+
+void CustomWindow::_q_reloadSource()
+{
+    d->view->setSource(d->view->source());
 }
 
 void CustomWindow::_q_statusChanged()

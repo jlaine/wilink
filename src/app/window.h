@@ -47,10 +47,12 @@ signals:
     void windowStateChanged();
 
 public slots:
+    void reload();
     void showAndRaise();
 
 private slots:
     void _q_loadSource();
+    void _q_reloadSource();
     void _q_statusChanged();
 
 protected:
