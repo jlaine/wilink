@@ -39,6 +39,7 @@
     <file>qml/GroupBox.qml</file>
     <file>qml/Highlight.qml</file>
     <file>qml/HistoryView.qml</file>
+    <file>qml/Icon.qml</file>
     <file>qml/InputBar.qml</file>
     <file>qml/InputDialog.qml</file>
     <file>qml/InputMenu.qml</file>

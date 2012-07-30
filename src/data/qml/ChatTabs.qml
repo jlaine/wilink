@@ -127,14 +127,14 @@ ListView {
             }
         }
 
-        Label {
+        Icon {
             id: closeButton
 
             anchors.right: parent.right
             anchors.rightMargin: appStyle.margin.large
             anchors.verticalCenter: parent.verticalCenter
             font.family: appStyle.icon.fontFamily
-            text: '\uF00D'
+            style: 'icon-remove'
             visible: tabView.model.count > 1
 
             MouseArea {

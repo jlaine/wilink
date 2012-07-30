@@ -75,13 +75,13 @@ Item {
         anchors.rightMargin: 8
     }
 
-    Label {
+    Icon {
         id: eject
 
         anchors.right: parent.right
         anchors.rightMargin: 8
         anchors.verticalCenter: parent.verticalCenter
-        text: '\uF052'
+        style: 'icon-eject'
         z: 1
     }
 

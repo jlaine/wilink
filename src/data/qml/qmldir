@@ -34,6 +34,7 @@ GeneralPreferencePanel 1.0 GeneralPreferencePanel.qml
 GroupBox 1.0 GroupBox.qml
 Highlight 1.0 Highlight.qml
 HistoryView 1.0 HistoryView.qml
+Icon 1.0 Icon.qml
 InputBar 1.0 InputBar.qml
 InputDialog 1.0 InputDialog.qml
 InputMenu 1.0 InputMenu.qml

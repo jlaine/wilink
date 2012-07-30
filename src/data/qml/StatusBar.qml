@@ -110,14 +110,13 @@ Rectangle {
             presenceStatus: 'available'
         }
 
-        Label {
+        Icon {
             id: eject
 
             anchors.right: parent.right
             anchors.rightMargin: appStyle.margin.normal
             anchors.verticalCenter: parent.verticalCenter
-            font.family: appStyle.icon.fontFamily
-            text: '\uF052'
+            style: 'icon-eject'
             z: 1
         }
 
