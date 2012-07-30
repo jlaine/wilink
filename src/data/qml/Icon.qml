@@ -23,6 +23,7 @@ Label {
     property string style
 
     font.family: appStyle.icon.fontFamily
+    font.pixelSize: 14
     text: {
         switch (style) {
         case 'icon-search':
