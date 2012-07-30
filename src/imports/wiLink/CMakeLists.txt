@@ -47,6 +47,7 @@ set(plugin_SOURCES
     settings.cpp
     shares.cpp
     systeminfo.cpp
+    translations.cpp
     updater.cpp)
 
 set(plugin_MOC_HEADERS
@@ -74,6 +75,7 @@ set(plugin_MOC_HEADERS
     roster.h
     settings.h
     shares.h
+    translations.h
     updater.h)
 
 if(APPLE)

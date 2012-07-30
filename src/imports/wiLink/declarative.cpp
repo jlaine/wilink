@@ -69,6 +69,7 @@
 #include "rooms.h"
 #include "roster.h"
 #include "settings.h"
+#include "translations.h"
 #include "updater.h"
 
 QDeclarativeSortFilterProxyModel::QDeclarativeSortFilterProxyModel(QObject *parent)
@@ -354,6 +355,7 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterType<QSoundPlayer>(uri, 2, 4, "SoundPlayer");
     qmlRegisterUncreatableType<QSoundPlayerJob>(uri, 2, 4, "SoundPlayerJob", "");
     qmlRegisterType<QSoundTester>(uri, 2, 4, "SoundTester");
+    qmlRegisterType<TranslationLoader>(uri, 2, 4, "TranslationLoader");
     qmlRegisterType<Updater>(uri, 2, 4, "Updater");
     qmlRegisterType<VCard>(uri, 2, 4, "VCard");
     qmlRegisterType<WheelArea>(uri, 2, 4, "WheelArea");
