@@ -53,8 +53,8 @@ Item {
         anchors.rightMargin: 1
         anchors.bottomMargin: 1
         border.width: 1
-        border.color: '#ffffff'
-        color: '#567dbc'
+        border.color: '#DDDDDD'
+        color: '#F5F5F5'
         radius: 3
         smooth: true
     }
