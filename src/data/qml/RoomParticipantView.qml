@@ -101,8 +101,17 @@ ScrollView {
                 id: vcard
             }
 
-            onProfileEnabledChanged: menu.model.setProperty(0, 'enabled', profileEnabled)
-            onKickEnabledChanged: menu.model.setProperty(1, 'enabled', kickEnabled)
+            onProfileEnabledChanged: {
+                if (menu.model.count > 0) {
+                    menu.model.setProperty(0, 'enabled', profileEnabled);
+                }
+            }
+
+            onKickEnabledChanged: {
+                if (menu.model.count > 0) {
+                    menu.model.setProperty(1, 'enabled', kickEnabled);
+                }
+            }
 
             onItemClicked: {
                 var item = menu.model.get(index);
