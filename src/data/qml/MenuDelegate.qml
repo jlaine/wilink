@@ -36,6 +36,7 @@ Rectangle {
         anchors.left: parent.left
         anchors.leftMargin: (model.iconSource || model.iconStyle) ? 4 : 0
         anchors.top: parent.top
+        anchors.topMargin: 3
         anchors.bottom: parent.bottom
         width: appStyle.icon.tinySize
 

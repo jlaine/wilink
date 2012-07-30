@@ -49,8 +49,9 @@ Rectangle {
 
         anchors.left: parent.left
         anchors.leftMargin: margins
-        anchors.verticalCenter: parent.verticalCenter
-        height: iconSize
+        anchors.top: parent.top
+        anchors.topMargin: 3
+        anchors.bottom: parent.bottom
         width: iconSize
 
         Image {
