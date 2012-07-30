@@ -112,5 +112,6 @@
     <file>qml/WebPanel.qml</file>
     <file>qml/WebPlugin.qml</file>
     <file>qml/WebTab.qml</file>
+    <file>qml/boot.qml</file>
 </qresource>
 </RCC>

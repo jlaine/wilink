@@ -60,5 +60,6 @@ write_qrc('qml.qrc', font_files + js_files + qml_files)
 fp = open('qml/qmldir', 'w')
 for qml_path in qml_files:
     qml_name = os.path.basename(qml_path).split('.')[0]
-    fp.write("%s 1.0 %s.qml\n" % (qml_name, qml_name));
+    if qml_name[0].upper() == qml_name[0]:
+        fp.write("%s 1.0 %s.qml\n" % (qml_name, qml_name))
 fp.close()
