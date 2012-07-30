@@ -157,7 +157,7 @@ Panel {
                 if (room.allowedActions & QXmppMucRoom.SubjectAction) {
                     menu.model.append({
                         action: 'subject',
-                        iconStyle: 'icon-comment',
+                        iconStyle: 'icon-edit',
                         text: qsTr('Subject')});
                 }
                 if (room.allowedActions & QXmppMucRoom.ConfigurationAction) {

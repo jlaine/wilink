@@ -125,7 +125,7 @@ ScrollView {
                 menu.model.append({
                     'action': 'kick',
                     'enabled': kickEnabled,
-                    'iconStyle': 'icon-minus',
+                    'iconStyle': 'icon-bolt',
                     'text': qsTr('Kick user')});
             }
         }

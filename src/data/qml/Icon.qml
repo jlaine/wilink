@@ -39,6 +39,8 @@ Label {
             return '\uF021';
         case 'icon-lock':
             return '\uF023';
+        case 'icon-edit':
+            return '\uF044';
         case 'icon-play':
             return '\uF04B';
         case 'icon-pause':
@@ -71,6 +73,8 @@ Label {
             return '\uF095';
         case 'icon-rss':
             return '\uF09E';
+        case 'icon-globe':
+            return '\uF0AC';
         case 'icon-wrench':
             return '\uF0AD';
         case 'icon-fullscreen':
@@ -81,6 +85,16 @@ Label {
             return '\uF0C5';
         case 'icon-reorder':
             return '\uF0C9';
+        case 'icon-caret-up':
+            return '\uF0D7';
+        case 'icon-caret-down':
+            return '\uF0D8';
+        case 'icon-caret-left':
+            return '\uF0D9';
+        case 'icon-caret-right':
+            return '\uF0DA';
+        case 'icon-bolt':
+            return '\uF0E7';
         case 'icon-paste':
             return '\uF0EA';
         default:
