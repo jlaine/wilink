@@ -22,7 +22,7 @@ import wiLink 2.4
 
 Item {
     TranslationLoader {
-        source: localeName + '.qm'
+        source: 'i18n/' + localeName + '.qm'
 
         onStatusChanged: {
             console.log("load: " + source);
