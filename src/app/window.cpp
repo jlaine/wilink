@@ -200,7 +200,7 @@ void CustomWindow::_q_loadSource()
 #ifdef MEEGO_EDITION_HARMATTAN
     const QUrl qmlFile("MeegoMain.qml");
 #else
-    const QUrl qmlFile("Main.qml");
+    const QUrl qmlFile("boot.qml");
 #endif
     const QUrl qmlSource = d->qmlRoots.takeFirst().resolved(qmlFile);
     qDebug("Window loading %s", qPrintable(qmlSource.toString()));
