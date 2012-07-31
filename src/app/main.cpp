@@ -65,13 +65,14 @@ protected:
 
 bool CustomApplication::event(QEvent *event)
 {
-    switch (event->type()) {
-    case QEvent::FileOpen:
-        QMetaObject::invokeMethod(peer, "messageReceived", Q_ARG(QString, "OPEN " + static_cast<QFileOpenEvent *>(event)->url().toString()));
-        return true;
-    default:
-        return QApplication::event(event);
+    if (event->type() == QEvent::FileOpen) {
+        const QUrl url = static_cast<QFileOpenEvent *>(event)->url();
+        if (url.isValid() && url.scheme() == "wilink") {
+            QMetaObject::invokeMethod(peer, "messageReceived", Q_ARG(QString, "OPEN " + url.toString()));
+            return true;
+        }
     }
+    return QApplication::event(event);
 }
 
 int main(int argc, char *argv[])
@@ -92,15 +93,15 @@ int main(int argc, char *argv[])
 #endif
 
     /* Parse command line arguments */
-    const QString firstArgument = (argc > 1) ? QString::fromLocal8Bit(argv[1]) : QString();
+    const QUrl url = (argc > 1) ? QUrl(QString::fromLocal8Bit(argv[1])) : QUrl();
 
     /* Open RPC socket */
     peer = new QtLocalPeer(&app, "wiLink");
     if (peer->isClient()) {
-        if (firstArgument.isEmpty())
-            peer->sendMessage("SHOW", 1000);
+        if (url.isValid() && url.scheme() == "wilink")
+            peer->sendMessage("OPEN " + url.toString(), 1000);
         else
-            peer->sendMessage("OPEN " + firstArgument, 1000);
+            peer->sendMessage("SHOW", 1000);
         return EXIT_SUCCESS;
     }
 
@@ -124,8 +125,8 @@ int main(int argc, char *argv[])
 
     /* Create window */
     CustomWindow *window = new CustomWindow(peer);
-    if (!firstArgument.isEmpty())
-        QMetaObject::invokeMethod(peer, "messageReceived", Q_ARG(QString, "OPEN " + firstArgument));
+    if (url.isValid() && url.scheme() == "wilink")
+        QMetaObject::invokeMethod(peer, "messageReceived", Q_ARG(QString, "OPEN " + url.toString()));
 
     /* Run application */
     return app.exec();
