@@ -36,7 +36,6 @@ Dialog {
 
             anchors.left: parent.left
             anchors.right: parent.right
-            iconSize: 32
             text: qsTr('Enter the address of the contact you want to add.')
         }
 

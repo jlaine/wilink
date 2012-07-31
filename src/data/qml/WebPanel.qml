@@ -38,7 +38,6 @@ Panel {
             id: addButton
 
             anchors.verticalCenter: parent.verticalCenter
-            iconSize: appStyle.icon.tinySize
             iconStyle: 'icon-plus'
             width: iconSize
 

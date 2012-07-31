@@ -79,8 +79,7 @@ ContactView {
             anchors.right: parent.right
             anchors.rightMargin: 6
             anchors.verticalCenter: parent.verticalCenter
-            iconSize: appStyle.icon.smallSize
-            iconSource: 'image://icon/call'
+            iconStyle: 'icon-phone'
             visible: view.currentItem == item
             z: 1
 
@@ -177,13 +176,13 @@ ContactView {
 
                 Component.onCompleted: {
                     menu.model.append({
-                        'action': 'edit',
-                        'iconSource': 'image://icon/options',
-                        'text': qsTr('Modify')});
+                        action: 'edit',
+                        iconStyle: 'icon-edit',
+                        text: qsTr('Modify')});
                     menu.model.append({
-                        'action': 'remove',
-                        'iconStyle': 'icon-minus',
-                        'text': qsTr('Remove')});
+                        action: 'remove',
+                        iconStyle: 'icon-minus',
+                        text: qsTr('Remove')});
                 }
             }
         }

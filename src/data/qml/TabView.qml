@@ -93,7 +93,6 @@ ListView {
             anchors.right: parent.right
             anchors.rightMargin: appStyle.margin.large
             anchors.verticalCenter: parent.verticalCenter
-            iconSize: appStyle.icon.tinySize
             iconStyle: 'icon-remove'
             width: iconSize
             visible: tabView.model.count > 1

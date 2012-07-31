@@ -39,7 +39,7 @@ GroupBox {
         anchors.right: parent.right
         anchors.rightMargin: 4
         iconStyle: 'icon-plus'
-        width: appStyle.icon.smallSize
+        width: iconSize
 
         onClicked: block.addClicked()
     }
