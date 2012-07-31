@@ -31,13 +31,15 @@ GroupBox {
 
     signal addClicked
 
-    Button {
+    ToolButton {
         parent: block
+
         anchors.top: parent.top
+        anchors.topMargin: 8
         anchors.right: parent.right
-        anchors.margins: 4
-        iconSize: appStyle.icon.tinySize
+        anchors.rightMargin: 4
         iconStyle: 'icon-plus'
+        width: appStyle.icon.smallSize
 
         onClicked: block.addClicked()
     }
