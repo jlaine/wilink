@@ -228,6 +228,7 @@ FocusScope {
         window.minimumHeight = 360;
         window.fullScreen = appSettings.isMobile && appSettings.osType != 'android';
         window.showAndRaise();
+        window.startMessages();
     }
 
     Connections {
