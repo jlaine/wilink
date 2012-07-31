@@ -25,7 +25,6 @@ Item {
         source: 'i18n/' + localeName + '.qm'
 
         onStatusChanged: {
-            console.log("load: " + source);
             if (status == TranslationLoader.Ready || status == TranslationLoader.Error) {
                 uiLoader.source = 'Main.qml';
             }
