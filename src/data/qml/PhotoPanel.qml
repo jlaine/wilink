@@ -42,14 +42,14 @@ Panel {
         toolBar: ToolBar {
             ToolButton {
                 enabled: crumbBar.model.count > 1
-                iconSource: 'image://icon/back'
+                iconStyle: 'icon-chevron-left'
                 text: qsTr('Go back')
 
                 onClicked: crumbBar.pop()
             }
 
             ToolButton {
-                iconSource: 'image://icon/upload'
+                iconStyle: 'icon-upload'
                 text: qsTr('Upload')
                 enabled: photoModel.canUpload
                 visible: panel.state == ''
@@ -69,13 +69,13 @@ Panel {
             }
 
             ToolButton {
-                iconSource: 'image://icon/stop'
+                iconStyle: 'icon-stop'
                 text: qsTr('Cancel')
                 visible: false
             }
 
             ToolButton {
-                iconSource: 'image://icon/add'
+                iconStyle: 'icon-plus'
                 text: qsTr('Create')
                 enabled: photoModel.canCreateAlbum
                 visible: panel.state == ''
