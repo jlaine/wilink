@@ -30,20 +30,28 @@
 class TranslationLoaderPrivate
 {
 public:
+    TranslationLoaderPrivate();
+
     QByteArray data;
     QNetworkReply *reply;
     QUrl source;
     TranslationLoader::Status status;
     QTranslator *translator;
+    bool translatorInstalled;
 };
+
+TranslationLoaderPrivate::TranslationLoaderPrivate()
+    : reply(0)
+    , status(TranslationLoader::Null)
+    , translator(0)
+    , translatorInstalled(0)
+{
+}
 
 TranslationLoader::TranslationLoader(QObject *parent)
     : QObject(parent)
     , d(new TranslationLoaderPrivate)
 {
-    d->reply = 0;
-    d->status = Null;
-    d->translator = 0;
 }
 
 TranslationLoader::~TranslationLoader()
@@ -65,9 +73,13 @@ void TranslationLoader::setSource(const QUrl &source)
 {
     if (source == d->source)
         return;
-
     d->source = source;
     emit sourceChanged();
+
+    if (d->translatorInstalled) {
+        qApp->removeTranslator(d->translator);
+        d->translatorInstalled = false;
+    }
 
     QNetworkRequest request(d->source);
     request.setAttribute(QNetworkRequest::HttpPipeliningAllowedAttribute, true);
@@ -90,20 +102,16 @@ void TranslationLoader::_q_replyFinished()
         return;
 
     if (d->reply->error() == QNetworkReply::NoError) {
-        if (d->translator) {
-            delete d->translator;
-            d->translator = 0;
-        }
-
         d->data = d->reply->readAll();
-        d->translator = new QTranslator(this);
+        if (!d->translator)
+            d->translator = new QTranslator(this);
         if (d->translator->load((const uchar*)d->data.constData(), d->data.size())) {
             qApp->installTranslator(d->translator);
+            d->translatorInstalled = true;
+
             d->status = Ready;
             emit statusChanged();
         } else {
-            delete d->translator;
-            d->translator = 0;
             d->status = Error;
             emit statusChanged();
         }
