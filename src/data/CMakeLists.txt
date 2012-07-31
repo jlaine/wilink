@@ -8,7 +8,6 @@ set(SMALL_ICONS
     images/scalable/checkbox-checked.svg)
 
 set(ICONS
-    images/scalable/add.svg
     images/scalable/album.svg
     images/scalable/audio-input.svg
     images/scalable/audio-output.svg
@@ -18,10 +17,7 @@ set(ICONS
     images/scalable/camera.svg
     images/scalable/camera-active.svg
     images/scalable/chat.svg
-    images/scalable/clear.svg
     images/scalable/close.svg
-    images/scalable/copy.svg
-    images/scalable/cut.svg
     images/scalable/debug.svg
     images/scalable/diagnostics.svg
     images/scalable/dock-chat.svg
@@ -34,7 +30,6 @@ set(ICONS
     images/scalable/dock-photo.svg
     images/scalable/dock-rss.svg
     images/scalable/dock-share.svg
-    images/scalable/dock-start.svg
     images/scalable/dock-web.svg
     images/scalable/download.svg
     images/scalable/facebook.svg
@@ -50,20 +45,15 @@ set(ICONS
     images/scalable/invite.svg
     images/scalable/moderator.svg
     images/scalable/options.svg
-    images/scalable/paste.svg
     images/scalable/peer.svg
     images/scalable/permissions.svg
     images/scalable/phone.svg
     images/scalable/photos.svg
     images/scalable/plugin.svg
-    images/scalable/refresh.svg
-    images/scalable/remove.svg
     images/scalable/resize.svg
     images/scalable/rss.svg
     images/scalable/search.svg
     images/scalable/share.svg
-    images/scalable/start.svg
-    images/scalable/stop.svg
     images/scalable/tip.svg
     images/scalable/transfers.svg
     images/scalable/upload.svg

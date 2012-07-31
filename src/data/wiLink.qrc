@@ -16,7 +16,6 @@
     <file>images/16x16/face-surprise.png</file>
     <file>images/16x16/face-uncertain.png</file>
     <file>images/16x16/face-wink.png</file>
-    <file>images/32x32/add.png</file>
     <file>images/32x32/album.png</file>
     <file>images/32x32/audio-input.png</file>
     <file>images/32x32/audio-output.png</file>
@@ -28,10 +27,7 @@
     <file>images/32x32/chat.png</file>
     <file>images/32x32/checkbox-checked.png</file>
     <file>images/32x32/checkbox.png</file>
-    <file>images/32x32/clear.png</file>
     <file>images/32x32/close.png</file>
-    <file>images/32x32/copy.png</file>
-    <file>images/32x32/cut.png</file>
     <file>images/32x32/debug.png</file>
     <file>images/32x32/diagnostics.png</file>
     <file>images/32x32/dock-chat.png</file>
@@ -44,7 +40,6 @@
     <file>images/32x32/dock-photo.png</file>
     <file>images/32x32/dock-rss.png</file>
     <file>images/32x32/dock-share.png</file>
-    <file>images/32x32/dock-start.png</file>
     <file>images/32x32/dock-web.png</file>
     <file>images/32x32/download.png</file>
     <file>images/32x32/face-angry.png</file>
@@ -73,27 +68,21 @@
     <file>images/32x32/invite.png</file>
     <file>images/32x32/moderator.png</file>
     <file>images/32x32/options.png</file>
-    <file>images/32x32/paste.png</file>
     <file>images/32x32/peer.png</file>
     <file>images/32x32/permissions.png</file>
     <file>images/32x32/phone.png</file>
     <file>images/32x32/photos.png</file>
     <file>images/32x32/plugin.png</file>
-    <file>images/32x32/refresh.png</file>
-    <file>images/32x32/remove.png</file>
     <file>images/32x32/resize.png</file>
     <file>images/32x32/rss.png</file>
     <file>images/32x32/search.png</file>
     <file>images/32x32/share.png</file>
-    <file>images/32x32/start.png</file>
-    <file>images/32x32/stop.png</file>
     <file>images/32x32/tip.png</file>
     <file>images/32x32/transfers.png</file>
     <file>images/32x32/upload.png</file>
     <file>images/32x32/web.png</file>
     <file>images/32x32/wiLink-black.png</file>
     <file>images/32x32/wiLink.png</file>
-    <file>images/64x64/add.png</file>
     <file>images/64x64/album.png</file>
     <file>images/64x64/audio-input.png</file>
     <file>images/64x64/audio-output.png</file>
@@ -103,10 +92,7 @@
     <file>images/64x64/camera-active.png</file>
     <file>images/64x64/camera.png</file>
     <file>images/64x64/chat.png</file>
-    <file>images/64x64/clear.png</file>
     <file>images/64x64/close.png</file>
-    <file>images/64x64/copy.png</file>
-    <file>images/64x64/cut.png</file>
     <file>images/64x64/debug.png</file>
     <file>images/64x64/diagnostics.png</file>
     <file>images/64x64/dock-chat.png</file>
@@ -119,7 +105,6 @@
     <file>images/64x64/dock-photo.png</file>
     <file>images/64x64/dock-rss.png</file>
     <file>images/64x64/dock-share.png</file>
-    <file>images/64x64/dock-start.png</file>
     <file>images/64x64/dock-web.png</file>
     <file>images/64x64/download.png</file>
     <file>images/64x64/facebook.png</file>
@@ -135,20 +120,15 @@
     <file>images/64x64/invite.png</file>
     <file>images/64x64/moderator.png</file>
     <file>images/64x64/options.png</file>
-    <file>images/64x64/paste.png</file>
     <file>images/64x64/peer.png</file>
     <file>images/64x64/permissions.png</file>
     <file>images/64x64/phone.png</file>
     <file>images/64x64/photos.png</file>
     <file>images/64x64/plugin.png</file>
-    <file>images/64x64/refresh.png</file>
-    <file>images/64x64/remove.png</file>
     <file>images/64x64/resize.png</file>
     <file>images/64x64/rss.png</file>
     <file>images/64x64/search.png</file>
     <file>images/64x64/share.png</file>
-    <file>images/64x64/start.png</file>
-    <file>images/64x64/stop.png</file>
     <file>images/64x64/tip.png</file>
     <file>images/64x64/transfers.png</file>
     <file>images/64x64/upload.png</file>
