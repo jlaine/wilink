@@ -27,30 +27,47 @@
 
 #include "translations.h"
 
+#define TRANSLATIONLOADER_MAXIMUM_REDIRECT_RECURSION 16
+
 class TranslationLoaderPrivate
 {
 public:
-    TranslationLoaderPrivate();
+    TranslationLoaderPrivate(TranslationLoader *qq);
+    void download(const QUrl &url, QNetworkAccessManager *manager);
 
     QByteArray data;
+    int redirectCount;
     QNetworkReply *reply;
     QUrl source;
     TranslationLoader::Status status;
     QTranslator *translator;
     bool translatorInstalled;
+
+private:
+    TranslationLoader *q;
 };
 
-TranslationLoaderPrivate::TranslationLoaderPrivate()
-    : reply(0)
+TranslationLoaderPrivate::TranslationLoaderPrivate(TranslationLoader *qq)
+    : redirectCount(0)
+    , reply(0)
     , status(TranslationLoader::Null)
     , translator(0)
     , translatorInstalled(0)
+    , q(qq)
 {
+}
+
+void TranslationLoaderPrivate::download(const QUrl &url, QNetworkAccessManager *manager)
+{
+    QNetworkRequest req(url);
+    req.setAttribute(QNetworkRequest::HttpPipeliningAllowedAttribute, true);
+    reply = manager->get(req);
+    QObject::connect(reply, SIGNAL(finished()), q, SLOT(_q_replyFinished()));
 }
 
 TranslationLoader::TranslationLoader(QObject *parent)
     : QObject(parent)
-    , d(new TranslationLoaderPrivate)
+    , d(new TranslationLoaderPrivate(this))
 {
 }
 
@@ -81,11 +98,7 @@ void TranslationLoader::setSource(const QUrl &source)
         d->translatorInstalled = false;
     }
 
-    QNetworkRequest request(d->source);
-    request.setAttribute(QNetworkRequest::HttpPipeliningAllowedAttribute, true);
-    d->reply = qmlEngine(this)->networkAccessManager()->get(request);
-    connect(d->reply, SIGNAL(finished()),
-            this, SLOT(_q_replyFinished()));
+    d->download(d->source, qmlEngine(this)->networkAccessManager());
 
     d->status = Loading;
     emit statusChanged();
@@ -101,6 +114,20 @@ void TranslationLoader::_q_replyFinished()
     if (!d->reply)
         return;
 
+    d->redirectCount++;
+    if (d->redirectCount < TRANSLATIONLOADER_MAXIMUM_REDIRECT_RECURSION) {
+        QVariant redirect = d->reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
+        if (redirect.isValid()) {
+            const QUrl url = d->reply->url().resolved(redirect.toUrl());
+            QNetworkAccessManager *manager = d->reply->manager();
+            d->reply->deleteLater();
+            d->reply = 0;
+            d->download(url, manager);
+            return;
+        }
+    }
+    d->redirectCount = 0;
+
     if (d->reply->error() == QNetworkReply::NoError) {
         d->data = d->reply->readAll();
         if (!d->translator)
@@ -108,17 +135,17 @@ void TranslationLoader::_q_replyFinished()
         if (d->translator->load((const uchar*)d->data.constData(), d->data.size())) {
             qApp->installTranslator(d->translator);
             d->translatorInstalled = true;
-
             d->status = Ready;
-            emit statusChanged();
         } else {
+            qmlInfo(this) << "Cannot load translation: \"" << d->source.toString() << '"';
             d->status = Error;
-            emit statusChanged();
         }
     } else {
+        qmlInfo(this) << "Cannot fetch translation: \"" << d->source.toString() << '"';
         d->status = Error;
-        emit statusChanged();
     }
+
+    emit statusChanged();
 
     d->reply->deleteLater();
     d->reply = 0;
