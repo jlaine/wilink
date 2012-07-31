@@ -49,7 +49,7 @@ Panel {
             }
 
             ToolButton {
-                iconStyle: 'icon-close'
+                iconStyle: 'icon-remove'
                 text: qsTr('Close')
 
                 onClicked: panel.close()

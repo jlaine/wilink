@@ -107,7 +107,7 @@ Item {
                 anchors.right: parent.right
                 anchors.rightMargin: appStyle.margin.normal
                 anchors.verticalCenter: parent.verticalCenter
-                iconStyle: 'icon-close'
+                iconStyle: 'icon-remove'
                 text: qsTr('Cancel')
 
                 onClicked: view.model.cancel(model.index)
