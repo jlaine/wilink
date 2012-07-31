@@ -186,7 +186,7 @@ Panel {
             toolBar: ToolBar {
                 ToolButton {
                     enabled: callButton.enabled
-                    iconSource: 'image://icon/call'
+                    iconStyle: 'icon-phone'
                     text: qsTr('Voicemail')
                     visible: panel.voicemailNumber != ''
 
@@ -250,7 +250,7 @@ Panel {
 
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
-                    iconSource: 'image://icon/back'
+                    iconStyle: 'icon-caret-left'
 
                     onClicked: numberEdit.backspacePressed()
                 }
