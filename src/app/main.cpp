@@ -18,7 +18,7 @@
  */
 
 #include <cstdlib>
-#include <signal.h>
+#include <csignal>
 
 #include <QApplication>
 #include <QFileOpenEvent>
@@ -38,6 +38,7 @@ void mac_init();
 
 #include "window.h"
 
+static QtLocalPeer *peer = 0;
 static int aborted = 0;
 static void signal_handler(int sig)
 {
@@ -66,11 +67,7 @@ bool CustomApplication::event(QEvent *event)
 {
     switch (event->type()) {
     case QEvent::FileOpen:
-        foreach (QWidget *widget, QApplication::topLevelWidgets()) {
-            CustomWindow *window = qobject_cast<CustomWindow*>(widget);
-            if (window)
-                QMetaObject::invokeMethod(window, "messageReceived", Q_ARG(QString, "OPEN " + static_cast<QFileOpenEvent *>(event)->url().toString()));
-        }
+        QMetaObject::invokeMethod(peer, "messageReceived", Q_ARG(QString, "OPEN " + static_cast<QFileOpenEvent *>(event)->url().toString()));
         return true;
     default:
         return QApplication::event(event);
@@ -98,7 +95,7 @@ int main(int argc, char *argv[])
     const QString firstArgument = (argc > 1) ? QString::fromLocal8Bit(argv[1]) : QString();
 
     /* Open RPC socket */
-    QtLocalPeer *peer = new QtLocalPeer(&app, "wiLink");
+    peer = new QtLocalPeer(&app, "wiLink");
     if (peer->isClient()) {
         if (firstArgument.isEmpty())
             peer->sendMessage("SHOW", 1000);
@@ -128,7 +125,7 @@ int main(int argc, char *argv[])
     /* Create window */
     CustomWindow *window = new CustomWindow(peer);
     if (!firstArgument.isEmpty())
-        window->setInitialMessage("OPEN " + firstArgument);
+        QMetaObject::invokeMethod(peer, "messageReceived", Q_ARG(QString, "OPEN " + firstArgument));
 
     /* Run application */
     return app.exec();

@@ -39,7 +39,8 @@
 class CustomWindowPrivate
 {
 public:
-    QString initialMessage;
+    QStringList messages;
+    bool messagesStarted;
     QtLocalPeer *peer;
     QList<QUrl> qmlRoots;
     QDeclarativeView *view;
@@ -52,9 +53,10 @@ CustomWindow::CustomWindow(QtLocalPeer *peer, QWidget *parent)
     Q_UNUSED(check);
 
     d = new CustomWindowPrivate;
+    d->messagesStarted = false;
     d->peer = peer;
     check = connect(d->peer, SIGNAL(messageReceived(QString)),
-                    this, SIGNAL(messageReceived(QString)));
+                    this, SLOT(_q_messageReceived(QString)));
     Q_ASSERT(check);
 
     // declare QML roots
@@ -161,11 +163,6 @@ void CustomWindow::setFullScreen(bool fullScreen)
         setWindowState(windowState() & ~Qt::WindowFullScreen);
 }
 
-void CustomWindow::setInitialMessage(const QString &message)
-{
-    d->initialMessage = message;
-}
-
 void CustomWindow::showAndRaise()
 {
     setWindowState(windowState() & ~Qt::WindowMinimized);
@@ -192,6 +189,14 @@ void CustomWindow::showAndRaise()
 #endif
 }
 
+void CustomWindow::startMessages()
+{
+    foreach (const QString &message, d->messages)
+        emit messageReceived(message);
+    d->messages.clear();
+    d->messagesStarted = true;
+}
+
 void CustomWindow::_q_loadSource()
 {
     if (d->qmlRoots.isEmpty())
@@ -207,6 +212,15 @@ void CustomWindow::_q_loadSource()
     d->view->setSource(qmlSource);
 }
 
+void CustomWindow::_q_messageReceived(const QString &message)
+{
+    if (d->messagesStarted) {
+        emit messageReceived(message);
+    } else {
+        d->messages << message;
+    }
+}
+
 void CustomWindow::_q_statusChanged()
 {
     if (d->view->status() == QDeclarativeView::Ready) {
@@ -214,11 +228,6 @@ void CustomWindow::_q_statusChanged()
         d->view->setAttribute(Qt::WA_NoSystemBackground);
         d->view->viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
         d->view->viewport()->setAttribute(Qt::WA_NoSystemBackground);
-
-        if (!d->initialMessage.isEmpty()) {
-            QMetaObject::invokeMethod(this, "messageReceived", Q_ARG(QString, d->initialMessage));
-            d->initialMessage = QString();
-        }
     } else if (d->view->status() == QDeclarativeView::Error) {
         _q_loadSource();
     }
