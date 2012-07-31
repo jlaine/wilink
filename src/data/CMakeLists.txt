@@ -12,7 +12,6 @@ set(ICONS
     images/scalable/album.svg
     images/scalable/audio-input.svg
     images/scalable/audio-output.svg
-    images/scalable/back.svg
     images/scalable/call.svg
     images/scalable/call-incoming.svg
     images/scalable/call-outgoing.svg
@@ -43,7 +42,6 @@ set(ICONS
     images/scalable/favorite-inactive.svg
     images/scalable/file.svg
     images/scalable/fire.svg
-    images/scalable/forward.svg
     images/scalable/fullscreen.svg
     images/scalable/google.svg
     images/scalable/hangup.svg

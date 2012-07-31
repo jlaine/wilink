@@ -20,7 +20,6 @@
     <file>images/32x32/album.png</file>
     <file>images/32x32/audio-input.png</file>
     <file>images/32x32/audio-output.png</file>
-    <file>images/32x32/back.png</file>
     <file>images/32x32/call-incoming.png</file>
     <file>images/32x32/call-outgoing.png</file>
     <file>images/32x32/call.png</file>
@@ -66,7 +65,6 @@
     <file>images/32x32/favorite-inactive.png</file>
     <file>images/32x32/file.png</file>
     <file>images/32x32/fire.png</file>
-    <file>images/32x32/forward.png</file>
     <file>images/32x32/fullscreen.png</file>
     <file>images/32x32/google.png</file>
     <file>images/32x32/hangup.png</file>
@@ -99,7 +97,6 @@
     <file>images/64x64/album.png</file>
     <file>images/64x64/audio-input.png</file>
     <file>images/64x64/audio-output.png</file>
-    <file>images/64x64/back.png</file>
     <file>images/64x64/call-incoming.png</file>
     <file>images/64x64/call-outgoing.png</file>
     <file>images/64x64/call.png</file>
@@ -130,7 +127,6 @@
     <file>images/64x64/favorite-inactive.png</file>
     <file>images/64x64/file.png</file>
     <file>images/64x64/fire.png</file>
-    <file>images/64x64/forward.png</file>
     <file>images/64x64/fullscreen.png</file>
     <file>images/64x64/google.png</file>
     <file>images/64x64/hangup.png</file>
