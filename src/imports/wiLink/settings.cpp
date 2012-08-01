@@ -198,22 +198,20 @@ void ApplicationSettings::setIncomingMessageNotification(bool notification)
     }
 }
 
-/** Returns the sound to play for incoming messages.
+/** Returns whether to play a sound for incoming messages.
  */
-QString ApplicationSettings::incomingMessageSound() const
+bool ApplicationSettings::incomingMessageSound() const
 {
-    return d->settings->value("IncomingMessageSound").toString();
+    return d->settings->value("IncomingMessageSound").toBool();
 }
 
-/** Sets the sound to play for incoming messages.
- *
- * @param soundFile
+/** Sets whether to play a sound for incoming messages.
  */
-void ApplicationSettings::setIncomingMessageSound(const QString &soundFile)
+void ApplicationSettings::setIncomingMessageSound(bool sound)
 {
-    if (soundFile != incomingMessageSound()) {
-        d->settings->setValue("IncomingMessageSound", soundFile);
-        emit incomingMessageSoundChanged(soundFile);
+    if (sound != incomingMessageSound()) {
+        d->settings->setValue("IncomingMessageSound", sound);
+        emit incomingMessageSoundChanged(sound);
     }
 }
 
@@ -279,22 +277,20 @@ void ApplicationSettings::setOpenAtLogin(bool run)
     }
 }
 
-/** Returns the sound to play for outgoing messages.
+/** Returns whether to play a sound for outgoing messages.
  */
-QString ApplicationSettings::outgoingMessageSound() const
+bool ApplicationSettings::outgoingMessageSound() const
 {
-    return d->settings->value("OutgoingMessageSound").toString();
+    return d->settings->value("OutgoingMessageSound").toBool();
 }
 
-/** Sets the sound to play for outgoing messages.
- *
- * @param soundFile
+/** Sets whether to play a sound for outgoing messages.
  */
-void ApplicationSettings::setOutgoingMessageSound(const QString &soundFile)
+void ApplicationSettings::setOutgoingMessageSound(bool sound)
 {
-    if (soundFile != outgoingMessageSound()) {
-        d->settings->setValue("OutgoingMessageSound", soundFile);
-        emit outgoingMessageSoundChanged(soundFile);
+    if (sound != outgoingMessageSound()) {
+        d->settings->setValue("OutgoingMessageSound", sound);
+        emit outgoingMessageSoundChanged(sound);
     }
 }
 

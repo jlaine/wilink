@@ -35,8 +35,8 @@ Panel {
         }
 
         // notifications
-        appSettings.incomingMessageSound = incomingMessageSound.checked ? ':/sounds/message-incoming.ogg' : '';
-        appSettings.outgoingMessageSound = outgoingMessageSound.checked ? ':/sounds/message-outgoing.ogg' : '';
+        appSettings.incomingMessageSound = incomingMessageSound.checked;
+        appSettings.outgoingMessageSound = outgoingMessageSound.checked;
     }
 
     SoundTester {
@@ -204,7 +204,7 @@ Panel {
 
                 anchors.left: parent.left
                 anchors.right:  parent.right
-                checked: appSettings.incomingMessageSound.length > 0
+                checked: appSettings.incomingMessageSound
                 text: qsTr('Incoming message')
                 onClicked: checked = !checked
             }
@@ -214,7 +214,7 @@ Panel {
 
                 anchors.left: parent.left
                 anchors.right:  parent.right
-                checked: appSettings.outgoingMessageSound.length > 0
+                checked: appSettings.outgoingMessageSound
                 text: qsTr('Outgoing message')
                 onClicked: checked = !checked
             }

@@ -42,9 +42,9 @@ class ApplicationSettings : public QObject
     Q_PROPERTY(QStringList disabledPlugins READ disabledPlugins WRITE setDisabledPlugins NOTIFY disabledPluginsChanged)
     Q_PROPERTY(QStringList enabledPlugins READ enabledPlugins WRITE setEnabledPlugins NOTIFY enabledPluginsChanged)
     Q_PROPERTY(bool incomingMessageNotification READ incomingMessageNotification WRITE setIncomingMessageNotification NOTIFY incomingMessageNotificationChanged)
-    Q_PROPERTY(QString incomingMessageSound READ incomingMessageSound WRITE setIncomingMessageSound NOTIFY incomingMessageSoundChanged)
+    Q_PROPERTY(bool incomingMessageSound READ incomingMessageSound WRITE setIncomingMessageSound NOTIFY incomingMessageSoundChanged)
     Q_PROPERTY(bool openAtLogin READ openAtLogin WRITE setOpenAtLogin NOTIFY openAtLoginChanged)
-    Q_PROPERTY(QString outgoingMessageSound READ outgoingMessageSound WRITE setOutgoingMessageSound NOTIFY outgoingMessageSoundChanged)
+    Q_PROPERTY(bool outgoingMessageSound READ outgoingMessageSound WRITE setOutgoingMessageSound NOTIFY outgoingMessageSoundChanged)
     Q_PROPERTY(bool sharesConfigured READ sharesConfigured WRITE setSharesConfigured NOTIFY sharesConfiguredChanged)
     Q_PROPERTY(QVariantList sharesDirectories READ sharesDirectories WRITE setSharesDirectories NOTIFY sharesDirectoriesChanged)
     Q_PROPERTY(QString sharesLocation READ sharesLocation WRITE setSharesLocation NOTIFY sharesLocationChanged)
@@ -75,14 +75,14 @@ public:
     bool incomingMessageNotification() const;
     void setIncomingMessageNotification(bool notification);
 
-    QString incomingMessageSound() const;
-    void setIncomingMessageSound(const QString &soundFile);
+    bool incomingMessageSound() const;
+    void setIncomingMessageSound(bool sound);
 
     bool openAtLogin() const;
     void setOpenAtLogin(bool run);
 
-    QString outgoingMessageSound() const;
-    void setOutgoingMessageSound(const QString &soundFile);
+    bool outgoingMessageSound() const;
+    void setOutgoingMessageSound(bool sound);
 
     bool sharesConfigured() const;
     void setSharesConfigured(bool configured);
@@ -107,9 +107,9 @@ signals:
     void disabledPluginsChanged(const QStringList &plugins);
     void enabledPluginsChanged(const QStringList &plugins);
     void incomingMessageNotificationChanged(bool notification);
-    void incomingMessageSoundChanged(const QString &sound);
+    void incomingMessageSoundChanged(bool sound);
     void openAtLoginChanged(bool run);
-    void outgoingMessageSoundChanged(const QString &sound);
+    void outgoingMessageSoundChanged(bool sound);
     void sharesConfiguredChanged(bool configured);
     void sharesDirectoriesChanged(const QVariantList &directories);
     void sharesLocationChanged(const QString &location);
