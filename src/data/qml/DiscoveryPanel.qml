@@ -47,13 +47,6 @@ Panel {
 
                 onClicked: discoView.model.refresh()
             }
-
-            ToolButton {
-                iconStyle: 'icon-remove'
-                text: qsTr('Close')
-
-                onClicked: panel.close()
-            }
         }
     }
 
