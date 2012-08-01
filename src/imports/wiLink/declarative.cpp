@@ -23,8 +23,6 @@
 #include <QDesktopServices>
 #include <QGraphicsSceneDragDropEvent>
 #include <QMimeData>
-#include <QNetworkDiskCache>
-#include <QNetworkRequest>
 #include <QProcess>
 #include <QSslError>
 
@@ -142,106 +140,6 @@ void ListHelper::setModel(QAbstractItemModel *model)
     }
 }
 
-class NetworkAccessManagerFactory : public QDeclarativeNetworkAccessManagerFactory
-{
-public:
-    NetworkAccessManagerFactory();
-
-    QNetworkAccessManager *create(QObject * parent)
-    {
-        return new NetworkAccessManager(parent);
-    }
-};
-
-NetworkAccessManagerFactory::NetworkAccessManagerFactory()
-{
-    // initialise cache
-    const QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
-    QDir().mkpath(dataPath);
-
-    // initialise wallet
-    QNetIO::Wallet::setDataPath(QDir(dataPath).filePath("wallet"));
-}
-
-NetworkAccessManager::NetworkAccessManager(QObject *parent)
-    : QNetworkAccessManager(parent)
-{
-    bool check;
-    Q_UNUSED(check);
-
-    const QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
-    QNetworkDiskCache *cache = new QNetworkDiskCache(this);
-    cache->setCacheDirectory(QDir(dataPath).filePath("cache"));
-    setCache(cache);
-
-    check = connect(this, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)),
-                    this, SLOT(onSslErrors(QNetworkReply*,QList<QSslError>)));
-    Q_ASSERT(check);
-}
-
-QNetworkReply *NetworkAccessManager::createRequest(Operation op, const QNetworkRequest &req, QIODevice *outgoingData)
-{
-    QNetworkRequest request(req);
-    request.setRawHeader("Accept-Language", QLocale::system().name().toAscii());
-    request.setRawHeader("User-Agent", userAgent().toAscii());
-    return QNetworkAccessManager::createRequest(op, request, outgoingData);
-}
-
-void NetworkAccessManager::onSslErrors(QNetworkReply *reply, const QList<QSslError> &errors)
-{
-    Q_UNUSED(reply);
-
-    qWarning("SSL errors:");
-    foreach (const QSslError &error, errors)
-        qWarning("* %s", qPrintable(error.errorString()));
-
-    // uncomment for debugging purposes only
-    //reply->ignoreSslErrors();
-}
-
-QString NetworkAccessManager::userAgent()
-{
-    static QString globalUserAgent;
-
-    if (globalUserAgent.isEmpty()) {
-        QString osDetails;
-#if defined(Q_OS_ANDROID)
-        osDetails = QLatin1String("Linux; Android");
-#elif defined(Q_OS_LINUX)
-        osDetails = QLatin1String("X11; Linux");
-        QProcess process;
-        process.start(QString("uname"), QStringList(QString("-m")), QIODevice::ReadOnly);
-        process.waitForFinished();
-        const QString arch = QString::fromLocal8Bit(process.readAllStandardOutput()).trimmed();
-        if (!arch.isEmpty())
-            osDetails += " " + arch;
-#elif defined(Q_OS_MAC)
-        osDetails = QLatin1String("Macintosh");
-        switch (QSysInfo::MacintoshVersion)
-        {
-        case QSysInfo::MV_10_4:
-            osDetails += QLatin1String("; Mac OS X 10.4");
-            break;
-        case QSysInfo::MV_10_5:
-            osDetails += QLatin1String("; Mac OS X 10.5");
-            break;
-        case QSysInfo::MV_10_6:
-            osDetails += QLatin1String("; Mac OS X 10.6");
-            break;
-        }
-#elif defined(Q_OS_SYMBIAN)
-        osDetails = QLatin1String("Symbian");
-#elif defined(Q_OS_WIN)
-        DWORD dwVersion = GetVersion();
-        DWORD dwMajorVersion = (DWORD)(LOBYTE(LOWORD(dwVersion)));
-        DWORD dwMinorVersion = (DWORD)(HIBYTE(LOWORD(dwVersion)));
-        osDetails = QString("Windows NT %1.%2").arg(QString::number(dwMajorVersion), QString::number(dwMinorVersion));
-#endif
-        globalUserAgent = QString("Mozilla/5.0 (%1) %2/%3").arg(osDetails, qApp->applicationName(), qApp->applicationVersion());
-    }
-    return globalUserAgent;
-}
-
 static QStringList droppedFiles(QGraphicsSceneDragDropEvent *event)
 {
     QStringList files;
@@ -305,7 +203,11 @@ void Plugin::initializeEngine(QDeclarativeEngine *engine, const char *uri)
     engine->addImageProvider("icon", new IconImageProvider);
     engine->addImageProvider("photo", new PhotoImageProvider);
     engine->addImageProvider("roster", new RosterImageProvider);
-    engine->setNetworkAccessManagerFactory(new NetworkAccessManagerFactory);
+
+    // initialise wallet
+    const QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+    QDir().mkpath(dataPath);
+    QNetIO::Wallet::setDataPath(QDir(dataPath).filePath("wallet"));
 }
 
 void Plugin::registerTypes(const char *uri)

@@ -30,8 +30,6 @@
 #include <QMenu>
 #include <QSystemTrayIcon>
 
-#include "declarative.h"
-
 QString QDeclarativeFileDialog::directory() const
 {
     return QFileDialog::directory().path();
