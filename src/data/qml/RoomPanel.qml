@@ -190,9 +190,8 @@ Panel {
 
         onError: {
             dialogSwapper.showPanel('ErrorNotification.qml', {
-                'iconSource': 'image://icon/chat',
-                'title': qsTranslate('RoomPanel', 'Chat room error'),
-                'text': qsTranslate('RoomPanel', "Sorry, but you cannot join chat room '%1'.\n\n%2").replace('%1', room.jid).replace('%2', ''),
+                title: qsTranslate('RoomPanel', 'Chat room error'),
+                text: qsTranslate('RoomPanel', "Sorry, but you cannot join chat room '%1'.\n\n%2").replace('%1', room.jid).replace('%2', ''),
             });
         }
 
@@ -202,9 +201,8 @@ Panel {
 
         onKicked: {
             dialogSwapper.showPanel('ErrorNotification.qml', {
-                'iconSource': 'image://icon/chat',
-                'title': qsTranslate('RoomPanel', 'Chat room error'),
-                'text': qsTranslate('RoomPanel', "Sorry, but you were kicked from chat room '%1'.\n\n%2").replace('%1', room.jid).replace('%2', reason),
+                title: qsTranslate('RoomPanel', 'Chat room error'),
+                text: qsTranslate('RoomPanel', "Sorry, but you were kicked from chat room '%1'.\n\n%2").replace('%1', room.jid).replace('%2', reason),
             });
         }
     }

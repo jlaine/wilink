@@ -164,9 +164,8 @@ Item {
                     if (call.errorString) {
                         flags += 2;
                         dialogSwapper.showPanel('ErrorNotification.qml', {
-                            'iconSource': 'image://icon/phone',
-                            'title': qsTr('Call failed'),
-                            'text': qsTr('Sorry, but the call could not be completed.') + '\n\n' + call.errorString,
+                            title: qsTr('Call failed'),
+                            text: qsTr('Sorry, but the call could not be completed.') + '\n\n' + call.errorString,
                         });
                     }
                     historyView.model.updateItem(callWidget.callId, {address: call.recipient, duration: call.duration, flags: flags});
