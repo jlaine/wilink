@@ -114,16 +114,10 @@ Panel {
     }
 
     Component.onCompleted: {
-        for (var i = 0; i < accountModel.count; ++i) {
-            var account = accountModel.get(i);
-            if (account.type == 'xmpp') {
-                var client = accountModel.clientForJid(account.username);
-                var domain = Utils.jidToDomain(client.jid);
-                discoView.model.manager = client.discoveryManager;
-                crumbBar.push({'name': domain, 'jid': domain, 'node': ''});
-                break;
-            }
-        }
+        var client = accountModel.clientForJid('wifirst.net');
+        var domain = Utils.jidToDomain(client.jid);
+        discoView.model.manager = client.discoveryManager;
+        crumbBar.push({'name': domain, 'jid': domain, 'node': ''});
     }
 }
 
