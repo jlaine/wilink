@@ -24,7 +24,6 @@ set(ICONS
     images/scalable/resize.svg
     images/scalable/rss.svg
     images/scalable/search.svg
-    images/scalable/share.svg
     images/scalable/tip.svg
     images/scalable/transfers.svg
     images/scalable/upload.svg
