@@ -18,11 +18,8 @@ set(ICONS
     images/scalable/download.svg
     images/scalable/file.svg
     images/scalable/moderator.svg
-    images/scalable/options.svg
     images/scalable/peer.svg
-    images/scalable/permissions.svg
     images/scalable/resize.svg
-    images/scalable/rss.svg
     images/scalable/search.svg
     images/scalable/tip.svg
     images/scalable/transfers.svg

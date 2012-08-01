@@ -40,11 +40,8 @@
     <file>images/32x32/face-wink.png</file>
     <file>images/32x32/file.png</file>
     <file>images/32x32/moderator.png</file>
-    <file>images/32x32/options.png</file>
     <file>images/32x32/peer.png</file>
-    <file>images/32x32/permissions.png</file>
     <file>images/32x32/resize.png</file>
-    <file>images/32x32/rss.png</file>
     <file>images/32x32/search.png</file>
     <file>images/32x32/tip.png</file>
     <file>images/32x32/transfers.png</file>
@@ -61,11 +58,8 @@
     <file>images/64x64/download.png</file>
     <file>images/64x64/file.png</file>
     <file>images/64x64/moderator.png</file>
-    <file>images/64x64/options.png</file>
     <file>images/64x64/peer.png</file>
-    <file>images/64x64/permissions.png</file>
     <file>images/64x64/resize.png</file>
-    <file>images/64x64/rss.png</file>
     <file>images/64x64/search.png</file>
     <file>images/64x64/tip.png</file>
     <file>images/64x64/transfers.png</file>
