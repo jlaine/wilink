@@ -24,6 +24,7 @@ Rectangle {
 
     property bool enabled: true
     property int iconSize: (iconSource != '' || iconStyle != '') ? appStyle.icon.smallSize : 0
+    property alias iconColor: icon.color
     property string iconSource: ''
     property string iconStyle: ''
     property int margins: (text != '') ? appStyle.margin.large : appStyle.margin.normal;
@@ -62,6 +63,7 @@ Rectangle {
         }
 
         Icon {
+            id: icon
             anchors.centerIn: parent
             style: iconStyle
         }

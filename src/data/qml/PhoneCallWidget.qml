@@ -145,7 +145,7 @@ Item {
             Button {
                 id: hangupButton
 
-                iconSource: 'image://icon/hangup'
+                iconStyle: 'icon-remove'
                 onClicked: call.hangup()
             }
         }

@@ -42,12 +42,18 @@ Label {
             return '\uF021';
         case 'icon-lock':
             return '\uF023';
+        case 'icon-facetime-video':
+            return '\uF03D';
         case 'icon-picture':
             return '\uF03E';
         case 'icon-edit':
             return '\uF044';
         case 'icon-share':
             return '\uF045';
+        case 'icon-check':
+            return '\uF046';
+        case 'icon-move':
+            return '\uF047';
         case 'icon-play':
             return '\uF04B';
         case 'icon-pause':
@@ -70,6 +76,10 @@ Label {
             return '\uF068';
         case 'icon-exclamation-sign':
             return '\uF06A';
+        case 'icon-eye-open':
+            return '\uF06E';
+        case 'icon-eye-close':
+            return '\uF070';
         case 'icon-comment':
             return '\uF075';
         case 'icon-chevron-up':
@@ -80,6 +90,8 @@ Label {
             return '\uF085';
         case 'icon-phone':
             return '\uF095';
+        case 'icon-check-empty':
+            return '\uF096';
         case 'icon-rss':
             return '\uF09E';
         case 'icon-globe':

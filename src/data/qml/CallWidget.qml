@@ -166,7 +166,7 @@ Item {
                 id: cameraButton
 
                 enabled: Qt.isQtObject(call) && call.state == QXmppCall.ActiveState
-                iconSource: 'image://icon/camera'
+                iconStyle: 'icon-facetime-video'
 
                 onClicked: {
                     if (video.openMode & CallVideoHelper.WriteOnly)
@@ -178,7 +178,7 @@ Item {
                 states: State {
                     name: 'active'
                     when: (video.openMode & CallVideoHelper.WriteOnly) != 0
-                    PropertyChanges { target: cameraButton; iconSource: 'image://icon/camera-active' }
+                    PropertyChanges { target: cameraButton; iconColor: 'red' }
                 }
             }
 
@@ -186,7 +186,7 @@ Item {
                 id: fullScreenButton
 
                 enabled: Qt.isQtObject(call) && call.state == QXmppCall.ActiveState
-                iconSource: 'image://icon/fullscreen'
+                iconStyle: 'icon-fullscreen'
 
                 onClicked: {
                     if (callWidget.state == '')
@@ -199,7 +199,7 @@ Item {
             Button {
                 id: hangupButton
 
-                iconSource: 'image://icon/hangup'
+                iconStyle: 'icon-remove'
                 onClicked: call.hangup()
             }
         }
