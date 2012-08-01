@@ -52,8 +52,10 @@ NetworkAccessManager::NetworkAccessManager(QObject *parent)
 QNetworkReply *NetworkAccessManager::createRequest(Operation op, const QNetworkRequest &req, QIODevice *outgoingData)
 {
     QNetworkRequest request(req);
-    request.setRawHeader("Accept-Language", QLocale::system().name().toAscii());
-    request.setRawHeader("User-Agent", userAgent().toAscii());
+    if (!request.hasRawHeader("Accept-Language"))
+        request.setRawHeader("Accept-Language", QLocale::system().name().toAscii());
+    if (!request.hasRawHeader("User-Agent"))
+        request.setRawHeader("User-Agent", userAgent().toAscii());
     return QNetworkAccessManager::createRequest(op, request, outgoingData);
 }
 
