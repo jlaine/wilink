@@ -1,8 +1,5 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
-    <file>qml/fontawesome-webfont.ttf</file>
-    <file>qml/sip.js</file>
-    <file>qml/utils.js</file>
     <file>qml/AboutDialog.qml</file>
     <file>qml/AccountListPanel.qml</file>
     <file>qml/AccountPasswordDialog.qml</file>
@@ -110,6 +107,9 @@
     <file>qml/WebPlugin.qml</file>
     <file>qml/WebTab.qml</file>
     <file>qml/boot.qml</file>
+    <file>qml/fontawesome-webfont.ttf</file>
+    <file>qml/sip.js</file>
+    <file>qml/utils.js</file>
     <file>qml/i18n/fr.qm</file>
 </qresource>
 </RCC>

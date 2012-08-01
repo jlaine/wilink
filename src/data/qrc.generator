@@ -22,31 +22,22 @@
 import os
 import re
 
-# find files
-font_files = []
-image_files = []
-js_files = []
-qml_files = []
-sound_files = []
-translation_files = []
-for dirname in ['.', 'images', 'images/16x16', 'images/32x32', 'images/64x64', 'images/128x128', 'qml', 'qml/i18n', 'sounds']:
-    for name in sorted(os.listdir(dirname)):
-        if dirname == '.':
-            path = name
-        else:
-            path = os.path.join(dirname, name)
-        if name.endswith('.js'):
-            js_files.append(path)
-        elif name.endswith('.ogg'):
-            sound_files.append(path)
-        elif name.endswith('.png'):
-            image_files.append(path)
-        elif name.endswith('.qm'):
-            translation_files.append(path)
-        elif name.endswith('.qml'):
-            qml_files.append(path)
-        elif name.endswith('.ttf'):
-            font_files.append(path)
+EXTENSIONS = ('ogg', 'js', 'png', 'qm', 'qml', 'ttf')
+
+def find_files(dirnames):
+    paths = []
+    for dirname in dirnames:
+        for name in sorted(os.listdir(dirname)):
+            if dirname == '.':
+                path = name
+            else:
+                path = os.path.join(dirname, name)
+
+            if os.path.isdir(path):
+                continue
+            if name.split('.')[-1] in EXTENSIONS:
+                paths.append(path)
+    return paths
 
 def write_qrc(path, file_paths):
     fp = open(path, 'w')
@@ -58,11 +49,16 @@ def write_qrc(path, file_paths):
     fp.write('</RCC>\n')
     fp.close()
 
-write_qrc('wiLink.qrc', image_files + sound_files)
-write_qrc('qml.qrc', font_files + js_files + qml_files + translation_files)
+paths = find_files(['.', 'images', 'images/16x16', 'images/32x32', 'images/64x64', 'images/128x128', 'sounds'])
+write_qrc('wiLink.qrc', paths)
+
+paths = find_files(['qml', 'qml/i18n'])
+write_qrc('qml.qrc', paths)
 fp = open('qml/qmldir', 'w')
-for qml_path in qml_files:
-    qml_name = os.path.basename(qml_path).split('.')[0]
-    if qml_name[0].upper() == qml_name[0]:
-        fp.write("%s 1.0 %s.qml\n" % (qml_name, qml_name))
+for qml_path in paths:
+    extension = os.path.basename(qml_path).split('.')[-1]
+    if extension == 'qml':
+        qml_name = os.path.basename(qml_path).split('.')[0]
+        if qml_name[0].upper() == qml_name[0]:
+            fp.write("%s 1.0 %s.qml\n" % (qml_name, qml_name))
 fp.close()
