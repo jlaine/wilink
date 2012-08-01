@@ -46,6 +46,8 @@ Label {
             return '\uF03E';
         case 'icon-edit':
             return '\uF044';
+        case 'icon-share':
+            return '\uF045';
         case 'icon-play':
             return '\uF04B';
         case 'icon-pause':
@@ -104,6 +106,8 @@ Label {
             return '\uF0DA';
         case 'icon-bolt':
             return '\uF0E7';
+        case 'icon-sitemap':
+            return '\uF0E8';
         case 'icon-paste':
             return '\uF0EA';
         case 'icon-comments-alt':
