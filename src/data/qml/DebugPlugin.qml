@@ -25,7 +25,6 @@ Plugin {
     iconStyle: 'icon-exclamation-sign'
 
     onLoaded: {
-        /*
         dock.model.add({
             'iconStyle': 'icon-sitemap',
             'panelSource': 'DiscoveryPanel.qml',
@@ -33,7 +32,6 @@ Plugin {
             'shortcut': Qt.ControlModifier + Qt.Key_B,
             'text': qsTr('Discovery'),
             'visible': true});
-        */
         dock.model.add({
             'iconStyle': iconStyle,
             'panelSource': 'LogPanel.qml',
@@ -44,7 +42,7 @@ Plugin {
     }
 
     onUnloaded: {
-        //dock.model.removePanel('DiscoveryPanel.qml');
+        dock.model.removePanel('DiscoveryPanel.qml');
         dock.model.removePanel('LogPanel.qml');
     }
 }
