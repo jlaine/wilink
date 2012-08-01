@@ -22,8 +22,7 @@ import QtQuick 1.1
 Item {
     id: button
 
-    property int iconSize: (iconSource != '' || iconStyle != '') ? appStyle.icon.smallSize : 0
-    property string iconSource: ''
+    property int iconSize: iconStyle != '' ? appStyle.icon.smallSize : 0
     property string iconStyle: ''
     property alias text: label.text
     property bool enabled: true
@@ -75,15 +74,6 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             width: iconSize
             height: iconSize
-
-            Image {
-                anchors.centerIn: parent
-                opacity: button.enabled ? 1 : 0.5
-                smooth: true
-                source: iconSource
-                sourceSize.width: iconSize
-                sourceSize.height: iconSize
-            }
 
             Icon {
                 anchors.centerIn: parent

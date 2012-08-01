@@ -76,7 +76,7 @@ Dialog {
                 Component.onCompleted: {
                     for (var i in clients) {
                         var client = clients[i];
-                        model.append({iconSource: 'image://icon/chat', text: Utils.jidToBareJid(client.jid), client: client});
+                        model.append({iconStyle: 'icon-user', text: Utils.jidToBareJid(client.jid), client: client});
                     }
                     if (model.count > 0)
                         accountCombo.currentIndex = 0;
