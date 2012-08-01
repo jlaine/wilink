@@ -19,7 +19,8 @@
 
 #include <QCoreApplication>
 #include <QCryptographicHash>
-#include <QDebug>
+#include <QDeclarativeEngine>
+#include <QDeclarativeItem>
 #include <QDesktopServices>
 #include <QDir>
 #include <QDomDocument>
@@ -36,7 +37,6 @@
 #include <windows.h>
 #endif
 
-#include "declarative.h"
 #include "settings.h"
 #include "systeminfo.h"
 #include "updater.h"
@@ -64,7 +64,6 @@ public:
 
     Updater::Error error;
     QString errorString;
-    QNetworkAccessManager *network;
     int progressValue;
     Release release;
     Updater::State state;
@@ -82,7 +81,6 @@ UpdaterPrivate::UpdaterPrivate(Updater *qq)
     updatesUrl("https://download.wifirst.net/wiLink/"),
     q(qq)
 {
-    network = new NetworkAccessManager(q);
 }
 
 void UpdaterPrivate::fail(Updater::Error newError, const QString &newString)
@@ -179,7 +177,7 @@ void Updater::check()
 
     QNetworkRequest req(statusUrl);
     req.setRawHeader("Accept", "application/xml");
-    QNetworkReply *reply = d->network->get(req);
+    QNetworkReply *reply = qmlEngine(this)->networkAccessManager()->get(req);
     connect(reply, SIGNAL(finished()),
             this, SLOT(_q_processStatus()));
 
@@ -341,6 +339,7 @@ void Updater::_q_saveUpdate()
 {
     QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
     Q_ASSERT(reply != NULL);
+    reply->deleteLater();
 
     if (reply->error() != QNetworkReply::NoError) {
         // network error, retry in 5mn
@@ -381,6 +380,7 @@ void Updater::_q_processStatus()
 {
     QNetworkReply *reply = qobject_cast<QNetworkReply *>(sender());
     Q_ASSERT(reply != NULL);
+    reply->deleteLater();
 
     if (reply->error() != QNetworkReply::NoError) {
         // network error, retry in 5mn
@@ -434,7 +434,7 @@ void Updater::_q_processStatus()
 
     // download release
     QNetworkRequest req(d->release.url);
-    reply = d->network->get(req);
+    reply = qmlEngine(this)->networkAccessManager()->get(req);
 
     bool check;
     Q_UNUSED(check);
