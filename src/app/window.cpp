@@ -77,6 +77,7 @@ CustomWindow::CustomWindow(QtLocalPeer *peer, QWidget *parent)
     d->view = new QDeclarativeView;
     d->view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
     d->view->engine()->setNetworkAccessManagerFactory(new NetworkAccessManagerFactory);
+    QDir().mkpath(d->view->engine()->offlineStoragePath());
 
     check = connect(d->view, SIGNAL(statusChanged(QDeclarativeView::Status)),
                     this, SLOT(_q_statusChanged()));
