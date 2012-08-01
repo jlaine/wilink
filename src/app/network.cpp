@@ -18,10 +18,7 @@
  */
 
 #include <QCoreApplication>
-#include <QDesktopServices>
-#include <QDir>
 #include <QLocale>
-#include <QNetworkDiskCache>
 #include <QNetworkRequest>
 #include <QProcess>
 #include <QSslError>
@@ -37,13 +34,6 @@ NetworkAccessManager::NetworkAccessManager(QObject *parent)
 {
     bool check;
     Q_UNUSED(check);
-
-    const QString cachePath = QDir(QDesktopServices::storageLocation(QDesktopServices::DataLocation)).filePath("cache");
-    QDir().mkpath(cachePath);
-
-    QNetworkDiskCache *cache = new QNetworkDiskCache(this);
-    cache->setCacheDirectory(cachePath);
-    setCache(cache);
 
     check = connect(this, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)),
                     this, SLOT(onSslErrors(QNetworkReply*,QList<QSslError>)));

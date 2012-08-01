@@ -21,8 +21,10 @@
 #include <QDeclarativeContext>
 #include <QDeclarativeEngine>
 #include <QDeclarativeView>
+#include <QDesktopServices>
 #include <QDesktopWidget>
 #include <QMenuBar>
+#include <QNetworkDiskCache>
 #include <QSettings>
 #include <QShortcut>
 #include <QStringList>
@@ -40,10 +42,22 @@
 class NetworkAccessManagerFactory : public QDeclarativeNetworkAccessManagerFactory
 {
 public:
+    NetworkAccessManagerFactory(const QString &cachePath)
+        : m_cachePath(cachePath)
+    {
+    }
+
     QNetworkAccessManager *create(QObject * parent)
     {
-        return new NetworkAccessManager(parent);
+        QNetworkAccessManager *manager = new NetworkAccessManager(parent);
+        QNetworkDiskCache *cache = new QNetworkDiskCache(manager);
+        cache->setCacheDirectory(m_cachePath);
+        manager->setCache(cache);
+        return manager;
     }
+
+private:
+    QString m_cachePath;
 };
 
 class CustomWindowPrivate
@@ -73,11 +87,18 @@ CustomWindow::CustomWindow(QtLocalPeer *peer, QWidget *parent)
     d->qmlRoots << QUrl(QString("https://download.wifirst.net/public/%1/%2/qml/").arg(qApp->applicationName(), qApp->applicationVersion()));
     d->qmlRoots << QUrl("qrc:/qml/");
 
+    // create data paths
+    const QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+    const QString cachePath = QDir(dataPath).filePath("cache");
+    const QString storagePath = QDir(dataPath).filePath("storage");
+    QDir().mkpath(cachePath);
+    QDir().mkpath(storagePath);
+
     // create declarative view
     d->view = new QDeclarativeView;
     d->view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
-    d->view->engine()->setNetworkAccessManagerFactory(new NetworkAccessManagerFactory);
-    QDir().mkpath(d->view->engine()->offlineStoragePath());
+    d->view->engine()->setNetworkAccessManagerFactory(new NetworkAccessManagerFactory(cachePath));
+    d->view->engine()->setOfflineStoragePath(storagePath);
 
     check = connect(d->view, SIGNAL(statusChanged(QDeclarativeView::Status)),
                     this, SLOT(_q_statusChanged()));
