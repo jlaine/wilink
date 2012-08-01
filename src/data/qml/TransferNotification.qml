@@ -27,7 +27,7 @@ NotificationDialog {
     property QtObject job
     property Item panel
 
-    iconSource: vcard.avatar
+    iconStyle: 'icon-file'
     text: Qt.isQtObject(job) ? qsTr("%1 wants to send you a file called '%2' (%3).\n\nDo you accept?").replace('%1', vcard.name).replace('%2', job.fileName).replace('%3', Utils.formatSize(job.fileSize)) : ''
     title: qsTr('File from %1').replace('%1', vcard.name)
 

@@ -29,6 +29,7 @@ NotificationDialog {
         text: qsTr('Close')
         onClicked: dialog.rejected()
     }
+    iconStyle: 'icon-exclamation-sign'
 
     onAccepted: dialog.close()
 }

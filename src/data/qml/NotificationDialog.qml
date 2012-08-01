@@ -22,7 +22,7 @@ import QtQuick 1.1
 Dialog {
     id: dialog
 
-    property alias iconSource: image.source
+    property alias iconStyle: icon.style
     property QtObject soundJob
     property alias text: label.text
 
@@ -31,18 +31,19 @@ Dialog {
     Item {
         anchors.fill: parent
 
-        Image {
-            id: image
+        Icon {
+            id: icon
 
             anchors.top: parent.top
             anchors.left: parent.left
+            font.pixelSize: 24
         }
 
         Label {
             id: label
 
             anchors.top: parent.top
-            anchors.left: image.right
+            anchors.left: icon.right
             anchors.leftMargin: 8
             anchors.right: parent.right
             wrapMode: Text.WordWrap

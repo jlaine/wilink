@@ -26,7 +26,7 @@ NotificationDialog {
     property QtObject call
     property Item panel
 
-    iconSource: vcard.avatar
+    iconStyle: 'icon-phone'
     text: qsTr('%1 wants to talk to you.\n\nDo you accept?').replace('%1', vcard.name)
     title: qsTr('Call from %1').replace('%1', vcard.name)
 
