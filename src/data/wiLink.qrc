@@ -1,6 +1,5 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
-    <file>images/shadow.png</file>
     <file>images/16x16/checkbox-checked.png</file>
     <file>images/16x16/checkbox.png</file>
     <file>images/16x16/face-angry.png</file>

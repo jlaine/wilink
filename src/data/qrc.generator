@@ -49,10 +49,10 @@ def write_qrc(path, file_paths):
     fp.write('</RCC>\n')
     fp.close()
 
-paths = find_files(['.', 'images', 'images/16x16', 'images/32x32', 'images/64x64', 'images/128x128', 'sounds'])
+paths = find_files(['images/16x16', 'images/32x32', 'images/64x64', 'images/128x128', 'sounds'])
 write_qrc('wiLink.qrc', paths)
 
-paths = find_files(['qml', 'qml/i18n'])
+paths = find_files(['qml', 'qml/fonts', 'qml/i18n', 'qml/images'])
 write_qrc('qml.qrc', paths)
 fp = open('qml/qmldir', 'w')
 for qml_path in paths:

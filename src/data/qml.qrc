@@ -107,9 +107,10 @@
     <file>qml/WebPlugin.qml</file>
     <file>qml/WebTab.qml</file>
     <file>qml/boot.qml</file>
-    <file>qml/fontawesome-webfont.ttf</file>
     <file>qml/sip.js</file>
     <file>qml/utils.js</file>
+    <file>qml/fonts/fontawesome-webfont.ttf</file>
     <file>qml/i18n/fr.qm</file>
+    <file>qml/images/shadow.png</file>
 </qresource>
 </RCC>
