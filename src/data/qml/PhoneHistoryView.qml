@@ -19,8 +19,8 @@
 
 import QtQuick 1.1
 import wiLink 2.4
-import 'sip.js' as Sip
-import 'utils.js' as Utils
+import 'scripts/sip.js' as Sip
+import 'scripts/utils.js' as Utils
 
 GroupBox {
     id: block

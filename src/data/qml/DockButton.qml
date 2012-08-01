@@ -18,7 +18,7 @@
  */
 
 import QtQuick 1.1
-import 'utils.js' as Utils
+import 'scripts/utils.js' as Utils
 
 Item {
     id: button

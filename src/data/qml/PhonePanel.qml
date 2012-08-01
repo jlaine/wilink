@@ -19,7 +19,7 @@
 
 import QtQuick 1.1
 import wiLink 2.4
-import 'sip.js' as Sip
+import 'scripts/sip.js' as Sip
 
 Panel {
     id: panel
