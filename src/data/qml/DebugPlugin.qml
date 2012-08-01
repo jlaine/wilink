@@ -22,7 +22,7 @@ import QtQuick 1.1
 Plugin {
     name: qsTr('Debugging')
     description: qsTr('This plugin allows you to view debugging information.')
-    imageSource: 'image://icon/debug'
+    iconStyle: 'icon-exclamation-sign'
 
     onLoaded: {
         /*
@@ -35,7 +35,7 @@ Plugin {
             'visible': true});
         */
         dock.model.add({
-            'iconStyle': 'icon-exclamation-sign',
+            'iconStyle': iconStyle,
             'panelSource': 'LogPanel.qml',
             'priority': -1,
             'shortcut': Qt.ControlModifier + Qt.Key_L,

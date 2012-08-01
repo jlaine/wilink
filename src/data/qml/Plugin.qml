@@ -26,8 +26,8 @@ Item {
     // The full description of the plugin.
     property string description
 
-    // The URL of the plugin's image.
-    property url imageSource: 'image://icon/plugin'
+    // The URL's icon style.
+    property string iconStyle: 'icon-cogs'
 
     // This signal is emitted when the plugin is enabled.
     //

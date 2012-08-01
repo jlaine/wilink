@@ -23,11 +23,11 @@ import 'utils.js' as Utils
 Plugin {
     name: qsTr('Chat')
     description: qsTr('This plugin allows you to chat with your friends.')
-    imageSource: 'image://icon/chat'
+    iconStyle: 'icon-comments-alt'
 
     onLoaded: {
         dock.model.add({
-            'iconStyle': 'icon-comments-alt',
+            'iconStyle': iconStyle,
             'notified': false,
             'panelSource': 'ChatPanel.qml',
             'priority': 10,

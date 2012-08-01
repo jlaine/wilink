@@ -22,11 +22,11 @@ import QtQuick 1.1
 Plugin {
     name: qsTr('Diagnostics')
     description: qsTr('This plugin allows you to run tests to diagnostic network issues.')
-    imageSource: 'image://icon/diagnostics'
+    iconStyle: 'icon-info-sign'
 
     onLoaded: {
         dock.model.add({
-            'iconStyle': 'icon-info-sign',
+            'iconStyle': iconStyle,
             'panelSource': 'DiagnosticPanel.qml',
             'priority': 6,
             'shortcut': Qt.ControlModifier + Qt.Key_I,

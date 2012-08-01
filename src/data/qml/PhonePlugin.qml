@@ -26,14 +26,14 @@ Plugin {
 
     name: qsTr('Phone')
     description: qsTr('This plugin allows you to make phone calls.')
-    imageSource: 'image://icon/phone'
+    iconStyle: 'icon-phone'
 
     onLoaded: {
         for (var i = 0; i < accountModel.count; ++i) {
             var account = accountModel.get(i);
             if (account.type == 'web' && account.realm == 'www.wifirst.net') {
                 dock.model.add({
-                    'iconStyle': 'icon-phone',
+                    'iconStyle': iconStyle,
                     'panelSource': 'PhonePanel.qml',
                     'priority': 9,
                     'shortcut': Qt.ControlModifier + Qt.Key_T,

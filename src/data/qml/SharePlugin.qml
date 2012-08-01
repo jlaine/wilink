@@ -22,11 +22,11 @@ import QtQuick 1.1
 Plugin {
     name: qsTr('Shares')
     description: qsTr('This plugin allows you to share documents.')
-    imageSource: 'image://icon/share'
+    iconStyle: 'icon-share'
 
     onLoaded: {
         dock.model.add({
-            'iconStyle': 'icon-share',
+            'iconStyle': iconStyle,
             'panelSource': 'SharePanel.qml',
             'priority': 8,
             'shortcut': Qt.ControlModifier + Qt.Key_S,
