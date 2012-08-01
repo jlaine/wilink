@@ -25,14 +25,94 @@ Panel {
 
     property variant url
 
-    TabView {
+    ListView {
         id: tabView
 
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
+        clip: true
+        currentIndex: Qt.isQtObject(tabSwapper) ? tabSwapper.currentIndex : -1
         height: appStyle.icon.smallSize
-        panelSwapper: tabSwapper
+        highlightMoveDuration: appStyle.highlightMoveDuration
+        model: tabSwapper.model
+        orientation: ListView.Horizontal
+        spacing: 2
+
+        delegate: Item {
+            id: rect
+
+            height: tabView.height
+            width: 200
+            z: model.panel.z
+
+            Rectangle {
+                id: frame
+
+                anchors.fill: parent
+                anchors.bottomMargin: -radius
+                border.color: '#DDDDDD'
+                border.width: 1
+                opacity: 0
+                radius: 4
+                height: tabView.height
+
+                Behavior on opacity {
+                    PropertyAnimation { duration: appStyle.animation.normalDuration }
+                }
+            }
+
+            Image {
+                id: icon
+
+                anchors.left: parent.left
+                anchors.leftMargin: appStyle.margin.large
+                anchors.verticalCenter: parent.verticalCenter
+                smooth: true
+                source: model.panel.iconSource
+                sourceSize.height: appStyle.icon.tinySize
+                sourceSize.width: appStyle.icon.tinySize
+            }
+
+            Label {
+                anchors.margins: appStyle.margin.normal
+                anchors.left: icon.right
+                anchors.right: closeButton.left
+                anchors.verticalCenter: parent.verticalCenter
+                elide: Text.ElideRight
+                text: model.panel.title
+            }
+
+            MouseArea {
+                id: mouseArea
+
+                anchors.fill: parent
+                hoverEnabled: true
+                onClicked: {
+                    tabSwapper.currentIndex = model.index;
+                }
+            }
+
+            ToolButton {
+                id: closeButton
+
+                anchors.right: parent.right
+                anchors.rightMargin: appStyle.margin.large
+                anchors.verticalCenter: parent.verticalCenter
+                iconStyle: 'icon-remove'
+                width: iconSize
+                visible: tabView.model.count > 1
+
+                onClicked: model.panel.close()
+            }
+
+            states: State {
+                name: 'current'
+                when: (model.index == tabView.currentIndex)
+
+                PropertyChanges { target: frame; opacity: 1 }
+            }
+        }
 
         footer: ToolButton {
             id: addButton

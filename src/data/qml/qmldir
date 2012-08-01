@@ -98,7 +98,6 @@ StatusBar 1.0 StatusBar.qml
 StatusDelegate 1.0 StatusDelegate.qml
 StatusPill 1.0 StatusPill.qml
 Style 1.0 Style.qml
-TabView 1.0 TabView.qml
 ToolBar 1.0 ToolBar.qml
 ToolButton 1.0 ToolButton.qml
 TransferNotification 1.0 TransferNotification.qml

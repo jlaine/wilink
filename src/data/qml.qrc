@@ -103,7 +103,6 @@
     <file>qml/StatusDelegate.qml</file>
     <file>qml/StatusPill.qml</file>
     <file>qml/Style.qml</file>
-    <file>qml/TabView.qml</file>
     <file>qml/ToolBar.qml</file>
     <file>qml/ToolButton.qml</file>
     <file>qml/TransferNotification.qml</file>
