@@ -11,25 +11,12 @@ set(ICONS
     images/scalable/album.svg
     images/scalable/audio-input.svg
     images/scalable/audio-output.svg
-    images/scalable/call.svg
     images/scalable/call-incoming.svg
     images/scalable/call-outgoing.svg
     images/scalable/chat.svg
     images/scalable/close.svg
-    images/scalable/debug.svg
-    images/scalable/diagnostics.svg
     images/scalable/download.svg
-    images/scalable/facebook.svg
-    images/scalable/favorite-active.svg
-    images/scalable/favorite-inactive.svg
     images/scalable/file.svg
-    images/scalable/fire.svg
-    images/scalable/fullscreen.svg
-    images/scalable/google.svg
-    images/scalable/hangup.svg
-    images/scalable/home.svg
-    images/scalable/information.svg
-    images/scalable/invite.svg
     images/scalable/moderator.svg
     images/scalable/options.svg
     images/scalable/peer.svg
@@ -51,7 +38,6 @@ set(LARGE_ICONS
     images/scalable/file.svg
     images/scalable/image-x-generic.svgz
     images/scalable/peer.svg
-    images/scalable/photos.svg
     images/scalable/spinner.svg
     images/scalable/text-x-generic.svgz
     images/scalable/video-x-generic.svgz

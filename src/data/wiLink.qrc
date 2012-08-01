@@ -21,13 +21,9 @@
     <file>images/32x32/audio-output.png</file>
     <file>images/32x32/call-incoming.png</file>
     <file>images/32x32/call-outgoing.png</file>
-    <file>images/32x32/call.png</file>
     <file>images/32x32/chat.png</file>
     <file>images/32x32/checkbox-checked.png</file>
     <file>images/32x32/checkbox.png</file>
-    <file>images/32x32/close.png</file>
-    <file>images/32x32/debug.png</file>
-    <file>images/32x32/diagnostics.png</file>
     <file>images/32x32/download.png</file>
     <file>images/32x32/face-angry.png</file>
     <file>images/32x32/face-cool.png</file>
@@ -42,17 +38,7 @@
     <file>images/32x32/face-surprise.png</file>
     <file>images/32x32/face-uncertain.png</file>
     <file>images/32x32/face-wink.png</file>
-    <file>images/32x32/facebook.png</file>
-    <file>images/32x32/favorite-active.png</file>
-    <file>images/32x32/favorite-inactive.png</file>
     <file>images/32x32/file.png</file>
-    <file>images/32x32/fire.png</file>
-    <file>images/32x32/fullscreen.png</file>
-    <file>images/32x32/google.png</file>
-    <file>images/32x32/hangup.png</file>
-    <file>images/32x32/home.png</file>
-    <file>images/32x32/information.png</file>
-    <file>images/32x32/invite.png</file>
     <file>images/32x32/moderator.png</file>
     <file>images/32x32/options.png</file>
     <file>images/32x32/peer.png</file>
@@ -72,23 +58,9 @@
     <file>images/64x64/audio-output.png</file>
     <file>images/64x64/call-incoming.png</file>
     <file>images/64x64/call-outgoing.png</file>
-    <file>images/64x64/call.png</file>
     <file>images/64x64/chat.png</file>
-    <file>images/64x64/close.png</file>
-    <file>images/64x64/debug.png</file>
-    <file>images/64x64/diagnostics.png</file>
     <file>images/64x64/download.png</file>
-    <file>images/64x64/facebook.png</file>
-    <file>images/64x64/favorite-active.png</file>
-    <file>images/64x64/favorite-inactive.png</file>
     <file>images/64x64/file.png</file>
-    <file>images/64x64/fire.png</file>
-    <file>images/64x64/fullscreen.png</file>
-    <file>images/64x64/google.png</file>
-    <file>images/64x64/hangup.png</file>
-    <file>images/64x64/home.png</file>
-    <file>images/64x64/information.png</file>
-    <file>images/64x64/invite.png</file>
     <file>images/64x64/moderator.png</file>
     <file>images/64x64/options.png</file>
     <file>images/64x64/peer.png</file>
@@ -108,7 +80,6 @@
     <file>images/128x128/file.png</file>
     <file>images/128x128/image-x-generic.png</file>
     <file>images/128x128/peer.png</file>
-    <file>images/128x128/photos.png</file>
     <file>images/128x128/spinner.png</file>
     <file>images/128x128/text-x-generic.png</file>
     <file>images/128x128/video-x-generic.png</file>
