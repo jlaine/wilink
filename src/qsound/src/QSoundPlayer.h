@@ -28,46 +28,6 @@ class QNetworkAccessManager;
 class QSoundFile;
 class QSoundPlayer;
 class QSoundPlayerPrivate;
-class QSoundPlayerJobPrivate;
-
-class QSoundPlayerJob : public QObject
-{
-    Q_OBJECT
-    Q_ENUMS(State)
-    Q_PROPERTY(State state READ state NOTIFY stateChanged)
-    Q_PROPERTY(QUrl url READ url CONSTANT)
-
-public:
-    enum State {
-        IdleState = 0,
-        DownloadingState = 1,
-        PlayingState = 2,
-    };
-
-    QSoundPlayerJob::State state() const;
-    QUrl url() const;
-
-signals:
-    void finished();
-    void stateChanged();
-
-public slots:
-    void stop();
-
-private slots:
-    void _q_download();
-    void _q_downloadFinished();
-    void _q_stateChanged();
-
-private:
-    QSoundPlayerJob(QSoundPlayer *player, int id);
-    ~QSoundPlayerJob();
-
-    void setFile(QSoundFile *soundFile);
-
-    QSoundPlayerJobPrivate *d;
-    friend class QSoundPlayer;
-};
 
 class QSoundPlayer : public QObject
 {
@@ -95,20 +55,11 @@ public:
     QAudioDeviceInfo outputDevice() const;
     QStringList outputDeviceNames() const;
 
-    QNetworkAccessManager *networkAccessManager() const;
-    void setNetworkAccessManager(QNetworkAccessManager *manager);
-
     QThread *soundThread() const;
 
 signals:
     void inputDeviceNameChanged();
     void outputDeviceNameChanged();
-
-public slots:
-    QSoundPlayerJob *play(const QUrl &url, bool repeat = false);
-
-private slots:
-    void _q_finished();
 
 private:
     QSoundPlayerPrivate *d;

@@ -160,7 +160,10 @@ void QSoundLoader::start()
 
 void QSoundLoader::stop()
 {
-
+    if (d->reply)
+        d->reply->abort();
+    if (d->audioOutput)
+        d->audioOutput->stop();
 }
 
 QSoundLoader::Status QSoundLoader::status() const
