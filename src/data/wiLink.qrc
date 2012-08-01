@@ -24,7 +24,6 @@
     <file>images/32x32/chat.png</file>
     <file>images/32x32/checkbox-checked.png</file>
     <file>images/32x32/checkbox.png</file>
-    <file>images/32x32/download.png</file>
     <file>images/32x32/face-angry.png</file>
     <file>images/32x32/face-cool.png</file>
     <file>images/32x32/face-crying.png</file>
@@ -45,7 +44,6 @@
     <file>images/32x32/search.png</file>
     <file>images/32x32/tip.png</file>
     <file>images/32x32/transfers.png</file>
-    <file>images/32x32/upload.png</file>
     <file>images/32x32/web.png</file>
     <file>images/32x32/wiLink-black.png</file>
     <file>images/32x32/wiLink.png</file>
@@ -55,7 +53,6 @@
     <file>images/64x64/call-incoming.png</file>
     <file>images/64x64/call-outgoing.png</file>
     <file>images/64x64/chat.png</file>
-    <file>images/64x64/download.png</file>
     <file>images/64x64/file.png</file>
     <file>images/64x64/moderator.png</file>
     <file>images/64x64/peer.png</file>
@@ -63,7 +60,6 @@
     <file>images/64x64/search.png</file>
     <file>images/64x64/tip.png</file>
     <file>images/64x64/transfers.png</file>
-    <file>images/64x64/upload.png</file>
     <file>images/64x64/web.png</file>
     <file>images/64x64/wiLink-black.png</file>
     <file>images/64x64/wiLink.png</file>

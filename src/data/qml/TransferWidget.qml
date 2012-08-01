@@ -41,15 +41,13 @@ Item {
         }
     }
 
-    Image {
+    Icon {
         id: icon
 
-        width: appStyle.icon.smallSize
-        height: appStyle.icon.smallSize
         anchors.left: parent.left
         anchors.leftMargin: appStyle.margin.normal
         anchors.verticalCenter: parent.verticalCenter
-        source: (Qt.isQtObject(job) && job.direction == QXmppTransferJob.OutgoingDirection) ? 'image://icon/upload' : 'image://icon/download'
+        iconStyle: (Qt.isQtObject(job) && job.direction == QXmppTransferJob.OutgoingDirection) ? 'icon-upload' : 'icon-download'
     }
 
     ProgressBar {

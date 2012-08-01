@@ -15,7 +15,6 @@ set(ICONS
     images/scalable/call-outgoing.svg
     images/scalable/chat.svg
     images/scalable/close.svg
-    images/scalable/download.svg
     images/scalable/file.svg
     images/scalable/moderator.svg
     images/scalable/peer.svg
@@ -23,7 +22,6 @@ set(ICONS
     images/scalable/search.svg
     images/scalable/tip.svg
     images/scalable/transfers.svg
-    images/scalable/upload.svg
     images/scalable/web.svg
     images/scalable/wiLink.svg
     images/scalable/wiLink-black.svg)
