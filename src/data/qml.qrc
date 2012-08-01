@@ -47,9 +47,6 @@
     <file>qml/MeegoMain.qml</file>
     <file>qml/Menu.qml</file>
     <file>qml/MenuDelegate.qml</file>
-    <file>qml/NewsDialog.qml</file>
-    <file>qml/NewsPanel.qml</file>
-    <file>qml/NewsPlugin.qml</file>
     <file>qml/NotificationDialog.qml</file>
     <file>qml/Panel.qml</file>
     <file>qml/PanelHeader.qml</file>

@@ -45,9 +45,6 @@ Main 1.0 Main.qml
 MeegoMain 1.0 MeegoMain.qml
 Menu 1.0 Menu.qml
 MenuDelegate 1.0 MenuDelegate.qml
-NewsDialog 1.0 NewsDialog.qml
-NewsPanel 1.0 NewsPanel.qml
-NewsPlugin 1.0 NewsPlugin.qml
 NotificationDialog 1.0 NotificationDialog.qml
 Panel 1.0 Panel.qml
 PanelHeader 1.0 PanelHeader.qml
