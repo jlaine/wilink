@@ -112,5 +112,9 @@
     <file>qml/fonts/fontawesome-webfont.ttf</file>
     <file>qml/i18n/fr.qm</file>
     <file>qml/images/shadow.png</file>
+    <file>qml/sounds/call-incoming.ogg</file>
+    <file>qml/sounds/call-outgoing.ogg</file>
+    <file>qml/sounds/message-incoming.ogg</file>
+    <file>qml/sounds/message-outgoing.ogg</file>
 </qresource>
 </RCC>

@@ -201,7 +201,7 @@ Item {
         // play a sound
         if (callWidget.call.direction == QXmppCall.OutgoingDirection &&
             callWidget.call.state == QXmppCall.ConnectingState) {
-            callWidget.soundJob = appSoundPlayer.play(":/sounds/call-outgoing.ogg", true);
+            callWidget.soundJob = appSoundPlayer.play(Qt.resolvedUrl('sounds/call-outgoing.ogg'), true);
         }
 
         // log call

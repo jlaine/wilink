@@ -71,9 +71,5 @@
     <file>images/128x128/text-x-generic.png</file>
     <file>images/128x128/video-x-generic.png</file>
     <file>images/128x128/wiLink.png</file>
-    <file>sounds/call-incoming.ogg</file>
-    <file>sounds/call-outgoing.ogg</file>
-    <file>sounds/message-incoming.ogg</file>
-    <file>sounds/message-outgoing.ogg</file>
 </qresource>
 </RCC>

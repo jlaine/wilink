@@ -164,7 +164,7 @@ Panel {
 
                     // play a sound
                     if (appSettings.incomingMessageSound) {
-                        appSoundPlayer.play(":/sounds/message-incoming.ogg");
+                        appSoundPlayer.play(Qt.resolvedUrl('sounds/message-incoming.ogg'));
                     }
 
                     // add pending message
@@ -321,7 +321,7 @@ Panel {
                 if (conversation.sendMessage(text)) {
                     chatInput.text = '';
                     if (appSettings.outgoingMessageSound) {
-                        appSoundPlayer.play(":/sounds/message-outgoing.ogg");
+                        appSoundPlayer.play(Qt.resolvedUrl('sounds/message-outgoing.ogg'));
                     }
                 }
             }
