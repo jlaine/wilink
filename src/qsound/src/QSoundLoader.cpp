@@ -81,14 +81,8 @@ void QSoundLoaderPrivate::play(QSoundFile *soundFile)
     }
 
     // play file
-    qmlInfo(q) << "Starting audio";
     QSoundPlayer *player = QSoundPlayer::instance();
-    if (!player) {
-        qmlInfo(q) << "Could not open find sound player";
-        status = QSoundLoader::Error;
-        emit q->statusChanged();
-        return;
-    }
+    Q_ASSERT(player);
 
     audioOutput = new QAudioOutput(player->outputDevice(), soundFile->format());
 
@@ -101,6 +95,7 @@ void QSoundLoaderPrivate::play(QSoundFile *soundFile)
     soundFile->setParent(audioOutput);
     audioOutput->start(soundFile);
 
+    qmlInfo(q) << "Audio started";
     status = QSoundLoader::Playing;
     emit q->statusChanged();
 }
@@ -191,22 +186,21 @@ void QSoundLoader::_q_replyFinished()
     d->redirectCount = 0;
 
     if (d->reply->error() == QNetworkReply::NoError) {
-        QAbstractNetworkCache *cache = d->reply->manager()->cache();
-        QIODevice *iodevice = cache->data(d->reply->url());
-        if (iodevice) {
-            QSoundFile::FileType fileType = QSoundFile::typeFromFileName(d->source.path());
-            const QNetworkCacheMetaData::RawHeaderList headers = cache->metaData(d->reply->url()).rawHeaders();
-            foreach (const QNetworkCacheMetaData::RawHeader &header, headers) {
-                if (header.first.toLower() == "content-type")
-                    fileType = QSoundFile::typeFromMimeType(header.second);
-            }
-
-            d->play(new QSoundFile(iodevice, fileType));
-        } else {
-            qmlInfo(this) << "Cannot find sound in cache: \"" << d->source.toString() << '"';
+        // detect file type
+        const QByteArray contentType = d->reply->header(QNetworkRequest::ContentTypeHeader).toByteArray();
+        QSoundFile::FileType fileType = QSoundFile::typeFromMimeType(contentType);
+        if (fileType == QSoundFile::UnknownFile)
+            fileType = QSoundFile::typeFromFileName(d->source.path());
+        if (fileType == QSoundFile::UnknownFile) {
+            qmlInfo(this) << "Cannot determine sound type: \"" << d->source.toString() << '"';
             d->status = Error;
             emit statusChanged();
         }
+
+        // play file
+        QBuffer *buffer = new QBuffer(this);
+        buffer->setData(d->reply->readAll());
+        d->play(new QSoundFile(buffer, fileType));
     } else {
         qmlInfo(this) << "Cannot fetch sound: \"" << d->source.toString() << '"';
         d->status = Error;
