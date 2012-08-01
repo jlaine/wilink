@@ -22,7 +22,12 @@ import wiLink 2.4
 
 Item {
     TranslationLoader {
-        source: 'i18n/' + localeName + '.qm'
+        Component.onCompleted: {
+            if (localeName == 'en')
+                uiLoader.source = 'Main.qml';
+            else
+                source = 'i18n/' + localeName + '.qm';
+        }
 
         onStatusChanged: {
             if (status == TranslationLoader.Ready || status == TranslationLoader.Error) {
