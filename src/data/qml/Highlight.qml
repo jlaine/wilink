@@ -25,9 +25,9 @@ Rectangle {
     border.color: '#ffb0c4de'
     border.width: 1
     gradient: Gradient {
-        GradientStop { id:stop1; position:0.0; color: '#33b0c4de' }
-        GradientStop { id:stop2; position:0.5; color: '#ffb0c4de' }
-        GradientStop { id:stop3; position:1.0; color: '#33b0c4de' }
+        GradientStop { id:stop1; position:0.0; color: '#33c4c4c4' }
+        GradientStop { id:stop2; position:0.5; color: '#99c4c4c4' }
+        GradientStop { id:stop3; position:1.0; color: '#33c4c4c4' }
     }
     radius: 5
     smooth: true
