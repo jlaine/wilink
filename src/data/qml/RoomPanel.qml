@@ -182,7 +182,9 @@ Panel {
             var text = chatInput.text;
             if (room.sendMessage(text)) {
                 chatInput.text = '';
-                appSoundPlayer.play(appSettings.outgoingMessageSound);
+                if (appSettings.outgoingMessageSound) {
+                    appSoundPlayer.play(":/sounds/message-outgoing.ogg");
+                }
             }
         }
     }

@@ -320,7 +320,9 @@ Panel {
                 var text = chatInput.text;
                 if (conversation.sendMessage(text)) {
                     chatInput.text = '';
-                    appSoundPlayer.play(appSettings.outgoingMessageSound);
+                    if (appSettings.outgoingMessageSound) {
+                        appSoundPlayer.play(":/sounds/message-outgoing.ogg");
+                    }
                 }
             }
         }
