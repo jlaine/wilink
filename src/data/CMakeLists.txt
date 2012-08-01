@@ -20,17 +20,6 @@ set(ICONS
     images/scalable/close.svg
     images/scalable/debug.svg
     images/scalable/diagnostics.svg
-    images/scalable/dock-chat.svg
-    images/scalable/dock-close.svg
-    images/scalable/dock-diagnostics.svg
-    images/scalable/dock-debug.svg
-    images/scalable/dock-options.svg
-    images/scalable/dock-peer.svg
-    images/scalable/dock-phone.svg
-    images/scalable/dock-photo.svg
-    images/scalable/dock-rss.svg
-    images/scalable/dock-share.svg
-    images/scalable/dock-web.svg
     images/scalable/download.svg
     images/scalable/facebook.svg
     images/scalable/favorite-active.svg

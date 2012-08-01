@@ -30,17 +30,6 @@
     <file>images/32x32/close.png</file>
     <file>images/32x32/debug.png</file>
     <file>images/32x32/diagnostics.png</file>
-    <file>images/32x32/dock-chat.png</file>
-    <file>images/32x32/dock-close.png</file>
-    <file>images/32x32/dock-debug.png</file>
-    <file>images/32x32/dock-diagnostics.png</file>
-    <file>images/32x32/dock-options.png</file>
-    <file>images/32x32/dock-peer.png</file>
-    <file>images/32x32/dock-phone.png</file>
-    <file>images/32x32/dock-photo.png</file>
-    <file>images/32x32/dock-rss.png</file>
-    <file>images/32x32/dock-share.png</file>
-    <file>images/32x32/dock-web.png</file>
     <file>images/32x32/download.png</file>
     <file>images/32x32/face-angry.png</file>
     <file>images/32x32/face-cool.png</file>
@@ -95,17 +84,6 @@
     <file>images/64x64/close.png</file>
     <file>images/64x64/debug.png</file>
     <file>images/64x64/diagnostics.png</file>
-    <file>images/64x64/dock-chat.png</file>
-    <file>images/64x64/dock-close.png</file>
-    <file>images/64x64/dock-debug.png</file>
-    <file>images/64x64/dock-diagnostics.png</file>
-    <file>images/64x64/dock-options.png</file>
-    <file>images/64x64/dock-peer.png</file>
-    <file>images/64x64/dock-phone.png</file>
-    <file>images/64x64/dock-photo.png</file>
-    <file>images/64x64/dock-rss.png</file>
-    <file>images/64x64/dock-share.png</file>
-    <file>images/64x64/dock-web.png</file>
     <file>images/64x64/download.png</file>
     <file>images/64x64/facebook.png</file>
     <file>images/64x64/favorite-active.png</file>
