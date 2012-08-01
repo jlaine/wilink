@@ -42,9 +42,12 @@ NotificationDialog {
         dialog.call.destroyLater();
     }
 
-    Component.onCompleted: {
-        // play a sound
-        dialog.soundJob = appSoundPlayer.play(Qt.resolvedUrl('sounds/call-incoming.ogg'), true);
+    SoundLoader {
+        id: soundLoader
+
+        repeat: true
+        source: 'sounds/call-incoming.ogg'
+        Component.onCompleted: soundLoader.start()
     }
 
     Connections {

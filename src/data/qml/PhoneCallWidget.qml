@@ -27,13 +27,19 @@ Item {
     property QtObject call: null
     property string caller
     property int callId: 0
-    property QtObject soundJob
 
     anchors.left: parent ? parent.left : undefined
     anchors.right: parent ? parent.right : undefined
     clip: true
     height: frame.height
     z: 5
+
+    SoundLoader {
+        id: soundLoader
+
+        repeat: true
+        source: 'sounds/call-outgoing.ogg'
+    }
 
     PhoneAudioHelper {
         id: audio
@@ -154,10 +160,7 @@ Item {
     Connections {
         target: call
         onStateChanged: {
-            if (callWidget.soundJob) {
-                callWidget.soundJob.stop();
-                callWidget.soundJob = null;
-            }
+            soundLoader.stop();
             if (call.state == QXmppCall.FinishedState) {
                 if (callWidget.callId) {
                     var flags = call.direction;
@@ -201,7 +204,7 @@ Item {
         // play a sound
         if (callWidget.call.direction == QXmppCall.OutgoingDirection &&
             callWidget.call.state == QXmppCall.ConnectingState) {
-            callWidget.soundJob = appSoundPlayer.play(Qt.resolvedUrl('sounds/call-outgoing.ogg'), true);
+            soundLoader.start();
         }
 
         // log call

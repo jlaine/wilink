@@ -44,6 +44,16 @@ Panel {
         }
     }
 
+    SoundLoader {
+        id: incomingMessageSound
+        source: appSettings.incomingMessageSound ? 'sounds/message-incoming.ogg' : ''
+    }
+
+    SoundLoader {
+        id: outgoingMessageSound
+        source: appSettings.outgoingMessageSound ? 'sounds/message-outgoing.ogg' : ''
+    }
+
     Conversation {
         id: conversation
 
@@ -163,9 +173,7 @@ Panel {
                     appNotifier.alert();
 
                     // play a sound
-                    if (appSettings.incomingMessageSound) {
-                        appSoundPlayer.play(Qt.resolvedUrl('sounds/message-incoming.ogg'));
-                    }
+                    incomingMessageSound.start();
 
                     // add pending message
                     rosterModel.addPendingMessage(jid);
@@ -320,9 +328,7 @@ Panel {
                 var text = chatInput.text;
                 if (conversation.sendMessage(text)) {
                     chatInput.text = '';
-                    if (appSettings.outgoingMessageSound) {
-                        appSoundPlayer.play(Qt.resolvedUrl('sounds/message-outgoing.ogg'));
-                    }
+                    outgoingMessageSound.start();
                 }
             }
         }

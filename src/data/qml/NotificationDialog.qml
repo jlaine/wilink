@@ -23,7 +23,6 @@ Dialog {
     id: dialog
 
     property alias iconStyle: icon.style
-    property QtObject soundJob
     property alias text: label.text
 
     minimumHeight: 150
@@ -48,12 +47,6 @@ Dialog {
             anchors.right: parent.right
             wrapMode: Text.WordWrap
         }
-    }
-
-    onClose: {
-        // stop sound
-        if (Qt.isQtObject(dialog.soundJob))
-            dialog.soundJob.stop();
     }
 
     Component.onCompleted: {
