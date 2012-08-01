@@ -19,9 +19,7 @@ set(ICONS
     images/scalable/moderator.svg
     images/scalable/peer.svg
     images/scalable/resize.svg
-    images/scalable/search.svg
     images/scalable/tip.svg
-    images/scalable/transfers.svg
     images/scalable/web.svg
     images/scalable/wiLink.svg
     images/scalable/wiLink-black.svg)

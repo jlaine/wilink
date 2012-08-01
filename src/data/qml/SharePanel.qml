@@ -83,15 +83,13 @@ Panel {
         height: 32
         z: 1
 
-        Image {
+        Icon {
             id: searchIcon
 
             anchors.left: parent.left
             anchors.leftMargin: 8
             anchors.verticalCenter: parent.verticalCenter
-            source: 'image://icon/search'
-            sourceSize.height: appStyle.icon.tinySize
-            sourceSize.width: appStyle.icon.tinySize
+            style: 'icon-search'
         }
 
         InputBar {
