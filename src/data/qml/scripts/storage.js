@@ -22,7 +22,7 @@
 function getDatabase() {
      return openDatabaseSync("wiLink", "1.0", "StorageDatabase", 100000);
 }
- 
+
 /** Initialize database tables.
  */
 function initialize() {
@@ -31,7 +31,7 @@ function initialize() {
         tx.executeSql('CREATE TABLE IF NOT EXISTS setting(key TEXT UNIQUE, value TEXT)');
     });
 }
- 
+
 /** Retrieves a setting value.
  */
 function getSetting(setting, fallback) {
