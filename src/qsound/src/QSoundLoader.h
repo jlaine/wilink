@@ -58,6 +58,7 @@ public slots:
 
 private slots:
     void _q_replyFinished();
+    void _q_stateChanged();
 
 private:
     QSoundLoaderPrivate *d;

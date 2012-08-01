@@ -35,7 +35,6 @@ class QSoundLoaderPrivate
 public:
     QSoundLoaderPrivate(QSoundLoader *qq);
     void download(const QUrl &url, QNetworkAccessManager *manager);
-    void finish();
     void play(QSoundFile *soundFile);
 
     QAudioOutput *audioOutput;
@@ -67,22 +66,17 @@ void QSoundLoaderPrivate::download(const QUrl &url, QNetworkAccessManager *manag
     QObject::connect(reply, SIGNAL(finished()), q, SLOT(_q_replyFinished()));
 }
 
-void QSoundLoaderPrivate::finish()
-{
-}
-
 void QSoundLoaderPrivate::play(QSoundFile *soundFile)
 {
     bool check;
     Q_UNUSED(check);
 
-    qmlInfo(q) << "Play";
-
     // open sound file
     soundFile->setRepeat(repeat);
     if (!soundFile->open(QIODevice::Unbuffered | QIODevice::ReadOnly)) {
         qmlInfo(q) << "Could not open sound file";
-        finish();
+        status = QSoundLoader::Error;
+        emit q->statusChanged();
         return;
     }
 
@@ -91,7 +85,8 @@ void QSoundLoaderPrivate::play(QSoundFile *soundFile)
     QSoundPlayer *player = QSoundPlayer::instance();
     if (!player) {
         qmlInfo(q) << "Could not open find sound player";
-        finish();
+        status = QSoundLoader::Error;
+        emit q->statusChanged();
         return;
     }
 
@@ -193,17 +188,39 @@ void QSoundLoader::_q_replyFinished()
     d->redirectCount = 0;
 
     if (d->reply->error() == QNetworkReply::NoError) {
-        QSoundFile::FileType fileType = QSoundFile::typeFromFileName(d->source.path());
-        qmlInfo(this) << "Got sound: \"" << d->source.toString() << '"' << fileType;
-        QSoundFile *soundFile = new QSoundFile(d->reply, fileType);
-        qmlInfo(this) << "Got sound2: \"" << d->source.toString() << '"' << fileType;
-        //d->play(new QSoundFile(d->reply, fileType));
+        QAbstractNetworkCache *cache = d->reply->manager()->cache();
+        QIODevice *iodevice = cache->data(d->reply->url());
+        if (iodevice) {
+            QSoundFile::FileType fileType = QSoundFile::typeFromFileName(d->source.path());
+            const QNetworkCacheMetaData::RawHeaderList headers = cache->metaData(d->reply->url()).rawHeaders();
+            foreach (const QNetworkCacheMetaData::RawHeader &header, headers) {
+                if (header.first.toLower() == "content-type")
+                    fileType = QSoundFile::typeFromMimeType(header.second);
+            }
+
+            d->play(new QSoundFile(iodevice, fileType));
+        } else {
+            qmlInfo(this) << "Cannot find sound in cache: \"" << d->source.toString() << '"';
+            d->status = Error;
+            emit statusChanged();
+        }
     } else {
         qmlInfo(this) << "Cannot fetch sound: \"" << d->source.toString() << '"';
         d->status = Error;
         emit statusChanged();
-        
-        d->reply->deleteLater();
-        d->reply = 0;
+    }
+
+    d->reply->deleteLater();
+    d->reply = 0;
+}
+
+void QSoundLoader::_q_stateChanged()
+{
+    if (d->audioOutput && d->audioOutput->state() != QAudio::ActiveState) {
+        qmlInfo(this) << "Audio stopped";
+        // FIXME: free memory!
+        d->audioOutput = 0;
+        d->status = QSoundLoader::Null;
+        emit statusChanged();
     }
 }
