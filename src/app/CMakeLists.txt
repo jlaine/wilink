@@ -13,8 +13,8 @@ if(WILINK_EMBEDDED)
     add_definitions(-DWILINK_EMBEDDED)
 endif()
 
-set(app_SOURCES main.cpp window.cpp)
-set(app_MOC_HEADERS window.h)
+set(app_SOURCES main.cpp network.cpp window.cpp)
+set(app_MOC_HEADERS network.h window.h)
 
 if(APPLE)
     list(APPEND app_SOURCES application_mac.mm)

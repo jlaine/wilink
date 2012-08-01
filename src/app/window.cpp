@@ -28,6 +28,7 @@
 #include <QStringList>
 
 #include "qtlocalpeer.h"
+#include "network.h"
 #include "window.h"
 
 #ifdef Q_WS_X11
@@ -35,6 +36,15 @@
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #endif
+
+class NetworkAccessManagerFactory : public QDeclarativeNetworkAccessManagerFactory
+{
+public:
+    QNetworkAccessManager *create(QObject * parent)
+    {
+        return new NetworkAccessManager(parent);
+    }
+};
 
 class CustomWindowPrivate
 {
@@ -66,6 +76,8 @@ CustomWindow::CustomWindow(QtLocalPeer *peer, QWidget *parent)
     // create declarative view
     d->view = new QDeclarativeView;
     d->view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
+    d->view->engine()->setNetworkAccessManagerFactory(new NetworkAccessManagerFactory);
+
     check = connect(d->view, SIGNAL(statusChanged(QDeclarativeView::Status)),
                     this, SLOT(_q_statusChanged()));
     Q_ASSERT(check);
