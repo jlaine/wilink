@@ -87,12 +87,6 @@ private slots:
     void onSslErrors(QNetworkReply *reply, const QList<QSslError> &errors);
 };
 
-class AuthenticatedNetworkAccessManager : public NetworkAccessManager
-{
-public:
-    AuthenticatedNetworkAccessManager(QObject *parent = 0);
-};
-
 class DropArea : public QDeclarativeItem
 {
     Q_OBJECT

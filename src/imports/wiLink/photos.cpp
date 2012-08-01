@@ -66,7 +66,7 @@ class PhotoNetworkAccessManagerFactory : public FileSystemNetworkAccessManagerFa
 public:
     QNetworkAccessManager *create(QObject *parent)
     {
-        return new AuthenticatedNetworkAccessManager(parent);
+        return new NetworkAccessManager(parent);
     };
 };
 
