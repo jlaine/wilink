@@ -37,7 +37,7 @@ Panel {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        iconSource: 'image://icon/photos'
+        iconStyle: 'icon-picture'
         title: qsTr('Photos')
         toolBar: ToolBar {
             ToolButton {

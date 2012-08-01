@@ -83,7 +83,7 @@ Item {
 
         anchors.right: cancelButton.left
         anchors.verticalCenter: parent.verticalCenter
-        iconSource: 'image://icon/file'
+        iconStyle: 'icon-file'
         text: qsTr('Open')
         //visible: job && job.state == QXmppTransferJob.FinishedState && job.error == QXmppTransferJob.NoError
         visible: Qt.isQtObject(job) && job.state == QXmppTransferJob.FinishedState && job.direction == QXmppTransferJob.IncomingDirection

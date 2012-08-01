@@ -110,7 +110,7 @@ ScrollView {
             anchors.right: parent.right
             anchors.rightMargin: appStyle.margin.normal
             anchors.verticalCenter: parent.verticalCenter
-            iconSource: 'image://icon/download'
+            iconStyle: 'icon-download'
             state: 'inactive'
             text: qsTr('Download')
 
