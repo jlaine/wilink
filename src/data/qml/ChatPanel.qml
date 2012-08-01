@@ -198,7 +198,7 @@ Panel {
 
             onAddClicked: {
                 // FIXME: we only support default client
-                dialogSwapper.showPanel('RoomJoinDialog.qml', {client: accountModel.clientForJid()});
+                dialogSwapper.showPanel('RoomJoinDialog.qml', {client: accountModel.clientForJid('wifirst.net')});
             }
 
             onCurrentJidChanged: {
