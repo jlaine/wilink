@@ -14,8 +14,6 @@ set(ICONS
     images/scalable/call.svg
     images/scalable/call-incoming.svg
     images/scalable/call-outgoing.svg
-    images/scalable/camera.svg
-    images/scalable/camera-active.svg
     images/scalable/chat.svg
     images/scalable/close.svg
     images/scalable/debug.svg
@@ -36,9 +34,6 @@ set(ICONS
     images/scalable/options.svg
     images/scalable/peer.svg
     images/scalable/permissions.svg
-    images/scalable/phone.svg
-    images/scalable/photos.svg
-    images/scalable/plugin.svg
     images/scalable/resize.svg
     images/scalable/rss.svg
     images/scalable/search.svg

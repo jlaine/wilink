@@ -86,7 +86,6 @@ RoomPermissionDialog 1.0 RoomPermissionDialog.qml
 RoomSubjectDialog 1.0 RoomSubjectDialog.qml
 ScrollBar 1.0 ScrollBar.qml
 ScrollView 1.0 ScrollView.qml
-SendPanel 1.0 SendPanel.qml
 SetupDialog 1.0 SetupDialog.qml
 SharePanel 1.0 SharePanel.qml
 SharePlugin 1.0 SharePlugin.qml

@@ -91,7 +91,6 @@
     <file>qml/RoomSubjectDialog.qml</file>
     <file>qml/ScrollBar.qml</file>
     <file>qml/ScrollView.qml</file>
-    <file>qml/SendPanel.qml</file>
     <file>qml/SetupDialog.qml</file>
     <file>qml/SharePanel.qml</file>
     <file>qml/SharePlugin.qml</file>

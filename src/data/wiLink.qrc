@@ -22,8 +22,6 @@
     <file>images/32x32/call-incoming.png</file>
     <file>images/32x32/call-outgoing.png</file>
     <file>images/32x32/call.png</file>
-    <file>images/32x32/camera-active.png</file>
-    <file>images/32x32/camera.png</file>
     <file>images/32x32/chat.png</file>
     <file>images/32x32/checkbox-checked.png</file>
     <file>images/32x32/checkbox.png</file>
@@ -59,9 +57,6 @@
     <file>images/32x32/options.png</file>
     <file>images/32x32/peer.png</file>
     <file>images/32x32/permissions.png</file>
-    <file>images/32x32/phone.png</file>
-    <file>images/32x32/photos.png</file>
-    <file>images/32x32/plugin.png</file>
     <file>images/32x32/resize.png</file>
     <file>images/32x32/rss.png</file>
     <file>images/32x32/search.png</file>
@@ -78,8 +73,6 @@
     <file>images/64x64/call-incoming.png</file>
     <file>images/64x64/call-outgoing.png</file>
     <file>images/64x64/call.png</file>
-    <file>images/64x64/camera-active.png</file>
-    <file>images/64x64/camera.png</file>
     <file>images/64x64/chat.png</file>
     <file>images/64x64/close.png</file>
     <file>images/64x64/debug.png</file>
@@ -100,9 +93,6 @@
     <file>images/64x64/options.png</file>
     <file>images/64x64/peer.png</file>
     <file>images/64x64/permissions.png</file>
-    <file>images/64x64/phone.png</file>
-    <file>images/64x64/photos.png</file>
-    <file>images/64x64/plugin.png</file>
     <file>images/64x64/resize.png</file>
     <file>images/64x64/rss.png</file>
     <file>images/64x64/search.png</file>
