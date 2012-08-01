@@ -121,6 +121,19 @@ QSoundLoader::~QSoundLoader()
     delete d;
 }
 
+bool QSoundLoader::repeat() const
+{
+    return d->repeat;
+}
+
+void QSoundLoader::setRepeat(bool repeat)
+{
+    if (repeat != d->repeat) {
+        d->repeat = repeat;
+        emit repeatChanged();
+    }
+}
+
 QUrl QSoundLoader::source() const
 {
     return d->source;
@@ -132,7 +145,10 @@ void QSoundLoader::setSource(const QUrl &source)
         return;
     d->source = source;
     emit sourceChanged();
+}
 
+void QSoundLoader::start()
+{
     // clear old
 
     if (d->source.scheme() == "file") {
@@ -145,6 +161,11 @@ void QSoundLoader::setSource(const QUrl &source)
         d->status = Loading;
         emit statusChanged();
     }
+}
+
+void QSoundLoader::stop()
+{
+
 }
 
 QSoundLoader::Status QSoundLoader::status() const

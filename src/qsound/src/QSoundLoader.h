@@ -29,6 +29,7 @@ class QSoundLoader : public QObject
 {
     Q_OBJECT
     Q_ENUMS(Status)
+    Q_PROPERTY(bool repeat READ repeat WRITE setRepeat NOTIFY repeatChanged)
     Q_PROPERTY(QUrl source READ source WRITE setSource NOTIFY sourceChanged)
     Q_PROPERTY(Status status READ status NOTIFY statusChanged)
 
@@ -38,14 +39,22 @@ public:
     QSoundLoader(QObject *parent = 0);
     ~QSoundLoader();
 
+    bool repeat() const;
+    void setRepeat(bool repeat);
+
     QUrl source() const;
     void setSource(const QUrl &source);
 
     Status status() const;
 
 signals:
+    void repeatChanged();
     void sourceChanged();
     void statusChanged();
+
+public slots:
+    void start();
+    void stop();
 
 private slots:
     void _q_replyFinished();
