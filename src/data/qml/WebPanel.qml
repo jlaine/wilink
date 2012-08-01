@@ -150,7 +150,7 @@ Panel {
                 js += "f.login.value = '" + account.username + "';\n";
                 js += "f.password.value = '" + account.password + "';\n";
                 js += "f.submit();";
-                tabSwapper.addPanel('WebTab.qml', {url: 'https://apps.wifirst.net/', loadScript: js}, true)
+                tabSwapper.addPanel('WebTab.qml', {url: 'https://apps.wifirst.net/', urlBar: false, loadScript: js}, true)
             } else if (account.type == 'web' && account.realm == 'www.google.com') {
                 var js = "var f = document.getElementById('gaia_loginform');\n";
                 js += "f.Email.value = '" + account.username + "';\n";

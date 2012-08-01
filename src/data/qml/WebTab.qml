@@ -28,6 +28,7 @@ Panel {
     property string loadScript: ''
     property alias title: webView.title
     property alias url: webView.url
+    property bool urlBar: true
     clip: true
 
     Item {
@@ -196,5 +197,11 @@ Panel {
                 webView.reload.triggered()
             }
         }
+    }
+
+    states: State {
+        name: 'no-topbar'
+        when: !urlBar
+        PropertyChanges { target: topBar; height: 0; opacity: 0 }
     }
 }
