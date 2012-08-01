@@ -353,7 +353,6 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterType<RosterModel>(uri, 2, 4, "RosterModel");
     qmlRegisterType<QSoundLoader>(uri, 2, 4, "SoundLoader");
     qmlRegisterType<QSoundPlayer>(uri, 2, 4, "SoundPlayer");
-    qmlRegisterUncreatableType<QSoundPlayerJob>(uri, 2, 4, "SoundPlayerJob", "");
     qmlRegisterType<QSoundTester>(uri, 2, 4, "SoundTester");
     qmlRegisterType<TranslationLoader>(uri, 2, 4, "TranslationLoader");
     qmlRegisterType<Updater>(uri, 2, 4, "Updater");
