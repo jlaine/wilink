@@ -206,15 +206,13 @@ Panel {
                 }
             }
 
-            Image {
+            Icon {
                 id: fetchIcon
 
                 anchors.left: parent.left
                 anchors.leftMargin: appStyle.margin.normal
                 anchors.verticalCenter: parent.verticalCenter
-                source: 'image://icon/information'
-                sourceSize.height: appStyle.icon.smallSize
-                sourceSize.width: appStyle.icon.smallSize
+                style: 'icon-info-sign'
             }
 
             Label {
