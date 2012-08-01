@@ -163,7 +163,9 @@ Panel {
                     appNotifier.alert();
 
                     // play a sound
-                    appSoundPlayer.play(appSettings.incomingMessageSound);
+                    if (appSettings.incomingMessageSound) {
+                        appSoundPlayer.play(":/sounds/message-incoming.ogg");
+                    }
 
                     // add pending message
                     rosterModel.addPendingMessage(jid);
