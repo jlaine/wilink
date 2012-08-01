@@ -66,28 +66,11 @@ Panel {
             anchors.fill: parent
             spacing: appStyle.spacing.vertical
 
-            Item {
+            Label {
                 anchors.left: parent.left
                 anchors.right: parent.right
-                height: appStyle.icon.smallSize
-
-                Image {
-                    id: outputImage
-                    anchors.left: parent.left
-                    anchors.verticalCenter: parent.verticalCenter
-                    height: appStyle.icon.smallSize
-                    width: appStyle.icon.smallSize
-                    source: 'image://icon/audio-output'
-                }
-
-                Label {
-                    anchors.left: outputImage.right
-                    anchors.leftMargin: appStyle.spacing.horizontal
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                    elide: Text.ElideRight
-                    text: qsTr('Audio playback device')
-                }
+                elide: Text.ElideRight
+                text: qsTr('Audio playback device')
             }
 
             ComboBox {
@@ -111,28 +94,11 @@ Panel {
                 }
             }
 
-            Item {
+            Label {
                 anchors.left: parent.left
                 anchors.right: parent.right
-                height: appStyle.icon.smallSize
-
-                Image {
-                    id: inputImage
-                    anchors.left: parent.left
-                    anchors.verticalCenter: parent.verticalCenter
-                    height: appStyle.icon.smallSize
-                    width: appStyle.icon.smallSize
-                    source: 'image://icon/audio-input'
-                }
-
-                Label {
-                    anchors.left: inputImage.right
-                    anchors.leftMargin: appStyle.spacing.horizontal
-                    anchors.right: parent.right
-                    anchors.verticalCenter: parent.verticalCenter
-                    elide: Text.ElideRight
-                    text: qsTr('Audio capture device')
-                }
+                elide: Text.ElideRight
+                text: qsTr('Audio capture device')
             }
 
             ComboBox {
