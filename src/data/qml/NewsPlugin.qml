@@ -29,8 +29,7 @@ Plugin {
             var account = accountModel.get(i);
             if (account.type == 'xmpp' && account.realm == 'wifirst.net') {
                 dock.model.add({
-                    'iconSource': 'image://icon/dock-rss',
-                    'iconPress': 'image://icon/rss',
+                    'iconStyle': 'icon-rss',
                     'panelProperties': {accountJid: account.username},
                     'panelSource': 'NewsPanel.qml',
                     'shortcut': Qt.ControlModifier + Qt.Key_N,

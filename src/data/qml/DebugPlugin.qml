@@ -27,8 +27,7 @@ Plugin {
     onLoaded: {
         /*
         dock.model.add({
-            'iconSource': 'image://icon/dock-peer',
-            'iconPress': 'image://icon/peer',
+            'iconStyle': 'icon-sitemap',
             'panelSource': 'DiscoveryPanel.qml',
             'priority': -1,
             'shortcut': Qt.ControlModifier + Qt.Key_B,
@@ -36,8 +35,7 @@ Plugin {
             'visible': true});
         */
         dock.model.add({
-            'iconSource': 'image://icon/dock-debug',
-            'iconPress': 'image://icon/debug',
+            'iconStyle': 'icon-exclamation-sign',
             'panelSource': 'LogPanel.qml',
             'priority': -1,
             'shortcut': Qt.ControlModifier + Qt.Key_L,

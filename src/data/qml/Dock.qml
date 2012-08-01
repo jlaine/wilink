@@ -36,9 +36,9 @@ Rectangle {
         anchors.left: parent.left
         anchors.topMargin: -parent.width
         gradient: Gradient {
-            GradientStop {position: 0.05; color: '#597fbe' }
-            GradientStop {position: 0.06; color: '#7495ca'}
-            GradientStop {position: 1.0; color: '#9fb7dd'}
+            GradientStop {position: 0.05; color: '#262b30' }
+            GradientStop {position: 0.06; color: '#262b30'}
+            GradientStop {position: 1.0; color: '#262b30'}
         }
 
         transform: Rotation {
@@ -93,9 +93,7 @@ Rectangle {
 
             delegate: DockButton {
                 id: button
-
-                iconSource: model.iconSource
-                iconPress: model.iconPress
+                iconStyle: model.iconStyle
                 notified: model.notified == true
                 panelProperties: model.panelProperties
                 panelSource: model.panelSource
@@ -118,9 +116,7 @@ Rectangle {
 
         DockButton {
             id: preferenceButton
-
-            iconSource: 'image://icon/dock-options'
-            iconPress: 'image://icon/options'
+            iconStyle: 'icon-cogs'
             panelSource: 'PreferenceDialog.qml'
             text: qsTr('Preferences')
             visible: true
@@ -131,8 +127,7 @@ Rectangle {
 
         DockButton {
             id: quitButton
-            iconSource: 'image://icon/dock-close'
-            iconPress: 'image://icon/close'
+            iconStyle: 'icon-remove'
             text: qsTr('Quit')
             visible: appStyle.isMobile
             onClicked: {

@@ -27,8 +27,7 @@ Plugin {
 
     onLoaded: {
         dock.model.add({
-            'iconSource': 'image://icon/dock-chat',
-            'iconPress': 'image://icon/chat',
+            'iconStyle': 'icon-comments-alt',
             'notified': false,
             'panelSource': 'ChatPanel.qml',
             'priority': 10,

@@ -26,8 +26,7 @@ Item {
     property bool active
     property bool enabled: true
     property bool notified: false
-    property string iconSource: ''
-    property string iconPress: ''
+    property string iconStyle: ''
     property variant panelProperties
     property string panelSource: ''
     property string text
@@ -51,25 +50,21 @@ Item {
     width: appStyle.icon.normalSize
     state: mouseArea.pressed ? 'pressed' : (mouseArea.hovered ? 'hovered' : '')
 
-    Image {
-        id: image
+    Icon {
+        id: icon
 
-        anchors.top: parent.top
-        anchors.horizontalCenter: parent.horizontalCenter
-        opacity: button.enabled ? 1 : 0.5
-        smooth: true
-        source: (button.iconPress != '' && button.active) ? button.iconPress : button.iconSource
-        sourceSize.height: appStyle.icon.normalSize
-        sourceSize.width: appStyle.icon.normalSize
-        width: parent.width
-        height: parent.height
+        anchors.centerIn: parent
+        color: button.active ? '#597fbe' : '#e1e5eb'
+        font.pixelSize: 24
+        style: iconStyle
     }
 
     Rectangle {
         id: labelBackground
 
-        anchors.left: image.right
-        anchors.verticalCenter: image.verticalCenter
+        anchors.left: parent.right
+        anchors.leftMargin: 8
+        anchors.verticalCenter: parent.verticalCenter
         opacity: 0
         color: '#597fbe'
         width: label.width + 2*appStyle.spacing.horizontal
@@ -94,9 +89,9 @@ Item {
                 return '';
         }
 
-        anchors.left: image.right
-        anchors.leftMargin: appStyle.spacing.horizontal
-        anchors.verticalCenter: image.verticalCenter
+        anchors.left: parent.right
+        anchors.leftMargin: 8 + appStyle.spacing.horizontal
+        anchors.verticalCenter: parent.verticalCenter
         opacity: 0
         color: 'white'
         font.pixelSize: appStyle.font.smallSize
@@ -106,15 +101,11 @@ Item {
     states: [
         State {
             name: 'hovered'
-            PropertyChanges { target: button; width: image.width + 16; height: image.height }
-            PropertyChanges { target: image; height: appStyle.icon.normalSize; width: appStyle.icon.normalSize }
             PropertyChanges { target: label; opacity: 1 }
             PropertyChanges { target: labelBackground; opacity: 1 }
         },
         State {
             name: 'pressed'
-            PropertyChanges { target: button; width: image.width + 16; height: image.height }
-            PropertyChanges { target: image; height: appStyle.icon.normalSize; width: appStyle.icon.normalSize }
             PropertyChanges { target: label; opacity: 0.5 }
             PropertyChanges { target: labelBackground; opacity: 1 }
         }
@@ -124,8 +115,6 @@ Item {
             from: ''
             to: 'hovered'
             reversible: true
-            PropertyAnimation { target: button; properties: 'height,width'; duration: appStyle.animation.normalDuration }
-            PropertyAnimation { target: image; properties: 'height,width'; duration: appStyle.animation.normalDuration }
             PropertyAnimation { target: label; properties: 'opacity'; duration: appStyle.animation.normalDuration }
             PropertyAnimation { target: labelBackground; properties: 'opacity'; duration: appStyle.animation.normalDuration }
         }

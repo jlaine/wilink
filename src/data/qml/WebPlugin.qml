@@ -27,8 +27,7 @@ Plugin {
 
     onLoaded: {
         dock.model.add({
-            'iconSource': 'image://icon/dock-web',
-            'iconPress': 'image://icon/web',
+            'iconStyle': 'icon-globe',
             'panelSource': 'WebPanel.qml',
             'priority': 7,
             'text': qsTr('Web'),

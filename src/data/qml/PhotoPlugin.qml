@@ -32,8 +32,7 @@ Plugin {
                 title += '<br/><small>Picasa</small>';
 
                 dock.model.add({
-                    'iconSource': 'image://icon/dock-photo',
-                    'iconPress': 'image://icon/photos',
+                    'iconStyle': 'icon-picture',
                     'panelSource': 'PhotoPanel.qml',
                     'panelProperties': {'url': 'picasa://default'},
                     'priority': 7,

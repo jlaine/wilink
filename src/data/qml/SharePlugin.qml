@@ -26,8 +26,7 @@ Plugin {
 
     onLoaded: {
         dock.model.add({
-            'iconSource': 'image://icon/dock-share',
-            'iconPress': 'image://icon/share',
+            'iconStyle': 'icon-share',
             'panelSource': 'SharePanel.qml',
             'priority': 8,
             'shortcut': Qt.ControlModifier + Qt.Key_S,
