@@ -33,6 +33,7 @@ Plugin {
             'text': qsTr('Web'),
             'visible': true,
         });
+        swapper.showPanel('WebPanel.qml');
     }
 
     onUnloaded: {
