@@ -183,7 +183,7 @@ Panel {
             anchors.right: parent.right
             anchors.rightMargin: -appStyle.margin.normal
             anchors.top: parent.top
-            iconSource: 'image://icon/phone'
+            iconStyle: 'icon-phone'
             title: qsTr('Phone')
             subTitle: panel.phoneNumber ? qsTr('Your number is %1').replace('%1', panel.phoneNumber) : ''
             toolBar: ToolBar {

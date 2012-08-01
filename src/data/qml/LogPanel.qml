@@ -33,7 +33,7 @@ Panel {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        iconSource: 'image://icon/debug'
+        iconStyle: 'icon-exclamation-sign'
         title: qsTr('Debugging console')
         toolBar: ToolBar {
             ToolButton {

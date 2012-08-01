@@ -30,7 +30,7 @@ Panel {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        iconSource: 'image://icon/peer'
+        iconStyle: 'icon-sitemap'
         title: qsTr('Service discovery')
         toolBar: ToolBar {
             ToolButton {

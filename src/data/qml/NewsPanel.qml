@@ -186,7 +186,7 @@ Panel {
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
-            iconSource: 'image://icon/rss'
+            iconStyle: 'icon-rss'
             title: qsTr('News reader')
         }
 

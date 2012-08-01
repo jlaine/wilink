@@ -29,7 +29,7 @@ Panel {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        iconSource: 'image://icon/share'
+        iconStyle: 'icon-share'
         title: qsTr('Shares')
         toolBar: ToolBar {
             ToolButton {
