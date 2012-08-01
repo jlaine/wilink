@@ -124,10 +124,7 @@ Panel {
         Flickable {
             id: webFlickable
 
-            anchors.top: parent.top
-            anchors.bottom: horizontalScrollBar.top
-            anchors.left: parent.left
-            anchors.right: verticalScrollBar.left
+            anchors.fill: parent
             contentWidth: webView.width
             contentHeight: webView.height
 
@@ -166,7 +163,7 @@ Panel {
             id: verticalScrollBar
 
             anchors.top: parent.top
-            anchors.bottom: horizontalScrollBar.top
+            anchors.bottom: parent.bottom
             anchors.right: parent.right
             flickableItem: webFlickable
         }
@@ -179,14 +176,6 @@ Panel {
             anchors.right: verticalScrollBar.left
             flickableItem: webFlickable
             orientation: Qt.Horizontal
-        }
-
-        Rectangle {
-            color: '#dfdfdf'
-            anchors.left: horizontalScrollBar.right
-            anchors.right: parent.right
-            anchors.top: verticalScrollBar.bottom
-            anchors.bottom: parent.bottom
         }
 
         Keys.forwardTo: [verticalScrollBar, horizontalScrollBar]
