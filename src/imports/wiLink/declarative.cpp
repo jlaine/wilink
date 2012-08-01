@@ -60,7 +60,6 @@
 #include "history.h"
 #include "icons.h"
 #include "menubar.h"
-#include "news.h"
 #include "notifications.h"
 #include "phone.h"
 #include "phone/sip.h"
@@ -339,7 +338,6 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterType<ListHelper>(uri, 2, 4, "ListHelper");
     qmlRegisterType<LogModel>(uri, 2, 4, "LogModel");
     qmlRegisterType<MenuBar>(uri, 2, 4, "MenuBar");
-    qmlRegisterType<NewsListModel>(uri, 2, 4, "NewsListModel");
     qmlRegisterType<Notifier>(uri, 2, 4, "Notifier");
     qmlRegisterUncreatableType<Notification>(uri, 2, 4, "Notification", "");
     qmlRegisterType<PhoneAudioHelper>(uri, 2, 4, "PhoneAudioHelper");
