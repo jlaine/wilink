@@ -79,7 +79,6 @@
     <file>qml/PluginLoader.qml</file>
     <file>qml/PluginPreferencePanel.qml</file>
     <file>qml/PreferenceDialog.qml</file>
-    <file>qml/PreferenceModel.qml</file>
     <file>qml/ProgressBar.qml</file>
     <file>qml/RoomConfigurationDialog.qml</file>
     <file>qml/RoomInviteDialog.qml</file>

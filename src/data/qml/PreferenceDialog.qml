@@ -85,7 +85,7 @@ Dialog {
                     }
                 }
             }
-            model: appPreferences
+            model: ListModel {}
         }
 
         PanelSwapper {
@@ -111,6 +111,26 @@ Dialog {
         }
 
         Component.onCompleted: {
+            tabList.model.append({
+                'iconSource': 'image://icon/options',
+                'name': qsTr('General'),
+                'source': 'GeneralPreferencePanel.qml'});
+            tabList.model.append({
+                'iconSource': 'image://icon/peer',
+                'name': qsTr('Accounts'),
+                'source': 'AccountPreferencePanel.qml'});
+            tabList.model.append({
+                'iconSource': 'image://icon/audio-output',
+                'name': qsTr('Sound'),
+                'source': 'SoundPreferencePanel.qml'});
+            tabList.model.append({
+                'iconSource': 'image://icon/plugin',
+                'name': qsTr('Plugins'),
+                'source': 'PluginPreferencePanel.qml'});
+            tabList.model.append({
+                'iconSource': 'image://icon/share',
+                'name': qsTr('Shares'),
+                'source': 'SharePreferencePanel.qml'});
             prefSwapper.showPanel(tabList.model.get(0).source);
         }
     }

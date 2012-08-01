@@ -32,15 +32,10 @@ Plugin {
             'shortcut': Qt.ControlModifier + Qt.Key_S,
             'text': qsTr('Shares'),
             'visible': false});
-        appPreferences.append({
-            'iconSource': 'image://icon/share',
-            'name': qsTr('Shares'),
-            'source': 'SharePreferencePanel.qml'});
         swapper.addPanel('SharePanel.qml');
     }
 
     onUnloaded: {
         dock.model.removePanel('SharePanel.qml');
-        appPreferences.removePanel('SharePreferencePanel.qml');
     }
 }

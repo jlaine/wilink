@@ -78,10 +78,6 @@ FocusScope {
         id: appPlugins
     }
 
-    PreferenceModel {
-        id: appPreferences
-    }
-
     ApplicationSettings {
         id: appSettings
     }
