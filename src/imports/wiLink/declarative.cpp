@@ -18,17 +18,10 @@
  */
 
 #include <QCoreApplication>
-#include <QDeclarativeItem>
 #include <QDeclarativeEngine>
 #include <QDesktopServices>
 #include <QGraphicsSceneDragDropEvent>
 #include <QMimeData>
-#include <QProcess>
-#include <QSslError>
-
-#ifdef Q_OS_WIN
-#include <windows.h>
-#endif
 
 #include "QXmppArchiveManager.h"
 #include "QXmppBookmarkManager.h"

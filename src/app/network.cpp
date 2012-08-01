@@ -23,6 +23,7 @@
 #include <QLocale>
 #include <QNetworkDiskCache>
 #include <QNetworkRequest>
+#include <QProcess>
 #include <QSslError>
 
 #ifdef Q_OS_WIN
