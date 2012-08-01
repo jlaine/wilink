@@ -55,15 +55,13 @@ Dialog {
                 height: appStyle.icon.smallSize + 2*appStyle.margin.normal
                 width: parent.width
 
-                Image {
+                Icon {
                     id: image
                     anchors.left: parent.left
                     anchors.leftMargin: appStyle.margin.normal
                     anchors.verticalCenter: parent.verticalCenter
-                    smooth: true
-                    source: model.iconSource
-                    sourceSize.height: appStyle.icon.smallSize
-                    sourceSize.width: appStyle.icon.smallSize
+                    font.pixelSize: 24
+                    style: model.iconStyle
                 }
 
                 Label {
@@ -112,25 +110,25 @@ Dialog {
 
         Component.onCompleted: {
             tabList.model.append({
-                'iconSource': 'image://icon/options',
-                'name': qsTr('General'),
-                'source': 'GeneralPreferencePanel.qml'});
+                iconStyle: 'icon-home',
+                name: qsTr('General'),
+                source: 'GeneralPreferencePanel.qml'});
             tabList.model.append({
-                'iconSource': 'image://icon/peer',
-                'name': qsTr('Accounts'),
-                'source': 'AccountPreferencePanel.qml'});
+                iconStyle: 'icon-user',
+                name: qsTr('Accounts'),
+                source: 'AccountPreferencePanel.qml'});
             tabList.model.append({
-                'iconSource': 'image://icon/audio-output',
-                'name': qsTr('Sound'),
-                'source': 'SoundPreferencePanel.qml'});
+                iconStyle: 'icon-music',
+                name: qsTr('Sound'),
+                source: 'SoundPreferencePanel.qml'});
             tabList.model.append({
-                'iconSource': 'image://icon/plugin',
-                'name': qsTr('Plugins'),
-                'source': 'PluginPreferencePanel.qml'});
+                iconStyle: 'icon-cog',
+                name: qsTr('Plugins'),
+                source: 'PluginPreferencePanel.qml'});
             tabList.model.append({
-                'iconSource': 'image://icon/share',
-                'name': qsTr('Shares'),
-                'source': 'SharePreferencePanel.qml'});
+                iconStyle: 'icon-share',
+                name: qsTr('Shares'),
+                source: 'SharePreferencePanel.qml'});
             prefSwapper.showPanel(tabList.model.get(0).source);
         }
     }
