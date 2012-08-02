@@ -168,6 +168,14 @@ RoomListModel::RoomListModel(QObject *parent)
     names.insert(ParticipantsRole, "participants");
     names.insert(StatusRole, "status");
     setRoleNames(names);
+
+    // monitor rooms
+    foreach (ChatClient *client, ChatClient::instances())
+        _q_clientCreated(client);
+    connect(ChatClient::observer(), SIGNAL(clientCreated(ChatClient*)),
+            this, SLOT(_q_clientCreated(ChatClient*)));
+    connect(ChatClient::observer(), SIGNAL(clientDestroyed(ChatClient*)),
+            this, SLOT(_q_clientDestroyed(ChatClient*)));
 }
 
 QVariant RoomListModel::data(const QModelIndex &index, int role) const
@@ -196,30 +204,6 @@ QVariant RoomListModel::data(const QModelIndex &index, int role) const
     }
 
     return QVariant();
-}
-
-void RoomListModel::addClient(ChatClient *client)
-{
-    bool check;
-    Q_UNUSED(check);
-
-    if (client && !m_clients.contains(client)) {
-        m_clients << client;
-
-        QXmppBookmarkManager *bookmarkManager = client->bookmarkManager();
-
-        // connect signals
-        check = connect(bookmarkManager, SIGNAL(bookmarksReceived(QXmppBookmarkSet)),
-                        this, SLOT(_q_bookmarksReceived()));
-        Q_ASSERT(check);
-
-        check = connect(client->mucManager(), SIGNAL(roomAdded(QXmppMucRoom*)),
-                        this, SLOT(_q_roomAdded(QXmppMucRoom*)));
-        Q_ASSERT(check);
-
-        if (bookmarkManager->areBookmarksReceived())
-            _q_bookmarksReceived(bookmarkManager);
-    }
 }
 
 void RoomListModel::addPendingMessage(const QString &jid)
@@ -307,12 +291,6 @@ void RoomListModel::addRoom(const QString &jid)
     }
 }
 
-void RoomListModel::removeClient(ChatClient *client)
-{
-    // TODO
-    Q_UNUSED(client);
-}
-
 void RoomListModel::removeRoom(const QString &jid)
 {
     if (jid.isEmpty())
@@ -360,6 +338,38 @@ void RoomListModel::_q_bookmarksReceived()
     QXmppBookmarkManager *bookmarkManager = qobject_cast<QXmppBookmarkManager*>(sender());
     if (bookmarkManager)
         _q_bookmarksReceived(bookmarkManager);
+}
+
+void RoomListModel::_q_clientCreated(ChatClient *client)
+{
+    bool check;
+    Q_UNUSED(check);
+
+    if (client && !m_clients.contains(client)) {
+        m_clients << client;
+
+        QXmppBookmarkManager *bookmarkManager = client->bookmarkManager();
+
+        // connect signals
+        check = connect(bookmarkManager, SIGNAL(bookmarksReceived(QXmppBookmarkSet)),
+                        this, SLOT(_q_bookmarksReceived()));
+        Q_ASSERT(check);
+
+        check = connect(client->mucManager(), SIGNAL(roomAdded(QXmppMucRoom*)),
+                        this, SLOT(_q_roomAdded(QXmppMucRoom*)));
+        Q_ASSERT(check);
+
+        if (bookmarkManager->areBookmarksReceived())
+            _q_bookmarksReceived(bookmarkManager);
+    }
+}
+
+void RoomListModel::_q_clientDestroyed(ChatClient *client)
+{
+    if (!m_clients.remove(client))
+        return;
+
+    // TODO
 }
 
 void RoomListModel::_q_participantsChanged()
