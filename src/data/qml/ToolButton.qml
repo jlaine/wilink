@@ -25,11 +25,10 @@ Item {
     property int iconSize: iconStyle != '' ? appStyle.icon.smallSize : 0
     property string iconStyle: ''
     property alias text: label.text
-    property bool enabled: true
+    property alias enabled: mouseArea.enabled
     signal clicked
 
     height: iconSize + (label.text ? 16 : 0)
-    state: mouseArea.pressed ? 'pressed' : (mouseArea.hovered ? 'hovered' : '')
     width: visible ? 64 : 0
 
     Gradient {
@@ -100,41 +99,21 @@ Item {
         anchors.fill: parent
         hoverEnabled: true
 
-        property bool pressed: false
-        property bool hovered: false
-
-        onClicked: {
-            if (button.enabled) {
-                button.clicked();
-            }
-        }
-        onDoubleClicked: {
-            // skip double click
-        }
-        onPressed: {
-            if (button.enabled) {
-                pressed = true;
-            }
-        }
-        onReleased: pressed = false
-        onEntered: {
-            if (button.enabled) {
-                hovered = true;
-            }
-        }
-        onExited: hovered = false
+        onClicked: button.clicked()
     }
 
     states: [
         State {
-            name: 'hovered'
-            PropertyChanges { target: hoverStop2; color: 'white' }
-            PropertyChanges { target: background; opacity: 0.4 }
-        },
-        State {
             name: 'pressed'
+            when: mouseArea.pressed
             PropertyChanges { target: hoverStop2; color: 'white' }
             PropertyChanges { target: background; opacity: 0.8 }
+        },
+        State {
+            name: 'hovered'
+            when: mouseArea.containsMouse
+            PropertyChanges { target: hoverStop2; color: 'white' }
+            PropertyChanges { target: background; opacity: 0.4 }
         }
     ]
 }
