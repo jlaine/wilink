@@ -249,64 +249,13 @@ RosterModel::RosterModel(QObject *parent)
         _q_clientCreated(client);
     connect(ChatClient::observer(), SIGNAL(clientCreated(ChatClient*)),
             this, SLOT(_q_clientCreated(ChatClient*)));
+    connect(ChatClient::observer(), SIGNAL(clientDestroyed(ChatClient*)),
+            this, SLOT(_q_clientDestroyed(ChatClient*)));
 }
 
 RosterModel::~RosterModel()
 {
     delete d;
-}
-
-/** Adds a client to the monitored list.
- */
-void RosterModel::_q_clientCreated(ChatClient *client)
-{
-    bool check;
-    Q_UNUSED(check);
-
-    if (client && !d->clients.contains(client)) {
-        d->clients << client;
-
-        VCardCache::instance()->addClient(client);
-
-        check = connect(client, SIGNAL(destroyed(QObject*)),
-                        this, SLOT(_q_clientDestroyed(QObject*)));
-        Q_ASSERT(check);
-
-        check = connect(client, SIGNAL(connected()),
-                        this, SLOT(_q_connected()));
-        Q_ASSERT(check);
-
-        check = connect(client, SIGNAL(disconnected()),
-                        this, SLOT(_q_disconnected()));
-        Q_ASSERT(check);
-
-        check = connect(client->rosterManager(), SIGNAL(itemAdded(QString)),
-                        this, SLOT(_q_itemAdded(QString)));
-        Q_ASSERT(check);
-
-        check = connect(client->rosterManager(), SIGNAL(itemRemoved(QString)),
-                        this, SLOT(_q_itemRemoved(QString)));
-        Q_ASSERT(check);
-
-        check = connect(client->rosterManager(), SIGNAL(presenceChanged(QString,QString)),
-                        this, SLOT(_q_itemChanged(QString)));
-        Q_ASSERT(check);
-
-        // use a queued connection so that the VCard gets updated first
-        check = connect(VCardCache::instance(), SIGNAL(cardChanged(QString)),
-                        this, SLOT(_q_itemChanged(QString)), Qt::QueuedConnection);
-        Q_ASSERT(check);
-
-        check = connect(client->rosterManager(), SIGNAL(rosterReceived()),
-                        this, SLOT(_q_rosterReceived()));
-        Q_ASSERT(check);
-
-        if (client->state() == QXmppClient::ConnectedState)
-            d->clientConnected(client);
-
-        if (client->rosterManager()->isRosterReceived())
-            d->rosterReceived(client->rosterManager());
-    }
 }
 
 QVariant RosterModel::data(const QModelIndex &index, int role) const
@@ -380,9 +329,58 @@ int RosterModel::pendingMessages() const
     return pending;
 }
 
+/** Adds a client to the monitored list.
+ */
+void RosterModel::_q_clientCreated(ChatClient *client)
+{
+    bool check;
+    Q_UNUSED(check);
+
+    if (client && !d->clients.contains(client)) {
+        d->clients << client;
+
+        VCardCache::instance()->addClient(client);
+
+        check = connect(client, SIGNAL(connected()),
+                        this, SLOT(_q_connected()));
+        Q_ASSERT(check);
+
+        check = connect(client, SIGNAL(disconnected()),
+                        this, SLOT(_q_disconnected()));
+        Q_ASSERT(check);
+
+        check = connect(client->rosterManager(), SIGNAL(itemAdded(QString)),
+                        this, SLOT(_q_itemAdded(QString)));
+        Q_ASSERT(check);
+
+        check = connect(client->rosterManager(), SIGNAL(itemRemoved(QString)),
+                        this, SLOT(_q_itemRemoved(QString)));
+        Q_ASSERT(check);
+
+        check = connect(client->rosterManager(), SIGNAL(presenceChanged(QString,QString)),
+                        this, SLOT(_q_itemChanged(QString)));
+        Q_ASSERT(check);
+
+        // use a queued connection so that the VCard gets updated first
+        check = connect(VCardCache::instance(), SIGNAL(cardChanged(QString)),
+                        this, SLOT(_q_itemChanged(QString)), Qt::QueuedConnection);
+        Q_ASSERT(check);
+
+        check = connect(client->rosterManager(), SIGNAL(rosterReceived()),
+                        this, SLOT(_q_rosterReceived()));
+        Q_ASSERT(check);
+
+        if (client->state() == QXmppClient::ConnectedState)
+            d->clientConnected(client);
+
+        if (client->rosterManager()->isRosterReceived())
+            d->rosterReceived(client->rosterManager());
+    }
+}
+
 /** Removes a client to the monitored list.
  */
-void RosterModel::removeClient(ChatClient *client)
+void RosterModel::_q_clientDestroyed(ChatClient *client)
 {
     if (!d->clients.remove(client))
         return;
@@ -404,11 +402,6 @@ void RosterModel::removeClient(ChatClient *client)
             removeItem(item);
     }
 #endif
-}
-
-void RosterModel::_q_clientDestroyed(QObject *object)
-{
-    removeClient(static_cast<ChatClient*>(object));
 }
 
 void RosterModel::_q_connected()
