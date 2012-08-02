@@ -23,6 +23,8 @@
 #include <QObject>
 #include <QUrl>
 
+class QAudioOutput;
+class QSoundFile;
 class QSoundLoaderPrivate;
 
 class QSoundLoader : public QObject
@@ -58,11 +60,34 @@ public slots:
 
 private slots:
     void _q_replyFinished();
-    void _q_stateChanged();
+    void _q_soundFinished(int id);
 
 private:
     QSoundLoaderPrivate *d;
     friend class QSoundLoaderPrivate;
+};
+
+class QSoundManager : public QObject
+{
+    Q_OBJECT
+
+public:
+    QSoundManager();
+    int play(QSoundFile *soundFile);
+    void stop(int id);
+
+signals:
+    void finished(int id);
+
+private slots:
+    void _q_start();
+    void _q_stateChanged();
+    void _q_stop(int id);
+
+private:
+    QHash<int, QSoundFile*> m_files;
+    QHash<int, QAudioOutput*> m_outputs;
+    int m_outputNum;
 };
 
 #endif
