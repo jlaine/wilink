@@ -55,7 +55,8 @@ QSoundPlayer::QSoundPlayer(QObject *parent)
     d->soundThread = new QThread(this);
     d->soundThread->start();
 
-    thePlayer = this;
+    if (!thePlayer)
+        thePlayer = this;
 }
 
 QSoundPlayer::~QSoundPlayer()
@@ -63,7 +64,8 @@ QSoundPlayer::~QSoundPlayer()
     d->soundThread->quit();
     d->soundThread->wait();
 
-    thePlayer = 0;
+    if (thePlayer == this)
+        thePlayer = 0;
     delete d;
 }
 
