@@ -129,14 +129,12 @@ Panel {
                 console.log("connecting to: " + data.jid);
                 item.client.connectToServer(data.jid, data.password);
             }
-            rosterModel.addClient(item.client);
             roomListModel.addClient(item.client);
             statusBar.addClient(item.client);
         }
 
         onItemRemoved: {
             console.log("removing client: " + item.client.jid);
-            rosterModel.removeClient(item.client);
             roomListModel.removeclient(item.client);
             statusBar.removeClient(item.client);
         }
