@@ -46,8 +46,8 @@ public:
     ChatClientObserver();
 
 signals:
-    void clientAdded(ChatClient *client);
-    void clientRemoved(ChatClient *client);
+    void clientCreated(ChatClient *client);
+    void clientDestroyed(ChatClient *client);
 
     friend class ChatClient;
 };

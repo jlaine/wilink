@@ -114,12 +114,12 @@ ChatClient::ChatClient(QObject *parent)
     diagnosticManager();
 
     chatClients.append(this);
-    theClientObserver()->clientAdded(this);
+    theClientObserver()->clientCreated(this);
 }
 
 ChatClient::~ChatClient()
 {
-    theClientObserver()->clientRemoved(this);
+    theClientObserver()->clientDestroyed(this);
     chatClients.removeAll(this);
     delete d;
 }
