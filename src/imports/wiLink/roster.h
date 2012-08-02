@@ -83,6 +83,7 @@ private slots:
     void _q_itemAdded(const QString &jid);
     void _q_itemChanged(const QString &jid);
     void _q_itemRemoved(const QString &jid);
+    void _q_rosterPurge();
     void _q_rosterReceived();
 
 private:

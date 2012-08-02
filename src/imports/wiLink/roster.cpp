@@ -28,6 +28,7 @@
 #include <QNetworkDiskCache>
 #include <QPainter>
 #include <QStringList>
+#include <QTimer>
 #include <QUrl>
 
 #include "QXmppDiscoveryIq.h"
@@ -216,11 +217,11 @@ void RosterModelPrivate::itemAdded(QXmppRosterManager *rosterManager, const QStr
 void RosterModelPrivate::rosterReceived(QXmppRosterManager *rosterManager)
 {
     // make a note of existing contacts
-    QList<RosterItem*> affected;
+    int affected = 0;
     foreach (ChatModelItem *item, q->rootItem->children) {
         RosterItem *child = static_cast<RosterItem*>(item);
         if (child->rosterManagers.remove(rosterManager))
-            affected << child;
+            affected++;
     }
 
     // process received entries
@@ -228,10 +229,8 @@ void RosterModelPrivate::rosterReceived(QXmppRosterManager *rosterManager)
         itemAdded(rosterManager, jid);
 
     // remove obsolete entries
-    foreach (RosterItem *item, affected) {
-        if (item->rosterManagers.isEmpty())
-            q->removeItem(item);
-    }
+    if (affected)
+        q->_q_rosterPurge();
 }
 
 RosterModel::RosterModel(QObject *parent)
@@ -387,18 +386,16 @@ void RosterModel::_q_clientDestroyed(ChatClient *client)
 
     // mark affected contacts
     QXmppRosterManager *rosterManager = client->rosterManager();
-    QList<RosterItem*> affected;
+    int affected = 0;
     foreach (ChatModelItem *item, rootItem->children) {
         RosterItem *child = static_cast<RosterItem*>(item);
         if (child->rosterManagers.remove(rosterManager))
-            affected << child;
+            affected++;
     }
 
-    // remove obsolete entries
-    foreach (RosterItem *item, affected) {
-        if (item->rosterManagers.isEmpty())
-            removeItem(item);
-    }
+    // remove obsolete entries later, to avoid a crash on exit
+    if (affected)
+        QTimer::singleShot(0, this, SLOT(_q_rosterPurge()));
 }
 
 void RosterModel::_q_connected()
@@ -447,6 +444,17 @@ void RosterModel::_q_itemRemoved(const QString &jid)
         item->rosterManagers.remove(rosterManager);
         if (item->rosterManagers.isEmpty())
             removeItem(item);
+    }
+}
+
+void RosterModel::_q_rosterPurge()
+{
+    for (int i = 0; i < rootItem->children.size(); ) {
+        RosterItem *item = static_cast<RosterItem*>(rootItem->children.at(i));
+        if (item->rosterManagers.isEmpty())
+            removeItem(item);
+        else
+            ++i;
     }
 }
 
