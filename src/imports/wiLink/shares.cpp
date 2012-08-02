@@ -66,6 +66,8 @@ ShareWatcher::ShareWatcher(QObject *parent)
         _q_clientCreated(client);
     connect(ChatClient::observer(), SIGNAL(clientCreated(ChatClient*)),
             this, SLOT(_q_clientCreated(ChatClient*)));
+    connect(ChatClient::observer(), SIGNAL(clientDestroyed(ChatClient*)),
+            this, SLOT(_q_clientDestroyed(ChatClient*)));
 }
 
 ShareWatcher::~ShareWatcher()
@@ -94,6 +96,14 @@ void ShareWatcher::_q_clientCreated(ChatClient *client)
     const QString server = client->shareServer();
     if (!server.isEmpty()) {
         QMetaObject::invokeMethod(client, "shareServerChanged", Q_ARG(QString, server));
+    }
+}
+
+void ShareWatcher::_q_clientDestroyed(ChatClient *client)
+{
+    if (m_shareDatabase && ChatClient::instances().isEmpty()) {
+        delete m_shareDatabase;
+        m_shareDatabase = 0;
     }
 }
 

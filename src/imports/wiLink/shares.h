@@ -46,6 +46,7 @@ signals:
 
 private slots:
     void _q_clientCreated(ChatClient *client);
+    void _q_clientDestroyed(ChatClient *client);
     void _q_disconnected();
     void _q_presenceReceived(const QXmppPresence &presence);
     void _q_searchReceived(const QXmppShareSearchIq &shareIq);
