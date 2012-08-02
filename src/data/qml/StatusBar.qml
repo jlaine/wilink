@@ -25,8 +25,6 @@ Rectangle {
 
     property bool autoAway: false
 
-    border.color: '#DDDDDD'
-    border.width: 1
     color: '#F5F5F5'
     height: appStyle.icon.tinySize + 3 * appStyle.margin.normal
 

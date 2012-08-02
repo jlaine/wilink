@@ -27,6 +27,7 @@ Plugin {
 
     onLoaded: {
         dock.model.add({
+            'iconStyle': 'icon-user',
             'iconSource': 'image://icon/dock-web',
             'iconPress': 'image://icon/web',
             'panelSource': 'WebPanel.qml',

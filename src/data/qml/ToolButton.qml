@@ -100,7 +100,7 @@ Item {
             elide: Text.ElideRight
             font.pixelSize: appStyle.font.smallSize
             horizontalAlignment: Text.AlignHCenter
-            opacity: button.enabled ? 1 : 0.5
+            opacity: button.enabled ? 1 : 0
             visible: button.text
         }
     }

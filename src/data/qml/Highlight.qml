@@ -22,14 +22,7 @@ import QtQuick 1.1
 Rectangle {
     id: highlight
 
-    border.color: '#ffb0c4de'
-    border.width: 1
-    gradient: Gradient {
-        GradientStop { id:stop1; position:0.0; color: '#33b0c4de' }
-        GradientStop { id:stop2; position:0.5; color: '#ffb0c4de' }
-        GradientStop { id:stop3; position:1.0; color: '#33b0c4de' }
-    }
-    radius: 5
+    color: '#597fbe'
     smooth: true
 
     states: State {

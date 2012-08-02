@@ -160,15 +160,16 @@ Panel {
             chatPanel.state = 'no-sidebar';
     }
 
-    Item {
+    Rectangle {
         id: sidebar
 
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        anchors.margins: appStyle.margin.normal
+        //anchors.margins: appStyle.margin.normal
         visible: width > 0
         width: chatPanel.singlePanel ? parent.width : appStyle.sidebarWidth
+        color: '#474747'
         z: 2
 
         ChatContactView {
@@ -291,7 +292,6 @@ Panel {
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.right: parent.right
-            radius: appStyle.margin.normal
         }
 
         // FIXME : this is a hack to make sure ConversationPanel loads fast
@@ -305,7 +305,7 @@ Panel {
         id: tabBox
 
         anchors.top: parent.top
-        anchors.topMargin: appStyle.margin.normal
+        //anchors.topMargin: appStyle.margin.normal
         anchors.left: chatPanel.singlePanel ? parent.left : sidebar.right
         anchors.right: parent.right
         gradient: Gradient {

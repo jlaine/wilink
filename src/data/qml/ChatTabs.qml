@@ -39,16 +39,18 @@ ListView {
         height: tabView.height
         width: 200
         z: model.panel.z
+        opacity: 0.3
 
         Rectangle {
             id: frame
 
             anchors.fill: parent
-            border.color: '#DDDDDD'
+            border.color: 'white'
             border.width: 1
             opacity: 0
-            radius: 4
+            radius: 0
             height: tabView.height
+            color: 'white'
 
             Behavior on opacity {
                 PropertyAnimation { duration: appStyle.animation.normalDuration }
@@ -63,8 +65,8 @@ ListView {
             anchors.verticalCenter: parent.verticalCenter
             smooth: true
             source: model.panel.iconSource
-            height: appStyle.icon.tinySize
-            width: appStyle.icon.tinySize
+            height: appStyle.icon.normalSize
+            width: appStyle.icon.normalSize
 
             Behavior on height {
                 NumberAnimation { duration: animationDuration }
@@ -111,8 +113,11 @@ ListView {
             Label {
                 anchors.left: parent.left
                 anchors.right: parent.right
+                anchors.leftMargin: 3
                 elide: Text.ElideRight
                 text: model.panel.subTitle
+                color: '#858585'
+                font.pixelSize: 11
                 visible: text != '' && (model.index == tabView.currentIndex)
             }
         }
@@ -136,23 +141,20 @@ ListView {
             iconStyle: 'icon-remove'
             visible: tabView.model.count > 1
             width: iconSize
-
+            opacity: (closeButton.state == "hovered") || (closeButton.state == "pressed") ? 1 : 0.5
             onClicked: model.panel.close()
+
         }
 
-        Behavior on width {
-            NumberAnimation { duration: animationDuration } 
-        }
 
         states: State {
             name: 'current'
             when: (model.index == tabView.currentIndex)
 
-            PropertyChanges { target: column; anchors.margins: appStyle.margin.large }
-            PropertyChanges { target: frame; border.width: 1; opacity: 1 }
             PropertyChanges { target: statusPill; opacity: 1 }
-            PropertyChanges { target: rect; height: 40; width: 250 }
-            PropertyChanges { target: icon; height: appStyle.icon.normalSize; width: appStyle.icon.normalSize }
+            PropertyChanges { target: rect; opacity: 1 }
+            PropertyChanges { target: frame; opacity: 1 }
+
         }
     }
 }

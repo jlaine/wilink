@@ -29,6 +29,7 @@ Rectangle {
     property int margins: (text != '') ? appStyle.margin.large : appStyle.margin.normal;
     property string style: ''
     property string text: ''
+    property string iconColor: '#333333'
 
     signal clicked
     signal pressed
@@ -64,6 +65,7 @@ Rectangle {
         Icon {
             anchors.centerIn: parent
             style: iconStyle
+            color: iconColor
         }
     }
 

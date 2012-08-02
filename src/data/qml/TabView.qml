@@ -27,7 +27,8 @@ ListView {
 
     clip: true
     currentIndex: Qt.isQtObject(panelSwapper) ? panelSwapper.currentIndex : -1
-    height: appStyle.icon.smallSize
+    //height: appStyle.icon.smallSize
+    height: 40
     highlightMoveDuration: appStyle.highlightMoveDuration
     model: panelSwapper.model
     orientation: ListView.Horizontal

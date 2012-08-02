@@ -21,13 +21,16 @@ import QtQuick 1.1
 
 Label {
     property string style
+    property int size: 14
 
     font.family: appStyle.icon.fontFamily
-    font.pixelSize: 14
+    font.pixelSize: size
     text: {
         switch (style) {
         case 'icon-search':
             return '\uF002';
+        case 'icon-user':
+            return '\uF007';
         case 'icon-remove':
             return '\uF00D';
         case 'icon-home':
@@ -40,6 +43,8 @@ Label {
             return '\uF021';
         case 'icon-lock':
             return '\uF023';
+        case 'icon-picture':
+            return '\uF03E';
         case 'icon-edit':
             return '\uF044';
         case 'icon-play':
@@ -70,6 +75,8 @@ Label {
             return '\uF077';
         case 'icon-chevron-down':
             return '\uF078';
+        case 'icon-cogs':
+            return '\uF085';
         case 'icon-phone':
             return '\uF095';
         case 'icon-rss':
@@ -80,6 +87,8 @@ Label {
             return '\uF0AD';
         case 'icon-fullscreen':
             return '\uF0B2';
+        case 'icon-cloud':
+            return '\uF0C2';
         case 'icon-cut':
             return '\uF0C4';
         case 'icon-copy':
@@ -98,6 +107,8 @@ Label {
             return '\uF0E7';
         case 'icon-paste':
             return '\uF0EA';
+        case 'icon-comments-alt':
+            return '\uf0e6';
         default:
             return '';
         }

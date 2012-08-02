@@ -35,12 +35,25 @@ Rectangle {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.topMargin: -parent.width
+        
+        /*
+         * Sparrow 
+         */
+//        gradient: Gradient {
+//            GradientStop {position: 0.05; color: '#262b30' }
+//            GradientStop {position: 0.06; color: '#262b30'}
+//            GradientStop {position: 1.0; color: '#262b30'}
+//        }
+        
+        /*
+         * Webapps
+         */
         gradient: Gradient {
-            GradientStop {position: 0.05; color: '#597fbe' }
-            GradientStop {position: 0.06; color: '#7495ca'}
-            GradientStop {position: 1.0; color: '#9fb7dd'}
+            GradientStop {position: 0.05; color: '#566c8a' }
+            GradientStop {position: 0.06; color: '#566c8a'}
+            GradientStop {position: 1.0; color: '#677e9f'}
         }
-
+        
         transform: Rotation {
             angle: 90
             origin.x: 0
@@ -93,9 +106,7 @@ Rectangle {
 
             delegate: DockButton {
                 id: button
-
-                iconSource: model.iconSource
-                iconPress: model.iconPress
+                iconStyle: model.iconStyle
                 notified: model.notified == true
                 panelProperties: model.panelProperties
                 panelSource: model.panelSource
@@ -118,8 +129,8 @@ Rectangle {
 
         DockButton {
             id: preferenceButton
-
-            iconSource: 'image://icon/dock-options'
+            iconStyle: 'icon-cogs'
+            //iconSource: 'image://icon/dock-options'
             iconPress: 'image://icon/options'
             panelSource: 'PreferenceDialog.qml'
             text: qsTr('Preferences')
@@ -139,6 +150,16 @@ Rectangle {
                 Qt.quit();
             }
         }
+    }
+
+    Rectangle {
+        id: rightBorder
+
+        anchors.left: parent.right
+        width: 1
+        height: parent.height
+        color: 'white'
+        opacity: 0.0
     }
 
     Keys.onPressed: {

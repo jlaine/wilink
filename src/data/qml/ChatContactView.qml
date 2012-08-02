@@ -39,27 +39,43 @@ ContactView {
         Item {
             anchors.fill: parent
 
-            Image {
-                id: avatar
+            Rectangle {
+                id: avatarFrame
 
                 anchors.left: parent.left
-                anchors.leftMargin: appStyle.margin.normal
+                anchors.leftMargin: 15
                 anchors.verticalCenter: parent.verticalCenter
-                asynchronous: true
-                source: block.iconSource != '' ? block.iconSource : model.avatar
-                sourceSize.width: appStyle.icon.smallSize
-                sourceSize.height: appStyle.icon.smallSize
                 width: appStyle.icon.smallSize
                 height: appStyle.icon.smallSize
+                border.color: '#c7c7c7'
+                border.width: 1
+
+                Image {
+                    id: avatar
+
+                    anchors.topMargin: 1
+                    anchors.top: parent.top
+                    anchors.leftMargin: 1
+                    anchors.left: parent.left
+                    width: parent.width - 1
+                    height: parent.height - 1
+                    asynchronous: true
+                    source: block.iconSource != '' ? block.iconSource : model.avatar
+                    sourceSize.width: appStyle.icon.smallSize - 1
+                    sourceSize.height: appStyle.icon.smallSize- 1
+                }
+
             }
 
             Label {
-                anchors.left: avatar.right
-                anchors.leftMargin: 3
+                anchors.left: avatarFrame.right
+                anchors.leftMargin: 6
                 anchors.right: bubble.right
                 anchors.verticalCenter: parent.verticalCenter
                 elide: Text.ElideRight
                 text: model.participants > 0 ? model.name + ' (' + model.participants + ')' : model.name
+                font.pixelSize: 11
+                color: block.ListView.isCurentItem ? 'white' : '#c7c7c7'
             }
 
             Bubble {

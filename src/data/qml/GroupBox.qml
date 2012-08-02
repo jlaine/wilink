@@ -41,47 +41,16 @@ FocusScope {
             Label {
                 id: textItem
 
-                anchors.centerIn: parent
+                anchors.fill: parent
+                color: '#858585'
                 font.bold: true
+                font.capitalization: Font.AllUppercase
+                style:Text.Sunken
+                horizontalAlignment: Text.AlignLeft
                 text: box.title
+
             }
         }
-    }
-
-    // FIXME: this is a hack waiting 'blur' or 'shadow' attribute in qml
-    BorderImage {
-        id: shadow
-
-        anchors.fill: box
-        anchors { leftMargin: -5; topMargin: -5; rightMargin: -8; bottomMargin: -9 }
-        border { left: 10; top: 10; right: 10; bottom: 10 }
-        opacity: shadowOpacity
-        source: 'image://icon/shadow'
-        smooth: true
-        z: -1
-    }
-
-    Rectangle {
-        id: background
-
-        anchors.fill: parent
-        border.color: box.borderColor
-        border.width: 1
-        color: 'white'
-        radius: box.radius
-        smooth: true
-    }
-
-    Rectangle {
-        id: frame
-
-        anchors.fill: parent
-        border.color: box.borderColor
-        border.width: 1
-        color: 'transparent'
-        radius: box.radius
-        smooth: true
-        z: 1
     }
 
     Item {
@@ -92,34 +61,6 @@ FocusScope {
         anchors.top: parent.top
         height: headerComponent ? (appStyle.font.largeSize + 2 * appStyle.margin.large) : 0
         visible: headerComponent ? true : false
-
-        Rectangle {
-            anchors.fill: parent
-            gradient: Gradient {
-                GradientStop { position: 0; color: '#FAFAFA' }
-                GradientStop { position: 1; color: '#E9E9E9' }
-            }
-            radius: box.radius
-            visible: box.headerBackground
-
-            Rectangle {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: parent.bottom
-                anchors.bottomMargin: 1
-                color: '#E9E9E9'
-                height: box.radius
-            }
-        }
-
-        Rectangle {
-            id: headerBorder
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.bottom: parent.bottom
-            height: 1
-            color: '#DDDDDD'
-        }
 
         Loader {
             anchors.fill: parent
@@ -135,7 +76,6 @@ FocusScope {
         anchors.bottom: footer.top
         anchors.left: parent.left
         anchors.right: parent.right
-        anchors.margins: appStyle.margin.normal
     }
 
     Item {

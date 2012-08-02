@@ -23,4 +23,5 @@ Text {
     id: label
     color: '#333333'
     font.pixelSize: appStyle.font.normalSize
+    property alias textStyle: label.style
 }

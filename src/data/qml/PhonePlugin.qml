@@ -33,8 +33,7 @@ Plugin {
             var account = accountModel.get(i);
             if (account.type == 'web' && account.realm == 'www.wifirst.net') {
                 dock.model.add({
-                    'iconSource': 'image://icon/dock-phone',
-                    'iconPress': 'image://icon/phone',
+                    'iconStyle': 'icon-phone',
                     'panelSource': 'PhonePanel.qml',
                     'priority': 9,
                     'shortcut': Qt.ControlModifier + Qt.Key_T,

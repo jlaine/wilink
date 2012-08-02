@@ -38,8 +38,30 @@ GroupBox {
         anchors.margins: 4
         iconSize: appStyle.icon.tinySize
         iconStyle: 'icon-plus'
-
+        gradient: Gradient {
+            GradientStop { id: stop1; position: 0.0; color: '#353535' }
+            GradientStop { id: stop2; position: 1.0; color: '#353535' }
+        }
+        border.width: 0
+        iconColor: '#858585'
         onClicked: block.addClicked()
+
+        states: [
+            State {
+                name: 'hovered'
+                PropertyChanges   { target: stop1; color: 'black' }
+                PropertyChanges   { target: stop2; color: 'black' }
+            }
+        ]
+
+        MouseArea {
+            id: mouseArea
+            anchors.fill: parent
+            hoverEnabled: true
+            property bool hovered: false
+            onEntered: hovered = true
+            onExited: hovered = false
+        }
     }
 
     ScrollView {
@@ -48,5 +70,6 @@ GroupBox {
         anchors.fill: parent
         clip: true
         focus: true
+        zeroMargin: true
     }
 }

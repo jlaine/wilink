@@ -26,6 +26,7 @@ Item {
     property bool active
     property bool enabled: true
     property bool notified: false
+    property string iconStyle: ''
     property string iconSource: ''
     property string iconPress: ''
     property variant panelProperties
@@ -51,27 +52,63 @@ Item {
     width: appStyle.icon.normalSize
     state: mouseArea.pressed ? 'pressed' : (mouseArea.hovered ? 'hovered' : '')
 
-    Image {
-        id: image
+    Icon {
+        id: icon
 
-        anchors.top: parent.top
-        anchors.horizontalCenter: parent.horizontalCenter
-        opacity: button.enabled ? 1 : 0.5
-        smooth: true
-        source: (button.iconPress != '' && button.active) ? button.iconPress : button.iconSource
-        sourceSize.height: appStyle.icon.normalSize
-        sourceSize.width: appStyle.icon.normalSize
-        width: parent.width
-        height: parent.height
+        anchors.centerIn: parent
+        style: iconStyle
+        size: 24
+        /* Sparrow */
+        //color: button.active ? '#2d8ffe' : '#e1e5eb'
+        //color: button.active ? 'white' : '#e1e5eb'
+
+        /* Wifirst */
+        //color: button.active ? '#597fbe' : '#e1e5eb'
+        color: button.active ? 'white' : '#d6dae0'
+
+        styleColor: '#969ea7'
+        textStyle: Text.Normal
     }
+
+    Rectangle {
+        width: 6
+        height: 4
+        radius: 2
+        anchors.horizontalCenter: icon.horizontalCenter
+        anchors.top: icon.bottom
+        //anchors.topMargin: 40
+        color: 'white'
+        opacity: button.active ? 0.9 : 0.0
+    }
+
+//    Image {
+//        id: image
+
+//        anchors.top: parent.top
+//        anchors.horizontalCenter: parent.horizontalCenter
+//        opacity: button.enabled ? 1 : 0.5
+//        smooth: true
+//        source: (button.iconPress != '' && button.active) ? button.iconPress : button.iconSource
+//        sourceSize.height: appStyle.icon.normalSize
+//        sourceSize.width: appStyle.icon.normalSize
+//        width: parent.width
+//        height: parent.height
+//    }
 
     Rectangle {
         id: labelBackground
 
-        anchors.left: image.right
-        anchors.verticalCenter: image.verticalCenter
+        anchors.left: button.right
+        anchors.leftMargin: 20
+        anchors.verticalCenter: button.verticalCenter
         opacity: 0
-        color: '#597fbe'
+        radius:5
+        /* Wifirst */
+        //color: '#597fbe'
+
+        /* Sparrow */
+        color: '#333'
+        
         width: label.width + 2*appStyle.spacing.horizontal
         height: label.height +2*appStyle.spacing.vertical
     }
@@ -79,56 +116,67 @@ Item {
     Label {
         id: label
 
-        function shortcutText(shortcut) {
-            var text = '';
-            if (shortcut & Qt.ControlModifier)
-                text += appSettings.osType == 'mac' ? 'Cmd-' : 'Ctrl-';
-            var key = shortcut & 0xffffff;
-            if (key >= Qt.Key_A && key <= Qt.Key_Z) {
-                var alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-                text += alpha[key - Qt.Key_A];
-            }
-            if (text.length)
-                return '<br/>' + text;
-            else
-                return '';
-        }
-
-        anchors.left: image.right
-        anchors.leftMargin: appStyle.spacing.horizontal
-        anchors.verticalCenter: image.verticalCenter
+        anchors.verticalCenter: labelBackground.verticalCenter
+        anchors.centerIn: labelBackground
+        font.pixelSize: 12
         opacity: 0
+        text: button.text
         color: 'white'
-        font.pixelSize: appStyle.font.smallSize
-        text: '<b>' + button.text + '</b>' + shortcutText(button.shortcut)
     }
+//    Label {
+//        id: label
+
+//        function shortcutText(shortcut) {
+//            var text = '';
+//            if (shortcut & Qt.ControlModifier)
+//                text += appSettings.osType == 'mac' ? 'Cmd-' : 'Ctrl-';
+//            var key = shortcut & 0xffffff;
+//            if (key >= Qt.Key_A && key <= Qt.Key_Z) {
+//                var alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+//                text += alpha[key - Qt.Key_A];
+//            }
+//            if (text.length)
+//                return '<br/>' + text;
+//            else
+//                return '';
+//        }
+
+//        anchors.left: image.right
+//        anchors.leftMargin: appStyle.spacing.horizontal
+//        anchors.verticalCenter: image.verticalCenter
+//        opacity: 0
+//        color: 'white'
+//        font.pixelSize: appStyle.font.smallSize
+//        text: '<b>' + button.text + '</b>' + shortcutText(button.shortcut)
+//    }
 
     states: [
         State {
             name: 'hovered'
-            PropertyChanges { target: button; width: image.width + 16; height: image.height }
-            PropertyChanges { target: image; height: appStyle.icon.normalSize; width: appStyle.icon.normalSize }
+            PropertyChanges   { target: icon; textStyle: button.active ? Text.Normal : Text.Sunken }
+            //PropertyChanges { target: button; width: image.width + 16; height: image.height }
+            //PropertyChanges { target: image; height: appStyle.icon.normalSize; width: appStyle.icon.normalSize }
             PropertyChanges { target: label; opacity: 1 }
-            PropertyChanges { target: labelBackground; opacity: 1 }
-        },
-        State {
-            name: 'pressed'
-            PropertyChanges { target: button; width: image.width + 16; height: image.height }
-            PropertyChanges { target: image; height: appStyle.icon.normalSize; width: appStyle.icon.normalSize }
-            PropertyChanges { target: label; opacity: 0.5 }
-            PropertyChanges { target: labelBackground; opacity: 1 }
+            PropertyChanges { target: labelBackground; opacity: 0.7 }
         }
+        //State {
+            //name: 'pressed'
+            //PropertyChanges { target: button; width: image.width + 16; height: image.height }
+            //PropertyChanges { target: image; height: appStyle.icon.normalSize; width: appStyle.icon.normalSize }
+            //PropertyChanges { target: label; opacity: 0.75 }
+            //PropertyChanges { target: labelBackground; opacity: 1 }
+        //}
     ]
 
-    transitions: Transition {
-            from: ''
-            to: 'hovered'
-            reversible: true
-            PropertyAnimation { target: button; properties: 'height,width'; duration: appStyle.animation.normalDuration }
-            PropertyAnimation { target: image; properties: 'height,width'; duration: appStyle.animation.normalDuration }
-            PropertyAnimation { target: label; properties: 'opacity'; duration: appStyle.animation.normalDuration }
-            PropertyAnimation { target: labelBackground; properties: 'opacity'; duration: appStyle.animation.normalDuration }
-        }
+//    transitions: Transition {
+//            from: ''
+//            to: 'hovered'
+//            reversible: true
+//            PropertyAnimation { target: button; properties: 'height,width'; duration: appStyle.animation.normalDuration }
+//            PropertyAnimation { target: image; properties: 'height,width'; duration: appStyle.animation.normalDuration }
+//            PropertyAnimation { target: label; properties: 'opacity'; duration: appStyle.animation.normalDuration }
+//            PropertyAnimation { target: labelBackground; properties: 'opacity'; duration: appStyle.animation.normalDuration }
+//        }
 
     MouseArea {
         id: mouseArea

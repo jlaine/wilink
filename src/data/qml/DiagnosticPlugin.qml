@@ -26,8 +26,7 @@ Plugin {
 
     onLoaded: {
         dock.model.add({
-            'iconSource': 'image://icon/dock-diagnostics',
-            'iconPress': 'image://icon/diagnostics',
+            'iconStyle': 'icon-info-sign',
             'panelSource': 'DiagnosticPanel.qml',
             'priority': 6,
             'shortcut': Qt.ControlModifier + Qt.Key_I,

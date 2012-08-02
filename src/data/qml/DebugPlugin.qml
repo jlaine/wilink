@@ -36,8 +36,7 @@ Plugin {
             'visible': true});
         */
         dock.model.add({
-            'iconSource': 'image://icon/dock-debug',
-            'iconPress': 'image://icon/debug',
+            'iconStyle': 'icon-exclamation-sign',
             'panelSource': 'LogPanel.qml',
             'priority': -1,
             'shortcut': Qt.ControlModifier + Qt.Key_L,

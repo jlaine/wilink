@@ -28,6 +28,7 @@ FocusScope {
     property alias model: view.model
     property alias moving: view.moving
     property alias spacing: view.spacing
+    property bool zeroMargin: false
 
     ListView {
         id: view
@@ -36,11 +37,11 @@ FocusScope {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: scrollBar.left
-        anchors.margins: appStyle.margin.small
+        anchors.margins: zeroMargin ? 0 : appStyle.margin.small
         focus: true
 
         highlight: Highlight {
-            width: view.width
+            width: parent.width
         }
         highlightMoveDuration: appStyle.highlightMoveDuration
     }

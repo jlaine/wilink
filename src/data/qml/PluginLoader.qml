@@ -118,6 +118,7 @@ Item {
     }
 
     Component.onCompleted: {
+        pluginModel.append({ source: 'WebPlugin.qml', autoload: true });
         pluginModel.append({ source: 'ChatPlugin.qml', autoload: true });
         pluginModel.append({ source: 'DebugPlugin.qml' });
         pluginModel.append({ source: 'DiagnosticPlugin.qml', autoload: true });
@@ -125,6 +126,5 @@ Item {
             pluginModel.append({ source: 'PhonePlugin.qml', autoload: true });
         pluginModel.append({ source: 'PhotoPlugin.qml', autoload: true });
         pluginModel.append({ source: 'SharePlugin.qml', autoload: true });
-        pluginModel.append({ source: 'WebPlugin.qml', autoload: true });
     }
 }
