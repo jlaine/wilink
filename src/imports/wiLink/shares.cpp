@@ -59,11 +59,18 @@ ShareWatcher::ShareWatcher(QObject *parent)
     : QObject(parent)
     , m_shareDatabase(0)
 {
+    qDebug("ShareWatcher created");
+
     // monitor clients
     foreach (ChatClient *client, ChatClient::instances())
         _q_clientCreated(client);
     connect(ChatClient::observer(), SIGNAL(clientCreated(ChatClient*)),
             this, SLOT(_q_clientCreated(ChatClient*)));
+}
+
+ShareWatcher::~ShareWatcher()
+{
+    qDebug("ShareWatcher destroyed");
 }
 
 void ShareWatcher::_q_clientCreated(ChatClient *client)

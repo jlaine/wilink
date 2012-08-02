@@ -39,6 +39,7 @@ class ShareWatcher : public QObject
 
 public:
     ShareWatcher(QObject *parent = 0);
+    ~ShareWatcher();
 
 signals:
     void isConnectedChanged();
