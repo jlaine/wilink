@@ -57,6 +57,7 @@ private:
     QXmppShareDatabase *database();
 
     QXmppShareDatabase *m_shareDatabase;
+    bool m_shareDatabaseSet;
 };
 
 class ShareFileSystem : public FileSystem
