@@ -59,11 +59,19 @@ ShareWatcher::ShareWatcher(QObject *parent)
     : QObject(parent)
     , m_shareDatabase(0)
 {
+    bool check;
+    Q_UNUSED(check);
+
+    ChatClientObserver *observer = ChatClient::observer();
     foreach (ChatClient *client, ChatClient::instances())
-        addClient(client);
+        _q_clientCreated(client);
+
+    check = connect(observer, SIGNAL(clientCreated(ChatClient*)),
+                    this, SLOT(_q_clientCreated(ChatClient*)));
+    Q_ASSERT(check);
 }
 
-void ShareWatcher::addClient(ChatClient *client)
+void ShareWatcher::_q_clientCreated(ChatClient *client)
 {
     bool check;
     Q_UNUSED(check);
@@ -185,8 +193,6 @@ void ShareWatcher::_q_presenceReceived(const QXmppPresence &presence)
         ChatClient *newClient = new ChatClient(this);
         newClient->setProperty("_parent_jid", client->jid());
         newClient->setLogger(client->logger());
-
-        addClient(newClient);
 
         const QString newJid = client->configuration().user() + '@' + newDomain;
         newClient->connectToServer(newJid, client->configuration().password());
