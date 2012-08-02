@@ -153,7 +153,6 @@ void RoomConfigurationModel::_q_configurationReceived(const QXmppDataForm &confi
 class RoomListItem : public ChatModelItem
 {
 public:
-    QSet<ChatClient*> clients;
     QString jid;
     int messages;
 };
