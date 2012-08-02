@@ -58,6 +58,7 @@ static QXmppShareLocation urlToLocation(const QUrl &url)
 ShareWatcher::ShareWatcher(QObject *parent)
     : QObject(parent)
     , m_shareDatabase(0)
+    , m_shareDatabaseSet(false)
 {
     qDebug("ShareWatcher created");
 
@@ -113,16 +114,20 @@ QXmppShareDatabase *ShareWatcher::database()
     Q_UNUSED(check);
 
     if (!m_shareDatabase) {
-        // initialise database
-        const QString databaseName = QDir(QDesktopServices::storageLocation(QDesktopServices::DataLocation)).filePath("database.sqlite");
-        QSqlDatabase sharesDb = QSqlDatabase::addDatabase("QSQLITE");
-        sharesDb.setDatabaseName(databaseName);
-        check = sharesDb.open();
-        Q_ASSERT(check);
+        if (!m_shareDatabaseSet) {
+            // initialise database
+            const QString databaseName = QDir(QDesktopServices::storageLocation(QDesktopServices::DataLocation)).filePath("database.sqlite");
+            QSqlDatabase sharesDb = QSqlDatabase::addDatabase("QSQLITE");
+            sharesDb.setDatabaseName(databaseName);
+            check = sharesDb.open();
+            Q_ASSERT(check);
 
-        QDjango::setDatabase(sharesDb);
-        // drop wiLink <= 0.9.4 table
-        sharesDb.exec("DROP TABLE files");
+            QDjango::setDatabase(sharesDb);
+            // drop wiLink <= 0.9.4 table
+            sharesDb.exec("DROP TABLE files");
+
+            m_shareDatabaseSet = true;
+        }
 
         // create shares database
         m_shareDatabase = new QXmppShareDatabase(this);
