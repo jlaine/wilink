@@ -209,7 +209,7 @@ void ShareWatcher::_q_presenceReceived(const QXmppPresence &presence)
         qDebug("Shares redirecting to %s", qPrintable(newDomain));
         ChatClient *newClient = new ChatClient(client);
         newClient->setProperty("_parent_jid", client->jid());
-        newClient->setLogger(client->logger());
+        newClient->setLogger(0);
 
         const QString newJid = client->configuration().user() + '@' + newDomain;
         newClient->connectToServer(newJid, client->configuration().password());
