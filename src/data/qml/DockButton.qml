@@ -27,11 +27,6 @@ Item {
     property bool enabled: true
     property bool notified: false
     property string iconStyle: ''
-<<<<<<< HEAD
-    property string iconSource: ''
-    property string iconPress: ''
-=======
->>>>>>> 6482869b3f09c09da2b0da251d1246fb2e733d3f
     property variant panelProperties
     property string panelSource: ''
     property string text

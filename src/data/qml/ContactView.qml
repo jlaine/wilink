@@ -38,14 +38,14 @@ GroupBox {
         anchors.topMargin: 8
         anchors.right: parent.right
         anchors.rightMargin: 4
-        iconStyle: 'icon-plus'
-        gradient: Gradient {
-            GradientStop { id: stop1; position: 0.0; color: '#353535' }
-            GradientStop { id: stop2; position: 1.0; color: '#353535' }
-        }
-        border.width: 0
-        iconColor: '#858585'
-        onClicked: block.addClicked()
+        //iconStyle: 'icon-plus'
+//        gradient: Gradient {
+//            GradientStop { id: stop1; position: 0.0; color: '#353535' }
+//            GradientStop { id: stop2; position: 1.0; color: '#353535' }
+//        }
+//        border.width: 0
+//        iconColor: '#858585'
+//        onClicked: block.addClicked()
 
         states: [
             State {
