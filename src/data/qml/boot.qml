@@ -20,7 +20,9 @@
 import QtQuick 1.1
 import wiLink 2.4
 
-Item {
+FocusScope {
+    focus: true
+
     TranslationLoader {
         Component.onCompleted: {
             if (localeName == 'en')
@@ -40,5 +42,6 @@ Item {
         id: uiLoader
 
         anchors.fill: parent
+        focus: true
     }
 }
