@@ -124,10 +124,19 @@ int main(int argc, char *argv[])
     signal(SIGTERM, signal_handler);
 
     /* Create window */
-    CustomWindow *window = new CustomWindow(peer);
+    new CustomWindow(peer);
     if (url.isValid() && url.scheme() == "wilink")
         QMetaObject::invokeMethod(peer, "messageReceived", Q_ARG(QString, "OPEN " + url.toString()));
 
     /* Run application */
-    return app.exec();
+    int ret = app.exec();
+
+    /* Delete window */
+    foreach (QWidget *widget, QApplication::topLevelWidgets()) {
+        if (qobject_cast<CustomWindow*>(widget)) {
+            delete widget;
+            break;
+        }
+    }
+    return ret;
 }
