@@ -75,6 +75,7 @@ void QSoundLoaderPrivate::play(QSoundFile *soundFile)
     soundFile->setRepeat(repeat);
     if (!soundFile->open(QIODevice::Unbuffered | QIODevice::ReadOnly)) {
         qmlInfo(q) << "Could not open sound file";
+        delete soundFile;
         status = QSoundLoader::Error;
         emit q->statusChanged();
         return;
@@ -82,7 +83,13 @@ void QSoundLoaderPrivate::play(QSoundFile *soundFile)
 
     // play file
     QSoundPlayer *player = QSoundPlayer::instance();
-    Q_ASSERT(player);
+    if (!player) {
+        qmlInfo(q) << "Could not find sound player";
+        delete soundFile;
+        status = QSoundLoader::Error;
+        emit q->statusChanged();
+        return;
+    }
 
     audioOutput = new QAudioOutput(player->outputDevice(), soundFile->format());
 
