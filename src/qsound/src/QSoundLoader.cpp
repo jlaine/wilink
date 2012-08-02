@@ -30,8 +30,6 @@
 
 #define SOUNDLOADER_MAXIMUM_REDIRECT_RECURSION 16
 
-Q_GLOBAL_STATIC(QSoundManager, theManager);
-
 class QSoundLoaderPrivate
 {
 public:
@@ -39,7 +37,7 @@ public:
     void download(const QUrl &url, QNetworkAccessManager *manager);
     void play(QSoundFile *soundFile);
 
-    int audioId;
+    QSoundJob *audioJob;
     int redirectCount;
     bool repeat;
     QNetworkReply *reply;
@@ -51,7 +49,7 @@ private:
 };
 
 QSoundLoaderPrivate::QSoundLoaderPrivate(QSoundLoader *qq)
-    : audioId(-1)
+    : audioJob(0)
     , redirectCount(0)
     , repeat(false)
     , reply(0)
@@ -82,7 +80,12 @@ void QSoundLoaderPrivate::play(QSoundFile *soundFile)
 
     // play file
     qmlInfo(q) << "Audio started";
-    audioId = theManager()->play(soundFile);
+    audioJob = new QSoundJob(soundFile);
+    audioJob->moveToThread(QSoundPlayer::instance()->soundThread());
+    QObject::connect(audioJob, SIGNAL(finished()),
+                     q, SLOT(_q_soundFinished()));
+    QMetaObject::invokeMethod(audioJob, "start");
+
     status = QSoundLoader::Playing;
     emit q->statusChanged();
 }
@@ -91,16 +94,15 @@ QSoundLoader::QSoundLoader(QObject *parent)
     : QObject(parent)
     , d(new QSoundLoaderPrivate(this))
 {
-    connect(theManager(), SIGNAL(finished(int)),
-            this, SLOT(_q_soundFinished(int)));
 }
 
 QSoundLoader::~QSoundLoader()
 {
+    stop();
     if (d->reply)
         d->reply->deleteLater();
-    if (d->audioId >= 0)
-        theManager()->stop(d->audioId);
+    if (d->audioJob)
+        d->audioJob->deleteLater();
     delete d;
 }
 
@@ -154,8 +156,8 @@ void QSoundLoader::stop()
 {
     if (d->reply)
         d->reply->abort();
-    if (d->audioId >= 0)
-        theManager()->stop(d->audioId);
+    if (d->audioJob)
+        QMetaObject::invokeMethod(d->audioJob, "stop");
 }
 
 QSoundLoader::Status QSoundLoader::status() const
@@ -208,80 +210,50 @@ void QSoundLoader::_q_replyFinished()
     d->reply = 0;
 }
 
-void QSoundLoader::_q_soundFinished(int id)
+void QSoundLoader::_q_soundFinished()
 {
-    if (id == d->audioId) {
+    if (sender() == d->audioJob) {
         qmlInfo(this) << "Audio stopped";
-        d->audioId = -1;
+        d->audioJob = 0;
         d->status = QSoundLoader::Null;
         emit statusChanged();
     }
 }
 
-QSoundManager::QSoundManager()
-    : m_outputNum(0)
+QSoundJob::QSoundJob(QSoundFile *file)
+    : m_file(file)
+    , m_output(0)
 {
-    qRegisterMetaType<QSoundFile*>("QSoundFile*");
-
-    QSoundPlayer *player = QSoundPlayer::instance();
-    if (player)
-        moveToThread(player->soundThread());
+    m_file->setParent(this);
 }
 
-int QSoundManager::play(QSoundFile *soundFile)
-{
-    soundFile->setParent(0);
-    soundFile->moveToThread(thread());
-    soundFile->setParent(this);
-
-    const int audioId = m_outputNum++;
-    m_files.insert(audioId, soundFile);
-    QMetaObject::invokeMethod(this, "_q_start", Qt::QueuedConnection);
-    return audioId;
-}
-
-void QSoundManager::stop(int id)
-{
-    QMetaObject::invokeMethod(this, "_q_stop", Qt::QueuedConnection, Q_ARG(int, id));
-}
-
-void QSoundManager::_q_start()
+void QSoundJob::start()
 {
     QSoundPlayer *player = QSoundPlayer::instance();
     if (!player) {
         qWarning("Could not find sound player");
+        emit finished();
         return;
     }
 
-    foreach (const int audioId, m_files.keys()) {
-        QSoundFile *soundFile = m_files.value(audioId);
-
-        QAudioOutput *audioOutput = new QAudioOutput(player->outputDevice(), soundFile->format(), this);
-        m_outputs.insert(audioId, audioOutput);
-
-        connect(audioOutput, SIGNAL(stateChanged(QAudio::State)),
-                this, SLOT(_q_stateChanged()));
-
-        soundFile->setParent(audioOutput);
-        audioOutput->start(soundFile);
-    }
-    m_files.clear();
+    m_output = new QAudioOutput(player->outputDevice(), m_file->format(), this);
+    connect(m_output, SIGNAL(stateChanged(QAudio::State)),
+            this, SLOT(_q_stateChanged()));
+    m_output->start(m_file);
 }
 
-void QSoundManager::_q_stateChanged()
+void QSoundJob::stop()
 {
-    QAudioOutput *audioOutput = qobject_cast<QAudioOutput*>(sender());
-    const int audioId = m_outputs.key(audioOutput, -1);
-    if (audioId >= 0 && audioOutput->state() != QAudio::ActiveState) {
-        audioOutput->deleteLater();
-        m_outputs.remove(audioId);
-        emit finished(audioId);
+    if (m_output)
+        m_output->stop();
+}
+
+void QSoundJob::_q_stateChanged()
+{
+    if (m_output && m_output->state() != QAudio::ActiveState) {
+        m_output->deleteLater();
+        m_output = 0;
+        emit finished();
     }
 }
 
-void QSoundManager::_q_stop(int id)
-{
-    QAudioOutput *audioOutput = m_outputs.value(id);
-    if (audioOutput)
-        audioOutput->stop();
-}

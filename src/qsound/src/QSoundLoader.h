@@ -60,34 +60,33 @@ public slots:
 
 private slots:
     void _q_replyFinished();
-    void _q_soundFinished(int id);
+    void _q_soundFinished();
 
 private:
     QSoundLoaderPrivate *d;
     friend class QSoundLoaderPrivate;
 };
 
-class QSoundManager : public QObject
+class QSoundJob : public QObject
 {
     Q_OBJECT
 
 public:
-    QSoundManager();
-    int play(QSoundFile *soundFile);
-    void stop(int id);
+    QSoundJob(QSoundFile *soundFile);
 
 signals:
-    void finished(int id);
+    void finished();
+
+public slots:
+    void start();
+    void stop();
 
 private slots:
-    void _q_start();
     void _q_stateChanged();
-    void _q_stop(int id);
 
 private:
-    QHash<int, QSoundFile*> m_files;
-    QHash<int, QAudioOutput*> m_outputs;
-    int m_outputNum;
+    QSoundFile* m_file;
+    QAudioOutput* m_output;
 };
 
 #endif
