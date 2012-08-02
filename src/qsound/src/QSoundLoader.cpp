@@ -108,6 +108,10 @@ QSoundLoader::QSoundLoader(QObject *parent)
 
 QSoundLoader::~QSoundLoader()
 {
+    if (d->reply)
+        d->reply->deleteLater();
+    if (d->audioOutput)
+        d->audioOutput->deleteLater();
     delete d;
 }
 
@@ -215,7 +219,7 @@ void QSoundLoader::_q_stateChanged()
 {
     if (d->audioOutput && d->audioOutput->state() != QAudio::ActiveState) {
         qmlInfo(this) << "Audio stopped";
-        // FIXME: free memory!
+        d->audioOutput->deleteLater();
         d->audioOutput = 0;
         d->status = QSoundLoader::Null;
         emit statusChanged();
