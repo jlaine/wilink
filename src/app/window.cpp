@@ -90,9 +90,11 @@ CustomWindow::CustomWindow(QtLocalPeer *peer, QWidget *parent)
     // create data paths
     const QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
     const QString cachePath = QDir(dataPath).filePath("cache");
-    const QString storagePath = QDir(dataPath).filePath("storage");
+    QString storagePath = QDir(dataPath).filePath("storage");
     QDir().mkpath(cachePath);
     QDir().mkpath(storagePath);
+    // NOTE: for some reason we need native directory separators
+    storagePath.replace(QLatin1Char('/'), QDir::separator());
 
     // create declarative view
     d->view = new QDeclarativeView;
