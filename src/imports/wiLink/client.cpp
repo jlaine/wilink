@@ -113,14 +113,16 @@ ChatClient::ChatClient(QObject *parent)
     // diagnostics
     diagnosticManager();
 
+    qDebug("ChatClient 0x%llx created", reinterpret_cast<qint64>(this));
     chatClients.append(this);
     theClientObserver()->clientCreated(this);
 }
 
 ChatClient::~ChatClient()
 {
-    theClientObserver()->clientDestroyed(this);
+    qDebug("ChatClient 0x%llx destroyed", reinterpret_cast<qint64>(this));
     chatClients.removeAll(this);
+    theClientObserver()->clientDestroyed(this);
     delete d;
 }
 
