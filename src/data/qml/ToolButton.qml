@@ -89,7 +89,6 @@ Item {
             elide: Text.ElideRight
             font.pixelSize: appStyle.font.smallSize
             horizontalAlignment: Text.AlignHCenter
-            opacity: button.enabled ? 1 : 0.5
             visible: button.text
         }
     }
@@ -103,6 +102,12 @@ Item {
     }
 
     states: [
+        State {
+            name: 'disabled'
+            when: !enabled
+            PropertyChanges { target: image; opacity: 0.5 }
+            PropertyChanges { target: label; opacity: 0.5 }
+        },
         State {
             name: 'pressed'
             when: mouseArea.pressed
