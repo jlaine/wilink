@@ -47,9 +47,7 @@ Panel {
                 text: qsTr('Options')
 
                 onClicked: {
-                    dialogSwapper.showPanel('PreferenceDialog.qml');
-                    var panel = dialogSwapper.findPanel('PreferenceDialog.qml');
-                    panel.showPanel('SharePreferencePanel.qml');
+                    dialogSwapper.showPanel('PreferenceDialog.qml', {initialPanel: 'SharePreferencePanel.qml'});
                 }
 
                 // run one-time configuration dialog

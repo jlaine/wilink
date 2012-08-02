@@ -22,13 +22,11 @@ import QtQuick 1.1
 Dialog {
     id: dialog
 
+    property string initialPanel: 'GeneralPreferencePanel.qml'
+
     minimumHeight: 500
     minimumWidth: 360
     title: qsTr("Preferences")
-
-    function showPanel(source) {
-        prefSwapper.showPanel(source);
-    }
 
     onAccepted: {
         for (var i = tabList.count - 1; i >= 0; i--) {
@@ -129,7 +127,7 @@ Dialog {
                 iconStyle: 'icon-share',
                 name: qsTr('Shares'),
                 source: 'SharePreferencePanel.qml'});
-            prefSwapper.showPanel(tabList.model.get(0).source);
+            prefSwapper.showPanel(initialPanel);
         }
     }
 }
