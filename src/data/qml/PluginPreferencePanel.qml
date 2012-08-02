@@ -77,11 +77,11 @@ Panel {
                 source: model.source
             }
 
-            Image {
+            Icon {
                 id: image
                 anchors.top: parent.top
                 anchors.left: parent.left
-                source: Qt.isQtObject(plugin) ? plugin.imageSource : 'image://icon/plugin'
+                style: Qt.isQtObject(plugin) ? plugin.iconStyle : 'icon-cogs'
             }
 
             Label {

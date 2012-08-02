@@ -26,7 +26,7 @@ NotificationDialog {
     property QtObject call
     property Item panel
 
-    iconSource: vcard.avatar
+    iconStyle: 'icon-phone'
     text: qsTr('%1 wants to talk to you.\n\nDo you accept?').replace('%1', vcard.name)
     title: qsTr('Call from %1').replace('%1', vcard.name)
 
@@ -48,9 +48,12 @@ NotificationDialog {
         dialog.call.hangup();
     }
 
-    Component.onCompleted: {
-        // play a sound
-        dialog.soundJob = appSoundPlayer.play(":/sounds/call-incoming.ogg", true);
+    SoundLoader {
+        id: soundLoader
+
+        repeat: true
+        source: 'sounds/call-incoming.ogg'
+        Component.onCompleted: soundLoader.start()
     }
 
     Connections {

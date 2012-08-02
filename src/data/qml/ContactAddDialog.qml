@@ -18,7 +18,7 @@
  */
 
 import QtQuick 1.1
-import 'utils.js' as Utils
+import 'scripts/utils.js' as Utils
 
 Dialog {
     id: dialog
@@ -36,7 +36,6 @@ Dialog {
 
             anchors.left: parent.left
             anchors.right: parent.right
-            iconSize: 32
             text: qsTr('Enter the address of the contact you want to add.')
         }
 
@@ -77,7 +76,7 @@ Dialog {
                 Component.onCompleted: {
                     for (var i in clients) {
                         var client = clients[i];
-                        model.append({iconSource: 'image://icon/chat', text: Utils.jidToBareJid(client.jid), client: client});
+                        model.append({iconStyle: 'icon-user', text: Utils.jidToBareJid(client.jid), client: client});
                     }
                     if (model.count > 0)
                         accountCombo.currentIndex = 0;

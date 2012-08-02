@@ -90,16 +90,16 @@ signals:
     void roomAdded(const QString &jid);
 
 public slots:
-    void addClient(ChatClient *client);
     void addPendingMessage(const QString &jid);
     void clearPendingMessages(const QString &jid);
-    void removeClient(ChatClient *client);
 
     void addRoom(const QString &jid);
     void removeRoom(const QString &jid);
 
 private slots:
     void _q_bookmarksReceived();
+    void _q_clientCreated(ChatClient *client);
+    void _q_clientDestroyed(ChatClient *client);
     void _q_participantsChanged();
     void _q_roomAdded(QXmppMucRoom *room);
 

@@ -1,8 +1,5 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
-    <file>qml/fontawesome-webfont.ttf</file>
-    <file>qml/sip.js</file>
-    <file>qml/utils.js</file>
     <file>qml/AboutDialog.qml</file>
     <file>qml/AccountListPanel.qml</file>
     <file>qml/AccountPasswordDialog.qml</file>
@@ -50,9 +47,6 @@
     <file>qml/MeegoMain.qml</file>
     <file>qml/Menu.qml</file>
     <file>qml/MenuDelegate.qml</file>
-    <file>qml/NewsDialog.qml</file>
-    <file>qml/NewsPanel.qml</file>
-    <file>qml/NewsPlugin.qml</file>
     <file>qml/NotificationDialog.qml</file>
     <file>qml/Panel.qml</file>
     <file>qml/PanelHeader.qml</file>
@@ -79,7 +73,6 @@
     <file>qml/PluginLoader.qml</file>
     <file>qml/PluginPreferencePanel.qml</file>
     <file>qml/PreferenceDialog.qml</file>
-    <file>qml/PreferenceModel.qml</file>
     <file>qml/ProgressBar.qml</file>
     <file>qml/RoomConfigurationDialog.qml</file>
     <file>qml/RoomInviteDialog.qml</file>
@@ -92,7 +85,6 @@
     <file>qml/RoomSubjectDialog.qml</file>
     <file>qml/ScrollBar.qml</file>
     <file>qml/ScrollView.qml</file>
-    <file>qml/SendPanel.qml</file>
     <file>qml/SetupDialog.qml</file>
     <file>qml/SharePanel.qml</file>
     <file>qml/SharePlugin.qml</file>
@@ -104,7 +96,6 @@
     <file>qml/StatusDelegate.qml</file>
     <file>qml/StatusPill.qml</file>
     <file>qml/Style.qml</file>
-    <file>qml/TabView.qml</file>
     <file>qml/ToolBar.qml</file>
     <file>qml/ToolButton.qml</file>
     <file>qml/TransferNotification.qml</file>
@@ -112,5 +103,16 @@
     <file>qml/WebPanel.qml</file>
     <file>qml/WebPlugin.qml</file>
     <file>qml/WebTab.qml</file>
+    <file>qml/boot.qml</file>
+    <file>qml/fonts/fontawesome-webfont.ttf</file>
+    <file>qml/i18n/fr.qm</file>
+    <file>qml/images/shadow.png</file>
+    <file>qml/scripts/sip.js</file>
+    <file>qml/scripts/storage.js</file>
+    <file>qml/scripts/utils.js</file>
+    <file>qml/sounds/call-incoming.ogg</file>
+    <file>qml/sounds/call-outgoing.ogg</file>
+    <file>qml/sounds/message-incoming.ogg</file>
+    <file>qml/sounds/message-outgoing.ogg</file>
 </qresource>
 </RCC>

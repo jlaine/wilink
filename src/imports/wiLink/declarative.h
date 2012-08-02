@@ -22,10 +22,8 @@
 
 #include <QAbstractItemModel>
 #include <QDeclarativeItem>
-#include <QDeclarativeNetworkAccessManagerFactory>
 #include <QDeclarativeExtensionPlugin>
 #include <QFileDialog>
-#include <QNetworkAccessManager>
 #include <QSortFilterProxyModel>
 
 #include "QXmppMessage.h"
@@ -70,27 +68,6 @@ signals:
 private:
     QAbstractItemModel *m_model;
     QList<QPersistentModelIndex> m_selection;
-};
-
-class NetworkAccessManager : public QNetworkAccessManager
-{
-    Q_OBJECT
-
-public:
-    NetworkAccessManager(QObject *parent = 0);
-    static QString userAgent();
-
-protected:
-    virtual QNetworkReply *createRequest(Operation op, const QNetworkRequest &req, QIODevice *outgoingData = 0);
-
-private slots:
-    void onSslErrors(QNetworkReply *reply, const QList<QSslError> &errors);
-};
-
-class AuthenticatedNetworkAccessManager : public NetworkAccessManager
-{
-public:
-    AuthenticatedNetworkAccessManager(QObject *parent = 0);
 };
 
 class DropArea : public QDeclarativeItem

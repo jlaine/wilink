@@ -19,7 +19,7 @@
 
 import QtQuick 1.1
 import wiLink 2.4
-import 'utils.js' as Utils
+import 'scripts/utils.js' as Utils
 
 Dialog {
     id: dialog
@@ -51,7 +51,6 @@ Dialog {
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.right: parent.right
-            iconSize: 32
             text: qsTr('Enter the name of the chat room you want to join. If the chat room does not exist yet, it will be created for you.')
         }
 

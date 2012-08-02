@@ -19,7 +19,7 @@
 
 import QtQuick 1.1
 import wiLink 2.4
-import 'utils.js' as Utils
+import 'scripts/utils.js' as Utils
 
 Item {
     id: block
@@ -65,8 +65,7 @@ Item {
                 anchors.right: cancelButton.left
                 anchors.rightMargin: appStyle.spacing.horizontal
                 anchors.verticalCenter: parent.verticalCenter
-                iconSource: 'image://icon/copy'
-                iconSize: appStyle.icon.tinySize
+                iconStyle: 'icon-copy'
                 text: qsTr('Copy')
                 visible: false
 
@@ -106,8 +105,7 @@ Item {
                 anchors.right: parent.right
                 anchors.rightMargin: appStyle.spacing.horizontal
                 anchors.verticalCenter: parent.verticalCenter
-                iconSource: 'image://icon/close'
-                iconSize: appStyle.icon.tinySize
+                iconStyle: 'icon-remove'
                 text: qsTr('Cancel')
                 visible: false
 

@@ -18,23 +18,22 @@
  */
 
 import QtQuick 1.1
-import 'utils.js' as Utils
+import 'scripts/utils.js' as Utils
 
 Plugin {
     name: qsTr('Web')
     description: qsTr('This plugin allows you to access the web.')
-    imageSource: 'image://icon/web'
+    iconStyle: 'icon-globe'
 
     onLoaded: {
         dock.model.add({
-            'iconStyle': 'icon-user',
-            'iconSource': 'image://icon/dock-web',
-            'iconPress': 'image://icon/web',
+            'iconStyle': iconStyle,
             'panelSource': 'WebPanel.qml',
             'priority': 7,
             'text': qsTr('Web'),
             'visible': true,
         });
+        swapper.showPanel('WebPanel.qml');
     }
 
     onUnloaded: {

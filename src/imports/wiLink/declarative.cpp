@@ -18,19 +18,10 @@
  */
 
 #include <QCoreApplication>
-#include <QDeclarativeItem>
 #include <QDeclarativeEngine>
 #include <QDesktopServices>
 #include <QGraphicsSceneDragDropEvent>
 #include <QMimeData>
-#include <QNetworkDiskCache>
-#include <QNetworkRequest>
-#include <QProcess>
-#include <QSslError>
-
-#ifdef Q_OS_WIN
-#include <windows.h>
-#endif
 
 #include "QXmppArchiveManager.h"
 #include "QXmppBookmarkManager.h"
@@ -42,6 +33,7 @@
 #include "QXmppTransferManager.h"
 #include "QXmppUtils.h"
 
+#include "QSoundLoader.h"
 #include "QSoundPlayer.h"
 #include "QSoundTester.h"
 
@@ -60,7 +52,6 @@
 #include "history.h"
 #include "icons.h"
 #include "menubar.h"
-#include "news.h"
 #include "notifications.h"
 #include "phone.h"
 #include "phone/sip.h"
@@ -69,6 +60,7 @@
 #include "rooms.h"
 #include "roster.h"
 #include "settings.h"
+#include "translations.h"
 #include "updater.h"
 
 QDeclarativeSortFilterProxyModel::QDeclarativeSortFilterProxyModel(QObject *parent)
@@ -141,117 +133,6 @@ void ListHelper::setModel(QAbstractItemModel *model)
     }
 }
 
-class NetworkAccessManagerFactory : public QDeclarativeNetworkAccessManagerFactory
-{
-public:
-    NetworkAccessManagerFactory();
-
-    QNetworkAccessManager *create(QObject * parent)
-    {
-        return new NetworkAccessManager(parent);
-    }
-};
-
-NetworkAccessManagerFactory::NetworkAccessManagerFactory()
-{
-    // initialise cache
-    const QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
-    QDir().mkpath(dataPath);
-
-    // initialise wallet
-    QNetIO::Wallet::setDataPath(QDir(dataPath).filePath("wallet"));
-}
-
-NetworkAccessManager::NetworkAccessManager(QObject *parent)
-    : QNetworkAccessManager(parent)
-{
-    bool check;
-    Q_UNUSED(check);
-
-    const QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
-    QNetworkDiskCache *cache = new QNetworkDiskCache(this);
-    cache->setCacheDirectory(QDir(dataPath).filePath("cache"));
-    setCache(cache);
-
-    check = connect(this, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)),
-                    this, SLOT(onSslErrors(QNetworkReply*,QList<QSslError>)));
-    Q_ASSERT(check);
-}
-
-QNetworkReply *NetworkAccessManager::createRequest(Operation op, const QNetworkRequest &req, QIODevice *outgoingData)
-{
-    QNetworkRequest request(req);
-    request.setRawHeader("Accept-Language", QLocale::system().name().toAscii());
-    request.setRawHeader("User-Agent", userAgent().toAscii());
-    return QNetworkAccessManager::createRequest(op, request, outgoingData);
-}
-
-void NetworkAccessManager::onSslErrors(QNetworkReply *reply, const QList<QSslError> &errors)
-{
-    Q_UNUSED(reply);
-
-    qWarning("SSL errors:");
-    foreach (const QSslError &error, errors)
-        qWarning("* %s", qPrintable(error.errorString()));
-
-    // uncomment for debugging purposes only
-    //reply->ignoreSslErrors();
-}
-
-QString NetworkAccessManager::userAgent()
-{
-    static QString globalUserAgent;
-
-    if (globalUserAgent.isEmpty()) {
-        QString osDetails;
-#if defined(Q_OS_ANDROID)
-        osDetails = QLatin1String("Linux; Android");
-#elif defined(Q_OS_LINUX)
-        osDetails = QLatin1String("X11; Linux");
-        QProcess process;
-        process.start(QString("uname"), QStringList(QString("-m")), QIODevice::ReadOnly);
-        process.waitForFinished();
-        const QString arch = QString::fromLocal8Bit(process.readAllStandardOutput()).trimmed();
-        if (!arch.isEmpty())
-            osDetails += " " + arch;
-#elif defined(Q_OS_MAC)
-        osDetails = QLatin1String("Macintosh");
-        switch (QSysInfo::MacintoshVersion)
-        {
-        case QSysInfo::MV_10_4:
-            osDetails += QLatin1String("; Mac OS X 10.4");
-            break;
-        case QSysInfo::MV_10_5:
-            osDetails += QLatin1String("; Mac OS X 10.5");
-            break;
-        case QSysInfo::MV_10_6:
-            osDetails += QLatin1String("; Mac OS X 10.6");
-            break;
-        }
-#elif defined(Q_OS_SYMBIAN)
-        osDetails = QLatin1String("Symbian");
-#elif defined(Q_OS_WIN)
-        DWORD dwVersion = GetVersion();
-        DWORD dwMajorVersion = (DWORD)(LOBYTE(LOWORD(dwVersion)));
-        DWORD dwMinorVersion = (DWORD)(HIBYTE(LOWORD(dwVersion)));
-        osDetails = QString("Windows NT %1.%2").arg(QString::number(dwMajorVersion), QString::number(dwMinorVersion));
-#endif
-        globalUserAgent = QString("Mozilla/5.0 (%1) %2/%3").arg(osDetails, qApp->applicationName(), qApp->applicationVersion());
-    }
-    return globalUserAgent;
-}
-
-AuthenticatedNetworkAccessManager::AuthenticatedNetworkAccessManager(QObject *parent)
-    : NetworkAccessManager(parent)
-{
-    bool check;
-    Q_UNUSED(check);
-
-    check = QObject::connect(this, SIGNAL(authenticationRequired(QNetworkReply*,QAuthenticator*)),
-                             QNetIO::Wallet::instance(), SLOT(onAuthenticationRequired(QNetworkReply*,QAuthenticator*)));
-    Q_ASSERT(check);
-}
-
 static QStringList droppedFiles(QGraphicsSceneDragDropEvent *event)
 {
     QStringList files;
@@ -315,7 +196,11 @@ void Plugin::initializeEngine(QDeclarativeEngine *engine, const char *uri)
     engine->addImageProvider("icon", new IconImageProvider);
     engine->addImageProvider("photo", new PhotoImageProvider);
     engine->addImageProvider("roster", new RosterImageProvider);
-    engine->setNetworkAccessManagerFactory(new NetworkAccessManagerFactory);
+
+    // initialise wallet
+    const QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+    QDir().mkpath(dataPath);
+    QNetIO::Wallet::setDataPath(QDir(dataPath).filePath("wallet"));
 }
 
 void Plugin::registerTypes(const char *uri)
@@ -338,7 +223,6 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterType<ListHelper>(uri, 2, 4, "ListHelper");
     qmlRegisterType<LogModel>(uri, 2, 4, "LogModel");
     qmlRegisterType<MenuBar>(uri, 2, 4, "MenuBar");
-    qmlRegisterType<NewsListModel>(uri, 2, 4, "NewsListModel");
     qmlRegisterType<Notifier>(uri, 2, 4, "Notifier");
     qmlRegisterUncreatableType<Notification>(uri, 2, 4, "Notification", "");
     qmlRegisterType<PhoneAudioHelper>(uri, 2, 4, "PhoneAudioHelper");
@@ -351,9 +235,10 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterType<RoomModel>(uri, 2, 4, "RoomModel");
     qmlRegisterType<RoomPermissionModel>(uri, 2, 4, "RoomPermissionModel");
     qmlRegisterType<RosterModel>(uri, 2, 4, "RosterModel");
+    qmlRegisterType<QSoundLoader>(uri, 2, 4, "SoundLoader");
     qmlRegisterType<QSoundPlayer>(uri, 2, 4, "SoundPlayer");
-    qmlRegisterUncreatableType<QSoundPlayerJob>(uri, 2, 4, "SoundPlayerJob", "");
     qmlRegisterType<QSoundTester>(uri, 2, 4, "SoundTester");
+    qmlRegisterType<TranslationLoader>(uri, 2, 4, "TranslationLoader");
     qmlRegisterType<Updater>(uri, 2, 4, "Updater");
     qmlRegisterType<VCard>(uri, 2, 4, "VCard");
     qmlRegisterType<WheelArea>(uri, 2, 4, "WheelArea");

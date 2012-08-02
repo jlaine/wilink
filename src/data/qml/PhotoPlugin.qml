@@ -22,7 +22,7 @@ import QtQuick 1.1
 Plugin {
     name: qsTr('Photos')
     description: qsTr('This plugin allows you to access your photos.')
-    imageSource: 'image://icon/photos'
+    iconStyle: 'icon-picture'
 
     onLoaded: {
         for (var i = 0; i < accountModel.count; ++i) {
@@ -32,7 +32,7 @@ Plugin {
                 title += '<br/><small>Picasa</small>';
 
                 dock.model.add({
-                    'iconStyle': 'icon-picture',
+                    'iconStyle': iconStyle,
                     'panelSource': 'PhotoPanel.qml',
                     'panelProperties': {'url': 'picasa://default'},
                     'priority': 7,

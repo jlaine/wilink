@@ -98,17 +98,18 @@ void AccountModel::append(const QVariantMap &obj)
 
 ChatClient* AccountModel::clientForJid(const QString &jid)
 {
-    const QString bareJid = QXmppUtils::jidToBareJid(jid);
     QList<ChatClient*> clients = ChatClient::instances();
 
-    // look for own jid or domain
+    // look for domain in clients
+    const QString domain = QXmppUtils::jidToDomain(jid);
     foreach (ChatClient *client, clients) {
-        if (QXmppUtils::jidToBareJid(client->jid()) == bareJid
-            || QXmppUtils::jidToDomain(client->jid()) == QXmppUtils::jidToDomain(bareJid))
+        const QString clientDomain = QXmppUtils::jidToDomain(client->jid());
+        if (domain == clientDomain || domain.endsWith("." + clientDomain))
             return client;
     }
 
-    // look for jid in contacts
+    // look for bare jid in contacts
+    const QString bareJid = QXmppUtils::jidToBareJid(jid);
     foreach (ChatClient *client, clients) {
         if (client->rosterManager()->getRosterBareJids().contains(bareJid))
             return client;

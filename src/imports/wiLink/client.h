@@ -36,6 +36,22 @@ class QXmppEntityTimeIq;
 class QXmppMucManager;
 class QXmppTransferManager;
 
+class ChatClient;
+
+class ChatClientObserver : public QObject
+{
+    Q_OBJECT
+
+public:
+    ChatClientObserver();
+
+signals:
+    void clientCreated(ChatClient *client);
+    void clientDestroyed(ChatClient *client);
+
+    friend class ChatClient;
+};
+
 class ChatClient : public QXmppClient
 {
     Q_OBJECT
@@ -75,6 +91,7 @@ public:
     QXmppTransferManager* transferManager();
 
     static QList<ChatClient*> instances();
+    static ChatClientObserver* observer();
 
     static QString statusToString(QXmppPresence::AvailableStatusType type);
     static QXmppPresence::AvailableStatusType stringToStatus(const QString& str);

@@ -39,6 +39,12 @@
 
 static QList<ChatClient*> chatClients;
 
+Q_GLOBAL_STATIC(ChatClientObserver, theClientObserver);
+
+ChatClientObserver::ChatClientObserver()
+{
+}
+
 class ChatClientPrivate
 {
 public:
@@ -107,12 +113,16 @@ ChatClient::ChatClient(QObject *parent)
     // diagnostics
     diagnosticManager();
 
+    qDebug("ChatClient 0x%llx created", reinterpret_cast<qint64>(this));
     chatClients.append(this);
+    theClientObserver()->clientCreated(this);
 }
 
 ChatClient::~ChatClient()
 {
+    qDebug("ChatClient 0x%llx destroyed", reinterpret_cast<qint64>(this));
     chatClients.removeAll(this);
+    theClientObserver()->clientDestroyed(this);
     delete d;
 }
 
@@ -145,6 +155,11 @@ void ChatClient::connectToServer(const QString &jid, const QString &password)
 QList<ChatClient*> ChatClient::instances()
 {
     return chatClients;
+}
+
+ChatClientObserver* ChatClient::observer()
+{
+    return theClientObserver();
 }
 
 QString ChatClient::jid() const

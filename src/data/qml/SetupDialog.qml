@@ -19,7 +19,7 @@
 
 import QtQuick 1.1
 import wiLink 2.4
-import 'utils.js' as Utils
+import 'scripts/utils.js' as Utils
 
 Dialog {
     id: dialog
@@ -83,9 +83,9 @@ Dialog {
                     model: ListModel {}
 
                     Component.onCompleted: {
-                        model.append({iconSource: 'image://icon/wiLink', text: 'Wifirst', type: 'wifirst'});
-                        model.append({iconSource: 'image://icon/google', text: 'Google', type: 'google'});
-                        model.append({iconSource: 'image://icon/peer', text: qsTr('Other'), type: 'other'});
+                        model.append({iconStyle: 'icon-home', text: 'Wifirst', type: 'wifirst'});
+                        model.append({iconStyle: 'icon-google-plus', text: 'Google', type: 'google'});
+                        model.append({iconStyle: 'icon-user', text: qsTr('Other'), type: 'other'});
                         accountCombo.currentIndex = 0;
                     }
                 }

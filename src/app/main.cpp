@@ -18,7 +18,7 @@
  */
 
 #include <cstdlib>
-#include <signal.h>
+#include <csignal>
 
 #include <QApplication>
 #include <QFileOpenEvent>
@@ -38,6 +38,7 @@ void mac_init();
 
 #include "window.h"
 
+static QtLocalPeer *peer = 0;
 static int aborted = 0;
 static void signal_handler(int sig)
 {
@@ -64,17 +65,14 @@ protected:
 
 bool CustomApplication::event(QEvent *event)
 {
-    switch (event->type()) {
-    case QEvent::FileOpen:
-        foreach (QWidget *widget, QApplication::topLevelWidgets()) {
-            CustomWindow *window = qobject_cast<CustomWindow*>(widget);
-            if (window)
-                QMetaObject::invokeMethod(window, "messageReceived", Q_ARG(QString, "OPEN " + static_cast<QFileOpenEvent *>(event)->url().toString()));
+    if (event->type() == QEvent::FileOpen) {
+        const QUrl url = static_cast<QFileOpenEvent *>(event)->url();
+        if (url.isValid() && url.scheme() == "wilink") {
+            QMetaObject::invokeMethod(peer, "messageReceived", Q_ARG(QString, "OPEN " + url.toString()));
+            return true;
         }
-        return true;
-    default:
-        return QApplication::event(event);
     }
+    return QApplication::event(event);
 }
 
 int main(int argc, char *argv[])
@@ -95,15 +93,15 @@ int main(int argc, char *argv[])
 #endif
 
     /* Parse command line arguments */
-    const QString firstArgument = (argc > 1) ? QString::fromLocal8Bit(argv[1]) : QString();
+    const QUrl url = (argc > 1) ? QUrl(QString::fromLocal8Bit(argv[1])) : QUrl();
 
     /* Open RPC socket */
-    QtLocalPeer *peer = new QtLocalPeer(&app, "wiLink");
+    peer = new QtLocalPeer(&app, "wiLink");
     if (peer->isClient()) {
-        if (firstArgument.isEmpty())
-            peer->sendMessage("SHOW", 1000);
+        if (url.isValid() && url.scheme() == "wilink")
+            peer->sendMessage("OPEN " + url.toString(), 1000);
         else
-            peer->sendMessage("OPEN " + firstArgument, 1000);
+            peer->sendMessage("SHOW", 1000);
         return EXIT_SUCCESS;
     }
 
@@ -126,10 +124,19 @@ int main(int argc, char *argv[])
     signal(SIGTERM, signal_handler);
 
     /* Create window */
-    CustomWindow *window = new CustomWindow(peer);
-    if (!firstArgument.isEmpty())
-        window->setInitialMessage("OPEN " + firstArgument);
+    new CustomWindow(peer);
+    if (url.isValid() && url.scheme() == "wilink")
+        QMetaObject::invokeMethod(peer, "messageReceived", Q_ARG(QString, "OPEN " + url.toString()));
 
     /* Run application */
-    return app.exec();
+    int ret = app.exec();
+
+    /* Delete window */
+    foreach (QWidget *widget, QApplication::topLevelWidgets()) {
+        if (qobject_cast<CustomWindow*>(widget)) {
+            delete widget;
+            break;
+        }
+    }
+    return ret;
 }

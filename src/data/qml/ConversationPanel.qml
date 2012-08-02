@@ -19,7 +19,7 @@
 
 import QtQuick 1.1
 import wiLink 2.4
-import 'utils.js' as Utils
+import 'scripts/utils.js' as Utils
 
 Panel {
     id: panel
@@ -42,6 +42,16 @@ Panel {
         } else {
             return vcard.jid;
         }
+    }
+
+    SoundLoader {
+        id: incomingMessageSound
+        source: appSettings.incomingMessageSound ? 'sounds/message-incoming.ogg' : ''
+    }
+
+    SoundLoader {
+        id: outgoingMessageSound
+        source: appSettings.outgoingMessageSound ? 'sounds/message-outgoing.ogg' : ''
     }
 
     Conversation {
@@ -163,7 +173,7 @@ Panel {
                     appNotifier.alert();
 
                     // play a sound
-                    appSoundPlayer.play(appSettings.incomingMessageSound);
+                    incomingMessageSound.start();
 
                     // add pending message
                     rosterModel.addPendingMessage(jid);
@@ -206,15 +216,13 @@ Panel {
                 }
             }
 
-            Image {
+            Icon {
                 id: fetchIcon
 
                 anchors.left: parent.left
                 anchors.leftMargin: appStyle.margin.normal
                 anchors.verticalCenter: parent.verticalCenter
-                source: 'image://icon/information'
-                sourceSize.height: appStyle.icon.smallSize
-                sourceSize.width: appStyle.icon.smallSize
+                style: 'icon-info-sign'
             }
 
             Label {
@@ -320,7 +328,7 @@ Panel {
                 var text = chatInput.text;
                 if (conversation.sendMessage(text)) {
                     chatInput.text = '';
-                    appSoundPlayer.play(appSettings.outgoingMessageSound);
+                    outgoingMessageSound.start();
                 }
             }
         }

@@ -19,7 +19,7 @@
 
 import QtQuick 1.1
 import wiLink 2.4
-import 'sip.js' as Sip
+import 'scripts/sip.js' as Sip
 
 Panel {
     id: panel
@@ -169,9 +169,11 @@ Panel {
 
         anchors.top: parent.top
         anchors.bottom: parent.bottom
+        anchors.bottomMargin: appStyle.margin.normal
         anchors.left: panel.singlePanel ? parent.left : sidebar.right
         anchors.leftMargin: appStyle.margin.normal
         anchors.right: parent.right
+        anchors.rightMargin: appStyle.margin.normal
         visible: width > 0
 
         PanelHeader {
@@ -179,14 +181,15 @@ Panel {
 
             anchors.left: parent.left
             anchors.right: parent.right
+            anchors.rightMargin: -appStyle.margin.normal
             anchors.top: parent.top
-            iconSource: 'image://icon/phone'
+            iconStyle: 'icon-phone'
             title: qsTr('Phone')
             subTitle: panel.phoneNumber ? qsTr('Your number is %1').replace('%1', panel.phoneNumber) : ''
             toolBar: ToolBar {
                 ToolButton {
                     enabled: callButton.enabled
-                    iconSource: 'image://icon/call'
+                    iconStyle: 'icon-phone'
                     text: qsTr('Voicemail')
                     visible: panel.voicemailNumber != ''
 
@@ -206,6 +209,7 @@ Panel {
             anchors.top: header.bottom
             anchors.left: parent.left
             anchors.right: parent.right
+            anchors.rightMargin: -appStyle.margin.normal
             text: (panel.phoneEnabled ? qsTr('You can view your phone bills and your call history at the following address:') : qsTr('You can subscribe to the phone service at the following address:')) + ' <a href="' + panel.selfcareUrl + '">' + panel.selfcareUrl + '</a>';
             visible: panel.selfcareUrl != ''
         }
@@ -250,7 +254,7 @@ Panel {
 
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
-                    iconSource: 'image://icon/back'
+                    iconStyle: 'icon-caret-left'
 
                     onClicked: numberEdit.backspacePressed()
                 }

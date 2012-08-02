@@ -27,7 +27,7 @@ NotificationDialog {
     property string caller
     property Item swapper
 
-    iconSource: 'image://icon/phone'
+    iconStyle: 'icon-phone'
     text: qsTr('%1 wants to talk to you.\n\nDo you accept?').replace('%1', caller)
     title: qsTr('Call from %1').replace('%1', caller)
 
@@ -42,9 +42,12 @@ NotificationDialog {
         dialog.call.destroyLater();
     }
 
-    Component.onCompleted: {
-        // play a sound
-        dialog.soundJob = appSoundPlayer.play(":/sounds/call-incoming.ogg", true);
+    SoundLoader {
+        id: soundLoader
+
+        repeat: true
+        source: 'sounds/call-incoming.ogg'
+        Component.onCompleted: soundLoader.start()
     }
 
     Connections {

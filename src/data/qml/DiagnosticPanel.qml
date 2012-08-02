@@ -36,7 +36,7 @@ Panel {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        iconSource: 'image://icon/diagnostics'
+        iconStyle: 'icon-info-sign'
         title: qsTr('Diagnostics')
         toolBar: ToolBar {
             ToolButton {

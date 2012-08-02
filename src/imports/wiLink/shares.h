@@ -39,11 +39,14 @@ class ShareWatcher : public QObject
 
 public:
     ShareWatcher(QObject *parent = 0);
+    ~ShareWatcher();
 
 signals:
     void isConnectedChanged();
 
 private slots:
+    void _q_clientCreated(ChatClient *client);
+    void _q_clientDestroyed(ChatClient *client);
     void _q_disconnected();
     void _q_presenceReceived(const QXmppPresence &presence);
     void _q_searchReceived(const QXmppShareSearchIq &shareIq);
@@ -51,10 +54,10 @@ private slots:
     void _q_settingsChanged() const;
 
 private:
-    void addClient(ChatClient *client);
     QXmppShareDatabase *database();
 
     QXmppShareDatabase *m_shareDatabase;
+    bool m_shareDatabaseSet;
 };
 
 class ShareFileSystem : public FileSystem

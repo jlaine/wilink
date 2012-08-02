@@ -34,19 +34,11 @@ Rectangle {
         id: icon
 
         anchors.left: parent.left
-        anchors.leftMargin: (model.iconSource || model.iconStyle) ? 4 : 0
+        anchors.leftMargin: model.iconStyle != '' ? 4 : 0
         anchors.top: parent.top
         anchors.topMargin: 3
         anchors.bottom: parent.bottom
         width: appStyle.icon.tinySize
-
-        Image {
-            anchors.centerIn: parent
-            opacity: menuItem.enabled ? 1 : 0.5
-            source: model.iconSource ? model.iconSource : ''
-            sourceSize.width: appStyle.icon.tinySize
-            sourceSize.height: appStyle.icon.tinySize
-        }
 
         Icon {
             anchors.centerIn: parent

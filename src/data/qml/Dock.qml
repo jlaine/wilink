@@ -19,7 +19,7 @@
 
 import QtQuick 1.1
 import wiLink 2.4
-import 'utils.js' as Utils
+import 'scripts/utils.js' as Utils
 
 Rectangle {
     id: dock
@@ -130,8 +130,6 @@ Rectangle {
         DockButton {
             id: preferenceButton
             iconStyle: 'icon-cogs'
-            //iconSource: 'image://icon/dock-options'
-            iconPress: 'image://icon/options'
             panelSource: 'PreferenceDialog.qml'
             text: qsTr('Preferences')
             visible: true
@@ -142,8 +140,7 @@ Rectangle {
 
         DockButton {
             id: quitButton
-            iconSource: 'image://icon/dock-close'
-            iconPress: 'image://icon/close'
+            iconStyle: 'icon-remove'
             text: qsTr('Quit')
             visible: appStyle.isMobile
             onClicked: {

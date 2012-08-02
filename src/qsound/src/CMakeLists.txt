@@ -47,10 +47,11 @@ if(QTKIT_LIBRARY)
 endif()
 
 # Qt
+set(QT_USE_QTDECLARATIVE 1)
 set(QT_USE_QTNETWORK 1)
 include(${QT_USE_FILE})
 
-SET(qsound_SOURCES QSoundFile.cpp QSoundMeter.cpp QSoundPlayer.cpp QSoundStream.cpp QSoundTester.cpp QVideoGrabber.cpp)
+SET(qsound_SOURCES QSoundFile.cpp QSoundLoader.cpp QSoundMeter.cpp QSoundPlayer.cpp QSoundStream.cpp QSoundTester.cpp QVideoGrabber.cpp)
 if(WIN32)
     list(APPEND qsound_SOURCES QVideoGrabber_win.cpp)
 elseif(APPLE)
@@ -59,6 +60,6 @@ else()
     list(APPEND qsound_SOURCES QVideoGrabber_linux.cpp)
 endif()
 
-qt4_wrap_cpp(qsound_MOC_SOURCES QSoundFile.h QSoundMeter.h QSoundPlayer.h QSoundStream.h QSoundTester.h QVideoGrabber.h)
+qt4_wrap_cpp(qsound_MOC_SOURCES QSoundFile.h QSoundLoader.h QSoundMeter.h QSoundPlayer.h QSoundStream.h QSoundTester.h QVideoGrabber.h)
 add_library(qsound STATIC ${qsound_SOURCES} ${qsound_MOC_SOURCES})
 target_link_libraries(qsound ${QT_LIBRARIES} ${qsound_LIBRARIES})

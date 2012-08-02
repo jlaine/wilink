@@ -22,21 +22,18 @@ import QtQuick 1.1
 Plugin {
     name: qsTr('Debugging')
     description: qsTr('This plugin allows you to view debugging information.')
-    imageSource: 'image://icon/debug'
+    iconStyle: 'icon-exclamation-sign'
 
     onLoaded: {
-        /*
         dock.model.add({
-            'iconSource': 'image://icon/dock-peer',
-            'iconPress': 'image://icon/peer',
+            'iconStyle': 'icon-sitemap',
             'panelSource': 'DiscoveryPanel.qml',
             'priority': -1,
             'shortcut': Qt.ControlModifier + Qt.Key_B,
             'text': qsTr('Discovery'),
             'visible': true});
-        */
         dock.model.add({
-            'iconStyle': 'icon-exclamation-sign',
+            'iconStyle': iconStyle,
             'panelSource': 'LogPanel.qml',
             'priority': -1,
             'shortcut': Qt.ControlModifier + Qt.Key_L,
@@ -45,7 +42,7 @@ Plugin {
     }
 
     onUnloaded: {
-        //dock.model.removePanel('DiscoveryPanel.qml');
+        dock.model.removePanel('DiscoveryPanel.qml');
         dock.model.removePanel('LogPanel.qml');
     }
 }

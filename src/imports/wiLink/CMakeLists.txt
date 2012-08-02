@@ -35,7 +35,6 @@ set(plugin_SOURCES
     idle/idle.cpp
     menubar.cpp
     model.cpp
-    news.cpp
     notifications.cpp
     photos.cpp
     phone.cpp
@@ -47,6 +46,7 @@ set(plugin_SOURCES
     settings.cpp
     shares.cpp
     systeminfo.cpp
+    translations.cpp
     updater.cpp)
 
 set(plugin_MOC_HEADERS
@@ -63,7 +63,6 @@ set(plugin_MOC_HEADERS
     idle/idle.h
     menubar.h
     model.h
-    news.h
     notifications.h
     photos.h
     phone.h
@@ -74,6 +73,7 @@ set(plugin_MOC_HEADERS
     roster.h
     settings.h
     shares.h
+    translations.h
     updater.h)
 
 if(APPLE)

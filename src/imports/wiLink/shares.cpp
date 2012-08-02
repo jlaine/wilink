@@ -58,12 +58,25 @@ static QXmppShareLocation urlToLocation(const QUrl &url)
 ShareWatcher::ShareWatcher(QObject *parent)
     : QObject(parent)
     , m_shareDatabase(0)
+    , m_shareDatabaseSet(false)
 {
+    qDebug("ShareWatcher created");
+
+    // monitor clients
     foreach (ChatClient *client, ChatClient::instances())
-        addClient(client);
+        _q_clientCreated(client);
+    connect(ChatClient::observer(), SIGNAL(clientCreated(ChatClient*)),
+            this, SLOT(_q_clientCreated(ChatClient*)));
+    connect(ChatClient::observer(), SIGNAL(clientDestroyed(ChatClient*)),
+            this, SLOT(_q_clientDestroyed(ChatClient*)));
 }
 
-void ShareWatcher::addClient(ChatClient *client)
+ShareWatcher::~ShareWatcher()
+{
+    qDebug("ShareWatcher destroyed");
+}
+
+void ShareWatcher::_q_clientCreated(ChatClient *client)
 {
     bool check;
     Q_UNUSED(check);
@@ -87,22 +100,34 @@ void ShareWatcher::addClient(ChatClient *client)
     }
 }
 
+void ShareWatcher::_q_clientDestroyed(ChatClient *client)
+{
+    if (m_shareDatabase && ChatClient::instances().isEmpty()) {
+        delete m_shareDatabase;
+        m_shareDatabase = 0;
+    }
+}
+
 QXmppShareDatabase *ShareWatcher::database()
 {
     bool check;
     Q_UNUSED(check);
 
     if (!m_shareDatabase) {
-        // initialise database
-        const QString databaseName = QDir(QDesktopServices::storageLocation(QDesktopServices::DataLocation)).filePath("database.sqlite");
-        QSqlDatabase sharesDb = QSqlDatabase::addDatabase("QSQLITE");
-        sharesDb.setDatabaseName(databaseName);
-        check = sharesDb.open();
-        Q_ASSERT(check);
+        if (!m_shareDatabaseSet) {
+            // initialise database
+            const QString databaseName = QDir(QDesktopServices::storageLocation(QDesktopServices::DataLocation)).filePath("database.sqlite");
+            QSqlDatabase sharesDb = QSqlDatabase::addDatabase("QSQLITE");
+            sharesDb.setDatabaseName(databaseName);
+            check = sharesDb.open();
+            Q_ASSERT(check);
 
-        QDjango::setDatabase(sharesDb);
-        // drop wiLink <= 0.9.4 table
-        sharesDb.exec("DROP TABLE files");
+            QDjango::setDatabase(sharesDb);
+            // drop wiLink <= 0.9.4 table
+            sharesDb.exec("DROP TABLE files");
+
+            m_shareDatabaseSet = true;
+        }
 
         // create shares database
         m_shareDatabase = new QXmppShareDatabase(this);
@@ -182,11 +207,9 @@ void ShareWatcher::_q_presenceReceived(const QXmppPresence &presence)
 
         // reconnect to another server
         qDebug("Shares redirecting to %s", qPrintable(newDomain));
-        ChatClient *newClient = new ChatClient(this);
+        ChatClient *newClient = new ChatClient(client);
         newClient->setProperty("_parent_jid", client->jid());
-        newClient->setLogger(client->logger());
-
-        addClient(newClient);
+        newClient->setLogger(0);
 
         const QString newJid = client->configuration().user() + '@' + newDomain;
         newClient->connectToServer(newJid, client->configuration().password());

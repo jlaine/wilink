@@ -20,6 +20,10 @@
 #include <QAction>
 #include <QBuffer>
 #include <QCache>
+#include <QDir>
+#include <QDeclarativeEngine>
+#include <QDeclarativeItem>
+#include <QDeclarativeNetworkAccessManagerFactory>
 #include <QFile>
 #include <QFileInfo>
 #include <QImage>
@@ -29,7 +33,6 @@
 
 #include "QXmppClient.h"
 
-#include "declarative.h"
 #include "photos.h"
 #include "shares.h"
 #include "settings.h"
@@ -64,10 +67,18 @@ static QString availableFilePath(const QString &dirPath, const QString &name)
 class PhotoNetworkAccessManagerFactory : public FileSystemNetworkAccessManagerFactory
 {
 public:
+    PhotoNetworkAccessManagerFactory(QDeclarativeNetworkAccessManagerFactory *factory)
+        : m_factory(factory)
+    {
+    }
+
     QNetworkAccessManager *create(QObject *parent)
     {
-        return new AuthenticatedNetworkAccessManager(parent);
+        return m_factory->create(parent);
     };
+
+private:
+    QDeclarativeNetworkAccessManagerFactory *m_factory;
 };
 
 class PhotoDownloadItem
@@ -455,7 +466,8 @@ void FolderModel::setRootUrl(const QUrl &rootUrl)
         refresh();
     } else {
         if (!photoInitialised) {
-            FileSystem::setNetworkAccessManagerFactory(new PhotoNetworkAccessManagerFactory);
+            QDeclarativeNetworkAccessManagerFactory *factory = qmlEngine(this)->networkAccessManagerFactory();
+            FileSystem::setNetworkAccessManagerFactory(new PhotoNetworkAccessManagerFactory(factory));
             photoInitialised = true;
         }
 

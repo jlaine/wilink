@@ -19,7 +19,7 @@
 
 import QtQuick 1.1
 import wiLink 2.4
-import 'utils.js' as Utils
+import 'scripts/utils.js' as Utils
 
 Item {
     id: panel
@@ -56,21 +56,19 @@ Item {
                 anchors.fill: parent
                 anchors.margins: 2
 
-                Image {
+                Icon {
                     id: image
 
-                    anchors.top: parent.top
                     anchors.left: parent.left
-                    source: {
+                    anchors.verticalCenter: parent.verticalCenter
+                    style: {
                         if (model.realm == 'www.wifirst.net')
-                            return 'image://icon/wiLink';
+                            return 'icon-home';
                         else if (model.realm == 'www.google.com')
-                            return 'image://icon/google';
+                            return 'icon-google-plus';
                         else
-                            return 'image://icon/chat';
+                            return 'icon-user';
                     }
-                    sourceSize.height: appStyle.icon.smallSize
-                    sourceSize.width: appStyle.icon.smallSize
                 }
 
                 Label {

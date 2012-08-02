@@ -19,7 +19,7 @@
 
 import QtQuick 1.1
 import wiLink 2.4
-import 'utils.js' as Utils
+import 'scripts/utils.js' as Utils
 
 Panel {
     id: panel
@@ -31,6 +31,16 @@ Panel {
     property string title: Utils.jidToUser(jid)
     property string subTitle: Qt.isQtObject(room) ? room.subject : ''
     property string presenceStatus
+
+    SoundLoader {
+        id: incomingMessageSound
+        source: appSettings.incomingMessageSound ? 'sounds/message-incoming.ogg' : ''
+    }
+
+    SoundLoader {
+        id: outgoingMessageSound
+        source: appSettings.outgoingMessageSound ? 'sounds/message-outgoing.ogg' : ''
+    }
 
     RoomModel {
         id: participantModel
@@ -97,7 +107,7 @@ Panel {
                         appNotifier.alert();
 
                         // play a sound
-                        appSoundPlayer.play(appSettings.incomingMessageSound);
+                        incomingMessageSound.start();
 
                         // add pending message
                         roomListModel.addPendingMessage(jid);
@@ -180,7 +190,7 @@ Panel {
             var text = chatInput.text;
             if (room.sendMessage(text)) {
                 chatInput.text = '';
-                appSoundPlayer.play(appSettings.outgoingMessageSound);
+                outgoingMessageSound.start();
             }
         }
     }
@@ -190,9 +200,8 @@ Panel {
 
         onError: {
             dialogSwapper.showPanel('ErrorNotification.qml', {
-                'iconSource': 'image://icon/chat',
-                'title': qsTranslate('RoomPanel', 'Chat room error'),
-                'text': qsTranslate('RoomPanel', "Sorry, but you cannot join chat room '%1'.\n\n%2").replace('%1', room.jid).replace('%2', ''),
+                title: qsTranslate('RoomPanel', 'Chat room error'),
+                text: qsTranslate('RoomPanel', "Sorry, but you cannot join chat room '%1'.\n\n%2").replace('%1', room.jid).replace('%2', ''),
             });
         }
 
@@ -202,9 +211,8 @@ Panel {
 
         onKicked: {
             dialogSwapper.showPanel('ErrorNotification.qml', {
-                'iconSource': 'image://icon/chat',
-                'title': qsTranslate('RoomPanel', 'Chat room error'),
-                'text': qsTranslate('RoomPanel', "Sorry, but you were kicked from chat room '%1'.\n\n%2").replace('%1', room.jid).replace('%2', reason),
+                title: qsTranslate('RoomPanel', 'Chat room error'),
+                text: qsTranslate('RoomPanel', "Sorry, but you were kicked from chat room '%1'.\n\n%2").replace('%1', room.jid).replace('%2', reason),
             });
         }
     }

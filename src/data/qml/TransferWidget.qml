@@ -19,7 +19,7 @@
 
 import QtQuick 1.1
 import wiLink 2.4
-import 'utils.js' as Utils
+import 'scripts/utils.js' as Utils
 
 Item {
     id: item
@@ -41,15 +41,13 @@ Item {
         }
     }
 
-    Image {
+    Icon {
         id: icon
 
-        width: appStyle.icon.smallSize
-        height: appStyle.icon.smallSize
         anchors.left: parent.left
         anchors.leftMargin: appStyle.margin.normal
         anchors.verticalCenter: parent.verticalCenter
-        source: (Qt.isQtObject(job) && job.direction == QXmppTransferJob.OutgoingDirection) ? 'image://icon/upload' : 'image://icon/download'
+        iconStyle: (Qt.isQtObject(job) && job.direction == QXmppTransferJob.OutgoingDirection) ? 'icon-upload' : 'icon-download'
     }
 
     ProgressBar {
@@ -83,7 +81,7 @@ Item {
 
         anchors.right: cancelButton.left
         anchors.verticalCenter: parent.verticalCenter
-        iconSource: 'image://icon/file'
+        iconStyle: 'icon-file'
         text: qsTr('Open')
         //visible: job && job.state == QXmppTransferJob.FinishedState && job.error == QXmppTransferJob.NoError
         visible: Qt.isQtObject(job) && job.state == QXmppTransferJob.FinishedState && job.direction == QXmppTransferJob.IncomingDirection

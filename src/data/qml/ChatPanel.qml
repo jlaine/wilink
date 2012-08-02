@@ -19,7 +19,7 @@
 
 import QtQuick 1.1
 import wiLink 2.4
-import 'utils.js' as Utils
+import 'scripts/utils.js' as Utils
 
 Panel {
     id: chatPanel
@@ -129,15 +129,11 @@ Panel {
                 console.log("connecting to: " + data.jid);
                 item.client.connectToServer(data.jid, data.password);
             }
-            rosterModel.addClient(item.client);
-            roomListModel.addClient(item.client);
             statusBar.addClient(item.client);
         }
 
         onItemRemoved: {
             console.log("removing client: " + item.client.jid);
-            rosterModel.removeClient(item.client);
-            roomListModel.removeclient(item.client);
             statusBar.removeClient(item.client);
         }
     }
@@ -199,7 +195,7 @@ Panel {
 
             onAddClicked: {
                 // FIXME: we only support default client
-                dialogSwapper.showPanel('RoomJoinDialog.qml', {client: accountModel.clientForJid()});
+                dialogSwapper.showPanel('RoomJoinDialog.qml', {client: accountModel.clientForJid('wifirst.net')});
             }
 
             onCurrentJidChanged: {

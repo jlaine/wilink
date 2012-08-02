@@ -37,7 +37,6 @@ public:
     CustomWindow(QtLocalPeer *peer, QWidget *parent = 0);
     ~CustomWindow();
     void setFullScreen(bool fullScreen);
-    void setInitialMessage(const QString &message);
 
 signals:
     void messageReceived(const QString &message);
@@ -49,9 +48,11 @@ signals:
 public slots:
     void reload();
     void showAndRaise();
+    void startMessages();
 
 private slots:
     void _q_loadSource();
+    void _q_messageReceived(const QString &message);
     void _q_statusChanged();
 
 protected:

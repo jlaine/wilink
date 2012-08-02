@@ -21,13 +21,16 @@
 #include <QDeclarativeContext>
 #include <QDeclarativeEngine>
 #include <QDeclarativeView>
+#include <QDesktopServices>
 #include <QDesktopWidget>
 #include <QMenuBar>
+#include <QNetworkDiskCache>
 #include <QSettings>
 #include <QShortcut>
 #include <QStringList>
 
 #include "qtlocalpeer.h"
+#include "network.h"
 #include "window.h"
 
 #ifdef Q_WS_X11
@@ -36,10 +39,32 @@
 #include <X11/Xatom.h>
 #endif
 
+class NetworkAccessManagerFactory : public QDeclarativeNetworkAccessManagerFactory
+{
+public:
+    NetworkAccessManagerFactory(const QString &cachePath)
+        : m_cachePath(cachePath)
+    {
+    }
+
+    QNetworkAccessManager *create(QObject * parent)
+    {
+        QNetworkAccessManager *manager = new NetworkAccessManager(parent);
+        QNetworkDiskCache *cache = new QNetworkDiskCache(manager);
+        cache->setCacheDirectory(m_cachePath);
+        manager->setCache(cache);
+        return manager;
+    }
+
+private:
+    QString m_cachePath;
+};
+
 class CustomWindowPrivate
 {
 public:
-    QString initialMessage;
+    QStringList messages;
+    bool messagesStarted;
     QtLocalPeer *peer;
     QList<QUrl> qmlRoots;
     QDeclarativeView *view;
@@ -52,18 +77,31 @@ CustomWindow::CustomWindow(QtLocalPeer *peer, QWidget *parent)
     Q_UNUSED(check);
 
     d = new CustomWindowPrivate;
+    d->messagesStarted = false;
     d->peer = peer;
     check = connect(d->peer, SIGNAL(messageReceived(QString)),
-                    this, SIGNAL(messageReceived(QString)));
+                    this, SLOT(_q_messageReceived(QString)));
     Q_ASSERT(check);
 
     // declare QML roots
     d->qmlRoots << QUrl(QString("https://download.wifirst.net/public/%1/%2/qml/").arg(qApp->applicationName(), qApp->applicationVersion()));
     d->qmlRoots << QUrl("qrc:/qml/");
 
+    // create data paths
+    const QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+    const QString cachePath = QDir(dataPath).filePath("cache");
+    QString storagePath = QDir(dataPath).filePath("storage");
+    QDir().mkpath(cachePath);
+    QDir().mkpath(storagePath);
+    // NOTE: for some reason we need native directory separators
+    storagePath.replace(QLatin1Char('/'), QDir::separator());
+
     // create declarative view
     d->view = new QDeclarativeView;
     d->view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
+    d->view->engine()->setNetworkAccessManagerFactory(new NetworkAccessManagerFactory(cachePath));
+    d->view->engine()->setOfflineStoragePath(storagePath);
+
     check = connect(d->view, SIGNAL(statusChanged(QDeclarativeView::Status)),
                     this, SLOT(_q_statusChanged()));
     Q_ASSERT(check);
@@ -161,11 +199,6 @@ void CustomWindow::setFullScreen(bool fullScreen)
         setWindowState(windowState() & ~Qt::WindowFullScreen);
 }
 
-void CustomWindow::setInitialMessage(const QString &message)
-{
-    d->initialMessage = message;
-}
-
 void CustomWindow::showAndRaise()
 {
     setWindowState(windowState() & ~Qt::WindowMinimized);
@@ -192,6 +225,14 @@ void CustomWindow::showAndRaise()
 #endif
 }
 
+void CustomWindow::startMessages()
+{
+    foreach (const QString &message, d->messages)
+        emit messageReceived(message);
+    d->messages.clear();
+    d->messagesStarted = true;
+}
+
 void CustomWindow::_q_loadSource()
 {
     if (d->qmlRoots.isEmpty())
@@ -200,11 +241,20 @@ void CustomWindow::_q_loadSource()
 #ifdef MEEGO_EDITION_HARMATTAN
     const QUrl qmlFile("MeegoMain.qml");
 #else
-    const QUrl qmlFile("Main.qml");
+    const QUrl qmlFile("boot.qml");
 #endif
     const QUrl qmlSource = d->qmlRoots.takeFirst().resolved(qmlFile);
     qDebug("Window loading %s", qPrintable(qmlSource.toString()));
     d->view->setSource(qmlSource);
+}
+
+void CustomWindow::_q_messageReceived(const QString &message)
+{
+    if (d->messagesStarted) {
+        emit messageReceived(message);
+    } else {
+        d->messages << message;
+    }
 }
 
 void CustomWindow::_q_statusChanged()
@@ -214,11 +264,6 @@ void CustomWindow::_q_statusChanged()
         d->view->setAttribute(Qt::WA_NoSystemBackground);
         d->view->viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
         d->view->viewport()->setAttribute(Qt::WA_NoSystemBackground);
-
-        if (!d->initialMessage.isEmpty()) {
-            QMetaObject::invokeMethod(this, "messageReceived", Q_ARG(QString, d->initialMessage));
-            d->initialMessage = QString();
-        }
     } else if (d->view->status() == QDeclarativeView::Error) {
         _q_loadSource();
     }

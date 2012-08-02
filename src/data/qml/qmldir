@@ -45,9 +45,6 @@ Main 1.0 Main.qml
 MeegoMain 1.0 MeegoMain.qml
 Menu 1.0 Menu.qml
 MenuDelegate 1.0 MenuDelegate.qml
-NewsDialog 1.0 NewsDialog.qml
-NewsPanel 1.0 NewsPanel.qml
-NewsPlugin 1.0 NewsPlugin.qml
 NotificationDialog 1.0 NotificationDialog.qml
 Panel 1.0 Panel.qml
 PanelHeader 1.0 PanelHeader.qml
@@ -74,7 +71,6 @@ Plugin 1.0 Plugin.qml
 PluginLoader 1.0 PluginLoader.qml
 PluginPreferencePanel 1.0 PluginPreferencePanel.qml
 PreferenceDialog 1.0 PreferenceDialog.qml
-PreferenceModel 1.0 PreferenceModel.qml
 ProgressBar 1.0 ProgressBar.qml
 RoomConfigurationDialog 1.0 RoomConfigurationDialog.qml
 RoomInviteDialog 1.0 RoomInviteDialog.qml
@@ -87,7 +83,6 @@ RoomPermissionDialog 1.0 RoomPermissionDialog.qml
 RoomSubjectDialog 1.0 RoomSubjectDialog.qml
 ScrollBar 1.0 ScrollBar.qml
 ScrollView 1.0 ScrollView.qml
-SendPanel 1.0 SendPanel.qml
 SetupDialog 1.0 SetupDialog.qml
 SharePanel 1.0 SharePanel.qml
 SharePlugin 1.0 SharePlugin.qml
@@ -99,7 +94,6 @@ StatusBar 1.0 StatusBar.qml
 StatusDelegate 1.0 StatusDelegate.qml
 StatusPill 1.0 StatusPill.qml
 Style 1.0 Style.qml
-TabView 1.0 TabView.qml
 ToolBar 1.0 ToolBar.qml
 ToolButton 1.0 ToolButton.qml
 TransferNotification 1.0 TransferNotification.qml

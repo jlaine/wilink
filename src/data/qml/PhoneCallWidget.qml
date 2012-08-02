@@ -19,7 +19,7 @@
 
 import QtQuick 1.1
 import wiLink 2.4
-import 'utils.js' as Utils
+import 'scripts/utils.js' as Utils
 
 Item {
     id: callWidget
@@ -27,13 +27,19 @@ Item {
     property QtObject call: null
     property string caller
     property int callId: 0
-    property QtObject soundJob
 
     anchors.left: parent ? parent.left : undefined
     anchors.right: parent ? parent.right : undefined
     clip: true
     height: frame.height
     z: 5
+
+    SoundLoader {
+        id: soundLoader
+
+        repeat: true
+        source: 'sounds/call-outgoing.ogg'
+    }
 
     PhoneAudioHelper {
         id: audio
@@ -145,7 +151,7 @@ Item {
             Button {
                 id: hangupButton
 
-                iconSource: 'image://icon/hangup'
+                iconStyle: 'icon-remove'
                 onClicked: call.hangup()
             }
         }
@@ -154,19 +160,15 @@ Item {
     Connections {
         target: call
         onStateChanged: {
-            if (callWidget.soundJob) {
-                callWidget.soundJob.stop();
-                callWidget.soundJob = null;
-            }
+            soundLoader.stop();
             if (call.state == QXmppCall.FinishedState) {
                 if (callWidget.callId) {
                     var flags = call.direction;
                     if (call.errorString) {
                         flags += 2;
                         dialogSwapper.showPanel('ErrorNotification.qml', {
-                            'iconSource': 'image://icon/phone',
-                            'title': qsTr('Call failed'),
-                            'text': qsTr('Sorry, but the call could not be completed.') + '\n\n' + call.errorString,
+                            title: qsTr('Call failed'),
+                            text: qsTr('Sorry, but the call could not be completed.') + '\n\n' + call.errorString,
                         });
                     }
                     historyView.model.updateItem(callWidget.callId, {address: call.recipient, duration: call.duration, flags: flags});
@@ -202,7 +204,7 @@ Item {
         // play a sound
         if (callWidget.call.direction == QXmppCall.OutgoingDirection &&
             callWidget.call.state == QXmppCall.ConnectingState) {
-            callWidget.soundJob = appSoundPlayer.play(":/sounds/call-outgoing.ogg", true);
+            soundLoader.start();
         }
 
         // log call

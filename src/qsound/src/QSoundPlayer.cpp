@@ -33,188 +33,17 @@
 
 static QSoundPlayer *thePlayer = 0;
 
-class QSoundPlayerJobPrivate
-{
-public:
-    QSoundPlayerJobPrivate(QSoundPlayerJob *qq);
-    void finish();
-
-    int id;
-    QAudioOutput *audioOutput;
-    QNetworkReply *networkReply;
-    QSoundPlayer *player;
-    bool repeat;
-    QSoundPlayerJob::State state;
-    QUrl url;
-
-private:
-    QSoundPlayerJob *q;
-};
-
-QSoundPlayerJobPrivate::QSoundPlayerJobPrivate(QSoundPlayerJob *qq)
-    : id(0),
-    audioOutput(0),
-    networkReply(0),
-    player(0),
-    repeat(false),
-    state(QSoundPlayerJob::IdleState),
-    q(qq)
-{
-}
-
-void QSoundPlayerJobPrivate::finish()
-{
-    state = QSoundPlayerJob::IdleState;
-    QMetaObject::invokeMethod(q, "stateChanged");
-    QMetaObject::invokeMethod(q, "finished");
-}
-
-QSoundPlayerJob::QSoundPlayerJob(QSoundPlayer *player, int id)
-    : QObject(player)
-{
-    d = new QSoundPlayerJobPrivate(this);
-    d->id = id;
-    d->player = player;
-}
-
-QSoundPlayerJob::~QSoundPlayerJob() 
-{
-    if (d->networkReply)
-        d->networkReply->deleteLater();
-    if (d->audioOutput)
-        d->audioOutput->deleteLater();
-    delete d;
-}
-
-QSoundPlayerJob::State QSoundPlayerJob::state() const
-{
-    return d->state;
-}
-
-QUrl QSoundPlayerJob::url() const
-{
-    return d->url;
-}
-
-void QSoundPlayerJob::setFile(QSoundFile *soundFile)
-{
-    bool check;
-    Q_UNUSED(check);
-
-    // open sound file
-    soundFile->setRepeat(d->repeat);
-    if (!soundFile->open(QIODevice::Unbuffered | QIODevice::ReadOnly)) {
-        qWarning("QSoundPlayer(%i) could not open sound file", d->id);
-        d->finish();
-        return;
-    }
-
-    // play file
-    qDebug("QSoundPlayer(%i) starting audio", d->id);
-    d->audioOutput = new QAudioOutput(d->player->outputDevice(), soundFile->format());
-
-    check = connect(d->audioOutput, SIGNAL(stateChanged(QAudio::State)),
-                    this, SLOT(_q_stateChanged()));
-    Q_ASSERT(check);
-
-    d->audioOutput->moveToThread(d->player->soundThread());
-    soundFile->moveToThread(d->player->soundThread());
-    soundFile->setParent(d->audioOutput);
-    d->audioOutput->start(soundFile);
-
-    d->state = PlayingState;
-    emit stateChanged();
-}
-
-void QSoundPlayerJob::stop()
-{
-    if (d->networkReply)
-        d->networkReply->abort();
-    if (d->audioOutput)
-        d->audioOutput->stop();
-}
-
-void QSoundPlayerJob::_q_download()
-{
-    bool check;
-    Q_UNUSED(check);
-
-    qDebug("QSoundPlayer(%i) requesting %s", d->id, qPrintable(d->url.toString()));
-    d->networkReply = d->player->networkAccessManager()->get(QNetworkRequest(d->url));
-    check = connect(d->networkReply, SIGNAL(finished()),
-                    this, SLOT(_q_downloadFinished()));
-    Q_ASSERT(check);
-
-    d->state = DownloadingState;
-    emit stateChanged();
-}
-
-void QSoundPlayerJob::_q_downloadFinished()
-{
-    bool check;
-    Q_UNUSED(check);
-
-    QNetworkReply *reply = d->networkReply;
-    reply->deleteLater();
-    d->networkReply = 0;
-
-    // follow redirect
-    QUrl redirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl();
-    if (redirectUrl.isValid()) {
-        redirectUrl = reply->url().resolved(redirectUrl);
-
-        qDebug("QSoundPlayer(%i) following redirect to %s", d->id, qPrintable(redirectUrl.toString()));
-        d->networkReply = d->player->networkAccessManager()->get(QNetworkRequest(redirectUrl));
-        check = connect(d->networkReply, SIGNAL(finished()),
-                        this, SLOT(_q_downloadFinished()));
-        Q_ASSERT(check);
-        return;
-    }
-
-    // check reply
-    if (reply->error() != QNetworkReply::NoError) {
-        qWarning("QSoundPlayer(%i) failed to retrieve file: %s", d->id, qPrintable(reply->errorString()));
-        d->finish();
-        return;
-    }
-
-    // read file
-    QSoundFile::FileType fileType = QSoundFile::UnknownFile;
-    QAbstractNetworkCache *cache = d->player->networkAccessManager()->cache();
-    const QNetworkCacheMetaData::RawHeaderList headers = cache->metaData(reply->url()).rawHeaders();
-    foreach (const QNetworkCacheMetaData::RawHeader &header, headers) {
-        if (header.first.toLower() == "content-type")
-            fileType = QSoundFile::typeFromMimeType(header.second);
-    }
-
-    QIODevice *iodevice = d->player->networkAccessManager()->cache()->data(reply->url());
-    setFile(new QSoundFile(iodevice, fileType));
-}
-
-void QSoundPlayerJob::_q_stateChanged()
-{
-    if (d->audioOutput->state() != QAudio::ActiveState) {
-        qDebug("QSoundPlayer(%i) audio stopped", d->id);
-        d->finish();
-    }
-}
-
 class QSoundPlayerPrivate
 {
 public:
     QSoundPlayerPrivate();
     QString inputName;
     QString outputName;
-    QSet<QSoundPlayerJob*> jobs;
-    QNetworkAccessManager *network;
-    int readerId;
     QThread *soundThread;
 };
 
 QSoundPlayerPrivate::QSoundPlayerPrivate()
-    : network(0)
-    , readerId(0)
-    , soundThread(0)
+    : soundThread(0)
 {
 }
 
@@ -226,7 +55,8 @@ QSoundPlayer::QSoundPlayer(QObject *parent)
     d->soundThread = new QThread(this);
     d->soundThread->start();
 
-    thePlayer = this;
+    if (!thePlayer)
+        thePlayer = this;
 }
 
 QSoundPlayer::~QSoundPlayer()
@@ -234,36 +64,14 @@ QSoundPlayer::~QSoundPlayer()
     d->soundThread->quit();
     d->soundThread->wait();
 
-    thePlayer = 0;
+    if (thePlayer == this)
+        thePlayer = 0;
     delete d;
 }
 
 QSoundPlayer* QSoundPlayer::instance()
 {
     return thePlayer;
-}
-
-QSoundPlayerJob *QSoundPlayer::play(const QUrl &url, bool repeat)
-{
-    if (!url.isValid())
-        return 0;
-
-    QSoundPlayerJob *job = new QSoundPlayerJob(this, ++d->readerId);
-    job->d->repeat = repeat;
-    job->d->url = url;
-    d->jobs.insert(job);
-
-    if (url.scheme() == "file") {
-        job->setFile(new QSoundFile(url.toLocalFile()));
-    } else if (url.scheme() == "qrc" || url.scheme() == "") {
-        const QString path = QLatin1String(":") + (url.path().startsWith("/") ? "" : "/") + url.path();
-        job->setFile(new QSoundFile(path));
-    } else if (d->network) {
-        QMetaObject::invokeMethod(job, "_q_download");
-    } else {
-        QMetaObject::invokeMethod(job, "finished", Qt::QueuedConnection);
-    }
-    return job;
 }
 
 QAudioDeviceInfo QSoundPlayer::inputDevice() const
@@ -326,28 +134,7 @@ QStringList QSoundPlayer::outputDeviceNames() const
     return names;
 }
 
-QNetworkAccessManager *QSoundPlayer::networkAccessManager() const
-{
-    return d->network;
-}
-
-void QSoundPlayer::setNetworkAccessManager(QNetworkAccessManager *network)
-{
-    d->network = network;
-}
-
 QThread *QSoundPlayer::soundThread() const
 {
     return d->soundThread;
 }
-
-void QSoundPlayer::_q_finished()
-{
-    QSoundPlayerJob *job = qobject_cast<QSoundPlayerJob*>(sender());
-    if (!job)
-        return;
-
-    d->jobs.remove(job);
-    job->deleteLater();
-}
-

@@ -19,6 +19,7 @@
 
 import QtQuick 1.1
 import wiLink 2.4
+import 'scripts/storage.js' as Storage
 
 FocusScope {
     id: root
@@ -44,6 +45,7 @@ FocusScope {
         /** Load plugins at startup.
          */
         Component.onCompleted: {
+            Storage.initialize();
             if (accountModel.count) {
                 appPlugins.load();
             } else {
@@ -76,10 +78,6 @@ FocusScope {
      */
     PluginLoader {
         id: appPlugins
-    }
-
-    PreferenceModel {
-        id: appPreferences
     }
 
     ApplicationSettings {
@@ -228,6 +226,7 @@ FocusScope {
         window.minimumHeight = 360;
         window.fullScreen = appSettings.isMobile && appSettings.osType != 'android';
         window.showAndRaise();
+        window.startMessages();
     }
 
     Connections {

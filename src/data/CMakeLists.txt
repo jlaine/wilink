@@ -3,72 +3,19 @@ generate_icns(icns images/scalable/wiLink.svg)
 generate_ico(ico images/scalable/wiLink.svg)
 generate_xpm(xpm images/scalable/wiLink.svg)
 
-set(SMALL_ICONS
-    images/scalable/checkbox.svg
-    images/scalable/checkbox-checked.svg)
-
 set(ICONS
-    images/scalable/add.svg
     images/scalable/album.svg
     images/scalable/audio-input.svg
     images/scalable/audio-output.svg
-    images/scalable/back.svg
-    images/scalable/call.svg
     images/scalable/call-incoming.svg
     images/scalable/call-outgoing.svg
-    images/scalable/camera.svg
-    images/scalable/camera-active.svg
     images/scalable/chat.svg
-    images/scalable/clear.svg
     images/scalable/close.svg
-    images/scalable/copy.svg
-    images/scalable/cut.svg
-    images/scalable/debug.svg
-    images/scalable/diagnostics.svg
-    images/scalable/dock-chat.svg
-    images/scalable/dock-close.svg
-    images/scalable/dock-diagnostics.svg
-    images/scalable/dock-debug.svg
-    images/scalable/dock-options.svg
-    images/scalable/dock-peer.svg
-    images/scalable/dock-phone.svg
-    images/scalable/dock-photo.svg
-    images/scalable/dock-rss.svg
-    images/scalable/dock-share.svg
-    images/scalable/dock-start.svg
-    images/scalable/dock-web.svg
-    images/scalable/download.svg
-    images/scalable/facebook.svg
-    images/scalable/favorite-active.svg
-    images/scalable/favorite-inactive.svg
     images/scalable/file.svg
-    images/scalable/fire.svg
-    images/scalable/forward.svg
-    images/scalable/fullscreen.svg
-    images/scalable/google.svg
-    images/scalable/hangup.svg
-    images/scalable/home.svg
-    images/scalable/information.svg
-    images/scalable/invite.svg
     images/scalable/moderator.svg
-    images/scalable/options.svg
-    images/scalable/paste.svg
     images/scalable/peer.svg
-    images/scalable/permissions.svg
-    images/scalable/phone.svg
-    images/scalable/photos.svg
-    images/scalable/plugin.svg
-    images/scalable/refresh.svg
-    images/scalable/remove.svg
     images/scalable/resize.svg
-    images/scalable/rss.svg
-    images/scalable/search.svg
-    images/scalable/share.svg
-    images/scalable/start.svg
-    images/scalable/stop.svg
     images/scalable/tip.svg
-    images/scalable/transfers.svg
-    images/scalable/upload.svg
     images/scalable/web.svg
     images/scalable/wiLink.svg
     images/scalable/wiLink-black.svg)
@@ -79,17 +26,13 @@ set(LARGE_ICONS
     images/scalable/file.svg
     images/scalable/image-x-generic.svgz
     images/scalable/peer.svg
-    images/scalable/photos.svg
     images/scalable/spinner.svg
     images/scalable/text-x-generic.svgz
     images/scalable/video-x-generic.svgz
     images/scalable/wiLink.svg)
 
-# 16x16 icons
-generate_png(png SIZE 16 DESTINATION images/16x16 ${SMALL_ICONS})
-
 # 32x32 icons
-generate_png(png SIZE 32 DESTINATION images/32x32 ${ICONS} ${SMALL_ICONS})
+generate_png(png SIZE 32 DESTINATION images/32x32 ${ICONS})
 
 # 64x64 icons
 generate_png(png SIZE 64 DESTINATION images/64x64 ${ICONS})

@@ -18,7 +18,7 @@
  */
 
 import QtQuick 1.1
-import 'utils.js' as Utils
+import 'scripts/utils.js' as Utils
 
 Item {
     id: button
@@ -27,8 +27,11 @@ Item {
     property bool enabled: true
     property bool notified: false
     property string iconStyle: ''
+<<<<<<< HEAD
     property string iconSource: ''
     property string iconPress: ''
+=======
+>>>>>>> 6482869b3f09c09da2b0da251d1246fb2e733d3f
     property variant panelProperties
     property string panelSource: ''
     property string text
@@ -103,6 +106,7 @@ Item {
         anchors.verticalCenter: button.verticalCenter
         opacity: 0
         radius:5
+
         /* Wifirst */
         //color: '#597fbe'
 
@@ -115,6 +119,21 @@ Item {
 
     Label {
         id: label
+
+        function shortcutText(shortcut) {
+            var text = '';
+            if (shortcut & Qt.ControlModifier)
+                text += appSettings.osType == 'mac' ? 'Cmd-' : 'Ctrl-';
+            var key = shortcut & 0xffffff;
+            if (key >= Qt.Key_A && key <= Qt.Key_Z) {
+                var alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                text += alpha[key - Qt.Key_A];
+            }
+            if (text.length)
+                return '<br/>' + text;
+            else
+                return '';
+        }
 
         anchors.verticalCenter: labelBackground.verticalCenter
         anchors.centerIn: labelBackground
@@ -154,8 +173,6 @@ Item {
         State {
             name: 'hovered'
             PropertyChanges   { target: icon; textStyle: button.active ? Text.Normal : Text.Sunken }
-            //PropertyChanges { target: button; width: image.width + 16; height: image.height }
-            //PropertyChanges { target: image; height: appStyle.icon.normalSize; width: appStyle.icon.normalSize }
             PropertyChanges { target: label; opacity: 1 }
             PropertyChanges { target: labelBackground; opacity: 0.7 }
         }

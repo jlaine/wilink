@@ -23,8 +23,8 @@ Rectangle {
     id: button
 
     property bool enabled: true
-    property int iconSize: (iconSource != '' || iconStyle != '') ? appStyle.icon.smallSize : 0
-    property string iconSource: ''
+    property int iconSize: iconStyle != '' ? appStyle.icon.smallSize : 0
+    property alias iconColor: icon.color
     property string iconStyle: ''
     property int margins: (text != '') ? appStyle.margin.large : appStyle.margin.normal;
     property string style: ''
@@ -36,7 +36,7 @@ Rectangle {
     signal released
 
     height: button.visible ? (Math.max(iconSize, Math.round(labelHelper.height*1.2)) + 2 * appStyle.margin.normal) : 0
-    width: button.visible ? Math.round(labelHelper.width*1.2 + iconSize + ((iconSource != '' && text != '') ? 3 : 2) * margins) : 0
+    width: button.visible ? Math.round(labelHelper.width*1.2 + iconSize + ((iconStyle != '' && text != '') ? 3 : 2) * margins) : 0
     border.color: '#b3b3b3'
     gradient: Gradient {
         GradientStop { id: stop1; position: 0.0; color: '#ffffff' }
@@ -55,14 +55,8 @@ Rectangle {
         anchors.bottom: parent.bottom
         width: iconSize
 
-        Image {
-            anchors.centerIn: parent
-            source: iconSource
-            sourceSize.height: iconSize
-            sourceSize.width: iconSize
-        }
-
         Icon {
+            id: icon
             anchors.centerIn: parent
             style: iconStyle
             color: iconColor
@@ -73,7 +67,7 @@ Rectangle {
         id: label
 
         anchors.left: image.right
-        anchors.leftMargin: iconSource != '' ? margins : 0
+        anchors.leftMargin: iconStyle != '' ? margins : 0
         anchors.right: parent.right
         anchors.rightMargin: margins
         anchors.verticalCenter: parent.verticalCenter

@@ -29,7 +29,7 @@ Panel {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.top: parent.top
-        iconSource: 'image://icon/share'
+        iconStyle: 'icon-share'
         title: qsTr('Shares')
         toolBar: ToolBar {
             ToolButton {
@@ -47,9 +47,7 @@ Panel {
                 text: qsTr('Options')
 
                 onClicked: {
-                    dialogSwapper.showPanel('PreferenceDialog.qml');
-                    var panel = dialogSwapper.findPanel('PreferenceDialog.qml');
-                    panel.showPanel('SharePreferencePanel.qml');
+                    dialogSwapper.showPanel('PreferenceDialog.qml', {initialPanel: 'SharePreferencePanel.qml'});
                 }
 
                 // run one-time configuration dialog
@@ -83,15 +81,13 @@ Panel {
         height: 32
         z: 1
 
-        Image {
+        Icon {
             id: searchIcon
 
             anchors.left: parent.left
             anchors.leftMargin: 8
             anchors.verticalCenter: parent.verticalCenter
-            source: 'image://icon/search'
-            sourceSize.height: appStyle.icon.tinySize
-            sourceSize.width: appStyle.icon.tinySize
+            style: 'icon-search'
         }
 
         InputBar {

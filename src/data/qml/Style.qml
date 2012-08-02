@@ -78,7 +78,7 @@ Item {
 
     FontLoader {
         id: iconFont
-        source: "fontawesome-webfont.ttf"
+        source: "fonts/fontawesome-webfont.ttf"
     }
 }
 
