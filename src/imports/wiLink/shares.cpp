@@ -59,16 +59,11 @@ ShareWatcher::ShareWatcher(QObject *parent)
     : QObject(parent)
     , m_shareDatabase(0)
 {
-    bool check;
-    Q_UNUSED(check);
-
-    ChatClientObserver *observer = ChatClient::observer();
+    // monitor clients
     foreach (ChatClient *client, ChatClient::instances())
         _q_clientCreated(client);
-
-    check = connect(observer, SIGNAL(clientCreated(ChatClient*)),
-                    this, SLOT(_q_clientCreated(ChatClient*)));
-    Q_ASSERT(check);
+    connect(ChatClient::observer(), SIGNAL(clientCreated(ChatClient*)),
+            this, SLOT(_q_clientCreated(ChatClient*)));
 }
 
 void ShareWatcher::_q_clientCreated(ChatClient *client)

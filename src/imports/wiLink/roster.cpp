@@ -243,6 +243,12 @@ RosterModel::RosterModel(QObject *parent)
     QHash<int, QByteArray> names = roleNames();
     names.insert(RosterModel::StatusRole, "status");
     setRoleNames(names);
+
+    // monitor clients
+    foreach (ChatClient *client, ChatClient::instances())
+        _q_clientCreated(client);
+    connect(ChatClient::observer(), SIGNAL(clientCreated(ChatClient*)),
+            this, SLOT(_q_clientCreated(ChatClient*)));
 }
 
 RosterModel::~RosterModel()
@@ -252,7 +258,7 @@ RosterModel::~RosterModel()
 
 /** Adds a client to the monitored list.
  */
-void RosterModel::addClient(ChatClient *client)
+void RosterModel::_q_clientCreated(ChatClient *client)
 {
     bool check;
     Q_UNUSED(check);
