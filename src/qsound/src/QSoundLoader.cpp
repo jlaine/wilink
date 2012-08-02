@@ -143,7 +143,11 @@ void QSoundLoader::setSource(const QUrl &source)
 
 void QSoundLoader::start()
 {
-    // clear old
+    // TODO: stop old
+
+    // if we have no URL, do nothing
+    if (!d->source.isValid())
+        return;
 
     if (d->source.scheme() == "file") {
         d->play(new QSoundFile(d->source.toLocalFile()));
