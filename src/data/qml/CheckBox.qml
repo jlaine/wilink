@@ -30,14 +30,12 @@ Item {
 
     height: Math.max(appStyle.icon.tinySize, textItem.paintedHeight)
 
-    Image {
+    Icon {
         id: rect
 
         anchors.left:  parent.left
         anchors.verticalCenter: parent.verticalCenter
-        source: checked ? 'image://icon/checkbox-checked' : 'image://icon/checkbox'
-        width: appStyle.icon.tinySize
-        height: appStyle.icon.tinySize
+        style: checked ? 'icon-check' : 'icon-check-empty'
     }
 
     Image {
