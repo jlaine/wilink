@@ -3,10 +3,6 @@ generate_icns(icns images/scalable/wiLink.svg)
 generate_ico(ico images/scalable/wiLink.svg)
 generate_xpm(xpm images/scalable/wiLink.svg)
 
-set(SMALL_ICONS
-    images/scalable/checkbox.svg
-    images/scalable/checkbox-checked.svg)
-
 set(ICONS
     images/scalable/album.svg
     images/scalable/audio-input.svg
@@ -35,11 +31,8 @@ set(LARGE_ICONS
     images/scalable/video-x-generic.svgz
     images/scalable/wiLink.svg)
 
-# 16x16 icons
-generate_png(png SIZE 16 DESTINATION images/16x16 ${SMALL_ICONS})
-
 # 32x32 icons
-generate_png(png SIZE 32 DESTINATION images/32x32 ${ICONS} ${SMALL_ICONS})
+generate_png(png SIZE 32 DESTINATION images/32x32 ${ICONS})
 
 # 64x64 icons
 generate_png(png SIZE 64 DESTINATION images/64x64 ${ICONS})

@@ -1,7 +1,5 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
-    <file>images/16x16/checkbox-checked.png</file>
-    <file>images/16x16/checkbox.png</file>
     <file>images/16x16/face-angry.png</file>
     <file>images/16x16/face-cool.png</file>
     <file>images/16x16/face-crying.png</file>
@@ -21,8 +19,6 @@
     <file>images/32x32/call-incoming.png</file>
     <file>images/32x32/call-outgoing.png</file>
     <file>images/32x32/chat.png</file>
-    <file>images/32x32/checkbox-checked.png</file>
-    <file>images/32x32/checkbox.png</file>
     <file>images/32x32/face-angry.png</file>
     <file>images/32x32/face-cool.png</file>
     <file>images/32x32/face-crying.png</file>
