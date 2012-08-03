@@ -62,6 +62,10 @@ Rectangle {
                 id: listModel
 
                 function add(properties) {
+                    if (properties.notified === undefined)
+                        properties.notified = false;
+                    if (properties.visible === undefined)
+                        properties.visible = true;
                     function priority(props) {
                         if (props.priority == undefined)
                             return 0;
