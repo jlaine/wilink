@@ -56,7 +56,9 @@ ContactView {
 
                 anchors.left: parent.left
                 anchors.right: parent.right
+                color: '#c7c7c7'
                 elide: Text.ElideRight
+                font.pixelSize: 11
                 text: model.name
             }
 
@@ -66,7 +68,9 @@ ContactView {
                 anchors.left: parent.left
                 anchors.leftMargin: 6
                 anchors.right: parent.right
+                color: '#c7c7c7'
                 elide: Text.ElideRight
+                font.pixelSize: 11
                 font.italic: true
                 text: model.phone
                 visible: false
@@ -122,7 +126,7 @@ ContactView {
             State {
                 name: 'expanded'
                 when: view.currentItem == item
-                PropertyChanges { target: name; font.bold: true }
+                PropertyChanges { target: name; color: 'white' }
                 PropertyChanges { target: phone; visible: true }
             }
         ]
