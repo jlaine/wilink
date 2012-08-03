@@ -175,11 +175,8 @@ Panel {
 
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        anchors.bottomMargin: appStyle.margin.normal
         anchors.left: panel.singlePanel ? parent.left : sidebar.right
-        anchors.leftMargin: appStyle.margin.normal
         anchors.right: parent.right
-        anchors.rightMargin: appStyle.margin.normal
         visible: width > 0
 
         PanelHeader {
@@ -187,7 +184,6 @@ Panel {
 
             anchors.left: parent.left
             anchors.right: parent.right
-            anchors.rightMargin: -appStyle.margin.normal
             anchors.top: parent.top
             iconStyle: 'icon-phone'
             title: qsTr('Phone')
@@ -215,7 +211,6 @@ Panel {
             anchors.top: header.bottom
             anchors.left: parent.left
             anchors.right: parent.right
-            anchors.rightMargin: -appStyle.margin.normal
             text: (panel.phoneEnabled ? qsTr('You can view your phone bills and your call history at the following address:') : qsTr('You can subscribe to the phone service at the following address:')) + ' <a href="' + panel.selfcareUrl + '">' + panel.selfcareUrl + '</a>';
             visible: panel.selfcareUrl != ''
         }
@@ -224,7 +219,9 @@ Panel {
             id: numberRow
 
             anchors.left: parent.left
+            anchors.leftMargin: appStyle.margin.normal
             anchors.right: parent.right
+            anchors.rightMargin: appStyle.margin.normal
             anchors.top: help.bottom
             anchors.topMargin: appStyle.spacing.vertical
             height: 32
