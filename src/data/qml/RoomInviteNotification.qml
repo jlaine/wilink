@@ -31,9 +31,11 @@ NotificationDialog {
     text: qsTr("%1 has invited you to join the '%2' chat room.\n\nDo you accept?").replace('%1', vcard.name).replace('%2', roomJid)
     title: qsTr('Invitation from %1').replace('%1', vcard.name)
 
-    VCard {
-        id: vcard
-    }
+    resources: [
+        VCard {
+            id: vcard
+        }
+    ]
 
     onAccepted: {
         panel.showRoom(roomJid);

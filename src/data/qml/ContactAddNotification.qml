@@ -30,9 +30,11 @@ NotificationDialog {
     text: qsTr('%1 has asked to add you to his or her contact list.\n\nDo you accept?').replace('%1', jid);
     title: qsTr('Invitation from %1').replace('%1', vcard.name)
 
-    VCard {
-        id: vcard
-    }
+    resources: [
+        VCard {
+            id: vcard
+        }
+    ]
 
     onAccepted: {
         console.log("Contact accepted " + jid);
