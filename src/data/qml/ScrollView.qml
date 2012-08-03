@@ -24,6 +24,7 @@ FocusScope {
     property alias currentIndex: view.currentIndex
     property alias currentItem: view.currentItem
     property alias delegate: view.delegate
+    property alias header: view.header
     property alias highlight: view.highlight
     property alias model: view.model
     property alias moving: view.moving
