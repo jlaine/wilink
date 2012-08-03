@@ -35,25 +35,11 @@ Rectangle {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.topMargin: -parent.width
-        
-        /*
-         * Sparrow 
-         */
-//        gradient: Gradient {
-//            GradientStop {position: 0.05; color: '#262b30' }
-//            GradientStop {position: 0.06; color: '#262b30'}
-//            GradientStop {position: 1.0; color: '#262b30'}
-//        }
-        
-        /*
-         * Webapps
-         */
         gradient: Gradient {
             GradientStop {position: 0.05; color: '#566c8a' }
             GradientStop {position: 0.06; color: '#566c8a'}
             GradientStop {position: 1.0; color: '#677e9f'}
         }
-        
         transform: Rotation {
             angle: 90
             origin.x: 0
@@ -147,16 +133,6 @@ Rectangle {
                 Qt.quit();
             }
         }
-    }
-
-    Rectangle {
-        id: rightBorder
-
-        anchors.left: parent.right
-        width: 1
-        height: parent.height
-        color: 'white'
-        opacity: 0.0
     }
 
     Keys.onPressed: {
