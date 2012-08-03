@@ -20,7 +20,7 @@
 import QtQuick 1.1
 import wiLink 2.4
 
-GroupBox {
+FocusScope {
     id: block
 
     property alias count: view.count
@@ -28,47 +28,49 @@ GroupBox {
     property alias delegate: view.delegate
     property alias model: view.model
     property alias moving: view.moving
+    property string title
 
     signal addClicked
 
-    ToolButton {
-        parent: block
+    Item {
+        id: header
 
-        anchors.top: parent.top
-        anchors.topMargin: 8
+        anchors.left: parent.left
         anchors.right: parent.right
-        anchors.rightMargin: 4
-        //iconStyle: 'icon-plus'
-//        gradient: Gradient {
-//            GradientStop { id: stop1; position: 0.0; color: '#353535' }
-//            GradientStop { id: stop2; position: 1.0; color: '#353535' }
-//        }
-//        border.width: 0
-//        iconColor: '#858585'
-//        onClicked: block.addClicked()
+        height: 24
 
-        states: [
-            State {
-                name: 'hovered'
-                PropertyChanges   { target: stop1; color: 'black' }
-                PropertyChanges   { target: stop2; color: 'black' }
-            }
-        ]
+        Label {
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.left: parent.left
+            anchors.leftMargin: appStyle.margin.large
+            anchors.right: button.left
+            color: '#858585'
+            font.bold: true
+            font.capitalization: Font.AllUppercase
+            style:Text.Sunken
+            horizontalAlignment: Text.AlignLeft
+            text: block.title
+        }
 
-        MouseArea {
-            id: mouseArea
-            anchors.fill: parent
-            hoverEnabled: true
-            property bool hovered: false
-            onEntered: hovered = true
-            onExited: hovered = false
+        ToolButton {
+            id: button
+
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.right: parent.right
+            anchors.rightMargin: appStyle.margin.small
+            iconStyle: 'icon-plus'
+
+            onClicked: block.addClicked()
         }
     }
 
     ScrollView {
         id: view
 
-        anchors.fill: parent
+        anchors.top: header.bottom
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
         clip: true
         focus: true
         zeroMargin: true
