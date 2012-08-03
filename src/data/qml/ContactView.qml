@@ -64,15 +64,27 @@ FocusScope {
         }
     }
 
-    ScrollView {
+    ListView {
         id: view
 
         anchors.top: header.bottom
         anchors.bottom: parent.bottom
         anchors.left: parent.left
-        anchors.right: parent.right
+        anchors.right: scrollBar.left
         clip: true
         focus: true
-        zeroMargin: true
+        highlight: Highlight {
+            width: view.width
+        }
+        highlightMoveDuration: appStyle.highlightMoveDuration
+    }
+
+    ScrollBar {
+        id: scrollBar
+
+        anchors.top: header.bottom
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        flickableItem: view
     }
 }
