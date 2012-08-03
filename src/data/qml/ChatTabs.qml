@@ -102,6 +102,7 @@ ListView {
             anchors.left: icon.right
             anchors.margins: appStyle.margin.normal
             anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenterOffset: 1
         }
 
         Label {
