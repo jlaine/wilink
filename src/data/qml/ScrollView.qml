@@ -41,7 +41,7 @@ FocusScope {
         focus: true
 
         highlight: Highlight {
-            width: parent.width
+            width: view.width
         }
         highlightMoveDuration: appStyle.highlightMoveDuration
     }
