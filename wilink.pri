@@ -8,7 +8,3 @@ isEmpty(PREFIX) {
         PREFIX = /usr/local
     }
 }
-
-OTHER_FILES += \
-    ../data/qml/SocialIcon.qml \
-    ../data/qml/ChatToolButton.qml
