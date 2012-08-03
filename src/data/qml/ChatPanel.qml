@@ -162,7 +162,6 @@ Panel {
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        //anchors.margins: appStyle.margin.normal
         visible: width > 0
         width: chatPanel.singlePanel ? parent.width : appStyle.sidebarWidth
         color: '#474747'

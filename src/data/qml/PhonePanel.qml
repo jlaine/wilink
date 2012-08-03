@@ -54,10 +54,10 @@ Panel {
                             historyView.model.password = panel.webPassword;
                             historyView.model.reload();
                         } else if (node.nodeName == 'contacts-url') {
-                            sidebar.model.url = node.firstChild.nodeValue;
-                            sidebar.model.username = panel.webUsername;
-                            sidebar.model.password = panel.webPassword;
-                            sidebar.model.reload();
+                            contacts.model.url = node.firstChild.nodeValue;
+                            contacts.model.username = panel.webUsername;
+                            contacts.model.password = panel.webPassword;
+                            contacts.model.reload();
                         } else if (node.nodeName == 'domain') {
                             sipClient.domain = node.firstChild.nodeValue;
                         } else if (node.nodeName == 'enabled') {
@@ -143,23 +143,29 @@ Panel {
         }
     }
 
-    PhoneContactView {
+    Rectangle {
         id: sidebar
 
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.left: parent.left
-        anchors.margins: appStyle.margin.normal
+        color: '#474747'
         visible: width > 0
         width: panel.singlePanel ? parent.width : appStyle.sidebarWidth
         z: 1
 
-        onItemClicked: {
-            if (callButton.enabled) {
-                var address = Sip.buildAddress(model.phone, sipClient.domain);
-                sipClient.call(address);
-                if (panel.singlePanel)
-                    panel.state = 'no-sidebar';
+        PhoneContactView {
+            id: contacts
+
+            anchors.fill: parent
+
+            onItemClicked: {
+                if (callButton.enabled) {
+                    var address = Sip.buildAddress(model.phone, sipClient.domain);
+                    sipClient.call(address);
+                    if (panel.singlePanel)
+                        panel.state = 'no-sidebar';
+                }
             }
         }
     }
@@ -318,7 +324,7 @@ Panel {
             anchors.top: keypad.bottom
             anchors.topMargin: appStyle.spacing.vertical
             anchors.bottom: parent.bottom
-            contactModel: sidebar.model
+            contactModel: contacts.model
 
             onAddressClicked: {
                 numberEdit.text = Sip.parseAddress(address, sipClient.domain);
