@@ -45,8 +45,6 @@ Item {
         id: image
 
         anchors.centerIn: background
-        //width: iconSize
-        //height: iconSize
         style: iconStyle
         color: '#c7c7c7'
         font.pixelSize: 11
