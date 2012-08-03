@@ -142,3 +142,19 @@ function getElementsByTagName(rootElement, tagName) {
     }
     return elements;
 }
+
+function getSocialIcon(email) {
+    var result = {};
+    switch (true) {
+    case /chat\.facebook\.com/.test(email):
+        result = {color: '#3d589d', style: 'icon-facebook-sign', opacity: 1, visible: true};
+        break;
+    case /gmail\.com/.test(email):
+        result = {color: '#f71100', style: 'icon-google-plus-sign', opacity: 1, visible: true};
+        break;
+    default:
+        result = {color: 'black', style:'icon-sign-blank', opacity: 0, visible: false};
+        break;
+    }
+    return result;
+}

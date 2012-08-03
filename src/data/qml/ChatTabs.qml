@@ -95,31 +95,21 @@ ListView {
             }
         }
 
-        Column {
-            id: column
+        SocialIcon {
+            id: socialIcon
 
-            anchors.margins: appStyle.margin.normal
+            email: model.panel.subTitle
             anchors.left: icon.right
+            anchors.margins: appStyle.margin.normal
+            anchors.verticalCenter: parent.verticalCenter
+        }
+
+        Label {
+            anchors.left: socialIcon.right
             anchors.right: closeButton.left
             anchors.verticalCenter: parent.verticalCenter
-
-            Label {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                elide: Text.ElideRight
-                text: model.panel.title
-            }
-
-            Label {
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.leftMargin: 3
-                elide: Text.ElideRight
-                text: model.panel.subTitle
-                color: '#858585'
-                font.pixelSize: 11
-                visible: text != '' && (model.index == tabView.currentIndex)
-            }
+            elide: Text.ElideRight
+            text: model.panel.title
         }
 
         MouseArea {
