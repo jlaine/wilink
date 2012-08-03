@@ -13,6 +13,7 @@
     <file>qml/ChatPanel.qml</file>
     <file>qml/ChatPlugin.qml</file>
     <file>qml/ChatTabs.qml</file>
+    <file>qml/ChatToolButton.qml</file>
     <file>qml/CheckBox.qml</file>
     <file>qml/Clipboard.qml</file>
     <file>qml/ComboBox.qml</file>
@@ -90,12 +91,14 @@
     <file>qml/SharePlugin.qml</file>
     <file>qml/SharePreferencePanel.qml</file>
     <file>qml/ShareView.qml</file>
+    <file>qml/SocialIcon.qml</file>
     <file>qml/SoundPreferencePanel.qml</file>
     <file>qml/Spinner.qml</file>
     <file>qml/StatusBar.qml</file>
     <file>qml/StatusDelegate.qml</file>
     <file>qml/StatusPill.qml</file>
     <file>qml/Style.qml</file>
+    <file>qml/TabView.qml</file>
     <file>qml/ToolBar.qml</file>
     <file>qml/ToolButton.qml</file>
     <file>qml/TransferNotification.qml</file>
@@ -103,6 +106,7 @@
     <file>qml/WebPanel.qml</file>
     <file>qml/WebPlugin.qml</file>
     <file>qml/WebTab.qml</file>
+    <file>qml/Zob.qml</file>
     <file>qml/boot.qml</file>
     <file>qml/fonts/fontawesome-webfont.ttf</file>
     <file>qml/i18n/fr.qm</file>

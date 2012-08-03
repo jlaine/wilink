@@ -52,12 +52,12 @@ FocusScope {
             text: block.title
         }
 
-        ToolButton {
+        ChatToolButton {
             id: button
 
             anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.right
-            anchors.rightMargin: appStyle.margin.small
+            anchors.rightMargin: appStyle.margin.normal
             iconStyle: 'icon-plus'
 
             onClicked: block.addClicked()

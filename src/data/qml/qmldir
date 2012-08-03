@@ -11,6 +11,7 @@ ChatEdit 1.0 ChatEdit.qml
 ChatPanel 1.0 ChatPanel.qml
 ChatPlugin 1.0 ChatPlugin.qml
 ChatTabs 1.0 ChatTabs.qml
+ChatToolButton 1.0 ChatToolButton.qml
 CheckBox 1.0 CheckBox.qml
 Clipboard 1.0 Clipboard.qml
 ComboBox 1.0 ComboBox.qml
@@ -88,12 +89,14 @@ SharePanel 1.0 SharePanel.qml
 SharePlugin 1.0 SharePlugin.qml
 SharePreferencePanel 1.0 SharePreferencePanel.qml
 ShareView 1.0 ShareView.qml
+SocialIcon 1.0 SocialIcon.qml
 SoundPreferencePanel 1.0 SoundPreferencePanel.qml
 Spinner 1.0 Spinner.qml
 StatusBar 1.0 StatusBar.qml
 StatusDelegate 1.0 StatusDelegate.qml
 StatusPill 1.0 StatusPill.qml
 Style 1.0 Style.qml
+TabView 1.0 TabView.qml
 ToolBar 1.0 ToolBar.qml
 ToolButton 1.0 ToolButton.qml
 TransferNotification 1.0 TransferNotification.qml
@@ -101,3 +104,4 @@ TransferWidget 1.0 TransferWidget.qml
 WebPanel 1.0 WebPanel.qml
 WebPlugin 1.0 WebPlugin.qml
 WebTab 1.0 WebTab.qml
+Zob 1.0 Zob.qml

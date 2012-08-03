@@ -10,4 +10,5 @@ isEmpty(PREFIX) {
 }
 
 OTHER_FILES += \
-    ../data/qml/SocialIcon.qml
+    ../data/qml/SocialIcon.qml \
+    ../data/qml/ChatToolButton.qml
