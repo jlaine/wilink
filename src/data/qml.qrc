@@ -90,6 +90,7 @@
     <file>qml/SharePlugin.qml</file>
     <file>qml/SharePreferencePanel.qml</file>
     <file>qml/ShareView.qml</file>
+    <file>qml/SocialIcon.qml</file>
     <file>qml/SoundPreferencePanel.qml</file>
     <file>qml/Spinner.qml</file>
     <file>qml/StatusBar.qml</file>

@@ -88,6 +88,7 @@ SharePanel 1.0 SharePanel.qml
 SharePlugin 1.0 SharePlugin.qml
 SharePreferencePanel 1.0 SharePreferencePanel.qml
 ShareView 1.0 ShareView.qml
+SocialIcon 1.0 SocialIcon.qml
 SoundPreferencePanel 1.0 SoundPreferencePanel.qml
 Spinner 1.0 Spinner.qml
 StatusBar 1.0 StatusBar.qml
