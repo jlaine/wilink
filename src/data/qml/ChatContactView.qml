@@ -75,7 +75,7 @@ ContactView {
                 elide: Text.ElideRight
                 text: model.participants > 0 ? model.name + ' (' + model.participants + ')' : model.name
                 font.pixelSize: 11
-                color: block.ListView.isCurentItem ? 'white' : '#c7c7c7'
+                color: item.ListView.isCurrentItem ? 'white' : '#c7c7c7'
             }
 
             Bubble {
