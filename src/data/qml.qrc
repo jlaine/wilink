@@ -98,7 +98,6 @@
     <file>qml/StatusDelegate.qml</file>
     <file>qml/StatusPill.qml</file>
     <file>qml/Style.qml</file>
-    <file>qml/TabView.qml</file>
     <file>qml/ToolBar.qml</file>
     <file>qml/ToolButton.qml</file>
     <file>qml/TransferNotification.qml</file>
@@ -106,7 +105,6 @@
     <file>qml/WebPanel.qml</file>
     <file>qml/WebPlugin.qml</file>
     <file>qml/WebTab.qml</file>
-    <file>qml/Zob.qml</file>
     <file>qml/boot.qml</file>
     <file>qml/fonts/fontawesome-webfont.ttf</file>
     <file>qml/i18n/fr.qm</file>
