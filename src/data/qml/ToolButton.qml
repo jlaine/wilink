@@ -26,7 +26,6 @@ Item {
     property string iconStyle: ''
     property alias text: label.text
     property alias enabled: mouseArea.enabled
-    property alias backgroundGradient: background.gradient
     signal clicked
 
     height: iconSize + (label.text ? 16 : 0)
