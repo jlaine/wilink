@@ -156,10 +156,7 @@ Panel {
         onParticipantClicked: chatInput.talkAt(participant)
 
         onComposing: {
-            console.log(state);
             state = remoteState;
-            console.log(state);
-            console.log('---');
             view.positionViewAtEnd();
         }
 
