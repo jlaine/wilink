@@ -325,6 +325,8 @@ Panel {
     ChatEdit {
         id: chatInput
 
+        callButton.visible: vcard.features & VCard.VoiceFeature
+
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
@@ -353,12 +355,6 @@ Panel {
             }
 
             Component.onCompleted: {
-                if (vcard.features & VCard.VoiceFeature) {
-                    menu.model.append({
-                        action: 'call',
-                        iconStyle: 'icon-phone',
-                        text: qsTr('Call')});
-                }
                 if (vcard.features & VCard.FileTransferFeature) {
                     menu.model.append({
                         action: 'send',
@@ -370,6 +366,11 @@ Panel {
                     iconStyle: 'icon-remove',
                     text: qsTr('Clear')});
             }
+        }
+
+        onCallTriggered: {
+            var fullJid = vcard.jidForFeature(VCard.VoiceFeature);
+            conversation.client.callManager.call(fullJid);
         }
 
         onChatStateChanged: {

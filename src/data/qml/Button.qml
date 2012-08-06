@@ -25,6 +25,7 @@ Rectangle {
     property bool enabled: true
     property int iconSize: iconStyle != '' ? appStyle.icon.smallSize : 0
     property alias iconColor: icon.color
+    property alias iconFontSize: icon.size
     property string iconStyle: ''
     property int margins: (text != '') ? appStyle.margin.large : appStyle.margin.normal;
     property string style: ''
@@ -139,6 +140,14 @@ Rectangle {
             PropertyChanges { target: labelShadow; color: Qt.rgba(0, 0, 0, 0.25); yOffset: -1 }
             PropertyChanges { target: stop1; color: '#0088cc' }
             PropertyChanges { target: stop2; color: '#0055cc' }
+        },
+        State {
+            name: 'success'
+            PropertyChanges { target: button; border.color: '#5aa844' }
+            PropertyChanges { target: label; color: 'white' }
+            PropertyChanges { target: labelShadow; color: Qt.rgba(0, 0, 0, 0.25); yOffset: -1 }
+            PropertyChanges { target: stop1; color: '#69c350' }
+            PropertyChanges { target: stop2; color: '#5aa844' }
         }
     ]
 }

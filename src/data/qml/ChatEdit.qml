@@ -24,11 +24,13 @@ Item {
     id: chatEdit
 
     property int chatState: QXmppMessage.None
+    property alias callButton: callButton
     property alias text: input.text
     property Component menuComponent
     property QtObject model
     signal returnPressed
     signal tabPressed
+    signal callTriggered
 
     function talkAt(participant) {
         var text = input.text;
@@ -219,7 +221,7 @@ Item {
 
         anchors.top: parent.top
         anchors.bottom: parent.bottom
-        anchors.right: sendButton.left
+        anchors.right: callButton.left
         anchors.rightMargin: appStyle.margin.normal
         iconStyle: 'icon-reorder'
 
@@ -229,6 +231,21 @@ Item {
             menuLoader.sourceComponent = menuComponent;
             menuLoader.show(pos.x, pos.y);
         }
+    }
+
+    Button {
+        id: callButton
+
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        anchors.right: sendButton.left
+        anchors.rightMargin: visible ? appStyle.margin.normal : 0
+        iconStyle: 'icon-phone'
+        iconColor: 'white'
+        iconFontSize: 20
+        style: 'success'
+
+        onClicked: chatEdit.callTriggered();
     }
 
     Button {
