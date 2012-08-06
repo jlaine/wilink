@@ -60,25 +60,15 @@ Panel {
         onJidChanged: {
             conversation.client = accountModel.clientForJid(jid);
         }
-    }
 
-/*
-    PanelHeader {
-        id: header
-
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        title: {
-            var text = '';
-            if (conversation.remoteState == QXmppMessage.Composing)
-                text += vcard.name + ' ' + qsTr('is composing a message');
-            else if (conversation.remoteState == QXmppMessage.Gone)
-                text += vcard.name + ' ' + qsTr('has closed the conversation');
-            return text;
+        onRemoteStateChanged: {
+            if (remoteState == QXmppMessage.Composing)
+                historyView.composing(true);
+            else if ((remoteState == QXmppMessage.Gone) || (remoteState == QXmppMessage.Paused)) {
+                historyView.composing(false);
+            }
         }
     }
-*/
 
     Column {
         id: widgetBar
@@ -146,13 +136,63 @@ Panel {
     HistoryView {
         id: historyView
 
+        property real footerOpacity: 0
+        property int footerHeight: 0
+
         anchors.top: widgetBar.bottom
         anchors.bottom: chatInput.top
         anchors.left: parent.left
         anchors.right: parent.right
         model: conversation.historyModel
 
+        signal composing(bool isComposing)
+
         onParticipantClicked: chatInput.talkAt(participant)
+
+        onComposing: {
+            if (isComposing) {
+                footerOpacity = 1;
+                footerHeight = 48;
+            } else {
+                footerOpacity = 0;
+                footerHeight = 0;
+            }
+            view.positionViewAtEnd()
+        }
+
+        historyFooter: Rectangle {
+                id: footer
+
+                width: parent.width - 16
+                anchors.horizontalCenter: parent.horizontalCenter
+                opacity: footerOpacity
+                height: footerHeight
+
+                Image {
+                    id: avatar
+
+                    anchors.bottom: parent.bottom
+                    anchors.bottomMargin: 6
+                    asynchronous: true
+                    source: vcard.avatar
+                    sourceSize.height: appStyle.icon.normalSize
+                    sourceSize.width: appStyle.icon.normalSize
+                    height: appStyle.icon.normalSize
+                    width: appStyle.icon.normalSize
+
+                    Icon {
+                        style: 'icon-comment-alt'
+                        size: 20
+                        color: '#333'
+                        opacity: 0.5
+                        anchors.top: parent.top
+                        anchors.topMargin: -5
+                        anchors.left: parent.right
+                        anchors.leftMargin: 10
+                    }
+                }
+
+            }
 
         Connections {
             target: historyView.model

@@ -28,6 +28,9 @@ Item {
     property alias atYEnd: historyView.atYEnd
     property alias count: historyView.count
     property alias model: historyView.model
+    property alias historyFooter: historyView.footer
+    property alias view: historyView
+
     signal participantClicked(string participant)
 
     clip: true
