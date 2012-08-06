@@ -62,10 +62,15 @@ Panel {
         }
 
         onRemoteStateChanged: {
-            if (remoteState == QXmppMessage.Composing)
-                historyView.composing(true);
-            else if ((remoteState == QXmppMessage.Gone) || (remoteState == QXmppMessage.Paused)) {
-                historyView.composing(false);
+            switch (remoteState) {
+                case QXmppMessage.Composing:
+                    historyView.composing('composing');
+                    break;
+                case QXmppMessage.Paused:
+                    historyView.composing('paused');
+                    break;
+                default:
+                    historyView.composing('gone');
             }
         }
     }
@@ -138,6 +143,7 @@ Panel {
 
         property real footerOpacity: 0
         property int footerHeight: 0
+        property string footerIcon: 'icon-comment-alt'
 
         anchors.top: widgetBar.bottom
         anchors.bottom: chatInput.top
@@ -145,20 +151,30 @@ Panel {
         anchors.right: parent.right
         model: conversation.historyModel
 
-        signal composing(bool isComposing)
+        signal composing(string remoteState)
 
         onParticipantClicked: chatInput.talkAt(participant)
 
         onComposing: {
-            if (isComposing) {
-                footerOpacity = 1;
-                footerHeight = 48;
-            } else {
-                footerOpacity = 0;
-                footerHeight = 0;
-            }
-            view.positionViewAtEnd()
+            console.log(state);
+            state = remoteState;
+            console.log(state);
+            console.log('---');
+            view.positionViewAtEnd();
         }
+
+        state: 'gone'
+        states: [
+            State { name: 'composing'
+                    PropertyChanges { target: historyView; footerOpacity: 1; footerHeight: 48; footerIcon:'icon-comment-alt' }
+            },
+            State { name: 'paused'
+                    PropertyChanges { target: historyView; footerOpacity: 0.7; footerHeight: 48; footerIcon:'icon-cloud' }
+            },
+            State { name: 'gone'
+                    PropertyChanges { target: historyView; footerOpacity: 0; footerHeight: 0; footerIcon:'icon-comment-alt' }
+            }
+        ]
 
         historyFooter: Rectangle {
                 id: footer
@@ -181,7 +197,7 @@ Panel {
                     width: appStyle.icon.normalSize
 
                     Icon {
-                        style: 'icon-comment-alt'
+                        style: footerIcon
                         size: 20
                         color: '#333'
                         opacity: 0.5
