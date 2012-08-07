@@ -269,7 +269,17 @@ FocusScope {
 
                             break;
                         case 'chat_room':
-                            console.log('Open chatroom: ' + param);
+                            var jid = param + '@conference.wifirst.net';
+                            if ( /^[^@/ ]+@[^@/ ]+$/.test(jid) ) {
+                                console.log('Open chat room: ' + jid);
+                                var panel = swapper.findPanel('ChatPanel.qml');
+                                panel.showRoom(jid);
+                            } else {
+                                dialogSwapper.showPanel('ErrorNotification.qml', {
+                                    title: qsTr('Chat failed'),
+                                    text: qsTr('Sorry, but the chat session could not be started.') + '\n\n' + qsTr('%1 is not a valid chat room id').replace('%1',jid),
+                                });
+                            }
                             break;
                         default:
                             break;

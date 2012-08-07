@@ -449,13 +449,17 @@ Acceptez-vous?</translation>
         <translation>Le tchat a échoué</translation>
      </message>
      <message>
-         <source>Sorry, but the chat session could not be started.</source>
-         <translation>Désolé, la session de tchat n&lapos;a pu être démarrée</translation>
-      </message>
-      <message>
-          <source>%1 is not a valid contact format</source>
-          <translation>%1 n&lapos;est pas un format de contact reconnu</translation>
-       </message>
+        <source>Sorry, but the chat session could not be started.</source>
+        <translation>Désolé, la session de tchat n&lapos;a pu être démarrée</translation>
+     </message>
+     <message>
+        <source>%1 is not a valid contact format</source>
+        <translation>%1 n&lapos;est pas un format de contact reconnu</translation>
+     </message>
+     <message>
+         <source>%1 is not a valid chat room id</source>
+         <translation>%1 n&lapos;est pas un identifiant de salon de discussion valide</translation>
+     </message>
 </context>
 <context>
     <name>NewsDialog</name>
