@@ -242,19 +242,25 @@ FocusScope {
                 if (argv.length == 2) {
                     // Received a well formed wilink://verb/param command
                     argv = argv[1].split('/');
-                    if (argv.length >= 2) {
-                        var verb = argv[0];
-                        var param = argv[1];
-                        switch (verb) {
+                    var verb = argv[0];
+                    var param = "";
+                    if (argv.length >= 2)
+                        param = argv[1];
+                    switch (verb) {
+                        case 'about':
+                            dialogSwapper.showPanel('AboutDialog.qml');
+                            break;
                         case 'chat':
                             console.log('Open chat with: ' + param);
+                            var jid = param + '@wifirst.net';
+                            var panel = swapper.findPanel('ChatPanel.qml');
+                            panel.showConversation(jid);
                             break;
                         case 'chat_room':
                             console.log('Open chatroom: ' + param);
                             break;
                         default:
                             break;
-                        }
                     }
                 }
                 window.showAndRaise();
