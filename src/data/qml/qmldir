@@ -19,6 +19,7 @@ ContactAddDialog 1.0 ContactAddDialog.qml
 ContactAddNotification 1.0 ContactAddNotification.qml
 ContactRemoveDialog 1.0 ContactRemoveDialog.qml
 ContactRenameDialog 1.0 ContactRenameDialog.qml
+ContactSendSubscriptionDialog 1.0 ContactSendSubscriptionDialog.qml
 ContactView 1.0 ContactView.qml
 ConversationPanel 1.0 ConversationPanel.qml
 CrumbBar 1.0 CrumbBar.qml

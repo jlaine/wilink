@@ -21,6 +21,7 @@
     <file>qml/ContactAddNotification.qml</file>
     <file>qml/ContactRemoveDialog.qml</file>
     <file>qml/ContactRenameDialog.qml</file>
+    <file>qml/ContactSendSubscriptionDialog.qml</file>
     <file>qml/ContactView.qml</file>
     <file>qml/ConversationPanel.qml</file>
     <file>qml/CrumbBar.qml</file>

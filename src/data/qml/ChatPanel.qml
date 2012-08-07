@@ -156,10 +156,10 @@ Panel {
             chatPanel.state = 'no-sidebar';
     }
 
-    /** Convenience method to test whether a jid has been subscrided
+    /** Convenience method to test whether a jid has been subscribed with wifirst.net
      */
 
-    function hasSubscribedToJid(jid) {
+    function hasSubscribedWithWifirst(jid) {
         for (var i = 0; i < chatClients.count; ++i) {
             var client = chatClients.itemAt(i).client;
             var domain = Utils.jidToDomain(client.jid);
@@ -182,6 +182,18 @@ Panel {
             }
         }
         return false;
+    }
+
+    /** Convenience method to send a subscription request for wifirst.net
+     */
+    function addSubscriptionRequest(jid) {
+        for (var i = 0; i < chatClients.count; ++i) {
+            var client = chatClients.itemAt(i).client;
+            var domain = Utils.jidToDomain(client.jid);
+            if (domain == 'wifirst.net')
+                break;
+        }
+        dialogSwapper.showPanel('ContactSendSubscriptionDialog.qml', {jid: jid, client: client});
     }
 
     Rectangle {

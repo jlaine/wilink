@@ -221,6 +221,21 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>ContactSendSubscriptionDialog</name>
+    <message>
+        <source>Add a contact</source>
+        <translation>Ajouter un contact</translation>
+    </message>
+    <message>
+        <source>The contact you tried to reach is not in your contact list.</source>
+        <translation>Le contact que vous cherchez à joindre n&lapos;est pas dans votre liste de contacts</translation>
+    </message>
+    <message>
+        <source>Send a subscription request to %1 ?</source>
+        <translation>Envoyer une demande d'ajout dans vos contacts à %1 ?</translation>
+    </message>
+</context>
+<context>
     <name>ConversationPanel</name>
     <message>
         <source>Call</source>

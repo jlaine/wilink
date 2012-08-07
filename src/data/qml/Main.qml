@@ -252,13 +252,13 @@ FocusScope {
                             break;
                         case 'chat':
                             var jid = param + '@wifirst.net';
-                            if ( /^[^@/ ]+@[^@/ ]+$/.test(param) ) {
+                            if ( /^[^@/ ]+@[^@/ ]+$/.test(jid) ) {
                                 console.log('Open chat with: ' + jid);
                                 var panel = swapper.findPanel('ChatPanel.qml');
-                                if ( panel.hasSubscribedToJid(jid) ) {
+                                if ( panel.hasSubscribedWithWifirst(jid) ) {
                                     panel.showConversation(jid);
                                 } else {
-                                    // TODO
+                                    panel.addSubscriptionRequest(jid);
                                 }
                             } else { // jid format is invalid
                                 dialogSwapper.showPanel('ErrorNotification.qml', {
