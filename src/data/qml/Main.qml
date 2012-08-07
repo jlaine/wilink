@@ -140,7 +140,6 @@ FocusScope {
         anchors.bottom: parent.bottom
         anchors.left: dock.right
         anchors.right: parent.right
-        //anchors.margins: appStyle.margin.normal
         focus: true
     }
 
@@ -239,9 +238,25 @@ FocusScope {
             var bits = message.split(' ');
             var command = bits[0];
             if (command == 'OPEN') {
-                // TODO
-                console.log("open " + bits[1]);
-                dialogSwapper.showPanel('NotificationDialog.qml', {text: bits[1], title: 'Open a link'});
+                var argv = bits[1].split('wilink://');
+                if (argv.length == 2) {
+                    // Received a well formed wilink://verb/param command
+                    argv = argv[1].split('/');
+                    if (argv.length >= 2) {
+                        var verb = argv[0];
+                        var param = argv[1];
+                        switch (verb) {
+                        case 'chat':
+                            console.log('Open chat with: ' + param);
+                            break;
+                        case 'chat_room':
+                            console.log('Open chatroom: ' + param);
+                            break;
+                        default:
+                            break;
+                        }
+                    }
+                }
                 window.showAndRaise();
             } else if (command == 'SHOW') {
                 window.showAndRaise();
