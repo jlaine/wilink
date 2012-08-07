@@ -254,7 +254,11 @@ FocusScope {
                             console.log('Open chat with: ' + param);
                             var jid = param + '@wifirst.net';
                             var panel = swapper.findPanel('ChatPanel.qml');
-                            panel.showConversation(jid);
+                            if ( panel.hasSubscribed(jid) ) {
+                                panel.showConversation(jid);
+                            } else {
+                                // TODO
+                            }
                             break;
                         case 'chat_room':
                             console.log('Open chatroom: ' + param);

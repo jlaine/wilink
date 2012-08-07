@@ -156,6 +156,34 @@ Panel {
             chatPanel.state = 'no-sidebar';
     }
 
+    /** Convenience method to test whether a jid has been subscrided
+     */
+
+    function hasSubscribed(jid) {
+        for (var i = 0; i < chatClients.count; ++i) {
+            var client = chatClients.itemAt(i).client;
+            var domain = Utils.jidToDomain(client.jid);
+            if (domain == 'wifirst.net') {
+                var subscription = client.subscriptionType((Utils.jidToBareJid(jid)));
+                // FIXME: use QXmppRosterIq.SubscriptionType
+                // None = 0,   ///< the user does not have a subscription to the
+                //            ///< contact's presence information, and the contact does
+                //            ///< not have a subscription to the user's presence information
+                // From = 1,   ///< the contact has a subscription to the user's presence information,
+                //            ///< but the user does not have a subscription to the contact's presence information
+                // To = 2,     ///< the user has a subscription to the contact's presence information,
+                //            ///< but the contact does not have a subscription to the user's presence information
+                // Both = 3,   ///< both the user and the contact have subscriptions to each
+                //            ///< other's presence information
+                // Remove = 4, ///< to delete a roster item
+                // NotSet = 8  ///< the subscription state was not specified
+                if (subscription != 8)
+                    return true;
+            }
+        }
+        return false;
+    }
+
     Rectangle {
         id: sidebar
 
