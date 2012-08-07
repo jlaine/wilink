@@ -159,7 +159,7 @@ Panel {
     /** Convenience method to test whether a jid has been subscrided
      */
 
-    function hasSubscribed(jid) {
+    function hasSubscribedToJid(jid) {
         for (var i = 0; i < chatClients.count; ++i) {
             var client = chatClients.itemAt(i).client;
             var domain = Utils.jidToDomain(client.jid);

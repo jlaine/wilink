@@ -428,6 +428,21 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>Main</name>
+    <message>
+        <source>Chat failed</source>
+        <translation>Le tchat a échoué</translation>
+     </message>
+     <message>
+         <source>Sorry, but the chat session could not be started.</source>
+         <translation>Désolé, la session de tchat n&lapos;a pu être démarrée</translation>
+      </message>
+      <message>
+          <source>%1 is not a valid contact format</source>
+          <translation>%1 n&lapos;est pas un format de contact reconnu</translation>
+       </message>
+</context>
+<context>
     <name>NewsDialog</name>
     <message>
         <source>Add a bookmark</source>
@@ -591,7 +606,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>You can subscribe to the phone service at the following address:</source>
-        <translation>Vous pouvez vous abonner à une offre qui inclut la téléphonie à l&apos;adresse suivante :</translation>
+        <translation>Vous pouvez vous abonner à une offre qui inclut la téléphonie à l&apos;adresse suivante :</translation>
     </message>
     <message>
         <source>Call</source>
@@ -629,7 +644,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>Album name:</source>
-        <translation>Nom de l&apos;album :</translation>
+        <translation>Nom de l&apos;album :</translation>
     </message>
 </context>
 <context>
@@ -640,7 +655,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>Do you want to delete %1 from your photos?</source>
-        <translation>Souhaitez-vous supprimer %1 de vos photos ?</translation>
+        <translation>Souhaitez-vous supprimer %1 de vos photos ?</translation>
     </message>
 </context>
 <context>

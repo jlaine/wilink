@@ -251,14 +251,22 @@ FocusScope {
                             dialogSwapper.showPanel('AboutDialog.qml');
                             break;
                         case 'chat':
-                            console.log('Open chat with: ' + param);
                             var jid = param + '@wifirst.net';
-                            var panel = swapper.findPanel('ChatPanel.qml');
-                            if ( panel.hasSubscribed(jid) ) {
-                                panel.showConversation(jid);
-                            } else {
-                                // TODO
+                            if ( /^[^@/ ]+@[^@/ ]+$/.test(param) ) {
+                                console.log('Open chat with: ' + jid);
+                                var panel = swapper.findPanel('ChatPanel.qml');
+                                if ( panel.hasSubscribedToJid(jid) ) {
+                                    panel.showConversation(jid);
+                                } else {
+                                    // TODO
+                                }
+                            } else { // jid format is invalid
+                                dialogSwapper.showPanel('ErrorNotification.qml', {
+                                    title: qsTr('Chat failed'),
+                                    text: qsTr('Sorry, but the chat session could not be started.') + '\n\n' + qsTr('%1 is not a valid contact').replace('%1',jid),
+                                });
                             }
+
                             break;
                         case 'chat_room':
                             console.log('Open chatroom: ' + param);
