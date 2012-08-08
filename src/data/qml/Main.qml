@@ -255,10 +255,21 @@ FocusScope {
                             if ( /^[^@/ ]+@[^@/ ]+$/.test(jid) ) {
                                 console.log('Open chat with: ' + jid);
                                 var panel = swapper.findPanel('ChatPanel.qml');
-                                if ( panel.hasSubscribedWithWifirst(jid) ) {
-                                    panel.showConversation(jid);
-                                } else {
-                                    panel.addSubscriptionRequest(jid);
+                                if (panel) {
+                                    if (panel.wifirstRosterReceived) {
+                                        // Wifirst roster received
+                                        if (panel.hasSubscribedWithWifirst(jid)) {
+                                            console.log('Wifirst roster received, opening chat with ' + jid);
+                                            panel.showConversation(jid);
+                                        } else {
+                                            console.log('Wifirst roster received, sending subscribe request to ' + jid);
+                                            panel.addSubscriptionRequest(jid);
+                                        }
+                                    } else {
+                                        // Wifirst roster NOT received, postponing all actions
+                                        console.log('Postponing chat opening with ' + jid + ' to when Wifirst roster will have been received');
+                                        panel.conversationToOpen = jid;
+                                    }
                                 }
                             } else { // jid format is invalid
                                 dialogSwapper.showPanel('ErrorNotification.qml', {
@@ -273,7 +284,17 @@ FocusScope {
                             if ( /^[^@/ ]+@[^@/ ]+$/.test(jid) ) {
                                 console.log('Open chat room: ' + jid);
                                 var panel = swapper.findPanel('ChatPanel.qml');
-                                panel.showRoom(jid);
+                                if (panel) {
+                                    if (panel.wifirstRosterReceived) {
+                                        // Wifirst roster received
+                                        console.log('Wifirst roster received, opening room ' + jid);
+                                        panel.showRoom(jid);
+                                    } else {
+                                        // Wifirst roster NOT received, postponing all actions
+                                        console.log('Postponing room opening of ' + jid + ' to when Wifirst roster will have been received');
+                                        panel.roomToOpen = jid;
+                                    }
+                                }
                             } else {
                                 dialogSwapper.showPanel('ErrorNotification.qml', {
                                     title: qsTr('Chat failed'),

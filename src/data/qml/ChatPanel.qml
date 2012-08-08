@@ -27,6 +27,10 @@ Panel {
     property alias rooms: roomListModel
     property bool pendingMessages: (roomListModel.pendingMessages + rosterModel.pendingMessages) > 0
 
+    property string conversationToOpen
+    property string roomToOpen
+    property bool wifirstRosterReceived: false
+
     function isFacebook(jid) {
        return Utils.jidToDomain(jid) == 'chat.facebook.com';
     }
@@ -107,6 +111,25 @@ Panel {
                     }
 
                     dialogSwapper.showPanel('ContactAddNotification.qml', {jid: bareJid, rosterManager: item.client.rosterManager});
+                }
+
+                onRosterReceived: {
+                    if (Utils.jidToDomain(item.client.jid) == 'wifirst.net') {
+                        // Wifirst roster has been received
+                        chatPanel.wifirstRosterReceived = true;
+                        if (chatPanel.conversationToOpen != undefined && chatPanel.conversationToOpen != '' ) {
+                            var jid = chatPanel.conversationToOpen;
+                            if (chatPanel.hasSubscribedWithWifirst(jid))
+                                chatPanel.showConversation(jid);
+                            else
+                                chatPanel.addSubscriptionRequest(jid);
+                            chatPanel.conversationToOpen = '';
+                        }
+                        if (chatPanel.roomToOpen != undefined && chatPanel.roomToOpen != '' ) {
+                            chatPanel.showRoom(chatPanel.roomToOpen);
+                            chatPanel.roomToOpen = '';
+                        }
+                    }
                 }
             }
 
@@ -340,7 +363,6 @@ Panel {
         id: tabBox
 
         anchors.top: parent.top
-        //anchors.topMargin: appStyle.margin.normal
         anchors.left: chatPanel.singlePanel ? parent.left : sidebar.right
         anchors.right: parent.right
         gradient: Gradient {
