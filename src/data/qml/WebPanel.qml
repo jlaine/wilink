@@ -150,27 +150,8 @@ Panel {
                 js += "f.login.value = '" + account.username + "';\n";
                 js += "f.password.value = '" + account.password + "';\n";
                 js += "f.submit();";
-                tabSwapper.addPanel('WebTab.qml', {url: 'https://apps.wifirst.net/', urlBar: false, loadScript: js}, true)
-            } else if (account.type == 'web' && account.realm == 'www.google.com') {
-                var js = "var f = document.getElementById('gaia_loginform');\n";
-                js += "f.Email.value = '" + account.username + "';\n";
-                js += "f.Passwd.value = '" + account.password + "';\n";
-                js += "f.submit();";
-                tabSwapper.addPanel('WebTab.qml', {url: 'https://mail.google.com/mail/', loadScript: js}, true)
+                tabSwapper.addPanel('WebTab.qml', {url: 'http://apps.wifirst.dev/wilink/embedded', urlBar: false, loadScript: js}, true)
             }
-        }
-    }
-
-    Keys.onPressed: {
-        if (event.modifiers == Qt.ControlModifier && event.key == Qt.Key_T) {
-            tabSwapper.addPanel('WebTab.qml', {}, true);
-        } else if (event.modifiers == Qt.ControlModifier && event.key == Qt.Key_W) {
-            if (tabSwapper.model.count > 1)
-                tabSwapper.model.get(tabSwapper.currentIndex).panel.close();
-        } else if ((event.modifiers  & Qt.ControlModifier) && (event.modifiers & Qt.AltModifier) && event.key == Qt.Key_Left) {
-            tabSwapper.decrementCurrentIndex();
-        } else if ((event.modifiers  & Qt.ControlModifier) && (event.modifiers & Qt.AltModifier) && event.key == Qt.Key_Right) {
-            tabSwapper.incrementCurrentIndex();
         }
     }
 }
