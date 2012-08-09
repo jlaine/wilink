@@ -29,6 +29,8 @@
     <file>qml/DiagnosticPanel.qml</file>
     <file>qml/DiagnosticPlugin.qml</file>
     <file>qml/Dialog.qml</file>
+    <file>qml/Directory.qml</file>
+    <file>qml/DirectoryXmlModel.qml</file>
     <file>qml/DiscoveryPanel.qml</file>
     <file>qml/Dock.qml</file>
     <file>qml/DockButton.qml</file>

@@ -27,6 +27,8 @@ DebugPlugin 1.0 DebugPlugin.qml
 DiagnosticPanel 1.0 DiagnosticPanel.qml
 DiagnosticPlugin 1.0 DiagnosticPlugin.qml
 Dialog 1.0 Dialog.qml
+Directory 1.0 Directory.qml
+DirectoryXmlModel 1.0 DirectoryXmlModel.qml
 DiscoveryPanel 1.0 DiscoveryPanel.qml
 Dock 1.0 Dock.qml
 DockButton 1.0 DockButton.qml

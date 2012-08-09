@@ -150,7 +150,7 @@ Panel {
                 js += "f.login.value = '" + account.username + "';\n";
                 js += "f.password.value = '" + account.password + "';\n";
                 js += "f.submit();";
-                tabSwapper.addPanel('WebTab.qml', {url: 'http://apps.wifirst.dev/wilink/embedded', urlBar: false, loadScript: js}, true)
+                tabSwapper.addPanel('WebTab.qml', {url: appSettings.wifirstBaseUrl + '/wilink/embedded', urlBar: false, loadScript: js}, true)
             }
         }
     }
