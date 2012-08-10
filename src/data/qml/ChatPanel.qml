@@ -26,9 +26,7 @@ Panel {
 
     property alias rooms: roomListModel
     property bool pendingMessages: (roomListModel.pendingMessages + rosterModel.pendingMessages) > 0
-
     property variant delayedOpening: {}
-
     property bool wifirstRosterReceived: false
 
     function isFacebook(jid) {

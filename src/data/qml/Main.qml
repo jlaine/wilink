@@ -84,7 +84,7 @@ FocusScope {
     ApplicationSettings {
         id: appSettings
 
-        property string wifirstBaseUrl: 'https://apps-dev.wifirst.net'
+        property string wifirstBaseUrl: 'https://apps.wifirst.net'
     }
 
     SoundPlayer {

@@ -29,7 +29,6 @@
     <file>qml/DiagnosticPanel.qml</file>
     <file>qml/DiagnosticPlugin.qml</file>
     <file>qml/Dialog.qml</file>
-    <file>qml/Directory.qml</file>
     <file>qml/DirectoryXmlModel.qml</file>
     <file>qml/DiscoveryPanel.qml</file>
     <file>qml/Dock.qml</file>
@@ -40,12 +39,15 @@
     <file>qml/GroupBox.qml</file>
     <file>qml/Highlight.qml</file>
     <file>qml/HistoryView.qml</file>
+    <file>qml/HomePage.qml</file>
     <file>qml/Icon.qml</file>
     <file>qml/InputBar.qml</file>
     <file>qml/InputDialog.qml</file>
     <file>qml/InputMenu.qml</file>
     <file>qml/KeyPad.qml</file>
     <file>qml/Label.qml</file>
+    <file>qml/LandingPagePanel.qml</file>
+    <file>qml/LandingPagePlugin.qml</file>
     <file>qml/LogPanel.qml</file>
     <file>qml/Main.qml</file>
     <file>qml/MeegoMain.qml</file>
@@ -111,6 +113,7 @@
     <file>qml/boot.qml</file>
     <file>qml/fonts/fontawesome-webfont.ttf</file>
     <file>qml/i18n/fr.qm</file>
+    <file>qml/images/logo_header.png</file>
     <file>qml/images/shadow.png</file>
     <file>qml/scripts/sip.js</file>
     <file>qml/scripts/storage.js</file>

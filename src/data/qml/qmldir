@@ -27,7 +27,6 @@ DebugPlugin 1.0 DebugPlugin.qml
 DiagnosticPanel 1.0 DiagnosticPanel.qml
 DiagnosticPlugin 1.0 DiagnosticPlugin.qml
 Dialog 1.0 Dialog.qml
-Directory 1.0 Directory.qml
 DirectoryXmlModel 1.0 DirectoryXmlModel.qml
 DiscoveryPanel 1.0 DiscoveryPanel.qml
 Dock 1.0 Dock.qml
@@ -38,12 +37,15 @@ GeneralPreferencePanel 1.0 GeneralPreferencePanel.qml
 GroupBox 1.0 GroupBox.qml
 Highlight 1.0 Highlight.qml
 HistoryView 1.0 HistoryView.qml
+HomePage 1.0 HomePage.qml
 Icon 1.0 Icon.qml
 InputBar 1.0 InputBar.qml
 InputDialog 1.0 InputDialog.qml
 InputMenu 1.0 InputMenu.qml
 KeyPad 1.0 KeyPad.qml
 Label 1.0 Label.qml
+LandingPagePanel 1.0 LandingPagePanel.qml
+LandingPagePlugin 1.0 LandingPagePlugin.qml
 LogPanel 1.0 LogPanel.qml
 Main 1.0 Main.qml
 MeegoMain 1.0 MeegoMain.qml

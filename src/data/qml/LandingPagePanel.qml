@@ -43,7 +43,29 @@ Panel {
                 break;
              }
         }
+        var js = "var f = document.getElementsByTagName('form')[0];\n";
+        js += "f.login.value = '" + panel.webUsername + "';\n";
+        js += "f.password.value = '" + panel.webPassword + "';\n";
+        js += "f.submit();";
 
-        landingSwapper.showPanel('Directory.qml', {panelSwapper: landingSwapper});
+        /**
+         * TODO
+         *
+         * At startup, HomePage should be displayed
+         *
+         * onAuthenticationFailed with Facebook, a web tab with https://apps.wifirst.net/wilink/embedded?invalid_facebook_permission=true
+         * should be loaded
+         */
+
+        // TODO: find a way to load this in background so that authentication can be performed and cookie obtained
+        // landingSwapper.addPanel('WebTab.qml', {url: 'https://selfcare.wifirst.net', urlBar: false, loadScript: js}, true);
+
+        // TODO
+        // load the following at startup
+        landingSwapper.showPanel('HomePage.qml', {panelSwapper: landingSwapper});
+
+        // TODO
+        // hook the following with the onAuthenticationFailed for the facebook client
+        // landingSwapper.showPanel('WebTab.qml', {url: appSettings.wifirstBaseUrl + '/wilink/embedded/?invalid_facebook_permission=true', urlBar: false, loadScript: js}, true)
     }
 }
