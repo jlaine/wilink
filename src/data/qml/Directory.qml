@@ -18,55 +18,247 @@
  */
 
 import QtQuick 1.1
+import wiLink 2.4
+import 'scripts/utils.js' as Utils
 
-Item {
+Panel {
     id: directory
 
-    GridView {
-        id: directoryGrid
+    property QtObject panelSwapper
 
-        cacheBuffer: 1000
-        height: parent.height
-        cellWidth: 120
-        cellHeight: 120
-        width: parent.width
-        model: directoryXml
-        delegate: directoryDelegate
+//    Image {
+//        source: 'images/landing_bg_directory.jpg'
+//        anchors.fill: parent
+//        fillMode: Image.PreserveAspectCrop
+//        smooth: true
+//    }
+
+    Rectangle {
+        color: '#F6F6F6'
+        //color: '#333'
+        //color: 'white'
+        anchors.fill: parent
+    }
+
+    VCard {
+        id: vcard
+    }
+
+    Column {
+        id: main
+
+        spacing: 8
+        anchors.fill: directory
+
+        Item {
+            id: header
+
+            height: 50
+            anchors.left: parent.left
+            anchors.right: parent.right
+
+            Rectangle {
+                id: headerBackground
+                anchors.fill: parent
+                color: '#879fbd'
+            }
+
+            Text {
+                horizontalAlignment: Text.AlignLeft
+                text: qsTr('Welcome %1').replace('%1', vcard.name);
+                color: 'white'
+                font.pixelSize: 20
+                anchors.left: parent.left
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.leftMargin: appStyle.margin.large
+            }
+
+            Button {
+                id: button
+
+                width: 200
+                height: 30
+                text: 'zob'
+                anchors.top: header.top
+                anchors.horizontalCenter: header.horizontalCenter
+                anchors.margins: 10
+                onClicked: {
+                    console.log(vcard.name);
+                    directoryXml.reload();
+                }
+            }
+
+            Image {
+                source: 'images/logo_header.png'
+                anchors.right: parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.rightMargin: appStyle.margin.large
+            }
+        }
+
+//        ScrollBar {
+//            id: scrollBar
+
+//            anchors.top: header.bottom
+//            anchors.bottom: footer.top
+//            anchors.right: parent.right
+//            anchors.left: container.right
+//            flickableItem: container.grid
+//        }
+
+        Item {
+            id: container
+
+            property alias grid: directoryGrid
+            anchors.left: parent.left
+            //anchors.right: scrollBar.left
+            anchors.right: parent.right
+
+            anchors.top: header.bottom
+            anchors.bottom: footer.top
+            anchors.margins: appStyle.margin.large
+
+            Item {
+                id: paragraph
+
+                anchors.top: parent.top
+                anchors.right: parent.right
+                anchors.left: parent.left
+                height: 100
+
+                Text {
+                    id: message
+                    horizontalAlignment: Text.Right
+                    verticalAlignment: Text.AlignVCenter
+                    font.pixelSize: 24
+                    text: "Annuaire"
+                    color: '#858585'
+                    anchors.fill: parent
+                }
+            }
+
+            GridView {
+                id: directoryGrid
+
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.top: paragraph.bottom
+                anchors.bottom: container.bottom
+                cacheBuffer: 1000
+                cellWidth: 140
+                cellHeight: 150
+                model: directoryXml
+                delegate: directoryDelegate
+            }
+        }
+
+        Item {
+            id: footer
+
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.bottom: parent.bottom
+            height: 40
+
+            Rectangle {
+                id: footerBackground
+                color: 'transparent'
+                anchors.fill: parent
+                Text {
+                    text: 'lorem ipsum zob'
+                    width: parent.width
+                    anchors.margins: appStyle.margin.normal
+                    horizontalAlignment: Text.AlignRight
+                    color: 'white'
+                }
+            }
+        }
     }
 
     DirectoryXmlModel {
         id: directoryXml
 
-        query: '/wilink/directory'
+        query: '/objects/object'
 
         XmlRole { name: 'name'; query: 'name/string()' }
-        XmlRole { name: 'jabber_id'; query: 'jabber_id/string()' }
-        XmlRole { name: 'avatar_url'; query: 'avatar_url/string()' }
+        XmlRole { name: 'jabber_id'; query: 'jabber-id/string()' }
+        XmlRole { name: 'avatar_url'; query: 'avatar-url/string()' }
         XmlRole { name: 'gender'; query: 'gender/string()' }
         XmlRole { name: 'birthday'; query: 'birthday/string()' }
         XmlRole { name: 'hometown'; query: 'hometown/string()' }
-        XmlRole { name: 'first_name'; query: 'first_name/string()' }
-        XmlRole { name: 'last_name'; query: 'last_name/string()' }
-        XmlRole { name: 'interested_in'; query: 'interested_in/array()' }
-        XmlRole { name: 'relationship_status'; query: 'relationship_status/string()' }
+        XmlRole { name: 'first_name'; query: 'first-name/string()' }
+        XmlRole { name: 'last_name'; query: 'last-name/string()' }
+        XmlRole { name: 'relationship_status'; query: 'relationship-status/string()' }
+    }
+
+    Component.onCompleted: {
+        directoryXml.url =  appSettings.wifirstBaseUrl + '/wilink/directory';
+        directoryXml.username = panelSwapper.parent.webUsername;
+        directoryXml.password = panelSwapper.parent.webPassword;
+        directoryXml.reload();
     }
 
     Component {
         id: directoryDelegate
 
-        Image {
-            id: avatar
+        Item {
+            id: rect
 
-            anchors.top: parent.top
-            anchors.horizontalCenter: parent.horizontalCenter
-            source: appSettings.wifirstBaseUrl + avatar_url
-            width: 120
-            height: 120
-        }
+            width: directoryGrid.cellWidth - 5
+            height: directoryGrid.cellHeight - 5
 
-        Text {
-            anchors.top: avatar.top
-            text: name
+            Column {
+                id: person
+                anchors.horizontalCenter: rect.horizontalCenter
+                anchors.verticalCenter: rect.verticalCenter
+
+                Image {
+                    id: avatar
+                    source: appSettings.wifirstBaseUrl + avatar_url
+                    width: 120
+                    height: 120
+                }
+
+                Text {
+                    id: label
+                    text: name
+                    color: '#c7c7c7'
+                    opacity: 0
+                }
+            }
+
+            MouseArea {
+                hoverEnabled: true
+                anchors.fill: person
+                onClicked: {
+                    var jid = jabber_id;
+                    var nickname = name;
+                    var panel = swapper.findPanel('ChatPanel.qml');
+                    if (panel) {
+                        console.log(vcard.name);
+                        if (panel.wifirstRosterReceived) {
+                            // Wifirst roster received
+                            if (panel.hasSubscribedWithWifirst(jid)) {
+                                console.log('Wifirst roster received, opening chat with ' + jid);
+                                panel.showConversation(jid);
+                            } else {
+                                console.log('Wifirst roster received, sending subscribe request to ' + jid);
+                                panel.addSubscriptionRequest(jid, nickname);
+                            }
+                        } else {
+                            // Wifirst roster NOT received, postponing all actions
+                            console.log('Postponing chat opening with ' + jid + ' to when Wifirst roster will have been received');
+                            panel.delayedOpening = {action: 'open_conversation', jid: jid, nickname: nickname};
+                        }
+                    }
+                }
+                onEntered: {
+                    label.opacity = 1;
+                }
+                onExited: {
+                    label.opacity = 0;
+                }
+            }
         }
     }
 }

@@ -36,7 +36,7 @@ XmlListModel {
                     console.log("DirectoryXmlModel failed to load " + xmlModel.url + ": " + xhr.status + "/" + xhr.statusText);
                 }
             }
-        };
+        }
         xhr.open('GET', xmlModel.url, true, xmlModel.username, xmlModel.password);
         xhr.setRequestHeader('Accept', 'application/xml');
         xhr.send();

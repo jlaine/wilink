@@ -84,7 +84,6 @@ FocusScope {
     ApplicationSettings {
         id: appSettings
 
-        //property string wifirstBaseUrl: "http://apps.wifirst.dev"
         property string wifirstBaseUrl: 'https://apps-dev.wifirst.net'
     }
 

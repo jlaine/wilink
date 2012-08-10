@@ -323,6 +323,14 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>Directory</name>
+    <message>
+        <source>Welcome %1</source>
+        <translation>Bienvenue %1</translation>
+    </message>
+</context>
+</context>
+<context>
     <name>DiscoveryPanel</name>
     <message>
         <source>Go back</source>
