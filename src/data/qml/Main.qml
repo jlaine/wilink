@@ -20,6 +20,7 @@
 import QtQuick 1.1
 import wiLink 2.4
 import 'scripts/storage.js' as Storage
+import 'scripts/utils.js' as Utils
 
 FocusScope {
     id: root
@@ -83,7 +84,8 @@ FocusScope {
     ApplicationSettings {
         id: appSettings
 
-        property string wifirstBaseUrl: "http://apps.wifirst.dev"
+        //property string wifirstBaseUrl: "http://apps.wifirst.dev"
+        property string wifirstBaseUrl: 'https://apps-dev.wifirst.net'
     }
 
     SoundPlayer {
@@ -240,20 +242,23 @@ FocusScope {
             var bits = message.split(' ');
             var command = bits[0];
             if (command == 'OPEN') {
-                var argv = bits[1].split('wilink://');
-                if (argv.length == 2) {
-                    // Received a well formed wilink://verb/param command
-                    argv = argv[1].split('/');
-                    var verb = argv[0];
-                    var param = "";
-                    if (argv.length >= 2)
-                        param = argv[1];
+                var args = Utils.parseWilinkURI(bits[1]);
+                var verb = args.verb;
+                if (verb) {
+                    // Received a well formed wilink://verb?param1=value1&param2=value2... command
+                    var params = args.params;
                     switch (verb) {
                         case 'about':
                             dialogSwapper.showPanel('AboutDialog.qml');
                             break;
                         case 'chat':
-                            var jid = param + '@wifirst.net';
+                            // Accepts the following params
+                            //  * jid
+                            //  * nickname
+                            //
+                            // Ex: wilink://chat?jid=90210-001&nickname=pinton
+                            //
+                            var jid = params.jid + '@wifirst.net';
                             if ( /^[^@/ ]+@[^@/ ]+$/.test(jid) ) {
                                 console.log('Open chat with: ' + jid);
                                 var panel = swapper.findPanel('ChatPanel.qml');
@@ -265,12 +270,12 @@ FocusScope {
                                             panel.showConversation(jid);
                                         } else {
                                             console.log('Wifirst roster received, sending subscribe request to ' + jid);
-                                            panel.addSubscriptionRequest(jid);
+                                            panel.addSubscriptionRequest(jid, params.nickname);
                                         }
                                     } else {
                                         // Wifirst roster NOT received, postponing all actions
                                         console.log('Postponing chat opening with ' + jid + ' to when Wifirst roster will have been received');
-                                        panel.conversationToOpen = jid;
+                                        panel.delayedOpening = {action: 'open_conversation', jid: jid, nickname: nickname};
                                     }
                                 }
                             } else { // jid format is invalid
@@ -282,7 +287,7 @@ FocusScope {
 
                             break;
                         case 'chat_room':
-                            var jid = param + '@conference.wifirst.net';
+                            var jid = params.jid + '@conference.wifirst.net';
                             if ( /^[^@/ ]+@[^@/ ]+$/.test(jid) ) {
                                 console.log('Open chat room: ' + jid);
                                 var panel = swapper.findPanel('ChatPanel.qml');
@@ -294,7 +299,7 @@ FocusScope {
                                     } else {
                                         // Wifirst roster NOT received, postponing all actions
                                         console.log('Postponing room opening of ' + jid + ' to when Wifirst roster will have been received');
-                                        panel.roomToOpen = jid;
+                                        panel.delayedOpening = {action: 'open_room', jid: jid};
                                     }
                                 }
                             } else {

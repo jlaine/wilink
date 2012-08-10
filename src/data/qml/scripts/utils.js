@@ -158,3 +158,26 @@ function getSocialIcon(email) {
     }
     return result;
 }
+
+function parseWilinkURI(uri) {
+    // ex: wilink://verb?param1=value1&param2=value2
+    var result = {verb: null, params: {}};
+    if ( (uri == undefined) || (uri == null) || (uri.length == 0) )
+        return result;
+    var argv = decodeURIComponent(uri).split('wilink://');
+    if (argv.length == 2) {
+        argv = argv[1].split('?');
+        result.verb = argv[0];
+        if (argv.length >=2) {
+            var params = argv[1].split('&');
+            var keyval = [];
+            for (var i=0 ; i < params.length ; i++) {
+                keyval = params[i].split("=");
+                if (keyval.length == 2) {
+                    result.params[keyval[0]] = keyval[1];
+                }
+            }
+        }
+    }
+    return result;
+}

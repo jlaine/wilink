@@ -27,8 +27,8 @@ Panel {
     property alias rooms: roomListModel
     property bool pendingMessages: (roomListModel.pendingMessages + rosterModel.pendingMessages) > 0
 
-    property string conversationToOpen
-    property string roomToOpen
+    property variant delayedOpening: {}
+
     property bool wifirstRosterReceived: false
 
     function isFacebook(jid) {
@@ -117,18 +117,19 @@ Panel {
                     if (Utils.jidToDomain(item.client.jid) == 'wifirst.net') {
                         // Wifirst roster has been received
                         chatPanel.wifirstRosterReceived = true;
-                        if (chatPanel.conversationToOpen != undefined && chatPanel.conversationToOpen != '' ) {
-                            var jid = chatPanel.conversationToOpen;
+                        switch (chatPanel.delayedOpening.action) {
+                        case 'open_conversation':
+                            var jid = chatPanel.delayedOpening.jid;
                             if (chatPanel.hasSubscribedWithWifirst(jid))
                                 chatPanel.showConversation(jid);
                             else
                                 chatPanel.addSubscriptionRequest(jid);
-                            chatPanel.conversationToOpen = '';
+                            break;
+                        case 'open_room':
+                            chatPanel.showRoom(chatPanel.delayedOpening.jid);
+                            break;
                         }
-                        if (chatPanel.roomToOpen != undefined && chatPanel.roomToOpen != '' ) {
-                            chatPanel.showRoom(chatPanel.roomToOpen);
-                            chatPanel.roomToOpen = '';
-                        }
+                        chatPanel.delayedOpening = {};
                     }
                 }
             }
@@ -209,14 +210,17 @@ Panel {
 
     /** Convenience method to send a subscription request for wifirst.net
      */
-    function addSubscriptionRequest(jid) {
+    function addSubscriptionRequest(jid, nickname) {
         for (var i = 0; i < chatClients.count; ++i) {
             var client = chatClients.itemAt(i).client;
             var domain = Utils.jidToDomain(client.jid);
             if (domain == 'wifirst.net')
                 break;
         }
-        dialogSwapper.showPanel('ContactSendSubscriptionDialog.qml', {jid: jid, client: client});
+        if (nickname == undefined) {
+            nickname = jid;
+        }
+        dialogSwapper.showPanel('ContactSendSubscriptionDialog.qml', {jid: jid, nickname: nickname, client: client});
     }
 
     Rectangle {
