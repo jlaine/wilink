@@ -47,6 +47,7 @@ Label 1.0 Label.qml
 LandingPagePanel 1.0 LandingPagePanel.qml
 LandingPagePlugin 1.0 LandingPagePlugin.qml
 LogPanel 1.0 LogPanel.qml
+Login 1.0 Login.qml
 Main 1.0 Main.qml
 MeegoMain 1.0 MeegoMain.qml
 Menu 1.0 Menu.qml

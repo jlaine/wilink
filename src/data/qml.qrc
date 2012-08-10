@@ -49,6 +49,7 @@
     <file>qml/LandingPagePanel.qml</file>
     <file>qml/LandingPagePlugin.qml</file>
     <file>qml/LogPanel.qml</file>
+    <file>qml/Login.qml</file>
     <file>qml/Main.qml</file>
     <file>qml/MeegoMain.qml</file>
     <file>qml/Menu.qml</file>

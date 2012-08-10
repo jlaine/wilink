@@ -50,6 +50,7 @@ FocusScope {
             if (accountModel.count) {
                 appPlugins.load();
             } else {
+                swapper.showPanel('Login.qml');
                 dialogSwapper.showPanel('SetupDialog.qml');
             }
         }
