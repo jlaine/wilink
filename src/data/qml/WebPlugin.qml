@@ -23,7 +23,7 @@ import 'scripts/utils.js' as Utils
 Plugin {
     name: qsTr('Web')
     description: qsTr('This plugin allows you to access the web.')
-    iconStyle: 'icon-home'
+    iconStyle: 'icon-globe'
 
     onLoaded: {
         dock.model.add({
