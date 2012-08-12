@@ -67,5 +67,9 @@ Panel {
         // TODO
         // hook the following with the onAuthenticationFailed for the facebook client
         // landingSwapper.showPanel('WebTab.qml', {url: appSettings.wifirstBaseUrl + '/wilink/embedded/?invalid_facebook_permission=true', urlBar: false, loadScript: js}, true)
+
+        // TODO
+        // hook the following with the 'I am lost' button
+        // landingSwapper.showPanel('WebTab.qml', {url: appSettings.wifirstBaseUrl + '/wilink/embedded/?help=true', urlBar: false, loadScript: js}, true)
     }
 }
