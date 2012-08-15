@@ -51,7 +51,7 @@ ScrollView {
             Label {
                 anchors.left: parent.left
                 anchors.right: parent.right
-                color: moderator ? '#ff6500' : '#2689d6'
+                color: item.ListView.isCurrentItem ? 'white' : (moderator ? '#ff6500' : '#2689d6')
                 elide: Text.ElideRight
                 horizontalAlignment: Text.AlignHCenter
                 font.pixelSize: appStyle.font.smallSize
