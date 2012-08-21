@@ -47,7 +47,7 @@ Item {
         anchors.left: parent.left
         anchors.leftMargin: appStyle.margin.normal
         anchors.verticalCenter: parent.verticalCenter
-        iconStyle: (Qt.isQtObject(job) && job.direction == QXmppTransferJob.OutgoingDirection) ? 'icon-upload' : 'icon-download'
+        style: (Qt.isQtObject(job) && job.direction == QXmppTransferJob.OutgoingDirection) ? 'icon-upload' : 'icon-download'
     }
 
     ProgressBar {
