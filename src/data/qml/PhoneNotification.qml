@@ -31,6 +31,23 @@ NotificationDialog {
     text: qsTr('%1 wants to talk to you.\n\nDo you accept?').replace('%1', caller)
     title: qsTr('Call from %1').replace('%1', caller)
 
+    resources: [
+        SoundLoader {
+            id: soundLoader
+
+            repeat: true
+            source: 'sounds/call-incoming.ogg'
+            Component.onCompleted: soundLoader.start()
+        },
+        Connections {
+            target: call
+            onFinished: {
+                call.destroyLater();
+                dialog.close();
+            }
+        }
+    ]
+
     onAccepted: {
         swapper.showPanel('PhonePanel.qml');
         dialog.call.accept();
@@ -40,22 +57,6 @@ NotificationDialog {
     onRejected: {
         dialog.call.hangup();
         dialog.call.destroyLater();
-    }
-
-    SoundLoader {
-        id: soundLoader
-
-        repeat: true
-        source: 'sounds/call-incoming.ogg'
-        Component.onCompleted: soundLoader.start()
-    }
-
-    Connections {
-        target: call
-        onFinished: {
-            call.destroyLater();
-            dialog.close();
-        }
     }
 }
 

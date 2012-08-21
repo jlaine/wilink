@@ -35,6 +35,17 @@ NotificationDialog {
             id: vcard
 
             jid: Qt.isQtObject(call) ? call.jid : ''
+        },
+        SoundLoader {
+            id: soundLoader
+
+            repeat: true
+            source: 'sounds/call-incoming.ogg'
+            Component.onCompleted: soundLoader.start()
+        },
+        Connections {
+            target: call
+            onFinished: dialog.close()
         }
     ]
 
@@ -46,19 +57,6 @@ NotificationDialog {
 
     onRejected: {
         dialog.call.hangup();
-    }
-
-    SoundLoader {
-        id: soundLoader
-
-        repeat: true
-        source: 'sounds/call-incoming.ogg'
-        Component.onCompleted: soundLoader.start()
-    }
-
-    Connections {
-        target: call
-        onFinished: dialog.close()
     }
 }
 

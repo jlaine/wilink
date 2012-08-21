@@ -35,6 +35,10 @@ NotificationDialog {
         VCard {
             id: vcard
             jid: Qt.isQtObject(job) ? job.jid : ''
+        },
+        Connections {
+            target: job
+            onStateChanged: dialog.close()
         }
     ]
 
@@ -49,10 +53,5 @@ NotificationDialog {
     }
 
     onRejected: job.abort()
-
-    Connections {
-        target: job
-        onStateChanged: dialog.close()
-    }
 }
 
