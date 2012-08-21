@@ -81,14 +81,17 @@ Panel {
 
             onCallStarted: {
                 if (Utils.jidToBareJid(call.jid) == conversation.jid) {
+                    // NOTE: for some reason, if we don't store the call in a local
+                    // variable, finishCreation seems to receive an incomplete call
+                    // object.
+                    var currentCall = call;
                     var component = Qt.createComponent('CallWidget.qml');
 
                     function finishCreation() {
                         if (component.status != Component.Ready)
                             return;
 
-                        var widget = component.createObject(widgetBar);
-                        widget.call = call;
+                        component.createObject(widgetBar, {call: currentCall});
                     }
 
                     if (component.status == Component.Loading)
@@ -107,14 +110,17 @@ Panel {
 
             onJobStarted: {
                 if (Utils.jidToBareJid(job.jid) == conversation.jid) {
+                    // NOTE: for some reason, if we don't store the job in a local
+                    // variable, finishCreation seems to receive an incomplete job
+                    // object.
+                    var currentJob = job;
                     var component = Qt.createComponent('TransferWidget.qml');
 
                     function finishCreation() {
                         if (component.status != Component.Ready)
                             return;
 
-                        var widget = component.createObject(widgetBar);
-                        widget.job = job;
+                        component.createObject(widgetBar, {job: currentJob});
                     }
 
                     if (component.status == Component.Loading)
