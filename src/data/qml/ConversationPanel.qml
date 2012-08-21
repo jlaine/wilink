@@ -70,6 +70,7 @@ Panel {
         anchors.topMargin: appStyle.margin.large
         anchors.left: parent.left
         anchors.right: parent.right
+        spacing: 2
         z: 1
 
         /** Call widget.

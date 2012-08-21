@@ -39,6 +39,7 @@ Item {
             GradientStop { position: 0; color: '#e7effd' }
             GradientStop { position: 1; color: '#cbdaf1' }
         }
+        smooth: true
     }
 
     Icon {

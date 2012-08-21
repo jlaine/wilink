@@ -62,6 +62,7 @@ Item {
             GradientStop { position: 0; color: '#e7effd' }
             GradientStop { position: 1; color: '#cbdaf1' }
         }
+        smooth: true
 
         Label {
             id: status
@@ -123,6 +124,7 @@ Item {
             border.color: background.border.color
             border.width: background.border.width
             gradient: background.gradient
+            smooth: true
         }
 
         Row {
