@@ -154,4 +154,17 @@ Panel {
             }
         }
     }
+
+    Keys.onPressed: {
+        if (event.modifiers == Qt.ControlModifier && event.key == Qt.Key_T) {
+            tabSwapper.addPanel('WebTab.qml', {}, true);
+        } else if (event.modifiers == Qt.ControlModifier && event.key == Qt.Key_W) {
+            if (tabSwapper.model.count > 1)
+                tabSwapper.model.get(tabSwapper.currentIndex).panel.close();
+        } else if ((event.modifiers  & Qt.ControlModifier) && (event.modifiers & Qt.AltModifier) && event.key == Qt.Key_Left) {
+            tabSwapper.decrementCurrentIndex();
+        } else if ((event.modifiers  & Qt.ControlModifier) && (event.modifiers & Qt.AltModifier) && event.key == Qt.Key_Right) {
+            tabSwapper.incrementCurrentIndex();
+        }
+    }
 }
