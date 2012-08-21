@@ -72,6 +72,8 @@ QString SystemInfo::osVersion()
         return QString::fromLatin1("10.5");
     case QSysInfo::MV_10_6:
         return QString::fromLatin1("10.6");
+    case QSysInfo::MV_10_7:
+        return QString::fromLatin1("10.7");
     default:
         return QString();
     }

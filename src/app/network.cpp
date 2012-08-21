@@ -91,6 +91,9 @@ QString NetworkAccessManager::userAgent()
         case QSysInfo::MV_10_6:
             osDetails += QLatin1String("; Mac OS X 10.6");
             break;
+        case QSysInfo::MV_10_7:
+            osDetails += QLatin1String("; Mac OS X 10.7");
+            break;
         }
 #elif defined(Q_OS_SYMBIAN)
         osDetails = QLatin1String("Symbian");
