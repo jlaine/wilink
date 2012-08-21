@@ -60,19 +60,6 @@ Panel {
         onJidChanged: {
             conversation.client = accountModel.clientForJid(jid);
         }
-
-        onRemoteStateChanged: {
-            switch (remoteState) {
-                case QXmppMessage.Composing:
-                    historyView.composing('composing');
-                    break;
-                case QXmppMessage.Paused:
-                    historyView.composing('paused');
-                    break;
-                default:
-                    historyView.composing('gone');
-            }
-        }
     }
 
     Column {
@@ -141,71 +128,63 @@ Panel {
     HistoryView {
         id: historyView
 
-        property real footerOpacity: 0
-        property int footerHeight: 0
-        property string footerIcon: 'icon-comment-alt'
-
         anchors.top: widgetBar.bottom
         anchors.bottom: chatInput.top
         anchors.left: parent.left
         anchors.right: parent.right
         model: conversation.historyModel
 
-        signal composing(string remoteState)
-
         onParticipantClicked: chatInput.talkAt(participant)
 
-        onComposing: {
-            state = remoteState;
-            view.positionViewAtEnd();
-        }
-
-        state: 'gone'
-        states: [
-            State { name: 'composing'
-                    PropertyChanges { target: historyView; footerOpacity: 1; footerHeight: 48; footerIcon:'icon-comment-alt' }
-            },
-            State { name: 'paused'
-                    PropertyChanges { target: historyView; footerOpacity: 0.7; footerHeight: 48; footerIcon:'icon-cloud' }
-            },
-            State { name: 'gone'
-                    PropertyChanges { target: historyView; footerOpacity: 0; footerHeight: 0; footerIcon:'icon-comment-alt' }
-            }
-        ]
-
         historyFooter: Rectangle {
-                id: footer
+            id: footer
 
-                width: parent.width - 16
-                anchors.horizontalCenter: parent.horizontalCenter
-                opacity: footerOpacity
-                height: footerHeight
+            property alias iconStyle: icon.style
 
-                Image {
-                    id: avatar
+            anchors.horizontalCenter: parent.horizontalCenter
+            opacity: 0
+            height: 0
+            width: parent.width - 16
 
-                    anchors.bottom: parent.bottom
-                    anchors.bottomMargin: 6
-                    asynchronous: true
-                    source: vcard.avatar
-                    sourceSize.height: appStyle.icon.normalSize
-                    sourceSize.width: appStyle.icon.normalSize
-                    height: appStyle.icon.normalSize
-                    width: appStyle.icon.normalSize
+            Image {
+                id: avatar
 
-                    Icon {
-                        style: footerIcon
-                        size: 20
-                        color: '#333'
-                        opacity: 0.5
-                        anchors.top: parent.top
-                        anchors.topMargin: -5
-                        anchors.left: parent.right
-                        anchors.leftMargin: 10
-                    }
+                anchors.bottom: parent.bottom
+                anchors.bottomMargin: 6
+                asynchronous: true
+                source: vcard.avatar
+                sourceSize.height: appStyle.icon.normalSize
+                sourceSize.width: appStyle.icon.normalSize
+                height: appStyle.icon.normalSize
+                width: appStyle.icon.normalSize
+
+                Icon {
+                    id: icon
+
+                    size: 20
+                    color: '#333'
+                    opacity: 0.5
+                    anchors.top: parent.top
+                    anchors.topMargin: -5
+                    anchors.left: parent.right
+                    anchors.leftMargin: 10
                 }
-
             }
+
+            states: [
+                State {
+                    name: 'composing'
+                    when: conversation.remoteState == QXmppMessage.Composing
+                    PropertyChanges { target: footer; opacity: 1; height: 48; iconStyle: 'icon-comment-alt' }
+                    StateChangeScript { script: view.positionViewAtEnd() }
+                },
+                State {
+                    name: 'paused'
+                    when: conversation.remoteState == QXmppMessage.Paused
+                    PropertyChanges { target: footer; opacity: 0.7; height: 48; iconStyle: 'icon-cloud' }
+                }
+            ]
+        }
 
         Connections {
             target: historyView.model
