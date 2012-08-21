@@ -136,6 +136,63 @@ Panel {
 
         onParticipantClicked: chatInput.talkAt(participant)
 
+        historyHeader: Item {
+            id: fetchPrevious
+
+            anchors.horizontalCenter: parent.horizontalCenter
+            height: 0
+            width: appStyle.icon.smallSize + 2*appStyle.margin.normal + appStyle.spacing.horizontal + fetchLabel.width
+            opacity: 0
+
+            Rectangle {
+                anchors.fill: parent
+                opacity: 0.8
+                radius: appStyle.margin.large
+                smooth: true
+                gradient: Gradient {
+                    GradientStop { position: 0; color: '#9bbdf4' }
+                    GradientStop { position: 1; color: '#90acd8' }
+                }
+            }
+
+            Icon {
+                id: fetchIcon
+
+                anchors.left: parent.left
+                anchors.leftMargin: appStyle.margin.normal
+                anchors.verticalCenter: parent.verticalCenter
+                style: 'icon-info-sign'
+            }
+
+            Label {
+                id: fetchLabel
+
+                anchors.left: fetchIcon.right
+                anchors.leftMargin: appStyle.spacing.horizontal
+                anchors.verticalCenter: parent.verticalCenter
+                text: qsTr('Fetch older messages')
+            }
+
+            MouseArea {
+                id: fetchArea
+
+                anchors.fill: parent
+                hoverEnabled: true
+
+                onClicked: {
+                    if (fetchPrevious.state == 'active') {
+                        conversation.historyModel.fetchPreviousPage();
+                    }
+                }
+            }
+
+            states: State {
+                name: 'active'
+                when: conversation.historyModel.hasPreviousPage
+                PropertyChanges { target: fetchPrevious; opacity: 1; height: appStyle.icon.smallSize + 2*appStyle.margin.normal }
+            }
+        }
+
         historyFooter: Rectangle {
             id: footer
 
@@ -226,79 +283,6 @@ Panel {
             }
         }
 
-        // Button to fetch older messages.
-        Item {
-            id: fetchPrevious
-
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.top: parent.top
-            anchors.topMargin: appStyle.margin.normal
-            height: appStyle.icon.smallSize + 2*appStyle.margin.normal
-            width: appStyle.icon.smallSize + 2*appStyle.margin.normal + appStyle.spacing.horizontal + fetchLabel.width
-            opacity: 0
-
-            Rectangle {
-                anchors.fill: parent
-                opacity: 0.8
-                radius: appStyle.margin.large
-                smooth: true
-                gradient: Gradient {
-                    GradientStop { position: 0; color: '#9bbdf4' }
-                    GradientStop { position: 1; color: '#90acd8' }
-                }
-            }
-
-            Icon {
-                id: fetchIcon
-
-                anchors.left: parent.left
-                anchors.leftMargin: appStyle.margin.normal
-                anchors.verticalCenter: parent.verticalCenter
-                style: 'icon-info-sign'
-            }
-
-            Label {
-                id: fetchLabel
-
-                anchors.left: fetchIcon.right
-                anchors.leftMargin: appStyle.spacing.horizontal
-                anchors.verticalCenter: parent.verticalCenter
-                text: qsTr('Fetch older messages')
-            }
-
-            MouseArea {
-                id: fetchArea
-
-                anchors.fill: parent
-                hoverEnabled: true
-
-                onClicked: {
-                    if (fetchPrevious.state == 'active') {
-                        conversation.historyModel.fetchPreviousPage();
-                    }
-                }
-            }
-
-            states: State {
-                name: 'active'
-                when: conversation.historyModel.hasPreviousPage && historyView.atYBeginning
-                PropertyChanges { target: fetchPrevious; opacity: 1 }
-            }
-
-            transitions: [
-                Transition {
-                    to: 'active'
-                    SequentialAnimation {
-                        PauseAnimation { duration: 500 }
-                        NumberAnimation { properties: 'opacity'; duration: appStyle.animation.normalDuration }
-                    }
-                },
-                Transition {
-                    from: 'active'
-                    NumberAnimation { properties: 'opacity'; duration: appStyle.animation.normalDuration }
-                }
-            ]
-        }
     }
 
     ChatEdit {

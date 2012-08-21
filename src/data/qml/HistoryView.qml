@@ -29,6 +29,7 @@ Item {
     property alias count: historyView.count
     property alias model: historyView.model
     property alias historyFooter: historyView.footer
+    property alias historyHeader: historyView.header
     property alias view: historyView
 
     signal participantClicked(string participant)
