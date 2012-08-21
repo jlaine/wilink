@@ -244,6 +244,7 @@ Item {
         iconColor: 'white'
         iconFontSize: 20
         style: 'success'
+        visible: false
 
         onClicked: chatEdit.callTriggered();
     }
