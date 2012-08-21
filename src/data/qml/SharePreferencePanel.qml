@@ -234,7 +234,7 @@ Panel {
                 text: moreString
 
                 onClicked: {
-                    places.state = (places.state == '') ? 'folders': ''
+                    places.state = (places.state == '') ? 'folders' : ''
                 }
             }
         }
