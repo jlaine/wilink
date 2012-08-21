@@ -53,6 +53,7 @@ public slots:
 private slots:
     void _q_loadSource();
     void _q_messageReceived(const QString &message);
+    void _q_openUrl(const QUrl &url);
     void _q_statusChanged();
 
 protected:

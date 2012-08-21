@@ -84,6 +84,7 @@ CustomWindow::CustomWindow(QtLocalPeer *peer, QWidget *parent)
     Q_ASSERT(check);
 
     // declare QML roots
+    d->qmlRoots << QUrl("src/data/qml/");
     d->qmlRoots << QUrl(QString("https://download.wifirst.net/public/%1/%2/qml/").arg(qApp->applicationName(), qApp->applicationVersion()));
     d->qmlRoots << QUrl("qrc:/qml/");
 
@@ -164,6 +165,9 @@ CustomWindow::CustomWindow(QtLocalPeer *peer, QWidget *parent)
         resize(size);
         move((desktopSize.width() - width()) / 2, (desktopSize.height() - height()) / 2);
     }
+
+    // register url handler
+    QDesktopServices::setUrlHandler("wilink", this, "_q_openUrl");
 
     // load source
     QMetaObject::invokeMethod(this, "_q_loadSource", Qt::QueuedConnection);
@@ -255,6 +259,11 @@ void CustomWindow::_q_messageReceived(const QString &message)
     } else {
         d->messages << message;
     }
+}
+
+void CustomWindow::_q_openUrl(const QUrl &url)
+{
+    _q_messageReceived("OPEN " + url.toString());
 }
 
 void CustomWindow::_q_statusChanged()
