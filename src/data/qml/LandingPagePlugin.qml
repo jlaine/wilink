@@ -27,11 +27,11 @@ Plugin {
 
     onLoaded: {
         dock.model.add({
-            'iconStyle': iconStyle,
-            'panelSource': 'LandingPagePanel.qml',
-            'priority': 20,
-            'text': qsTr('Home'),
-            'visible': true});
+            iconStyle: iconStyle,
+            panelSource: 'LandingPagePanel.qml',
+            priority: 20,
+            text: qsTr('Home'),
+            visible: true});
         swapper.showPanel('LandingPagePanel.qml');
     }
 

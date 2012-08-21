@@ -26,12 +26,12 @@ Plugin {
 
     onLoaded: {
         dock.model.add({
-            'iconStyle': iconStyle,
-            'panelSource': 'DiagnosticPanel.qml',
-            'priority': 6,
-            'shortcut': Qt.ControlModifier + Qt.Key_I,
-            'text': qsTr('Diagnostics'),
-            'visible': true,
+            iconStyle: iconStyle,
+            panelSource: 'DiagnosticPanel.qml',
+            priority: 6,
+            shortcut: Qt.ControlModifier + Qt.Key_I,
+            text: qsTr('Diagnostics'),
+            visible: true,
         });
     }
 

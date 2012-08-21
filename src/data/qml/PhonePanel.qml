@@ -117,9 +117,9 @@ Panel {
             }
 
             dialogSwapper.showPanel('PhoneNotification.qml', {
-                'call': call,
-                'caller': historyView.contactName(call.recipient),
-                'swapper': swapper,
+                call: call,
+                caller: historyView.contactName(call.recipient),
+                swapper: swapper,
             });
         }
 
@@ -135,8 +135,8 @@ Panel {
                     return;
 
                 var widget = component.createObject(widgetBar, {
-                    'call': currentCall,
-                    'caller': historyView.contactName(currentCall.recipient),
+                    call: currentCall,
+                    caller: historyView.contactName(currentCall.recipient),
                 });
             }
 

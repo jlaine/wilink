@@ -157,14 +157,14 @@ GroupBox {
                         var contact = contactModel.getContactByPhone(callPhone);
                         if (contact) {
                             dialogSwapper.showPanel('PhoneContactDialog.qml', {
-                                'contactId': contact.id,
-                                'contactName': contact.name,
-                                'contactPhone': contact.phone,
-                                'model': contactModel});
+                                contactId: contact.id,
+                                contactName: contact.name,
+                                contactPhone: contact.phone,
+                                model: contactModel});
                         } else {
                             dialogSwapper.showPanel('PhoneContactDialog.qml', {
-                                'contactPhone': callPhone,
-                                'model': contactModel});
+                                contactPhone: callPhone,
+                                model: contactModel});
                         }
                     } else if (item.action == 'remove') {
                         historyView.model.removeItem(callId);

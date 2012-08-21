@@ -27,11 +27,11 @@ Plugin {
 
     onLoaded: {
         dock.model.add({
-            'iconStyle': iconStyle,
-            'panelSource': 'WebPanel.qml',
-            'priority': 11,
-            'text': qsTr('Web'),
-            'visible': true,
+            iconStyle: iconStyle,
+            panelSource: 'WebPanel.qml',
+            priority: 11,
+            text: qsTr('Web'),
+            visible: true,
         });
         swapper.showPanel('WebPanel.qml');
     }

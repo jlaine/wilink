@@ -124,7 +124,7 @@ Panel {
         }
 
         Component.onCompleted: {
-            crumbBar.push({'name': qsTr('Home'), 'url': 'share:'});
+            crumbBar.push({name: qsTr('Home'), url: 'share:'});
         }
         z: 1
     }

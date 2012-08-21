@@ -27,11 +27,11 @@ Plugin {
 
     onLoaded: {
         dock.model.add({
-            'iconStyle': iconStyle,
-            'panelSource': 'ChatPanel.qml',
-            'priority': 10,
-            'text': qsTr('Chat'),
-            'visible': true});
+            iconStyle: iconStyle,
+            panelSource: 'ChatPanel.qml',
+            priority: 10,
+            text: qsTr('Chat'),
+            visible: true});
         swapper.showPanel('ChatPanel.qml');
     }
 

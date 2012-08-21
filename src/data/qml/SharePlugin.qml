@@ -26,12 +26,12 @@ Plugin {
 
     onLoaded: {
         dock.model.add({
-            'iconStyle': iconStyle,
-            'panelSource': 'SharePanel.qml',
-            'priority': 8,
-            'shortcut': Qt.ControlModifier + Qt.Key_S,
-            'text': qsTr('Shares'),
-            'visible': false});
+            iconStyle: iconStyle,
+            panelSource: 'SharePanel.qml',
+            priority: 8,
+            shortcut: Qt.ControlModifier + Qt.Key_S,
+            text: qsTr('Shares'),
+            visible: false});
         swapper.addPanel('SharePanel.qml');
     }
 

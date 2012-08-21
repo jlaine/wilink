@@ -50,7 +50,7 @@ FocusScope {
             height: view.cellHeight
 
             function clicked() {
-                crumbBar.push({'name': model.name, 'isDir': model.isDir, 'url': model.url});
+                crumbBar.push({name: model.name, isDir: model.isDir, url: model.url});
             }
 
             function data() {

@@ -27,7 +27,7 @@ Panel {
 
     onUrlChanged: {
         if (!crumbBar.model.count) {
-            crumbBar.push({'name': qsTr('Home'), 'isDir': true, 'url': url});
+            crumbBar.push({name: qsTr('Home'), isDir: true, url: url});
         }
     }
 
@@ -81,7 +81,7 @@ Panel {
                 visible: panel.state == ''
 
                 onClicked: {
-                    dialogSwapper.showPanel('PhotoAlbumDialog.qml', {'model': photoModel});
+                    dialogSwapper.showPanel('PhotoAlbumDialog.qml', {model: photoModel});
                 }
             }
         }

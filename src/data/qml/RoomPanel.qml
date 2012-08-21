@@ -147,15 +147,15 @@ Panel {
                 var item = menu.model.get(index);
                 if (item.action == 'invite') {
                     dialogSwapper.showPanel('RoomInviteDialog.qml', {
-                        'contacts': onlineContacts,
-                        'room': room,
+                        contacts: onlineContacts,
+                        room: room,
                     });
                 } else if (item.action == 'subject') {
-                    dialogSwapper.showPanel('RoomSubjectDialog.qml', {'room': room});
+                    dialogSwapper.showPanel('RoomSubjectDialog.qml', {room: room});
                 } else if (item.action == 'configuration') {
-                    dialogSwapper.showPanel('RoomConfigurationDialog.qml', {'room': room});
+                    dialogSwapper.showPanel('RoomConfigurationDialog.qml', {room: room});
                 } else if (item.action == 'permission') {
-                    dialogSwapper.showPanel('RoomPermissionDialog.qml', {'room': room});
+                    dialogSwapper.showPanel('RoomPermissionDialog.qml', {room: room});
                 }
             }
 

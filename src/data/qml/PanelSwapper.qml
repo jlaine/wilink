@@ -75,7 +75,7 @@ FocusScope {
             }
 
             var panel = component.createObject(panelSwapper, properties);
-            panels.append({'source': source, 'properties': properties, 'panel': panel});
+            panels.append({source: source, properties: properties, panel: panel});
             panel.close.connect(function() {
                 d.removePanel(panel);
             });

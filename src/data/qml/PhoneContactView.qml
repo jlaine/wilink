@@ -151,7 +151,7 @@ ContactView {
     }
 
     onAddClicked: {
-        dialogSwapper.showPanel('PhoneContactDialog.qml', {'model': block.model});
+        dialogSwapper.showPanel('PhoneContactDialog.qml', {model: block.model});
     }
 
     resources: [
@@ -169,10 +169,10 @@ ContactView {
                     var item = menu.model.get(index);
                     if (item.action == 'edit') {
                         dialogSwapper.showPanel('PhoneContactDialog.qml', {
-                            'contactId': contactId,
-                            'contactName': contactName,
-                            'contactPhone': contactPhone,
-                            'model': block.model});
+                            contactId: contactId,
+                            contactName: contactName,
+                            contactPhone: contactPhone,
+                            model: block.model});
                     } else if (item.action == 'remove') {
                         block.model.removeItem(contactId);
                     }

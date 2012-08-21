@@ -100,7 +100,7 @@ Panel {
                 anchors.fill: parent
 
                 onClicked: {
-                    crumbBar.push({'name': model.node ? model.node : model.jid, 'jid': model.jid, 'node': model.node});
+                    crumbBar.push({name: model.node ? model.node : model.jid, jid: model.jid, node: model.node});
                 }
             }
         }
@@ -110,7 +110,7 @@ Panel {
         var client = accountModel.clientForJid('wifirst.net');
         var domain = Utils.jidToDomain(client.jid);
         discoView.model.manager = client.discoveryManager;
-        crumbBar.push({'name': domain, 'jid': domain, 'node': ''});
+        crumbBar.push({name: domain, jid: domain, node: ''});
     }
 }
 

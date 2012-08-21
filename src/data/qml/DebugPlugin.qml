@@ -26,19 +26,19 @@ Plugin {
 
     onLoaded: {
         dock.model.add({
-            'iconStyle': 'icon-sitemap',
-            'panelSource': 'DiscoveryPanel.qml',
-            'priority': -1,
-            'shortcut': Qt.ControlModifier + Qt.Key_B,
-            'text': qsTr('Discovery'),
-            'visible': true});
+            iconStyle: 'icon-sitemap',
+            panelSource: 'DiscoveryPanel.qml',
+            priority: -1,
+            shortcut: Qt.ControlModifier + Qt.Key_B,
+            text: qsTr('Discovery'),
+            visible: true});
         dock.model.add({
-            'iconStyle': iconStyle,
-            'panelSource': 'LogPanel.qml',
-            'priority': -1,
-            'shortcut': Qt.ControlModifier + Qt.Key_L,
-            'text': qsTr('Debugging'),
-            'visible': true});
+            iconStyle: iconStyle,
+            panelSource: 'LogPanel.qml',
+            priority: -1,
+            shortcut: Qt.ControlModifier + Qt.Key_L,
+            text: qsTr('Debugging'),
+            visible: true});
     }
 
     onUnloaded: {

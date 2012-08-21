@@ -66,7 +66,7 @@ Item {
                     return;
                 }
             }
-            pluginModel.append({'source': source, 'loaded': plugin});
+            pluginModel.append({source: source, loaded: plugin});
         }
     }
 

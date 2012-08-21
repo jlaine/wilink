@@ -63,7 +63,7 @@ Panel {
                     }
                 }
                 if (!found)
-                    selectionModel.append({'url': url});
+                    selectionModel.append({url: url});
             } else {
                 for (var i = selectionModel.count - 1; i >= 0; --i) {
                     if (selectionModel.get(i).url == url) {
@@ -77,7 +77,7 @@ Panel {
         Component.onCompleted: {
             var urls = appSettings.sharesDirectories;
             for (var i in urls) {
-                selectionModel.append({'url': urls[i]});
+                selectionModel.append({url: urls[i]});
             }
         }
     }
@@ -211,14 +211,14 @@ Panel {
                                 anchors.right: parent.right
 
                                 onClicked: {
-                                    crumbs.push({'name': model.name, 'url': model.url});
+                                    crumbs.push({name: model.name, url: model.url});
                                 }
                             }
                         }
                     }
 
                     Component.onCompleted: {
-                        crumbs.push({'name': qsTr('My computer'), 'url': 'file:///'});
+                        crumbs.push({name: qsTr('My computer'), url: 'file:///'});
                     }
                 }
             }

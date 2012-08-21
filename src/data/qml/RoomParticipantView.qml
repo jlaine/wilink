@@ -119,23 +119,23 @@ ScrollView {
                     Qt.openUrlExternally(vcard.url)
                 } else if (item.action == 'kick') {
                     dialogSwapper.showPanel('RoomKickDialog.qml', {
-                        'jid': jid,
-                        'room': room,
+                        jid: jid,
+                        room: room,
                     });
                 }
             }
 
             Component.onCompleted: {
                 menu.model.append({
-                    'action': 'profile',
-                    'enabled': profileEnabled,
-                    'iconStyle': 'icon-info-sign',
-                    'text': qsTr('Show profile')});
+                    action: 'profile',
+                    enabled: profileEnabled,
+                    iconStyle: 'icon-info-sign',
+                    text: qsTr('Show profile')});
                 menu.model.append({
-                    'action': 'kick',
-                    'enabled': kickEnabled,
-                    'iconStyle': 'icon-bolt',
-                    'text': qsTr('Kick user')});
+                    action: 'kick',
+                    enabled: kickEnabled,
+                    iconStyle: 'icon-bolt',
+                    text: qsTr('Kick user')});
             }
         }
     }

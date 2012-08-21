@@ -69,10 +69,10 @@ Rectangle {
             }
 
             Component.onCompleted: {
-                menu.model.append({'text': qsTr('Available'), 'status': 'available'});
-                menu.model.append({'text': qsTr('Away'), 'status': 'away'});
-                menu.model.append({'text': qsTr('Busy'), 'status': 'busy'});
-                menu.model.append({'text': qsTr('Offline'), 'status': 'offline'});
+                menu.model.append({text: qsTr('Available'), status: 'available'});
+                menu.model.append({text: qsTr('Away'), status: 'away'});
+                menu.model.append({text: qsTr('Busy'), status: 'busy'});
+                menu.model.append({text: qsTr('Offline'), status: 'offline'});
             }
         }
     }

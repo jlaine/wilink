@@ -77,8 +77,8 @@ Panel {
                 target: item.client.callManager
                 onCallReceived: {
                     dialogSwapper.showPanel('CallNotification.qml', {
-                        'call': call,
-                        'panel': chatPanel});
+                        call: call,
+                        panel: chatPanel});
                 }
             }
 
@@ -87,9 +87,9 @@ Panel {
 
                 onInvitationReceived: {
                     dialogSwapper.showPanel('RoomInviteNotification.qml', {
-                        'jid': Utils.jidToBareJid(inviter),
-                        'panel': chatPanel,
-                        'roomJid': roomJid});
+                        jid: Utils.jidToBareJid(inviter),
+                        panel: chatPanel,
+                        roomJid: roomJid});
                 }
             }
 
@@ -136,8 +136,8 @@ Panel {
                 target: item.client.transferManager
                 onFileReceived: {
                     dialogSwapper.showPanel('TransferNotification.qml', {
-                        'job': job,
-                        'panel': chatPanel});
+                        job: job,
+                        panel: chatPanel});
                 }
             }
         }
@@ -478,22 +478,22 @@ Panel {
 
             Component.onCompleted: {
                 menu.model.append({
-                    'action': 'profile',
-                    'enabled': profileEnabled,
-                    'iconStyle': 'icon-info-sign',
-                    'text': qsTr('Show profile')});
+                    action: 'profile',
+                    enabled: profileEnabled,
+                    iconStyle: 'icon-info-sign',
+                    text: qsTr('Show profile')});
                 menu.model.append({
-                    'action': 'rename',
-                    'enabled': changeEnabled,
-                    'iconStyle': 'icon-wrench',
-                    'name': model.name,
-                    'text': qsTr('Rename contact')});
+                    action: 'rename',
+                    enabled: changeEnabled,
+                    iconStyle: 'icon-wrench',
+                    name: model.name,
+                    text: qsTr('Rename contact')});
                 menu.model.append({
-                    'action': 'remove',
-                    'enabled': changeEnabled,
-                    'iconStyle': 'icon-minus',
-                    'name': model.name,
-                    'text': qsTr('Remove contact')});
+                    action: 'remove',
+                    enabled: changeEnabled,
+                    iconStyle: 'icon-minus',
+                    name: model.name,
+                    text: qsTr('Remove contact')});
             }
         }
     }

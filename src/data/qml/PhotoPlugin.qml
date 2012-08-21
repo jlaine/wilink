@@ -32,13 +32,13 @@ Plugin {
                 title += '<br/><small>Picasa</small>';
 
                 dock.model.add({
-                    'iconStyle': iconStyle,
-                    'panelSource': 'PhotoPanel.qml',
-                    'panelProperties': {'url': 'picasa://default'},
-                    'priority': 7,
-                    'shortcut': Qt.ControlModifier + Qt.Key_P,
-                    'text': title,
-                    'visible': true});
+                    iconStyle: iconStyle,
+                    panelSource: 'PhotoPanel.qml',
+                    panelProperties: {url: 'picasa://default'},
+                    priority: 7,
+                    shortcut: Qt.ControlModifier + Qt.Key_P,
+                    text: title,
+                    visible: true});
             }
         }
     }

@@ -88,7 +88,7 @@ ScrollView {
             onClicked: {
                 itemHovered = false
                 if (model.isDir) {
-                    crumbBar.push({'name': model.name, 'url': model.url});
+                    crumbBar.push({name: model.name, url: model.url});
                 }
             }
 

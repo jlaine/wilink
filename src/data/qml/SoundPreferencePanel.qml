@@ -84,7 +84,7 @@ Panel {
                     var names = tester.outputDeviceNames;
                     for (var i in names) {
                         var device = names[i];
-                        model.append({'text': device});
+                        model.append({text: device});
                         if (device == appSettings.audioOutputDeviceName) {
                             output.currentIndex = i;
                         }
@@ -112,7 +112,7 @@ Panel {
                     var names = tester.inputDeviceNames;
                     for (var i in names) {
                         var device = names[i];
-                        model.append({'text': device});
+                        model.append({text: device});
                         if (device == appSettings.audioInputDeviceName) {
                             input.currentIndex = i;
                         }
