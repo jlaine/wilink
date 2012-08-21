@@ -124,6 +124,10 @@ Panel {
         }
 
         onCallStarted: {
+            // NOTE: for some reason, if we don't store the call in a local
+            // variable, finishCreation seems to receive an incomplete call
+            // object.
+            var currentCall = call;
             var component = Qt.createComponent('PhoneCallWidget.qml');
 
             function finishCreation() {
@@ -131,8 +135,8 @@ Panel {
                     return;
 
                 var widget = component.createObject(widgetBar, {
-                    'call': call,
-                    'caller': historyView.contactName(call.recipient),
+                    'call': currentCall,
+                    'caller': historyView.contactName(currentCall.recipient),
                 });
             }
 
