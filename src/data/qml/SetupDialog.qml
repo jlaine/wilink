@@ -24,6 +24,7 @@ import 'scripts/utils.js' as Utils
 Dialog {
     id: dialog
 
+    property bool accountChoice: true
     property QtObject accountModel: AccountModel {}
     property bool accountSlave: false
 
@@ -61,6 +62,7 @@ Dialog {
                 anchors.left: parent.left
                 anchors.right: parent.right
                 height: accountCombo.height
+                visible: accountChoice
 
                 Label {
                     id: accountLabel

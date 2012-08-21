@@ -29,6 +29,7 @@
     <file>qml/DiagnosticPanel.qml</file>
     <file>qml/DiagnosticPlugin.qml</file>
     <file>qml/Dialog.qml</file>
+    <file>qml/Directory.qml</file>
     <file>qml/DirectoryXmlModel.qml</file>
     <file>qml/DiscoveryPanel.qml</file>
     <file>qml/Dock.qml</file>
@@ -49,7 +50,6 @@
     <file>qml/LandingPagePanel.qml</file>
     <file>qml/LandingPagePlugin.qml</file>
     <file>qml/LogPanel.qml</file>
-    <file>qml/Login.qml</file>
     <file>qml/Main.qml</file>
     <file>qml/MeegoMain.qml</file>
     <file>qml/Menu.qml</file>
@@ -92,6 +92,7 @@
     <file>qml/RoomSubjectDialog.qml</file>
     <file>qml/ScrollBar.qml</file>
     <file>qml/ScrollView.qml</file>
+    <file>qml/SetupBackground.qml</file>
     <file>qml/SetupDialog.qml</file>
     <file>qml/SharePanel.qml</file>
     <file>qml/SharePlugin.qml</file>

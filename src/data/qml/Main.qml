@@ -39,7 +39,8 @@ FocusScope {
             if (accountModel.count) {
                 appPlugins.load();
             } else {
-                dialogSwapper.showPanel('SetupDialog.qml');
+                swapper.showPanel('SetupBackground.qml');
+                dialogSwapper.showPanel('SetupDialog.qml', {accountChoice: false});
             }
         }
 
@@ -50,8 +51,8 @@ FocusScope {
             if (accountModel.count) {
                 appPlugins.load();
             } else {
-                swapper.showPanel('Login.qml');
-                dialogSwapper.showPanel('SetupDialog.qml');
+                swapper.showPanel('SetupBackground.qml');
+                dialogSwapper.showPanel('SetupDialog.qml', {accountChoice: false});
             }
         }
     }
