@@ -84,7 +84,6 @@ CustomWindow::CustomWindow(QtLocalPeer *peer, QWidget *parent)
     Q_ASSERT(check);
 
     // declare QML roots
-    d->qmlRoots << QUrl("src/data/qml/");
     d->qmlRoots << QUrl(QString("https://download.wifirst.net/public/%1/%2/qml/").arg(qApp->applicationName(), qApp->applicationVersion()));
     d->qmlRoots << QUrl("qrc:/qml/");
 
