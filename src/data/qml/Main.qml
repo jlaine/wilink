@@ -256,9 +256,9 @@ FocusScope {
                             // Accepts the following params
                             //  * jid
                             //
-                            // Ex: wilink://chat?jid=90210-001
+                            // Ex: wilink://chat?jid=90210-001@wifirst.net
                             //
-                            var jid = params.jid + '@wifirst.net';
+                            var jid = params.jid;
                             if ( /^[^@/ ]+@[^@/ ]+$/.test(jid) ) {
                                 console.log('Open chat with: ' + jid);
                                 var panel = swapper.findPanel('ChatPanel.qml');
@@ -287,7 +287,12 @@ FocusScope {
 
                             break;
                         case 'chat_room':
-                            var jid = params.jid + '@conference.wifirst.net';
+                            // Accepts the following params
+                            //  * jid
+                            //
+                            // Ex: wilink://chat_room?jid=blabla@conference.wifirst.net
+                            //
+                            var jid = params.jid;
                             if ( /^[^@/ ]+@[^@/ ]+$/.test(jid) ) {
                                 console.log('Open chat room: ' + jid);
                                 var panel = swapper.findPanel('ChatPanel.qml');
