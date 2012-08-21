@@ -102,7 +102,7 @@ Panel {
 
             onAccepted: {
                 var url = urlInput.text.trim();
-                if (url.match(/^(ftp|http|https):\/\//)) {
+                if (url.match(/^(file|ftp|http|https):\/\//)) {
                     webView.url = urlInput.text;
                 } else if ((url.search(/\s/) == -1) && url.match(/\.[a-z]{2,}$/)) {
                     webView.url = 'http://' + url;
