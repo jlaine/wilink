@@ -18,21 +18,24 @@
  */
 
 import QtQuick 1.1
+import wiLink 2.4
 import 'scripts/utils.js' as Utils
 
 Dialog {
     id: dialog
 
     property string jid
-    property string nickname
 
     property QtObject client
 
     title: qsTr('Add a contact')
 
-    function isWifirst(jid) {
-       return Utils.jidToDomain(jid) == 'wifirst.net';
-    }
+    resources: [
+        VCard {
+            id: vcard
+            jid: dialog.jid
+        }
+    ]
 
     Column {
         anchors.fill: parent
@@ -56,7 +59,7 @@ Dialog {
                 anchors.topMargin: 15
                 horizontalAlignment: Text.Center
                 verticalAlignment: Text.Center
-                text: qsTr('Send a subscription request to %1 ?').replace('%1', nickname);
+                text: qsTr('Send a subscription request to %1 ?').replace('%1', vcard.name);
             }
         }
     }

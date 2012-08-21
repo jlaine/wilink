@@ -232,7 +232,6 @@ Panel {
                 anchors.fill: person
                 onClicked: {
                     var jid = jabber_id;
-                    var nickname = name;
                     var panel = swapper.findPanel('ChatPanel.qml');
                     if (panel) {
                         console.log(vcard.name);
@@ -243,12 +242,12 @@ Panel {
                                 panel.showConversation(jid);
                             } else {
                                 console.log('Wifirst roster received, sending subscribe request to ' + jid);
-                                panel.addSubscriptionRequest(jid, nickname);
+                                panel.addSubscriptionRequest(jid);
                             }
                         } else {
                             // Wifirst roster NOT received, postponing all actions
                             console.log('Postponing chat opening with ' + jid + ' to when Wifirst roster will have been received');
-                            panel.delayedOpening = {action: 'open_conversation', jid: jid, nickname: nickname};
+                            panel.delayedOpening = {action: 'open_conversation', jid: jid};
                         }
                     }
                 }

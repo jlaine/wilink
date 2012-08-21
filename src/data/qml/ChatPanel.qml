@@ -208,17 +208,14 @@ Panel {
 
     /** Convenience method to send a subscription request for wifirst.net
      */
-    function addSubscriptionRequest(jid, nickname) {
+    function addSubscriptionRequest(jid) {
         for (var i = 0; i < chatClients.count; ++i) {
             var client = chatClients.itemAt(i).client;
             var domain = Utils.jidToDomain(client.jid);
             if (domain == 'wifirst.net')
                 break;
         }
-        if (nickname == undefined) {
-            nickname = jid;
-        }
-        dialogSwapper.showPanel('ContactSendSubscriptionDialog.qml', {jid: jid, nickname: nickname, client: client});
+        dialogSwapper.showPanel('ContactSendSubscriptionDialog.qml', {jid: jid, client: client});
     }
 
     Rectangle {

@@ -255,9 +255,8 @@ FocusScope {
                         case 'chat':
                             // Accepts the following params
                             //  * jid
-                            //  * nickname
                             //
-                            // Ex: wilink://chat?jid=90210-001&nickname=pinton
+                            // Ex: wilink://chat?jid=90210-001
                             //
                             var jid = params.jid + '@wifirst.net';
                             if ( /^[^@/ ]+@[^@/ ]+$/.test(jid) ) {
@@ -271,12 +270,12 @@ FocusScope {
                                             panel.showConversation(jid);
                                         } else {
                                             console.log('Wifirst roster received, sending subscribe request to ' + jid);
-                                            panel.addSubscriptionRequest(jid, params.nickname);
+                                            panel.addSubscriptionRequest(jid);
                                         }
                                     } else {
                                         // Wifirst roster NOT received, postponing all actions
                                         console.log('Postponing chat opening with ' + jid + ' to when Wifirst roster will have been received');
-                                        panel.delayedOpening = {action: 'open_conversation', jid: jid, nickname: nickname};
+                                        panel.delayedOpening = {action: 'open_conversation', jid: jid};
                                     }
                                 }
                             } else { // jid format is invalid
