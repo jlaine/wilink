@@ -228,30 +228,18 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>The contact you tried to reach is not in your contact list.</source>
-        <translation>Le contact que vous cherchez à joindre n&lapos;est pas dans votre liste de contacts</translation>
+        <translation>Le contact que vous cherchez à joindre n&apos;est pas dans votre liste de contacts.</translation>
     </message>
     <message>
-        <source>Send a subscription request to %1 ?</source>
-        <translation>Envoyer une demande d'ajout dans vos contacts à %1 ?</translation>
+        <source>Send a subscription request to %1?</source>
+        <translation>Envoyer une demande d&apos;ajout dans vos contacts à %1 ?</translation>
     </message>
 </context>
 <context>
     <name>ConversationPanel</name>
     <message>
-        <source>Call</source>
-        <translation>Appeler</translation>
-    </message>
-    <message>
         <source>Send a file</source>
         <translation>Envoyer un fichier</translation>
-    </message>
-    <message>
-        <source>is composing a message</source>
-        <translation>compose un message</translation>
-    </message>
-    <message>
-        <source>has closed the conversation</source>
-        <translation>a fermé la conversation</translation>
     </message>
     <message>
         <source>Send</source>
@@ -322,6 +310,12 @@ Acceptez-vous?</translation>
         <translation>Annuler</translation>
     </message>
 </context>
+<context>
+    <name>Directory</name>
+    <message>
+        <source>Welcome %1</source>
+        <translation>Bienvenue %1</translation>
+    </message>
 </context>
 <context>
     <name>DiscoveryPanel</name>
@@ -336,10 +330,6 @@ Acceptez-vous?</translation>
     <message>
         <source>Service discovery</source>
         <translation>Découverte de services</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation>Fermer</translation>
     </message>
 </context>
 <context>
@@ -428,6 +418,17 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>LandingPagePlugin</name>
+    <message>
+        <source>Home</source>
+        <translation>Accueil</translation>
+    </message>
+    <message>
+        <source>This plugin allows you to access your dashboard.</source>
+        <translation>Ce module vous donne accès à votre tableau de bord.</translation>
+    </message>
+</context>
+<context>
     <name>LogPanel</name>
     <message>
         <source>Debugging console</source>
@@ -455,79 +456,18 @@ Acceptez-vous?</translation>
     <message>
         <source>Chat failed</source>
         <translation>Le tchat a échoué</translation>
-     </message>
-     <message>
+    </message>
+    <message>
         <source>Sorry, but the chat session could not be started.</source>
-        <translation>Désolé, la session de tchat n&lapos;a pu être démarrée</translation>
-     </message>
-     <message>
-        <source>%1 is not a valid contact format</source>
-        <translation>%1 n&lapos;est pas un format de contact reconnu</translation>
-     </message>
-     <message>
-         <source>%1 is not a valid chat room id</source>
-         <translation>%1 n&lapos;est pas un identifiant de salon de discussion valide</translation>
-     </message>
-</context>
-<context>
-    <name>NewsDialog</name>
-    <message>
-        <source>Add a bookmark</source>
-        <translation>Ajouter un signet</translation>
+        <translation>Désolé, la session de tchat n&apos;a pu être démarrée.</translation>
     </message>
     <message>
-        <source>Edit bookmark</source>
-        <translation>Modifier le signet</translation>
+        <source>%1 is not a valid chat room id</source>
+        <translation>%1 n&apos;est pas un identifiant de salon de discussion valide</translation>
     </message>
     <message>
-        <source>Name</source>
-        <translation>Nom</translation>
-    </message>
-    <message>
-        <source>URL</source>
-        <translation>Adresse</translation>
-    </message>
-</context>
-<context>
-    <name>NewsPanel</name>
-    <message>
-        <source>News reader</source>
-        <translation>Nouvelles</translation>
-    </message>
-    <message>
-        <source>My news</source>
-        <translation>Mes nouvelles</translation>
-    </message>
-    <message>
-        <source>Modify</source>
-        <translation>Modifier</translation>
-    </message>
-    <message>
-        <source>Remove</source>
-        <translation>Retirer</translation>
-    </message>
-    <message>
-        <source>Play sound</source>
-        <translation>Lire le son</translation>
-    </message>
-    <message>
-        <source>Stop sound</source>
-        <translation>Arrêter le son</translation>
-    </message>
-</context>
-<context>
-    <name>NewsPlugin</name>
-    <message>
-        <source>News reader</source>
-        <translation>Nouvelles</translation>
-    </message>
-    <message>
-        <source>News</source>
-        <translation>Nouvelles</translation>
-    </message>
-    <message>
-        <source>This plugin allows you to read RSS news feeds.</source>
-        <translation>Ce module vous permet de lire des nouvelles aux format RSS.</translation>
+        <source>%1 is not a valid contact</source>
+        <translation>%1 n&apos;est pas un identifiant de contact valide</translation>
     </message>
 </context>
 <context>
@@ -752,9 +692,6 @@ Acceptez-vous?</translation>
         <source>Preferences</source>
         <translation>Préférences</translation>
     </message>
-</context>
-<context>
-    <name>PreferenceModel</name>
     <message>
         <source>General</source>
         <translation>Général</translation>
@@ -770,6 +707,10 @@ Acceptez-vous?</translation>
     <message>
         <source>Plugins</source>
         <translation>Modules</translation>
+    </message>
+    <message>
+        <source>Shares</source>
+        <translation>Partages</translation>
     </message>
 </context>
 <context>

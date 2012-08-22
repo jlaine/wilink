@@ -59,7 +59,7 @@ Dialog {
                 anchors.topMargin: 15
                 horizontalAlignment: Text.Center
                 verticalAlignment: Text.Center
-                text: qsTr('Send a subscription request to %1 ?').replace('%1', vcard.name);
+                text: qsTr('Send a subscription request to %1?').replace('%1', vcard.name);
             }
         }
     }

@@ -22,7 +22,7 @@ import 'scripts/utils.js' as Utils
 
 Plugin {
     name: qsTr('Home')
-    description: qsTr('This plugin allows you to access your dashboard')
+    description: qsTr('This plugin allows you to access your dashboard.')
     iconStyle: 'icon-home'
 
     onLoaded: {
