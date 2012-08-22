@@ -131,9 +131,15 @@ Panel {
             WebView {
                 id: webView
 
+                javaScriptWindowObjects: QtObject {
+                    WebView.windowObjectName: "qml"
+
+                    function openUrl(url) {
+                        Qt.openUrlExternally(url);
+                    }
+                }
                 preferredHeight: webFlickable.height
                 preferredWidth: webFlickable.width
-
                 settings.printElementBackgrounds: true
 
                 onAlert: {
@@ -149,6 +155,9 @@ Panel {
                         var js = panel.loadScript;
                         panel.loadScript = '';
                         webView.evaluateJavaScript(js);
+                    } else {
+                        // catch links to wilink:// urls
+                        webView.evaluateJavaScript('for (var i = 0; i < document.links.length; ++i) { if (/^wilink:/.test(document.links[i].href)) { document.links[i].onclick = function() { window.qml.openUrl(this.href); return false; } } }');
                     }
                 }
             }
