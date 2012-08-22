@@ -57,6 +57,7 @@ public:
         NameRole = ChatModel::NameRole,
         StatusRole = ChatModel::UserRole,
         StatusSortRole,
+        SubscriptionStatusRole,
         SubscriptionTypeRole
     };
 
@@ -102,7 +103,6 @@ class VCard : public QObject
     Q_PROPERTY(QString name READ name NOTIFY nameChanged)
     Q_PROPERTY(QString nickName READ nickName NOTIFY nickNameChanged)
     Q_PROPERTY(QString status READ status NOTIFY statusChanged)
-    Q_PROPERTY(int subscriptionType READ subscriptionType NOTIFY statusChanged)
     Q_PROPERTY(QUrl url READ url NOTIFY urlChanged)
 
 public:
@@ -124,7 +124,6 @@ public:
     QString name() const;
     QString nickName() const;
     QString status() const;
-    int subscriptionType() const;
     QUrl url() const;
 
 signals:
@@ -166,6 +165,7 @@ public:
     
     QUrl imageUrl(const QString &jid);
     QString presenceStatus(const QString &jid) const;
+    QString subscriptionStatus(const QString &jid) const;
     int subscriptionType(const QString &jid) const;
 
 signals:

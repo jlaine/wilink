@@ -241,6 +241,7 @@ RosterModel::RosterModel(QObject *parent)
     // set additionals role names
     QHash<int, QByteArray> names = roleNames();
     names.insert(RosterModel::StatusRole, "status");
+    names.insert(RosterModel::SubscriptionStatusRole, "subscriptionStatus");
     names.insert(RosterModel::SubscriptionTypeRole, "subscriptionType");
     setRoleNames(names);
 
@@ -276,6 +277,8 @@ QVariant RosterModel::data(const QModelIndex &index, int role) const
         return VCardCache::instance()->presenceStatus(item->jid);
     } else if (role == StatusSortRole) {
         return VCardCache::instance()->presenceStatus(item->jid) + sortSeparator + item->vcard()->name().toLower() + sortSeparator + item->jid.toLower();
+    } else if (role == SubscriptionStatusRole) {
+        return VCardCache::instance()->subscriptionStatus(item->jid);
     } else if (role == SubscriptionTypeRole) {
         return VCardCache::instance()->subscriptionType(item->jid);
     }
@@ -553,14 +556,6 @@ QString VCard::status() const
         return "offline";
 }
 
-int VCard::subscriptionType() const
-{
-    if (!m_jid.isEmpty())
-        return VCardCache::instance()->subscriptionType(m_jid);
-    else
-        return 0;
-}
-
 QUrl VCard::url() const
 {
     return m_url;
@@ -798,6 +793,16 @@ QString VCardCache::presenceStatus(const QString &jid) const
         }
     }
     return statusType;
+}
+
+QString VCardCache::subscriptionStatus(const QString &jid) const
+{
+    foreach (ChatClient *client, d->clients) {
+        const QString status = client->rosterManager()->getRosterEntry(jid).subscriptionStatus();
+        if (!status.isEmpty())
+            return status;
+    }
+    return QString();
 }
 
 int VCardCache::subscriptionType(const QString &jid) const
