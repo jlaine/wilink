@@ -33,8 +33,10 @@ Dialog {
     minimumHeight: 270
 
     function save() {
-        if (!dialog.accountSlave)
+        if (!dialog.accountSlave) {
             accountModel.submit();
+            window.reload();
+        }
 
         dialog.close();
     }

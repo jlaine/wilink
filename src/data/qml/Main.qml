@@ -32,18 +32,6 @@ FocusScope {
     AccountModel {
         id: accountModel
 
-        /** Reload plugins after accounts were modified.
-         */
-        onModelReset: {
-            appPlugins.unload();
-            if (accountModel.count) {
-                appPlugins.load();
-            } else {
-                swapper.showPanel('SetupBackground.qml');
-                dialogSwapper.showPanel('SetupDialog.qml', {accountChoice: false});
-            }
-        }
-
         /** Load plugins at startup.
          */
         Component.onCompleted: {

@@ -29,13 +29,23 @@ Dialog {
     title: qsTr("Preferences")
 
     onAccepted: {
+        var reloadWindow = false;
+
         for (var i = tabList.count - 1; i >= 0; i--) {
-            var panel = prefSwapper.findPanel(tabList.model.get(i).source);
+            var source = tabList.model.get(i).source;
+            var panel = prefSwapper.findPanel(source);
             if (panel) {
                 console.log("Saving " + panel);
                 panel.save()
+                if (source == 'AccountPreferencePanel.qml') {
+                    reloadWindow = true;
+                }
             }
         }
+
+        if (reloadWindow)
+            window.reload();
+
         dialog.close();
     }
 
