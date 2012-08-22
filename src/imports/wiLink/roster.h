@@ -57,6 +57,7 @@ public:
         NameRole = ChatModel::NameRole,
         StatusRole = ChatModel::UserRole,
         StatusSortRole,
+        SubscriptionTypeRole
     };
 
     RosterModel(QObject *parent = 0);
@@ -163,6 +164,7 @@ public:
     
     QUrl imageUrl(const QString &jid);
     QString presenceStatus(const QString &jid) const;
+    int subscriptionType(const QString &jid) const;
 
 signals:
     void cardChanged(const QString &jid);

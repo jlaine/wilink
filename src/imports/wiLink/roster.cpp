@@ -241,6 +241,7 @@ RosterModel::RosterModel(QObject *parent)
     // set additionals role names
     QHash<int, QByteArray> names = roleNames();
     names.insert(RosterModel::StatusRole, "status");
+    names.insert(RosterModel::SubscriptionType, "subscriptionType");
     setRoleNames(names);
 
     // monitor clients
@@ -275,6 +276,8 @@ QVariant RosterModel::data(const QModelIndex &index, int role) const
         return VCardCache::instance()->presenceStatus(item->jid);
     } else if (role == StatusSortRole) {
         return VCardCache::instance()->presenceStatus(item->jid) + sortSeparator + item->vcard()->name().toLower() + sortSeparator + item->jid.toLower();
+    } else if (role == SubscriptionTypeRole) {
+        return VCardCache::instance()->subscriptionType(item->jid);
     }
 
     return QVariant();
@@ -787,6 +790,15 @@ QString VCardCache::presenceStatus(const QString &jid) const
         }
     }
     return statusType;
+}
+
+int VCardCache::subscriptionType(const QString &jid) const
+{
+    int type = 0;
+    foreach (ChatClient *client, d->clients) {
+        type |= (client->rosterManager()->getRosterEntry(jid).subscriptionType() & QXmppRosterIq::Item::Both);
+    }
+    return type;
 }
 
 void VCardCache::_q_clientDestroyed(QObject *object)
