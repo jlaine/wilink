@@ -73,7 +73,7 @@ ContactView {
                 anchors.right: bubble.right
                 anchors.verticalCenter: parent.verticalCenter
                 elide: Text.ElideRight
-                text: model.participants > 0 ? model.name + ' (' + model.participants + ')' : model.name
+                text: model.name
                 font.pixelSize: 11
                 color: item.ListView.isCurrentItem ? 'white' : '#c7c7c7'
             }
@@ -88,15 +88,27 @@ ContactView {
                 text: model.messages > 0 ? model.messages : ''
             }
 
-            StatusPill {
+            Item {
                 id: status
                 anchors.right: parent.right
                 anchors.rightMargin: appStyle.margin.normal
                 anchors.verticalCenter: parent.verticalCenter
-                presenceStatus: model.status
-                smooth: !block.moving
                 width: Math.round(appStyle.icon.tinySize * 0.6)
                 height: Math.round(appStyle.icon.tinySize * 0.6)
+
+                StatusPill {
+                    anchors.fill: parent
+                    presenceStatus: model.status
+                    smooth: !block.moving
+                    visible: model.subscriptionStatus != 'subscribe'
+                }
+
+                Icon {
+                    anchors.centerIn: parent
+                    color: 'white'
+                    text: '?'
+                    visible: model.subscriptionStatus == 'subscribe'
+                }
             }
 
             MouseArea {
