@@ -107,8 +107,7 @@ private:
     void _q_bookmarksReceived(QXmppBookmarkManager *bookmarkManager);
 
     enum Role {
-        ParticipantsRole = ChatModel::UserRole,
-        StatusRole
+        ParticipantsRole = ChatModel::UserRole
     };
     QSet<ChatClient*> m_clients;
 };
