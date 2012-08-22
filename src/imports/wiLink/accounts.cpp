@@ -28,8 +28,6 @@
 #include "QXmppRosterManager.h"
 #include "QXmppUtils.h"
 
-static QSet<AccountModel*> globalInstances;
-
 class AccountItem : public ChatModelItem
 {
 public:
@@ -67,14 +65,11 @@ AccountModel::AccountModel(QObject *parent)
     setRoleNames(names);
 
     // load accounts
-    _q_reload();
-
-    globalInstances.insert(this);
+    reload();
 }
 
 AccountModel::~AccountModel()
 {
-    globalInstances.remove(this);
     delete d;
 }
 
@@ -189,15 +184,11 @@ bool AccountModel::submit()
 
     // save accounts
     settings.setValue("Accounts", newAccounts);
-    foreach (AccountModel *other, globalInstances) {
-        if (other != this)
-            other->_q_reload();
-    }
 
     return true;
 }
 
-void AccountModel::_q_reload()
+void AccountModel::reload()
 {
     beginResetModel();
 

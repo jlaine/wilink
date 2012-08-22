@@ -39,6 +39,7 @@ public:
 
 public slots:
     ChatClient *clientForJid(const QString &jid = QString());
+    void reload();
 
     // QML ListModel
     void append(const QVariantMap &obj);
@@ -47,9 +48,6 @@ public slots:
 
     // QAbstractItemModel
     bool submit();
-
-private slots:
-    void _q_reload();
 
 private:
     enum Role {
