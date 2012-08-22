@@ -29,7 +29,7 @@ ContactView {
     signal itemClicked(variant model)
     signal itemContextMenu(variant model, variant point)
 
-    title: qsTr('My contacts')
+    title: qsTr('My rooms')
     delegate: Item {
         id: item
 
@@ -60,7 +60,7 @@ ContactView {
                     width: parent.width - 1
                     height: parent.height - 1
                     asynchronous: true
-                    source: model.avatar
+                    source: 'image://icon/chat'
                     sourceSize.width: appStyle.icon.smallSize - 1
                     sourceSize.height: appStyle.icon.smallSize- 1
                 }
@@ -81,22 +81,12 @@ ContactView {
             Bubble {
                 id: bubble
 
-                anchors.right: status.left
+                anchors.right: parent.right
+                anchors.rightMargin: appStyle.margin.normal
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.margins: 3
                 opacity: model.messages > 0 ? 1 : 0
                 text: model.messages > 0 ? model.messages : ''
-            }
-
-            StatusPill {
-                id: status
-                anchors.right: parent.right
-                anchors.rightMargin: appStyle.margin.normal
-                anchors.verticalCenter: parent.verticalCenter
-                presenceStatus: model.status
-                smooth: !block.moving
-                width: Math.round(appStyle.icon.tinySize * 0.6)
-                height: Math.round(appStyle.icon.tinySize * 0.6)
             }
 
             MouseArea {

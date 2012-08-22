@@ -79,6 +79,7 @@ PluginPreferencePanel 1.0 PluginPreferencePanel.qml
 PreferenceDialog 1.0 PreferenceDialog.qml
 ProgressBar 1.0 ProgressBar.qml
 RoomConfigurationDialog 1.0 RoomConfigurationDialog.qml
+RoomContactView 1.0 RoomContactView.qml
 RoomInviteDialog 1.0 RoomInviteDialog.qml
 RoomInviteNotification 1.0 RoomInviteNotification.qml
 RoomJoinDialog 1.0 RoomJoinDialog.qml

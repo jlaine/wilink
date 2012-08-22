@@ -81,6 +81,7 @@
     <file>qml/PreferenceDialog.qml</file>
     <file>qml/ProgressBar.qml</file>
     <file>qml/RoomConfigurationDialog.qml</file>
+    <file>qml/RoomContactView.qml</file>
     <file>qml/RoomInviteDialog.qml</file>
     <file>qml/RoomInviteNotification.qml</file>
     <file>qml/RoomJoinDialog.qml</file>

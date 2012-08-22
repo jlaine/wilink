@@ -124,6 +124,13 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>ChatContactView</name>
+    <message>
+        <source>My contacts</source>
+        <translation>Mes contacts</translation>
+    </message>
+</context>
+<context>
     <name>ChatEdit</name>
     <message>
         <source>Send</source>
@@ -132,14 +139,6 @@ Acceptez-vous?</translation>
 </context>
 <context>
     <name>ChatPanel</name>
-    <message>
-        <source>My rooms</source>
-        <translation>Mes salons</translation>
-    </message>
-    <message>
-        <source>My contacts</source>
-        <translation>Mes contacts</translation>
-    </message>
     <message>
         <source>Show profile</source>
         <translation>Accéder au profil</translation>
@@ -308,13 +307,6 @@ Acceptez-vous?</translation>
     <message>
         <source>Cancel</source>
         <translation>Annuler</translation>
-    </message>
-</context>
-<context>
-    <name>Directory</name>
-    <message>
-        <source>Welcome %1</source>
-        <translation>Bienvenue %1</translation>
     </message>
 </context>
 <context>
@@ -718,6 +710,13 @@ Acceptez-vous?</translation>
     <message>
         <source>Chat room configuration</source>
         <translation>Configuration du salon</translation>
+    </message>
+</context>
+<context>
+    <name>RoomContactView</name>
+    <message>
+        <source>My rooms</source>
+        <translation>Mes salons</translation>
     </message>
 </context>
 <context>

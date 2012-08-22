@@ -231,14 +231,13 @@ Panel {
         color: '#474747'
         z: 2
 
-        ChatContactView {
+        RoomContactView {
             id: rooms
 
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.top: parent.top
             currentJid: (Qt.application.active && swapper.currentItem == chatPanel && Qt.isQtObject(chatSwapper.currentItem) && chatSwapper.currentItem.jid != undefined) ? chatSwapper.currentItem.jid : ''
-            iconSource: 'image://icon/chat'
             model: RoomListModel {
                 id: roomListModel
 
@@ -253,7 +252,6 @@ Panel {
                     }
                 }
             }
-            title: qsTr('My rooms')
             height: 32 + rowHeight * (appStyle.isMobile ? 2 : 4)
 
             onAddClicked: {
@@ -317,7 +315,6 @@ Panel {
             anchors.bottomMargin: appStyle.margin.normal
             currentJid: (Qt.application.active && swapper.currentItem == chatPanel && Qt.isQtObject(chatSwapper.currentItem) && chatSwapper.currentItem.jid != undefined) ? chatSwapper.currentItem.jid : ''
             model: sortedContacts
-            title: qsTr('My contacts')
 
             onAddClicked: {
                 var clients = [];
