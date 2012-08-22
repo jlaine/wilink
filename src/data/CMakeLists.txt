@@ -14,7 +14,6 @@ set(ICONS
     images/scalable/file.svg
     images/scalable/moderator.svg
     images/scalable/peer.svg
-    images/scalable/resize.svg
     images/scalable/tip.svg
     images/scalable/web.svg
     images/scalable/wiLink.svg

@@ -99,20 +99,20 @@ GroupBox {
         }
     }
 
-    Image {
-        id: resizeButton
-
-        anchors.bottom: dialog.bottom
+    Icon {
+        id: resizeIcon
+        style: 'icon-resize-full'
+        anchors.top: dialog.bottom
+        anchors.topMargin: -4
         anchors.right: dialog.right
-        anchors.margins: 2
+        anchors.rightMargin: 4
+        opacity: 0.4
         parent: dialog
-        opacity: 0.5
-        source: 'image://icon/resize'
-        sourceSize.height: appStyle.icon.tinySize
-        sourceSize.width: appStyle.icon.tinySize
-        visible: !appStyle.isMobile
+        transform: Rotation { angle: -90 }
 
         MouseArea {
+            id: resizeArea
+
             property variant mousePress
             property variant sizePress
 
@@ -120,11 +120,11 @@ GroupBox {
             hoverEnabled: true
 
             onEntered: {
-                parent.opacity = 1
+                parent.opacity = 0.8;
             }
 
             onExited: {
-                parent.opacity = 0.5
+                parent.opacity = 0.4;
             }
 
             onPressed: {
