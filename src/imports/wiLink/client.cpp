@@ -197,9 +197,14 @@ void ChatClient::setStatusType(const QString &statusType)
     }
 }
 
-/** Returns the current subscription type for the given contact.
- *
- * @param bareJid
+/** Returns the subscription status for contact with the given \a bareJid.
+ */
+QString ChatClient::subscriptionStatus(const QString &bareJid)
+{
+    return rosterManager()->getRosterEntry(bareJid).subscriptionStatus();
+}
+
+/** Returns the subscription type for contact with the given \a bareJid.
  */
 int ChatClient::subscriptionType(const QString &bareJid)
 {
