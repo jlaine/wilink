@@ -87,8 +87,23 @@ Dialog {
                     model: ListModel {}
 
                     Component.onCompleted: {
-                        model.append({iconStyle: 'icon-home', text: 'Wifirst', type: 'wifirst'});
-                        model.append({iconStyle: 'icon-google-plus', text: 'Google', type: 'google'});
+                        // make a note of existing accounts
+                        var hasWifirst = false;
+                        var hasGoogle = false;
+                        for (var i = 0; i < accountModel.count; i++) {
+                            var account = accountModel.get(i);
+                            if (account.type == 'web' && account.realm == 'www.wifirst.net') {
+                                hasWifirst = true;
+                            } else if (account.type == 'web' && account.realm == 'www.google.com') {
+                                hasGoogle = true;
+                            }
+                        }
+
+                        // populate account type combo
+                        if (!hasWifirst)
+                            model.append({iconStyle: 'icon-home', text: 'Wifirst', type: 'wifirst'});
+                        if (!hasGoogle)
+                            model.append({iconStyle: 'icon-google-plus', text: 'Google', type: 'google'});
                         model.append({iconStyle: 'icon-user', text: qsTr('Other'), type: 'other'});
                         accountCombo.currentIndex = 0;
                     }
@@ -199,15 +214,6 @@ Dialog {
             var username = usernameInput.text;
             var password = passwordInput.text;
 
-            // check for duplicate account
-            for (var i = 0; i < accountModel.count; i++) {
-                var account = accountModel.get(i);
-                if (account.type == 'web' && account.realm == 'www.wifirst.net') {
-                    dialog.state = 'dupe';
-                    return;
-                }
-            }
-
             var xhr = new XMLHttpRequest();
             xhr.onreadystatechange = function() {
                 if (xhr.readyState == 4) {
@@ -234,15 +240,6 @@ Dialog {
             }
             var username = usernameInput.text;
             var password = passwordInput.text;
-
-            // check for duplicate account
-            for (var i = 0; i < accountModel.count; i++) {
-                var account = accountModel.get(i);
-                if (account.type == 'web' && account.realm == 'www.google.com') {
-                    dialog.state = 'dupe';
-                    return;
-                }
-            }
 
             // test credentials
             dialog.state = 'testing';
