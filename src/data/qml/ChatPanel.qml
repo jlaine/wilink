@@ -118,10 +118,7 @@ Panel {
                         switch (chatPanel.delayedOpening.action) {
                         case 'open_conversation':
                             var jid = chatPanel.delayedOpening.jid;
-                            if (chatPanel.hasSubscribedWithWifirst(jid))
-                                chatPanel.showConversation(jid);
-                            else
-                                chatPanel.addSubscriptionRequest(jid);
+                            chatPanel.showConversation(jid);
                             break;
                         case 'open_room':
                             chatPanel.showRoom(chatPanel.delayedOpening.jid);
@@ -164,7 +161,12 @@ Panel {
      */
     function showConversation(jid) {
         swapper.showPanel('ChatPanel.qml');
-        chatSwapper.showPanel('ConversationPanel.qml', { jid: Utils.jidToBareJid(jid) });
+        if (Utils.jidToDomain(jid) == 'wifirst.net' && !chatPanel.hasSubscribedWithWifirst(jid)) {
+            console.log('Sending subscribe request to ' + jid);
+            chatPanel.addSubscriptionRequest(jid);
+        } else {
+            chatSwapper.showPanel('ConversationPanel.qml', { jid: Utils.jidToBareJid(jid) });
+        }
         if (chatPanel.singlePanel)
             chatPanel.state = 'no-sidebar';
     }

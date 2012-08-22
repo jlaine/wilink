@@ -248,18 +248,12 @@ FocusScope {
                             //
                             var jid = params.jid;
                             if ( /^[^@/ ]+@[^@/ ]+$/.test(jid) ) {
-                                console.log('Open chat with: ' + jid);
                                 var panel = swapper.findPanel('ChatPanel.qml');
                                 if (panel) {
                                     if (panel.wifirstRosterReceived) {
                                         // Wifirst roster received
-                                        if (panel.hasSubscribedWithWifirst(jid)) {
-                                            console.log('Wifirst roster received, opening chat with ' + jid);
-                                            panel.showConversation(jid);
-                                        } else {
-                                            console.log('Wifirst roster received, sending subscribe request to ' + jid);
-                                            panel.addSubscriptionRequest(jid);
-                                        }
+                                        console.log('Wifirst roster received, opening chat with ' + jid);
+                                        panel.showConversation(jid);
                                     } else {
                                         // Wifirst roster NOT received, postponing all actions
                                         console.log('Postponing chat opening with ' + jid + ' to when Wifirst roster will have been received');
