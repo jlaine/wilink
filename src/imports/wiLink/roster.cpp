@@ -241,7 +241,7 @@ RosterModel::RosterModel(QObject *parent)
     // set additionals role names
     QHash<int, QByteArray> names = roleNames();
     names.insert(RosterModel::StatusRole, "status");
-    names.insert(RosterModel::SubscriptionType, "subscriptionType");
+    names.insert(RosterModel::SubscriptionTypeRole, "subscriptionType");
     setRoleNames(names);
 
     // monitor clients
