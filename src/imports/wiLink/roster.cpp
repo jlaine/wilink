@@ -553,6 +553,14 @@ QString VCard::status() const
         return "offline";
 }
 
+int VCard::subscriptionType() const
+{
+    if (!m_jid.isEmpty())
+        return VCardCache::instance()->subscriptionType(m_jid);
+    else
+        return 0;
+}
+
 QUrl VCard::url() const
 {
     return m_url;
