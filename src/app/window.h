@@ -31,11 +31,14 @@ class CustomWindowPrivate;
 class CustomWindow : public QMainWindow
 {
     Q_OBJECT
+    Q_PROPERTY(QRect availableGeometry READ availableGeometry CONSTANT)
     Q_PROPERTY(bool fullScreen READ isFullScreen WRITE setFullScreen NOTIFY windowStateChanged)
 
 public:
     CustomWindow(QtLocalPeer *peer, QWidget *parent = 0);
     ~CustomWindow();
+
+    QRect availableGeometry() const;
     void setFullScreen(bool fullScreen);
 
 signals:

@@ -216,7 +216,13 @@ FocusScope {
     Component.onCompleted: {
         window.minimumWidth = 360;
         window.minimumHeight = 360;
+
+        // set window geometry
+        var desktop = window.availableGeometry;
+        window.size = Qt.size(desktop.width - 100, desktop.height - 100);
+        window.pos = Qt.point((desktop.width - window.width) / 2, (desktop.height - window.height) / 2);
         window.fullScreen = appSettings.isMobile && appSettings.osType != 'android';
+
         window.showAndRaise();
         window.startMessages();
     }

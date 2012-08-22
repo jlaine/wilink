@@ -25,7 +25,6 @@
 #include <QDesktopWidget>
 #include <QMenuBar>
 #include <QNetworkDiskCache>
-#include <QSettings>
 #include <QShortcut>
 #include <QStringList>
 
@@ -152,19 +151,6 @@ CustomWindow::CustomWindow(QtLocalPeer *peer, QWidget *parent)
     Q_ASSERT(check);
 #endif
 
-    // restore geometry
-    const QByteArray geometry = QSettings().value("WindowGeometry").toByteArray();
-    if (!geometry.isEmpty()) {
-        restoreGeometry(geometry);
-    } else {
-        const QSize desktopSize = QApplication::desktop()->availableGeometry(this).size();
-        QSize size;
-        size.setHeight(desktopSize.height() - 100);
-        size.setWidth((desktopSize.height() * 4.0) / 3.0);
-        resize(size);
-        move((desktopSize.width() - width()) / 2, (desktopSize.height() - height()) / 2);
-    }
-
     // register url handler
     QDesktopServices::setUrlHandler("wilink", this, "_q_openUrl");
 
@@ -174,10 +160,12 @@ CustomWindow::CustomWindow(QtLocalPeer *peer, QWidget *parent)
 
 CustomWindow::~CustomWindow()
 {
-    // save geometry
-    QSettings settings;
-    settings.setValue("CustomWindowGeometry", saveGeometry());
     delete d;
+}
+
+QRect CustomWindow::availableGeometry() const
+{
+    return QApplication::desktop()->availableGeometry(this);
 }
 
 void CustomWindow::changeEvent(QEvent *event)
