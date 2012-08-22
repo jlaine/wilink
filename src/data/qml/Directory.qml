@@ -35,8 +35,6 @@ Panel {
 
     Rectangle {
         color: '#F6F6F6'
-        //color: '#333'
-        //color: 'white'
         anchors.fill: parent
     }
 
@@ -231,25 +229,7 @@ Panel {
                 hoverEnabled: true
                 anchors.fill: person
                 onClicked: {
-                    var jid = jabber_id;
-                    var panel = swapper.findPanel('ChatPanel.qml');
-                    if (panel) {
-                        console.log(vcard.name);
-                        if (panel.wifirstRosterReceived) {
-                            // Wifirst roster received
-                            if (panel.hasSubscribedWithWifirst(jid)) {
-                                console.log('Wifirst roster received, opening chat with ' + jid);
-                                panel.showConversation(jid);
-                            } else {
-                                console.log('Wifirst roster received, sending subscribe request to ' + jid);
-                                panel.addSubscriptionRequest(jid);
-                            }
-                        } else {
-                            // Wifirst roster NOT received, postponing all actions
-                            console.log('Postponing chat opening with ' + jid + ' to when Wifirst roster will have been received');
-                            panel.delayedOpening = {action: 'open_conversation', jid: jid};
-                        }
-                    }
+                    Qt.openUrlExternally('wilink://chat?jid=' + jabber_id);
                 }
                 onEntered: {
                     label.opacity = 1;
