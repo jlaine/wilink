@@ -31,18 +31,6 @@ FocusScope {
      */
     AccountModel {
         id: accountModel
-
-        /** Load plugins at startup.
-         */
-        Component.onCompleted: {
-            Storage.initialize();
-            if (accountModel.count) {
-                appPlugins.load();
-            } else {
-                swapper.showPanel('SetupBackground.qml');
-                dialogSwapper.showPanel('SetupDialog.qml', {accountChoice: false});
-            }
-        }
     }
 
     /** Logger which records debugging and protocol (XMPP, SIP) information.
@@ -325,6 +313,25 @@ FocusScope {
          */
         onShowPreferences: {
             dialogSwapper.showPanel('PreferenceDialog.qml');
+        }
+    }
+
+    Timer {
+        interval: 100
+        repeat: false
+        running: true
+
+        /** Load plugins at startup.
+         */
+        onTriggered: {
+            Storage.initialize();
+            if (accountModel.count) {
+                swapper.showPanel('WebPanel.qml');
+                appPlugins.load();
+            } else {
+                swapper.showPanel('SetupBackground.qml');
+                dialogSwapper.showPanel('SetupDialog.qml', {accountChoice: false});
+            }
         }
     }
 
