@@ -332,6 +332,20 @@ FocusScope {
                 swapper.showPanel('SetupBackground.qml');
                 dialogSwapper.showPanel('SetupDialog.qml', {accountChoice: false});
             }
+            rpcTimer.start();
+        }
+    }
+
+    Timer {
+        id: rpcTimer
+
+        interval: 1000
+        repeat: false
+
+        /** Start handling RPC messages.
+         */
+        onTriggered: {
+            window.startMessages();
         }
     }
 

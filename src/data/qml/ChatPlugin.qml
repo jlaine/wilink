@@ -32,7 +32,7 @@ Plugin {
             priority: 10,
             text: qsTr('Chat'),
             visible: true});
-        swapper.showPanel('ChatPanel.qml');
+        swapper.addPanel('ChatPanel.qml');
     }
 
     onUnloaded: {
