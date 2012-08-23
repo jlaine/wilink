@@ -126,6 +126,6 @@ Item {
             pluginModel.append({ source: 'PhonePlugin.qml', autoload: true });
         pluginModel.append({ source: 'PhotoPlugin.qml', autoload: false });
         pluginModel.append({ source: 'SharePlugin.qml', autoload: true });
-        pluginModel.append({ source: 'WebPlugin.qml', autoload: false });
+        pluginModel.append({ source: 'WebPlugin.qml', autoload: true });
     }
 }
