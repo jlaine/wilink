@@ -266,13 +266,9 @@ FocusScope {
                                         panel.delayedOpening = {action: 'open_conversation', jid: jid};
                                     }
                                 }
-                            } else { // jid format is invalid
-                                dialogSwapper.showPanel('ErrorNotification.qml', {
-                                    title: qsTr('Chat failed'),
-                                    text: qsTr('Sorry, but the chat session could not be started.') + '\n\n' + qsTr('%1 is not a valid contact').replace('%1',jid),
-                                });
+                            } else {
+                                swapper.showPanel('ChatPanel.qml');
                             }
-
                             break;
                         case 'chat_room':
                             // Accepts the following params
@@ -296,11 +292,11 @@ FocusScope {
                                     }
                                 }
                             } else {
-                                dialogSwapper.showPanel('ErrorNotification.qml', {
-                                    title: qsTr('Chat failed'),
-                                    text: qsTr('Sorry, but the chat session could not be started.') + '\n\n' + qsTr('%1 is not a valid chat room id').replace('%1',jid),
-                                });
+                                swapper.showPanel('ChatPanel.qml');
                             }
+                            break;
+                        case 'phone':
+                            swapper.showPanel('PhonePanel.qml');
                             break;
                         default:
                             break;
