@@ -60,6 +60,7 @@ Dialog {
                 horizontalAlignment: Text.Center
                 verticalAlignment: Text.Center
                 text: qsTr('Send a subscription request to %1?').replace('%1', vcard.name);
+                wrapMode: Text.WordWrap
             }
         }
     }
