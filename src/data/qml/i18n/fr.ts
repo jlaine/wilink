@@ -444,25 +444,6 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>Main</name>
-    <message>
-        <source>Chat failed</source>
-        <translation>Le tchat a échoué</translation>
-    </message>
-    <message>
-        <source>Sorry, but the chat session could not be started.</source>
-        <translation>Désolé, la session de tchat n&apos;a pu être démarrée.</translation>
-    </message>
-    <message>
-        <source>%1 is not a valid chat room id</source>
-        <translation>%1 n&apos;est pas un identifiant de salon de discussion valide</translation>
-    </message>
-    <message>
-        <source>%1 is not a valid contact</source>
-        <translation>%1 n&apos;est pas un identifiant de contact valide</translation>
-    </message>
-</context>
-<context>
     <name>PhoneCallWidget</name>
     <message>
         <source>Connecting..</source>
