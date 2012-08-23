@@ -553,6 +553,9 @@ Panel {
                 xhr.send();
             }
         }
+
+        // start processing RPC messages
+        window.startMessages();
     }
 
     Keys.onPressed: {

@@ -224,7 +224,6 @@ FocusScope {
         window.fullScreen = appSettings.isMobile && appSettings.osType != 'android';
 
         window.showAndRaise();
-        window.startMessages();
     }
 
     Connections {
