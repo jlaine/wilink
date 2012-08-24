@@ -49,11 +49,15 @@ Panel {
                 target: item.client
 
                 onAuthenticationFailed: {
-                    console.log("Failed to authenticate with chat server");
                     var domain = Utils.jidToDomain(item.client.jid);
-                    if (domain != 'wifirst.net' && domain != 'chat.facebook.com') {
+                    console.log("Failed to authenticate with chat server for domain: " + domain);
+                    if (domain == 'chat.facebook.com') {
+                        dialogSwapper.showPanel('FacebookTokenNotification.qml');
+                        item.client.disconnectFromServer();
+                    } else if (domain != 'wifirst.net') {
                         var jid = Utils.jidToBareJid(item.client.jid);
                         dialogSwapper.showPanel('AccountPasswordDialog.qml', {client: item.client, jid: jid});
+                        item.client.disconnectFromServer();
                     }
                 }
 

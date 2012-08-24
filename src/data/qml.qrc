@@ -34,6 +34,7 @@
     <file>qml/Dock.qml</file>
     <file>qml/DockButton.qml</file>
     <file>qml/ErrorNotification.qml</file>
+    <file>qml/FacebookTokenNotification.qml</file>
     <file>qml/FolderQueueView.qml</file>
     <file>qml/GeneralPreferencePanel.qml</file>
     <file>qml/GroupBox.qml</file>

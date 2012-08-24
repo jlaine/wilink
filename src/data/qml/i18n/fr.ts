@@ -343,6 +343,21 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
+    <name>FacebookTokenNotification</name>
+    <message>
+        <source>In order to chat with your Facebook friends, you need to add the Wifirst Facebook application then restart wiLink.
+
+Do you accept?</source>
+        <translation>Pour tchatter avec vos amis Facebook, vous devez ajouter l&apos;application Facebook Wifirst et redémarrer wiLink.
+
+Acceptez-vous?</translation>
+    </message>
+    <message>
+        <source>Access to your Facebook chat</source>
+        <translation>Accès à votre chat Facebook</translation>
+    </message>
+</context>
+<context>
     <name>FolderQueueView</name>
     <message>
         <source>%1 files</source>

@@ -32,6 +32,7 @@ DiscoveryPanel 1.0 DiscoveryPanel.qml
 Dock 1.0 Dock.qml
 DockButton 1.0 DockButton.qml
 ErrorNotification 1.0 ErrorNotification.qml
+FacebookTokenNotification 1.0 FacebookTokenNotification.qml
 FolderQueueView 1.0 FolderQueueView.qml
 GeneralPreferencePanel 1.0 GeneralPreferencePanel.qml
 GroupBox 1.0 GroupBox.qml
