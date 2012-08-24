@@ -25,7 +25,7 @@ Dialog {
     property alias iconStyle: icon.style
     property alias text: label.text
 
-    minimumHeight: 150
+    minimumHeight: 170
 
     Item {
         anchors.fill: parent
