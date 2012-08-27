@@ -158,12 +158,17 @@ Panel {
     Keys.onPressed: {
         if (event.modifiers == Qt.ControlModifier && event.key == Qt.Key_T) {
             tabSwapper.addPanel('WebTab.qml', {}, true);
-        } else if (event.modifiers == Qt.ControlModifier && event.key == Qt.Key_W) {
+        } else if (((event.modifiers == Qt.ControlModifier) && (event.key == Qt.Key_W))
+                || ((event.modifiers == Qt.ControlModifier) && (event.key == Qt.Key_F4))) {
             if (tabSwapper.model.count > 1)
                 tabSwapper.model.get(tabSwapper.currentIndex).panel.close();
-        } else if ((event.modifiers  & Qt.ControlModifier) && (event.modifiers & Qt.AltModifier) && event.key == Qt.Key_Left) {
+        } else if (((event.modifiers & Qt.ControlModifier) && (event.modifiers & Qt.AltModifier) && (event.key == Qt.Key_Left))
+                || ((event.modifiers & Qt.ControlModifier) && (event.key == Qt.Key_PageUp))
+                || ((event.modifiers == (Qt.ControlModifier|Qt.ShiftModifier)) && (event.key == Qt.Key_Tab))) {
             tabSwapper.decrementCurrentIndex();
-        } else if ((event.modifiers  & Qt.ControlModifier) && (event.modifiers & Qt.AltModifier) && event.key == Qt.Key_Right) {
+        } else if (((event.modifiers & Qt.ControlModifier) && (event.modifiers & Qt.AltModifier) && (event.key == Qt.Key_Right))
+                || ((event.modifiers & Qt.ControlModifier) && (event.key == Qt.Key_PageDown))
+                || ((event.modifiers == Qt.ControlModifier) && (event.key == Qt.Key_Tab))) {
             tabSwapper.incrementCurrentIndex();
         }
     }
