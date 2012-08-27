@@ -550,12 +550,10 @@ Panel {
          || ((event.modifiers == Qt.ControlModifier) && (event.key == Qt.Key_F4))) {
             chatSwapper.model.get(chatSwapper.currentIndex).panel.close();
         } else if (((event.modifiers & Qt.ControlModifier) && (event.modifiers & Qt.AltModifier) && (event.key == Qt.Key_Left))
-                || ((event.modifiers & Qt.ControlModifier) && (event.key == Qt.Key_PageUp))
-                || ((event.modifiers == (Qt.ControlModifier|Qt.ShiftModifier)) && (event.key == Qt.Key_Tab))) {
+                || ((event.modifiers & Qt.ControlModifier) && (event.key == Qt.Key_PageUp))) {
             chatSwapper.decrementCurrentIndex();
         } else if (((event.modifiers & Qt.ControlModifier) && (event.modifiers & Qt.AltModifier) && (event.key == Qt.Key_Right))
-                || ((event.modifiers & Qt.ControlModifier) && (event.key == Qt.Key_PageDown))
-                || ((event.modifiers == Qt.ControlModifier) && (event.key == Qt.Key_Tab))) {
+                || ((event.modifiers & Qt.ControlModifier) && (event.key == Qt.Key_PageDown))) {
             chatSwapper.incrementCurrentIndex();
         }
     }
