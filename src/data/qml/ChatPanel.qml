@@ -562,8 +562,7 @@ Panel {
 
     Keys.onPressed: {
         if (event.modifiers == Qt.ControlModifier && event.key == Qt.Key_W) {
-            if (chatSwapper.model.count > 1)
-                chatSwapper.model.get(chatSwapper.currentIndex).panel.close();
+            chatSwapper.model.get(chatSwapper.currentIndex).panel.close();
         } else if ((event.modifiers  & Qt.ControlModifier) && (event.modifiers & Qt.AltModifier) && event.key == Qt.Key_Left) {
             chatSwapper.decrementCurrentIndex();
         } else if ((event.modifiers  & Qt.ControlModifier) && (event.modifiers & Qt.AltModifier) && event.key == Qt.Key_Right) {

@@ -130,11 +130,9 @@ ListView {
             anchors.rightMargin: appStyle.margin.large
             anchors.verticalCenter: parent.verticalCenter
             iconStyle: 'icon-remove'
-            visible: tabView.model.count > 1
             width: iconSize
             opacity: (closeButton.state == "hovered") || (closeButton.state == "pressed") ? 1 : 0.5
             onClicked: model.panel.close()
-
         }
 
 
