@@ -290,7 +290,7 @@ Item {
         onHeightChanged: {
             // follow bottom if we were at the bottom
             if (historyView.scrollBarAtBottom) {
-                historyView.positionViewAtIndex(historyView.count - 1, ListView.End);
+                historyView.positionViewAtEnd();
             }
         }
     }
@@ -305,7 +305,7 @@ Item {
         onBottomChanged: {
             // follow bottom if we were at the bottom
             if (historyView.scrollBarAtBottom) {
-                historyView.positionViewAtIndex(historyView.count - 1, ListView.End);
+                historyView.positionViewAtEnd();
             }
             historyView.bottomChanging = false;
         }
