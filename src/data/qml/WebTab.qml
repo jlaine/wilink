@@ -111,12 +111,13 @@ Panel {
             anchors.right: parent.right
             focus: webView.url == ''
             text: webView.url
+            visible: urlBar
 
             onAccepted: {
                 var url = urlInput.text.trim();
                 if (url.match(/^(file|ftp|http|https):\/\//)) {
                     webView.url = urlInput.text;
-                } else if ((url.search(/\s/) == -1) && url.match(/\.[a-z]{2,}$/)) {
+                } else if ((url.search(/\s/) == -1) && url.match(/\.[a-z\.\/]{2,}$/)) {
                     webView.url = 'http://' + url;
                 } else {
                     webView.url = 'http://www.google.com/search?q=' + encodeURIComponent(url);
@@ -209,11 +210,5 @@ Panel {
                 webView.reload.triggered()
             }
         }
-    }
-
-    states: State {
-        name: 'no-topbar'
-        when: !urlBar
-        PropertyChanges { target: topBar; height: 0; opacity: 0 }
     }
 }
