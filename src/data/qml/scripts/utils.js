@@ -167,7 +167,13 @@ function parseWilinkURI(uri) {
     var argv = decodeURIComponent(uri).split('wilink://');
     if (argv.length == 2) {
         argv = argv[1].split('?');
+
+        // NOTE: on windows browsers seem to mangle the URL and add a slash
         result.verb = argv[0];
+        if (result.verb[result.verb.length - 1] == '/') {
+            result.verb = result.verb.substr(0, result.verb.length - 1);
+        }
+
         if (argv.length >=2) {
             var params = argv[1].split('&');
             var keyval = [];
