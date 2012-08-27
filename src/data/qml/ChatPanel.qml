@@ -54,6 +54,7 @@ Panel {
                     if (domain == 'chat.facebook.com') {
                         dialogSwapper.showPanel('FacebookTokenNotification.qml');
                         item.client.disconnectFromServer();
+                        chatClients.model.remove(model.index);
                     } else if (domain != 'wifirst.net') {
                         var jid = Utils.jidToBareJid(item.client.jid);
                         dialogSwapper.showPanel('AccountPasswordDialog.qml', {client: item.client, jid: jid});
