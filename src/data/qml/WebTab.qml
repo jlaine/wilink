@@ -57,6 +57,9 @@ Panel {
             anchors.left: parent.left
 
             ToolButton {
+                anchors.top: parent.top
+                anchors.topMargin: 2
+                anchors.bottom: parent.bottom
                 enabled: webView.back.enabled
                 iconStyle: 'icon-chevron-left'
                 width: iconSize
@@ -65,6 +68,9 @@ Panel {
             }
 
             ToolButton {
+                anchors.top: parent.top
+                anchors.topMargin: 2
+                anchors.bottom: parent.bottom
                 enabled: webView.forward.enabled
                 iconStyle: 'icon-chevron-right'
                 width: iconSize
@@ -73,6 +79,9 @@ Panel {
             }
 
             ToolButton {
+                anchors.top: parent.top
+                anchors.topMargin: 2
+                anchors.bottom: parent.bottom
                 enabled: webView.url != '' && webView.reload.enabled
                 iconStyle: 'icon-refresh'
                 visible: !webView.stop.enabled
@@ -82,6 +91,9 @@ Panel {
             }
 
             ToolButton {
+                anchors.top: parent.top
+                anchors.topMargin: 2
+                anchors.bottom: parent.bottom
                 iconStyle: 'icon-stop'
                 visible: webView.stop.enabled
                 width: iconSize
