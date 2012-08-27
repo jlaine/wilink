@@ -163,12 +163,10 @@ Panel {
             if (tabSwapper.model.count > 1)
                 tabSwapper.model.get(tabSwapper.currentIndex).panel.close();
         } else if (((event.modifiers & Qt.ControlModifier) && (event.modifiers & Qt.AltModifier) && (event.key == Qt.Key_Left))
-                || ((event.modifiers & Qt.ControlModifier) && (event.key == Qt.Key_PageUp))
-                || ((event.modifiers == (Qt.ControlModifier|Qt.ShiftModifier)) && (event.key == Qt.Key_Tab))) {
+                || ((event.modifiers & Qt.ControlModifier) && (event.key == Qt.Key_PageUp))) {
             tabSwapper.decrementCurrentIndex();
         } else if (((event.modifiers & Qt.ControlModifier) && (event.modifiers & Qt.AltModifier) && (event.key == Qt.Key_Right))
-                || ((event.modifiers & Qt.ControlModifier) && (event.key == Qt.Key_PageDown))
-                || ((event.modifiers == Qt.ControlModifier) && (event.key == Qt.Key_Tab))) {
+                || ((event.modifiers & Qt.ControlModifier) && (event.key == Qt.Key_PageDown))) {
             tabSwapper.incrementCurrentIndex();
         }
     }
