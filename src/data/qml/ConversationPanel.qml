@@ -329,12 +329,12 @@ Panel {
                     menu.model.append({
                         action: 'send',
                         iconStyle: 'icon-upload',
-                        text: qsTr('Send')});
+                        text: qsTr('Send a file')});
                 }
                 menu.model.append({
                     action: 'clear',
                     iconStyle: 'icon-remove',
-                    text: qsTr('Clear')});
+                    text: qsTr('Clear history')});
             }
         }
 

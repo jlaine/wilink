@@ -241,20 +241,16 @@ Acceptez-vous?</translation>
         <translation>Envoyer un fichier</translation>
     </message>
     <message>
-        <source>Send</source>
-        <translation>Envoyer</translation>
-    </message>
-    <message>
         <source>Show this conversation</source>
         <translation>Afficher la conversation</translation>
     </message>
     <message>
-        <source>Clear</source>
-        <translation>Effacer</translation>
-    </message>
-    <message>
         <source>Fetch older messages</source>
         <translation>Messages plus anciens</translation>
+    </message>
+    <message>
+        <source>Clear history</source>
+        <translation>Effacer l'historique</translation>
     </message>
 </context>
 <context>

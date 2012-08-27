@@ -51,9 +51,9 @@ Rectangle {
         id: itemText
 
         anchors.left: icon.right
-        anchors.leftMargin: 8
+        anchors.leftMargin: 4
         anchors.right: parent.right
-        anchors.rightMargin: 8
+        anchors.rightMargin: 4
         anchors.verticalCenter: parent.verticalCenter
         color: menuItem.enabled ? '#333333' : '#888'
         elide: Text.ElideRight
