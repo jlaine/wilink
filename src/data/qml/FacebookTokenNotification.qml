@@ -19,6 +19,7 @@
 
 import QtQuick 1.1
 import wiLink 2.4
+import 'scripts/storage.js' as Storage
 
 NotificationDialog {
     id: dialog
@@ -30,6 +31,10 @@ NotificationDialog {
     onAccepted: {
         Qt.openUrlExternally("https://apps.wifirst.net/auth/facebook");
         dialog.close();
+    }
+
+    onRejected: {
+        Storage.setSetting('facebookTokenRefused', '1');
     }
 }
 

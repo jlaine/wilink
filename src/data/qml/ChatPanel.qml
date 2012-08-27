@@ -19,6 +19,7 @@
 
 import QtQuick 1.1
 import wiLink 2.4
+import 'scripts/storage.js' as Storage
 import 'scripts/utils.js' as Utils
 
 Panel {
@@ -51,8 +52,10 @@ Panel {
                 onAuthenticationFailed: {
                     var domain = Utils.jidToDomain(item.client.jid);
                     console.log("Failed to authenticate with chat server for domain: " + domain);
-                    if (domain == 'chat.facebook.com') {
-                        dialogSwapper.showPanel('FacebookTokenNotification.qml');
+                    if (isFacebook(item.client.jid)) {
+                        if (Storage.getSetting('facebookTokenRefused', '0') != '1') {
+                            dialogSwapper.showPanel('FacebookTokenNotification.qml');
+                        }
                         item.client.disconnectFromServer();
                         chatClients.model.remove(model.index);
                     } else if (domain != 'wifirst.net') {
@@ -65,6 +68,12 @@ Panel {
                 onConflictReceived: {
                     console.log("Received a resource conflict from chat server");
                     Qt.quit();
+                }
+
+                onConnected: {
+                    if (isFacebook(item.client.jid)) {
+                        Storage.removeSetting('facebookTokenRefused');
+                    }
                 }
 
                 // FIXME : this is a hack to replay received messages after

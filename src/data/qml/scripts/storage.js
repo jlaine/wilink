@@ -46,6 +46,15 @@ function getSetting(setting, fallback) {
     return res;
 }
 
+/** Removes a setting.
+ */
+function removeSetting(setting) {
+    var db = getDatabase();
+    db.transaction(function(tx) {
+        tx.executeSql('DELETE FROM setting WHERE key=?;', [setting]);
+    });
+}
+
 /** Stores a setting value.
  */
 function setSetting(setting, value) {
