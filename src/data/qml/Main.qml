@@ -306,7 +306,7 @@ FocusScope {
         /** Shows the FAQ page in the browser.
          */
         onShowHelp: {
-            Qt.openUrlExternally('https://www.wifirst.net/wilink/faq');
+            Qt.openUrlExternally(appSettings.wifirstBaseUrl + '/wilink/faq');
         }
 
         /** Shows the "preferences" dialog.

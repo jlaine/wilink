@@ -194,7 +194,7 @@ Dialog {
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.bottom: parent.bottom
-            text: qsTr('If you need help, please refer to the <a href="%1">wiLink FAQ</a>.').replace('%1', 'https://www.wifirst.net/wilink/faq')
+            text: qsTr('If you need help, please refer to the <a href="%1">wiLink FAQ</a>.').replace('%1', appSettings.wifirstBaseUrl + '/wilink/faq')
         }
     }
 
