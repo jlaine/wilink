@@ -24,6 +24,7 @@ import 'scripts/utils.js' as Utils
 Item {
     id: panel
 
+    property bool changed: false
     property alias model: accountView.model
 
     signal addClicked
@@ -99,13 +100,17 @@ Item {
 
         Button {
             iconStyle: 'icon-plus'
-            onClicked: panel.addClicked()
+            onClicked: {
+                panel.changed = true;
+                panel.addClicked();
+            }
         }
 
         Button {
             iconStyle: 'icon-minus'
             onClicked: {
                 if (accountView.currentIndex >= 0) {
+                    panel.changed = true;
                     accountView.model.remove(accountView.currentIndex);
                 }
             }

@@ -37,7 +37,7 @@ Dialog {
             if (panel) {
                 console.log("Saving " + panel);
                 panel.save()
-                if (source == 'AccountPreferencePanel.qml') {
+                if (source == 'AccountPreferencePanel.qml' && panel.changed) {
                     reloadWindow = true;
                 }
             }

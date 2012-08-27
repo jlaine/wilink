@@ -24,6 +24,8 @@ import 'scripts/utils.js' as Utils
 Panel {
     id: panel
 
+    property alias changed: listPanel.changed
+
     function save() {
         listPanel.model.submit();
     }
