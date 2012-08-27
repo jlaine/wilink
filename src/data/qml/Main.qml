@@ -339,7 +339,7 @@ FocusScope {
     Timer {
         id: rpcTimer
 
-        interval: 1000
+        interval: 2000
         repeat: false
 
         /** Start handling RPC messages.
