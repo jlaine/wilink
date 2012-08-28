@@ -182,7 +182,7 @@ Panel {
                 if (Utils.jidToDomain(client.jid) == 'wifirst.net') {
                     // FIXME: use QXmppRosterIq.SubscriptionType
                     // "2" means the user has a subscription to the contact's presence information
-                    if (!(client.subscriptionType(jid) & 2)) {
+                    if ((client.subscriptionType(jid) & 2) == 0) {
                         if (client.subscriptionStatus(jid) == 'subscribe') {
                             console.log('Already sent subscribe request to ' + jid);
                         } else {
