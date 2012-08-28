@@ -90,6 +90,9 @@ ContactView {
 
             Item {
                 id: status
+
+                property bool pending: (model.subscriptionType & 2) == 0
+
                 anchors.right: parent.right
                 anchors.rightMargin: appStyle.margin.normal
                 anchors.verticalCenter: parent.verticalCenter
@@ -100,14 +103,14 @@ ContactView {
                     anchors.fill: parent
                     presenceStatus: model.status
                     smooth: !block.moving
-                    visible: model.subscriptionStatus != 'subscribe'
+                    visible: !status.pending
                 }
 
                 Icon {
                     anchors.centerIn: parent
                     color: 'white'
                     text: '?'
-                    visible: model.subscriptionStatus == 'subscribe'
+                    visible: status.pending
                 }
             }
 
