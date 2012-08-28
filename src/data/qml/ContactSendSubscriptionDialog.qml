@@ -54,9 +54,21 @@ Dialog {
             anchors.right: parent.right
             height: 25
 
+            Image {
+                id: image
+
+                anchors.top: parent.top
+                anchors.left: parent.left
+                source: vcard.avatar
+            }
+
             Label {
-                anchors.fill: parent
+                anchors.left: image.right
+                anchors.leftMargin: 8
+                anchors.right: parent.right
+                anchors.top: parent.top
                 anchors.topMargin: 15
+                anchors.bottom: parent.bottom
                 horizontalAlignment: Text.Center
                 verticalAlignment: Text.Center
                 text: qsTr('Send a subscription request to %1?').replace('%1', vcard.name);
