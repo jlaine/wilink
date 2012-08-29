@@ -246,6 +246,10 @@ RosterModel::RosterModel(QObject *parent)
     names.insert(RosterModel::SubscriptionTypeRole, "subscriptionType");
     setRoleNames(names);
 
+    // use a queued connection so that the VCard gets updated first
+    connect(VCardCache::instance(), SIGNAL(cardChanged(QString)),
+            this, SLOT(_q_itemChanged(QString)), Qt::QueuedConnection);
+
     // monitor clients
     foreach (ChatClient *client, ChatClient::instances())
         _q_clientCreated(client);
@@ -365,11 +369,6 @@ void RosterModel::_q_clientCreated(ChatClient *client)
 
         check = connect(client->rosterManager(), SIGNAL(presenceChanged(QString,QString)),
                         this, SLOT(_q_itemChanged(QString)));
-        Q_ASSERT(check);
-
-        // use a queued connection so that the VCard gets updated first
-        check = connect(VCardCache::instance(), SIGNAL(cardChanged(QString)),
-                        this, SLOT(_q_itemChanged(QString)), Qt::QueuedConnection);
         Q_ASSERT(check);
 
         check = connect(client->rosterManager(), SIGNAL(rosterReceived()),
