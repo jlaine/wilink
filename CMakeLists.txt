@@ -102,6 +102,14 @@ if(APPLE)
     add_custom_target(package DEPENDS ${BUNDLE_DMG})
 else(APPLE)
     if(WIN32)
+        set(CPACK_NSIS_DEFINES "
+  VIProductVersion ${WILINK_VERSION}.0
+  VIAddVersionKey CompanyName \\\"Wifirst\\\"
+  VIAddVersionKey FileDescription \\\"wiLink ${WILINK_VERSION}\\\"
+  VIAddVersionKey FileVersion \\\"${WILINK_VERSION}\\\"
+  VIAddVersionKey LegalCopyright \\\"Copyright 2009-2012 Wifirst\\\"
+  VIAddVersionKey ProductName \\\"wiLink\\\"
+  VIAddVersionKey ProductVersion \\\"${WILINK_VERSION}\\\"")
         set(CPACK_NSIS_PAGE_COMPONENTS "!define MUI_FINISHPAGE_RUN \\\"$INSTDIR\\\\bin\\\\wiLink.exe\\\";")
         set(CPACK_NSIS_FULL_INSTALL "
   ;Make sure program is closed
