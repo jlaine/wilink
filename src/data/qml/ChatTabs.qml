@@ -98,7 +98,7 @@ ListView {
         SocialIcon {
             id: socialIcon
 
-            email: model.panel.subTitle
+            jid: model.panel.jid
             anchors.left: icon.right
             anchors.margins: appStyle.margin.normal
             anchors.verticalCenter: parent.verticalCenter

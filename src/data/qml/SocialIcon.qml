@@ -23,16 +23,22 @@ import 'scripts/utils.js' as Utils
 Icon {
     id: socialIcon
 
-    property string email: ""
-    property bool isVisible: false
-    width: isVisible ? appStyle.icon.tinySize : 0
-    height: isVisible ? appStyle.icon.tinySize : 0
+    property string jid
+
+    width: style ? appStyle.icon.tinySize : 0
+    height: style ? appStyle.icon.tinySize : 0
     font.pixelSize: 16
 
-    Component.onCompleted: {
-        style = Utils.getSocialIcon(email).style
-        color = Utils.getSocialIcon(email).color
-        opacity = Utils.getSocialIcon(email).opacity
-        isVisible = Utils.getSocialIcon(email).visible
+    onJidChanged: {
+        var domain = Utils.jidToDomain(jid);
+        if (domain == 'chat.facebook.com') {
+            color = '#3d589d';
+            style = 'icon-facebook-sign';
+        } else if (domain == 'gmail.com') {
+            color = '#f71100';
+            style = 'icon-google-plus-sign';
+        } else {
+            style = '';
+        }
     }
 }
