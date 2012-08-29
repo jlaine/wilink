@@ -91,7 +91,7 @@ ContactView {
             Item {
                 id: status
 
-                property bool pending: (model.subscriptionType & 2) == 0
+                property bool pending: (model.subscriptionStatus == 'subscribe')
 
                 anchors.right: parent.right
                 anchors.rightMargin: appStyle.margin.normal
