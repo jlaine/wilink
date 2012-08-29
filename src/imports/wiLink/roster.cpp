@@ -200,6 +200,7 @@ void RosterModelPrivate::itemAdded(QXmppRosterManager *rosterManager, const QStr
     RosterItem *item = find(jid);
     if (item) {
         item->rosterManagers << rosterManager;
+        emit q->dataChanged(q->createIndex(item), q->createIndex(item));
         return;
     }
 
