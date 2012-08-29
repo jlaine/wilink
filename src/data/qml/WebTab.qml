@@ -170,7 +170,7 @@ Panel {
                         webView.evaluateJavaScript(js);
                     } else {
                         // catch links to wilink:// urls
-                        webView.evaluateJavaScript('for (var i = 0; i < document.links.length; ++i) { if (/^wilink:/.test(document.links[i].href)) { document.links[i].onclick = function() { window.qml.openUrl(this.href); return false; } } }');
+                        webView.evaluateJavaScript('$("a[href^=\\"wilink:\\"]").live("click", function() { window.qml.openUrl(this.href); return false; })');
                     }
                 }
             }
