@@ -29,7 +29,6 @@ Panel {
     property alias jid: participantModel.jid
     property alias room: participantModel.room
     property string title: Utils.jidToUser(jid)
-    property string subTitle: Qt.isQtObject(room) ? room.subject : ''
     property string presenceStatus
 
     SoundLoader {

@@ -28,21 +28,6 @@ Panel {
     property alias jid: conversation.jid
     property alias title: vcard.name
     property alias presenceStatus: vcard.status
-    property string subTitle
-
-    subTitle: {
-        var domain = Utils.jidToDomain(vcard.jid);
-        if (domain == 'wifirst.net') {
-            // for wifirst accounts, return the nickname if it is
-            // different from the display name
-            if (vcard.name != vcard.nickName)
-                return vcard.nickName;
-            else
-                return '';
-        } else {
-            return vcard.jid;
-        }
-    }
 
     SoundLoader {
         id: incomingMessageSound
