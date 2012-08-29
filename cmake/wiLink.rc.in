@@ -15,7 +15,7 @@ BEGIN
         BEGIN
             VALUE "FileDescription",  "wiLink ${WILINK_VERSION}\0"
             VALUE "FileVersion",      "${WILINK_VERSION_WIN32}\0"
-            VALUE "LegalCopyright",   "Copyright 2009-2010 Bollore telecom\0"
+            VALUE "LegalCopyright",   "Copyright 2009-2012 Wifirst\0"
             VALUE "ProductName",      "wiLink\0"
             VALUE "ProductVersion",   "${WILINK_VERSION_WIN32}\0"
         END
