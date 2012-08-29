@@ -153,7 +153,6 @@ Panel {
                 }
                 preferredHeight: webFlickable.height
                 preferredWidth: webFlickable.width
-                settings.printElementBackgrounds: true
 
                 onAlert: {
                     console.log("Alert: " + message);
