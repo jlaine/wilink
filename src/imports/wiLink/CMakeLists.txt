@@ -36,10 +36,9 @@ set(plugin_SOURCES
     menubar.cpp
     model.cpp
     notifications.cpp
-    photos.cpp
     phone.cpp
     phone/sip.cpp
-    phone/stun.cpp
+    photos.cpp
     places.cpp
     rooms.cpp
     roster.cpp
@@ -67,7 +66,6 @@ set(plugin_MOC_HEADERS
     photos.h
     phone.h
     phone/sip.h
-    phone/stun.h
     places.h
     rooms.h
     roster.h

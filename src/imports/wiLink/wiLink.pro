@@ -53,7 +53,6 @@ SOURCES += \
     idle/idle.cpp \
     menubar.cpp \
     model.cpp \
-    news.cpp \
     notifications.cpp \
     phone.cpp \
     phone/sip.cpp \
@@ -64,6 +63,7 @@ SOURCES += \
     settings.cpp \
     shares.cpp \
     systeminfo.cpp \
+    translations.cpp \
     updater.cpp
 
 HEADERS += \
@@ -81,7 +81,6 @@ HEADERS += \
     idle/idle.h \
     menubar.h \
     model.h \
-    news.h \
     notifications.h \
     photos.h \
     phone.h \
@@ -93,6 +92,7 @@ HEADERS += \
     settings.h \
     shares.h \
     systeminfo.h \
+    translations.h \
     updater.h
 
 INCLUDEPATH += \
