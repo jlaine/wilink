@@ -102,6 +102,7 @@ void ShareWatcher::_q_clientCreated(ChatClient *client)
 
 void ShareWatcher::_q_clientDestroyed(ChatClient *client)
 {
+    Q_UNUSED(client);
     if (m_shareDatabase && ChatClient::instances().isEmpty()) {
         delete m_shareDatabase;
         m_shareDatabase = 0;
