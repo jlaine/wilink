@@ -1,2 +1,2 @@
 TEMPLATE = subdirs
-SUBDIRS = qdjango qxmpp libmad
+SUBDIRS = qdjango qxmpp libmad qtsingleapplication

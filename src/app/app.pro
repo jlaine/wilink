@@ -26,8 +26,8 @@ android|symbian|contains(MEEGO_EDITION,harmattan) {
 }
 
 RESOURCES += app.qrc ../data/qml.qrc
-SOURCES += main.cpp window.cpp
-HEADERS += window.h
+SOURCES += main.cpp network.cpp window.cpp
+HEADERS += network.h window.h
 
 mac {
     SOURCES += application_mac.mm
@@ -35,6 +35,8 @@ mac {
 }
 
 INCLUDEPATH += $$WILINK_INCLUDE_DIR
+INCLUDEPATH += ../3rdparty/qtsingleapplication
+LIBS += -L../3rdparty/qtsingleapplication -lqtsingleapplication
 
 # Installation
 QMAKE_TARGET_COMPANY="Wifirst"
