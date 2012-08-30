@@ -60,6 +60,18 @@ Panel {
                 anchors.top: parent.top
                 anchors.topMargin: 2
                 anchors.bottom: parent.bottom
+                iconStyle: 'icon-home'
+                width: iconSize
+
+                onClicked: {
+                    webView.url = appSettings.wifirstBaseUrl;
+                }
+            }
+
+            ToolButton {
+                anchors.top: parent.top
+                anchors.topMargin: 2
+                anchors.bottom: parent.bottom
                 enabled: webView.back.enabled
                 iconStyle: 'icon-chevron-left'
                 width: iconSize
