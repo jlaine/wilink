@@ -95,6 +95,8 @@ HEADERS += \
     translations.h \
     updater.h
 
+RESOURCES += ../../data/wiLink.qrc
+
 INCLUDEPATH += \
     $$WILINK_INCLUDE_DIR \
     $$QNETIO_INCLUDE_DIR \
