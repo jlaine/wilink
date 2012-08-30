@@ -1,6 +1,7 @@
 include(../qsound.pri)
 include(../../3rdparty/qxmpp/qxmpp.pri)
 
+QT += declarative
 TEMPLATE = lib
 CONFIG += staticlib
 
@@ -25,6 +26,7 @@ android {
 
 HEADERS += \
     QSoundFile.h \
+    QSoundLoader.h \
     QSoundMeter.h \
     QSoundPlayer.h \
     QSoundStream.h \
@@ -33,6 +35,7 @@ HEADERS += \
     QVideoGrabber_p.h
 SOURCES += \
     QSoundFile.cpp \
+    QSoundLoader.cpp \
     QSoundMeter.cpp \
     QSoundPlayer.cpp \
     QSoundStream.cpp \
