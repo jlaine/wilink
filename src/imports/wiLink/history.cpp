@@ -184,10 +184,10 @@ public:
     QString archiveFirst;
     QString archiveLast;
     bool archivesFetched;
+    ChatClient *client;
     bool hasPreviousPage;
     QList<HistoryQueueItem> messageQueue;
     PageDirection pageDirection;
-    ChatClient *client;
     QString jid;
     QMap<QString, VCard*> rosterCards;
 
@@ -197,8 +197,8 @@ private:
 
 HistoryModelPrivate::HistoryModelPrivate(HistoryModel *qq)
     : archivesFetched(false)
-    , hasPreviousPage(false)
     , client(0)
+    , hasPreviousPage(false)
     , pageDirection(PageBackwards)
     , q(qq)
 {
@@ -557,6 +557,7 @@ void HistoryModel::_q_cardChanged()
 
 void HistoryModel::_q_archiveChatReceived(const QXmppArchiveChat &chat, const QXmppResultSetReply &rsmReply)
 {
+    Q_UNUSED(rsmReply);
     Q_ASSERT(d->client);
 
     if (QXmppUtils::jidToBareJid(chat.with()) != d->jid)
