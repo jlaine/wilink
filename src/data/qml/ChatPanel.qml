@@ -158,6 +158,9 @@ Panel {
             if (data.facebookAppId && data.facebookAccessToken) {
                 console.log("connecting to facebook: " + data.facebookAppId);
                 item.client.connectToFacebook(data.facebookAppId, data.facebookAccessToken);
+            } else if (data.windowsLiveAccessToken) {
+                console.log("connecting to windows live");
+                item.client.connectToWindowsLive(data.windowsLiveAccessToken);
             } else {
                 console.log("connecting to: " + data.jid);
                 item.client.connectToServer(data.jid, data.password);
@@ -502,6 +505,7 @@ Panel {
                         if (xhr.status == 200) {
                             var facebookAppId = '',
                                 facebookAccessToken = '',
+                                windowsLiveAccessToken = '',
                                 xmppJid = '',
                                 xmppPassword = '';
                             var doc = xhr.responseXML.documentElement;
@@ -534,6 +538,12 @@ Panel {
                                 chatClients.model.append({
                                     facebookAppId: facebookAppId,
                                     facebookAccessToken: facebookAccessToken});
+                            }
+
+                            // connect to windows live
+                            if (windowsLiveAccessToken) {
+                                chatClients.model.append({
+                                    windowsLiveAccessToken: windowsLiveAccessToken});
                             }
                         }
                     }

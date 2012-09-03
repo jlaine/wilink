@@ -138,6 +138,16 @@ void ChatClient::connectToFacebook(const QString &appId, const QString &accessTo
     QXmppClient::connectToServer(config);
 }
 
+void ChatClient::connectToWindowsLive(const QString &accessToken)
+{
+    QXmppConfiguration config;
+    config.setResource(qApp->applicationName());
+    config.setWindowsLiveAccessToken(accessToken);
+    config.setDomain("messenger.live.com");
+    config.setSaslAuthMechanism("X-MESSENGER-OAUTH2");
+    QXmppClient::connectToServer(config);
+}
+
 void ChatClient::connectToServer(const QString &jid, const QString &password)
 {
     QXmppConfiguration config;
