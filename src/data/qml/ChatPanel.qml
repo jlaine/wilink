@@ -155,7 +155,7 @@ Panel {
 
         onItemAdded: {
             var data = model.get(index);
-            if (data.facebookAppId) {
+            if (data.facebookAppId && data.facebookAccessToken) {
                 console.log("connecting to facebook: " + data.facebookAppId);
                 item.client.connectToFacebook(data.facebookAppId, data.facebookAccessToken);
             } else {
