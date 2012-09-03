@@ -91,7 +91,7 @@ Item {
 
         Timer {
             id: pausedTimer
-            interval: 30000
+            interval: 5000
 
             onTriggered: {
                 if (chatEdit.chatState == QXmppMessage.Composing) {
