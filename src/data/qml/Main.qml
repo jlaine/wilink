@@ -285,6 +285,9 @@ FocusScope {
                         case 'phone':
                             swapper.showPanel('PhonePanel.qml');
                             break;
+                        case 'reload':
+                            window.reload();
+                            return;
                         default:
                             break;
                     }
