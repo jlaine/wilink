@@ -257,11 +257,11 @@ FocusScope {
                                 swapper.showPanel('ChatPanel.qml');
                             }
                             break;
-                        case 'chat_room':
+                        case 'conference':
                             // Accepts the following params
                             //  * jid
                             //
-                            // Ex: wilink://chat_room?jid=blabla@conference.wifirst.net
+                            // Ex: wilink://conference?jid=blabla@conference.wifirst.net
                             //
                             var jid = params.jid;
                             if ( /^[^@/ ]+@[^@/ ]+$/.test(jid) ) {
