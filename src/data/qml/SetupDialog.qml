@@ -245,14 +245,6 @@ Dialog {
             dialog.state = 'testing';
             console.log("connecting: " + username);
             testClient.connectToServer(username + '/AccountCheck', password);
-            testClient.connected.connect(function() {
-                console.log("google ok");
-                accountModel.append({type: 'web',
-                    username: username,
-                    password: password,
-                    realm: 'www.google.com'});
-                dialog.save();
-            });
         } else {
             // validate input
             if (usernameInput.text.indexOf('@') < 0) {
@@ -274,14 +266,6 @@ Dialog {
             // test credentials
             console.log("connecting: " + username);
             testClient.connectToServer(username + '/AccountCheck', password);
-            testClient.connected.connect(function() {
-                console.log("other ok");
-                accountModel.append({type: 'xmpp',
-                    username: username,
-                    password: password,
-                    realm: Utils.jidToDomain(username)});
-                dialog.save();
-            });
         }
     }
 
@@ -291,6 +275,24 @@ Dialog {
 
             logger: QXmppLogger {
                 loggingType: QXmppLogger.StdoutLogging
+            }
+
+            onConnected: {
+                var accountType = accountCombo.model.get(accountCombo.currentIndex).type;
+                if (accountType == 'google') {
+                    console.log("google ok");
+                    accountModel.append({type: 'web',
+                        username: usernameInput.text,
+                        password: passwordInput.text,
+                        realm: 'www.google.com'});
+                } else {
+                    console.log("other ok");
+                    accountModel.append({type: 'xmpp',
+                        username: usernameInput.text,
+                        password: passwordInput.text,
+                        realm: Utils.jidToDomain(usernameInput.text)});
+                }
+                dialog.save();
             }
 
             onDisconnected: {
