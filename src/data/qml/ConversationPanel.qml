@@ -210,8 +210,8 @@ Panel {
                 Icon {
                     id: icon
 
-                    size: 20
                     color: '#333'
+                    font.pixelSize: 20
                     opacity: 0.5
                     anchors.top: parent.top
                     anchors.topMargin: -5

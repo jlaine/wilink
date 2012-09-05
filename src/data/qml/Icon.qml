@@ -21,10 +21,9 @@ import QtQuick 1.1
 
 Label {
     property string style
-    property int size: 14
 
     font.family: appStyle.icon.fontFamily
-    font.pixelSize: size
+    font.pixelSize: 14
     text: {
         switch (style) {
         case 'icon-glass':

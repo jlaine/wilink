@@ -55,8 +55,8 @@ Item {
 
         anchors.centerIn: parent
         style: iconStyle
-        size: 24
         color: button.active ? 'white' : '#d6dae0'
+        font.pixelSize: appStyle.icon.smallSize
         styleColor: '#969ea7'
         textStyle: Text.Normal
     }

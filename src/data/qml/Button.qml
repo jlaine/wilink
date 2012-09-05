@@ -25,7 +25,7 @@ Rectangle {
     property bool enabled: true
     property int iconSize: iconStyle != '' ? appStyle.icon.smallSize : 0
     property alias iconColor: icon.color
-    property alias iconFontSize: icon.size
+    property alias iconFontSize: icon.font.pixelSize
     property string iconStyle: ''
     property int margins: (text != '') ? appStyle.margin.large : appStyle.margin.normal;
     property string style: ''
