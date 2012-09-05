@@ -25,7 +25,6 @@ import 'scripts/utils.js' as Utils
 Panel {
     id: chatPanel
 
-    property alias rooms: roomListModel
     property bool pendingMessages: (roomListModel.pendingMessages + rosterModel.pendingMessages) > 0
     property variant delayedOpening: {}
     property bool wifirstRosterReceived: false
@@ -245,16 +244,44 @@ Panel {
             anchors.right: parent.right
             anchors.top: parent.top
             currentJid: (Qt.application.active && swapper.currentItem == chatPanel && Qt.isQtObject(chatSwapper.currentItem) && chatSwapper.currentItem.jid != undefined) ? chatSwapper.currentItem.jid : ''
-            model: RoomListModel {
+            model: ListModel {
                 id: roomListModel
 
-                onRoomAdded: {
-                    var opts = { jid: jid };
-                    if (!chatSwapper.findPanel('RoomPanel.qml', opts)) {
-                        if (chatSwapper.currentItem) {
-                            chatSwapper.addPanel('RoomPanel.qml', opts);
-                        } else {
-                            chatSwapper.showPanel('RoomPanel.qml', opts);
+                property int pendingMessages: 0
+
+                function addRoom(jid) {
+                    append({jid: jid, name: Utils.jidToUser(jid), messages: 0});
+                }
+
+                function addPendingMessage(jid) {
+                    for (var i = 0; i < count; ++i) {
+                        var data = get(i);
+                        if (data.jid == jid) {
+                            pendingMessages++;
+                            setProperty(i, 'messages', data.messages + 1);
+                            break;
+                        }
+                    }
+                }
+
+                function clearPendingMessages(jid) {
+                    for (var i = 0; i < count; ++i) {
+                        var data = get(i);
+                        if (data.jid == jid) {
+                            pendingMessages -= data.messages;
+                            setProperty(i, 'messages', 0);
+                            break;
+                        }
+                    }
+                }
+
+                function removeRoom(jid) {
+                    for (var i = 0; i < count; ++i) {
+                        var data = get(i);
+                        if (data.jid == jid) {
+                            pendingMessages -= data.messages;
+                            remove(i);
+                            break;
                         }
                     }
                 }

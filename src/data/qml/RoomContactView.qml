@@ -106,11 +106,6 @@ ContactView {
     onCurrentJidChanged: timer.restart()
 
     resources: [
-        ListHelper {
-            id: listHelper
-            model: block.model
-        },
-
         Timer {
             id: timer
 
@@ -118,8 +113,8 @@ ContactView {
 
             onTriggered: {
                 // Update the currently selected item after delay.
-                for (var i = 0; i < listHelper.count; i++) {
-                    if (listHelper.getProperty(i, 'jid') == currentJid) {
+                for (var i = 0; i < block.model.count; i++) {
+                    if (block.model.get(i).jid == currentJid) {
                         block.currentIndex = i;
                         return;
                     }
@@ -131,9 +126,7 @@ ContactView {
         Connections {
             target: block.model
 
-            onDataChanged: timer.restart()
-            onRowsInserted: timer.restart()
-            onRowsRemoved: timer.restart()
+            onCountChanged: timer.restart()
         }
     ]
 }
