@@ -503,7 +503,9 @@ Panel {
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState == 4) {
                         if (xhr.status == 200) {
-                            var facebookAppId = '',
+                            var conferenceJid = '',
+                                conferenceName = '',
+                                facebookAppId = '',
                                 facebookAccessToken = '',
                                 windowsLiveAccessToken = '',
                                 xmppJid = '',
@@ -515,6 +517,14 @@ Panel {
                                     xmppJid = node.firstChild.nodeValue;
                                 } else if (node.nodeName == 'password' && node.firstChild) {
                                     xmppPassword = node.firstChild.nodeValue;
+                                } else if (node.nodeName == 'conference') {
+                                    for (var j = 0; j < node.childNodes.length; ++j) {
+                                        var child = node.childNodes[j];
+                                        if (child.nodeName == 'jid' && child.firstChild)
+                                            conferenceJid = child.firstChild.nodeValue;
+                                        else if (child.nodeName == 'name' && child.firstChild)
+                                            conferenceName = child.firstChild.nodeValue;
+                                    }
                                 } else if (node.nodeName == 'facebook') {
                                     for (var j = 0; j < node.childNodes.length; ++j) {
                                         var child = node.childNodes[j];
