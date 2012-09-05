@@ -1,6 +1,8 @@
 wiLink 2.4.1 (UNRELEASED)
  * Application:
   - Set vendor information on Windows installer.
+ * Rooms:
+  - Remove RoomListModel.
  * Roster:
   - Upon reconnection, update roster items.
 

@@ -24,7 +24,6 @@
 #include <QMimeData>
 
 #include "QXmppArchiveManager.h"
-#include "QXmppBookmarkManager.h"
 #include "QXmppCallManager.h"
 #include "QXmppDiscoveryManager.h"
 #include "QXmppMucManager.h"
@@ -231,7 +230,6 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterUncreatableType<FolderQueueModel>(uri, 2, 4, "FolderQueueModel", "");
     qmlRegisterType<PlaceModel>(uri, 2, 4, "PlaceModel");
     qmlRegisterType<RoomConfigurationModel>(uri, 2, 4, "RoomConfigurationModel");
-    qmlRegisterType<RoomListModel>(uri, 2, 4, "RoomListModel");
     qmlRegisterType<RoomModel>(uri, 2, 4, "RoomModel");
     qmlRegisterType<RoomPermissionModel>(uri, 2, 4, "RoomPermissionModel");
     qmlRegisterType<RosterModel>(uri, 2, 4, "RosterModel");
@@ -244,7 +242,6 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterType<WheelArea>(uri, 2, 4, "WheelArea");
 
     // QXmpp
-    qmlRegisterUncreatableType<QXmppBookmarkManager>(uri, 2, 4, "QXmppBookmarkManager", "");
     qmlRegisterUncreatableType<QXmppArchiveManager>(uri, 2, 4, "QXmppArchiveManager", "");
     qmlRegisterUncreatableType<QXmppClient>(uri, 2, 4, "QXmppClient", "");
     qmlRegisterUncreatableType<QXmppCall>(uri, 2, 4, "QXmppCall", "");
