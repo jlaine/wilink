@@ -42,6 +42,7 @@ Panel {
         Item {
             id: item
 
+            property string conferenceJid
             property QtObject client: Client {
                 logger: appLogger
             }
@@ -73,6 +74,10 @@ Panel {
                 onConnected: {
                     if (isFacebook(item.client.jid)) {
                         Storage.removeSetting('facebookTokenRefused');
+                    }
+                    if (item.conferenceJid) {
+                        chatSwapper.showPanel('RoomPanel.qml', { jid: item.conferenceJid });
+                        item.conferenceJid = '';
                     }
                 }
 
@@ -163,6 +168,8 @@ Panel {
                 item.client.connectToWindowsLive(data.windowsLiveAccessToken);
             } else {
                 console.log("connecting to: " + data.jid);
+                if (data.conferenceJid)
+                    item.conferenceJid = data.conferenceJid;
                 item.client.connectToServer(data.jid, data.password);
             }
             statusBar.addClient(item.client);
@@ -540,7 +547,8 @@ Panel {
                             if (xmppJid && xmppPassword) {
                                 chatClients.model.append({
                                     jid: xmppJid,
-                                    password: xmppPassword});
+                                    password: xmppPassword,
+                                    conferenceJid: conferenceJid});
                             }
 
                             // connect to facebook
