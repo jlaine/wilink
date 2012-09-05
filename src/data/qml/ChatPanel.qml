@@ -46,6 +46,7 @@ Panel {
             id: item
 
             property string conferenceJid
+            property string conferenceName
             property QtObject client: Client {
                 logger: appLogger
             }
@@ -82,8 +83,9 @@ Panel {
                         Storage.removeSetting('facebookTokenRefused');
                     }
                     if (item.conferenceJid) {
-                        chatSwapper.showPanel('RoomPanel.qml', { jid: item.conferenceJid });
+                        chatSwapper.showPanel('RoomPanel.qml', { jid: item.conferenceJid, title: item.conferenceName });
                         item.conferenceJid = '';
+                        item.conferenceName = '';
                     }
                 }
 
@@ -174,8 +176,10 @@ Panel {
                 item.client.connectToWindowsLive(data.windowsLiveAccessToken);
             } else {
                 console.log("connecting to: " + data.jid);
-                if (data.conferenceJid)
+                if (data.conferenceJid) {
                     item.conferenceJid = data.conferenceJid;
+                    item.conferenceName = data.conferenceName;
+                }
                 item.client.connectToServer(data.jid, data.password);
             }
             statusBar.addClient(item.client);
@@ -249,8 +253,8 @@ Panel {
 
                 property int pendingMessages: 0
 
-                function addRoom(jid) {
-                    append({jid: jid, name: Utils.jidToUser(jid), messages: 0});
+                function addRoom(jid, name) {
+                    append({jid: jid, name: name, messages: 0});
                 }
 
                 function addPendingMessage(jid) {
@@ -582,7 +586,8 @@ Panel {
                                 chatClients.model.append({
                                     jid: xmppJid,
                                     password: xmppPassword,
-                                    conferenceJid: conferenceJid});
+                                    conferenceJid: conferenceJid,
+                                    conferenceName: conferenceName});
                             }
 
                             // connect to facebook
