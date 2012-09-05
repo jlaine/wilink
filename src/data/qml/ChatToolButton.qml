@@ -47,7 +47,7 @@ Item {
         anchors.centerIn: background
         style: iconStyle
         color: '#c7c7c7'
-        font.pixelSize: 11
+        font.pixelSize: appStyle.font.tinySize
     }
 
     MouseArea {

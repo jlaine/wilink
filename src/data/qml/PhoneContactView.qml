@@ -58,7 +58,7 @@ ContactView {
                 anchors.right: parent.right
                 color: '#c7c7c7'
                 elide: Text.ElideRight
-                font.pixelSize: 11
+                font.pixelSize: appStyle.font.tinySize
                 text: model.name
             }
 
@@ -70,7 +70,7 @@ ContactView {
                 anchors.right: parent.right
                 color: '#c7c7c7'
                 elide: Text.ElideRight
-                font.pixelSize: 11
+                font.pixelSize: appStyle.font.tinySize
                 font.italic: true
                 text: model.phone
                 visible: false

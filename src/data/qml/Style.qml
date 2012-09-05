@@ -41,9 +41,10 @@ Item {
     Item {
         id: fontItem
 
-        property int largeSize: Math.ceil(normalSize * 1.5)
-        property int normalSize: isMobile ? 22 : textItem.font.pixelSize
-        property int smallSize: Math.ceil(normalSize * 0.9)
+        property int largeSize: isMobile ? 30 : 20
+        property int normalSize: isMobile ? 22 : 13
+        property int smallSize: isMobile ? 20 : 12
+        property int tinySize: isMobile ? 18 : 11
     }
 
     Item {
@@ -70,10 +71,6 @@ Item {
 
         property int horizontal: isMobile ? 12 : 6
         property int vertical: isMobile ? 8 : 4
-    }
-
-    Text {
-        id: textItem
     }
 
     FontLoader {

@@ -74,7 +74,7 @@ ContactView {
                 anchors.verticalCenter: parent.verticalCenter
                 elide: Text.ElideRight
                 text: model.name
-                font.pixelSize: 11
+                font.pixelSize: appStyle.font.tinySize
                 color: item.ListView.isCurrentItem ? 'white' : '#c7c7c7'
             }
 
