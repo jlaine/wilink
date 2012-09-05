@@ -34,6 +34,10 @@ Panel {
        return Utils.jidToDomain(jid) == 'chat.facebook.com';
     }
 
+    function isWindowsLive(jid) {
+       return Utils.jidToDomain(jid) == 'messenger.live.com';
+    }
+
     Repeater {
         id: chatClients
 
@@ -57,6 +61,9 @@ Panel {
                         if (Storage.getSetting('facebookTokenRefused', '0') != '1') {
                             dialogSwapper.showPanel('FacebookTokenNotification.qml');
                         }
+                        item.client.disconnectFromServer();
+                        chatClients.model.remove(model.index);
+                    } else if (isWindowsLive(item.client.jid)) {
                         item.client.disconnectFromServer();
                         chatClients.model.remove(model.index);
                     } else if (domain != 'wifirst.net') {
