@@ -27,7 +27,7 @@ Icon {
 
     width: style ? appStyle.icon.tinySize : 0
     height: style ? appStyle.icon.tinySize : 0
-    font.pixelSize: 16
+    font.pixelSize: appStyle.icon.tinySize
 
     onJidChanged: {
         var domain = Utils.jidToDomain(jid);
