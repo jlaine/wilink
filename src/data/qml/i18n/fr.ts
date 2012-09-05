@@ -250,7 +250,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>Clear history</source>
-        <translation>Effacer l'historique</translation>
+        <translation>Effacer l&apos;historique</translation>
     </message>
 </context>
 <context>
@@ -399,13 +399,6 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>HomePage</name>
-    <message>
-        <source>Welcome %1</source>
-        <translation>Bienvenue %1</translation>
-    </message>
-</context>
-<context>
     <name>InputMenu</name>
     <message>
         <source>Cut</source>
@@ -418,17 +411,6 @@ Acceptez-vous?</translation>
     <message>
         <source>Paste</source>
         <translation>Coller</translation>
-    </message>
-</context>
-<context>
-    <name>LandingPagePlugin</name>
-    <message>
-        <source>Home</source>
-        <translation>Accueil</translation>
-    </message>
-    <message>
-        <source>This plugin allows you to access your dashboard.</source>
-        <translation>Ce module vous donne accès à votre tableau de bord.</translation>
     </message>
 </context>
 <context>
