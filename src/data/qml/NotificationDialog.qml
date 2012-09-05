@@ -35,7 +35,7 @@ Dialog {
 
             anchors.top: parent.top
             anchors.left: parent.left
-            font.pixelSize: 24
+            font.pixelSize: appStyle.icon.smallSize
         }
 
         Label {

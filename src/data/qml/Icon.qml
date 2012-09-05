@@ -23,7 +23,7 @@ Label {
     property string style
 
     font.family: appStyle.icon.fontFamily
-    font.pixelSize: 14
+    font.pixelSize: appStyle.isMobile ? 28 : 14
     text: {
         switch (style) {
         case 'icon-glass':

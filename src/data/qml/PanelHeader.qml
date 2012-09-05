@@ -51,7 +51,7 @@ Item {
         anchors.left: parent.left
         anchors.leftMargin: iconMargin
         anchors.verticalCenter: parent.verticalCenter
-        font.pixelSize: 24
+        font.pixelSize: appStyle.icon.smallSize
         width: iconSize
 
         states: State {

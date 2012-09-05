@@ -104,7 +104,7 @@ Item {
 
         anchors.verticalCenter: labelBackground.verticalCenter
         anchors.centerIn: labelBackground
-        font.pixelSize: 12
+        font.pixelSize: appStyle.font.smallSize
         opacity: 0
         text: button.text
         color: 'white'

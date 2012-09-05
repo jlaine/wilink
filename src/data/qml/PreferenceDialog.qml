@@ -68,7 +68,7 @@ Dialog {
                     anchors.left: parent.left
                     anchors.leftMargin: appStyle.margin.normal
                     anchors.verticalCenter: parent.verticalCenter
-                    font.pixelSize: 24
+                    font.pixelSize: appStyle.icon.smallSize
                     style: model.iconStyle
                 }
 
