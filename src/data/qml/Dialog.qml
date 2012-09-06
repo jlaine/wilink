@@ -159,4 +159,3 @@ GroupBox {
     Keys.onEscapePressed: dialog.rejected()
     Keys.onReturnPressed: dialog.accepted()
 }
-

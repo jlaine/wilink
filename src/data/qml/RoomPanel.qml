@@ -73,7 +73,7 @@ Panel {
         anchors.bottomMargin: appStyle.margin.normal
         anchors.left: parent.left
         anchors.right: parent.right
-    
+
         HistoryView {
             id: historyView
 

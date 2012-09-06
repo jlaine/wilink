@@ -79,7 +79,7 @@ Rectangle {
 
     Item {
         id: statusArea
-        
+
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.left: parent.left

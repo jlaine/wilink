@@ -101,7 +101,7 @@ Dialog {
             anchors.bottom: parent.bottom
             anchors.left: tabList.right
             anchors.leftMargin: appStyle.spacing.horizontal
-            anchors.right: parent.right 
+            anchors.right: parent.right
             anchors.rightMargin: appStyle.margin.small
 
             onCurrentIndexChanged: {
