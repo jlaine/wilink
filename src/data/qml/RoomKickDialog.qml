@@ -18,18 +18,64 @@
  */
 
 import QtQuick 1.1
+import 'scripts/utils.js' as Utils
 
-InputDialog {
+Dialog {
     id: dialog
 
     property string jid
     property QtObject room
 
+    // NOTE: requires wiLink 2.4.1
+    property string bareJid: room.participantFullJid !== undefined ? Utils.jidToBareJid(room.participantFullJid(jid)) : ''
+
     title: qsTr('Kick user')
-    labelText: qsTr('Enter the reason for kicking the user from the room.')
+
+    minimumHeight: 180
+
+    Item {
+        anchors.fill: parent
+
+        Label {
+            id: label
+
+            anchors.top: parent.top
+            anchors.left:  parent.left
+            anchors.right: parent.right
+            text: qsTr('Enter the reason for kicking the user from the room.')
+            wrapMode: Text.WordWrap
+
+            onLinkActivated: Qt.openUrlExternally(link)
+        }
+
+        InputBar {
+            id: reason
+
+            anchors.top: label.bottom
+            anchors.topMargin: 8
+            anchors.left: parent.left
+            anchors.right: parent.right
+            focus: true
+        }
+
+        CheckBox {
+            id: ban
+
+            anchors.top: reason.bottom
+            anchors.topMargin: 8
+            anchors.left: parent.left
+            anchors.right: parent.right
+            text: qsTr('Ban user from the room:') + ' ' + dialog.bareJid
+            visible: dialog.bareJid != ''
+            onClicked: checked = !checked
+        }
+    }
 
     onAccepted: {
-        room.kick(jid, dialog.textValue);
+        if (dialog.bareJid && ban.checked) {
+            room.ban(dialog.bareJid, reason.text);
+        }
+        room.kick(jid, reason.text);
         dialog.close();
     }
 }
