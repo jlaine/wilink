@@ -25,13 +25,16 @@ import 'scripts/utils.js' as Utils
 Panel {
     id: chatPanel
 
-    property alias rooms: roomListModel
     property bool pendingMessages: (roomListModel.pendingMessages + rosterModel.pendingMessages) > 0
     property variant delayedOpening: {}
     property bool wifirstRosterReceived: false
 
     function isFacebook(jid) {
        return Utils.jidToDomain(jid) == 'chat.facebook.com';
+    }
+
+    function isWindowsLive(jid) {
+       return Utils.jidToDomain(jid) == 'messenger.live.com';
     }
 
     Repeater {
@@ -43,6 +46,7 @@ Panel {
             id: item
 
             property string conferenceJid
+            property string conferenceName
             property QtObject client: Client {
                 logger: appLogger
             }
@@ -57,6 +61,9 @@ Panel {
                         if (Storage.getSetting('facebookTokenRefused', '0') != '1') {
                             dialogSwapper.showPanel('FacebookTokenNotification.qml');
                         }
+                        item.client.disconnectFromServer();
+                        chatClients.model.remove(model.index);
+                    } else if (isWindowsLive(item.client.jid)) {
                         item.client.disconnectFromServer();
                         chatClients.model.remove(model.index);
                     } else if (domain != 'wifirst.net') {
@@ -76,8 +83,9 @@ Panel {
                         Storage.removeSetting('facebookTokenRefused');
                     }
                     if (item.conferenceJid) {
-                        chatSwapper.showPanel('RoomPanel.qml', { jid: item.conferenceJid });
+                        chatSwapper.showPanel('RoomPanel.qml', { jid: item.conferenceJid, title: item.conferenceName });
                         item.conferenceJid = '';
+                        item.conferenceName = '';
                     }
                 }
 
@@ -168,8 +176,10 @@ Panel {
                 item.client.connectToWindowsLive(data.windowsLiveAccessToken);
             } else {
                 console.log("connecting to: " + data.jid);
-                if (data.conferenceJid)
+                if (data.conferenceJid) {
                     item.conferenceJid = data.conferenceJid;
+                    item.conferenceName = data.conferenceName;
+                }
                 item.client.connectToServer(data.jid, data.password);
             }
             statusBar.addClient(item.client);
@@ -238,16 +248,44 @@ Panel {
             anchors.right: parent.right
             anchors.top: parent.top
             currentJid: (Qt.application.active && swapper.currentItem == chatPanel && Qt.isQtObject(chatSwapper.currentItem) && chatSwapper.currentItem.jid != undefined) ? chatSwapper.currentItem.jid : ''
-            model: RoomListModel {
+            model: ListModel {
                 id: roomListModel
 
-                onRoomAdded: {
-                    var opts = { jid: jid };
-                    if (!chatSwapper.findPanel('RoomPanel.qml', opts)) {
-                        if (chatSwapper.currentItem) {
-                            chatSwapper.addPanel('RoomPanel.qml', opts);
-                        } else {
-                            chatSwapper.showPanel('RoomPanel.qml', opts);
+                property int pendingMessages: 0
+
+                function addRoom(jid, name) {
+                    append({jid: jid, name: name, messages: 0});
+                }
+
+                function addPendingMessage(jid) {
+                    for (var i = 0; i < count; ++i) {
+                        var data = get(i);
+                        if (data.jid == jid) {
+                            pendingMessages++;
+                            setProperty(i, 'messages', data.messages + 1);
+                            break;
+                        }
+                    }
+                }
+
+                function clearPendingMessages(jid) {
+                    for (var i = 0; i < count; ++i) {
+                        var data = get(i);
+                        if (data.jid == jid) {
+                            pendingMessages -= data.messages;
+                            setProperty(i, 'messages', 0);
+                            break;
+                        }
+                    }
+                }
+
+                function removeRoom(jid) {
+                    for (var i = 0; i < count; ++i) {
+                        var data = get(i);
+                        if (data.jid == jid) {
+                            pendingMessages -= data.messages;
+                            remove(i);
+                            break;
                         }
                     }
                 }
@@ -548,7 +586,8 @@ Panel {
                                 chatClients.model.append({
                                     jid: xmppJid,
                                     password: xmppPassword,
-                                    conferenceJid: conferenceJid});
+                                    conferenceJid: conferenceJid,
+                                    conferenceName: conferenceName});
                             }
 
                             // connect to facebook

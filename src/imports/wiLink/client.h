@@ -28,7 +28,6 @@ class DiagnosticManager;
 class QDateTime;
 class QHostInfo;
 class QXmppArchiveManager;
-class QXmppBookmarkManager;
 class QXmppCallManager;
 class QXmppDiscoveryIq;
 class QXmppDiscoveryManager;
@@ -58,7 +57,6 @@ class ChatClient : public QXmppClient
     Q_PROPERTY(QString jid READ jid NOTIFY jidChanged)
     Q_PROPERTY(QString statusType READ statusType WRITE setStatusType NOTIFY statusTypeChanged)
     Q_PROPERTY(QXmppArchiveManager* archiveManager READ archiveManager CONSTANT)
-    Q_PROPERTY(QXmppBookmarkManager* bookmarkManager READ bookmarkManager CONSTANT)
     Q_PROPERTY(QXmppCallManager* callManager READ callManager CONSTANT)
     Q_PROPERTY(DiagnosticManager* diagnosticManager READ diagnosticManager CONSTANT)
     Q_PROPERTY(QString diagnosticServer READ diagnosticServer NOTIFY diagnosticServerChanged)
@@ -79,7 +77,6 @@ public:
     void setStatusType(const QString &statusType);
 
     QXmppArchiveManager *archiveManager();
-    QXmppBookmarkManager *bookmarkManager();
     QXmppCallManager *callManager();
     DiagnosticManager *diagnosticManager();
     QString diagnosticServer() const;

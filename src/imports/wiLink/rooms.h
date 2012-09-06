@@ -29,7 +29,6 @@
 class ChatClient;
 class HistoryModel;
 class QModelIndex;
-class QXmppBookmarkManager;
 class QXmppMessage;
 class QXmppMucManager;
 class QXmppMucRoom;
@@ -71,45 +70,6 @@ private:
     };
     QXmppDataForm m_form;
     QXmppMucRoom *m_room;
-};
-
-class RoomListModel : public ChatModel
-{
-    Q_OBJECT
-    Q_PROPERTY(int pendingMessages READ pendingMessages NOTIFY pendingMessagesChanged)
-
-public:
-    RoomListModel(QObject *parent = 0);
-
-    int pendingMessages() const;
-
-    QVariant data(const QModelIndex &index, int role) const;
-
-signals:
-    void pendingMessagesChanged();
-    void roomAdded(const QString &jid);
-
-public slots:
-    void addPendingMessage(const QString &jid);
-    void clearPendingMessages(const QString &jid);
-
-    void addRoom(const QString &jid);
-    void removeRoom(const QString &jid);
-
-private slots:
-    void _q_bookmarksReceived();
-    void _q_clientCreated(ChatClient *client);
-    void _q_clientDestroyed(ChatClient *client);
-    void _q_participantsChanged();
-    void _q_roomAdded(QXmppMucRoom *room);
-
-private:
-    void _q_bookmarksReceived(QXmppBookmarkManager *bookmarkManager);
-
-    enum Role {
-        ParticipantsRole = ChatModel::UserRole
-    };
-    QSet<ChatClient*> m_clients;
 };
 
 class RoomModel : public ChatModel

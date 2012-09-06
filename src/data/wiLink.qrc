@@ -19,6 +19,7 @@
     <file>images/32x32/call-incoming.png</file>
     <file>images/32x32/call-outgoing.png</file>
     <file>images/32x32/chat.png</file>
+    <file>images/32x32/close.png</file>
     <file>images/32x32/face-angry.png</file>
     <file>images/32x32/face-cool.png</file>
     <file>images/32x32/face-crying.png</file>
@@ -45,6 +46,7 @@
     <file>images/64x64/call-incoming.png</file>
     <file>images/64x64/call-outgoing.png</file>
     <file>images/64x64/chat.png</file>
+    <file>images/64x64/close.png</file>
     <file>images/64x64/file.png</file>
     <file>images/64x64/moderator.png</file>
     <file>images/64x64/peer.png</file>

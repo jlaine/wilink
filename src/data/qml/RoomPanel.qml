@@ -205,7 +205,7 @@ Panel {
         }
 
         onJoined: {
-            roomListModel.addRoom(room.jid);
+            roomListModel.addRoom(room.jid, panel.title);
         }
 
         onKicked: {

@@ -22,7 +22,6 @@
 #include "qdnslookup.h"
 
 #include "QXmppArchiveManager.h"
-#include "QXmppBookmarkManager.h"
 #include "QXmppCallManager.h"
 #include "QXmppDiscoveryIq.h"
 #include "QXmppDiscoveryManager.h"
@@ -227,11 +226,6 @@ int ChatClient::subscriptionType(const QString &bareJid)
 QXmppArchiveManager *ChatClient::archiveManager()
 {
     return getManager<QXmppArchiveManager>();
-}
-
-QXmppBookmarkManager *ChatClient::bookmarkManager()
-{
-    return getManager<QXmppBookmarkManager>();
 }
 
 QXmppCallManager *ChatClient::callManager()
