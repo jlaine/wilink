@@ -254,6 +254,11 @@ Panel {
                 property int pendingMessages: 0
 
                 function addRoom(jid, name) {
+                    for (var i = 0; i < count; ++i) {
+                        if (get(i).jid == jid) {
+                            return;
+                        }
+                    }
                     append({jid: jid, name: name, messages: 0});
                 }
 
