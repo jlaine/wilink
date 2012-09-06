@@ -43,7 +43,7 @@ Item {
 
         return item !== undefined &&
                item.source == panelSource &&
-               (panelProperties === undefined || Utils.equalProperties(item.properties, panelProperties));
+               Utils.matchProperties(item.properties, panelProperties);
     }
 
     height: appStyle.icon.normalSize

@@ -105,14 +105,14 @@ function jidToUser(jid) {
     return jid.substring(0, pos);
 }
 
-// Compare the two object's properties and returns
-// true if they are equal, false otherwise.
+// Checks whether the given object's properties match the given conditions.
 
-function equalProperties(a, b) {
-    if (a.length != b.length)
-        return false;
-    for (var key in a) {
-        if (a[key] != b[key])
+function matchProperties(a, props) {
+    if (props === undefined)
+        return true;
+
+    for (var key in props) {
+        if (a[key] != props[key])
             return false;
     }
     return true;
