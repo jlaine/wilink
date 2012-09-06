@@ -133,8 +133,9 @@ void ChatClient::connectToFacebook(const QString &appId, const QString &accessTo
     config.setFacebookAppId(appId);
     config.setFacebookAccessToken(accessToken);
     config.setDomain("chat.facebook.com");
-    config.setHost("chat.facebook.com");
     config.setSaslAuthMechanism("X-FACEBOOK-PLATFORM");
+    config.setStreamSecurityMode(QXmppConfiguration::TLSRequired);
+    config.setIgnoreSslErrors(false);
     QXmppClient::connectToServer(config);
 }
 
@@ -145,6 +146,8 @@ void ChatClient::connectToWindowsLive(const QString &accessToken)
     config.setWindowsLiveAccessToken(accessToken);
     config.setDomain("messenger.live.com");
     config.setSaslAuthMechanism("X-MESSENGER-OAUTH2");
+    config.setStreamSecurityMode(QXmppConfiguration::TLSRequired);
+    config.setIgnoreSslErrors(false);
     QXmppClient::connectToServer(config);
 }
 
