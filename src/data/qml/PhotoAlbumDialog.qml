@@ -19,16 +19,40 @@
 
 import QtQuick 1.1
 
-InputDialog {
+Dialog {
     id: dialog
 
     property QtObject model
 
+    minimumHeight: 150
     title: qsTr('Create an album')
-    labelText: qsTr('Album name:')
+
+    Item {
+        anchors.fill: parent
+
+        Label {
+            id: label
+
+            anchors.top: parent.top
+            anchors.left:  parent.left
+            anchors.right: parent.right
+            text: qsTr('Album name:')
+            wrapMode: Text.WordWrap
+        }
+
+        InputBar {
+            id: bar
+
+            anchors.top: label.bottom
+            anchors.topMargin: 8
+            anchors.left: parent.left
+            anchors.right: parent.right
+            focus: true
+        }
+    }
 
     onAccepted: {
-        var name = dialog.textValue;
+        var name = bar.text;
         if (name.length > 0) {
             dialog.model.createAlbum(name);
             dialog.close();
