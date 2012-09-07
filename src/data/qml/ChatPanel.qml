@@ -588,6 +588,12 @@ Panel {
                                         else if (child.nodeName == 'access-token' && child.firstChild)
                                             facebookAccessToken = child.firstChild.nodeValue;
                                     }
+                                } else if (node.nodeName == 'windowslive') {
+                                    for (var j = 0; j < node.childNodes.length; ++j) {
+                                        var child = node.childNodes[j];
+                                        if (child.nodeName == 'access-token' && child.firstChild)
+                                            windowsLiveAccessToken = child.firstChild.nodeValue;
+                                    }
                                 }
                             }
 
@@ -614,7 +620,7 @@ Panel {
                         }
                     }
                 };
-                xhr.open('GET', 'https://www.wifirst.net/w/wilink/credentials', true, account.username, account.password);
+                xhr.open('GET', appSettings.wifirstBaseUrl + '/wilink/credentials', true, account.username, account.password);
                 xhr.setRequestHeader('Accept', 'application/xml');
                 xhr.send();
             }
