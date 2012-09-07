@@ -46,7 +46,6 @@ KeyPad 1.0 KeyPad.qml
 Label 1.0 Label.qml
 LogPanel 1.0 LogPanel.qml
 Main 1.0 Main.qml
-MeegoMain 1.0 MeegoMain.qml
 Menu 1.0 Menu.qml
 MenuDelegate 1.0 MenuDelegate.qml
 NotificationDialog 1.0 NotificationDialog.qml

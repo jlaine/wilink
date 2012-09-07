@@ -48,7 +48,6 @@
     <file>qml/Label.qml</file>
     <file>qml/LogPanel.qml</file>
     <file>qml/Main.qml</file>
-    <file>qml/MeegoMain.qml</file>
     <file>qml/Menu.qml</file>
     <file>qml/MenuDelegate.qml</file>
     <file>qml/NotificationDialog.qml</file>
@@ -110,6 +109,7 @@
     <file>qml/WebPanel.qml</file>
     <file>qml/WebPlugin.qml</file>
     <file>qml/WebTab.qml</file>
+    <file>qml/boot-meego.qml</file>
     <file>qml/boot.qml</file>
     <file>qml/fonts/fontawesome-webfont.ttf</file>
     <file>qml/i18n/fr.qm</file>

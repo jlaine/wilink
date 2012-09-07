@@ -230,7 +230,7 @@ void CustomWindow::_q_loadSource()
         return;
 
 #ifdef MEEGO_EDITION_HARMATTAN
-    const QUrl qmlFile("MeegoMain.qml");
+    const QUrl qmlFile("boot-meego.qml");
 #else
     const QUrl qmlFile("boot.qml");
 #endif
