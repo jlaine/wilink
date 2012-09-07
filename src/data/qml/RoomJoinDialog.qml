@@ -28,7 +28,6 @@ Dialog {
     property alias model: roomView.model
 
     title: qsTr('Join or create a chat room')
-    minimumWidth: 360
     minimumHeight: 300
 
     onAccepted: {

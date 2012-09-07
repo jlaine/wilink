@@ -25,8 +25,7 @@ Dialog {
 
     property alias room: permissionModel.room
 
-    minimumWidth: 280
-    minimumHeight: 150
+    minimumHeight: 300
     title: qsTr('Chat room permissions')
 
     Item {

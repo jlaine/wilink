@@ -25,7 +25,6 @@ Dialog {
     property string initialPanel: 'GeneralPreferencePanel.qml'
 
     minimumHeight: 500
-    minimumWidth: 360
     title: qsTr("Preferences")
 
     onAccepted: {

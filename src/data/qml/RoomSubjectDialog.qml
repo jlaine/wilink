@@ -19,17 +19,41 @@
 
 import QtQuick 1.1
 
-InputDialog {
+Dialog {
     id: dialog
 
     property QtObject room
 
+    minimumHeight: 150
     title: qsTr('Change subject')
-    labelText: qsTr('Enter the new room subject.')
-    textValue: Qt.isQtObject(room) ? room.subject : ''
+
+    Item {
+        anchors.fill: parent
+
+        Label {
+            id: label
+
+            anchors.top: parent.top
+            anchors.left:  parent.left
+            anchors.right: parent.right
+            text: qsTr('Enter the new room subject.')
+            wrapMode: Text.WordWrap
+        }
+
+        InputBar {
+            id: bar
+
+            anchors.top: label.bottom
+            anchors.topMargin: 8
+            anchors.left: parent.left
+            anchors.right: parent.right
+            focus: true
+            text: Qt.isQtObject(room) ? room.subject : ''
+        }
+    }
 
     onAccepted: {
-        room.subject = dialog.textValue;
+        room.subject = bar.text;
         dialog.close();
     }
 }
