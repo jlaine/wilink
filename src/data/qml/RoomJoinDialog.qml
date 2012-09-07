@@ -110,6 +110,7 @@ Dialog {
                     }
                 }
             }
+            highlight: Item {}
         }
     }
 }
