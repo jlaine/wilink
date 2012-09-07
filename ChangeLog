@@ -1,4 +1,4 @@
-wiLink 2.4.1 (UNRELEASED)
+wiLink 2.4.1 (2012-09-07)
  * Application:
   - Set vendor information on Windows installer.
   - Move accounts migration code to QML.
