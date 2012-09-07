@@ -26,8 +26,7 @@ Dialog {
     property string jid
     property QtObject room
 
-    // NOTE: requires wiLink 2.4.1
-    property string bareJid: room.participantFullJid !== undefined ? Utils.jidToBareJid(room.participantFullJid(jid)) : ''
+    property string bareJid: Utils.jidToBareJid(room.participantFullJid(jid))
 
     title: qsTr('Kick user')
 
