@@ -328,6 +328,26 @@ FocusScope {
          */
         onTriggered: {
             Storage.initialize();
+
+            // Handle wiLink < 2.4 migration.
+            var version = Storage.getSetting('version', '');
+            if (version < '2.4.0') {
+                var migrated = false;
+                for (var i = accountModel.count - 1; i >= 0; --i) {
+                    var account = accountModel.get(i);
+                    if (account.type == 'xmpp' && (account.realm == 'wifirst.net' || account.realm == 'gmail.com')) {
+                        console.log("Removing old account: " + account.username);
+                        accountModel.remove(i);
+                        migrated = true;
+                    }
+                }
+                if (migrated) {
+                    accountModel.submit();
+                }
+            }
+            Storage.setSetting('version', appUpdater.applicationVersion);
+
+            // Check whether an account is configured.
             if (accountModel.count) {
                 swapper.showPanel('WebPanel.qml');
                 appPlugins.load();

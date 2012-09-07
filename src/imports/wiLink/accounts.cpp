@@ -229,12 +229,6 @@ void AccountModel::reload()
     foreach (const QString &accountStr, accountStrings) {
         const QStringList bits = accountStr.split(":");
         if (bits.size() == 3) {
-            // migrate from wiLink < 2.4
-            if (bits[0] == "xmpp" && (bits[1] == "wifirst.net" || bits[1] == "gmail.com")) {
-                QNetIO::Wallet::instance()->deleteCredentials(bits[1], bits[2]);
-                continue;
-            }
-
             AccountItem *item = new AccountItem(bits[0], bits[1], bits[2]);
             item->parent = rootItem;
             rootItem->children.append(item);
