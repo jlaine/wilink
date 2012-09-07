@@ -736,6 +736,10 @@ Acceptez-vous?</translation>
         <source>Enter the reason for kicking the user from the room.</source>
         <translation>Saisissez la raison pour laquelle vous éjectez l&apos;utilisateur du salon.</translation>
     </message>
+    <message>
+        <source>Ban user from the room:</source>
+        <translation>Bannir l'utilisateur du salon :</translation>
+    </message>
 </context>
 <context>
     <name>RoomPanel</name>
