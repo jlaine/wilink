@@ -148,7 +148,7 @@ void ChatClient::connectToGoogle(const QString &jid, const QString &accessToken)
     config.setSaslAuthMechanism("X-OAUTH2");
     config.setStreamSecurityMode(QXmppConfiguration::TLSRequired);
     // don't ignore SSL errors for gmail, but do for other domains (google apps hosted domains)
-    if (QXmppUtils::jidToDomain(jid) == "gmail.com" || QXmppUtils::jidToDomain(jid) == "googlemail.com")
+    if (config.domain() == "gmail.com" || config.domain() == "googlemail.com")
         config.setIgnoreSslErrors(false);
     QXmppClient::connectToServer(config);
 }
@@ -171,8 +171,8 @@ void ChatClient::connectToServer(const QString &jid, const QString &password)
     config.setResource(qApp->applicationName());
     config.setJid(jid);
     config.setPassword(password);
-    if (config.domain() == QLatin1String("wifirst.net"))
-    {
+    // don't ignore SSL errors for wifirst and gmail, but do for other domains
+    if (config.domain() == "wifirst.net" || config.domain() == "gmail.com" || config.domain() == "googlemail.com") {
         config.setStreamSecurityMode(QXmppConfiguration::TLSRequired);
         config.setIgnoreSslErrors(false);
     }
