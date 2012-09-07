@@ -83,9 +83,8 @@ Panel {
                         Storage.removeSetting('facebookTokenRefused');
                     }
                     if (item.conferenceJid) {
-                        chatSwapper.showPanel('RoomPanel.qml', { jid: item.conferenceJid, title: item.conferenceName });
+                        chatSwapper.showPanel('RoomPanel.qml', { jid: item.conferenceJid });
                         item.conferenceJid = '';
-                        item.conferenceName = '';
                     }
                 }
 
@@ -178,7 +177,6 @@ Panel {
                 console.log("connecting to: " + data.jid);
                 if (data.conferenceJid) {
                     item.conferenceJid = data.conferenceJid;
-                    item.conferenceName = data.conferenceName;
                 }
                 item.client.connectToServer(data.jid, data.password);
             }
@@ -564,7 +562,6 @@ Panel {
                     if (xhr.readyState == 4) {
                         if (xhr.status == 200) {
                             var conferenceJid = '',
-                                conferenceName = '',
                                 facebookAppId = '',
                                 facebookAccessToken = '',
                                 windowsLiveAccessToken = '',
@@ -582,8 +579,6 @@ Panel {
                                         var child = node.childNodes[j];
                                         if (child.nodeName == 'jid' && child.firstChild)
                                             conferenceJid = child.firstChild.nodeValue;
-                                        else if (child.nodeName == 'name' && child.firstChild)
-                                            conferenceName = child.firstChild.nodeValue;
                                     }
                                 } else if (node.nodeName == 'facebook') {
                                     for (var j = 0; j < node.childNodes.length; ++j) {
@@ -601,8 +596,7 @@ Panel {
                                 chatClients.model.append({
                                     jid: xmppJid,
                                     password: xmppPassword,
-                                    conferenceJid: conferenceJid,
-                                    conferenceName: conferenceName});
+                                    conferenceJid: conferenceJid});
                             }
 
                             // connect to facebook

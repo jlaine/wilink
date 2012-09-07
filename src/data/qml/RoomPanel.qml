@@ -28,7 +28,7 @@ Panel {
     property string iconSource: 'image://icon/chat'
     property alias jid: participantModel.jid
     property alias room: participantModel.room
-    property string title: Utils.jidToUser(jid)
+    property string title: room.name ? room.name : Utils.jidToUser(jid)
     property string presenceStatus
 
     SoundLoader {
