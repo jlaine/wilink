@@ -807,11 +807,12 @@ QString VCardCache::subscriptionStatus(const QString &jid) const
 
 int VCardCache::subscriptionType(const QString &jid) const
 {
-    int type = 0;
     foreach (ChatClient *client, d->clients) {
-        type |= (client->rosterManager()->getRosterEntry(jid).subscriptionType() & QXmppRosterIq::Item::Both);
+        const QXmppRosterIq::Item::SubscriptionType type = client->rosterManager()->getRosterEntry(jid).subscriptionType();
+        if (type != QXmppRosterIq::Item::NotSet)
+            return type;
     }
-    return type;
+    return QXmppRosterIq::Item::NotSet;
 }
 
 void VCardCache::_q_clientDestroyed(QObject *object)
