@@ -32,6 +32,7 @@
 #include "QXmppMucManager.h"
 #include "QXmppRosterManager.h"
 #include "QXmppTransferManager.h"
+#include "QXmppUtils.h"
 
 #include "client.h"
 #include "diagnostics.h"
@@ -135,6 +136,20 @@ void ChatClient::connectToFacebook(const QString &appId, const QString &accessTo
     config.setSaslAuthMechanism("X-FACEBOOK-PLATFORM");
     config.setStreamSecurityMode(QXmppConfiguration::TLSRequired);
     config.setIgnoreSslErrors(false);
+    QXmppClient::connectToServer(config);
+}
+
+void ChatClient::connectToGoogle(const QString &jid, const QString &accessToken)
+{
+    QXmppConfiguration config;
+    config.setResource(qApp->applicationName());
+    config.setGoogleAccessToken(accessToken);
+    config.setJid(jid);
+    config.setSaslAuthMechanism("X-OAUTH2");
+    config.setStreamSecurityMode(QXmppConfiguration::TLSRequired);
+    // don't ignore SSL errors for gmail, but do for other domains (google apps hosted domains)
+    if (QXmppUtils::jidToDomain(jid) == "gmail.com" || QXmppUtils::jidToDomain(jid) == "googlemail.com")
+        config.setIgnoreSslErrors(false);
     QXmppClient::connectToServer(config);
 }
 

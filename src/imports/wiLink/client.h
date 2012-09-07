@@ -105,6 +105,7 @@ signals:
 
 public slots:
     void connectToFacebook(const QString &appId, const QString &accessToken);
+    void connectToGoogle(const QString &jid, const QString &accessToken);
     void connectToWindowsLive(const QString &accessToken);
     void connectToServer(const QString &jid, const QString &password);
     void replayMessage();
