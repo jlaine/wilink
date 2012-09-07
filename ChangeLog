@@ -1,6 +1,9 @@
 wiLink 2.4.1 (UNRELEASED)
  * Application:
   - Set vendor information on Windows installer.
+ * Chat:
+  - Add support for Windows Live's X-MESSENGER-OAUTH2.
+  - Add support for Google's X-OAUTH2.
  * Rooms:
   - Remove RoomListModel.
  * Roster:
