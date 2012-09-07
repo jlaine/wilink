@@ -104,7 +104,9 @@ int main(int argc, char *argv[])
     QUrl openUrl;
     QUrl qmlRoot = QUrl(QString("https://download.wifirst.net/public/%1/%2/qml/").arg(app.applicationName(), app.applicationVersion()));
     for (int i = 1; i < argc; ++i) {
-        if (!strcmp(argv[i], "--help")) {
+        if (!argv[i]) {
+            break;
+        } else if (!strcmp(argv[i], "--help")) {
             usage();
             return EXIT_SUCCESS;
         } else if (!strcmp(argv[i], "--qmlroot")) {
