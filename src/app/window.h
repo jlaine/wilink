@@ -35,7 +35,7 @@ class CustomWindow : public QMainWindow
     Q_PROPERTY(bool fullScreen READ isFullScreen WRITE setFullScreen NOTIFY windowStateChanged)
 
 public:
-    CustomWindow(QtLocalPeer *peer, QWidget *parent = 0);
+    CustomWindow(QtLocalPeer *peer, const QUrl &qmlRoot, QWidget *parent = 0);
     ~CustomWindow();
 
     QRect availableGeometry() const;

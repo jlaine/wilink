@@ -65,11 +65,12 @@ public:
     QStringList messages;
     bool messagesStarted;
     QtLocalPeer *peer;
-    QList<QUrl> qmlRoots;
+    bool qmlFail;
+    QUrl qmlRoot;
     QDeclarativeView *view;
 };
 
-CustomWindow::CustomWindow(QtLocalPeer *peer, QWidget *parent)
+CustomWindow::CustomWindow(QtLocalPeer *peer, const QUrl &qmlRoot, QWidget *parent)
     : QMainWindow(parent)
 {
     bool check;
@@ -78,13 +79,12 @@ CustomWindow::CustomWindow(QtLocalPeer *peer, QWidget *parent)
     d = new CustomWindowPrivate;
     d->messagesStarted = false;
     d->peer = peer;
+    d->qmlFail = false;
+    d->qmlRoot = qmlRoot;
+
     check = connect(d->peer, SIGNAL(messageReceived(QString)),
                     this, SLOT(_q_messageReceived(QString)));
     Q_ASSERT(check);
-
-    // declare QML roots
-    d->qmlRoots << QUrl(QString("https://download.wifirst.net/public/%1/%2/qml/").arg(qApp->applicationName(), qApp->applicationVersion()));
-    d->qmlRoots << QUrl("qrc:/qml/");
 
     // create data paths
     const QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
@@ -178,7 +178,7 @@ void CustomWindow::changeEvent(QEvent *event)
 
 void CustomWindow::reload()
 {
-    new CustomWindow(d->peer);
+    new CustomWindow(d->peer, d->qmlRoot);
     QMetaObject::invokeMethod(this, "deleteLater", Qt::QueuedConnection);
 }
 
@@ -226,15 +226,12 @@ void CustomWindow::startMessages()
 
 void CustomWindow::_q_loadSource()
 {
-    if (d->qmlRoots.isEmpty())
-        return;
-
 #ifdef MEEGO_EDITION_HARMATTAN
     const QUrl qmlFile("boot-meego.qml");
 #else
     const QUrl qmlFile("boot.qml");
 #endif
-    const QUrl qmlSource = d->qmlRoots.takeFirst().resolved(qmlFile);
+    const QUrl qmlSource = (d->qmlFail ? QUrl("qrc:/qml/") : d->qmlRoot).resolved(qmlFile);
     qDebug("Window loading %s", qPrintable(qmlSource.toString()));
     d->view->setSource(qmlSource);
 }
@@ -261,6 +258,13 @@ void CustomWindow::_q_statusChanged()
         d->view->viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
         d->view->viewport()->setAttribute(Qt::WA_NoSystemBackground);
     } else if (d->view->status() == QDeclarativeView::Error) {
-        _q_loadSource();
+        if (!d->qmlFail) {
+            // network load failed, use fallback
+            d->qmlFail = true;
+            _q_loadSource();
+        } else {
+            // fallback load failed too, abort
+            qApp->quit();
+        }
     }
 }

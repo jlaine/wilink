@@ -75,6 +75,14 @@ bool CustomApplication::event(QEvent *event)
     return QApplication::event(event);
 }
 
+static void usage()
+{
+    printf("Usage: wiLink [options] [open_url]\n");
+    printf("Options:\n");
+    printf(" --help               Display this information\n");
+    printf(" --qmlroot <url>      Fetch QML from the specified root URL\n");
+}
+
 int main(int argc, char *argv[])
 {
 #ifdef Q_OS_MAC
@@ -93,13 +101,30 @@ int main(int argc, char *argv[])
 #endif
 
     /* Parse command line arguments */
-    const QUrl url = (argc > 1) ? QUrl(QString::fromLocal8Bit(argv[1])) : QUrl();
+    QUrl openUrl;
+    QUrl qmlRoot = QUrl(QString("https://download.wifirst.net/public/%1/%2/qml/").arg(app.applicationName(), app.applicationVersion()));
+    for (int i = 1; i < argc; ++i) {
+        if (!strcmp(argv[i], "--help")) {
+            usage();
+            return EXIT_SUCCESS;
+        } else if (!strcmp(argv[i], "--qmlroot")) {
+            if (i == argc - 1 || !strlen(argv[i+1])) {
+                usage();
+                return EXIT_FAILURE;
+            }
+            const QString arg = QString::fromLocal8Bit(argv[++i]);
+            qmlRoot = QUrl(arg.endsWith("/") ? arg : arg + "/");
+        } else {
+            openUrl = QUrl(QString::fromLocal8Bit(argv[i]));
+            break;
+        }
+    }
 
     /* Open RPC socket */
     peer = new QtLocalPeer(&app, "wiLink");
     if (peer->isClient()) {
-        if (url.isValid() && url.scheme() == "wilink")
-            peer->sendMessage("OPEN " + url.toString(), 1000);
+        if (openUrl.isValid() && openUrl.scheme() == "wilink")
+            peer->sendMessage("OPEN " + openUrl.toString(), 1000);
         else
             peer->sendMessage("SHOW", 1000);
         return EXIT_SUCCESS;
@@ -124,9 +149,9 @@ int main(int argc, char *argv[])
     signal(SIGTERM, signal_handler);
 
     /* Create window */
-    new CustomWindow(peer);
-    if (url.isValid() && url.scheme() == "wilink")
-        QMetaObject::invokeMethod(peer, "messageReceived", Q_ARG(QString, "OPEN " + url.toString()));
+    new CustomWindow(peer, qmlRoot);
+    if (openUrl.isValid() && openUrl.scheme() == "wilink")
+        QMetaObject::invokeMethod(peer, "messageReceived", Q_ARG(QString, "OPEN " + openUrl.toString()));
 
     /* Run application */
     int ret = app.exec();
