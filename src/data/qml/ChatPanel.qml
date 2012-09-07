@@ -371,7 +371,7 @@ Panel {
                 var clients = [];
                 for (var i = 0; i < chatClients.count; ++i) {
                     var client = chatClients.itemAt(i).client;
-                    if (!isFacebook(client.jid))
+                    if (!isFacebook(client.jid) && !isWindowsLive(client.jid))
                         clients.push(client);
                 }
                 dialogSwapper.showPanel('ContactAddDialog.qml', {clients: clients});
@@ -490,7 +490,7 @@ Panel {
             id: menu
 
             property alias jid: vcard.jid
-            property bool changeEnabled: !isFacebook(jid)
+            property bool changeEnabled: !isFacebook(jid) && !isWindowsLive(jid)
             property bool profileEnabled: (profileUrl != undefined && profileUrl != '')
             property string profileUrl: isFacebook(vcard.jid) ? ('https://www.facebook.com/' + Utils.jidToUser(vcard.jid).substr(1)) : vcard.url
 
