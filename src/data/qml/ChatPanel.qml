@@ -294,6 +294,16 @@ Panel {
                         }
                     }
                 }
+
+                function renameRoom(jid, name) {
+                    for (var i = 0; i < count; ++i) {
+                        var data = get(i);
+                        if (data.jid == jid) {
+                            setProperty(i, 'name', name);
+                            break;
+                        }
+                    }
+                }
             }
             height: 32 + rowHeight * (appStyle.isMobile ? 2 : 4)
 

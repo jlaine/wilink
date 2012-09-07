@@ -231,6 +231,10 @@ Panel {
         roomListModel.removeRoom(room.jid);
     }
 
+    onTitleChanged: {
+        roomListModel.renameRoom(room.jid, title);
+    }
+
     Keys.forwardTo: historyView
 
     states: State {
