@@ -31,6 +31,12 @@ Panel {
     property string title: room.name ? room.name : Utils.jidToUser(jid)
     property string presenceStatus
 
+    function onParticipantClicked(participant, mouse, mouseArea) {
+        if (mouse.button == Qt.LeftButton) {
+            chatInput.talkAt(participant);
+        }
+    }
+
     SoundLoader {
         id: incomingMessageSound
         source: appSettings.incomingMessageSound ? 'sounds/message-incoming.ogg' : ''
@@ -83,7 +89,7 @@ Panel {
             anchors.right: participantView.left
             model: participantModel.historyModel
 
-            onParticipantClicked: chatInput.talkAt(participant)
+            onParticipantClicked: panel.onParticipantClicked(participant, mouse, mouseArea)
 
             Connections {
                 target: historyView.model
@@ -128,7 +134,7 @@ Panel {
                 anchors.fill: parent
                 model: participantModel
 
-                onParticipantClicked: chatInput.talkAt(participant)
+                onParticipantClicked: panel.onParticipantClicked(participant, mouse, mouseArea)
             }
         }
     }

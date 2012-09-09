@@ -23,7 +23,7 @@ import wiLink 2.4
 ScrollView {
     id: block
 
-    signal participantClicked(string participant)
+    signal participantClicked(string participant, variant mouse, variant mouseArea)
 
     clip: true
     delegate: Item {
@@ -71,13 +71,14 @@ ScrollView {
         }
 
         MouseArea {
+            id: mouseArea
+
             acceptedButtons: Qt.LeftButton | Qt.RightButton
             anchors.fill: parent
             onClicked: {
                 block.currentIndex = model.index;
-                if (mouse.button == Qt.LeftButton) {
-                    block.participantClicked(model.name);
-                } else if (mouse.button == Qt.RightButton) {
+                block.participantClicked(model.name, mouse, mouseArea);
+                if (mouse.button == Qt.RightButton) {
                     var pos = mapToItem(menuLoader.parent, mouse.x, mouse.y);
                     menuLoader.sourceComponent = participantMenu;
                     menuLoader.item.jid = model.jid;

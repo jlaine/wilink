@@ -32,7 +32,7 @@ Item {
     property alias historyHeader: historyView.header
     property alias view: historyView
 
-    signal participantClicked(string participant)
+    signal participantClicked(string participant, variant mouse, variant mouseArea)
 
     clip: true
 
@@ -153,8 +153,10 @@ Item {
                     width: appStyle.icon.normalSize
 
                     MouseArea {
+                        id: avatarMouseArea
+
                         anchors.fill: parent
-                        onClicked: block.participantClicked(model.from);
+                        onClicked: block.participantClicked(model.from, mouse, avatarMouseArea)
                     }
                 }
 
@@ -180,8 +182,10 @@ Item {
                             text: model.from
 
                             MouseArea {
+                                id: mouseArea
+
                                 anchors.fill: parent
-                                onClicked: block.participantClicked(model.from);
+                                onClicked: block.participantClicked(model.from, mouse, mouseArea)
                             }
                         }
 

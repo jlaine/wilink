@@ -126,7 +126,11 @@ Panel {
         anchors.right: parent.right
         model: conversation.historyModel
 
-        onParticipantClicked: chatInput.talkAt(participant)
+        onParticipantClicked: {
+            if (mouse.button == Qt.LeftButton) {
+                chatInput.talkAt(participant);
+            }
+        }
 
         historyHeader: Item {
             id: fetchPrevious
