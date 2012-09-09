@@ -128,7 +128,7 @@ Panel {
 
         onParticipantClicked: {
             if (mouse.button == Qt.LeftButton) {
-                chatInput.talkAt(participant);
+                chatInput.talkAt(participant.name);
             }
         }
 

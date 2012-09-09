@@ -32,7 +32,7 @@ Item {
     property alias historyHeader: historyView.header
     property alias view: historyView
 
-    signal participantClicked(string participant, variant mouse, variant mouseArea)
+    signal participantClicked(variant participant, variant mouse, variant mouseArea)
 
     clip: true
 
@@ -155,8 +155,9 @@ Item {
                     MouseArea {
                         id: avatarMouseArea
 
+                        acceptedButtons: Qt.LeftButton | Qt.RightButton
                         anchors.fill: parent
-                        onClicked: block.participantClicked(model.from, mouse, avatarMouseArea)
+                        onClicked: block.participantClicked({jid: model.jid, name: model.from}, mouse, avatarMouseArea)
                     }
                 }
 
@@ -184,8 +185,9 @@ Item {
                             MouseArea {
                                 id: mouseArea
 
+                                acceptedButtons: Qt.LeftButton | Qt.RightButton
                                 anchors.fill: parent
-                                onClicked: block.participantClicked(model.from, mouse, mouseArea)
+                                onClicked: block.participantClicked({jid: model.jid, name: model.from}, mouse, mouseArea)
                             }
                         }
 

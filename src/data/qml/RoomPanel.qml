@@ -33,7 +33,12 @@ Panel {
 
     function onParticipantClicked(participant, mouse, mouseArea) {
         if (mouse.button == Qt.LeftButton) {
-            chatInput.talkAt(participant);
+            chatInput.talkAt(participant.name);
+        } else if (mouse.button == Qt.RightButton) {
+            var pos = mouseArea.mapToItem(menuLoader.parent, mouse.x, mouse.y);
+            menuLoader.sourceComponent = participantMenu;
+            menuLoader.item.jid = participant.jid;
+            menuLoader.show(pos.x - menuLoader.item.width, pos.y);
         }
     }
 
