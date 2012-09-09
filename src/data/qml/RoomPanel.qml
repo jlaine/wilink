@@ -31,17 +31,6 @@ Panel {
     property string title: room.name ? room.name : Utils.jidToUser(jid)
     property string presenceStatus
 
-    function onParticipantClicked(participant, mouse, mouseArea) {
-        if (mouse.button == Qt.LeftButton) {
-            chatInput.talkAt(participant.name);
-        } else if (mouse.button == Qt.RightButton) {
-            var pos = mouseArea.mapToItem(menuLoader.parent, mouse.x, mouse.y);
-            menuLoader.sourceComponent = participantMenu;
-            menuLoader.item.jid = participant.jid;
-            menuLoader.show(pos.x - menuLoader.item.width, pos.y);
-        }
-    }
-
     SoundLoader {
         id: incomingMessageSound
         source: appSettings.incomingMessageSound ? 'sounds/message-incoming.ogg' : ''
@@ -94,7 +83,16 @@ Panel {
             anchors.right: participantView.left
             model: participantModel.historyModel
 
-            onParticipantClicked: panel.onParticipantClicked(participant, mouse, mouseArea)
+            onParticipantClicked: {
+                if (mouse.button == Qt.LeftButton) {
+                    chatInput.talkAt(participant.name);
+                } else if (mouse.button == Qt.RightButton) {
+                    var pos = mouseArea.mapToItem(menuLoader.parent, mouse.x, mouse.y);
+                    menuLoader.sourceComponent = participantMenu;
+                    menuLoader.item.jid = participant.jid;
+                    menuLoader.show(pos.x - menuLoader.item.width, pos.y);
+                }
+            }
 
             Connections {
                 target: historyView.model
@@ -139,7 +137,7 @@ Panel {
                 anchors.fill: parent
                 model: participantModel
 
-                onParticipantClicked: panel.onParticipantClicked(participant, mouse, mouseArea)
+                onParticipantClicked: historyView.participantClicked(participant, mouse, mouseArea)
             }
         }
     }
