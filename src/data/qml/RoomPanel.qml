@@ -194,6 +194,59 @@ Panel {
         }
     }
 
+    Component {
+        id: participantMenu
+
+        Menu {
+            id: menu
+
+            property alias jid: vcard.jid
+            property bool kickEnabled: (room.allowedActions & QXmppMucRoom.KickAction)
+            property bool profileEnabled: (vcard.url != undefined && vcard.url != '')
+
+            VCard {
+                id: vcard
+            }
+
+            onProfileEnabledChanged: {
+                if (menu.model.count > 0) {
+                    menu.model.setProperty(0, 'enabled', profileEnabled);
+                }
+            }
+
+            onKickEnabledChanged: {
+                if (menu.model.count > 0) {
+                    menu.model.setProperty(1, 'enabled', kickEnabled);
+                }
+            }
+
+            onItemClicked: {
+                var item = menu.model.get(index);
+                if (item.action == 'profile') {
+                    Qt.openUrlExternally(vcard.url)
+                } else if (item.action == 'kick') {
+                    dialogSwapper.showPanel('RoomKickDialog.qml', {
+                        jid: jid,
+                        room: room,
+                    });
+                }
+            }
+
+            Component.onCompleted: {
+                menu.model.append({
+                    action: 'profile',
+                    enabled: profileEnabled,
+                    iconStyle: 'icon-info-sign',
+                    text: qsTr('Show profile')});
+                menu.model.append({
+                    action: 'kick',
+                    enabled: kickEnabled,
+                    iconStyle: 'icon-bolt',
+                    text: qsTr('Kick user')});
+            }
+        }
+    }
+
     Connections {
         target: room
 
