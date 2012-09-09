@@ -210,7 +210,7 @@ Panel {
             id: menu
 
             property alias jid: vcard.jid
-            property bool kickEnabled: (room.allowedActions & QXmppMucRoom.KickAction)
+            property bool kickEnabled: room.participants.indexOf(jid) !== -1 && (room.allowedActions & QXmppMucRoom.KickAction)
             property bool profileEnabled: (vcard.url != undefined && vcard.url != '')
 
             VCard {
