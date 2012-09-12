@@ -264,6 +264,7 @@ Panel {
                 title: qsTranslate('RoomPanel', 'Chat room error'),
                 text: qsTranslate('RoomPanel', "Sorry, but you cannot join chat room '%1'.\n\n%2").replace('%1', room.jid).replace('%2', ''),
             });
+            panel.close();
         }
 
         onJoined: {
