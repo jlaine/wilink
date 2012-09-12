@@ -312,6 +312,11 @@ Item {
             // follow bottom if we were at the bottom
             if (historyView.scrollBarAtBottom) {
                 historyView.positionViewAtEnd();
+                // FIXME: for some reason we sometimes need to scroll again
+                // to really get to the end.
+                if (!historyView.atYEnd) {
+                    historyView.positionViewAtEnd();
+                }
             }
             historyView.bottomChanging = false;
         }
