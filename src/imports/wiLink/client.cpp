@@ -161,7 +161,8 @@ void ChatClient::connectToWindowsLive(const QString &accessToken)
     config.setDomain("messenger.live.com");
     config.setSaslAuthMechanism("X-MESSENGER-OAUTH2");
     config.setStreamSecurityMode(QXmppConfiguration::TLSRequired);
-    config.setIgnoreSslErrors(false);
+    // NOTE: messenger.live.com uses a certificate with an incorrect name
+    config.setIgnoreSslErrors(true);
     QXmppClient::connectToServer(config);
 }
 
