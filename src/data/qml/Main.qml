@@ -207,7 +207,7 @@ FocusScope {
 
         // set window geometry
         var desktop = window.availableGeometry;
-        window.size = Qt.size(desktop.width - 100, desktop.height - 100);
+        window.size = Qt.size(Math.min(1280, desktop.width - 100), Math.min(960, desktop.height - 100));
         window.pos = Qt.point((desktop.width - window.width) / 2, (desktop.height - window.height) / 2);
         window.fullScreen = appSettings.isMobile && appSettings.osType != 'android';
 
