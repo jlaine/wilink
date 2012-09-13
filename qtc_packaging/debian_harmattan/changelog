@@ -1,8 +1,8 @@
-wilink (2.2.909-1) unstable; urgency=low
+wilink (2.4.1-1) unstable; urgency=low
 
-  * New upstream beta.
+  * New upstream release.
 
- -- Jeremy Lainé <jeremy.laine@bolloretelecom.eu>  Wed, 16 May 2012 14:32:25 +0200
+ -- Jeremy Lainé <jeremy.laine@bolloretelecom.eu>  Fri, 07 Sep 2012 18:20:42 +0200
 
 wilink (2.2.2-1) unstable; urgency=low
 
