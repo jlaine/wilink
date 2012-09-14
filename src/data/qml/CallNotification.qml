@@ -19,6 +19,7 @@
 
 import QtQuick 1.1
 import wiLink 2.4
+import 'scripts/utils.js' as Utils
 
 NotificationDialog {
     id: dialog
@@ -50,7 +51,7 @@ NotificationDialog {
     ]
 
     onAccepted: {
-        panel.showConversation(call.jid);
+        panel.showConversation(Utils.jidToBareJid(call.jid));
         dialog.call.accept();
         dialog.close();
     }

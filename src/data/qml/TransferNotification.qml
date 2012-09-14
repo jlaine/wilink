@@ -46,7 +46,7 @@ NotificationDialog {
         // FIXME: this silently overwrite existing files!
         var path = appSettings.downloadsLocation + '/' + job.fileName;
         console.log("File accepted: " + path);
-        panel.showConversation(job.jid);
+        panel.showConversation(Utils.jidToBareJid(job.jid));
         job.accept(path);
 
         dialog.close();
