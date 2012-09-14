@@ -227,9 +227,9 @@ Item {
 
         onClicked: {
             // show context menu
-            var pos = mapToItem(menuLoader.parent, width/2 - 80, height/2 - 80);
+            var pos = mapToItem(menuLoader.parent, width, 0);
             menuLoader.sourceComponent = menuComponent;
-            menuLoader.show(pos.x, pos.y);
+            menuLoader.show(pos.x - menuLoader.item.width, pos.y - menuLoader.item.height);
         }
     }
 
