@@ -98,6 +98,10 @@ CustomWindow::CustomWindow(QtLocalPeer *peer, const QUrl &qmlRoot, QWidget *pare
     // create declarative view
     d->view = new QDeclarativeView;
     d->view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
+#ifdef Q_OS_ANDROID
+    d->view->engine()->addImportPath("assets:/imports");
+    d->view->engine()->addPluginPath(QDir::homePath()+"/../lib");
+#endif
     d->view->engine()->setNetworkAccessManagerFactory(new NetworkAccessManagerFactory(cachePath));
     d->view->engine()->setOfflineStoragePath(storagePath);
 

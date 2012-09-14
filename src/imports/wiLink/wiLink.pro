@@ -113,7 +113,11 @@ LIBS += \
     -L../../qxmpp-extra -lqxmpp-extra \
     -L../../3rdparty/qdjango/src/db $$QDJANGO_DB_LIBS
 
-unix {
+android {
+    qmldir.path = /assets/imports/wiLink
+    qmldir.files = qmldir
+    INSTALLS += qmldir
+} else:unix {
     qmldir.path = $$PREFIX/lib/qt4/imports/wiLink
     qmldir.files = qmldir
     target.path = $$PREFIX/lib/qt4/imports/wiLink
