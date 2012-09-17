@@ -112,6 +112,7 @@
     <file>qml/boot.qml</file>
     <file>qml/fonts/fontawesome-webfont.ttf</file>
     <file>qml/i18n/fr.qm</file>
+    <file>qml/images/login.jpg</file>
     <file>qml/images/logo_header.png</file>
     <file>qml/images/shadow.png</file>
     <file>qml/scripts/sip.js</file>
