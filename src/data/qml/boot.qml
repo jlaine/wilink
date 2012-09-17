@@ -25,10 +25,10 @@ FocusScope {
 
     TranslationLoader {
         Component.onCompleted: {
-            if (localeName == 'en')
-                uiLoader.source = 'Main.qml';
-            else
+            if (localeName == 'fr')
                 source = 'i18n/' + localeName + '.qm';
+            else
+                uiLoader.source = 'Main.qml';
         }
 
         onStatusChanged: {
