@@ -2,6 +2,7 @@
 <qresource>
     <file>app.pem</file>
     <file>app.png</file>
+    <file>DroidSans.ttf</file>
     <file>fr.qm</file>
     <file>qt_fr.qm</file>
 </qresource>

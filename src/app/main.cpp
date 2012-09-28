@@ -22,6 +22,7 @@
 
 #include <QApplication>
 #include <QFileOpenEvent>
+#include <QFontDatabase>
 #include <QLocale>
 #include <QSslSocket>
 #include <QTranslator>
@@ -98,6 +99,12 @@ int main(int argc, char *argv[])
     app.setQuitOnLastWindowClosed(false);
 #ifndef Q_OS_MAC
     app.setWindowIcon(QIcon(":/app.png"));
+#endif
+
+#ifdef Q_OS_ANDROID
+    /* Hack around font issue on Android simulator */
+    QFontDatabase db;
+    db.addApplicationFont(":/DroidSans.ttf");
 #endif
 
     /* Parse command line arguments */
