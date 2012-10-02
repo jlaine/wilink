@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import com.meego 1.0
+import com.nokia.meego 1.0
 
 PageStackWindow {
     initialPage: Page {
