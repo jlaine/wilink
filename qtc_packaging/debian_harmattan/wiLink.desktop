@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=wiLink
+Exec=wiLink
+Icon=/usr/share/icons/hicolor/80x80/apps/wiLink.png
+StartupNotify=true
+Terminal=false
+Type=Application
+Categories=Network;InstantMessaging;

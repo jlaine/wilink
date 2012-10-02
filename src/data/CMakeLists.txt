@@ -36,9 +36,6 @@ generate_png(png SIZE 32 DESTINATION images/32x32 ${ICONS})
 # 64x64 icons
 generate_png(png SIZE 64 DESTINATION images/64x64 ${ICONS})
 
-# 80x80 icons
-generate_png(png SIZE 80 DESTINATION images/80x80 images/scalable/wiLink.svg)
-
 # 128x128 icons
 generate_png(png SIZE 128 DESTINATION images/128x128 ${LARGE_ICONS})
 

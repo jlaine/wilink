@@ -62,12 +62,8 @@ android {
     TARGET.CAPABILITY = "NetworkServices ReadUserData WriteUserData UserEnvironment"
 } else:contains(MEEGO_EDITION,harmattan) {
     QT += dbus
-    desktop.path = $$PREFIX/share/applications
-    desktop.files = ../data/wiLink.desktop
-    icon80.path = $$PREFIX/share/icons/hicolor/80x80/apps
-    icon80.files = ../data/images/80x80/wiLink.png
     target.path = $$PREFIX/bin
-    INSTALLS += desktop icon80 target
+    INSTALLS += target
 } else:unix {
     QT += dbus
     desktop.path = $$PREFIX/share/applications
