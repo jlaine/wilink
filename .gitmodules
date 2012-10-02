@@ -6,7 +6,7 @@
 	url = https://code.google.com/p/qdjango/
 [submodule "src/qnetio"]
 	path = src/qnetio
-	url = git://git.bolloretelecom.eu/qnetio.git
+	url = git://git.wifirst.net/qnetio.git
 [submodule "src/qxmpp-extra"]
 	path = src/qxmpp-extra
 	url = git://git.wifirst.net/qxmpp-extra.git
