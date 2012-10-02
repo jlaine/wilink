@@ -9,4 +9,4 @@
 	url = git://git.bolloretelecom.eu/qnetio.git
 [submodule "src/qxmpp-extra"]
 	path = src/qxmpp-extra
-	url = git://git.bolloretelecom.eu/qxmpp-extra.git
+	url = git://git.wifirst.net/qxmpp-extra.git
