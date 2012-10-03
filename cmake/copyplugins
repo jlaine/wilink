@@ -29,7 +29,6 @@ if [ -z "$QMAKE" ]; then
     echo "You need to specify qmake"
     exit 1
 fi
-QT_INSTALL_LIBS=`$QMAKE -query QT_INSTALL_LIBS`
 QT_INSTALL_IMPORTS=`$QMAKE -query QT_INSTALL_IMPORTS`
 QT_INSTALL_PLUGINS=`$QMAKE -query QT_INSTALL_PLUGINS`
 DEPLOY_LIBS=$BUNDLE/Contents/Frameworks
@@ -47,9 +46,6 @@ macdeployqt $BUNDLE -no-plugins
 # generate Qt config file
 mkdir -p $DEPLOY_RESOURCES
 ( echo "[Paths]"; echo "Plugins = PlugIns"; echo "Imports = Imports" ) > $DEPLOY_RESOURCES/qt.conf
-
-# copy Qt resources
-cp -R $QT_INSTALL_LIBS/Resources/qt_menu.nib $DEPLOY_RESOURCES/
 
 # copy frameworks
 for framework in $FRAMEWORKS; do
