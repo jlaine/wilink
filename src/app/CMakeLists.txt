@@ -49,6 +49,7 @@ if(APPLE)
         COMMAND cp ${CPACK_BUNDLE_ICON} ${BUNDLE_LOCATION}/Contents/Resources/
         COMMAND ${CMAKE_SOURCE_DIR}/cmake/copyplugins -b ${BUNDLE_LOCATION} -q ${QT_QMAKE_EXECUTABLE} -f "${WILINK_EXTRA_FRAMEWORKS}" -i "${WILINK_EXTRA_IMPORTS}" ${WILINK_EXTRA_PLUGINS}
         DEPENDS wiLink)
+    add_dependencies(wiLink qmlwilinkplugin)
 endif(APPLE)
 if(WIN32)
     set_target_properties(wiLink PROPERTIES LINK_FLAGS "-mwindows")
