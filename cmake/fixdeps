@@ -6,6 +6,7 @@ dst=$2
 filter=`basename $dst`
 for dep in `otool -L $dst | grep -v $filter | grep -v /usr/lib | grep -v @executable_path | grep -v /System/Library | cut -d" " -f1`; do
     dep_name=`echo $dep | sed -e 's/.*\/lib\///'`
+    dep_name=`echo $dep_name | sed -e 's/.*\/Frameworks\///'`
     dep_id="@executable_path/../Frameworks/$dep_name"
     echo install_name_tool -change $dep $dep_id $dst
     install_name_tool -change $dep $dep_id $dst
