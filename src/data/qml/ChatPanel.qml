@@ -421,12 +421,42 @@ Panel {
         height: (appStyle.font.largeSize + 2 * appStyle.margin.large)
         property int radius: appStyle.margin.small
 
+        Button {
+            id: prevButton
+
+            anchors.left: parent.left
+            iconStyle: 'icon-chevron-left'
+            z: 2
+
+            onClicked: chatSwapper.decrementCurrentIndex()
+        }
+
         ChatTabs {
             id: tabView
 
-            anchors.fill: parent
+            anchors.left: prevButton.right
+            anchors.right: nextButton.left
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
             panelSwapper: chatSwapper
             z: 1
+        }
+
+        Button {
+            id: nextButton
+
+            anchors.right: parent.right
+            iconStyle: 'icon-chevron-right'
+            z: 2
+
+            onClicked: chatSwapper.incrementCurrentIndex()
+        }
+
+        states: State {
+            when: chatSwapper.model.count < 2
+
+            PropertyChanges { target: prevButton; visible: false }
+            PropertyChanges { target: nextButton; visible: false }
         }
     }
 
