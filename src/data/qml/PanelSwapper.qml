@@ -46,6 +46,11 @@ FocusScope {
     */
     property Item currentItem
 
+    /*!
+        This property holds whether the list wraps key navigation.
+    */
+    property bool keyNavigationWraps: true
+
     ListModel {
         id: panels
     }
@@ -111,7 +116,8 @@ FocusScope {
             return;
 
         if (panelSwapper.currentIndex == 0) {
-            panelSwapper.currentIndex = panels.count - 1;
+            if (panelSwapper.keyNavigationWraps)
+                panelSwapper.currentIndex = panels.count - 1;
         } else {
             panelSwapper.currentIndex -= 1;
         }
@@ -122,7 +128,8 @@ FocusScope {
             return;
 
         if (panelSwapper.currentIndex == panels.count - 1) {
-            panelSwapper.currentIndex = 0;
+            if (panelSwapper.keyNavigationWraps)
+                panelSwapper.currentIndex = 0;
         } else {
             panelSwapper.currentIndex += 1;
         }
