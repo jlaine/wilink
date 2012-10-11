@@ -27,7 +27,7 @@ Item {
     property string style
 
     width: label.width
-    height: Math.round(label.height * 0.8)
+    height: Math.round(label.height * 0.75)
 
     Label {
         id: label
