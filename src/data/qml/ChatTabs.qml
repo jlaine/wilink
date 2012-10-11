@@ -102,11 +102,11 @@ ListView {
             anchors.left: icon.right
             anchors.margins: appStyle.margin.normal
             anchors.verticalCenter: parent.verticalCenter
-            anchors.verticalCenterOffset: 1
         }
 
         Label {
             anchors.left: socialIcon.right
+            anchors.leftMargin: 4
             anchors.right: closeButton.left
             anchors.verticalCenter: parent.verticalCenter
             elide: Text.ElideRight
