@@ -22,7 +22,7 @@ import QtQuick 1.1
 FocusScope {
     id: panel
 
-    property bool singlePanel: width < 500
+    property bool singlePanel: width < 2 * appStyle.sidebarWidth
 
     signal close
     signal dockClicked

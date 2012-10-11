@@ -26,7 +26,7 @@ Item {
     property alias icon: iconItem
     property bool isMobile: false
     property alias margin: marginItem
-    property int sidebarWidth: isMobile ? 250 : 200
+    property int sidebarWidth: isMobile ? 300 : 200
     property alias spacing: spacingItem
 
     opacity: 0
@@ -41,10 +41,10 @@ Item {
     Item {
         id: fontItem
 
-        property int largeSize: isMobile ? 30 : 20
-        property int normalSize: isMobile ? 22 : 13
-        property int smallSize: isMobile ? 20 : 12
-        property int tinySize: isMobile ? 18 : 11
+        property int largeSize: isMobile ? 40 : 20
+        property int normalSize: isMobile ? 26 : 13
+        property int smallSize: isMobile ? 24 : 12
+        property int tinySize: isMobile ? 22 : 11
     }
 
     Item {
