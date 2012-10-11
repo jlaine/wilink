@@ -51,7 +51,6 @@ Rectangle {
         anchors.left: parent.left
         anchors.leftMargin: margins
         anchors.top: parent.top
-        anchors.topMargin: 3
         anchors.bottom: parent.bottom
         width: iconSize
 
