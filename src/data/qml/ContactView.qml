@@ -26,6 +26,7 @@ FocusScope {
     property alias count: view.count
     property alias currentIndex: view.currentIndex
     property alias delegate: view.delegate
+    property int headerHeight: 24
     property alias model: view.model
     property alias moving: view.moving
     property string title
@@ -37,7 +38,7 @@ FocusScope {
 
         anchors.left: parent.left
         anchors.right: parent.right
-        height: 24
+        height: headerHeight
 
         Label {
             anchors.verticalCenter: parent.verticalCenter
