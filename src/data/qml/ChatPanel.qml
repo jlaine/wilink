@@ -303,7 +303,7 @@ Panel {
                     }
                 }
             }
-            height: 32 + rowHeight * (appStyle.isMobile ? 2 : 4)
+            height: headerHeight + rowHeight * (appStyle.isMobile ? 2 : 4)
 
             onAddClicked: {
                 // FIXME: we only support default client
