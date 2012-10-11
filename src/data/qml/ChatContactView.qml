@@ -39,11 +39,29 @@ ContactView {
         Item {
             anchors.fill: parent
 
+            SocialIcon {
+                id: socialIcon
+
+                anchors.left: parent.left
+                anchors.leftMargin: 2
+                anchors.verticalCenter: parent.verticalCenter
+                jid: model.jid
+
+                Rectangle {
+                    anchors.fill: parent
+                    anchors.leftMargin: 0.5
+                    anchors.rightMargin: 1
+                    anchors.topMargin: 1
+                    anchors.bottomMargin: 1
+                    z: -1
+                }
+            }
+
             Rectangle {
                 id: avatarFrame
 
                 anchors.left: parent.left
-                anchors.leftMargin: 15
+                anchors.leftMargin: 17
                 anchors.verticalCenter: parent.verticalCenter
                 width: appStyle.icon.smallSize
                 height: appStyle.icon.smallSize
