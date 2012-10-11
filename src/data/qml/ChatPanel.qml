@@ -303,7 +303,7 @@ Panel {
                     }
                 }
             }
-            height: headerHeight + rowHeight * (appStyle.isMobile ? 2 : 4)
+            height: headerHeight + rowHeight * model.count
 
             onAddClicked: {
                 // FIXME: we only support default client
@@ -317,51 +317,12 @@ Panel {
             onItemClicked: showRoom(model.jid)
         }
 
-        Rectangle {
-            id: splitter
-
-            anchors.left: parent.left
-            anchors.right: parent.right
-            anchors.top: rooms.bottom
-            color: 'transparent'
-            height: appStyle.margin.normal
-
-            MouseArea {
-                property int mousePressY
-                property int roomsPressHeight
-
-                anchors.fill: parent
-
-                hoverEnabled: true
-                onEntered: parent.state = 'hovered'
-                onExited: parent.state = ''
-
-                onPressed: {
-                    mousePressY = mapToItem(sidebar, mouse.x, mouse.y).y
-                    roomsPressHeight = rooms.height
-                }
-
-                onPositionChanged: {
-                    if (mouse.buttons & Qt.LeftButton) {
-                        var position =  roomsPressHeight + mapToItem(sidebar, mouse.x, mouse.y).y - mousePressY
-                        position = Math.max(position, 0)
-                        position = Math.min(position, sidebar.height - splitter.height - statusBar.height - appStyle.margin.normal)
-                        rooms.height = position
-                    }
-                }
-            }
-            states: State {
-                name: 'hovered'
-                PropertyChanges{ target: splitter; color: '#97b0d9' }
-            }
-        }
-
         ChatContactView {
             id: contacts
 
             anchors.left: parent.left
             anchors.right: parent.right
-            anchors.top: splitter.bottom
+            anchors.top: rooms.bottom
             anchors.bottom: statusBar.top
             anchors.bottomMargin: appStyle.margin.normal
             currentJid: (Qt.application.active && swapper.currentItem == chatPanel && Qt.isQtObject(chatSwapper.currentItem) && chatSwapper.currentItem.jid != undefined) ? chatSwapper.currentItem.jid : ''
