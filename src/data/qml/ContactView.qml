@@ -26,7 +26,7 @@ FocusScope {
     property alias count: view.count
     property alias currentIndex: view.currentIndex
     property alias delegate: view.delegate
-    property int headerHeight: 24
+    property alias headerHeight: header.height
     property alias model: view.model
     property alias moving: view.moving
     property string title
@@ -38,9 +38,11 @@ FocusScope {
 
         anchors.left: parent.left
         anchors.right: parent.right
-        height: headerHeight
+        height: Math.max(label.height, button.height) + appStyle.margin.normal
 
         Label {
+            id: label
+
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
             anchors.leftMargin: appStyle.margin.large
