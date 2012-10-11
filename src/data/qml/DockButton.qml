@@ -58,7 +58,6 @@ Item {
         color: button.active ? 'white' : '#d6dae0'
         font.pixelSize: appStyle.icon.smallSize
         styleColor: '#969ea7'
-        textStyle: Text.Normal
     }
 
     Rectangle {
@@ -113,7 +112,8 @@ Item {
     states: [
         State {
             name: 'hovered'
-            PropertyChanges   { target: icon; textStyle: button.active ? Text.Normal : Text.Sunken }
+            PropertyChanges { target: icon; anchors.horizontalCenterOffset: button.active ? 0 : -1 }
+            PropertyChanges { target: icon; anchors.verticalCenterOffset: button.active ? 0 : -1 }
             PropertyChanges { target: label; opacity: 1 }
             PropertyChanges { target: labelBackground; opacity: 0.7 }
         }
