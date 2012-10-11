@@ -25,8 +25,6 @@ Icon {
 
     property string jid
 
-    width: style ? appStyle.icon.tinySize : 0
-    height: style ? appStyle.icon.tinySize : 0
     font.pixelSize: appStyle.icon.tinySize
 
     onJidChanged: {
@@ -40,5 +38,11 @@ Icon {
         } else {
             style = '';
         }
+    }
+
+    states: State {
+        name: 'collapsed'
+        when: !style.length
+        PropertyChanges { target: socialIcon; width: 0; height: 0 }
     }
 }
