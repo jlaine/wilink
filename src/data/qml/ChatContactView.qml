@@ -106,7 +106,7 @@ ContactView {
                     visible: !status.pending
                 }
 
-                Icon {
+                Label {
                     anchors.centerIn: parent
                     color: 'white'
                     text: '?'
