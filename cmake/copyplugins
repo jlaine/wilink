@@ -64,6 +64,7 @@ for import in $IMPORTS; do
     src=$QT_INSTALL_IMPORTS/$import
     dst=$DEPLOY_IMPORTS/$import
     echo "Copying import $import"
+    mkdir -p $dst
     rm -rf $dst
     cp -a $src $dst
     fix_deps $dst/*.dylib
