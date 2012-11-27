@@ -20,8 +20,6 @@ pkg_check_modules(QXMPP qxmpp REQUIRED)
 # Extra runtime dependencies
 set(WILINK_IMPORTS_DIR lib/qt4/imports)
 if(APPLE)
-    set(WILINK_EXTRA_FRAMEWORKS Growl)
-    set(WILINK_EXTRA_IMPORTS QtWebKit)
     set(WILINK_EXTRA_PLUGINS
         imageformats/libqgif.dylib
         imageformats/libqjpeg.dylib
