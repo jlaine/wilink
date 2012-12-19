@@ -113,7 +113,7 @@ QVariant ListHelper::getProperty(int row, const QString &name) const
 {
     if (m_model) {
         QModelIndex index = m_model->index(row, 0);
-        const int role = m_model->roleNames().key(name.toAscii());
+        const int role = m_model->roleNames().key(name.toLatin1());
         return index.data(role);
     }
     return QVariant();

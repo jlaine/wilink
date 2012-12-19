@@ -118,7 +118,7 @@ static QString transformToken(const QString &token)
     // handle links
     if (linkRegex.exactMatch(token)) {
         QUrl url;
-        url.setEncodedUrl(token.toAscii());
+        url.setEncodedUrl(token.toLatin1());
         return QString("<a href=\"%1\">%2</a>").arg(url.toString(), url.toString());
     }
 

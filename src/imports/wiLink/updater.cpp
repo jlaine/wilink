@@ -401,7 +401,7 @@ void Updater::_q_processStatus()
     QDomElement hash = item.firstChildElement("hash");
     while (!hash.isNull()) {
         const QString type = hash.attribute("type");
-        const QByteArray value = QByteArray::fromHex(hash.text().toAscii());
+        const QByteArray value = QByteArray::fromHex(hash.text().toLatin1());
         if (!type.isEmpty() && !value.isEmpty())
             release.hashes[type] = value;
         hash = hash.nextSiblingElement("hash");

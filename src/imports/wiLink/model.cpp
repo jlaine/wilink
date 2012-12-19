@@ -161,7 +161,7 @@ QVariant ChatModel::getProperty(int row, const QString &name) const
 {
     const QModelIndex idx = index(row, 0);
     if (idx.isValid()) {
-        const int role = roleNames().key(name.toAscii());
+        const int role = roleNames().key(name.toLatin1());
         return idx.data(role);
     }
     return QVariant();

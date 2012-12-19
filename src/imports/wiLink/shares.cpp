@@ -49,7 +49,7 @@ static QXmppShareLocation urlToLocation(const QUrl &url)
     const QString path = url.path();
     const int slashPos = path.indexOf('/');
     if (slashPos > 0) {
-        loc.setJid(QString::fromUtf8(QByteArray::fromHex(path.left(slashPos).toAscii())));
+        loc.setJid(QString::fromUtf8(QByteArray::fromHex(path.left(slashPos).toLatin1())));
         loc.setNode(path.mid(slashPos + 1));
     }
     return loc;

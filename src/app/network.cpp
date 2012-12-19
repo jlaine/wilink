@@ -44,9 +44,9 @@ QNetworkReply *NetworkAccessManager::createRequest(Operation op, const QNetworkR
 {
     QNetworkRequest request(req);
     if (!request.hasRawHeader("Accept-Language"))
-        request.setRawHeader("Accept-Language", QLocale::system().name().toAscii());
+        request.setRawHeader("Accept-Language", QLocale::system().name().toLatin1());
     if (!request.hasRawHeader("User-Agent"))
-        request.setRawHeader("User-Agent", userAgent().toAscii());
+        request.setRawHeader("User-Agent", userAgent().toLatin1());
     return QNetworkAccessManager::createRequest(op, request, outgoingData);
 }
 

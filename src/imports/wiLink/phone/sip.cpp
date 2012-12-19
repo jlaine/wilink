@@ -396,11 +396,11 @@ SdpMessage SipCallPrivate::buildSdp(const QList<QXmppJinglePayloadType> &payload
     foreach (const QXmppJingleCandidate &candidate, iceConnection->localCandidates()) {
         QByteArray ba = "candidate:" + QByteArray::number(candidate.foundation()) + " ";
         ba += QByteArray::number(candidate.component()) + " ";
-        ba += candidate.protocol().toUpper().toAscii() + " ";
+        ba += candidate.protocol().toUpper().toLatin1() + " ";
         ba += QByteArray::number(candidate.priority()) + " ";
         ba += candidate.host().toString().toUtf8() + " ";
         ba += QByteArray::number(candidate.port()) + " ";
-        ba += "typ " + QXmppJingleCandidate::typeToString(candidate.type()).toAscii();
+        ba += "typ " + QXmppJingleCandidate::typeToString(candidate.type()).toLatin1();
         sdp.addField('a', ba);
     }
 #endif
