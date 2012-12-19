@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: Jeremy Lainé <jeremy.laine@bolloretelecom.eu>
 Build-Depends: debhelper (>= 5), libqt4-dev, libspeex-dev
 Standards-Version: 3.7.3
-Homepage: http://opensource.wifirst.net/projects/wilink/
+Homepage: https://github.com/jlaine/wilink
 
 Package: wilink
 Architecture: any

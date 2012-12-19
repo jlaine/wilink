@@ -1,10 +1,10 @@
 Source: wilink
 Section: net
 Priority: optional
-Maintainer: Jeremy Lainé <jeremy.laine@bolloretelecom.eu>
+Maintainer: Jeremy Lainé <jeremy.laine@m4x.org>
 Standards-Version: 3.8.1
 Build-Depends: debhelper (>= 7), cmake, libmad0-dev, libqdjango-dev, libqt4-dev (>= 4.7.4), libqxmpp-dev (>= 0.4.91), qtmobility-dev, libvorbis-dev, libxss-dev, pkg-config
-Homepage: http://opensource.wifirst.net/projects/wilink/
+Homepage: https://github.com/jlaine/wilink
 
 Package: wilink
 Architecture: any
