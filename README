@@ -50,6 +50,11 @@ $ sudo port install cmake libmad pkgconfig qdjango qt4-mac qxmpp libvorbis
 Building wiLink
 ===============
 
+If you retrieved the wiLink source code via git, make sure you grab the
+necessary submodules using:
+
+$ git submodule update --init
+
 The basic procedure for building wiLink from source is:
 
 $ mkdir build
