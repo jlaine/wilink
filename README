@@ -2,6 +2,20 @@ wiLink
 Copyright (C) 2009-2012 Wifirst
 See AUTHORS file for a full list of contributors.
 
+About
+=====
+
+wiLink is an application for Wifirst customers, which runs on Windows,
+Mac OS X, Linux, Symbian and Android. It features:
+
+ * a chat client which supports:
+   - file transfers
+   - document sharing
+   - voice and video calls
+ * a soft phone (SIP) for telephone calls
+ * a diagnostic tool which performs tests to diagnostic connectivity
+   problems
+
 License
 =======
 
