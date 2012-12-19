@@ -39,8 +39,6 @@
 
  * \sa FileSystem
  * \sa Wallet
- *
- * Project page: http://opensource.bolloretelecom.eu/projects/qnetio/
  */
 
 /* native wallets */

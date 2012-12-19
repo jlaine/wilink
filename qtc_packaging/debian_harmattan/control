@@ -1,7 +1,7 @@
 Source: wilink
 Section: user/network
 Priority: optional
-Maintainer: Jeremy Lainé <jeremy.laine@bolloretelecom.eu>
+Maintainer: Jeremy Lainé <jeremy.laine@m4x.org>
 Build-Depends: debhelper (>= 5), libqt4-dev, libspeex-dev
 Standards-Version: 3.7.3
 Homepage: https://github.com/jlaine/wilink
