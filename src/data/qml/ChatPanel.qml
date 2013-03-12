@@ -48,6 +48,9 @@ Panel {
             property string conferenceJid
             property string conferenceName
             property QtObject client: Client {
+                diagnosticManager.pingHosts: ['213.91.4.201', '8.8.8.8', 'wireless.wifirst.net', 'www.wifirst.net', 'www.google.fr']
+                diagnosticManager.tracerouteHosts: ['213.91.4.201']
+                diagnosticManager.transferUrl: 'http://wireless.wifirst.net:8080/speed/'
                 logger: appLogger
             }
 

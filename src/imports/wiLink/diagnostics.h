@@ -37,13 +37,21 @@ class DiagnosticManager : public QXmppClientExtension
     Q_OBJECT
     Q_PROPERTY(QString html READ html NOTIFY htmlChanged)
     Q_PROPERTY(bool running READ running NOTIFY runningChanged)
-    Q_PROPERTY(QUrl transferUrl READ transferUrl NOTIFY transferUrlChanged)
+    Q_PROPERTY(QStringList pingHosts READ pingHosts WRITE setPingHosts NOTIFY pingHostsChanged)
+    Q_PROPERTY(QStringList tracerouteHosts READ tracerouteHosts WRITE setTracerouteHosts NOTIFY tracerouteHostsChanged)
+    Q_PROPERTY(QUrl transferUrl READ transferUrl WRITE setTransferUrl NOTIFY transferUrlChanged)
 
 public:
     DiagnosticManager();
 
     QString html() const;
     bool running() const;
+
+    QStringList pingHosts() const;
+    void setPingHosts(const QStringList &pingHosts);
+
+    QStringList tracerouteHosts() const;
+    void setTracerouteHosts(const QStringList &tracerouteHosts);
 
     QUrl transferUrl() const;
     void setTransferUrl(const QUrl &transferUrl);
@@ -60,7 +68,9 @@ protected:
 
 signals:
     void htmlChanged(const QString &html);
+    void pingHostsChanged(const QStringList &pingHosts);
     void runningChanged(bool running);
+    void tracerouteHostsChanged(const QStringList &pingHosts);
     void transferUrlChanged(const QUrl &transferUrl);
 
 public slots:

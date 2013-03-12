@@ -438,12 +438,6 @@ DiagnosticManager::DiagnosticManager()
     : m_thread(0)
 {
     qRegisterMetaType<QXmppDiagnosticIq>("QXmppDiagnosticIq");
-
-    // default config
-    m_config.pingHosts << "213.91.4.201" << "8.8.8.8";
-    m_config.pingHosts << "wireless.wifirst.net" << "www.wifirst.net" << "www.google.fr";
-    m_config.tracerouteHosts << "213.91.4.201";
-    m_config.transferUrl = QUrl("http://wireless.wifirst.net:8080/speed/");
 }
 
 void DiagnosticManager::setClient(QXmppClient *client)
@@ -560,6 +554,32 @@ void DiagnosticManager::run(const QXmppDiagnosticIq &request)
 bool DiagnosticManager::running() const
 {
     return m_thread != 0;
+}
+
+QStringList DiagnosticManager::pingHosts() const
+{
+    return m_config.pingHosts;
+}
+
+void DiagnosticManager::setPingHosts(const QStringList &pingHosts)
+{
+    if (pingHosts != m_config.pingHosts) {
+        m_config.pingHosts = pingHosts;
+        emit pingHostsChanged(m_config.pingHosts);
+    }
+}
+
+QStringList DiagnosticManager::tracerouteHosts() const
+{
+    return m_config.tracerouteHosts;
+}
+
+void DiagnosticManager::setTracerouteHosts(const QStringList &tracerouteHosts)
+{
+    if (tracerouteHosts != m_config.tracerouteHosts) {
+        m_config.tracerouteHosts = tracerouteHosts;
+        emit tracerouteHostsChanged(m_config.tracerouteHosts);
+    }
 }
 
 QUrl DiagnosticManager::transferUrl() const
