@@ -6,7 +6,6 @@
     'src/data/qml/dummydata',
     'src/data/qml/scripts',
     'src/imports/wiLink',
-    'src/imports/wiLink/phone',
     'src/qsound/src',
     'src/qsound/tests',
     'src/tests',
