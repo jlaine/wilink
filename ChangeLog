@@ -1,4 +1,5 @@
-wiLink 2.4.2 (UNRELEASED)
+wiLink 2.4.2 (2013-03-12)
+ * Application: rebuild against QXmpp >= 0.7.6 to fix Google authentication.
  * Diagnostics: let QML specify configuration.
 
 wiLink 2.4.1 (2012-09-07)
