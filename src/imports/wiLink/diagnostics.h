@@ -23,8 +23,13 @@
 #include "QXmppClientExtension.h"
 #include "QXmppDiagnosticIq.h"
 
-class DiagnosticManager;
 class QTimer;
+
+class DiagnosticConfig {
+public:
+    QList<QHostAddress> tracerouteAddresses;
+    QUrl transferUrl;
+};
 
 class DiagnosticManager : public QXmppClientExtension
 {
@@ -67,10 +72,10 @@ private slots:
 private:
     void run(const QXmppDiagnosticIq &request);
 
+    DiagnosticConfig m_config;
     QString m_diagnosticsServer;
     QString m_html;
     QThread *m_thread;
-    QUrl m_transferUrl;
 };
 
 class DiagnosticsAgent : public QObject
@@ -78,9 +83,7 @@ class DiagnosticsAgent : public QObject
     Q_OBJECT
 
 public:
-    DiagnosticsAgent(QObject *parent = 0) : QObject(parent) {};
-
-    QUrl transferUrl;
+    DiagnosticsAgent(const DiagnosticConfig &config, QObject *parent = 0);
 
 private slots:
     void handle(const QXmppDiagnosticIq &request);
@@ -90,6 +93,7 @@ signals:
     void finished(const QXmppDiagnosticIq &results);
 
 private:
+    DiagnosticConfig m_config;
     QXmppDiagnosticIq iq;
 };
 

@@ -54,6 +54,12 @@ static int id4 = qRegisterMetaType< Interface >();
 
 /* NETWORK */
 
+DiagnosticsAgent::DiagnosticsAgent(const DiagnosticConfig &config, QObject *parent)
+    : QObject(parent)
+    , m_config(config)
+{
+}
+
 void DiagnosticsAgent::handle(const QXmppDiagnosticIq &request)
 {
     iq.setId(request.id());
@@ -173,14 +179,16 @@ void DiagnosticsAgent::handle(const QXmppDiagnosticIq &request)
 
     /* run traceroute */
     QList<Traceroute> traceroutes;
-    traceroutes << NetworkInfo::traceroute(serverAddress, 3, 4);
+    foreach (const QHostAddress &address, m_config.tracerouteAddresses) {
+        traceroutes << NetworkInfo::traceroute(address, 3, 4);
+    }
     iq.setTraceroutes(traceroutes);
 
     /* run download */
-    if (transferUrl.isValid()) {
+    if (m_config.transferUrl.isValid()) {
         TransferTester *runner = new TransferTester(this);
         connect(runner, SIGNAL(finished(QList<Transfer>)), this, SLOT(transfersFinished(QList<Transfer>)));
-        runner->start(transferUrl);
+        runner->start(m_config.transferUrl);
     } else {
         emit finished(iq);
     }
@@ -414,9 +422,12 @@ static QString dumpResults(const QXmppDiagnosticIq &iq)
 
 DiagnosticManager::DiagnosticManager()
     : m_thread(0)
-    , m_transferUrl(QUrl("http://wireless.wifirst.net:8080/speed/"))
 {
     qRegisterMetaType<QXmppDiagnosticIq>("QXmppDiagnosticIq");
+
+    // default config
+    m_config.tracerouteAddresses << serverAddress;
+    m_config.transferUrl = QUrl("http://wireless.wifirst.net:8080/speed/");
 }
 
 void DiagnosticManager::setClient(QXmppClient *client)
@@ -512,8 +523,7 @@ void DiagnosticManager::run(const QXmppDiagnosticIq &request)
 
     m_thread = new QThread;
 
-    DiagnosticsAgent *agent = new DiagnosticsAgent;
-    agent->transferUrl = m_transferUrl;
+    DiagnosticsAgent *agent = new DiagnosticsAgent(m_config);
     agent->moveToThread(m_thread);
     check = connect(agent, SIGNAL(finished(QXmppDiagnosticIq)),
                     this, SLOT(handleResults(QXmppDiagnosticIq)));
@@ -537,13 +547,13 @@ bool DiagnosticManager::running() const
 
 QUrl DiagnosticManager::transferUrl() const
 {
-    return m_transferUrl;
+    return m_config.transferUrl;
 }
 
 void DiagnosticManager::setTransferUrl(const QUrl &transferUrl)
 {
-    if (transferUrl != m_transferUrl) {
-        m_transferUrl = transferUrl;
-        emit transferUrlChanged(m_transferUrl);
+    if (transferUrl != m_config.transferUrl) {
+        m_config.transferUrl = transferUrl;
+        emit transferUrlChanged(m_config.transferUrl);
     }
 }
