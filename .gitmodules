@@ -6,4 +6,4 @@
 	url = https://code.google.com/p/qdjango/
 [submodule "src/qxmpp-extra"]
 	path = src/qxmpp-extra
-	url = git://git.wifirst.net/qxmpp-extra.git
+	url = https://github.com/jlaine/qxmpp-extra.git
