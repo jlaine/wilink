@@ -121,7 +121,7 @@ Dialog {
                 switch (appUpdater.state) {
                 case Updater.IdleState: {
                     if (appUpdater.error == Updater.NoError) {
-                        return "<p>Copyright (C) 2009-2012 Wifirst<br/>"
+                        return "<p>Copyright (C) 2009-2013 Wifirst<br/>"
                         + "See AUTHORS file for a full list of contributors.</p>"
                         + "<p>This program is free software: you can redistribute it and/or modify "
                         + "it under the terms of the GNU General Public License as published by "

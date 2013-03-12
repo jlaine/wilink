@@ -105,7 +105,7 @@ else(APPLE)
   VIAddVersionKey CompanyName \\\"Wifirst\\\"
   VIAddVersionKey FileDescription \\\"wiLink ${WILINK_VERSION}\\\"
   VIAddVersionKey FileVersion \\\"${WILINK_VERSION}\\\"
-  VIAddVersionKey LegalCopyright \\\"Copyright 2009-2012 Wifirst\\\"
+  VIAddVersionKey LegalCopyright \\\"Copyright 2009-2013 Wifirst\\\"
   VIAddVersionKey ProductName \\\"wiLink\\\"
   VIAddVersionKey ProductVersion \\\"${WILINK_VERSION}\\\"")
         set(CPACK_NSIS_PAGE_COMPONENTS "!define MUI_FINISHPAGE_RUN \\\"$INSTDIR\\\\bin\\\\wiLink.exe\\\";")
