@@ -27,6 +27,7 @@ class QTimer;
 
 class DiagnosticConfig {
 public:
+    QStringList pingHosts;
     QList<QHostAddress> tracerouteAddresses;
     QUrl transferUrl;
 };

@@ -40,8 +40,6 @@
 #include "diagnostics.h"
 #include "systeminfo.h"
 
-static const QHostAddress serverAddress("213.91.4.201");
-
 Q_DECLARE_METATYPE(QList<QHostInfo>)
 Q_DECLARE_METATYPE(QList<Ping>)
 Q_DECLARE_METATYPE(QList<Traceroute>)
@@ -67,7 +65,6 @@ void DiagnosticsAgent::handle(const QXmppDiagnosticIq &request)
     iq.setTo(request.from());
     iq.setType(QXmppIq::Result);
 
-    QList<QHostAddress> gateways;
     QList<QHostInfo> lookups;
 
     /* software versions */
@@ -124,7 +121,8 @@ void DiagnosticsAgent::handle(const QXmppDiagnosticIq &request)
     }
     iq.setInterfaces(interfaceResults);
 
-    /* try to detemine gateways */
+    /* try to determine gateways */
+    QList<QHostAddress> pingAddresses;
     foreach (const QNetworkInterface &interface, QNetworkInterface::allInterfaces())
     {
         if (!(interface.flags() & QNetworkInterface::IsRunning) || (interface.flags() & QNetworkInterface::IsLoopBack))
@@ -134,19 +132,26 @@ void DiagnosticsAgent::handle(const QXmppDiagnosticIq &request)
         {
             if (entry.ip().protocol() == QAbstractSocket::IPv4Protocol && !entry.netmask().isNull() && entry.netmask() != QHostAddress::Broadcast)
             {
-                gateways.append(QHostAddress((entry.ip().toIPv4Address() & entry.netmask().toIPv4Address()) + 1));
+                const QHostAddress gateway((entry.ip().toIPv4Address() & entry.netmask().toIPv4Address()) + 1);
+                if (!pingAddresses.contains(gateway))
+                    pingAddresses.append(gateway);
                 break;
             }
         }
     }
-    gateways.append(serverAddress);
 
     /* run DNS tests */
-    QList<QHostAddress> longPing;
-    QStringList hostNames;
-    hostNames << "wireless.wifirst.net" << "www.wifirst.net" << "www.google.fr";
-    foreach (const QString &hostName, hostNames)
+    foreach (const QString &hostName, m_config.pingHosts)
     {
+        // check for an IP address
+        QHostAddress address;
+        if (address.setAddress(hostName)) {
+            if (!pingAddresses.contains(address))
+                pingAddresses.append(address);
+            continue;
+        }
+
+        // DNS lookup
         QHostInfo hostInfo = QHostInfo::fromName(hostName);
         lookups.append(hostInfo);
         if (hostInfo.error() == QHostInfo::NoError)
@@ -155,10 +160,8 @@ void DiagnosticsAgent::handle(const QXmppDiagnosticIq &request)
             {
                 if (address.protocol() == QAbstractSocket::IPv4Protocol)
                 {
-                    if (!gateways.contains(address))
-                        gateways.append(address);
-                    if (hostName == QLatin1String("www.google.fr"))
-                        longPing.append(address);
+                    if (!pingAddresses.contains(address))
+                        pingAddresses.append(address);
                     break;
                 }
             }
@@ -168,12 +171,12 @@ void DiagnosticsAgent::handle(const QXmppDiagnosticIq &request)
 
     /* run ping tests */
     QList<Ping> pings;
-    foreach (const QHostAddress &gateway, gateways)
+    foreach (const QHostAddress &address, pingAddresses)
     {
-        const Ping ping = NetworkInfo::ping(gateway, 3);
+        const Ping ping = NetworkInfo::ping(address, 3);
         pings.append(ping);
-        if (longPing.contains(gateway) && ping.sentPackets() != ping.receivedPackets())
-            pings.append(NetworkInfo::ping(gateway, 30));
+        if (address == QHostAddress("8.8.8.8") && ping.sentPackets() != ping.receivedPackets())
+            pings.append(NetworkInfo::ping(address, 30));
     }
     iq.setPings(pings);
 
@@ -426,7 +429,9 @@ DiagnosticManager::DiagnosticManager()
     qRegisterMetaType<QXmppDiagnosticIq>("QXmppDiagnosticIq");
 
     // default config
-    m_config.tracerouteAddresses << serverAddress;
+    m_config.pingHosts << "213.91.4.201" << "8.8.8.8";
+    m_config.pingHosts << "wireless.wifirst.net" << "www.wifirst.net" << "www.google.fr";
+    m_config.tracerouteAddresses << QHostAddress("213.91.4.201");
     m_config.transferUrl = QUrl("http://wireless.wifirst.net:8080/speed/");
 }
 
@@ -523,6 +528,7 @@ void DiagnosticManager::run(const QXmppDiagnosticIq &request)
 
     m_thread = new QThread;
 
+    // run diagnostics
     DiagnosticsAgent *agent = new DiagnosticsAgent(m_config);
     agent->moveToThread(m_thread);
     check = connect(agent, SIGNAL(finished(QXmppDiagnosticIq)),
