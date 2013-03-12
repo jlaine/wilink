@@ -1,3 +1,9 @@
+wilink (2.4.2-1) UNRELEASED; urgency=low
+
+  * New upstream release.
+
+ -- Jeremy Lainé <jeremy.laine@m4x.org>  Tue, 12 Mar 2013 12:09:22 +0100
+
 wilink (2.4.1-1) unstable; urgency=low
 
   * New upstream release.
