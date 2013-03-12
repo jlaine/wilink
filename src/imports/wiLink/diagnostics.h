@@ -28,7 +28,7 @@ class QTimer;
 class DiagnosticConfig {
 public:
     QStringList pingHosts;
-    QList<QHostAddress> tracerouteAddresses;
+    QStringList tracerouteHosts;
     QUrl transferUrl;
 };
 
@@ -94,6 +94,8 @@ signals:
     void finished(const QXmppDiagnosticIq &results);
 
 private:
+    bool resolve(const QString hostName, QHostAddress &result);
+
     DiagnosticConfig m_config;
     QXmppDiagnosticIq iq;
 };

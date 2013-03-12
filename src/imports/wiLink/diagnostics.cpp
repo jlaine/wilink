@@ -65,8 +65,6 @@ void DiagnosticsAgent::handle(const QXmppDiagnosticIq &request)
     iq.setTo(request.from());
     iq.setType(QXmppIq::Result);
 
-    QList<QHostInfo> lookups;
-
     /* software versions */
     QList<Software> softwares;
     Software os;
@@ -143,31 +141,12 @@ void DiagnosticsAgent::handle(const QXmppDiagnosticIq &request)
     /* run DNS tests */
     foreach (const QString &hostName, m_config.pingHosts)
     {
-        // check for an IP address
         QHostAddress address;
-        if (address.setAddress(hostName)) {
+        if (resolve(hostName, address)) {
             if (!pingAddresses.contains(address))
                 pingAddresses.append(address);
-            continue;
-        }
-
-        // DNS lookup
-        QHostInfo hostInfo = QHostInfo::fromName(hostName);
-        lookups.append(hostInfo);
-        if (hostInfo.error() == QHostInfo::NoError)
-        {
-            foreach (const QHostAddress &address, hostInfo.addresses())
-            {
-                if (address.protocol() == QAbstractSocket::IPv4Protocol)
-                {
-                    if (!pingAddresses.contains(address))
-                        pingAddresses.append(address);
-                    break;
-                }
-            }
         }
     }
-    iq.setLookups(lookups);
 
     /* run ping tests */
     QList<Ping> pings;
@@ -182,8 +161,12 @@ void DiagnosticsAgent::handle(const QXmppDiagnosticIq &request)
 
     /* run traceroute */
     QList<Traceroute> traceroutes;
-    foreach (const QHostAddress &address, m_config.tracerouteAddresses) {
-        traceroutes << NetworkInfo::traceroute(address, 3, 4);
+    foreach (const QString &hostName, m_config.tracerouteHosts)
+    {
+        QHostAddress address;
+        if (resolve(hostName, address)) {
+            traceroutes << NetworkInfo::traceroute(address, 3, 4);
+        }
     }
     iq.setTraceroutes(traceroutes);
 
@@ -195,6 +178,34 @@ void DiagnosticsAgent::handle(const QXmppDiagnosticIq &request)
     } else {
         emit finished(iq);
     }
+}
+
+bool DiagnosticsAgent::resolve(const QString hostName, QHostAddress &result)
+{
+    // check for an IP address
+    if (result.setAddress(hostName)) {
+        return true;
+    }
+
+    // DNS lookup
+    QHostInfo hostInfo = QHostInfo::fromName(hostName);
+    QList<QHostInfo> lookups = iq.lookups();
+    lookups.append(hostInfo);
+    iq.setLookups(lookups);
+    if (hostInfo.error() == QHostInfo::NoError)
+    {
+        foreach (const QHostAddress &address, hostInfo.addresses())
+        {
+            if (address.protocol() == QAbstractSocket::IPv4Protocol)
+            {
+                result = address;
+                return true;
+            }
+        }
+    }
+
+    // no valid address
+    return false;
 }
 
 void DiagnosticsAgent::transfersFinished(const QList<Transfer> &transfers)
@@ -431,7 +442,7 @@ DiagnosticManager::DiagnosticManager()
     // default config
     m_config.pingHosts << "213.91.4.201" << "8.8.8.8";
     m_config.pingHosts << "wireless.wifirst.net" << "www.wifirst.net" << "www.google.fr";
-    m_config.tracerouteAddresses << QHostAddress("213.91.4.201");
+    m_config.tracerouteHosts << "213.91.4.201";
     m_config.transferUrl = QUrl("http://wireless.wifirst.net:8080/speed/");
 }
 
