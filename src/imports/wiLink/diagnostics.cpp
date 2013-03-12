@@ -422,12 +422,14 @@ static QString dumpResults(const QXmppDiagnosticIq &iq)
     // show tests
     text += makeSection("Tests");
     text += dumpLookup(iq.lookups());
-    text += makeItem("Ping", dumpPings(iq.pings()));
+    if (!iq.pings().isEmpty())
+        text += makeItem("Ping", dumpPings(iq.pings()));
     foreach (const Traceroute &traceroute, iq.traceroutes())
         text += makeItem(
             QString("Traceroute to %1").arg(traceroute.hostAddress().toString()),
             dumpPings(traceroute));
-    text += makeItem("Transfer", dumpTransfers(iq.transfers()));
+    if (!iq.transfers().isEmpty())
+        text += makeItem("Transfer", dumpTransfers(iq.transfers()));
 
     return text;
 }
