@@ -31,12 +31,16 @@ class DiagnosticManager : public QXmppClientExtension
     Q_OBJECT
     Q_PROPERTY(QString html READ html NOTIFY htmlChanged)
     Q_PROPERTY(bool running READ running NOTIFY runningChanged)
+    Q_PROPERTY(QUrl transferUrl READ transferUrl NOTIFY transferUrlChanged)
 
 public:
     DiagnosticManager();
 
     QString html() const;
     bool running() const;
+
+    QUrl transferUrl() const;
+    void setTransferUrl(const QUrl &transferUrl);
 
     /// \cond
     QStringList discoveryFeatures() const;
@@ -51,6 +55,7 @@ protected:
 signals:
     void htmlChanged(const QString &html);
     void runningChanged(bool running);
+    void transferUrlChanged(const QUrl &transferUrl);
 
 public slots:
     void refresh();
@@ -65,6 +70,7 @@ private:
     QString m_diagnosticsServer;
     QString m_html;
     QThread *m_thread;
+    QUrl m_transferUrl;
 };
 
 class DiagnosticsAgent : public QObject
@@ -73,6 +79,8 @@ class DiagnosticsAgent : public QObject
 
 public:
     DiagnosticsAgent(QObject *parent = 0) : QObject(parent) {};
+
+    QUrl transferUrl;
 
 private slots:
     void handle(const QXmppDiagnosticIq &request);

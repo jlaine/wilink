@@ -159,6 +159,7 @@ void DiagnosticsAgent::handle(const QXmppDiagnosticIq &request)
         }
     }
     iq.setLookups(lookups);
+
     /* run ping tests */
     QList<Ping> pings;
     foreach (const QHostAddress &gateway, gateways)
@@ -176,9 +177,13 @@ void DiagnosticsAgent::handle(const QXmppDiagnosticIq &request)
     iq.setTraceroutes(traceroutes);
 
     /* run download */
-    TransferTester *runner = new TransferTester(this);
-    connect(runner, SIGNAL(finished(QList<Transfer>)), this, SLOT(transfersFinished(QList<Transfer>)));
-    runner->start(QUrl("http://wireless.wifirst.net:8080/speed/"));
+    if (transferUrl.isValid()) {
+        TransferTester *runner = new TransferTester(this);
+        connect(runner, SIGNAL(finished(QList<Transfer>)), this, SLOT(transfersFinished(QList<Transfer>)));
+        runner->start(transferUrl);
+    } else {
+        emit finished(iq);
+    }
 }
 
 void DiagnosticsAgent::transfersFinished(const QList<Transfer> &transfers)
@@ -409,6 +414,7 @@ static QString dumpResults(const QXmppDiagnosticIq &iq)
 
 DiagnosticManager::DiagnosticManager()
     : m_thread(0)
+    , m_transferUrl(QUrl("http://wireless.wifirst.net:8080/speed/"))
 {
     qRegisterMetaType<QXmppDiagnosticIq>("QXmppDiagnosticIq");
 }
@@ -507,6 +513,7 @@ void DiagnosticManager::run(const QXmppDiagnosticIq &request)
     m_thread = new QThread;
 
     DiagnosticsAgent *agent = new DiagnosticsAgent;
+    agent->transferUrl = m_transferUrl;
     agent->moveToThread(m_thread);
     check = connect(agent, SIGNAL(finished(QXmppDiagnosticIq)),
                     this, SLOT(handleResults(QXmppDiagnosticIq)));
@@ -528,3 +535,15 @@ bool DiagnosticManager::running() const
     return m_thread != 0;
 }
 
+QUrl DiagnosticManager::transferUrl() const
+{
+    return m_transferUrl;
+}
+
+void DiagnosticManager::setTransferUrl(const QUrl &transferUrl)
+{
+    if (transferUrl != m_transferUrl) {
+        m_transferUrl = transferUrl;
+        emit transferUrlChanged(m_transferUrl);
+    }
+}
