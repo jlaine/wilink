@@ -230,7 +230,7 @@ Dialog {
                     }
                 }
             }
-            xhr.open('GET', 'https://www.wifirst.net/w/wilink/credentials', true, username, password);
+            xhr.open('GET', 'https://apps.wifirst.net/wilink/credentials', true, username, password);
             xhr.setRequestHeader('Accept', 'application/xml');
             xhr.send();
         } else if (accountType == 'google') {
