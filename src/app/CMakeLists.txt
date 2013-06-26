@@ -19,6 +19,8 @@ set(app_MOC_HEADERS network.h window.h)
 if(APPLE)
     list(APPEND app_SOURCES application_mac.mm)
     list(APPEND app_LIBRARIES "-framework AppKit")
+elseif(UNIX)
+    list(APPEND app_LIBRARIES X11)
 endif()
 
 qt4_wrap_cpp(app_MOC_SOURCES ${app_MOC_HEADERS})
