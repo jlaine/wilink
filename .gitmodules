@@ -1,9 +1,9 @@
 [submodule "src/3rdparty/qxmpp"]
 	path = src/3rdparty/qxmpp
-	url = https://code.google.com/p/qxmpp/
+	url = https://github.com/qxmpp-project/qxmpp.git
 [submodule "src/3rdparty/qdjango"]
 	path = src/3rdparty/qdjango
-	url = https://code.google.com/p/qdjango/
+	url = https://github.com/jlaine/qdjango.git
 [submodule "src/qxmpp-extra"]
 	path = src/qxmpp-extra
 	url = https://github.com/jlaine/qxmpp-extra.git
