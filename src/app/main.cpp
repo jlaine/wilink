@@ -55,7 +55,7 @@ static void signal_handler(int sig)
 class CustomApplication : public QApplication
 {
 public:
-    CustomApplication(int argc, char *argv[])
+    CustomApplication(int &argc, char **argv)
         : QApplication(argc, argv)
     {
     }
