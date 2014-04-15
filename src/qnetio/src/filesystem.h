@@ -20,11 +20,10 @@
 #ifndef __QNETIO_FILESYSTEM_H__
 #define __QNETIO_FILESYSTEM_H__
 
-#include <QObject>
+#include <QDateTime>
 #include <QIODevice>
 #include <QList>
 #include <QUrl>
-#include <QUrlInfo>
 #include <QtPlugin>
 
 class QNetworkAccessManager;
@@ -57,28 +56,39 @@ public:
  *
  * @ingroup FileSystem
  */
-class FileInfo : public QUrlInfo
+class FileInfo
 {
 public:
+    FileInfo()
+        : m_isDir(false)
+        , m_size(0)
+    {}
+
+    bool isDir() const { return m_isDir; };
+    void setDir(bool isDir) { m_isDir = isDir; };
+
+    QDateTime lastModified () const { return m_lastModified; };
+    void setLastModified(const QDateTime &lastModified) { m_lastModified = lastModified; };
+
     /** Returns the file's MIME type.
      */
     QString mimeType() const;
 
+    QString name() const { return m_name; };
+    void setName(const QString& name) { m_name = name; };
+
+    qint64 size() const { return m_size; };
+    void setSize(qint64 size) { m_size = size; };
+
     /** Returns the file's url.
      */
-    QUrl url() const { return fileurl; };
+    QUrl url() const { return m_url; };
 
     /** Sets the file's url.
      *
      * @param url
      */
-    void setUrl(const QUrl &url) { fileurl = url; };
-
-    /** Assigns the values of \a other to this FileInfo object.
-     *
-     * @param other
-     */
-    FileInfo& operator=(const FileInfo &other);
+    void setUrl(const QUrl &url) { m_url = url; };
 
     /** Returns the URL of the file under the given URL.
      *
@@ -88,7 +98,11 @@ public:
     static QUrl fileUrl(const QUrl &baseUrl, const QString &fileName);
 
 private:
-    QUrl fileurl;
+    bool m_isDir;
+    QDateTime m_lastModified;
+    QString m_name;
+    qint64 m_size;
+    QUrl m_url;
 };
 
 typedef QList<FileInfo> FileInfoList;

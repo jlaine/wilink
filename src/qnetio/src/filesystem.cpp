@@ -42,13 +42,6 @@ using namespace QNetIO;
 
 static FileSystemNetworkAccessManagerFactory *networkFactory = 0;
 
-FileInfo& FileInfo::operator=(const FileInfo &other)
-{
-    *((QUrlInfo*)this) = other;
-    fileurl = other.url();
-    return *this;
-}
-
 QUrl FileInfo::fileUrl(const QUrl &baseUrl, const QString &fileName)
 {
     QUrl url(baseUrl);
@@ -64,7 +57,7 @@ QString FileInfo::mimeType() const
     if (isDir()) {
         return "application/x-directory";
     } else {
-        return MimeTypes().guessType(fileurl.path());
+        return MimeTypes().guessType(m_url.path());
     }
 }
 
