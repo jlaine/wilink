@@ -140,7 +140,7 @@ QVariant ChatModel::get(int row) const
         QVariantMap result;
         const QHash<int, QByteArray> roleMap = roleNames();
         foreach (int role, roleMap.keys()) {
-            const QString name = QString::fromAscii(roleMap.value(role));
+            const QString name = QString::fromLatin1(roleMap.value(role));
             result.insert(name, idx.data(role));
         }
         result.insert("index", row);

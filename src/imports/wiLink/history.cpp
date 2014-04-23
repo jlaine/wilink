@@ -123,7 +123,11 @@ static QString transformToken(const QString &token)
     }
 
     // default
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     return Qt::escape(token);
+#else
+    return token.toHtmlEscaped();
+#endif
 }
 
 /** Returns the HTML for the message body.
@@ -134,8 +138,14 @@ QString HistoryMessage::html(const QString &meName) const
 {
     // me
     QRegExp re(meRegex);
-    if (!meName.isEmpty() && re.exactMatch(body))
-        return QString("<b>%1 %2</b>").arg(meName, Qt::escape(re.cap(1)));
+    if (!meName.isEmpty() && re.exactMatch(body)) {
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+        const QString meBody = Qt::escape(re.cap(1));
+#else
+        const QString meBody = re.cap(1).toHtmlEscaped();
+#endif
+        return QString("<b>%1 %2</b>").arg(meName, meBody);
+    }
 
     // remove trailing whitespace
     int pos = body.size() - 1;
