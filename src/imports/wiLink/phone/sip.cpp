@@ -485,11 +485,11 @@ bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
                 if (bits.size() == 8 && bits[6] == "typ") {
                     candidate.setFoundation(bits[0].toInt());
                     candidate.setComponent(bits[1].toInt());
-                    candidate.setProtocol(QString::fromAscii(bits[2]).toLower());
+                    candidate.setProtocol(QString::fromLatin1(bits[2]).toLower());
                     candidate.setPriority(bits[3].toInt());
-                    candidate.setHost(QHostAddress(QString::fromAscii(bits[4])));
+                    candidate.setHost(QHostAddress(QString::fromLatin1(bits[4])));
                     candidate.setPort(bits[5].toInt());
-                    candidate.setType(QXmppJingleCandidate::typeFromString(QString::fromAscii(bits[7])));
+                    candidate.setType(QXmppJingleCandidate::typeFromString(QString::fromLatin1(bits[7])));
 
                     iceConnection->addRemoteCandidate(candidate);
                 }

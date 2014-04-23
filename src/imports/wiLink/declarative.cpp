@@ -101,7 +101,7 @@ QVariant ListHelper::get(int row) const
             QVariantMap result;
             const QHash<int, QByteArray> roleNames = m_model->roleNames();
             foreach (int role, roleNames.keys())
-                result.insert(QString::fromAscii(roleNames[role]), index.data(role));
+                result.insert(QString::fromLatin1(roleNames[role]), index.data(role));
             result.insert("index", row);
             return result;
         }
@@ -197,7 +197,11 @@ void Plugin::initializeEngine(QDeclarativeEngine *engine, const char *uri)
     engine->addImageProvider("roster", new RosterImageProvider);
 
     // initialise wallet
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+    const QString dataPath = QStandardPaths::standardLocations(QStandardPaths::DataLocation)[0];
+#else
     const QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+#endif
     QDir().mkpath(dataPath);
     QNetIO::Wallet::setDataPath(QDir(dataPath).filePath("wallet"));
 }
