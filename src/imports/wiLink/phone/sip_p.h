@@ -21,7 +21,11 @@
 #include <QHostAddress>
 #include <QMap>
 #include <QObject>
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
+#include <QDnsLookup>
+#else
 #include "qdnslookup.h"
+#endif
 
 #include "sip.h"
 
