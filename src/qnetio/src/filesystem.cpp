@@ -23,7 +23,7 @@
 #include <QTimer>
 
 #include "filesystem.h"
-#include "mime.h"
+#include "mimetypes.h"
 #include "wallet.h"
 
 Q_IMPORT_PLUGIN(local_filesystem)

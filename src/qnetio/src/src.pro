@@ -22,6 +22,7 @@ HEADERS += \
     filesystem/picasa.h \
     filesystem/wifirst.h \
     mime.h \
+    mimetypes.h \
     wallet.h \
     wallet/dummy.h
 SOURCES += \
@@ -32,6 +33,7 @@ SOURCES += \
     filesystem/picasa.cpp \
     filesystem/wifirst.cpp \
     mime.cpp \
+    mimetypes.cpp \
     wallet.cpp \
     wallet/dummy.cpp
 

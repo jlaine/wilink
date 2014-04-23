@@ -23,14 +23,9 @@
 #include <QObject>
 
 #include "mime.h"
+#include "mimetypes.h"
 
 using namespace QNetIO;
-
-typedef struct
-{
-    const char *type;
-    const char *extensions;
-} MimeEntry;
 
 MimeHeaders::MimeHeaders()
 {
@@ -205,87 +200,5 @@ void MimeForm::addFile(const QString &name, const QString &filename, const QByte
     part.headers.setValue("Content-Transfer-Encoding", "binary");
     part.body = data;
     parts.append(part);
-}
-
-static MimeEntry MIME_TYPES[] = {
-    { "application/pdf", "pdf" },
-    { "application/x-apple-diskimage", "dmg" },
-    { "application/zip", "zip" },
-    { "audio/mpeg", "mp3" },
-    { "audio/mp4", "m4p" },
-    { "audio/ogg", "ogg" },
-    { "audio/x-wav", "wav" },
-    { "image/gif", "gif" },
-    { "image/jpeg", "jpeg jpg jpe" },
-    { "image/png", "png" },
-    { "text/css", "css" },
-    { "text/html", "html" },
-    { "text/plain", "txt" },
-    { "video/x-msvideo", "avi" },
-    { "video/mpeg", "mpeg mpg m4v" },
-    { "video/quicktime", "mov" },
-    { NULL, NULL },
-};
-
-/** Construct a new MimeTypes instance and load all known types.
- */
-MimeTypes::MimeTypes()
-{
-    for (MimeEntry *entry = MIME_TYPES; entry->type; entry++)
-        db.insert(entry->type, QString::fromAscii(entry->extensions).split(" "));
-
-    // FIXME: get additional entries from /etc/mime.types or equivalent
-#if 0
-    QFile types("/etc/mime.types");
-    if (types.open(QIODevice::ReadOnly))
-    {
-        QStringList lines = QString(types.readAll()).split('\n');
-        for (int i  = 0; i < lines.size(); i++)
-        {
-            if (!lines[i].isEmpty() && !lines[i].startsWith('#'))
-            {
-                QStringList bits = lines[i].split(QRegExp("\\s+"));
-                QString type = bits.takeFirst();
-                if (bits.size() > 0)
-                    db.insert(type, bits);
-            }
-        }
-    }
-#endif
-}
-
-/** Guess the MIME type for the given file name.
- *
- * @param filename
- */
-QString MimeTypes::guessType(const QString &filename)
-{
-    QHash<QString, QStringList>::const_iterator iter;
-    QString extension = QFileInfo(filename).suffix();
-
-    for (iter = db.constBegin(); iter != db.constEnd(); iter++)
-    {
-        if (iter.value().contains(extension, Qt::CaseInsensitive))
-            return iter.key();
-    }
-    return "application/octet-stream";
-}
-
-/** Return a list of file extension filters for the given MIME types.
- *
- *  This list can then be used to filter files during a search for instance.
- *
- * @param types
- */
-QStringList MimeTypes::nameFilters(const QStringList &types)
-{
-    QStringList filters;
-    for (int i = 0; i < types.size(); i++)
-    {
-        QStringList extensions = db.value(types[i], QStringList());
-        for (int j = 0; j < extensions.size(); j++)
-            filters << ("*." + extensions[j]);
-    }
-    return filters;
 }
 

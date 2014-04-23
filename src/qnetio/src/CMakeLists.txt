@@ -23,7 +23,8 @@ if(UNIX)
 endif(UNIX)
 
 set(qnetio_SOURCES
-    mime.cpp)
+    mime.cpp
+    mimetypes.cpp)
 
 set(qnetio_SOURCES ${qnetio_SOURCES}
     filesystem.cpp

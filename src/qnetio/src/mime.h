@@ -21,9 +21,8 @@
 #define __QNETIO_MIME_H__
 
 #include <QByteArray>
-#include <QHash>
 #include <QHttpHeader>
-#include <QStringList>
+#include <QList>
 
 namespace QNetIO {
 
@@ -71,22 +70,6 @@ public:
 
     void addString(const QString &name, const QString &value);
     void addFile(const QString &name, const QString &filename, const QByteArray &data);
-};
-
-/** MimeTypes is used to manipulate MIME types.
- *
- * @ingroup Mime
- */
-class MimeTypes
-{
-public:
-    MimeTypes();
-
-    QString guessType(const QString &filename);
-    QStringList nameFilters(const QStringList &types);
-
-private:
-    QHash<QString, QStringList> db;
 };
 
 }
