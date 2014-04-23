@@ -57,7 +57,7 @@ static MimeEntry MIME_TYPES[] = {
 MimeTypes::MimeTypes()
 {
     for (MimeEntry *entry = MIME_TYPES; entry->type; entry++)
-        db.insert(entry->type, QString::fromAscii(entry->extensions).split(" "));
+        db.insert(entry->type, QString::fromLatin1(entry->extensions).split(" "));
 
     // FIXME: get additional entries from /etc/mime.types or equivalent
 #if 0
