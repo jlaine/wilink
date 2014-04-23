@@ -44,12 +44,9 @@ PlaceModel::PlaceModel(QObject *parent)
         m_paths << dir.path();
     }
 
-    // set role names
-    QHash<int, QByteArray> roleNames;
-    roleNames.insert(ChatModel::AvatarRole, "avatar");
-    roleNames.insert(ChatModel::NameRole, "name");
-    roleNames.insert(ChatModel::JidRole, "url");
-    setRoleNames(roleNames);
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+    setRoleNames(roleNames());
+#endif
 }
 
 QVariant PlaceModel::data(const QModelIndex &index, int role) const
@@ -66,6 +63,15 @@ QVariant PlaceModel::data(const QModelIndex &index, int role) const
         return QUrl::fromLocalFile(m_paths.value(i));
 
     return QVariant();
+}
+
+QHash<int, QByteArray> PlaceModel::roleNames() const
+{
+    QHash<int, QByteArray> roleNames;
+    roleNames.insert(ChatModel::AvatarRole, "avatar");
+    roleNames.insert(ChatModel::NameRole, "name");
+    roleNames.insert(ChatModel::JidRole, "url");
+    return roleNames;
 }
 
 int PlaceModel::rowCount(const QModelIndex &parent) const

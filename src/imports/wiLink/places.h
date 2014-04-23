@@ -32,6 +32,7 @@ public:
     // QAbstractItemModel
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     int rowCount(const QModelIndex &parent) const;
+    QHash<int, QByteArray> roleNames() const;
 
 private:
     QList<QString> m_paths;
