@@ -82,11 +82,7 @@ LogModel::LogModel(QObject *parent)
     m_enabled(true),
     m_logger(0)
 {
-    QHash<int, QByteArray> roleNames;
-    roleNames.insert(ContentRole, "content");
-    roleNames.insert(DateRole, "date");
-    roleNames.insert(TypeRole, "type");
-    setRoleNames(roleNames);
+    setRoleNames(roleNames());
 }
 
 void LogModel::clear()
@@ -157,6 +153,15 @@ void LogModel::messageReceived(QXmppLogger::MessageType type, const QString &msg
     item->date = QDateTime::currentDateTime();
     item->type = type;
     addItem(item, rootItem, rootItem->children.size());
+}
+
+QHash<int, QByteArray> LogModel::roleNames() const
+{
+    QHash<int, QByteArray> roleNames;
+    roleNames.insert(ContentRole, "content");
+    roleNames.insert(DateRole, "date");
+    roleNames.insert(TypeRole, "type");
+    return roleNames;
 }
 
 #if 0

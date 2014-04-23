@@ -347,13 +347,7 @@ FolderModel::FolderModel(QObject *parent)
     Q_ASSERT(check);
 
     // set role names
-    QHash<int, QByteArray> names = roleNames();
-    names.insert(ImageRole, "image");
-    names.insert(ImageReadyRole, "imageReady");
-    names.insert(IsDirRole, "isDir");
-    names.insert(SizeRole, "size");
-    names.insert(UrlRole, "url");
-    setRoleNames(names);
+    setRoleNames(roleNames());
 }
 
 FolderModel::~FolderModel()
@@ -445,6 +439,19 @@ void FolderModel::refresh()
     check = connect(d->listJob, SIGNAL(finished()),
                     this, SLOT(_q_listFinished()));
     emit isBusyChanged();
+}
+
+QHash<int, QByteArray> FolderModel::roleNames() const
+{
+    QHash<int, QByteArray> roleNames;
+    roleNames.insert(AvatarRole, "avatar");
+    roleNames.insert(ImageRole, "image");
+    roleNames.insert(ImageReadyRole, "imageReady");
+    roleNames.insert(IsDirRole, "isDir");
+    roleNames.insert(NameRole, "name");
+    roleNames.insert(SizeRole, "size");
+    roleNames.insert(UrlRole, "url");
+    return roleNames;
 }
 
 QUrl FolderModel::rootUrl() const
@@ -692,14 +699,7 @@ FolderQueueModel::FolderQueueModel(QObject *parent)
     , m_uploadItem(0)
 {
     // set role names
-    QHash<int, QByteArray> names = roleNames();
-    names.insert(IsDirRole, "isDir");
-    names.insert(SpeedRole, "speed");
-    names.insert(DoneBytesRole, "doneBytes");
-    names.insert(DoneFilesRole, "doneFiles");
-    names.insert(TotalBytesRole, "totalBytes");
-    names.insert(TotalFilesRole, "totalFiles");
-    setRoleNames(names);
+    setRoleNames(roleNames());
 
     m_resizerThread = new QThread;
     m_resizerThread->start();
@@ -866,6 +866,20 @@ void FolderQueueModel::processQueue()
             }
         }
     }
+}
+
+QHash<int, QByteArray> FolderQueueModel::roleNames() const
+{
+    QHash<int, QByteArray> roleNames;
+    roleNames.insert(AvatarRole, "avatar");
+    roleNames.insert(IsDirRole, "isDir");
+    roleNames.insert(NameRole, "name");
+    roleNames.insert(SpeedRole, "speed");
+    roleNames.insert(DoneBytesRole, "doneBytes");
+    roleNames.insert(DoneFilesRole, "doneFiles");
+    roleNames.insert(TotalBytesRole, "totalBytes");
+    roleNames.insert(TotalFilesRole, "totalFiles");
+    return roleNames;
 }
 
 /** Transfer the next block of data.

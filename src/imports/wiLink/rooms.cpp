@@ -41,13 +41,7 @@ RoomConfigurationModel::RoomConfigurationModel(QObject *parent)
     : QAbstractListModel(parent),
     m_room(0)
 {
-    QHash<int, QByteArray> names;
-    names.insert(DescriptionRole, "description");
-    names.insert(KeyRole, "key");
-    names.insert(LabelRole, "label");
-    names.insert(TypeRole, "type");
-    names.insert(ValueRole, "value");
-    setRoleNames(names);
+    setRoleNames(roleNames());
 }
 
 QVariant RoomConfigurationModel::data(const QModelIndex &index, int role) const
@@ -76,6 +70,17 @@ QModelIndex RoomConfigurationModel::index(int row, int column, const QModelIndex
         return QModelIndex();
 
     return createIndex(row, column);
+}
+
+QHash<int, QByteArray> RoomConfigurationModel::roleNames() const
+{
+    QHash<int, QByteArray> roleNames;
+    roleNames.insert(DescriptionRole, "description");
+    roleNames.insert(KeyRole, "key");
+    roleNames.insert(LabelRole, "label");
+    roleNames.insert(TypeRole, "type");
+    roleNames.insert(ValueRole, "value");
+    return roleNames;
 }
 
 QXmppMucRoom *RoomConfigurationModel::room() const
@@ -374,10 +379,7 @@ RoomPermissionModel::RoomPermissionModel(QObject *parent)
     : ChatModel(parent),
     m_room(0)
 {
-    QHash<int, QByteArray> names;
-    names.insert(AffiliationRole, "affiliation");
-    names.insert(JidRole, "jid");
-    setRoleNames(names);
+    setRoleNames(roleNames());
 }
 
 void RoomPermissionModel::setPermission(const QString &jid, int affiliation)
@@ -428,6 +430,14 @@ QVariant RoomPermissionModel::data(const QModelIndex &index, int role) const
     }
 
     return QVariant();
+}
+
+QHash<int, QByteArray> RoomPermissionModel::roleNames() const
+{
+    QHash<int, QByteArray> roleNames;
+    roleNames.insert(AffiliationRole, "affiliation");
+    roleNames.insert(JidRole, "jid");
+    return roleNames;
 }
 
 QXmppMucRoom *RoomPermissionModel::room() const

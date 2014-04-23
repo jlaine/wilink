@@ -129,6 +129,7 @@ public:
 
     // QAbstractItemModel
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    QHash<int, QByteArray> roleNames() const;
 
 signals:
     void filterChanged();
@@ -176,6 +177,7 @@ public:
 
     // QAbstractItemModel
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    QHash<int, QByteArray> roleNames() const;
 
 public slots:
     void cancel(int row);

@@ -44,6 +44,7 @@ public:
     /// cond
     QVariant data(const QModelIndex &index, int role) const;
     QModelIndex index(int row, int column = 0, const QModelIndex & parent = QModelIndex()) const;
+    QHash<int, QByteArray> roleNames() const;
     int rowCount(const QModelIndex &parent) const;
     /// endcond
 
@@ -130,6 +131,7 @@ public:
     RoomPermissionModel(QObject *parent = 0);
 
     QVariant data(const QModelIndex &index, int role) const;
+    QHash<int, QByteArray> roleNames() const;
 
     QXmppMucRoom *room() const;
     void setRoom(QXmppMucRoom *room);

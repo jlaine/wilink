@@ -41,6 +41,7 @@ public:
 
     // QAbstractItemModel
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    QHash<int, QByteArray> roleNames() const;
 
 signals:
     void enabledChanged(bool enabled);
