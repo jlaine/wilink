@@ -204,7 +204,7 @@ FileInfoList HttpFileSystem::parseDavList(const QByteArray &data)
     QDomElement response = doc.documentElement().firstChildElement("D:response");
     while (!response.isNull())
     {
-        QString href = QUrl::fromPercentEncoding(response.firstChildElement("D:href").text().toAscii());
+        QString href = QUrl::fromPercentEncoding(response.firstChildElement("D:href").text().toUtf8());
 
         if (href == listPath || !href.startsWith(listPath))
         {

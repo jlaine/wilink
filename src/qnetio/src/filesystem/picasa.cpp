@@ -132,7 +132,7 @@ void PicasaFileSystemJob::networkFinished(QNetworkReply *reply)
                 if (lnk.attribute("rel") == "edit")
                 {
                     QNetworkRequest req(lnk.attribute("href"));
-                    req.setRawHeader("Authorization", QString("GoogleLogin auth=%1").arg(m_fs->authToken).toAscii());
+                    req.setRawHeader("Authorization", QString("GoogleLogin auth=%1").arg(m_fs->authToken).toUtf8());
                     setNetworkReply(m_fs->network->deleteResource(req));
                     return;
                 }
@@ -173,7 +173,7 @@ FileSystemJob* PicasaFileSystem::get(const QUrl &fileUrl, ImageSize type)
         realUrl = mediumHash[fileUrl.toString()];
 
     QNetworkRequest req(realUrl);
-    req.setRawHeader("Authorization", QString("GoogleLogin auth=%1").arg(authToken).toAscii());
+    req.setRawHeader("Authorization", QString("GoogleLogin auth=%1").arg(authToken).toUtf8());
 
     QNetworkReply *reply = network->get(req);
     job->setData(reply);
@@ -193,7 +193,7 @@ FileSystemJob* PicasaFileSystem::list(const QUrl &dirUrl, const QString &filter)
     }
 
     QNetworkRequest req(url);
-    req.setRawHeader("Authorization", QString("GoogleLogin auth=%1").arg(authToken).toAscii());
+    req.setRawHeader("Authorization", QString("GoogleLogin auth=%1").arg(authToken).toUtf8());
     job->baseUrl = dirUrl;
     job->setNetworkReply(network->get(req));
     return job;
@@ -248,7 +248,7 @@ FileSystemJob* PicasaFileSystem::mkdir(const QUrl &dirUrl)
 #endif
 
     QNetworkRequest req(postUrl);
-    req.setRawHeader("Authorization", QString("GoogleLogin auth=%1").arg(authToken).toAscii());
+    req.setRawHeader("Authorization", QString("GoogleLogin auth=%1").arg(authToken).toUtf8());
     req.setRawHeader("Content-Type", "application/atom+xml; charset=UTF-8");
     job->baseUrl = bits.first;
     job->setNetworkReply(network->post(req, doc.toByteArray()));
@@ -289,9 +289,9 @@ FileSystemJob* PicasaFileSystem::put(const QUrl &fileUrl, QIODevice *data)
     }
 
     QNetworkRequest req(postUrl);
-    req.setRawHeader("Authorization", QString("GoogleLogin auth=%1").arg(authToken).toAscii());
+    req.setRawHeader("Authorization", QString("GoogleLogin auth=%1").arg(authToken).toUtf8());
     req.setRawHeader("Content-Type", "image/jpeg");
-    req.setRawHeader("Slug", bits.second.toAscii());
+    req.setRawHeader("Slug", bits.second.toUtf8());
 
     job->baseUrl = bits.first;
     job->setNetworkReply(network->post(req, data));
@@ -364,7 +364,7 @@ FileSystemJob *PicasaFileSystem::removeEntry(FileSystemJob::Operation operation,
     }
 
     QNetworkRequest req(postUrl);
-    req.setRawHeader("Authorization", QString("GoogleLogin auth=%1").arg(authToken).toAscii());
+    req.setRawHeader("Authorization", QString("GoogleLogin auth=%1").arg(authToken).toUtf8());
     job->baseUrl = bits.first;
     job->setNetworkReply(network->deleteResource(req));
     return job;
