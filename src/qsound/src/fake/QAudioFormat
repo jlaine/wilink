@@ -44,14 +44,14 @@ public:
     Endian byteOrder() const { return LittleEndian; }
     void setByteOrder(Endian) {}
 
-    int channels() const { return 1; }
-    void setChannels(int) {}
+    int channelCount() const { return 1; }
+    void setChannelCount(int) {}
 
     QString codec() const { return "audio/pcm"; }
     void setCodec(const QString&) {}
 
-    int frequency() const { return 8000; }
-    void setFrequency(int) {};
+    int sampleRate() const { return 8000; }
+    void setSampleRate(int) {};
 
     int sampleSize() const { return 16; }
     void setSampleSize(int) {}

@@ -343,7 +343,7 @@ bool QSoundFileMp3::readHeader()
     if (!decodeFrame() || !m_headerFound)
         return false;
 
-    m_duration = (1000 * samples) / m_format.frequency();
+    m_duration = (1000 * samples) / m_format.sampleRate();
 
     return true;
 }
@@ -582,7 +582,7 @@ void QSoundFileWav::close()
 
 qint64 QSoundFileWav::duration() const
 {
-    return (8000 * (m_endPos - m_beginPos)) / (m_format.sampleSize() * m_format.channels()  * m_format.frequency());
+    return (8000 * (m_endPos - m_beginPos)) / (m_format.sampleSize() * m_format.channelCount()  * m_format.sampleRate());
 }
 
 qint64 QSoundFileWav::readData(char * data, qint64 maxSize)
@@ -637,8 +637,8 @@ bool QSoundFileWav::readHeader()
 
             //qDebug("channelCount: %u, sampleRate: %u, sampleSize: %u", channelCount, sampleRate, sampleSize);
             // prepare format
-            m_format.setChannels(channelCount);
-            m_format.setFrequency(sampleRate);
+            m_format.setChannelCount(channelCount);
+            m_format.setSampleRate(sampleRate);
             m_format.setSampleSize(sampleSize);
             m_format.setCodec("audio/pcm");
             m_format.setByteOrder(QAudioFormat::LittleEndian);
@@ -708,10 +708,10 @@ bool QSoundFileWav::writeHeader()
     stream.writeRawData("fmt ", 4);
     stream << WAV_FMT_SIZE;
     stream << WAV_FMT_FORMAT;
-    stream << quint16(m_format.channels());
-    stream << quint32(m_format.frequency());
-    stream << quint32((m_format.channels() * m_format.sampleSize() * m_format.frequency()) / 8);
-    stream << quint16((m_format.channels() * m_format.sampleSize()) / 8);
+    stream << quint16(m_format.channelCount());
+    stream << quint32(m_format.sampleRate());
+    stream << quint32((m_format.channelCount() * m_format.sampleSize() * m_format.sampleRate()) / 8);
+    stream << quint16((m_format.channelCount() * m_format.sampleSize()) / 8);
     stream << quint16(m_format.sampleSize());
 
     // LIST subchunk

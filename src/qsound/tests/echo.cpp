@@ -160,7 +160,7 @@ int main(int argc, char *argv[])
     Q_ASSERT(local.format() == remote.format());
 
     // simulate echo
-    const size_t N = local.format().frequency() * 4;
+    const size_t N = local.format().sampleRate() * 4;
 
     QSoundFile buffer("mixed.wav");
     buffer.setFormat(local.format());

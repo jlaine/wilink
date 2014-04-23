@@ -29,10 +29,10 @@ static int bufferFor(const QAudioFormat &format)
 {
 #ifdef Q_OS_MAC
     // 128ms at 8kHz
-    return 2048 * format.channels();
+    return 2048 * format.channelCount();
 #else
     // 160ms at 8kHz
-    return 2560 * format.channels();
+    return 2560 * format.channelCount();
 #endif
 }
 
@@ -94,8 +94,8 @@ void QSoundStream::setFormat(unsigned char channels, unsigned int clockrate)
 QAudioFormat QSoundStream::pcmAudioFormat(unsigned char channels, unsigned int clockrate)
 {
     QAudioFormat format;
-    format.setChannels(channels);
-    format.setFrequency(clockrate);
+    format.setChannelCount(channels);
+    format.setSampleRate(clockrate);
     format.setSampleSize(16);
     format.setCodec("audio/pcm");
     format.setByteOrder(QAudioFormat::LittleEndian);
