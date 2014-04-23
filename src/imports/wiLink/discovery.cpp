@@ -39,9 +39,7 @@ DiscoveryModel::DiscoveryModel(QObject *parent)
     m_details(false),
     m_manager(0)
 {
-    QHash<int, QByteArray> names = roleNames();
-    names.insert(ChatModel::UserRole, "node");
-    setRoleNames(names);
+    setRoleNames(roleNames());
 
     m_timer = new QTimer(this);
     m_timer->setSingleShot(true);
@@ -126,6 +124,15 @@ void DiscoveryModel::refresh()
         if (!id.isEmpty())
             m_requests.append(id);
     }
+}
+
+QHash<int, QByteArray> DiscoveryModel::roleNames() const
+{
+    QHash<int, QByteArray> roleNames;
+    roleNames.insert(ChatModel::JidRole, "jid");
+    roleNames.insert(ChatModel::NameRole, "name");
+    roleNames.insert(ChatModel::UserRole, "node");
+    return roleNames;
 }
 
 QString DiscoveryModel::rootJid() const

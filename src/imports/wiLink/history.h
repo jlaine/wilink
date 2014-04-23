@@ -85,9 +85,10 @@ public:
     QString jid() const;
     void setJid(const QString &jid);
 
-    // QAbstracItemModel
+    // QAbstractItemModel
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    QHash<int, QByteArray> roleNames() const;
 
 signals:
     void bottomChanged();

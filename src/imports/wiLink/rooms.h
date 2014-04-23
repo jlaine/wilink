@@ -89,6 +89,7 @@ public:
     RoomModel(QObject *parent = 0);
 
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    QHash<int, QByteArray> roleNames() const;
 
     HistoryModel *historyModel() const;
 

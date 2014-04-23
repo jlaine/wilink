@@ -162,9 +162,7 @@ RoomModel::RoomModel(QObject *parent)
 {
     m_historyModel = new HistoryModel(this);
 
-    QHash<int, QByteArray> names = roleNames();
-    names.insert(RoomModel::AffiliationRole, "affiliation");
-    setRoleNames(names);
+    setRoleNames(roleNames());
 
     connect(VCardCache::instance(), SIGNAL(cardChanged(QString)),
             this, SLOT(_q_participantChanged(QString)));
@@ -230,6 +228,16 @@ void RoomModel::setManager(QXmppMucManager *manager)
 
         emit managerChanged(m_manager);
     }
+}
+
+QHash<int, QByteArray> RoomModel::roleNames() const
+{
+    QHash<int, QByteArray> roleNames;
+    roleNames.insert(ChatModel::AvatarRole, "avatar");
+    roleNames.insert(ChatModel::JidRole, "jid");
+    roleNames.insert(ChatModel::NameRole, "name");
+    roleNames.insert(RoomModel::AffiliationRole, "affiliation");
+    return roleNames;
 }
 
 void RoomModel::_q_messageReceived(const QXmppMessage &msg)

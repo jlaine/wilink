@@ -57,12 +57,7 @@ AccountModel::AccountModel(QObject *parent)
     , d(new AccountModelPrivate)
 {
     // set additionals role names
-    QHash<int, QByteArray> names;
-    names.insert(UsernameRole, "username");
-    names.insert(PasswordRole, "password");
-    names.insert(RealmRole, "realm");
-    names.insert(TypeRole, "type");
-    setRoleNames(names);
+    setRoleNames(roleNames());
 
     // load accounts
     reload();
@@ -238,3 +233,12 @@ void AccountModel::reload()
     endResetModel();
 }
 
+QHash<int, QByteArray> AccountModel::roleNames() const
+{
+    QHash<int, QByteArray> roleNames;
+    roleNames.insert(UsernameRole, "username");
+    roleNames.insert(PasswordRole, "password");
+    roleNames.insert(RealmRole, "realm");
+    roleNames.insert(TypeRole, "type");
+    return roleNames;
+}

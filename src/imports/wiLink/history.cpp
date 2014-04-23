@@ -236,17 +236,7 @@ HistoryModel::HistoryModel(QObject *parent)
     d = new HistoryModelPrivate(this);
 
     // set role names
-    QHash<int, QByteArray> roleNames;
-    roleNames.insert(ActionRole, "action");
-    roleNames.insert(AvatarRole, "avatar");
-    roleNames.insert(BodyRole, "body");
-    roleNames.insert(DateRole, "date");
-    roleNames.insert(FromRole, "from");
-    roleNames.insert(HtmlRole, "html");
-    roleNames.insert(JidRole, "jid");
-    roleNames.insert(ReceivedRole, "received");
-    roleNames.insert(SelectedRole, "selected");
-    setRoleNames(roleNames);
+    setRoleNames(roleNames());
 }
 
 /** Adds a message in the chat history.
@@ -523,6 +513,21 @@ QVariant HistoryModel::data(const QModelIndex &index, int role) const
     }
 
     return QVariant();
+}
+
+QHash<int, QByteArray> HistoryModel::roleNames() const
+{
+    QHash<int, QByteArray> roleNames;
+    roleNames.insert(ActionRole, "action");
+    roleNames.insert(AvatarRole, "avatar");
+    roleNames.insert(BodyRole, "body");
+    roleNames.insert(DateRole, "date");
+    roleNames.insert(FromRole, "from");
+    roleNames.insert(HtmlRole, "html");
+    roleNames.insert(JidRole, "jid");
+    roleNames.insert(ReceivedRole, "received");
+    roleNames.insert(SelectedRole, "selected");
+    return roleNames;
 }
 
 void HistoryModel::select(int from, int to)

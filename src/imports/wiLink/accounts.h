@@ -47,6 +47,7 @@ public slots:
     void setProperty(int index, const QString &property, const QVariant &value);
 
     // QAbstractItemModel
+    QHash<int, QByteArray> roleNames() const;
     bool submit();
 
 private:

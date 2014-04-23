@@ -240,11 +240,7 @@ RosterModel::RosterModel(QObject *parent)
     d = new RosterModelPrivate(this);
 
     // set additionals role names
-    QHash<int, QByteArray> names = roleNames();
-    names.insert(RosterModel::StatusRole, "status");
-    names.insert(RosterModel::SubscriptionStatusRole, "subscriptionStatus");
-    names.insert(RosterModel::SubscriptionTypeRole, "subscriptionType");
-    setRoleNames(names);
+    setRoleNames(roleNames());
 
     // use a queued connection so that the VCard gets updated first
     connect(VCardCache::instance(), SIGNAL(cardChanged(QString)),
@@ -337,6 +333,19 @@ int RosterModel::pendingMessages() const
         pending += child->messages;
     }
     return pending;
+}
+
+QHash<int, QByteArray> RosterModel::roleNames() const
+{
+    QHash<int, QByteArray> roleNames;
+    roleNames.insert(ChatModel::AvatarRole, "avatar");
+    roleNames.insert(ChatModel::JidRole, "jid");
+    roleNames.insert(ChatModel::MessagesRole, "messages");
+    roleNames.insert(ChatModel::NameRole, "name");
+    roleNames.insert(RosterModel::StatusRole, "status");
+    roleNames.insert(RosterModel::SubscriptionStatusRole, "subscriptionStatus");
+    roleNames.insert(RosterModel::SubscriptionTypeRole, "subscriptionType");
+    return roleNames;
 }
 
 /** Adds a client to the monitored list.
