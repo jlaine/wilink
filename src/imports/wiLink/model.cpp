@@ -45,14 +45,6 @@ ChatModel::ChatModel(QObject *parent)
     bool check;
     Q_UNUSED(check);
 
-    // set role names
-    QHash<int, QByteArray> roleNames;
-    roleNames.insert(ChatModel::AvatarRole, "avatar");
-    roleNames.insert(ChatModel::JidRole, "jid");
-    roleNames.insert(ChatModel::MessagesRole, "messages");
-    roleNames.insert(ChatModel::NameRole, "name");
-    setRoleNames(roleNames);
-
     // create root
     rootItem = new ChatModelItem;
 

@@ -346,8 +346,9 @@ FolderModel::FolderModel(QObject *parent)
                     this, SLOT(_q_photoChanged(QUrl,FileSystem::ImageSize)));
     Q_ASSERT(check);
 
-    // set role names
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     setRoleNames(roleNames());
+#endif
 }
 
 FolderModel::~FolderModel()
@@ -698,8 +699,9 @@ FolderQueueModel::FolderQueueModel(QObject *parent)
     , m_uploadDevice(0)
     , m_uploadItem(0)
 {
-    // set role names
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     setRoleNames(roleNames());
+#endif
 
     m_resizerThread = new QThread;
     m_resizerThread->start();

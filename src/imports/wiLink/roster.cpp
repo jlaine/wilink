@@ -239,8 +239,9 @@ RosterModel::RosterModel(QObject *parent)
 {
     d = new RosterModelPrivate(this);
 
-    // set additionals role names
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     setRoleNames(roleNames());
+#endif
 
     // use a queued connection so that the VCard gets updated first
     connect(VCardCache::instance(), SIGNAL(cardChanged(QString)),

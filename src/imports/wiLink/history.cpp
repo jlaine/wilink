@@ -235,8 +235,9 @@ HistoryModel::HistoryModel(QObject *parent)
 {
     d = new HistoryModelPrivate(this);
 
-    // set role names
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     setRoleNames(roleNames());
+#endif
 }
 
 /** Adds a message in the chat history.

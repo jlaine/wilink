@@ -82,7 +82,9 @@ LogModel::LogModel(QObject *parent)
     m_enabled(true),
     m_logger(0)
 {
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     setRoleNames(roleNames());
+#endif
 }
 
 void LogModel::clear()

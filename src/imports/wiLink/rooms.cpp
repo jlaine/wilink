@@ -41,7 +41,9 @@ RoomConfigurationModel::RoomConfigurationModel(QObject *parent)
     : QAbstractListModel(parent),
     m_room(0)
 {
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     setRoleNames(roleNames());
+#endif
 }
 
 QVariant RoomConfigurationModel::data(const QModelIndex &index, int role) const
@@ -167,7 +169,9 @@ RoomModel::RoomModel(QObject *parent)
 {
     m_historyModel = new HistoryModel(this);
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     setRoleNames(roleNames());
+#endif
 
     connect(VCardCache::instance(), SIGNAL(cardChanged(QString)),
             this, SLOT(_q_participantChanged(QString)));
@@ -379,7 +383,9 @@ RoomPermissionModel::RoomPermissionModel(QObject *parent)
     : ChatModel(parent),
     m_room(0)
 {
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     setRoleNames(roleNames());
+#endif
 }
 
 void RoomPermissionModel::setPermission(const QString &jid, int affiliation)
