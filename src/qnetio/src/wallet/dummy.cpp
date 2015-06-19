@@ -84,4 +84,6 @@ public:
     };
 };
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 Q_EXPORT_STATIC_PLUGIN2(dummy_wallet, DummyWalletPlugin)
+#endif
