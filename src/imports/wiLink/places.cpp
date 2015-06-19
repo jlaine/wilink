@@ -17,9 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QDesktopServices>
 #include <QDir>
 #include <QUrl>
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+#include <QDesktopServices>
+#else
+#include <QStandardPaths>
+#endif
 
 #include "model.h"
 #include "places.h"
@@ -27,6 +31,7 @@
 PlaceModel::PlaceModel(QObject *parent)
     : QAbstractListModel(parent)
 {
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     QList<QDesktopServices::StandardLocation> locations;
     locations << QDesktopServices::DocumentsLocation;
     locations << QDesktopServices::MusicLocation;
@@ -44,8 +49,26 @@ PlaceModel::PlaceModel(QObject *parent)
         m_paths << dir.path();
     }
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
     setRoleNames(roleNames());
+#else
+    QList<QStandardPaths::StandardLocation> locations;
+    locations << QStandardPaths::DocumentsLocation;
+    locations << QStandardPaths::MusicLocation;
+    locations << QStandardPaths::MoviesLocation;
+    locations << QStandardPaths::PicturesLocation;
+
+    foreach (QStandardPaths::StandardLocation location, locations) {
+        const QStringList paths = QStandardPaths::standardLocations(location);
+        foreach (const QString &path, paths) {
+            QDir dir(path);
+            if (path.isEmpty() || dir == QDir::home())
+                continue;
+
+            // do not use "path" directly, on Windows it uses back slashes
+            // where the rest of Qt uses forward slashes
+            m_paths << dir.path();
+        }
+    }
 #endif
 }
 

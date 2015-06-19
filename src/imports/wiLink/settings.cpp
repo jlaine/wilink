@@ -18,10 +18,14 @@
  */
 
 #include <QApplication>
-#include <QDesktopServices>
 #include <QDir>
 #include <QSettings>
 #include <QTextStream>
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+#include <QDesktopServices>
+#else
+#include <QStandardPaths>
+#endif
 
 #include "settings.h"
 #include "systeminfo.h"
@@ -147,10 +151,17 @@ QString ApplicationSettings::downloadsLocation() const
         if (downloads.exists())
             return downloads.absolutePath();
     }
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 #ifdef Q_OS_WIN
     return QDesktopServices::storageLocation(QDesktopServices::DesktopLocation);
 #endif
     return QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation);
+#else
+#ifdef Q_OS_WIN
+    return QStandardPaths::writableLocation(QStandardPaths::DesktopLocation);
+#endif
+    return QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+#endif
 }
 
 /** Returns the list of enabled plugins.

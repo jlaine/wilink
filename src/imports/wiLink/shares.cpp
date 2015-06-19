@@ -17,8 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QDesktopServices>
 #include <QTimer>
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+#include <QDesktopServices>
+#else
+#include <QStandardPaths>
+#endif
 
 #include "QDjango.h"
 #include "QXmppClient.h"
@@ -117,7 +121,12 @@ QXmppShareDatabase *ShareWatcher::database()
     if (!m_shareDatabase) {
         if (!m_shareDatabaseSet) {
             // initialise database
-            const QString databaseName = QDir(QDesktopServices::storageLocation(QDesktopServices::DataLocation)).filePath("database.sqlite");
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
+            const QString databaseDir = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
+#else
+            const QString databaseDir = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+#endif
+            const QString databaseName = QDir(databaseDir).filePath("database.sqlite");
             QSqlDatabase sharesDb = QSqlDatabase::addDatabase("QSQLITE");
             sharesDb.setDatabaseName(databaseName);
             check = sharesDb.open();

@@ -21,6 +21,7 @@
 #define __UPDATES_H__
 
 #include <QMap>
+#include <QObject>
 #include <QUrl>
 
 class QNetworkReply;
