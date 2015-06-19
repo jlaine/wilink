@@ -270,4 +270,6 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterType<QDeclarativeSortFilterProxyModel>(uri, 2, 4, "SortFilterProxyModel");
 }
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 Q_EXPORT_PLUGIN2(qmlwilinkplugin, Plugin);
+#endif
