@@ -18,7 +18,6 @@ HEADERS += \
     filesystem.h \
     filesystem/file.h \
     filesystem/http.h \
-    filesystem/picasa.h \
     filesystem/wifirst.h \
     mime.h \
     mimetypes.h \
@@ -28,7 +27,6 @@ SOURCES += \
     filesystem.cpp \
     filesystem/file.cpp \
     filesystem/http.cpp \
-    filesystem/picasa.cpp \
     filesystem/wifirst.cpp \
     mime.cpp \
     mimetypes.cpp \

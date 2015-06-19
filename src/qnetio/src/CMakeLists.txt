@@ -30,7 +30,6 @@ set(qnetio_SOURCES ${qnetio_SOURCES}
     filesystem.cpp
     filesystem/file.cpp
     filesystem/http.cpp
-    filesystem/picasa.cpp
     filesystem/wifirst.cpp
     wallet.cpp
     wallet/dummy.cpp)
@@ -39,7 +38,6 @@ set(qnetio_MOC_HEADERS
     filesystem.h
     filesystem/file.h
     filesystem/http.h
-    filesystem/picasa.h
     filesystem/wifirst.h
     wallet.h
     wallet/dummy.h)

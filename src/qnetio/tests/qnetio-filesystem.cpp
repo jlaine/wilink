@@ -297,10 +297,8 @@ int main(int argc, char *argv[])
 /*
         urls << "gphoto:///";
         urls << "file:///tmp";
-        urls << "picasa://default";
         urls << "https://mobile.bolloretelecom.eu/webdav";
         urls << "wifirst://default";
-        urls << "ftp://localhost/incoming";
 */
         BocTestFsHarness test(urls);
         test.run();

@@ -27,15 +27,10 @@
 #include "wallet.h"
 
 Q_IMPORT_PLUGIN(local_filesystem)
-Q_IMPORT_PLUGIN(ftp_filesystem)
 Q_IMPORT_PLUGIN(http_filesystem)
 #ifdef USE_GPHOTO
 Q_IMPORT_PLUGIN(gphoto_filesystem)
 #endif
-#ifdef USE_FACEBOOK
-Q_IMPORT_PLUGIN(facebook_filesystem)
-#endif
-Q_IMPORT_PLUGIN(picasa_filesystem)
 Q_IMPORT_PLUGIN(wifirst_filesystem)
 
 using namespace QNetIO;
