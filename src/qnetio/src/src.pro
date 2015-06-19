@@ -17,7 +17,6 @@ DEFINES += QT_STATICPLUGIN
 HEADERS += \
     filesystem.h \
     filesystem/file.h \
-    filesystem/ftp.h \
     filesystem/http.h \
     filesystem/picasa.h \
     filesystem/wifirst.h \
@@ -28,7 +27,6 @@ HEADERS += \
 SOURCES += \
     filesystem.cpp \
     filesystem/file.cpp \
-    filesystem/ftp.cpp \
     filesystem/http.cpp \
     filesystem/picasa.cpp \
     filesystem/wifirst.cpp \

@@ -29,7 +29,6 @@ set(qnetio_SOURCES
 set(qnetio_SOURCES ${qnetio_SOURCES}
     filesystem.cpp
     filesystem/file.cpp
-    filesystem/ftp.cpp
     filesystem/http.cpp
     filesystem/picasa.cpp
     filesystem/wifirst.cpp
@@ -39,7 +38,6 @@ set(qnetio_SOURCES ${qnetio_SOURCES}
 set(qnetio_MOC_HEADERS
     filesystem.h
     filesystem/file.h
-    filesystem/ftp.h
     filesystem/http.h
     filesystem/picasa.h
     filesystem/wifirst.h
