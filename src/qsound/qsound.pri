@@ -3,7 +3,9 @@
 QSOUND_INCLUDE_DIR = $$PWD/src
 QSOUND_LIBRARY_NAME = qsound
 
-android {
+greaterThan(QT_MAJOR_VERSION, 4) {
+    QT += multimedia
+} else:android {
     QSOUND_INCLUDE_DIR += $$PWD/src/fake
 } else:mac {
     QT += multimedia
