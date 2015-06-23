@@ -30,6 +30,9 @@ android|symbian|contains(MEEGO_EDITION,harmattan) {
     LIBS += -framework Carbon
     SOURCES += idle/idle_mac.cpp
 } else:unix {
+    greaterThan(QT_MAJOR_VERSION, 4) {
+        QT += x11extras
+    }
     DEFINES += HAVE_XSS
     SOURCES += idle/idle_x11.cpp
     LIBS += -lXss -lX11
