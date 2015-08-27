@@ -37,9 +37,5 @@ target_link_libraries(codec ${QXMPP_LIBRARIES} ${QT_LIBRARIES})
 #    ${phone_MOC_SOURCES})
 #target_link_libraries(phone qsound qxmpp ${QT_LIBRARIES})
 
-qt4_wrap_cpp(stun_MOC_SOURCES stun.h)
-add_executable(stun stun.cpp ${stun_MOC_SOURCES})
-target_link_libraries(stun ${QXMPP_LIBRARIES} ${QT_LIBRARIES})
-
 add_executable(hasher hasher.cpp)
 target_link_libraries(hasher ${QXMPP_LIBRARIES} ${QT_LIBRARIES})
