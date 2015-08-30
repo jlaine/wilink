@@ -298,7 +298,6 @@ int main(int argc, char *argv[])
         urls << "gphoto:///";
         urls << "file:///tmp";
         urls << "https://mobile.bolloretelecom.eu/webdav";
-        urls << "wifirst://default";
 */
         BocTestFsHarness test(urls);
         test.run();

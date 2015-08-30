@@ -19,14 +19,10 @@ if(UNIX)
 endif(UNIX)
 
 set(qnetio_SOURCES
-    mime.cpp
-    mimetypes.cpp)
-
-set(qnetio_SOURCES ${qnetio_SOURCES}
     filesystem.cpp
     filesystem/file.cpp
     filesystem/http.cpp
-    filesystem/wifirst.cpp
+    mimetypes.cpp
     wallet.cpp
     wallet/dummy.cpp)
 
