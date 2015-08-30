@@ -1,7 +1,3 @@
-set(QT_DONT_USE_QTGUI 1)
-set(QT_USE_QTNETWORK 1)
-include(${QT_USE_FILE})
-
 # needed for win32
 add_definitions(-DQT_PLUGIN)
 add_definitions(-DQT_SHARED)

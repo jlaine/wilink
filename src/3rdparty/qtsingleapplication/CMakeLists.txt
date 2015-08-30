@@ -1,5 +1,3 @@
-include(${QT_USE_FILE})
-
 set(SOURCES
     qtlocalpeer.cpp
     qtlockedfile.cpp)
@@ -10,4 +8,4 @@ else()
 endif()
 
 add_library(qtsingleapplication ${SOURCES})
-target_link_libraries(qtsingleapplication ${QT_LIBRARIES})
+target_link_libraries(qtsingleapplication Qt4::QtCore)

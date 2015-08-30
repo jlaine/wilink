@@ -15,7 +15,7 @@ if(QTMULTIMEDIAKIT_LIBRARY AND NOT APPLE)
     list(APPEND qsound_LIBRARIES ${QTMULTIMEDIAKIT_LIBRARY})
 else()
     message(STATUS "Using QtMultimedia library")
-    set(QT_USE_QTMULTIMEDIA 1)
+    list(APPEND qsound_LIBRARIES Qt4::QtMultimedia)
 endif()
 
 # mad support
@@ -46,11 +46,6 @@ if(QTKIT_LIBRARY)
     list(APPEND qsound_LIBRARIES ${QTKIT_LIBRARY} ${QUARTZCORE_LIBRARY} ${COCOA_LIBRARY})
 endif()
 
-# Qt
-set(QT_USE_QTDECLARATIVE 1)
-set(QT_USE_QTNETWORK 1)
-include(${QT_USE_FILE})
-
 SET(qsound_SOURCES QSoundFile.cpp QSoundLoader.cpp QSoundMeter.cpp QSoundPlayer.cpp QSoundStream.cpp QSoundTester.cpp QVideoGrabber.cpp)
 if(WIN32)
     list(APPEND qsound_SOURCES QVideoGrabber_win.cpp)
@@ -61,4 +56,4 @@ else()
 endif()
 
 add_library(qsound STATIC ${qsound_SOURCES})
-target_link_libraries(qsound ${QT_LIBRARIES} ${qsound_LIBRARIES})
+target_link_libraries(qsound Qt4::QtDeclarative Qt4::QtNetwork ${qsound_LIBRARIES})

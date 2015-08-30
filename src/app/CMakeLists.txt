@@ -1,11 +1,7 @@
-set(QT_USE_QTDECLARATIVE 1)
-set(QT_USE_QTNETWORK 1)
-include(${QT_USE_FILE})
-
 include_directories(../3rdparty/qtsingleapplication)
 
 # Libraries
-set(app_LIBRARIES ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTDECLARATIVE_LIBRARY} ${QT_QTNETWORK_LIBRARY} qtsingleapplication)
+set(app_LIBRARIES Qt4::QtCore Qt4::QtGui Qt4::QtDeclarative Qt4::QtNetwork qtsingleapplication)
 
 # wiLink
 add_definitions(-DWILINK_VERSION="${WILINK_VERSION}")

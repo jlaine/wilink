@@ -8,11 +8,7 @@ endif()
 add_subdirectory(filesystem)
 add_subdirectory(wallet)
 
-set(QT_DONT_USE_QTGUI 1)
-set(QT_USE_QTNETWORK 1)
-set(QT_USE_QTXML 1)
-include(${QT_USE_FILE})
-set(ALL_LIBRARIES ${QT_LIBRARIES})
+set(ALL_LIBRARIES Qt4::QtNetwork Qt4::QtXml)
 
 # Needed for plugin support
 add_definitions(-DQT_STATICPLUGIN)

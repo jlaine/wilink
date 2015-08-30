@@ -1,9 +1,3 @@
-set(QT_USE_QTDECLARATIVE 1)
-set(QT_USE_QTNETWORK 1)
-set(QT_USE_QTSQL 1)
-set(QT_USE_QTXML 1)
-include(${QT_USE_FILE})
-
 #include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../..)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../qnetio/src)
@@ -90,7 +84,7 @@ endif()
 qt4_add_resources(plugin_RCC_SOURCES ../../data/wiLink.qrc)
 add_library(qmlwilinkplugin SHARED ${plugin_SOURCES} ${plugin_RCC_SOURCES})
 target_link_libraries(qmlwilinkplugin qnetio qxmpp-extra qsound ${QXMPP_LIBRARIES} ${QDJANGO_LIBRARIES} ${plugin_LIBRARIES}
-    ${QT_QTDECLARATIVE_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTNETWORK_LIBRARY} ${QT_QTSQL_LIBRARY} ${QT_QTCORE_LIBRARY})
+    Qt4::QtDeclarative Qt4::QtGui Qt4::QtNetwork Qt4::QtSql)
 if(WIN32)
     set_target_properties(qmlwilinkplugin PROPERTIES PREFIX "")
 endif()

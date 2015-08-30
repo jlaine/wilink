@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.6)
+cmake_minimum_required(VERSION 3.0.0)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules ${CMAKE_MODULE_PATH})
 set(CMAKE_AUTOMOC ON)
 include(CheckIncludeFiles)
@@ -11,8 +11,7 @@ set(WILINK_VERSION_PATCH 2)
 set(WILINK_VERSION ${WILINK_VERSION_MAJOR}.${WILINK_VERSION_MINOR}.${WILINK_VERSION_PATCH})
 
 # Required
-set(QT_MIN_VERSION 4.7.4)
-find_package(Qt4 REQUIRED)
+find_package(Qt4 4.7.4 REQUIRED QtCore QtDeclarative QtGui QtNetwork QtSql QtXml)
 find_package(PkgConfig REQUIRED)
 
 pkg_check_modules(QDJANGO qdjango-db REQUIRED)
