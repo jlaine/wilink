@@ -30,7 +30,7 @@
 GnomeWallet::GnomeWallet(QObject *parent) : Wallet(parent)
 {
     qDebug("GnomeWallet initialised");
-    g_set_application_name(qApp->applicationName().toAscii().constData());
+    g_set_application_name(qApp->applicationName().toLatin1().constData());
 }
 
 bool GnomeWallet::deleteCredentials(const QString &realm, const QString &user)
@@ -40,13 +40,13 @@ bool GnomeWallet::deleteCredentials(const QString &realm, const QString &user)
     if (user.isEmpty()) {
         res = gnome_keyring_delete_password_sync(
             GNOME_KEYRING_NETWORK_PASSWORD,
-            "server", realm.toAscii().constData(),
+            "server", realm.toLatin1().constData(),
             NULL);
     } else {
         res = gnome_keyring_delete_password_sync(
             GNOME_KEYRING_NETWORK_PASSWORD,
-            "server", realm.toAscii().constData(),
-            "user", user.toAscii().constData(),
+            "server", realm.toLatin1().constData(),
+            "user", user.toLatin1().constData(),
             NULL);
     }
 
@@ -57,8 +57,8 @@ bool GnomeWallet::getCredentials(const QString &realm, QString &user, QString &p
 {
     GnomeKeyringResult res;
     GList *results = NULL;
-    const QByteArray realm_data = realm.toAscii();
-    const QByteArray user_data = user.toAscii();
+    const QByteArray realm_data = realm.toLatin1();
+    const QByteArray user_data = user.toLatin1();
 
     res = gnome_keyring_find_network_password_sync(user_data.isEmpty() ? NULL : user_data.constData(), NULL, realm_data.constData(), NULL, NULL, NULL, 0, &results);
     if (res != GNOME_KEYRING_RESULT_OK)
@@ -90,9 +90,9 @@ bool GnomeWallet::getRealms(QStringList &realms)
 
 bool GnomeWallet::setCredentials(const QString &realm, const QString &user, const QString &password)
 {
-    const QByteArray realm_data = realm.toAscii();
-    const QByteArray user_data = user.toAscii();
-    const QByteArray password_data = password.toAscii();
+    const QByteArray realm_data = realm.toLatin1();
+    const QByteArray user_data = user.toLatin1();
+    const QByteArray password_data = password.toLatin1();
 
     GnomeKeyringResult res = gnome_keyring_store_password_sync(
         GNOME_KEYRING_NETWORK_PASSWORD,

@@ -103,7 +103,7 @@ bool QVideoGrabberPrivate::open()
     v4l2_requestbuffers reqbuf;
     v4l2_streamparm streamparm;
 
-    fd = ::open(deviceName.toAscii().constData(), O_RDWR);
+    fd = ::open(deviceName.toLatin1().constData(), O_RDWR);
     if (fd < 0) {
         qWarning("QVideoGrabber(%s): could not open device", qPrintable(deviceName));
         return false;
@@ -309,7 +309,7 @@ QList<QVideoGrabberInfo> QVideoGrabberInfo::availableGrabbers()
         grabber.d->deviceName = dev.filePath(device);
 
         // query capabilities
-        int fd = ::open(grabber.d->deviceName.toAscii().constData(), O_RDWR);
+        int fd = ::open(grabber.d->deviceName.toLatin1().constData(), O_RDWR);
         if (fd < 0)
             continue;
         if (ioctl(fd, VIDIOC_QUERYCAP, &capability) < 0) {
