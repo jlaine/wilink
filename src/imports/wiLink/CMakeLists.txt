@@ -48,32 +48,6 @@ set(plugin_SOURCES
     translations.cpp
     updater.cpp)
 
-set(plugin_MOC_HEADERS
-    accounts.h
-    calls.h
-    client.h
-    console.h
-    conversations.h
-    declarative.h
-    declarative_qxmpp.h
-    diagnostics.h
-    discovery.h
-    history.h
-    idle/idle.h
-    menubar.h
-    model.h
-    notifications.h
-    photos.h
-    phone.h
-    phone/sip.h
-    places.h
-    rooms.h
-    roster.h
-    settings.h
-    shares.h
-    translations.h
-    updater.h)
-
 if(APPLE)
     # Growl support
     find_library(GROWL_LIBRARY Growl)
@@ -113,8 +87,7 @@ elseif(WIN32)
 endif()
 
 qt4_add_resources(plugin_RCC_SOURCES ../../data/wiLink.qrc)
-qt4_wrap_cpp(plugin_MOC_SOURCES ${plugin_MOC_HEADERS})
-add_library(qmlwilinkplugin SHARED ${plugin_SOURCES} ${plugin_MOC_SOURCES} ${plugin_RCC_SOURCES})
+add_library(qmlwilinkplugin SHARED ${plugin_SOURCES} ${plugin_RCC_SOURCES})
 target_link_libraries(qmlwilinkplugin qnetio qxmpp-extra qsound ${QXMPP_LIBRARIES} ${QDJANGO_LIBRARIES} ${plugin_LIBRARIES}
     ${QT_QTDECLARATIVE_LIBRARY} ${QT_QTGUI_LIBRARY} ${QT_QTNETWORK_LIBRARY} ${QT_QTSQL_LIBRARY} ${QT_QTCORE_LIBRARY})
 if(WIN32)

@@ -11,8 +11,7 @@ add_definitions(-DQT_NO_DEBUG)
 find_library(LIBGPHOTO_LIBRARY gphoto2)
 if(LIBGPHOTO_LIBRARY)
   message(STATUS "Found GPhoto2 library: ${LIBGPHOTO_LIBRARY}")
-  qt4_wrap_cpp(qnetio-gphoto_MOC_SOURCES gphoto.h)
-  add_library(qnetio-gphoto SHARED gphoto.cpp ${gphoto_plugin_MOC_SOURCES})
+  add_library(qnetio-gphoto SHARED gphoto.cpp)
   target_link_libraries(qnetio-gphoto qnetio ${LIBGPHOTO_LIBRARY})
   install(TARGETS qnetio-gphoto
     LIBRARY DESTINATION ${PLUGIN_INSTALL_DIR}/filesystem

@@ -34,20 +34,11 @@ set(qnetio_SOURCES ${qnetio_SOURCES}
     wallet.cpp
     wallet/dummy.cpp)
 
-set(qnetio_MOC_HEADERS
-    filesystem.h
-    filesystem/file.h
-    filesystem/http.h
-    filesystem/wifirst.h
-    wallet.h
-    wallet/dummy.h)
-
 if(WIN32)
   # Windows keyring support
   message(STATUS "Found Windows keyring support")
   add_definitions(-DUSE_WINDOWS_KEYRING)
   set(qnetio_SOURCES ${qnetio_SOURCES} wallet/windows.cpp)
-  set(qnetio_MOC_HEADERS ${qnetio_MOC_HEADERS} wallet/windows.h)
 else(WIN32)
   # OS X Keychain support
   find_library(APPLE_FOUNDATION_LIBRARY NAMES Foundation)
@@ -56,13 +47,11 @@ else(WIN32)
     message(STATUS "Found OS X Security library support : ${APPLE_SECURITY_LIBRARY}")
     add_definitions(-DUSE_OSX_KEYCHAIN)
     set(qnetio_SOURCES ${qnetio_SOURCES} wallet/osx.cpp)
-    set(qnetio_MOC_HEADERS ${qnetio_MOC_HEADERS} wallet/osx.h)
     set(ALL_LIBRARIES ${ALL_LIBRARIES} ${APPLE_FOUNDATION_LIBRARY} ${APPLE_SECURITY_LIBRARY})
   endif(APPLE_FOUNDATION_LIBRARY AND APPLE_SECURITY_LIBRARY)
 endif(WIN32)
 
-qt4_wrap_cpp(qnetio_MOC_SOURCES ${qnetio_MOC_HEADERS})
-add_library(qnetio ${QNETIO_LIBRARY_TYPE} ${qnetio_SOURCES} ${qnetio_MOC_SOURCES})
+add_library(qnetio ${QNETIO_LIBRARY_TYPE} ${qnetio_SOURCES})
 set_target_properties(qnetio PROPERTIES SOVERSION 0)
 target_link_libraries(qnetio ${ALL_LIBRARIES})
 

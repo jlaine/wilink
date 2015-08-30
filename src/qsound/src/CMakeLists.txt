@@ -60,6 +60,5 @@ else()
     list(APPEND qsound_SOURCES QVideoGrabber_linux.cpp)
 endif()
 
-qt4_wrap_cpp(qsound_MOC_SOURCES QSoundFile.h QSoundLoader.h QSoundMeter.h QSoundPlayer.h QSoundStream.h QSoundTester.h QVideoGrabber.h)
-add_library(qsound STATIC ${qsound_SOURCES} ${qsound_MOC_SOURCES})
+add_library(qsound STATIC ${qsound_SOURCES})
 target_link_libraries(qsound ${QT_LIBRARIES} ${qsound_LIBRARIES})

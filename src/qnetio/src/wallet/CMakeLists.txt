@@ -13,8 +13,7 @@ pkg_check_modules(GNOME_KEYRING gnome-keyring-1)
 if(GNOME_KEYRING_FOUND)
   message(STATUS "Found GNOME keyring support")
   include_directories(${GNOME_KEYRING_INCLUDE_DIRS})
-  qt4_wrap_cpp(qnetio-gnome_MOC_SOURCES gnome.h)
-  add_library(qnetio-gnome SHARED gnome.cpp ${qnetio-gnome_MOC_SOURCES})
+  add_library(qnetio-gnome SHARED gnome.cpp)
   target_link_libraries(qnetio-gnome qnetio ${GNOME_KEYRING_LIBRARIES})
   install(TARGETS qnetio-gnome
     LIBRARY DESTINATION ${PLUGIN_INSTALL_DIR}/wallet
@@ -26,8 +25,7 @@ find_package(KDE4)
 if(KDE4_FOUND)
   message(STATUS "Found KWallet support")
   include_directories(${KDE4_INCLUDES})
-  qt4_wrap_cpp(qnetio-kde_MOC_SOURCES kde.h)
-  add_library(qnetio-kde SHARED kde.cpp ${qnetio-kde_MOC_SOURCES})
+  add_library(qnetio-kde SHARED kde.cpp)
   target_link_libraries(qnetio-kde qnetio ${KDE4_KDEUI_LIBRARY})
   install(TARGETS qnetio-kde
     LIBRARY DESTINATION ${PLUGIN_INSTALL_DIR}/wallet

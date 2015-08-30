@@ -14,7 +14,6 @@ if(WILINK_EMBEDDED)
 endif()
 
 set(app_SOURCES main.cpp network.cpp window.cpp)
-set(app_MOC_HEADERS network.h window.h)
 
 if(APPLE)
     list(APPEND app_SOURCES application_mac.mm)
@@ -23,7 +22,6 @@ elseif(UNIX)
     list(APPEND app_LIBRARIES X11)
 endif()
 
-qt4_wrap_cpp(app_MOC_SOURCES ${app_MOC_HEADERS})
 qt4_add_resources(RCC_SOURCES app.qrc ../data/qml.qrc)
 
 if(WIN32)
@@ -33,7 +31,7 @@ if(WIN32)
     set(WILINK_RESOURCE wiLink.rc)
 endif(WIN32)
 
-add_executable(wiLink ${app_SOURCES} ${app_MOC_SOURCES} ${RCC_SOURCES} ${WILINK_RESOURCE})
+add_executable(wiLink ${app_SOURCES} ${RCC_SOURCES} ${WILINK_RESOURCE})
 target_link_libraries(wiLink ${app_LIBRARIES})
 
 if(APPLE)
