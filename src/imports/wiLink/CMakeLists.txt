@@ -28,6 +28,7 @@ set(plugin_SOURCES
     console.cpp
     conversations.cpp
     declarative.cpp
+    declarative_qxmpp.h
     diagnostics.cpp
     discovery.cpp
     history.cpp
