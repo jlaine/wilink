@@ -122,25 +122,23 @@ bool WindowsWallet::write()
     return true;
 }
 
-class WindowsWalletPlugin : public QNetIO::WalletPlugin
+QNetIO::Wallet *WindowsWalletPlugin::create(const QString &key)
 {
-public:
-    QNetIO::Wallet *create(const QString &key) {
-        if (key.toLower() == QLatin1String("windows"))
-            return new WindowsWallet;
-        return NULL;
-    };
+    if (key.toLower() == QLatin1String("windows"))
+        return new WindowsWallet;
+    return NULL;
+}
 
-    QStringList keys() const {
-        return QStringList(QLatin1String("windows"));
-    };
+QStringList WindowsWalletPlugin::keys() const
+{
+    return QStringList(QLatin1String("windows"));
+}
 
-    int priority(const QString &key) const {
-        Q_UNUSED(key);
-        return 1;
-    };
-
-};
+int WindowsWalletPlugin::priority(const QString &key) const
+{
+    Q_UNUSED(key);
+    return 1;
+}
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 Q_EXPORT_STATIC_PLUGIN2(windows_wallet, WindowsWalletPlugin)

@@ -343,15 +343,12 @@ FileInfoList HttpFileSystem::parseHttpList(const QByteArray &data)
     return listItems;
 }
 
-class HttpFileSystemPlugin : public QNetIO::FileSystemPlugin
+QNetIO::FileSystem *HttpFileSystemPlugin::create(const QUrl &url, QObject *parent)
 {
-public:
-    QNetIO::FileSystem *create(const QUrl &url, QObject *parent) {
-        if (url.scheme() == QLatin1String("http") || url.scheme() == QLatin1String("https"))
-            return new HttpFileSystem(parent);
-        return NULL;
-    };
-};
+    if (url.scheme() == QLatin1String("http") || url.scheme() == QLatin1String("https"))
+        return new HttpFileSystem(parent);
+    return NULL;
+}
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 Q_EXPORT_STATIC_PLUGIN2(http_filesystem, HttpFileSystemPlugin)

@@ -128,15 +128,12 @@ FileSystemJob* LocalFileSystem::rmdir(const QUrl &dirUrl)
     return job;
 }
 
-class LocalFileSystemPlugin : public QNetIO::FileSystemPlugin
+QNetIO::FileSystem *LocalFileSystemPlugin::create(const QUrl &url, QObject *parent)
 {
-public:
-    QNetIO::FileSystem *create(const QUrl &url, QObject *parent) {
-        if (url.scheme() == QLatin1String("file"))
-            return new LocalFileSystem(parent);
-        return NULL;
-    };
-};
+    if (url.scheme() == QLatin1String("file"))
+        return new LocalFileSystem(parent);
+    return NULL;
+}
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 Q_EXPORT_STATIC_PLUGIN2(local_filesystem, LocalFileSystemPlugin)

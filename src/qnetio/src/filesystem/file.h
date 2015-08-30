@@ -46,5 +46,13 @@ public slots:
     FileSystemJob* rmdir(const QUrl &dirUrl);
 };
 
+class LocalFileSystemPlugin : public QNetIO::FileSystemPlugin
+{
+    Q_OBJECT
+
+public:
+    QNetIO::FileSystem *create(const QUrl &url, QObject *parent);
+};
+
 #endif
 

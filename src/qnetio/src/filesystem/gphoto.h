@@ -47,4 +47,12 @@ private:
     GPContext *context;
 };
 
+class GPhotoFileSystemPlugin : public QNetIO::FileSystemPlugin
+{
+    Q_OBJECT
+
+public:
+    QNetIO::FileSystem *create(const QUrl &url, QObject *parent);
+};
+
 #endif

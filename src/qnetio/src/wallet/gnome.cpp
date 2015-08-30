@@ -105,28 +105,27 @@ bool GnomeWallet::setCredentials(const QString &realm, const QString &user, cons
     return (res == GNOME_KEYRING_RESULT_OK);
 }
 
-class GnomeWalletPlugin : public QNetIO::WalletPlugin
+QNetIO::Wallet* GnomeWalletPlugin::create(const QString &key)
 {
-public:
-    QNetIO::Wallet *create(const QString &key) {
-        if (key.toLower() == QLatin1String("gnome"))
-            return new GnomeWallet;
-        return NULL;
-    };
+    if (key.toLower() == QLatin1String("gnome"))
+        return new GnomeWallet;
+    return NULL;
+}
 
-    QStringList keys() const {
-        return QStringList(QLatin1String("gnome"));
-    };
+QStringList GnomeWalletPlugin::keys() const
+{
+    return QStringList(QLatin1String("gnome"));
+}
 
-    int priority(const QString &key) const {
-        Q_UNUSED(key);
-        const char *session = getenv("DESKTOP_SESSION");
-        if (session && !strcmp(session, "gnome"))
-            return 1;
-        else
-            return 0;
-    };
-};
+int GnomeWalletPlugin::priority(const QString &key) const
+{
+    Q_UNUSED(key);
+    const char *session = getenv("DESKTOP_SESSION");
+    if (session && !strcmp(session, "gnome"))
+        return 1;
+    else
+        return 0;
+}
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 Q_EXPORT_PLUGIN2(gnome_wallet, GnomeWalletPlugin)

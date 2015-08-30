@@ -43,4 +43,14 @@ private:
     KWallet::Wallet *currentWallet;
 };
 
+class KdeWalletPlugin : public QNetIO::WalletPlugin
+{
+    Q_OBJECT
+
+public:
+    QNetIO::Wallet *create(const QString &key);
+    QStringList keys() const;
+    int priority(const QString &key) const;
+};
+
 #endif

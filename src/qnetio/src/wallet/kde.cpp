@@ -75,28 +75,27 @@ bool KdeWallet::setCredentials(const QString &realm, const QString &user, const 
     return false;
 }
 
-class KdeWalletPlugin : public QNetIO::WalletPlugin
+QNetIO::Wallet *KdeWalletPlugin::create(const QString &key)
 {
-public:
-    QNetIO::Wallet *create(const QString &key) {
-        if (key.toLower() == QLatin1String("kde"))
-            return new KdeWallet;
-        return NULL;
-    };
+    if (key.toLower() == QLatin1String("kde"))
+        return new KdeWallet;
+    return NULL;
+}
 
-    QStringList keys() const {
-        return QStringList(QLatin1String("kde"));
-    };
+QStringList KdeWalletPlugin::keys() const
+{
+    return QStringList(QLatin1String("kde"));
+}
 
-    int priority(const QString &key) const {
-        Q_UNUSED(key);
-        const char *session = getenv("DESKTOP_SESSION");
-        if (session && !strcmp(session, "kde"))
-            return 1;
-        else
-            return 0;
-    };
-};
+int KdeWalletPlugin::priority(const QString &key) const
+{
+    Q_UNUSED(key);
+    const char *session = getenv("DESKTOP_SESSION");
+    if (session && !strcmp(session, "kde"))
+        return 1;
+    else
+        return 0;
+}
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 Q_EXPORT_PLUGIN2(kde_wallet, KdeWalletPlugin)
