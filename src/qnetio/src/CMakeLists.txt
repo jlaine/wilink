@@ -5,9 +5,6 @@ if(NOT QNETIO_LIBRARY_TYPE)
   set(QNETIO_LIBRARY_TYPE STATIC)
 endif()
 
-add_subdirectory(filesystem)
-add_subdirectory(wallet)
-
 set(ALL_LIBRARIES Qt4::QtNetwork Qt4::QtXml)
 
 # Needed for plugin support

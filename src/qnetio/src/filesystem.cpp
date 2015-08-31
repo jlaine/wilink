@@ -28,10 +28,6 @@
 
 Q_IMPORT_PLUGIN(local_filesystem)
 Q_IMPORT_PLUGIN(http_filesystem)
-#ifdef USE_GPHOTO
-Q_IMPORT_PLUGIN(gphoto_filesystem)
-#endif
-Q_IMPORT_PLUGIN(wifirst_filesystem)
 
 using namespace QNetIO;
 

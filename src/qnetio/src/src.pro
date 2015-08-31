@@ -18,7 +18,6 @@ HEADERS += \
     filesystem.h \
     filesystem/file.h \
     filesystem/http.h \
-    filesystem/wifirst.h \
     mime.h \
     mimetypes.h \
     wallet.h \
@@ -27,7 +26,6 @@ SOURCES += \
     filesystem.cpp \
     filesystem/file.cpp \
     filesystem/http.cpp \
-    filesystem/wifirst.cpp \
     mime.cpp \
     mimetypes.cpp \
     wallet.cpp \
