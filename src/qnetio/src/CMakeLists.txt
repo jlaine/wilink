@@ -15,27 +15,24 @@ if(UNIX)
   endif(NOT APPLE)
 endif(UNIX)
 
-set(qnetio_SOURCES
-    mimetypes.cpp
-    wallet.cpp
-    wallet/dummy.cpp)
+set(qnetio_SOURCES wallet.cpp)
 
-if(WIN32)
+if(APPLE)
+  # OS X Keychain support
+  message(STATUS "Found OS X Security library support")
+  find_library(APPLE_FOUNDATION_LIBRARY NAMES Foundation)
+  find_library(APPLE_SECURITY_LIBRARY NAMES Security)
+  add_definitions(-DUSE_OSX_KEYCHAIN)
+  set(qnetio_SOURCES ${qnetio_SOURCES} wallet/osx.cpp)
+  set(ALL_LIBRARIES ${ALL_LIBRARIES} ${APPLE_FOUNDATION_LIBRARY} ${APPLE_SECURITY_LIBRARY})
+elseif(WIN32)
   # Windows keyring support
   message(STATUS "Found Windows keyring support")
   add_definitions(-DUSE_WINDOWS_KEYRING)
   set(qnetio_SOURCES ${qnetio_SOURCES} wallet/windows.cpp)
-else(WIN32)
-  # OS X Keychain support
-  find_library(APPLE_FOUNDATION_LIBRARY NAMES Foundation)
-  find_library(APPLE_SECURITY_LIBRARY NAMES Security)
-  if(APPLE_FOUNDATION_LIBRARY AND APPLE_SECURITY_LIBRARY)
-    message(STATUS "Found OS X Security library support : ${APPLE_SECURITY_LIBRARY}")
-    add_definitions(-DUSE_OSX_KEYCHAIN)
-    set(qnetio_SOURCES ${qnetio_SOURCES} wallet/osx.cpp)
-    set(ALL_LIBRARIES ${ALL_LIBRARIES} ${APPLE_FOUNDATION_LIBRARY} ${APPLE_SECURITY_LIBRARY})
-  endif(APPLE_FOUNDATION_LIBRARY AND APPLE_SECURITY_LIBRARY)
-endif(WIN32)
+else()
+  set(qnetio_SOURCES ${qnetio_SOURCES} wallet/dummy.cpp)
+endif()
 
 add_library(qnetio ${QNETIO_LIBRARY_TYPE} ${qnetio_SOURCES})
 set_target_properties(qnetio PROPERTIES SOVERSION 0)

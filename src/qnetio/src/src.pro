@@ -14,14 +14,8 @@ INCLUDEPATH += $$QNETIO_INCLUDE_DIR
 
 # Plugins
 DEFINES += QT_STATICPLUGIN
-HEADERS += \
-    mimetypes.h \
-    wallet.h \
-    wallet/dummy.h
-SOURCES += \
-    mimetypes.cpp \
-    wallet.cpp \
-    wallet/dummy.cpp
+HEADERS += wallet.h
+SOURCES += wallet.cpp
 
 mac {
     DEFINES += USE_OSX_KEYCHAIN
@@ -32,4 +26,7 @@ mac {
     DEFINES += USE_WINDOWS_KEYRING
     HEADERS += wallet/windows.h
     SOURCES += wallet/windows.cpp
+} else {
+    HEADERS += wallet/dummy.h
+    SOURCES += wallet/dummy.cpp
 }
