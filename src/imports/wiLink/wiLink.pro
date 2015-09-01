@@ -102,8 +102,7 @@ INCLUDEPATH += \
     $$QSOUND_INCLUDE_DIR \
     $$QXMPP_INCLUDEPATH \
     ../../3rdparty/qdjango/src/db \
-    ../../qxmpp-extra/diagnostics \
-    ../../qxmpp-extra/shares
+    ../../qxmpp-extra/diagnostics
 
 LIBS += \
     -L../../qnetio/src $$QNETIO_LIBS \

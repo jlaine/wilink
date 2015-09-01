@@ -3,7 +3,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../..)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../qnetio/src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../qsound/src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../qxmpp-extra/diagnostics)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../../qxmpp-extra/shares)
 
 add_definitions(-DQT_PLUGIN)
 add_definitions(-DQT_SHARED)

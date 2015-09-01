@@ -132,10 +132,6 @@ Dialog {
                 iconStyle: 'icon-cog',
                 name: qsTr('Plugins'),
                 source: 'PluginPreferencePanel.qml'});
-            tabList.model.append({
-                iconStyle: 'icon-share',
-                name: qsTr('Shares'),
-                source: 'SharePreferencePanel.qml'});
             prefSwapper.showPanel(initialPanel);
         }
     }
