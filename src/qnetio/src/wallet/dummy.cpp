@@ -64,25 +64,3 @@ bool DummyWallet::write()
     out << creds;
     return true;
 }
-
-QNetIO::Wallet *DummyWalletPlugin::create(const QString &key)
-{
-    if (key.toLower() == QLatin1String("dummy"))
-        return new DummyWallet;
-    return NULL;
-}
-
-QStringList DummyWalletPlugin::keys() const
-{
-    return QStringList(QLatin1String("dummy"));
-}
-
-int DummyWalletPlugin::priority(const QString &key) const
-{
-    Q_UNUSED(key);
-    return -1;
-}
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-Q_EXPORT_STATIC_PLUGIN2(dummy_wallet, DummyWalletPlugin)
-#endif

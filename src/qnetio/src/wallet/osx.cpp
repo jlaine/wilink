@@ -152,25 +152,3 @@ bool OsxWallet::setCredentials(const QString &realm, const QString &user, const 
 
     return (rc == errSecSuccess);
 }
-
-QNetIO::Wallet *OsxWalletPlugin:create(const QString &key)
-{
-    if (key.toLower() == QLatin1String("osx"))
-        return new OsxWallet;
-    return NULL;
-}
-
-QStringList OsxWalletPlugin::keys() const
-{
-    return QStringList(QLatin1String("osx"));
-}
-
-int OsxWalletPlugin::priority(const QString &key) const
-{
-    Q_UNUSED(key);
-    return 1;
-}
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-Q_EXPORT_STATIC_PLUGIN2(osx_wallet, OsxWalletPlugin)
-#endif

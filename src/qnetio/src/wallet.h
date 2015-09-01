@@ -25,10 +25,6 @@
 #include <QList>
 #include <QtPlugin>
 
-class QAuthenticator;
-class QNetworkReply;
-class QSslError;
-
 namespace QNetIO {
 
 QObjectList pluginInstances(const QString &type);
@@ -47,19 +43,9 @@ class Wallet : public QObject
     Q_OBJECT
 
 public:
-    class Backend
-    {
-    public:
-        WalletPlugin *plugin;
-        QString key;
-        int priority;
-    };
-
     Wallet(QObject *parent = 0);
     ~Wallet();
 
-    static QList<Wallet::Backend> backends();
-    static Wallet *create(const QString &key = QString());
     static QString dataPath();
     static void setDataPath(const QString &path);
     static Wallet *instance();
@@ -82,16 +68,6 @@ public:
      */
     virtual bool setCredentials(const QString &realm, const QString &user, const QString &password) = 0;
     virtual void invalidate();
-
-signals:
-    /** This signal is emitted when no credentials could be found
-     *  for a given realm.
-     */
-    void credentialsRequired(const QString &realm, QAuthenticator *authenticator);
-
-public slots:
-    void onAuthenticationRequired(QNetworkReply *reply, QAuthenticator *authenticator);
-    void onAuthenticationRequired(const QString &hostname, QAuthenticator *authenticator);
 };
 
 class HashWallet : public Wallet
