@@ -10,16 +10,16 @@ add_definitions(-DWILINK_VERSION="${WILINK_VERSION}")
 #    ../plugins/utils.cpp
 #    tests.cpp
 #    ${tests_RCC_SOURCES})
-#target_link_libraries(tests qnetio qsound qxmpp diagnostics Qt5::Network Qt5::Sql Qt5::Xml Qt5::Test)
+#target_link_libraries(tests qnetio qsound qxmpp diagnostics Qt5::Network Qt5::Xml Qt5::Test)
 
 add_executable(codec codec.cpp)
-target_link_libraries(codec ${QXMPP_LIBRARIES} Qt5::Network Qt5::Sql Qt5::Xml)
+target_link_libraries(codec ${QXMPP_LIBRARIES} Qt5::Network Qt5::Xml)
 
 #add_executable(phone
 #    phone.cpp
 #    ../plugins/phone/sip.cpp
 #    ../plugins/phone/stun.cpp)
-#target_link_libraries(phone qsound qxmpp Qt5::Network Qt5::Sql Qt5::Xml)
+#target_link_libraries(phone qsound qxmpp Qt5::Network Qt5::Xml)
 
 add_executable(hasher hasher.cpp)
-target_link_libraries(hasher ${QXMPP_LIBRARIES} Qt5::Network Qt5::Sql Qt5::Xml)
+target_link_libraries(hasher ${QXMPP_LIBRARIES} Qt5::Network Qt5::Xml)

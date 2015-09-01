@@ -8,7 +8,7 @@ Homepage: https://github.com/jlaine/wilink
 
 Package: wilink
 Architecture: any
-Depends: ${shlibs:Depends}, libqt4-sql-sqlite, libqtwebkit-qmlwebkitplugin
+Depends: ${shlibs:Depends}, libqt5sql5-sqlite, qml-module-qtwebkit
 Recommends: pulseaudio
 Description: Utilities for Wifirst services
  This package provides a set of utilities to interact with the Wifirst
