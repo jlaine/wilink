@@ -24,7 +24,6 @@ find_package(Qt5X11Extras)
 find_package(Qt5Xml REQUIRED)
 find_package(PkgConfig REQUIRED)
 
-pkg_check_modules(QDJANGO qdjango-db REQUIRED)
 pkg_check_modules(QXMPP qxmpp REQUIRED)
 
 # Extra runtime dependencies
@@ -59,7 +58,6 @@ if(WIN32)
         ${CMAKE_FIND_ROOT_PATH}/bin/libtheoradec-1.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/libtheoraenc-1.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/libz.dll
-        ${CMAKE_FIND_ROOT_PATH}/bin/qdjango-db0.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/qxmpp0.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/ssleay32.dll
         DESTINATION bin)

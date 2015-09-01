@@ -1,7 +1,6 @@
 include(../../../wilink.pri)
 include(../../qnetio/qnetio.pri)
 include(../../qsound/qsound.pri)
-include(../../3rdparty/qdjango/qdjango.pri)
 include(../../3rdparty/qxmpp/qxmpp.pri)
 
 TEMPLATE = lib
@@ -101,15 +100,13 @@ INCLUDEPATH += \
     $$QNETIO_INCLUDE_DIR \
     $$QSOUND_INCLUDE_DIR \
     $$QXMPP_INCLUDEPATH \
-    ../../3rdparty/qdjango/src/db \
     ../../qxmpp-extra/diagnostics
 
 LIBS += \
     -L../../qnetio/src $$QNETIO_LIBS \
     -L../../qsound/src -L../../3rdparty/libmad $$QSOUND_LIBS \
     -L../../3rdparty/qxmpp/src $$QXMPP_LIBS \
-    -L../../qxmpp-extra -lqxmpp-extra \
-    -L../../3rdparty/qdjango/src/db $$QDJANGO_DB_LIBS
+    -L../../qxmpp-extra -lqxmpp-extra
 
 android {
     qmldir.path = /assets/imports/wiLink

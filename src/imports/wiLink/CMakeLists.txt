@@ -80,7 +80,7 @@ endif()
 
 qt5_add_resources(plugin_RCC_SOURCES ../../data/wiLink.qrc)
 add_library(qmlwilinkplugin SHARED ${plugin_SOURCES} ${plugin_RCC_SOURCES})
-target_link_libraries(qmlwilinkplugin qnetio qxmpp-extra qsound ${QXMPP_LIBRARIES} ${QDJANGO_LIBRARIES} ${plugin_LIBRARIES}
+target_link_libraries(qmlwilinkplugin qnetio qxmpp-extra qsound ${QXMPP_LIBRARIES} ${plugin_LIBRARIES}
     Qt5::Declarative Qt5::Gui Qt5::Network Qt5::Sql)
 if(WIN32)
     set_target_properties(qmlwilinkplugin PROPERTIES PREFIX "")
