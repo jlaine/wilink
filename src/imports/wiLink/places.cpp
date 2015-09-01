@@ -19,11 +19,7 @@
 
 #include <QDir>
 #include <QUrl>
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-#include <QDesktopServices>
-#else
 #include <QStandardPaths>
-#endif
 
 #include "model.h"
 #include "places.h"
@@ -31,26 +27,6 @@
 PlaceModel::PlaceModel(QObject *parent)
     : QAbstractListModel(parent)
 {
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    QList<QDesktopServices::StandardLocation> locations;
-    locations << QDesktopServices::DocumentsLocation;
-    locations << QDesktopServices::MusicLocation;
-    locations << QDesktopServices::MoviesLocation;
-    locations << QDesktopServices::PicturesLocation;
-
-    foreach (QDesktopServices::StandardLocation location, locations) {
-        const QString path = QDesktopServices::storageLocation(location);
-        QDir dir(path);
-        if (path.isEmpty() || dir == QDir::home())
-            continue;
-
-        // do not use "path" directly, on Windows it uses back slashes
-        // where the rest of Qt uses forward slashes
-        m_paths << dir.path();
-    }
-
-    setRoleNames(roleNames());
-#else
     QList<QStandardPaths::StandardLocation> locations;
     locations << QStandardPaths::DocumentsLocation;
     locations << QStandardPaths::MusicLocation;
@@ -69,7 +45,6 @@ PlaceModel::PlaceModel(QObject *parent)
             m_paths << dir.path();
         }
     }
-#endif
 }
 
 QVariant PlaceModel::data(const QModelIndex &index, int role) const

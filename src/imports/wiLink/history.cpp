@@ -118,20 +118,12 @@ static QString transformToken(const QString &token)
     // handle links
     if (linkRegex.exactMatch(token)) {
         QUrl url;
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-        url.setEncodedUrl(token.toLatin1());
-#else
         url.setUrl(token);
-#endif
         return QString("<a href=\"%1\">%2</a>").arg(url.toString(), url.toString());
     }
 
     // default
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    return Qt::escape(token);
-#else
     return token.toHtmlEscaped();
-#endif
 }
 
 /** Returns the HTML for the message body.
@@ -143,11 +135,7 @@ QString HistoryMessage::html(const QString &meName) const
     // me
     QRegExp re(meRegex);
     if (!meName.isEmpty() && re.exactMatch(body)) {
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-        const QString meBody = Qt::escape(re.cap(1));
-#else
         const QString meBody = re.cap(1).toHtmlEscaped();
-#endif
         return QString("<b>%1 %2</b>").arg(meName, meBody);
     }
 
@@ -248,10 +236,6 @@ HistoryModel::HistoryModel(QObject *parent)
     : ChatModel(parent)
 {
     d = new HistoryModelPrivate(this);
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    setRoleNames(roleNames());
-#endif
 }
 
 /** Adds a message in the chat history.

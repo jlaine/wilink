@@ -394,7 +394,7 @@ SdpMessage SipCallPrivate::buildSdp(const QList<QXmppJinglePayloadType> &payload
 #ifdef SIP_USE_ICE
     // ICE candidates
     foreach (const QXmppJingleCandidate &candidate, iceConnection->localCandidates()) {
-        QByteArray ba = "candidate:" + QByteArray::number(candidate.foundation()) + " ";
+        QByteArray ba = "candidate:" + candidate.foundation().toLatin1() + " ";
         ba += QByteArray::number(candidate.component()) + " ";
         ba += candidate.protocol().toUpper().toLatin1() + " ";
         ba += QByteArray::number(candidate.priority()) + " ";
@@ -483,7 +483,7 @@ bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
                 QList<QByteArray> bits = attrValue.split(' ');
                 QXmppJingleCandidate candidate;
                 if (bits.size() == 8 && bits[6] == "typ") {
-                    candidate.setFoundation(bits[0].toInt());
+                    candidate.setFoundation(bits[0]);
                     candidate.setComponent(bits[1].toInt());
                     candidate.setProtocol(QString::fromLatin1(bits[2]).toLower());
                     candidate.setPriority(bits[3].toInt());

@@ -87,11 +87,7 @@ CustomWindow::CustomWindow(QtLocalPeer *peer, const QUrl &qmlRoot, QWidget *pare
     Q_ASSERT(check);
 
     // create data paths
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
     const QString dataPath = QStandardPaths::standardLocations(QStandardPaths::DataLocation)[0];
-#else
-    const QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
-#endif
     const QString cachePath = QDir(dataPath).filePath("cache");
     QString storagePath = QDir(dataPath).filePath("storage");
     QDir().mkpath(cachePath);

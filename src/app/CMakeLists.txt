@@ -1,7 +1,7 @@
 include_directories(../3rdparty/qtsingleapplication)
 
 # Libraries
-set(app_LIBRARIES Qt4::QtCore Qt4::QtGui Qt4::QtDeclarative Qt4::QtNetwork qtsingleapplication)
+set(app_LIBRARIES Qt5::Core Qt5::Gui Qt5::Declarative Qt5::Network qtsingleapplication)
 
 # wiLink
 add_definitions(-DWILINK_VERSION="${WILINK_VERSION}")
@@ -18,7 +18,7 @@ elseif(UNIX)
     list(APPEND app_LIBRARIES X11)
 endif()
 
-qt4_add_resources(RCC_SOURCES app.qrc ../data/qml.qrc)
+qt5_add_resources(RCC_SOURCES app.qrc ../data/qml.qrc)
 
 if(WIN32)
     enable_language(RC)

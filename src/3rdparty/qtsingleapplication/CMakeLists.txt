@@ -8,4 +8,4 @@ else()
 endif()
 
 add_library(qtsingleapplication ${SOURCES})
-target_link_libraries(qtsingleapplication Qt4::QtCore)
+target_link_libraries(qtsingleapplication Qt5::Core)

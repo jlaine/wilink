@@ -31,9 +31,7 @@
 #include <QNetworkRequest>
 #include <QStringList>
 #include <QUrl>
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
 #include <QUrlQuery>
-#endif
 #include <QTimer>
 
 #ifdef Q_OS_WIN
@@ -172,19 +170,11 @@ void Updater::check()
     }
 
     QUrl statusUrl = d->updatesUrl;
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    QList< QPair<QString, QString> > query = statusUrl.queryItems();
-    query.append(qMakePair(QString::fromLatin1("ostype"), SystemInfo::osType()));
-    query.append(qMakePair(QString::fromLatin1("osversion"), SystemInfo::osVersion()));
-    query.append(qMakePair(QString::fromLatin1("version"), qApp->applicationVersion()));
-    statusUrl.setQueryItems(query);
-#else
     QUrlQuery query;
     query.addQueryItem(QString::fromLatin1("ostype"), SystemInfo::osType());
     query.addQueryItem(QString::fromLatin1("osversion"), SystemInfo::osVersion());
     query.addQueryItem(QString::fromLatin1("version"), qApp->applicationVersion());
     statusUrl.setQuery(query);
-#endif
 
     QNetworkRequest req(statusUrl);
     req.setRawHeader("Accept", "application/xml");

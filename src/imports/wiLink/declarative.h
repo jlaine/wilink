@@ -103,9 +103,7 @@ signals:
 class Plugin : public QDeclarativeExtensionPlugin
 {
     Q_OBJECT
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
     Q_PLUGIN_METADATA(IID "net.wifirst.wiLink")
-#endif
 
 public:
     void initializeEngine(QDeclarativeEngine *engine, const char *uri);

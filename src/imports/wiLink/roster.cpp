@@ -239,10 +239,6 @@ RosterModel::RosterModel(QObject *parent)
 {
     d = new RosterModelPrivate(this);
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    setRoleNames(roleNames());
-#endif
-
     // use a queued connection so that the VCard gets updated first
     connect(VCardCache::instance(), SIGNAL(cardChanged(QString)),
             this, SLOT(_q_itemChanged(QString)), Qt::QueuedConnection);
@@ -652,11 +648,7 @@ void VCard::_q_presenceChanged(const QString &jid)
 VCardCache::VCardCache(QObject *parent)
     : QObject(parent)
 {
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
     const QString dataPath = QStandardPaths::standardLocations(QStandardPaths::DataLocation)[0];
-#else
-    const QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
-#endif
 
     d = new VCardCachePrivate;
     d->cache = new QNetworkDiskCache(this);

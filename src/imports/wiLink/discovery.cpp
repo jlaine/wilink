@@ -39,10 +39,6 @@ DiscoveryModel::DiscoveryModel(QObject *parent)
     m_details(false),
     m_manager(0)
 {
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-    setRoleNames(roleNames());
-#endif
-
     m_timer = new QTimer(this);
     m_timer->setSingleShot(true);
     m_timer->setInterval(100);

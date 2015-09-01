@@ -195,11 +195,7 @@ void Plugin::initializeEngine(QDeclarativeEngine *engine, const char *uri)
     engine->addImageProvider("roster", new RosterImageProvider);
 
     // initialise wallet
-#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
     const QString dataPath = QStandardPaths::standardLocations(QStandardPaths::DataLocation)[0];
-#else
-    const QString dataPath = QDesktopServices::storageLocation(QDesktopServices::DataLocation);
-#endif
     QDir().mkpath(dataPath);
     QNetIO::Wallet::setDataPath(QDir(dataPath).filePath("wallet"));
 }
@@ -265,7 +261,3 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterUncreatableType<QFileDialog>(uri, 2, 4, "QFileDialog", "");
     qmlRegisterType<QDeclarativeSortFilterProxyModel>(uri, 2, 4, "SortFilterProxyModel");
 }
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
-Q_EXPORT_PLUGIN2(qmlwilinkplugin, Plugin);
-#endif

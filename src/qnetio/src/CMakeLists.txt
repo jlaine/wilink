@@ -5,7 +5,7 @@ if(NOT QNETIO_LIBRARY_TYPE)
   set(QNETIO_LIBRARY_TYPE STATIC)
 endif()
 
-set(ALL_LIBRARIES Qt4::QtNetwork Qt4::QtXml)
+set(ALL_LIBRARIES Qt5::Network Qt5::Xml)
 
 # Needed for plugin support
 add_definitions(-DQT_STATICPLUGIN)
@@ -16,9 +16,6 @@ if(UNIX)
 endif(UNIX)
 
 set(qnetio_SOURCES
-    filesystem.cpp
-    filesystem/file.cpp
-    filesystem/http.cpp
     mimetypes.cpp
     wallet.cpp
     wallet/dummy.cpp)

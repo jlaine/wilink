@@ -15,18 +15,10 @@ INCLUDEPATH += $$QNETIO_INCLUDE_DIR
 # Plugins
 DEFINES += QT_STATICPLUGIN
 HEADERS += \
-    filesystem.h \
-    filesystem/file.h \
-    filesystem/http.h \
-    mime.h \
     mimetypes.h \
     wallet.h \
     wallet/dummy.h
 SOURCES += \
-    filesystem.cpp \
-    filesystem/file.cpp \
-    filesystem/http.cpp \
-    mime.cpp \
     mimetypes.cpp \
     wallet.cpp \
     wallet/dummy.cpp
