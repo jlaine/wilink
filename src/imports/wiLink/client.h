@@ -64,7 +64,6 @@ class ChatClient : public QXmppClient
     Q_PROPERTY(QXmppMucManager* mucManager READ mucManager CONSTANT)
     Q_PROPERTY(QString mucServer READ mucServer NOTIFY mucServerChanged)
     Q_PROPERTY(QXmppRosterManager* rosterManager READ rosterManager CONSTANT)
-    Q_PROPERTY(QString shareServer READ shareServer NOTIFY shareServerChanged)
     Q_PROPERTY(QXmppTransferManager* transferManager READ transferManager CONSTANT)
 
 public:
@@ -84,7 +83,6 @@ public:
     QXmppMucManager *mucManager();
     QString mucServer() const;
     QXmppRosterManager *rosterManager();
-    QString shareServer() const;
     QXmppTransferManager* transferManager();
 
     static QList<ChatClient*> instances();
@@ -100,7 +98,6 @@ signals:
     void diagnosticServerChanged(const QString &diagnosticServer);
     void messageReceived(const QString &from);
     void mucServerChanged(const QString &mucServer);
-    void shareServerChanged(const QString &shareServer);
     void statusTypeChanged(const QString &statusType);
 
 public slots:

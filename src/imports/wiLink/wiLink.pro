@@ -59,12 +59,10 @@ SOURCES += \
     notifications.cpp \
     phone.cpp \
     phone/sip.cpp \
-    photos.cpp \
     places.cpp \
     rooms.cpp \
     roster.cpp \
     settings.cpp \
-    shares.cpp \
     systeminfo.cpp \
     translations.cpp \
     updater.cpp
@@ -85,7 +83,6 @@ HEADERS += \
     menubar.h \
     model.h \
     notifications.h \
-    photos.h \
     phone.h \
     places.h \
     phone/sip.h \
@@ -93,7 +90,6 @@ HEADERS += \
     rooms.h \
     roster.h \
     settings.h \
-    shares.h \
     systeminfo.h \
     translations.h \
     updater.h

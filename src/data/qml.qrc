@@ -35,7 +35,6 @@
     <file>qml/DockButton.qml</file>
     <file>qml/ErrorNotification.qml</file>
     <file>qml/FacebookTokenNotification.qml</file>
-    <file>qml/FolderQueueView.qml</file>
     <file>qml/GeneralPreferencePanel.qml</file>
     <file>qml/GroupBox.qml</file>
     <file>qml/Highlight.qml</file>
@@ -62,15 +61,6 @@
     <file>qml/PhonePanel.qml</file>
     <file>qml/PhonePlugin.qml</file>
     <file>qml/PhoneXmlModel.qml</file>
-    <file>qml/PhotoAlbumDialog.qml</file>
-    <file>qml/PhotoDelegate.qml</file>
-    <file>qml/PhotoDeleteDialog.qml</file>
-    <file>qml/PhotoFlickView.qml</file>
-    <file>qml/PhotoGridView.qml</file>
-    <file>qml/PhotoPanel.qml</file>
-    <file>qml/PhotoPlugin.qml</file>
-    <file>qml/PhotoSlideView.qml</file>
-    <file>qml/PhotoWall.qml</file>
     <file>qml/Plugin.qml</file>
     <file>qml/PluginLoader.qml</file>
     <file>qml/PluginPreferencePanel.qml</file>
@@ -90,10 +80,6 @@
     <file>qml/ScrollView.qml</file>
     <file>qml/SetupBackground.qml</file>
     <file>qml/SetupDialog.qml</file>
-    <file>qml/SharePanel.qml</file>
-    <file>qml/SharePlugin.qml</file>
-    <file>qml/SharePreferencePanel.qml</file>
-    <file>qml/ShareView.qml</file>
     <file>qml/SocialIcon.qml</file>
     <file>qml/SoundPreferencePanel.qml</file>
     <file>qml/Spinner.qml</file>

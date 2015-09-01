@@ -1,3 +1,7 @@
+wiLink 2.5.0 (UNRELEASED)
+ * Photos: remove photos app.
+ * Shares: remove shares app.
+
 wiLink 2.4.2 (2013-03-12)
  * Application: rebuild against QXmpp >= 0.7.6 to fix Google authentication.
  * Diagnostics: let QML specify configuration.

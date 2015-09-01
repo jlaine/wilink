@@ -54,7 +54,6 @@
 #include "notifications.h"
 #include "phone.h"
 #include "phone/sip.h"
-#include "photos.h"
 #include "places.h"
 #include "rooms.h"
 #include "roster.h"
@@ -193,7 +192,6 @@ void Plugin::initializeEngine(QDeclarativeEngine *engine, const char *uri)
 {
     Q_UNUSED(uri);
     engine->addImageProvider("icon", new IconImageProvider);
-    engine->addImageProvider("photo", new PhotoImageProvider);
     engine->addImageProvider("roster", new RosterImageProvider);
 
     // initialise wallet
@@ -220,7 +218,6 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterUncreatableType<DiagnosticManager>(uri, 2, 4, "DiagnosticManager", "");
     qmlRegisterType<DiscoveryModel>(uri, 2, 4, "DiscoveryModel");
     qmlRegisterType<DropArea>(uri, 2, 4, "DropArea");
-    qmlRegisterType<FolderModel>(uri, 2, 4, "FolderModel");
     qmlRegisterUncreatableType<HistoryModel>(uri, 2, 4, "HistoryModel", "");
     qmlRegisterType<Idle>(uri, 2, 4, "Idle");
     qmlRegisterType<ListHelper>(uri, 2, 4, "ListHelper");
@@ -231,7 +228,6 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterType<PhoneAudioHelper>(uri, 2, 4, "PhoneAudioHelper");
     qmlRegisterType<SipClient>(uri, 2, 4, "SipClient");
     qmlRegisterUncreatableType<SipCall>(uri, 2, 4, "SipCall", "");
-    qmlRegisterUncreatableType<FolderQueueModel>(uri, 2, 4, "FolderQueueModel", "");
     qmlRegisterType<PlaceModel>(uri, 2, 4, "PlaceModel");
     qmlRegisterType<RoomConfigurationModel>(uri, 2, 4, "RoomConfigurationModel");
     qmlRegisterType<RoomModel>(uri, 2, 4, "RoomModel");

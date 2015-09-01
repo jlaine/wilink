@@ -61,7 +61,6 @@ public:
     QDnsLookup dns;
     QXmppMessage lastMessage;
     QString mucServer;
-    QString shareServer;
     int timeOffset;
     QString timeQueue;
     QXmppEntityTimeManager *timeManager;
@@ -283,11 +282,6 @@ QXmppRosterManager *ChatClient::rosterManager()
     return &QXmppClient::rosterManager();
 }
 
-QString ChatClient::shareServer() const
-{
-    return d->shareServer;
-}
-
 QXmppTransferManager *ChatClient::transferManager()
 {
     return getManager<QXmppTransferManager>();
@@ -390,13 +384,6 @@ void ChatClient::_q_discoveryInfoReceived(const QXmppDiscoveryIq &disco)
             QXmppTransferManager *transferManager = findExtension<QXmppTransferManager>();
             if (transferManager)
                 transferManager->setProxy(disco.from());
-        }
-        // check if it's a file sharing server
-        else if (id.category() == QLatin1String("store") &&
-                 id.type() == QLatin1String("file")) {
-            d->shareServer = disco.from();
-            info("Found share server " + d->shareServer);
-            emit shareServerChanged(d->shareServer);
         }
     }
 

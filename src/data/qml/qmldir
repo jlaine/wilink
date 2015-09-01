@@ -33,7 +33,6 @@ Dock 1.0 Dock.qml
 DockButton 1.0 DockButton.qml
 ErrorNotification 1.0 ErrorNotification.qml
 FacebookTokenNotification 1.0 FacebookTokenNotification.qml
-FolderQueueView 1.0 FolderQueueView.qml
 GeneralPreferencePanel 1.0 GeneralPreferencePanel.qml
 GroupBox 1.0 GroupBox.qml
 Highlight 1.0 Highlight.qml
@@ -60,15 +59,6 @@ PhoneNotification 1.0 PhoneNotification.qml
 PhonePanel 1.0 PhonePanel.qml
 PhonePlugin 1.0 PhonePlugin.qml
 PhoneXmlModel 1.0 PhoneXmlModel.qml
-PhotoAlbumDialog 1.0 PhotoAlbumDialog.qml
-PhotoDelegate 1.0 PhotoDelegate.qml
-PhotoDeleteDialog 1.0 PhotoDeleteDialog.qml
-PhotoFlickView 1.0 PhotoFlickView.qml
-PhotoGridView 1.0 PhotoGridView.qml
-PhotoPanel 1.0 PhotoPanel.qml
-PhotoPlugin 1.0 PhotoPlugin.qml
-PhotoSlideView 1.0 PhotoSlideView.qml
-PhotoWall 1.0 PhotoWall.qml
 Plugin 1.0 Plugin.qml
 PluginLoader 1.0 PluginLoader.qml
 PluginPreferencePanel 1.0 PluginPreferencePanel.qml
@@ -88,10 +78,6 @@ ScrollBar 1.0 ScrollBar.qml
 ScrollView 1.0 ScrollView.qml
 SetupBackground 1.0 SetupBackground.qml
 SetupDialog 1.0 SetupDialog.qml
-SharePanel 1.0 SharePanel.qml
-SharePlugin 1.0 SharePlugin.qml
-SharePreferencePanel 1.0 SharePreferencePanel.qml
-ShareView 1.0 ShareView.qml
 SocialIcon 1.0 SocialIcon.qml
 SoundPreferencePanel 1.0 SoundPreferencePanel.qml
 Spinner 1.0 Spinner.qml

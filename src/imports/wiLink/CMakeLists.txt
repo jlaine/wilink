@@ -33,12 +33,10 @@ set(plugin_SOURCES
     notifications.cpp
     phone.cpp
     phone/sip.cpp
-    photos.cpp
     places.cpp
     rooms.cpp
     roster.cpp
     settings.cpp
-    shares.cpp
     systeminfo.cpp
     translations.cpp
     updater.cpp)
