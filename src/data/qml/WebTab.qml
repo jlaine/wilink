@@ -76,7 +76,7 @@ Panel {
                 iconStyle: 'icon-chevron-left'
                 width: iconSize
 
-                onClicked: webView.back.triggered()
+                onClicked: webView.goBack()
             }
 
             ToolButton {
@@ -87,7 +87,7 @@ Panel {
                 iconStyle: 'icon-chevron-right'
                 width: iconSize
 
-                onClicked: webView.forward.triggered()
+                onClicked: webView.goForward()
             }
 
             ToolButton {
@@ -99,7 +99,7 @@ Panel {
                 visible: !webView.stop.enabled
                 width: iconSize
 
-                onClicked: webView.reload.triggered()
+                onClicked: webView.reload()
             }
 
             ToolButton {
@@ -107,10 +107,10 @@ Panel {
                 anchors.topMargin: 2
                 anchors.bottom: parent.bottom
                 iconStyle: 'icon-stop'
-                visible: !webView.loading
+                visible: webView.loading
                 width: iconSize
 
-                onClicked: webView.stop.triggered()
+                onClicked: webView.stop()
             }
         }
 
@@ -208,7 +208,7 @@ Panel {
         Keys.onPressed: {
             if (((event.modifiers & Qt.ControlModifier) && event.key == Qt.Key_R)
              || ((event.modifiers == Qt.NoModifier) && event.key == Qt.Key_F5)) {
-                webView.reload.triggered()
+                webView.reload()
             }
         }
     }
