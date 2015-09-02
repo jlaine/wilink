@@ -3,18 +3,7 @@
 QSOUND_INCLUDE_DIR = $$PWD/src
 QSOUND_LIBRARY_NAME = qsound
 
-greaterThan(QT_MAJOR_VERSION, 4) {
-    QT += multimedia
-} else:android {
-    QSOUND_INCLUDE_DIR += $$PWD/src/fake
-} else:mac {
-    QT += multimedia
-} else:win32 {
-    QT += multimedia
-} else {
-    CONFIG += mobility
-    MOBILITY += multimedia
-}
+QT += multimedia
 
 # Libraries used internally by QSound
 QSOUND_INTERNAL_DEFINES += QSOUND_USE_MAD
@@ -30,12 +19,7 @@ mac {
 }
 
 # Libraries for apps which use QSound
-symbian {
-    # Symbian needs a .lib extension to recognise the library as static
-    QSOUND_LIBS = -l$${QSOUND_LIBRARY_NAME}.lib
-} else {
-    QSOUND_LIBS = -l$${QSOUND_LIBRARY_NAME}
-}
+QSOUND_LIBS = -l$${QSOUND_LIBRARY_NAME}
 
 # FIXME: we should be able to use the link_prl option to automatically pull in
 # the extra libraries which our library needs, but this does not seem to work.

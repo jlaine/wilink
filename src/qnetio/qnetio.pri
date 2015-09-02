@@ -10,12 +10,7 @@ mac {
 }
 
 # Libraries for apps which use QNetIO
-symbian {
-    # Symbian needs a .lib extension to recognise the library as static
-    QNETIO_LIBS = -l$${QNETIO_LIBRARY_NAME}.lib
-} else {
-    QNETIO_LIBS = -l$${QNETIO_LIBRARY_NAME}
-}
+QNETIO_LIBS = -l$${QNETIO_LIBRARY_NAME}
 
 # FIXME: we should be able to use the link_prl option to automatically pull in
 # the extra libraries which our library needs, but this does not seem to work.
