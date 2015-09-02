@@ -58,9 +58,9 @@ Panel {
                 onClicked: {
                     // copy the 20 last messages, to avoid freeze with important log
                     var text = '';
-                    var count = logView.model.count;
+                    var count = view.model.count;
                     for (var i = Math.max(0, count - 20); i < count; i++) {
-                        var item = logView.model.get(i);
+                        var item = view.model.get(i);
                         text += Qt.formatDateTime(item.date, 'hh:mm:ss') + '\n';
                         text += item.content + '\n';
                     }
@@ -78,7 +78,7 @@ Panel {
     }
 
     ScrollView {
-        id: logView
+        id: view
 
         anchors.top: header.bottom
         anchors.bottom: parent.bottom
