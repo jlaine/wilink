@@ -19,6 +19,7 @@
 
 import QtQuick 2.3
 import QtWebKit 3.0
+import QtWebKit.experimental 1.0
 import wiLink 2.4
 
 Panel {
@@ -167,16 +168,17 @@ Panel {
                 anchors.fill: parent
 
                 onLoadingChanged: {
-                    if (status == WebView.LoadFailedStatus) {
-                        webView.html = '<html><head><title>Error loading page</title></head><body>There was an error loading the page.</body></html>';
-                    } else if (status == WebView.LoadSucceededStatus) {
+                    if (loadRequest.status == WebView.LoadFailedStatus) {
+                        webView.loadHtml('<html><head><title>Error loading page</title></head><body>There was an error loading the page.<br/>' + url + '</body></html>', '', url);
+                    } else if (loadRequest.status == WebView.LoadSucceededStatus) {
                         if (panel.loadScript) {
                             var js = panel.loadScript;
                             panel.loadScript = '';
-                            webView.evaluateJavaScript(js);
+                            webView.experimental.evaluateJavaScript(js);
                         } else {
                             // catch links to wilink:// urls
-                            webView.evaluateJavaScript('$("a[href^=\\"wilink:\\"]").live("click", function() { window.qml.openUrl(this.href); return false; })');
+                            // FIXME: port to Qt5
+                            //webView.experimental.evaluateJavaScript('$("a[href^=\\"wilink:\\"]").live("click", function() { window.qml.openUrl(this.href); return false; })');
                         }
                     }
                 }
