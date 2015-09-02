@@ -1,6 +1,6 @@
 /*
  * wiLink
- * Copyright (C) 2009-2013 Wifirst
+ * Copyright (C) 2009-2015 Wifirst
  * See AUTHORS file for a full list of contributors.
  *
  * This program is free software: you can redistribute it and/or modify

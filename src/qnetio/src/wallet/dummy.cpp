@@ -1,6 +1,6 @@
 /*
- * QNetIO
- * Copyright (C) 2008-2012 Bolloré telecom
+ * wiLink
+ * Copyright (C) 2009-2015 Wifirst
  * See AUTHORS file for a full list of contributors.
  *
  * This program is free software: you can redistribute it and/or modify

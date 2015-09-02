@@ -6,12 +6,15 @@
     'src/data/qml/dummydata',
     'src/data/qml/scripts',
     'src/imports/wiLink',
+    'src/imports/wiLink/phone',
+    'src/qnetio/src',
+    'src/qnetio/src/wallet',
     'src/qsound/src',
     'src/qsound/tests',
     'src/tests',
 ],
 'license': """wiLink
-Copyright (C) 2009-2013 Wifirst
+Copyright (C) 2009-2015 Wifirst
 See AUTHORS file for a full list of contributors.
 
 This program is free software: you can redistribute it and/or modify

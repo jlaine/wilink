@@ -21,7 +21,7 @@ LIBS += -L../3rdparty/qtsingleapplication -lqtsingleapplication
 
 # Installation
 QMAKE_TARGET_COMPANY="Wifirst"
-QMAKE_TARGET_COPYRIGHT="Copyright (c) 2009-2013 Wifirst"
+QMAKE_TARGET_COPYRIGHT="Copyright (c) 2009-2015 Wifirst"
 android {
 } else:mac {
     ICON = ../data/wiLink.icns

@@ -1,6 +1,6 @@
 /*
  * wiLink
- * Copyright (C) 2009-2013 Wifirst
+ * Copyright (C) 2009-2015 Wifirst
  * See AUTHORS file for a full list of contributors.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -102,7 +102,10 @@ Item {
             height: appStyle.icon.smallSize + 4 * appStyle.margin.normal
             border.color: background.border.color
             border.width: background.border.width
-            gradient: background.gradient
+            gradient: Gradient {
+                GradientStop { position: 0; color: '#e7effd' }
+                GradientStop { position: 1; color: '#cbdaf1' }
+            }
         }
 
         Row {
