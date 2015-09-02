@@ -26,7 +26,12 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(QXMPP qxmpp REQUIRED)
 
 # Extra runtime dependencies
-set(WILINK_IMPORTS_DIR lib/qt4/imports)
+get_target_property(QMAKE_EXECUTABLE Qt5::qmake LOCATION)
+execute_process(
+    COMMAND ${QMAKE_EXECUTABLE} -query QT_INSTALL_QML
+    OUTPUT_VARIABLE QT_INSTALL_QML
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+set(WILINK_IMPORTS_DIR ${QT_INSTALL_QML})
 if(APPLE)
     set(WILINK_EXTRA_PLUGINS
         imageformats/libqgif.dylib
@@ -36,18 +41,17 @@ endif(APPLE)
 if(WIN32)
     set(WILINK_IMPORTS_DIR bin)
     install(FILES
-        ${CMAKE_FIND_ROOT_PATH}/bin/QtCore4.dll
-        ${CMAKE_FIND_ROOT_PATH}/bin/QtDeclarative4.dll
-        ${CMAKE_FIND_ROOT_PATH}/bin/QtGui4.dll
-        ${CMAKE_FIND_ROOT_PATH}/bin/QtMultimedia4.dll
-        ${CMAKE_FIND_ROOT_PATH}/bin/QtNetwork4.dll
-        ${CMAKE_FIND_ROOT_PATH}/bin/QtScript4.dll
-        ${CMAKE_FIND_ROOT_PATH}/bin/QtSql4.dll
-        ${CMAKE_FIND_ROOT_PATH}/bin/QtWebKit4.dll
-        ${CMAKE_FIND_ROOT_PATH}/bin/QtXml4.dll
-        ${CMAKE_FIND_ROOT_PATH}/bin/QtXmlPatterns4.dll
+        ${CMAKE_FIND_ROOT_PATH}/bin/QtCore5.dll
+        ${CMAKE_FIND_ROOT_PATH}/bin/QtGui5.dll
+        ${CMAKE_FIND_ROOT_PATH}/bin/QtMultimedia5.dll
+        ${CMAKE_FIND_ROOT_PATH}/bin/QtNetwork5.dll
+        ${CMAKE_FIND_ROOT_PATH}/bin/QtQml5.dll
+        ${CMAKE_FIND_ROOT_PATH}/bin/QtQuick5.dll
+        ${CMAKE_FIND_ROOT_PATH}/bin/QtWebKit5.dll
+        ${CMAKE_FIND_ROOT_PATH}/bin/QtWidgets5.dll
+        ${CMAKE_FIND_ROOT_PATH}/bin/QtXml5.dll
+        ${CMAKE_FIND_ROOT_PATH}/bin/QtXmlPatterns5.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/mingwm10.dll
-        ${CMAKE_FIND_ROOT_PATH}/bin/phonon4.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/libeay32.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/libgcc_s_dw2-1.dll
         ${CMAKE_FIND_ROOT_PATH}/bin/libogg-0.dll
@@ -61,11 +65,11 @@ if(WIN32)
         ${CMAKE_FIND_ROOT_PATH}/bin/ssleay32.dll
         DESTINATION bin)
     install(FILES
-        ${QT_PLUGINS_DIR}/imageformats/qgif4.dll
-        ${QT_PLUGINS_DIR}/imageformats/qjpeg4.dll
+        ${QT_PLUGINS_DIR}/imageformats/qgif5.dll
+        ${QT_PLUGINS_DIR}/imageformats/qjpeg5.dll
         DESTINATION bin/imageformats)
     install(FILES
-        ${QT_PLUGINS_DIR}/sqldrivers/qsqlite4.dll
+        ${QT_PLUGINS_DIR}/sqldrivers/qsqlite5.dll
         DESTINATION bin/sqldrivers)
     install(FILES
         ${QT_IMPORTS_DIR}/QtWebKit/qmldir
