@@ -155,8 +155,9 @@ public:
 };
 
 RoomModel::RoomModel(QObject *parent)
-    : ChatModel(parent),
-    m_room(0)
+    : ChatModel(parent)
+    , m_manager(0)
+    , m_room(0)
 {
     m_historyModel = new HistoryModel(this);
 
