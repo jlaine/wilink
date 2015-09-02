@@ -19,10 +19,6 @@
 
 #include <QCheckBox>
 #include <QComboBox>
-#include <QDeclarativeContext>
-#include <QDeclarativeEngine>
-#include <QDeclarativeItem>
-#include <QDeclarativeView>
 #include <QUrl>
 
 #include "QXmppClient.h"
