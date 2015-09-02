@@ -95,8 +95,6 @@ QString NetworkAccessManager::userAgent()
             osDetails += QLatin1String("; Mac OS X 10.7");
             break;
         }
-#elif defined(Q_OS_SYMBIAN)
-        osDetails = QLatin1String("Symbian");
 #elif defined(Q_OS_WIN)
         DWORD dwVersion = GetVersion();
         DWORD dwMajorVersion = (DWORD)(LOBYTE(LOWORD(dwVersion)));

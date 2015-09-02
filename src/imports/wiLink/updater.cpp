@@ -249,11 +249,7 @@ void Updater::install()
     d->state = InstallState;
     emit stateChanged(d->state);
 
-#if defined(Q_OS_SYMBIAN)
-    // open the download directory in file browser
-    QFileInfo fileInfo(d->cacheFile());
-    QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.dir().path()));
-#elif defined(Q_OS_WIN)
+#if defined(Q_OS_WIN)
     // invoke the downloaded installer on the same path as the current install
     QDir installDir(qApp->applicationDirPath());
     installDir.cdUp();

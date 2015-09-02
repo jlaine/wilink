@@ -30,8 +30,6 @@ QString SystemInfo::osName()
     return QString::fromLatin1("Linux");
 #elif defined(Q_OS_MAC)
     return QString::fromLatin1("Mac OS");
-#elif defined(Q_OS_SYMBIAN)
-    return QString::fromLatin1("Symbian");
 #elif defined(Q_OS_WIN)
     return QString::fromLatin1("Windows");
 #else
@@ -47,8 +45,6 @@ QString SystemInfo::osType()
     return QString::fromLatin1("linux");
 #elif defined(Q_OS_MAC)
     return QString::fromLatin1("mac");
-#elif defined(Q_OS_SYMBIAN)
-    return QString::fromLatin1("symbian");
 #elif defined(Q_OS_WIN)
     return QString::fromLatin1("win32");
 #else
@@ -74,20 +70,6 @@ QString SystemInfo::osVersion()
         return QString::fromLatin1("10.6");
     case QSysInfo::MV_10_7:
         return QString::fromLatin1("10.7");
-    default:
-        return QString();
-    }
-#elif defined(Q_OS_SYMBIAN)
-    switch (QSysInfo::symbianVersion())
-    {
-    case QSysInfo::SV_SF_1:
-        return QString::fromLatin1("1");
-    case QSysInfo::SV_SF_2:
-        return QString::fromLatin1("2");
-    case QSysInfo::SV_SF_3:
-        return QString::fromLatin1("3");
-    case QSysInfo::SV_SF_4:
-        return QString::fromLatin1("4");
     default:
         return QString();
     }
