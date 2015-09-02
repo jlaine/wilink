@@ -102,9 +102,9 @@ GroupBox {
     Icon {
         id: resizeIcon
         style: 'icon-resize-full'
-        anchors.top: dialog.bottom
+        anchors.top: parent.bottom
         anchors.topMargin: -4
-        anchors.right: dialog.right
+        anchors.right: parent.right
         anchors.rightMargin: 4
         opacity: 0.4
         parent: dialog
