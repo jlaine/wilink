@@ -113,8 +113,10 @@ android {
     qmldir.files = qmldir
     INSTALLS += qmldir
 } else:unix {
-    qmldir.path = $$PREFIX/lib/qt4/imports/wiLink
+    qmldir.path = $$[QT_INSTALL_QML]/wiLink
     qmldir.files = qmldir
-    target.path = $$PREFIX/lib/qt4/imports/wiLink
+    target.path = $$[QT_INSTALL_QML]/wiLink
     INSTALLS += qmldir target
 }
+
+QMAKE_POST_LINK += $$QMAKE_COPY $$replace($$list($$quote($$PWD/qmldir) $$OUT_PWD), /, $$QMAKE_DIR_SEP)
