@@ -251,7 +251,8 @@ FocusScope {
                                     } else {
                                         // Wifirst roster NOT received, postponing all actions
                                         console.log('Postponing chat opening with ' + jid + ' to when Wifirst roster will have been received');
-                                        panel.delayedOpening = {action: 'open_conversation', jid: jid};
+                                        panel.delayedOpeningAction = 'open_conversation';
+                                        panel.delayedOpeningJid = jid;
                                     }
                                 }
                             } else {
@@ -276,7 +277,8 @@ FocusScope {
                                     } else {
                                         // Wifirst roster NOT received, postponing all actions
                                         console.log('Postponing room opening of ' + jid + ' to when Wifirst roster will have been received');
-                                        panel.delayedOpening = {action: 'open_room', jid: jid};
+                                        panel.delayedOpeningAction = 'open_room';
+                                        panel.delayedOpeningJid = jid;
                                     }
                                 }
                             } else {

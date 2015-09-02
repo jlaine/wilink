@@ -27,7 +27,8 @@ Panel {
     id: chatPanel
 
     property bool pendingMessages: (roomListModel.pendingMessages + rosterModel.pendingMessages) > 0
-    property variant delayedOpening: {}
+    property string delayedOpeningAction
+    property string delayedOpeningJid
     property bool wifirstRosterReceived: false
 
     function isFacebook(jid) {
@@ -145,19 +146,18 @@ Panel {
                     if (Utils.jidToDomain(item.client.jid) == 'wifirst.net') {
                         // Wifirst roster has been received
                         // FIXME : port to Qt5
-/*
                         chatPanel.wifirstRosterReceived = true;
-                        switch (chatPanel.delayedOpening.action) {
+                        switch (chatPanel.delayedOpeningAction) {
                         case 'open_conversation':
-                            var jid = chatPanel.delayedOpening.jid;
+                            var jid = chatPanel.delayedOpeningJid;
                             chatPanel.showConversation(jid);
                             break;
                         case 'open_room':
-                            chatPanel.showRoom(chatPanel.delayedOpening.jid);
+                            chatPanel.showRoom(chatPanel.delayedOpeningJid);
                             break;
                         }
-                        chatPanel.delayedOpening = {};
-*/
+                        chatPanel.delayedOpeningAction = undefined;
+                        chatPanel.delayedOpeningJid = undefined;
                     }
                 }
             }
@@ -371,9 +371,8 @@ Panel {
 
         // FIXME : this is a hack to make sure ConversationPanel loads fast
         ConversationPanel {
-            opacity: 0
+            visible: false
         }
-
     }
 
     Rectangle {
