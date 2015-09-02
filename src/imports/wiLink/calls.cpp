@@ -21,8 +21,6 @@
 #include <QFile>
 #include <QHostInfo>
 #include <QImage>
-#include <QLayout>
-#include <QMenu>
 #include <QPainter>
 #include <QTimer>
 

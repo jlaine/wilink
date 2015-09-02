@@ -20,13 +20,8 @@
 #include <QCoreApplication>
 #include <QDateTime>
 #include <QDomElement>
-#include <QLineEdit>
-#include <QLayout>
-#include <QMenu>
 #include <QNetworkInterface>
-#include <QPushButton>
 #include <QShortcut>
-#include <QTextBrowser>
 #include <QTimer>
 #include <QThread>
 
