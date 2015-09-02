@@ -58,7 +58,7 @@ Item {
             name: 'collapsed'
             when: header.width < 400
             PropertyChanges { target: icon; opacity: 0 }
-            PropertyChanges { target: column; anchors.left: parent.left }
+            PropertyChanges { target: column; anchors.left: header.left }
         }
     }
 
