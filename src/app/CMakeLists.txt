@@ -5,9 +5,6 @@ set(app_LIBRARIES Qt5::Gui Qt5::Network Qt5::Quick Qt5::Widgets Qt5::Xml qtsingl
 
 # wiLink
 add_definitions(-DWILINK_VERSION="${WILINK_VERSION}")
-if(WILINK_EMBEDDED)
-    add_definitions(-DWILINK_EMBEDDED)
-endif()
 
 set(app_SOURCES main.cpp network.cpp window.cpp)
 

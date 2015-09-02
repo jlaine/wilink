@@ -120,7 +120,7 @@ CustomWindow::CustomWindow(QtLocalPeer *peer, const QUrl &qmlRoot, QWidget *pare
     QWidget *container = QWidget::createWindowContainer(d->view);
     setCentralWidget(container);
 
-#ifndef WILINK_EMBEDDED
+#ifndef Q_OS_ANDROID
     /* "File" menu */
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
 

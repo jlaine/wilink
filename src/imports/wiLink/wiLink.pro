@@ -10,28 +10,16 @@ QT += network quick widgets xml
 
 TARGET = qmlwilinkplugin
 
-# FIXME: this is a hack so that Q_OS_ANDROID is defined
+# Libraries used internal by idle
 android {
     DEFINES += ANDROID
-} else:unix {
-    QT += dbus
-}
-
-# embedded version
-android|symbian|contains(MEEGO_EDITION,harmattan) {
     DEFINES += WILINK_EMBEDDED
-}
-
-# Libraries used internal by idle
-android|symbian|contains(MEEGO_EDITION,harmattan) {
     SOURCES += idle/idle_stub.cpp
 } else:mac {
     LIBS += -framework Carbon
     SOURCES += idle/idle_mac.cpp
 } else:unix {
-    greaterThan(QT_MAJOR_VERSION, 4) {
-        QT += x11extras
-    }
+    QT += dbus x11extras
     DEFINES += HAVE_XSS
     SOURCES += idle/idle_x11.cpp
     LIBS += -lXss -lX11
