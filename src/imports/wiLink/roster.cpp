@@ -113,7 +113,7 @@ VCard *RosterItem::vcard()
 }
 
 RosterImageProvider::RosterImageProvider()
-    : QDeclarativeImageProvider(Pixmap)
+    : QQuickImageProvider(Pixmap)
 {
 }
 

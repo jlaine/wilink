@@ -20,7 +20,7 @@
 #ifndef __WILINK_CALLS_H__
 #define __WILINK_CALLS_H__
 
-#include <QDeclarativeItem>
+#include <QQuickPaintedItem>
 #include <QWidget>
 
 #include "QXmppCallManager.h"
@@ -149,14 +149,14 @@ private:
     bool _valid;
 };
 
-class CallVideoItem : public QDeclarativeItem
+class CallVideoItem : public QQuickPaintedItem
 {
     Q_OBJECT
     Q_PROPERTY(DeclarativePen * border READ border CONSTANT)
     Q_PROPERTY(qreal radius READ radius WRITE setRadius NOTIFY radiusChanged)
 
 public:
-    CallVideoItem(QDeclarativeItem *parent = 0);
+    CallVideoItem(QQuickItem *parent = 0);
 
     DeclarativePen* border();
 
@@ -171,7 +171,7 @@ signals:
     void radiusChanged(qreal radius);
 
 protected:
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
+    void paint(QPainter *painter);
 
 private:
     DeclarativePen *m_border;

@@ -1,7 +1,7 @@
 include(../qsound.pri)
 include(../../3rdparty/qxmpp/qxmpp.pri)
 
-QT += declarative
+QT += qml quick
 TEMPLATE = lib
 CONFIG += staticlib
 

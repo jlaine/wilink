@@ -20,6 +20,7 @@
 #include <QAudioOutput>
 #include <QBuffer>
 #include <QByteArray>
+#include <QDataStream>
 #include <QFile>
 #include <QMap>
 #include <QStringList>

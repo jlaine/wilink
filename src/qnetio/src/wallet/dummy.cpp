@@ -19,6 +19,7 @@
 
 #include <QDebug>
 #include <QCoreApplication>
+#include <QDataStream>
 #include <QDir>
 #include <QFile>
 

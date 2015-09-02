@@ -20,7 +20,6 @@
 #ifndef __WILINK_NETWORK_H__
 #define __WILINK_NETWORK_H__
 
-#include <QDeclarativeNetworkAccessManagerFactory>
 #include <QNetworkAccessManager>
 
 class NetworkAccessManager : public QNetworkAccessManager

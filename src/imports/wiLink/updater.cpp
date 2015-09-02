@@ -19,8 +19,6 @@
 
 #include <QCoreApplication>
 #include <QCryptographicHash>
-#include <QDeclarativeEngine>
-#include <QDeclarativeItem>
 #include <QDesktopServices>
 #include <QDir>
 #include <QDomDocument>
@@ -29,6 +27,9 @@
 #include <QLocale>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QQmlComponent>
+#include <QQmlEngine>
+#include <QQmlInfo>
 #include <QStringList>
 #include <QUrl>
 #include <QUrlQuery>

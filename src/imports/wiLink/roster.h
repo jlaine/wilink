@@ -20,7 +20,7 @@
 #ifndef __WILINK_CHAT_ROSTER_H__
 #define __WILINK_CHAT_ROSTER_H__
 
-#include <QDeclarativeImageProvider>
+#include <QQuickImageProvider>
 #include <QSet>
 #include <QUrl>
 
@@ -39,7 +39,7 @@ class RosterModelPrivate;
 class VCardCache;
 class VCardCachePrivate;
 
-class RosterImageProvider : public QDeclarativeImageProvider
+class RosterImageProvider : public QQuickImageProvider
 {
 public:
     RosterImageProvider();

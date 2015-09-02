@@ -22,7 +22,7 @@
 #include "icons.h"
 
 IconImageProvider::IconImageProvider()
-    : QDeclarativeImageProvider(Image)
+    : QQuickImageProvider(Image)
 {
 }
 

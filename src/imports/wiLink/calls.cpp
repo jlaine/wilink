@@ -17,7 +17,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QDeclarativeItem>
 #include <QFile>
 #include <QHostInfo>
 #include <QImage>
@@ -318,12 +317,12 @@ void CallVideoHelper::videoRefresh()
         m_videoOutput->present(frames.last());
 }
 
-CallVideoItem::CallVideoItem(QDeclarativeItem *parent)
-    : QDeclarativeItem(parent),
+CallVideoItem::CallVideoItem(QQuickItem *parent)
+    : QQuickPaintedItem(parent),
     m_radius(8)
 {
     m_border = new DeclarativePen(this);
-    setFlag(QGraphicsItem::ItemHasNoContents, false);
+    //setFlag(QGraphicsItem::ItemHasNoContents, false);
 }
 
 QRectF CallVideoItem::boundingRect() const
@@ -331,10 +330,8 @@ QRectF CallVideoItem::boundingRect() const
     return QRectF(0, 0, width(), height());
 }
 
-void CallVideoItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void CallVideoItem::paint(QPainter *painter)
 {
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
     const QRectF m_boundingRect(0, 0, width(), height());
     if (m_boundingRect.isEmpty())
         return;

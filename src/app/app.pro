@@ -1,6 +1,6 @@
 include(../../wilink.pri)
 
-QT += declarative network sql xml
+QT += network quick widgets xml
 
 TARGET = wiLink
 VERSION = $$WILINK_VERSION

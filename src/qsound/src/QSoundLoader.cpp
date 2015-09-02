@@ -17,12 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QtDeclarative>
-#include <QApplication>
-#include <QDeclarativeEngine>
+#include <QBuffer>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QQmlComponent>
+#include <QQmlEngine>
+#include <QQmlInfo>
 
 #include "QSoundFile.h"
 #include "QSoundLoader.h"

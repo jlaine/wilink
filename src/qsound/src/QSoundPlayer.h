@@ -20,6 +20,7 @@
 #ifndef __WILINK_SOUND_PLAYER_H__
 #define __WILINK_SOUND_PLAYER_H__
 
+#include <QObject>
 #include <QStringList>
 #include <QUrl>
 

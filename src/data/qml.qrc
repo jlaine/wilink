@@ -94,7 +94,6 @@
     <file>qml/WebPanel.qml</file>
     <file>qml/WebPlugin.qml</file>
     <file>qml/WebTab.qml</file>
-    <file>qml/boot-meego.qml</file>
     <file>qml/boot.qml</file>
     <file>qml/fonts/fontawesome-webfont.ttf</file>
     <file>qml/i18n/fr.qm</file>

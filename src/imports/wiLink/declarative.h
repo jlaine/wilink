@@ -21,9 +21,9 @@
 #define __WILINK_DECLARATIVE_H__
 
 #include <QAbstractItemModel>
-#include <QDeclarativeItem>
-#include <QDeclarativeExtensionPlugin>
 #include <QFileDialog>
+#include <QQmlExtensionPlugin>
+#include <QQuickItem>
 #include <QSortFilterProxyModel>
 
 #include "QXmppMessage.h"
@@ -70,43 +70,13 @@ private:
     QList<QPersistentModelIndex> m_selection;
 };
 
-class DropArea : public QDeclarativeItem
+class Plugin : public QQmlExtensionPlugin
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "org.qt-project.Qt.QQmlExtensionInterface")
 
 public:
-    DropArea(QDeclarativeItem *parent = 0);
-
-signals:
-    void filesDropped(const QStringList &files);
-
-protected:
-    void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
-    void dropEvent(QGraphicsSceneDragDropEvent *event);
-};
-
-class WheelArea : public QDeclarativeItem
-{
-    Q_OBJECT
-
-public:
-    WheelArea(QDeclarativeItem *parent = 0);
-
-protected:
-    void wheelEvent(QGraphicsSceneWheelEvent *event);
-
-signals:
-    void verticalWheel(int delta);
-    void horizontalWheel(int delta);
-};
-
-class Plugin : public QDeclarativeExtensionPlugin
-{
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID "net.wifirst.wiLink")
-
-public:
-    void initializeEngine(QDeclarativeEngine *engine, const char *uri);
+    void initializeEngine(QQmlEngine *engine, const char *uri);
     void registerTypes(const char *uri);
 };
 

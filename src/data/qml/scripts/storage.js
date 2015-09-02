@@ -17,10 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-.pragma library
+//.pragma library
 
 function getDatabase() {
-     return openDatabaseSync("wiLink", "1.0", "StorageDatabase", 100000);
+     return LocalStorage.openDatabaseSync("wiLink", "1.0", "StorageDatabase", 100000);
 }
 
 /** Initialize database tables.

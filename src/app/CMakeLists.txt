@@ -1,7 +1,7 @@
 include_directories(../3rdparty/qtsingleapplication)
 
 # Libraries
-set(app_LIBRARIES Qt5::Core Qt5::Gui Qt5::Declarative Qt5::Network qtsingleapplication)
+set(app_LIBRARIES Qt5::Gui Qt5::Network Qt5::Quick Qt5::Widgets Qt5::Xml qtsingleapplication)
 
 # wiLink
 add_definitions(-DWILINK_VERSION="${WILINK_VERSION}")

@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import QtQuick 1.1
+import QtQuick 2.3
 import wiLink 2.4
 import 'scripts/utils.js' as Utils
 
@@ -271,10 +271,10 @@ Panel {
             enabled: vcard.features & VCard.FileTransferFeature
             visible: enabled
 
-            onFilesDropped: {
-                for (var i in files) {
+            onDropped: {
+                for (var i in urls) {
                     var fullJid = vcard.jidForFeature(VCard.FileTransferFeature);
-                    conversation.client.transferManager.sendFile(fullJid, files[i]);
+                    conversation.client.transferManager.sendFile(fullJid, urls[i]);
                 }
             }
         }

@@ -20,9 +20,9 @@
 #ifndef __WILINK_ICONS_H__
 #define __WILINK_ICONS_H__
 
-#include <QDeclarativeImageProvider>
+#include <QQuickImageProvider>
 
-class IconImageProvider : public QDeclarativeImageProvider
+class IconImageProvider : public QQuickImageProvider
 {
 public:
     IconImageProvider();

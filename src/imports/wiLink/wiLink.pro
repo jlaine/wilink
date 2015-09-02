@@ -6,7 +6,7 @@ include(../../3rdparty/qxmpp/qxmpp.pri)
 TEMPLATE = lib
 CONFIG += qt plugin
 
-QT += declarative network sql xml
+QT += network quick widgets xml
 
 TARGET = qmlwilinkplugin
 

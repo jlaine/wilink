@@ -18,10 +18,8 @@
  */
 
 #include <QCoreApplication>
-#include <QDeclarativeEngine>
 #include <QDesktopServices>
-#include <QGraphicsSceneDragDropEvent>
-#include <QMimeData>
+#include <QQmlEngine>
 
 #include "QXmppArchiveManager.h"
 #include "QXmppCallManager.h"
@@ -131,64 +129,7 @@ void ListHelper::setModel(QAbstractItemModel *model)
     }
 }
 
-static QStringList droppedFiles(QGraphicsSceneDragDropEvent *event)
-{
-    QStringList files;
-    if (event->mimeData()->hasUrls()) {
-        foreach (const QUrl &url, event->mimeData()->urls()) {
-            if (url.scheme() == "file") {
-                QFileInfo info(url.toLocalFile());
-                if (info.exists() && !info.isDir())
-                    files << info.filePath();
-            }
-        }
-    }
-    return files;
-}
-
-DropArea::DropArea(QDeclarativeItem *parent)
-    : QDeclarativeItem(parent)
-{
-    setAcceptDrops(true);
-}
-
-void DropArea::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
-{
-    event->setAccepted(!droppedFiles(event).isEmpty());
-}
-
-void DropArea::dropEvent(QGraphicsSceneDragDropEvent *event)
-{
-    const QStringList files = droppedFiles(event);
-    if (!files.isEmpty()) {
-        emit filesDropped(files);
-        event->accept();
-    } else {
-        event->ignore();
-    }
-}
-
-WheelArea::WheelArea(QDeclarativeItem *parent)
-    : QDeclarativeItem(parent)
-{
-}
-
-void WheelArea::wheelEvent(QGraphicsSceneWheelEvent *event)
-{
-    switch(event->orientation()) {
-        case Qt::Horizontal:
-            emit horizontalWheel(event->delta());
-            break;
-        case Qt::Vertical:
-            emit verticalWheel(event->delta());
-            break;
-        default:
-            event->ignore();
-            break;
-    }
-}
-
-void Plugin::initializeEngine(QDeclarativeEngine *engine, const char *uri)
+void Plugin::initializeEngine(QQmlEngine *engine, const char *uri)
 {
     Q_UNUSED(uri);
     engine->addImageProvider("icon", new IconImageProvider);
@@ -213,7 +154,6 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterType<Conversation>(uri, 2, 4, "Conversation");
     qmlRegisterUncreatableType<DiagnosticManager>(uri, 2, 4, "DiagnosticManager", "");
     qmlRegisterType<DiscoveryModel>(uri, 2, 4, "DiscoveryModel");
-    qmlRegisterType<DropArea>(uri, 2, 4, "DropArea");
     qmlRegisterUncreatableType<HistoryModel>(uri, 2, 4, "HistoryModel", "");
     qmlRegisterType<Idle>(uri, 2, 4, "Idle");
     qmlRegisterType<ListHelper>(uri, 2, 4, "ListHelper");
@@ -235,7 +175,6 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterType<TranslationLoader>(uri, 2, 4, "TranslationLoader");
     qmlRegisterType<Updater>(uri, 2, 4, "Updater");
     qmlRegisterType<VCard>(uri, 2, 4, "VCard");
-    qmlRegisterType<WheelArea>(uri, 2, 4, "WheelArea");
 
     // QXmpp
     qmlRegisterUncreatableType<QXmppArchiveManager>(uri, 2, 4, "QXmppArchiveManager", "");

@@ -17,7 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import QtQuick 1.1
+import QtQuick 2.3
+import QtQuick.LocalStorage 2.0
 import wiLink 2.4
 import 'scripts/storage.js' as Storage
 import 'scripts/utils.js' as Utils
@@ -143,6 +144,8 @@ Panel {
                 onRosterReceived: {
                     if (Utils.jidToDomain(item.client.jid) == 'wifirst.net') {
                         // Wifirst roster has been received
+                        // FIXME : port to Qt5
+/*
                         chatPanel.wifirstRosterReceived = true;
                         switch (chatPanel.delayedOpening.action) {
                         case 'open_conversation':
@@ -154,6 +157,7 @@ Panel {
                             break;
                         }
                         chatPanel.delayedOpening = {};
+*/
                     }
                 }
             }

@@ -18,13 +18,14 @@
  */
 
 #include <QApplication>
-#include <QDeclarativeContext>
-#include <QDeclarativeEngine>
-#include <QDeclarativeView>
 #include <QDesktopServices>
 #include <QDesktopWidget>
 #include <QMenuBar>
 #include <QNetworkDiskCache>
+#include <QQmlContext>
+#include <QQmlEngine>
+#include <QQmlNetworkAccessManagerFactory>
+#include <QQuickView>
 #include <QShortcut>
 #include <QStringList>
 
@@ -38,7 +39,7 @@
 #include <X11/Xatom.h>
 #endif
 
-class NetworkAccessManagerFactory : public QDeclarativeNetworkAccessManagerFactory
+class NetworkAccessManagerFactory : public QQmlNetworkAccessManagerFactory
 {
 public:
     NetworkAccessManagerFactory(const QString &cachePath)
@@ -67,7 +68,7 @@ public:
     QtLocalPeer *peer;
     bool qmlFail;
     QUrl qmlRoot;
-    QDeclarativeView *view;
+    QQuickView *view;
 };
 
 CustomWindow::CustomWindow(QtLocalPeer *peer, const QUrl &qmlRoot, QWidget *parent)
@@ -96,8 +97,8 @@ CustomWindow::CustomWindow(QtLocalPeer *peer, const QUrl &qmlRoot, QWidget *pare
     storagePath.replace(QLatin1Char('/'), QDir::separator());
 
     // create declarative view
-    d->view = new QDeclarativeView;
-    d->view->setResizeMode(QDeclarativeView::SizeRootObjectToView);
+    d->view = new QQuickView;
+    d->view->setResizeMode(QQuickView::SizeRootObjectToView);
 #ifdef Q_OS_ANDROID
     d->view->engine()->addImportPath("assets:/imports");
     d->view->engine()->addPluginPath(QDir::homePath()+"/../lib");
@@ -105,7 +106,7 @@ CustomWindow::CustomWindow(QtLocalPeer *peer, const QUrl &qmlRoot, QWidget *pare
     d->view->engine()->setNetworkAccessManagerFactory(new NetworkAccessManagerFactory(cachePath));
     d->view->engine()->setOfflineStoragePath(storagePath);
 
-    check = connect(d->view, SIGNAL(statusChanged(QDeclarativeView::Status)),
+    check = connect(d->view, SIGNAL(statusChanged(QQuickView::Status)),
                     this, SLOT(_q_statusChanged()));
     Q_ASSERT(check);
 
@@ -113,10 +114,11 @@ CustomWindow::CustomWindow(QtLocalPeer *peer, const QUrl &qmlRoot, QWidget *pare
                     qApp, SLOT(quit()));
     Q_ASSERT(check);
 
-    QDeclarativeContext *context = d->view->rootContext();
+    QQmlContext *context = d->view->rootContext();
     context->setContextProperty("window", this);
 
-    setCentralWidget(d->view);
+    QWidget *container = QWidget::createWindowContainer(d->view);
+    setCentralWidget(container);
 
 #ifndef WILINK_EMBEDDED
     /* "File" menu */
@@ -230,11 +232,7 @@ void CustomWindow::startMessages()
 
 void CustomWindow::_q_loadSource()
 {
-#ifdef MEEGO_EDITION_HARMATTAN
-    const QUrl qmlFile("boot-meego.qml");
-#else
     const QUrl qmlFile("boot.qml");
-#endif
     const QUrl qmlSource = (d->qmlFail ? QUrl("qrc:/qml/") : d->qmlRoot).resolved(qmlFile);
     qDebug("Window loading %s", qPrintable(qmlSource.toString()));
     d->view->setSource(qmlSource);
@@ -256,12 +254,7 @@ void CustomWindow::_q_openUrl(const QUrl &url)
 
 void CustomWindow::_q_statusChanged()
 {
-    if (d->view->status() == QDeclarativeView::Ready) {
-        d->view->setAttribute(Qt::WA_OpaquePaintEvent);
-        d->view->setAttribute(Qt::WA_NoSystemBackground);
-        d->view->viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
-        d->view->viewport()->setAttribute(Qt::WA_NoSystemBackground);
-    } else if (d->view->status() == QDeclarativeView::Error) {
+    if (d->view->status() == QQuickView::Error) {
         if (!d->qmlFail) {
             // network load failed, use fallback
             d->qmlFail = true;

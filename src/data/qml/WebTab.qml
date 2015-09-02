@@ -17,8 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import QtQuick 1.1
-import QtWebKit 1.0
+import QtQuick 2.3
+import QtWebKit 3.0
 import wiLink 2.4
 
 Panel {
@@ -72,7 +72,7 @@ Panel {
                 anchors.top: parent.top
                 anchors.topMargin: 2
                 anchors.bottom: parent.bottom
-                enabled: webView.back.enabled
+                enabled: webView.canGoBack
                 iconStyle: 'icon-chevron-left'
                 width: iconSize
 
@@ -83,7 +83,7 @@ Panel {
                 anchors.top: parent.top
                 anchors.topMargin: 2
                 anchors.bottom: parent.bottom
-                enabled: webView.forward.enabled
+                enabled: webView.canGoForward
                 iconStyle: 'icon-chevron-right'
                 width: iconSize
 
@@ -94,7 +94,7 @@ Panel {
                 anchors.top: parent.top
                 anchors.topMargin: 2
                 anchors.bottom: parent.bottom
-                enabled: webView.url != '' && webView.reload.enabled
+                enabled: webView.url != ''
                 iconStyle: 'icon-refresh'
                 visible: !webView.stop.enabled
                 width: iconSize
@@ -107,7 +107,7 @@ Panel {
                 anchors.topMargin: 2
                 anchors.bottom: parent.bottom
                 iconStyle: 'icon-stop'
-                visible: webView.stop.enabled
+                visible: !webView.loading
                 width: iconSize
 
                 onClicked: webView.stop.triggered()
@@ -150,12 +150,12 @@ Panel {
             id: webFlickable
 
             anchors.fill: parent
-            contentWidth: webView.width
-            contentHeight: webView.height
 
             WebView {
                 id: webView
 
+                // FIXME: port to Qt5
+/*
                 javaScriptWindowObjects: QtObject {
                     WebView.windowObjectName: "qml"
 
@@ -163,37 +163,27 @@ Panel {
                         Qt.openUrlExternally(url);
                     }
                 }
-                preferredHeight: webFlickable.height
-                preferredWidth: webFlickable.width
+*/
+                anchors.fill: parent
 
-                onAlert: {
-                    console.log("Alert: " + message);
-                }
-
-                onLoadFailed: {
-                    webView.html = '<html><head><title>Error loading page</title></head><body>There was an error loading the page.</body></html>';
-                }
-
-                onLoadFinished: {
-                    if (panel.loadScript) {
-                        var js = panel.loadScript;
-                        panel.loadScript = '';
-                        webView.evaluateJavaScript(js);
-                    } else {
-                        // catch links to wilink:// urls
-                        webView.evaluateJavaScript('$("a[href^=\\"wilink:\\"]").live("click", function() { window.qml.openUrl(this.href); return false; })');
+                onLoadingChanged: {
+                    if (status == WebView.LoadFailedStatus) {
+                        webView.html = '<html><head><title>Error loading page</title></head><body>There was an error loading the page.</body></html>';
+                    } else if (status == WebView.LoadSucceededStatus) {
+                        if (panel.loadScript) {
+                            var js = panel.loadScript;
+                            panel.loadScript = '';
+                            webView.evaluateJavaScript(js);
+                        } else {
+                            // catch links to wilink:// urls
+                            webView.evaluateJavaScript('$("a[href^=\\"wilink:\\"]").live("click", function() { window.qml.openUrl(this.href); return false; })');
+                        }
                     }
                 }
             }
         }
 
-        WheelArea {
-            anchors.fill: webFlickable
-
-            onHorizontalWheel: horizontalScrollBar.moveBy(-delta)
-            onVerticalWheel: verticalScrollBar.moveBy(-delta)
-        }
-
+/*
         ScrollBar {
             id: verticalScrollBar
 
@@ -212,8 +202,8 @@ Panel {
             flickableItem: webFlickable
             orientation: Qt.Horizontal
         }
-
         Keys.forwardTo: [verticalScrollBar, horizontalScrollBar]
+*/
 
         Keys.onPressed: {
             if (((event.modifiers & Qt.ControlModifier) && event.key == Qt.Key_R)
