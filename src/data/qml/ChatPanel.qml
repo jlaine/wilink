@@ -156,8 +156,8 @@ Panel {
                             chatPanel.showRoom(chatPanel.delayedOpeningJid);
                             break;
                         }
-                        chatPanel.delayedOpeningAction = undefined;
-                        chatPanel.delayedOpeningJid = undefined;
+                        chatPanel.delayedOpeningAction = '';
+                        chatPanel.delayedOpeningJid = '';
                     }
                 }
             }
