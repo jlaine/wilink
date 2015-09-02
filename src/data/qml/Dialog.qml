@@ -147,12 +147,6 @@ GroupBox {
         }
     }
 
-    TextInput {
-        id: fakeInput
-        opacity: 0
-    }
-
-    onClose: fakeInput.closeSoftwareInputPanel()
     onRejected: dialog.close()
 
     Keys.onEnterPressed: dialog.accepted()

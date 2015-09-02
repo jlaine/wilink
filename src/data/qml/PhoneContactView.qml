@@ -18,6 +18,7 @@
  */
 
 import QtQuick 2.3
+import QtQuick.XmlListModel 2.0
 import wiLink 2.4
 
 ContactView {
@@ -84,7 +85,7 @@ ContactView {
             anchors.rightMargin: 6
             anchors.verticalCenter: parent.verticalCenter
             iconStyle: 'icon-phone'
-            visible: view.currentItem == item
+            visible: block.currentItem == item
             z: 1
 
             onClicked: {
@@ -97,9 +98,9 @@ ContactView {
             anchors.fill: parent
 
             onClicked: {
-                view.forceActiveFocus();
+                block.forceActiveFocus();
                 if (mouse.button == Qt.LeftButton) {
-                    view.currentIndex = model.index;
+                    block.currentIndex = model.index;
                 } else if (mouse.button == Qt.RightButton) {
                     // show context menu
                     var pos = mapToItem(menuLoader.parent, mouse.x, mouse.y);
@@ -112,7 +113,7 @@ ContactView {
             }
 
             onDoubleClicked: {
-                view.currentIndex = model.index;
+                block.currentIndex = model.index;
                 block.itemClicked(model);
             }
         }
@@ -120,12 +121,12 @@ ContactView {
         states: [
             State {
                 name: 'no-avatar'
-                when: view.width < 32
+                when: block.width < 32
                 PropertyChanges { target: avatar; visible: false }
             },
             State {
                 name: 'expanded'
-                when: view.currentItem == item
+                when: block.currentItem == item
                 PropertyChanges { target: name; color: 'white' }
                 PropertyChanges { target: phone; visible: true }
             }
