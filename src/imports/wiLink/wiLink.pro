@@ -107,4 +107,6 @@ android {
     INSTALLS += qmldir target
 }
 
-QMAKE_POST_LINK += $$QMAKE_COPY $$replace($$list($$quote($$PWD/qmldir) $$OUT_PWD), /, $$QMAKE_DIR_SEP)
+!equals(PWD, $$OUT_PWD) {
+    QMAKE_POST_LINK += $$QMAKE_COPY $$replace($$list($$quote($$PWD/qmldir) $$quote($$OUT_PWD)), /, $$QMAKE_DIR_SEP)
+}
