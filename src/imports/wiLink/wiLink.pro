@@ -8,6 +8,7 @@ CONFIG += qt plugin
 
 QT += network quick widgets xml
 
+DESTDIR = ../../app/wiLink.2
 TARGET = qmlwilinkplugin
 
 # Libraries used internal by idle
@@ -101,12 +102,10 @@ android {
     qmldir.files = qmldir
     INSTALLS += qmldir
 } else:unix {
-    qmldir.path = $$[QT_INSTALL_QML]/wiLink
+    qmldir.path = $$[QT_INSTALL_QML]/wiLink.2
     qmldir.files = qmldir
-    target.path = $$[QT_INSTALL_QML]/wiLink
+    target.path = $$[QT_INSTALL_QML]/wiLink.2
     INSTALLS += qmldir target
 }
 
-!equals(PWD, $$OUT_PWD) {
-    QMAKE_POST_LINK += $$QMAKE_COPY $$replace($$list($$quote($$PWD/qmldir) $$quote($$OUT_PWD)), /, $$QMAKE_DIR_SEP)
-}
+QMAKE_POST_LINK += $$QMAKE_COPY $$replace($$list($$quote($$PWD/qmldir) $$DESTDIR), /, $$QMAKE_DIR_SEP)
