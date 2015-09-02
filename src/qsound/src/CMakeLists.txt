@@ -44,4 +44,4 @@ else()
 endif()
 
 add_library(qsound STATIC ${qsound_SOURCES})
-target_link_libraries(qsound Qt5::Declarative Qt5::Network ${qsound_LIBRARIES})
+target_link_libraries(qsound Qt5::Network Qt5::Quick ${qsound_LIBRARIES})
