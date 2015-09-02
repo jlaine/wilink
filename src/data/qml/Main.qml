@@ -130,7 +130,7 @@ FocusScope {
 
         anchors.fill: parent
         color: '#44000000'
-        opacity: 0
+        visible: false
         z: 9
 
         // This MouseArea prevents clicks on items behind dialog
@@ -145,7 +145,7 @@ FocusScope {
     PanelSwapper {
         id: dialogSwapper
 
-        opacity: 0
+        visible: false
         z: 10
 
         onCurrentItemChanged: {
@@ -153,12 +153,12 @@ FocusScope {
                 dialogSwapper.forceActiveFocus();
                 x = Math.max(0, Math.floor((parent.width - currentItem.width) / 2));
                 y = Math.max(0, Math.floor((parent.height - currentItem.height) / 2));
-                opacity = 1;
-                dialogOverlay.opacity = 1;
+                visible = true;
+                dialogOverlay.visible = true;
             } else {
                 swapper.forceActiveFocus();
-                opacity = 0;
-                dialogOverlay.opacity = 0;
+                visible = true;
+                dialogOverlay.visible = false;
             }
         }
     }
@@ -179,19 +179,19 @@ FocusScope {
      */
     Loader {
         id: menuLoader
-
+        visible: false
         z: 12
 
         function hide() {
             menuCancelArea.enabled = false;
-            menuLoader.item.opacity = 0;
+            menuLoader.item.visible = false;
         }
 
         function show(x, y) {
             menuCancelArea.enabled = true;
             menuLoader.x = x;
             menuLoader.y = y;
-            menuLoader.item.opacity = 1;
+            menuLoader.item.visible = true;
         }
 
         Connections {
