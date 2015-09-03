@@ -51,7 +51,7 @@ class SipCallPrivate : public SipCallContext
 {
 public:
     SipCallPrivate(SipCall *qq);
-    SdpMessage buildSdp(const QList<QXmppJinglePayloadType> &payloadTypes) const;
+    QString buildSdp() const;
     void handleReply(const SipMessage &reply);
     void handleRequest(const SipMessage &request);
     bool handleSdp(const SdpMessage &sdp);

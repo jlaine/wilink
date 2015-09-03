@@ -352,61 +352,32 @@ static QString addressToSdp(const QHostAddress &host)
         host.toString());
 }
 
-SdpMessage SipCallPrivate::buildSdp(const QList<QXmppJinglePayloadType> &payloadTypes) const
+QString SipCallPrivate::buildSdp() const
 {
-    static const QDateTime ntpEpoch(QDate(1900, 1, 1));
-    quint32 ntpSeconds = ntpEpoch.secsTo(QDateTime::currentDateTime());
+    QXmppJingleIq::Content content;
 
-    SdpMessage sdp;
-    sdp.addField('v', "0");
-    sdp.addField('o', QString("- %1 %2 %3").arg(
+    // media
+    content.setDescriptionMedia("audio");
+    content.setDescriptionSsrc(audioChannel->localSsrc());
+    content.setPayloadTypes(audioChannel->localPayloadTypes());
+
+    // transport
+    content.setTransportCandidates(iceConnection->localCandidates());
+    content.setTransportUser(iceConnection->localUser());
+    content.setTransportPassword(iceConnection->localPassword());
+
+    const quint32 ntpSeconds = QDateTime(QDate(1900, 1, 1)).secsTo(QDateTime::currentDateTime());
+    QString sdpStr;
+    sdpStr += "v=0\r\n";
+    sdpStr += QString("o=- %1 %2 %3\r\n").arg(
         QString::number(ntpSeconds),
         QString::number(ntpSeconds),
-        addressToSdp(client->d->localAddress)).toUtf8());
-    sdp.addField('s', "-");
-    sdp.addField('c', addressToSdp(localRtpAddress).toUtf8());
-    sdp.addField('t', activeTime);
+        addressToSdp(client->d->localAddress));
+    sdpStr += "s=-\r\n";
+    sdpStr += QString("t=%1\r\n").arg(QString::fromUtf8(activeTime));
+    sdpStr += content.toSdp();
 
-#ifdef SIP_USE_ICE
-    // ICE credentials
-    sdp.addField('a', "ice-ufrag:" + iceConnection->localUser().toUtf8());
-    sdp.addField('a', "ice-pwd:" + iceConnection->localPassword().toUtf8());
-#endif
-
-    // RTP profile
-    QByteArray profiles = "RTP/AVP";
-    QList<QByteArray> attrs;
-    foreach (const QXmppJinglePayloadType &payload, payloadTypes) {
-        profiles += " " + QByteArray::number(payload.id());
-        QByteArray rtpmap = QByteArray::number(payload.id()) + " " + payload.name().toUtf8() + "/" + QByteArray::number(payload.clockrate());
-        if (payload.channels() > 1)
-            rtpmap += "/" + QByteArray::number(payload.channels());
-        attrs << "rtpmap:" + rtpmap;
-
-        // FIXME: make this generic
-        if (payload.name() == "telephone-event")
-            attrs << "fmtp:" + QByteArray::number(payload.id()) + " 0-15";
-    }
-    attrs << "sendrecv";
-
-    sdp.addField('m', "audio " + QByteArray::number(localRtpPort) + " "  + profiles);
-    foreach (const QByteArray &attr, attrs)
-        sdp.addField('a', attr);
-
-#ifdef SIP_USE_ICE
-    // ICE candidates
-    foreach (const QXmppJingleCandidate &candidate, iceConnection->localCandidates()) {
-        QByteArray ba = "candidate:" + candidate.foundation().toLatin1() + " ";
-        ba += QByteArray::number(candidate.component()) + " ";
-        ba += candidate.protocol().toUpper().toLatin1() + " ";
-        ba += QByteArray::number(candidate.priority()) + " ";
-        ba += candidate.host().toString().toUtf8() + " ";
-        ba += QByteArray::number(candidate.port()) + " ";
-        ba += "typ " + QXmppJingleCandidate::typeToString(candidate.type()).toLatin1();
-        sdp.addField('a', ba);
-    }
-#endif
-    return sdp;
+    return sdpStr;
 }
 
 bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
@@ -532,12 +503,12 @@ bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
 
 void SipCallPrivate::sendInvite()
 {
-    const SdpMessage sdp = buildSdp(audioChannel->localPayloadTypes());
+    const QString sdp = buildSdp();
 
     SipMessage request = client->d->buildRequest("INVITE", remoteUri, this, cseq++);
     request.setHeaderField("To", remoteRecipient);
     request.setHeaderField("Content-Type", "application/sdp");
-    request.setBody(sdp.toByteArray());
+    request.setBody(sdp.toUtf8());
     client->sendMessage(request);
     invitePending = true;
     inviteRequest = request;
@@ -655,7 +626,7 @@ void SipCall::accept()
         d->rtcpSocket->writeDatagram(rtcp, d->remoteHost, d->remotePort+1);
 #endif
 
-        const SdpMessage sdp = d->buildSdp(d->audioChannel->localPayloadTypes());
+        const QString sdp = d->buildSdp();
 
         SipMessage response = d->client->d->buildResponse(d->inviteRequest);
         response.setStatusCode(200);
@@ -663,7 +634,7 @@ void SipCall::accept()
         response.setHeaderField("Allow", "INVITE, ACK, CANCEL, OPTIONS, BYE");
         response.setHeaderField("Supported", "replaces");
         response.setHeaderField("Content-Type", "application/sdp");
-        response.setBody(sdp.toByteArray());
+        response.setBody(sdp.toUtf8());
         d->client->sendMessage(response);
 
         // notify user
@@ -1076,7 +1047,7 @@ void SipClient::connectToServer()
 
     // listen for SIP
     if (d->socket->state() == QAbstractSocket::UnconnectedState) {
-        if (!d->socket->bind(QHostAddress::AnyIPv4)) {
+        if (!d->socket->bind()) {
             warning("Could not start listening for SIP");
             return;
         }
