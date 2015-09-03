@@ -1,0 +1,75 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#
+# wiLink
+# Copyright (C) 2009-2015 Wifirst
+# See AUTHORS file for a full list of contributors.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+import os
+import subprocess
+
+ICONS = [
+    'album.svg',
+    'audio-input.svg',
+    'audio-output.svg',
+    'call-incoming.svg',
+    'call-outgoing.svg',
+    'chat.svg',
+    'close.svg',
+    'file.svg',
+    'moderator.svg',
+    'peer.svg',
+    'tip.svg',
+    'web.svg',
+    'wiLink.svg',
+    'wiLink-black.svg',
+]
+
+LARGE_ICONS = [
+    'album.svg',
+    'audio-x-generic.svgz',
+    'file.svg',
+    'image-x-generic.svgz',
+    'peer.svg',
+    'spinner.svg',
+    'text-x-generic.svgz',
+    'video-x-generic.svgz',
+    'wiLink.svg',
+]
+
+HUGE_ICONS = [
+    'wiLink.svg',
+]
+
+def generate_png(input_names, size):
+    """
+    Generate PNG icons from SVG files.
+    """
+    for name in input_names:
+        input_svg = os.path.join('images', 'scalable', name)
+        output_png = os.path.join('images', '%dx%d' % (size, size), os.path.splitext(name)[0] + '.png')
+        subprocess.check_call(['inkscape', '-z',
+            '--file=' + input_svg,
+            '--export-png=' + output_png,
+            '--export-width=%d' % size,
+            '--export-height=%d' % size])
+
+# PNG icons
+generate_png(ICONS, 32)
+generate_png(ICONS, 64)
+generate_png(LARGE_ICONS, 128)
+generate_png(HUGE_ICONS, 256)
