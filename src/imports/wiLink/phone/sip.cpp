@@ -126,54 +126,6 @@ static QString sipAddressToUri(const QString &address)
     return rx.cap(2);
 }
 
-SdpMessage::SdpMessage(const QByteArray &ba)
-{
-    const QByteArrayMatcher crlf("\r\n");
-
-    int i = 0;
-    while (i < ba.count() - 1) {
-        const char field = ba[i];
-        int j = i + 1;
-        if (ba[j] != '=')
-            break;
-        j++;
-
-        i = ba.indexOf('\n', j);
-        if (i == -1)
-            break;
-        int length = i - j;
-        if (length > 0 && ba[i-1] == '\r')
-            length--;
-
-        m_fields.append(qMakePair(field, ba.mid(j, length)));
-        i++;
-    }
-}
-
-void SdpMessage::addField(char name, const QByteArray &data)
-{
-    m_fields.append(qMakePair(name, data));
-}
-
-QList<QPair<char, QByteArray> > SdpMessage::fields() const
-{
-    return m_fields;
-}
-
-QByteArray SdpMessage::toByteArray() const
-{
-    QByteArray ba;
-    QList<QPair<char, QByteArray> >::ConstIterator it = m_fields.constBegin(),
-                                                        end = m_fields.constEnd();
-    for ( ; it != end; ++it) {
-        ba += it->first;
-        ba += "=";
-        ba += it->second;
-        ba += "\r\n";
-    }
-    return ba;
-}
-
 SipCallContext::SipCallContext()
     : cseq(1)
 {
@@ -372,7 +324,7 @@ QString SipCallPrivate::buildSdp() const
         QString::number(ntpSeconds),
         addressToSdp(client->d->localAddress));
     sdpStr += "s=-\r\n";
-    sdpStr += QString("t=%1\r\n").arg(QString::fromUtf8(activeTime));
+    sdpStr += QString("t=%1\r\n").arg(activeTime);
     sdpStr += content.toSdp();
 
     return sdpStr;
@@ -385,29 +337,32 @@ bool SipCallPrivate::handleSdp(const QString &sdpStr)
         return false;
 
     // parse descriptor
-    SdpMessage sdp(sdpStr.toUtf8());
-    QPair<char, QByteArray> field;
     quint16 remoteRtpPort = 0;
     QHostAddress remoteRtpAddress;
-    foreach (field, sdp.fields()) {
-        if (field.first == 'c') {
+    QString line;
+    foreach (line, sdpStr.split('\n')) {
+        if (line.endsWith('\r'))
+            line.resize(line.size() - 1);
+        if (line.startsWith("c=")) {
             // determine remote host
-            if (field.second.startsWith("IN IP4 ") || field.second.startsWith("IN IP6 ")) {
-                remoteRtpAddress = QHostAddress(QString::fromUtf8(field.second.mid(7)));
+            const QString val = line.mid(2);
+            if (val.startsWith("IN IP4 ") || val.startsWith("IN IP6 ")) {
+                remoteRtpAddress = QHostAddress(val.mid(7));
             }
-        } else if (field.first == 'm') {
-            QList<QByteArray> bits = field.second.split(' ');
+        } else if (line.startsWith("m=")) {
+            QStringList bits = line.mid(2).split(' ');
             if (bits.size() < 3 || bits[0] != "audio" || bits[2] != "RTP/AVP")
                 continue;
 
             // determine remote port
             remoteRtpPort = bits[1].toUInt();
-        } else if (field.first == 't') {
+        } else if (line.startsWith("t=")) {
             // active time
+            const QString val = line.mid(2);
             if (direction == SipCall::IncomingDirection)
-                activeTime = field.second;
-            else if (field.second != activeTime)
-                q->warning(QString("Answerer replied with a different active time %1").arg(QString::fromUtf8(activeTime)));
+                activeTime = val;
+            else if (val != activeTime)
+                q->warning(QString("Answerer replied with a different active time %1").arg(val));
         }
     }
 

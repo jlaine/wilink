@@ -37,18 +37,6 @@ class SipCallPrivate;
 class SipClient;
 class SipClientPrivate;
 
-class SdpMessage
-{
-public:
-    SdpMessage(const QByteArray &ba = QByteArray());
-    void addField(char name, const QByteArray &data);
-    QList<QPair<char, QByteArray> > fields() const;
-    QByteArray toByteArray() const;
-
-private:
-    QList<QPair<char, QByteArray> > m_fields;
-};
-
 /** The SipMessage class represents a SIP request or response.
  */
 class SipMessage

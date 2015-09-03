@@ -64,7 +64,7 @@ public:
     QDateTime startStamp;
     QDateTime finishStamp;
     SipCall::State state;
-    QByteArray activeTime;
+    QString activeTime;
     QXmppRtpAudioChannel *audioChannel;
     QXmppIceConnection *iceConnection;
     bool invitePending;
