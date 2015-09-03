@@ -1,7 +1,3 @@
-include(IconUtilities)
-generate_xpm(xpm images/scalable/wiLink.svg)
-
-add_custom_target(icons DEPENDS ${icns} ${ico} ${xpm})
 if (UNIX AND NOT APPLE)
 install(FILES wiLink.desktop DESTINATION share/applications)
 install(FILES images/32x32/wiLink.png DESTINATION share/icons/hicolor/32x32/apps)

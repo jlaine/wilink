@@ -91,6 +91,16 @@ def generate_icns(input_name, output_path):
     subprocess.check_call(['png2icns', output_path] + pngs)
     subprocess.check_call(['rm', '-f'] + pngs)
 
+def generate_xpm(input_name, output_path):
+    size = 32
+    output_alpha = output_path + '.alpha'
+    output_png = output_path + '.png'
+    input_svg = os.path.join('images', 'scalable', input_name)
+    inkscape(input_svg, output_png, size)
+    os.system('pngtopnm -alpha %s > %s' % (output_png, output_alpha))
+    os.system('pngtopnm %s | ppmtoxpm -alpha %s -name %s | sed -e "s/static char/static const char/g" > %s' % (output_png, output_alpha, 'wiLink_xpm', output_path))
+    subprocess.check_call(['rm', '-f', output_png, output_alpha])
+
 # PNG icons
 generate_png(ICONS, 32)
 generate_png(ICONS, 64)
@@ -100,3 +110,4 @@ generate_png(HUGE_ICONS, 256)
 # other icons
 generate_ico('wiLink.svg', 'wiLink.ico')
 generate_icns('wiLink.svg', 'wiLink.icns')
+generate_xpm('wiLink.svg', 'out.xpm')
