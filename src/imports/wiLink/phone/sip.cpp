@@ -209,7 +209,6 @@ SipCallPrivate::SipCallPrivate(SipCall *qq)
     , activeTime("0 0")
     , invitePending(false)
     , inviteQueued(false)
-    , localRtpPort(0)
     , remoteRtpPort(0)
     , q(qq)
 {
@@ -561,8 +560,8 @@ SipCall::SipCall(const QString &recipient, SipCall::Direction direction, SipClie
     d->iceConnection->setIceControlling(d->direction == SipCall::OutgoingDirection);
     d->iceConnection->setStunServer(d->client->d->stunServerAddress,
                                     d->client->d->stunServerPort);
-    check = connect(d->iceConnection, SIGNAL(localCandidatesChanged()),
-                    this, SLOT(localCandidatesChanged()));
+    check = connect(d->iceConnection, SIGNAL(gatheringStateChanged()),
+                    this, SLOT(gatheringStateChanged()));
     Q_ASSERT(check);
 
     // setup RTP transport
@@ -687,48 +686,14 @@ QByteArray SipCall::id() const
     return d->id;
 }
 
-void SipCall::localCandidatesChanged()
+void SipCall::gatheringStateChanged()
 {
-    // check whether we have server-reflexive candidates for all components
-    bool foundRtp = false;
-    bool foundRtcp = false;
-    foreach (const QXmppJingleCandidate &candidate, d->iceConnection->localCandidates()) {
-        if (candidate.type() == QXmppJingleCandidate::ServerReflexiveType) {
-            if (candidate.component() == RTP_COMPONENT) {
-                foundRtp = true;
-                d->localRtpAddress = candidate.host();
-                d->localRtpPort = candidate.port();
-            } else if (candidate.component() == RTCP_COMPONENT) {
-                foundRtcp = true;
-            }
-        }
-    }
-
     // send INVITE if required
-    if (d->inviteQueued && foundRtp && foundRtcp) {
+    if (d->inviteQueued &&
+        d->iceConnection->gatheringState() == QXmppIceConnection::CompleteGatheringState) {
         d->sendInvite();
         d->inviteQueued = false;
     }
-}
-
-QHostAddress SipCall::localRtpAddress() const
-{
-    return d->localRtpAddress;
-}
-
-void SipCall::setLocalRtpAddress(const QHostAddress &address)
-{
-    d->localRtpAddress = address;
-}
-
-quint16 SipCall::localRtpPort() const
-{
-    return d->localRtpPort;
-}
-
-void SipCall::setLocalRtpPort(quint16 port)
-{
-    d->localRtpPort = port;
 }
 
 QString SipCall::recipient() const

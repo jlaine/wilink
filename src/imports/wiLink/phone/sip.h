@@ -179,12 +179,6 @@ public:
     QString recipient() const;
     SipCall::State state() const;
 
-    QHostAddress localRtpAddress() const;
-    void setLocalRtpAddress(const QHostAddress &address);
-
-    quint16 localRtpPort() const;
-    void setLocalRtpPort(quint16 port);
-
     QHostAddress remoteRtpAddress() const;
     quint16 remoteRtpPort() const;
 
@@ -217,7 +211,7 @@ public slots:
 
 private slots:
     void handleTimeout();
-    void localCandidatesChanged();
+    void gatheringStateChanged();
     void transactionFinished();
 
 private:
