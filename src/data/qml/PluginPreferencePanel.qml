@@ -55,7 +55,7 @@ Panel {
                 for (var i = 0; i < appPlugins.model.count; i++) {
                     var plugin = appPlugins.model.get(i);
                     view.model.append({source: plugin.source,
-                        selected: plugin.loaded != undefined});
+                        selected: appPlugins.isPluginLoaded(plugin.source)});
                 }
             }
         }

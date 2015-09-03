@@ -23,19 +23,20 @@ Item {
     id: loader
 
     property alias model: pluginModel
+    property var loadedPlugins: new Object()
 
     ListModel {
         id: pluginModel
     }
 
+    function isPluginLoaded(source) {
+        return source in loadedPlugins;
+    }
+
     function loadPlugin(source) {
         // check plugin is not already loaded
-        for (var i = 0; i < pluginModel.count; i++) {
-            var plugin = pluginModel.get(i);
-            if (plugin.source == source && plugin.loaded) {
-                return;
-            }
-        }
+        if (isPluginLoaded(source))
+            return;
 
         console.log("PluginLoader loading plugin " + source);
         var component = Qt.createComponent(source);
@@ -58,30 +59,16 @@ Item {
 
             var plugin = component.createObject(loader);
             plugin.loaded();
-
-            // update plugins
-            for (var i = 0; i < pluginModel.count; i++) {
-                if (pluginModel.get(i).source == source) {
-                    pluginModel.setProperty(i, 'loaded', plugin);
-                    return;
-                }
-            }
-            pluginModel.append({source: source, loaded: plugin});
+            loadedPlugins[source] = plugin;
         }
     }
 
     function unloadPlugin(source) {
-        for (var i = 0; i < pluginModel.count; i++) {
-            var plugin = pluginModel.get(i);
-            if (plugin.source == source) {
-                if (plugin.loaded) {
-                    console.log("PluginLoader unloading plugin " + source);
-                    plugin.loaded.unloaded();
-                    plugin.loaded.destroy();
-                    pluginModel.setProperty(i, 'loaded', undefined);
-                }
-                break;
-            }
+        if (isPluginLoaded(source)) {
+            console.log("PluginLoader unloading plugin " + source);
+            loadedPlugins[source].unloaded();
+            loadedPlugins[source].destroy();
+            delete loadedPlugins[source];
         }
     }
 
@@ -91,15 +78,16 @@ Item {
         var enabledPlugins = [];
         for (var i = 0; i < pluginModel.count; i++) {
             var plugin = pluginModel.get(i);
-            if (plugin.autoload == true && plugin.loaded == undefined)
+            if (plugin.autoload == true && !isPluginLoaded(plugin.source))
                 disabledPlugins.push(plugin.source);
-            else if (plugin.autoload != true && plugin.loaded != undefined)
+            else if (plugin.autoload != true && isPluginLoaded(plugin.source))
                 enabledPlugins.push(plugin.source);
         }
         appSettings.disabledPlugins = disabledPlugins;
         appSettings.enabledPlugins = enabledPlugins;
     }
 
+    // Loads enabled plugins
     function load() {
         for (var i = 0; i < pluginModel.count; i++) {
             var plugin = pluginModel.get(i);
@@ -110,6 +98,7 @@ Item {
         }
     }
 
+    // Unloads all plugins
     function unload() {
         for (var i = pluginModel.count - 1; i >= 0; i--) {
             var plugin = pluginModel.get(i);
