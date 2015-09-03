@@ -179,9 +179,6 @@ public:
     QString recipient() const;
     SipCall::State state() const;
 
-    QHostAddress remoteRtpAddress() const;
-    quint16 remoteRtpPort() const;
-
     QXmppRtpAudioChannel *audioChannel() const;
     QXmppIceConnection *audioConnection() const;
 

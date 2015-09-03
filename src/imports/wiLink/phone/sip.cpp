@@ -209,7 +209,6 @@ SipCallPrivate::SipCallPrivate(SipCall *qq)
     , activeTime("0 0")
     , invitePending(false)
     , inviteQueued(false)
-    , remoteRtpPort(0)
     , q(qq)
 {
 }
@@ -274,7 +273,7 @@ void SipCallPrivate::handleReply(const SipMessage &reply)
     {
         timeoutTimer->stop();
         if (reply.headerField("Content-Type") == "application/sdp" &&
-            handleSdp(SdpMessage(reply.body())))
+            handleSdp(QString::fromUtf8(reply.body())))
         {
             q->debug(QString("SIP call %1 established").arg(QString::fromUtf8(id)));
             setState(SipCall::ActiveState);
@@ -327,7 +326,7 @@ void SipCallPrivate::handleRequest(const SipMessage &request)
     } else if (request.method() == "INVITE") {
 
         if (request.headerField("Content-Type") == "application/sdp" &&
-            handleSdp(SdpMessage(request.body())))
+            handleSdp(QString::fromUtf8(request.body())))
         {
             inviteRequest = request;
             response.setStatusCode(180);
@@ -379,12 +378,17 @@ QString SipCallPrivate::buildSdp() const
     return sdpStr;
 }
 
-bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
+bool SipCallPrivate::handleSdp(const QString &sdpStr)
 {
-    QList<QXmppJinglePayloadType> payloads;
+    QXmppJingleIq::Content content;
+    if (!content.parseSdp(sdpStr))
+        return false;
 
     // parse descriptor
+    SdpMessage sdp(sdpStr.toUtf8());
     QPair<char, QByteArray> field;
+    quint16 remoteRtpPort = 0;
+    QHostAddress remoteRtpAddress;
     foreach (field, sdp.fields()) {
         if (field.first == 'c') {
             // determine remote host
@@ -398,75 +402,6 @@ bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
 
             // determine remote port
             remoteRtpPort = bits[1].toUInt();
-
-            // parse payload types
-            for (int i = 3; i < bits.size(); ++i) {
-                bool ok = false;
-                int id = bits[i].toInt(&ok);
-                if (!ok)
-                    continue;
-                QXmppJinglePayloadType payload;
-                payload.setId(id);
-                payloads << payload;
-            }
-        } else if (field.first == 'a') {
-            const int pos = field.second.indexOf(':');
-            if (pos < 0)
-                continue;
-            const QByteArray attrName = field.second.left(pos);
-            const QByteArray attrValue = field.second.mid(pos+1);
-
-            if (attrName == "ptime") {
-                // packetization time
-                bool ok = false;
-                int ptime = attrValue.toInt(&ok);
-                if (ok && ptime > 0) {
-                    q->debug(QString("Setting RTP payload time to %1 ms").arg(QString::number(ptime)));
-                    for (int i = 0; i < payloads.size(); ++i)
-                        payloads[i].setPtime(ptime);
-                }
-            } else if (attrName == "rtpmap") {
-                // payload type map
-                const QList<QByteArray> bits = attrValue.split(' ');
-                if (bits.size() != 2)
-                    continue;
-                bool ok = false;
-                const int id = bits[0].toInt(&ok);
-                if (!ok)
-                    continue;
-
-                const QList<QByteArray> args = bits[1].split('/');
-                for (int i = 0; i < payloads.size(); ++i) {
-                    if (payloads[i].id() == id) {
-                        payloads[i].setName(args[0]);
-                        if (args.size() > 1)
-                            payloads[i].setClockrate(args[1].toInt());
-                    }
-                }
-#ifdef SIP_USE_ICE
-            } else if (attrName == "ice-ufrag") {
-                // ICE user
-                iceConnection->setRemoteUser(QString::fromUtf8(attrValue));
-            } else if (attrName == "ice-pwd") {
-                // ICE password
-                iceConnection->setRemotePassword(QString::fromUtf8(attrValue));
-            } else if (attrName == "candidate") {
-                // ICE candidate
-                QList<QByteArray> bits = attrValue.split(' ');
-                QXmppJingleCandidate candidate;
-                if (bits.size() == 8 && bits[6] == "typ") {
-                    candidate.setFoundation(bits[0]);
-                    candidate.setComponent(bits[1].toInt());
-                    candidate.setProtocol(QString::fromLatin1(bits[2]).toLower());
-                    candidate.setPriority(bits[3].toInt());
-                    candidate.setHost(QHostAddress(QString::fromLatin1(bits[4])));
-                    candidate.setPort(bits[5].toInt());
-                    candidate.setType(QXmppJingleCandidate::typeFromString(QString::fromLatin1(bits[7])));
-
-                    iceConnection->addRemoteCandidate(candidate);
-                }
-#endif
-            }
         } else if (field.first == 't') {
             // active time
             if (direction == SipCall::IncomingDirection)
@@ -475,6 +410,11 @@ bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
                 q->warning(QString("Answerer replied with a different active time %1").arg(QString::fromUtf8(activeTime)));
         }
     }
+
+    iceConnection->setRemoteUser(content.transportUser());
+    iceConnection->setRemotePassword(content.transportPassword());
+    foreach (const QXmppJingleCandidate &candidate, content.transportCandidates())
+        iceConnection->addRemoteCandidate(candidate);
 
     // add RTP remote candidate
     QXmppJingleCandidate remoteCandidate;
@@ -491,7 +431,7 @@ bool SipCallPrivate::handleSdp(const SdpMessage &sdp)
     iceConnection->addRemoteCandidate(remoteCandidate);
 
     // assign remote payload types
-    audioChannel->setRemotePayloadTypes(payloads);
+    audioChannel->setRemotePayloadTypes(content.payloadTypes());
     if (!audioChannel->isOpen()) {
         q->warning("Could not assign codec to RTP channel");
         return false;
@@ -699,16 +639,6 @@ void SipCall::gatheringStateChanged()
 QString SipCall::recipient() const
 {
     return QString::fromUtf8(d->remoteRecipient);
-}
-
-QHostAddress SipCall::remoteRtpAddress() const
-{
-    return d->remoteRtpAddress;
-}
-
-quint16 SipCall::remoteRtpPort() const
-{
-    return d->remoteRtpPort;
 }
 
 SipCall::State SipCall::state() const

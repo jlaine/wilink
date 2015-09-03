@@ -54,7 +54,7 @@ public:
     QString buildSdp() const;
     void handleReply(const SipMessage &reply);
     void handleRequest(const SipMessage &request);
-    bool handleSdp(const SdpMessage &sdp);
+    bool handleSdp(const QString &sdp);
     void onStateChanged();
     void sendInvite();
     void setState(SipCall::State state);
@@ -72,8 +72,6 @@ public:
     SipMessage inviteRequest;
     QByteArray remoteRecipient;
     QList<QByteArray> remoteRoute;
-    QHostAddress remoteRtpAddress;
-    quint16 remoteRtpPort;
     QByteArray remoteUri;
 
     SipClient *client;
