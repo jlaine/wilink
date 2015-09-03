@@ -11,7 +11,7 @@ SOURCES += main.cpp network.cpp window.cpp
 HEADERS += network.h window.h
 
 mac {
-    SOURCES += application_mac.mm
+    OBJECTIVE_SOURCES += application_mac.mm
     LIBS += -framework AppKit
 }
 
