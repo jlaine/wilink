@@ -37,10 +37,8 @@ android {
     icon128.files = ../data/images/128x128/wiLink.png
     icon256.path = $$PREFIX/share/icons/hicolor/256x256/apps
     icon256.files = ../data/images/256x256/wiLink.png
-    pixmap.path = $$PREFIX/share/pixmaps
-    pixmap.files = ../data/wiLink.xpm
     scalable.path = $$PREFIX/share/icons/hicolor/scalable/apps
     scalable.files = ../data/images/scalable/wiLink.svg
     target.path = $$PREFIX/bin
-    INSTALLS += desktop icon32 icon64 icon128 icon256 pixmap scalable target
+    INSTALLS += desktop icon32 icon64 icon128 icon256 scalable target
 }
