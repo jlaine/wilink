@@ -1,6 +1,5 @@
 include(IconUtilities)
 generate_icns(icns images/scalable/wiLink.svg)
-generate_ico(ico images/scalable/wiLink.svg)
 generate_xpm(xpm images/scalable/wiLink.svg)
 
 add_custom_target(icons DEPENDS ${icns} ${ico} ${xpm})

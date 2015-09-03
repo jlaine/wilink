@@ -55,6 +55,13 @@ HUGE_ICONS = [
     'wiLink.svg',
 ]
 
+def inkscape(input_svg, output_png, size):
+    subprocess.check_call(['inkscape', '-z',
+        '--file=' + input_svg,
+        '--export-png=' + output_png,
+        '--export-width=%d' % size,
+        '--export-height=%d' % size])
+
 def generate_png(input_names, size):
     """
     Generate PNG icons from SVG files.
@@ -62,14 +69,23 @@ def generate_png(input_names, size):
     for name in input_names:
         input_svg = os.path.join('images', 'scalable', name)
         output_png = os.path.join('images', '%dx%d' % (size, size), os.path.splitext(name)[0] + '.png')
-        subprocess.check_call(['inkscape', '-z',
-            '--file=' + input_svg,
-            '--export-png=' + output_png,
-            '--export-width=%d' % size,
-            '--export-height=%d' % size])
+        inkscape(input_svg, output_png, size)
+
+def generate_ico(input_name, output_path):
+    pngs = []
+    input_svg = os.path.join('images', 'scalable', input_name)
+    for size in [256, 128, 64, 48]:
+        output_png = output_path + ('.%d' % size)
+        inkscape(input_svg, output_png, size)
+        pngs.append(output_png)
+    subprocess.check_call(['icotool', '-c', '-o', output_path] + pngs)
+    subprocess.check_call(['rm', '-f'] + pngs)
 
 # PNG icons
 generate_png(ICONS, 32)
 generate_png(ICONS, 64)
 generate_png(LARGE_ICONS, 128)
 generate_png(HUGE_ICONS, 256)
+
+# other icons
+generate_ico('wiLink.svg', 'wiLink.ico')
