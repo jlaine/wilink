@@ -74,7 +74,7 @@ def generate_png(input_names, size):
 def generate_ico(input_name, output_path):
     pngs = []
     input_svg = os.path.join('images', 'scalable', input_name)
-    for size in [256, 128, 64, 48]:
+    for size in [256, 48, 32, 16]:
         output_png = output_path + ('.%d' % size)
         inkscape(input_svg, output_png, size)
         pngs.append(output_png)
