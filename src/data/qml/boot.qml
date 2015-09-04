@@ -50,13 +50,13 @@ ApplicationWindow {
             title: qsTr('&Help')
 
             MenuItem {
-                text: qsTr('wiLink FAQ')
+                text: qsTr('%1 FAQ').replace('%1', Qt.application.name)
                 shortcut: 'F1' // FIXME: for mac CTRL+?
                 onTriggered: window.showHelp()
             }
 
             MenuItem {
-                text: qsTr('About wiLink')
+                text: qsTr('About %1').replace('%1', Qt.application.name)
                 onTriggered: window.showAbout()
             }
         }
