@@ -18,10 +18,23 @@
  */
 
 import QtQuick 2.3
+import QtQuick.Window 2.2
 import wiLink 2.4
 
-FocusScope {
-    focus: true
+Window {
+    id: window
+
+    signal showAbout
+    signal showHelp
+    signal showPreferences
+
+    minimumWidth: 360
+    minimumHeight: 360
+
+    function reload() {
+        uiLoader.source = '';
+        uiLoader.source = 'Main.qml';
+    }
 
     TranslationLoader {
         Component.onCompleted: {
@@ -43,5 +56,15 @@ FocusScope {
 
         anchors.fill: parent
         focus: true
+    }
+
+    /** Once the QML file finishes loading, show the application window.
+     */
+    Component.onCompleted: {
+        window.width = Math.min(1280, Screen.desktopAvailableWidth - 100);
+        window.height = Math.min(960, Screen.desktopAvailableHeight - 100);
+        window.x = (Screen.desktopAvailableWidth - window.width) / 2;
+        window.y = (Screen.desktopAvailableHeight - window.height) / 2;
+        window.show();
     }
 }

@@ -19,6 +19,8 @@
 
 import QtQuick 2.3
 import QtQuick.LocalStorage 2.0
+import QtQuick.Window 2.2
+
 import wiLink 2.4
 import 'scripts/storage.js' as Storage
 import 'scripts/utils.js' as Utils
@@ -26,7 +28,7 @@ import 'scripts/utils.js' as Utils
 FocusScope {
     id: root
 
-    focus: !appSettings.isMobile
+    focus: true
 
     /** A model representing the user's accounts.
      */
@@ -200,23 +202,8 @@ FocusScope {
         }
     }
 
-    /** Once the QML file finishes loading, show the application window.
-     */
-    Component.onCompleted: {
-        window.minimumWidth = 360;
-        window.minimumHeight = 360;
-
-        // set window geometry
-        var desktop = window.availableGeometry;
-        window.size = Qt.size(Math.min(1280, desktop.width - 100), Math.min(960, desktop.height - 100));
-        window.pos = Qt.point((desktop.width - window.width) / 2, (desktop.height - window.height) / 2);
-        window.fullScreen = appSettings.isMobile && appSettings.osType != 'android';
-
-        window.showAndRaise();
-    }
-
     Connections {
-        target: window
+        target: rpcSocket
 
         /** Handles a message received over RPC socket.
          */
@@ -302,6 +289,10 @@ FocusScope {
                 Qt.quit();
             }
         }
+    }
+
+    Connections {
+        target: window
 
         /** Show the "about" dialog.
          */
@@ -371,7 +362,8 @@ FocusScope {
         /** Start handling RPC messages.
          */
         onTriggered: {
-            window.startMessages();
+            window.show();
+            //window.startMessages();
         }
     }
 

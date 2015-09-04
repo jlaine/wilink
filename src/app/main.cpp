@@ -24,6 +24,8 @@
 #include <QFileOpenEvent>
 #include <QFontDatabase>
 #include <QLocale>
+#include <QQmlApplicationEngine>
+#include <QQmlContext>
 #include <QSslSocket>
 #include <QTranslator>
 
@@ -158,19 +160,12 @@ int main(int argc, char *argv[])
     signal(SIGTERM, signal_handler);
 
     /* Create window */
-    new CustomWindow(peer, qmlRoot);
+    QQmlApplicationEngine engine;
+    engine.rootContext()->setContextProperty("rpcSocket", peer);
+    engine.load(QUrl("qrc:/qml/boot.qml"));
+
     if (openUrl.isValid() && openUrl.scheme() == "wilink")
         QMetaObject::invokeMethod(peer, "messageReceived", Q_ARG(QString, "OPEN " + openUrl.toString()));
 
-    /* Run application */
-    int ret = app.exec();
-
-    /* Delete window */
-    foreach (QWidget *widget, QApplication::topLevelWidgets()) {
-        if (qobject_cast<CustomWindow*>(widget)) {
-            delete widget;
-            break;
-        }
-    }
-    return ret;
+    return app.exec();
 }
