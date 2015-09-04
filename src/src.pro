@@ -1,8 +1,5 @@
 TEMPLATE = subdirs
 
-SUBDIRS = \
-    3rdparty \
-    qsound
+SUBDIRS = 3rdparty imports app
 
-SUBDIRS += imports app
 CONFIG += ordered
