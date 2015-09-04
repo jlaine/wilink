@@ -35,17 +35,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 Requirements
 ============
 
-wiLink requires cmake >= 2.8.2 and Qt >= 4.7.4 to build.
+wiLink requires Qt >= 5.4 to build.
 
 On Debian/Ubuntu
 ----------------
 
-$ sudo apt-get install cmake libmad0-dev libqt4-dev libqt4-sql-sqlite qtmobility-dev libqxmpp-dev libvorbis-dev libxss-dev
+$ sudo apt-get install cmake libmad0-dev libqxmpp-dev libvorbis-dev libxss-dev pkg-config qtbase5-dev qtmultimedia5-dev
 
 On Mac OS X
 -----------
 
-$ sudo port install cmake libmad pkgconfig qt4-mac qt4-mac-sqlite3-plugin qxmpp libvorbis
+Install Qt from https://www.qt.io/download/
 
 Building wiLink
 ===============
@@ -57,12 +57,7 @@ $ git submodule update --init
 
 The basic procedure for building wiLink from source is:
 
-$ mkdir build
-$ cd build
-$ cmake ..
-$ make
-
-See platform specific notes for applicable cmake options.
+./release
 
 On Debian/Ubuntu
 ----------------
@@ -71,16 +66,3 @@ wiLink is shipped with information for generating Debian packages, you can
 generate the Debian package for wiLink by running:
 
 $ dpkg-buildpackage
-
-Cross compiling for win32
--------------------------
-
-To cross compile for win32 on a Debian machine, install the libqt4-mingw32-dev
-and libspeex-mingw32-dev packages from:
-
-  http://dev.jerryweb.org/debian/pool/main/
-
-Then invoke cmake as:
-
-$ cmake .. -DCMAKE_TOOLCHAIN_FILE=../cmake/mingw32.toolchain
-
