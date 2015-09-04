@@ -6,5 +6,5 @@ SUBDIRS = \
     qsound \
     qxmpp-extra
 
-SUBDIRS += app imports
+SUBDIRS += imports app
 CONFIG += ordered
