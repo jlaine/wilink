@@ -35,7 +35,7 @@ mac)
     rm -rf release-mac
     mkdir release-mac
     cd release-mac
-    qmake ..
+    qmake .. QXMPP_NO_EXAMPLES=1 QXMPP_NO_TESTS=1
     make
     make package
     ;;
