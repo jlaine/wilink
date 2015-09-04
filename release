@@ -7,9 +7,13 @@ target=$1
 if [ -z "$target" ]; then
     if [ -n "`which sw_vers`" ]; then
         target="mac"
-    else
-        target="windows"
+    elif [ "`uname`" = "Linux" ]; then
+        target="linux"
     fi
+fi
+if [ -z "$target" ]; then
+    echo "Unknown target"
+    exit 1
 fi
 echo "Target: $target"
 
@@ -31,14 +35,6 @@ android)
     zipalign -v 4 bin/wiLink-release-unaligned.apk bin/wiLink-release-signed.apk
     rm bin/wiLink-release-unaligned.apk
     ;;
-mac)
-    rm -rf release-mac
-    mkdir release-mac
-    cd release-mac
-    qmake .. QXMPP_NO_EXAMPLES=1 QXMPP_NO_TESTS=1
-    make
-    make package
-    ;;
 windows)
     rm -rf release-win32
     mkdir release-win32
@@ -48,7 +44,11 @@ windows)
     make package
     ;;
 *)
-    echo "Unsupported target: $target"
-    exit 1
+    rm -rf release-$target
+    mkdir release-$target
+    cd release-$target
+    qmake .. QXMPP_NO_EXAMPLES=1 QXMPP_NO_TESTS=1
+    make
+    make package
     ;;
 esac
