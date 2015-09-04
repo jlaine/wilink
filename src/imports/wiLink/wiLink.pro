@@ -75,8 +75,6 @@ HEADERS += \
 
 RESOURCES += ../../data/wiLink.qrc
 
-INCLUDEPATH += $$WILINK_INCLUDE_DIR
-
 android {
     qmldir.path = /assets/imports/wiLink
     qmldir.files = qmldir

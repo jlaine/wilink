@@ -15,7 +15,6 @@ mac {
     LIBS += -framework AppKit
 }
 
-INCLUDEPATH += $$WILINK_INCLUDE_DIR
 INCLUDEPATH += ../3rdparty/qtsingleapplication
 LIBS += -L../3rdparty/qtsingleapplication -lqtsingleapplication
 
