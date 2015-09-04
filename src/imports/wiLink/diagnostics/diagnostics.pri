@@ -1,3 +1,5 @@
+INCLUDEPATH += diagnostics
+
 HEADERS += \
     diagnostics/interface.h \
     diagnostics/QXmppDiagnosticIq.h \

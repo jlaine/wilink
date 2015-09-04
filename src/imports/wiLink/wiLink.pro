@@ -1,7 +1,7 @@
 include(../../../wilink.pri)
-include(../../qnetio/qnetio.pri)
 include(../../qsound/qsound.pri)
 include(diagnostics/diagnostics.pri)
+include(wallet/wallet.pri)
 
 TEMPLATE = lib
 CONFIG += qt plugin
@@ -89,12 +89,9 @@ RESOURCES += ../../data/wiLink.qrc
 
 INCLUDEPATH += \
     $$WILINK_INCLUDE_DIR \
-    $$QNETIO_INCLUDE_DIR \
     $$QSOUND_INCLUDE_DIR
 
-LIBS += \
-    -L../../qnetio/src $$QNETIO_LIBS \
-    -L../../qsound/src -L../../3rdparty/libmad $$QSOUND_LIBS
+LIBS += -L../../qsound/src -L../../3rdparty/libmad $$QSOUND_LIBS
 
 android {
     qmldir.path = /assets/imports/wiLink
