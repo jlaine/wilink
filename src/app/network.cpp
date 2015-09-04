@@ -111,8 +111,8 @@ QString NetworkAccessManager::userAgent()
 
 NetworkAccessManagerFactory::NetworkAccessManagerFactory()
 {
-    const QString dataPath = QStandardPaths::standardLocations(QStandardPaths::CacheLocation)[0];
-    m_cachePath = QDir(dataPath).filePath("network");
+    const QString dataPath = QStandardPaths::standardLocations(QStandardPaths::DataLocation)[0];
+    m_cachePath = QDir(dataPath).filePath("cache");
     QDir().mkpath(m_cachePath);
 }
 
