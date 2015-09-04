@@ -16,11 +16,7 @@ mac {
         rm -rf $$package.tmp $$package.output; \
         $(MKDIR) $$package.tmp; \
         ln -s /Applications $$package.tmp/Applications; \
-        cp -r src/plugins/$$package.bundle $$package.tmp; \
-        $$PWD/cmake/copyplugins $$package.tmp/$$package.bundle $$QMAKE_QMAKE \
-            $$[QT_INSTALL_PLUGINS]/imageformats/libqgif.* \
-            $$[QT_INSTALL_PLUGINS]/imageformats/libqjpeg.* \
-            $$[QT_INSTALL_PLUGINS]/sqldrivers/libqsqlite.*; \
+        cp -r src/app/$$package.bundle $$package.tmp; \
         hdiutil create $$package.output -srcdir $$package.tmp -fs HFS+ -volname \"$$PACKAGE $$VERSION\"; \
         rm -rf $$package.tmp
     QMAKE_EXTRA_TARGETS = package
