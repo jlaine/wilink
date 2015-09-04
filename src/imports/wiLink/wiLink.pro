@@ -1,7 +1,6 @@
 include(../../../wilink.pri)
 include(../../qnetio/qnetio.pri)
 include(../../qsound/qsound.pri)
-include(../../3rdparty/qxmpp/qxmpp.pri)
 
 TEMPLATE = lib
 CONFIG += qt plugin
@@ -91,13 +90,11 @@ INCLUDEPATH += \
     $$WILINK_INCLUDE_DIR \
     $$QNETIO_INCLUDE_DIR \
     $$QSOUND_INCLUDE_DIR \
-    $$QXMPP_INCLUDEPATH \
     ../../qxmpp-extra/diagnostics
 
 LIBS += \
     -L../../qnetio/src $$QNETIO_LIBS \
     -L../../qsound/src -L../../3rdparty/libmad $$QSOUND_LIBS \
-    -L../../3rdparty/qxmpp/src $$QXMPP_LIBS \
     -L../../qxmpp-extra -lqxmpp-extra
 
 android {
@@ -112,7 +109,16 @@ android {
 }
 
 QMAKE_POST_LINK += $$QMAKE_COPY $$replace($$list($$quote($$PWD/qmldir) $$DESTDIR), /, $$QMAKE_DIR_SEP);
-mac {
-    QMAKE_POST_LINK += mkdir -p $$APPDIR/Contents/Frameworks;
-    QMAKE_POST_LINK += cp ../../3rdparty/qxmpp/src/lib$${QXMPP_LIBRARY_NAME}.0.dylib $$APPDIR/Contents/Frameworks/;
+
+!isEmpty(WILINK_SYSTEM_QXMPP) {
+    INCLUDEPATH += /usr/include/qxmpp
+    LIBS += -lqxmpp
+} else {
+    include(../../3rdparty/qxmpp/qxmpp.pri)
+    INCLUDEPATH += $$QXMPP_INCLUDEPATH
+    LIBS += -L../../3rdparty/qxmpp/src $$QXMPP_LIBS
+    mac {
+        QMAKE_POST_LINK += mkdir -p $$APPDIR/Contents/Frameworks;
+        QMAKE_POST_LINK += cp ../../3rdparty/qxmpp/src/lib$${QXMPP_LIBRARY_NAME}.0.dylib $$APPDIR/Contents/Frameworks/;
+    }
 }
