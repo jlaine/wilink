@@ -1,8 +1,0 @@
-if (UNIX AND NOT APPLE)
-install(FILES wiLink.desktop DESTINATION share/applications)
-install(FILES images/32x32/wiLink.png DESTINATION share/icons/hicolor/32x32/apps)
-install(FILES images/64x64/wiLink.png DESTINATION share/icons/hicolor/64x64/apps)
-install(FILES images/128x128/wiLink.png DESTINATION share/icons/hicolor/128x128/apps)
-install(FILES images/256x256/wiLink.png DESTINATION share/icons/hicolor/256x256/apps)
-install(FILES images/scalable/wiLink.svg DESTINATION share/icons/hicolor/scalable/apps)
-endif()
