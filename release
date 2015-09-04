@@ -6,6 +6,7 @@ set -e
 target=$1
 if [ -z "$target" ]; then
     if [ -n "`which sw_vers`" ]; then
+	export PATH=~/Qt/5.5/clang_64/bin:$PATH
         target="mac"
     elif [ "`uname`" = "Linux" ]; then
         target="linux"
