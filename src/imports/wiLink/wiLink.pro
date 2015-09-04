@@ -29,7 +29,6 @@ android {
 } else {
     SOURCES += idle/idle_stub.cpp
 }
-SOURCES += settings_stub.cpp
 
 SOURCES += \
     accounts.cpp \
