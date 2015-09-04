@@ -29,6 +29,8 @@ android {
     QMAKE_POST_LINK += mkdir -p wiLink.app/Contents/Frameworks;
     QMAKE_POST_LINK += cp ../3rdparty/qxmpp/src/libqxmpp_d.0.dylib wiLink.app/Contents/Frameworks/;
     QMAKE_POST_LINK += mkdir -p wiLink.app/Contents/Resources/qml/QtQuick;
+    QMAKE_POST_LINK += cp -r $$[QT_INSTALL_QML]/QtQuick/Controls wiLink.app/Contents/Resources/qml/QtQuick/;
+    QMAKE_POST_LINK += cp -r $$[QT_INSTALL_QML]/QtQuick/Layouts wiLink.app/Contents/Resources/qml/QtQuick/;
     QMAKE_POST_LINK += cp -r $$[QT_INSTALL_QML]/QtQuick/LocalStorage wiLink.app/Contents/Resources/qml/QtQuick/;
     QMAKE_POST_LINK += cp -r $$[QT_INSTALL_QML]/QtQuick/Window.2 wiLink.app/Contents/Resources/qml/QtQuick/;
     QMAKE_POST_LINK += cp -r $$[QT_INSTALL_QML]/QtQuick/XmlListModel wiLink.app/Contents/Resources/qml/QtQuick/;
