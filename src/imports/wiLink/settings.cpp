@@ -27,7 +27,7 @@
 #include "systeminfo.h"
 
 #ifdef Q_OS_MAC
-extern bool qt_mac_execute_apple_script(const QString &script, AEDesc *ret);
+extern bool qt_mac_execute_apple_script(const QString &script);
 #endif
 
 ApplicationSettings *wSettings = 0;
@@ -239,7 +239,7 @@ void ApplicationSettings::setOpenAtLogin(bool run)
         QString("tell application \"System Events\"\n"
             "\tdelete login item \"%1\"\n"
             "end tell\n").arg(appName);
-    qt_mac_execute_apple_script(script, 0);
+    qt_mac_execute_apple_script(script);
 #elif defined(Q_OS_WIN)
     QSettings registry("HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", QSettings::NativeFormat);
     if (run)

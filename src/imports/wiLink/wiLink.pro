@@ -19,6 +19,7 @@ android {
 } else:mac {
     LIBS += -framework Carbon
     SOURCES += idle/idle_mac.cpp
+    OBJECTIVE_SOURCES += settings_mac.mm
 } else:unix {
     QT += dbus x11extras
     DEFINES += HAVE_XSS

@@ -17,6 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <Cocoa/Cocoa.h>
 #include <QApplication>
 #include "window.h"
 
