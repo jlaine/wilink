@@ -113,6 +113,6 @@ android {
 
 QMAKE_POST_LINK += $$QMAKE_COPY $$replace($$list($$quote($$PWD/qmldir) $$DESTDIR), /, $$QMAKE_DIR_SEP);
 mac {
-    QMAKE_POST_LINK += mkdir -p wiLink.app/Contents/Frameworks;
-    QMAKE_POST_LINK += cp ../../3rdparty/qxmpp/src/lib$${QXMPP_LIBRARY_NAME}.0.dylib wiLink.app/Contents/Frameworks/;
+    QMAKE_POST_LINK += mkdir -p $$APPDIR/Contents/Frameworks;
+    QMAKE_POST_LINK += cp ../../3rdparty/qxmpp/src/lib$${QXMPP_LIBRARY_NAME}.0.dylib $$APPDIR/Contents/Frameworks/;
 }
