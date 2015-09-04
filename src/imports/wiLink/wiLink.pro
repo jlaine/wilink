@@ -17,7 +17,8 @@ android {
     DEFINES += WILINK_EMBEDDED
     SOURCES += idle/idle_stub.cpp
 } else:mac {
-    DESTDIR = ../../app/wiLink.app/Contents/Resources/qml/wiLink.2
+    APPDIR = ../../app/wiLink.app
+    DESTDIR = $$APPDIR/Contents/Resources/qml/wiLink.2
     LIBS += -framework Carbon
     SOURCES += idle/idle_mac.cpp
     OBJECTIVE_SOURCES += settings_mac.mm
@@ -110,4 +111,8 @@ android {
     INSTALLS += qmldir target
 }
 
-QMAKE_POST_LINK += $$QMAKE_COPY $$replace($$list($$quote($$PWD/qmldir) $$DESTDIR), /, $$QMAKE_DIR_SEP)
+QMAKE_POST_LINK += $$QMAKE_COPY $$replace($$list($$quote($$PWD/qmldir) $$DESTDIR), /, $$QMAKE_DIR_SEP);
+mac {
+    QMAKE_POST_LINK += mkdir -p wiLink.app/Contents/Frameworks;
+    QMAKE_POST_LINK += cp ../../3rdparty/qxmpp/src/lib$${QXMPP_LIBRARY_NAME}.0.dylib wiLink.app/Contents/Frameworks/;
+}

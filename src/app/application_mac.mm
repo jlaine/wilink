@@ -19,7 +19,6 @@
 
 #include <Cocoa/Cocoa.h>
 #include <QApplication>
-#include "window.h"
 
 @interface AppController : NSObject <NSApplicationDelegate>
 - (BOOL)applicationShouldHandleReopen: (NSApplication *)app hasVisibleWindows: (BOOL) flag;
@@ -35,11 +34,13 @@
     Q_UNUSED(app);
     Q_UNUSED(flag);
 
+#if 0
     foreach (QWidget *widget, QApplication::topLevelWidgets()) {
         CustomWindow *window = qobject_cast<CustomWindow*>(widget);
         if (window)
             window->showAndRaise();
     }
+#endif
 
     return NO;
 }
