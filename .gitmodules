@@ -1,6 +1,3 @@
 [submodule "src/3rdparty/qxmpp"]
 	path = src/3rdparty/qxmpp
 	url = https://github.com/qxmpp-project/qxmpp.git
-[submodule "src/qxmpp-extra"]
-	path = src/qxmpp-extra
-	url = https://github.com/jlaine/qxmpp-extra.git

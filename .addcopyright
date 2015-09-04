@@ -6,6 +6,7 @@
     'src/data/qml/dummydata',
     'src/data/qml/scripts',
     'src/imports/wiLink',
+    'src/imports/wiLink/diagnostics',
     'src/imports/wiLink/phone',
     'src/qnetio/src',
     'src/qnetio/src/wallet',
