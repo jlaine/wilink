@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __WILINK_SOUND_FILE_H_
+#ifndef __WILINK_SOUND_FILE_H__
 #define __WILINK_SOUND_FILE_H__
 
 #include <QAudioOutput>
