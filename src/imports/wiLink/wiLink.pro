@@ -17,6 +17,7 @@ android {
     DEFINES += WILINK_EMBEDDED
     SOURCES += idle/idle_stub.cpp
 } else:mac {
+    DESTDIR = ../../app/wiLink.app/Contents/Resources/qml/wiLink.2
     LIBS += -framework Carbon
     SOURCES += idle/idle_mac.cpp
     OBJECTIVE_SOURCES += settings_mac.mm

@@ -25,7 +25,12 @@ QMAKE_TARGET_COPYRIGHT="Copyright (c) 2009-2015 Wifirst"
 android {
 } else:mac {
     ICON = ../data/wiLink.icns
-    QMAKE_POST_LINK = sed -e \"s,@ICON@,wiLink.icns,g\" -e \"s,@EXECUTABLE@,wiLink,g\" -e \"s,@TYPEINFO@,????,g\" -e \"s,@VERSION@,$$VERSION,g\" -e \"s,@COPYRIGHT@,$$QMAKE_TARGET_COPYRIGHT,g\" $$PWD/app.plist > wiLink.app/Contents/Info.plist
+    QMAKE_POST_LINK += sed -e \"s,@ICON@,wiLink.icns,g\" -e \"s,@EXECUTABLE@,wiLink,g\" -e \"s,@TYPEINFO@,????,g\" -e \"s,@VERSION@,$$VERSION,g\" -e \"s,@COPYRIGHT@,$$QMAKE_TARGET_COPYRIGHT,g\" $$PWD/app.plist > wiLink.app/Contents/Info.plist;
+    QMAKE_POST_LINK += cp ../3rdparty/qxmpp/src/libqxmpp_d.0.dylib wiLink.app/Contents/Frameworks;
+    QMAKE_POST_LINK += mkdir -p wiLink.app/Contents/Resources/qml/QtQuick;
+    QMAKE_POST_LINK += cp -r $$[QT_INSTALL_QML]/QtQuick/LocalStorage wiLink.app/Contents/Resources/qml/QtQuick;
+    QMAKE_POST_LINK += cp -r $$[QT_INSTALL_QML]/QtQuick.2 wiLink.app/Contents/Resources/qml;
+    QMAKE_POST_LINK += $$[QT_INSTALL_BINS]/macdeployqt wiLink.app
 } else:unix {
     desktop.path = $$PREFIX/share/applications
     desktop.files = ../data/wiLink.desktop
