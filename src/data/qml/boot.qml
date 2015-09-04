@@ -17,11 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import QtQuick 2.3
-import QtQuick.Window 2.2
 import wiLink 2.4
+import QtQuick 2.3
+import QtQuick.Controls 1.3
+import QtQuick.Window 2.2
 
-Window {
+ApplicationWindow {
     id: window
 
     signal showAbout
@@ -30,6 +31,36 @@ Window {
 
     minimumWidth: 360
     minimumHeight: 360
+    menuBar: MenuBar {
+        Menu {
+            title: qsTr('&File')
+
+            MenuItem {
+                text: qsTr('&Preferences')
+                onTriggered: window.showPreferences()
+            }
+
+            MenuItem {
+                text: qsTr('&Quit')
+                shortcut: 'Ctrl+Q'
+                onTriggered: Qt.quit()
+            }
+        }
+        Menu {
+            title: qsTr('&Help')
+
+            MenuItem {
+                text: qsTr('wiLink FAQ')
+                shortcut: 'F1' // FIXME: for mac CTRL+?
+                onTriggered: window.showHelp()
+            }
+
+            MenuItem {
+                text: qsTr('About wiLink')
+                onTriggered: window.showAbout()
+            }
+        }
+    }
 
     function reload() {
         uiLoader.source = '';
