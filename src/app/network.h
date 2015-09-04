@@ -21,6 +21,7 @@
 #define __WILINK_NETWORK_H__
 
 #include <QNetworkAccessManager>
+#include <QQmlNetworkAccessManagerFactory>
 
 class NetworkAccessManager : public QNetworkAccessManager
 {
@@ -37,4 +38,13 @@ private slots:
     void onSslErrors(QNetworkReply *reply, const QList<QSslError> &errors);
 };
 
+class NetworkAccessManagerFactory : public QQmlNetworkAccessManagerFactory
+{
+public:
+    NetworkAccessManagerFactory();
+    QNetworkAccessManager *create(QObject * parent);
+
+private:
+    QString m_cachePath;
+};
 #endif

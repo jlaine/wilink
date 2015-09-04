@@ -339,7 +339,7 @@ FocusScope {
                     accountModel.submit();
                 }
             }
-            Storage.setSetting('version', appUpdater.applicationVersion);
+            Storage.setSetting('version', Qt.application.version);
 
             // Check whether an account is configured.
             if (accountModel.count) {

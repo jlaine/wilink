@@ -7,8 +7,8 @@ VERSION = $$WILINK_VERSION
 DEFINES += WILINK_VERSION=\\\"$${WILINK_VERSION}\\\"
 
 RESOURCES += app.qrc ../data/qml.qrc
-SOURCES += main.cpp network.cpp window.cpp
-HEADERS += network.h window.h
+SOURCES += main.cpp network.cpp
+HEADERS += network.h
 
 mac {
     OBJECTIVE_SOURCES += application_mac.mm

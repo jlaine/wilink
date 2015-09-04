@@ -6,7 +6,7 @@ set(app_LIBRARIES Qt5::Gui Qt5::Network Qt5::Quick Qt5::Widgets Qt5::Xml qtsingl
 # wiLink
 add_definitions(-DWILINK_VERSION="${WILINK_VERSION}")
 
-set(app_SOURCES main.cpp network.cpp window.cpp)
+set(app_SOURCES main.cpp network.cpp)
 
 if(APPLE)
     list(APPEND app_SOURCES application_mac.mm)

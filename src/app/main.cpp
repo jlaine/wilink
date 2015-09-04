@@ -23,6 +23,7 @@
 #include <QApplication>
 #include <QFileOpenEvent>
 #include <QFontDatabase>
+#include <QIcon>
 #include <QLocale>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
@@ -39,7 +40,7 @@ void mac_init();
 #include <windows.h>
 #endif
 
-#include "window.h"
+#include "network.h"
 
 static QtLocalPeer *peer = 0;
 static int aborted = 0;
@@ -162,6 +163,7 @@ int main(int argc, char *argv[])
 
     /* Create window */
     QQmlApplicationEngine engine;
+    engine.setNetworkAccessManagerFactory(new NetworkAccessManagerFactory());
     engine.rootContext()->setContextProperty("rpcSocket", peer);
     engine.load(qmlRoot.resolved(QUrl("boot.qml")));
 

@@ -207,16 +207,6 @@ int Updater::compareVersions(const QString &v1, const QString v2)
     return 0;
 }
 
-QString Updater::applicationName() const
-{
-    return qApp->applicationName();
-}
-
-QString Updater::applicationVersion() const
-{
-    return qApp->applicationVersion();
-}
-
 Updater::Error Updater::error() const
 {
     return d->error;

@@ -35,8 +35,6 @@ class Updater : public QObject
 {
     Q_OBJECT
     Q_ENUMS(Error State)
-    Q_PROPERTY(QString applicationName READ applicationName CONSTANT)
-    Q_PROPERTY(QString applicationVersion READ applicationVersion CONSTANT)
     Q_PROPERTY(Error error READ error NOTIFY error)
     Q_PROPERTY(QString errorString READ errorString NOTIFY error)
     Q_PROPERTY(int progressMaximum READ progressMaximum CONSTANT)
@@ -66,8 +64,6 @@ public:
     Updater(QObject *parent = 0);
     ~Updater();
 
-    QString applicationName() const;
-    QString applicationVersion() const;
     Error error() const;
     QString errorString() const;
     int progressMaximum() const;

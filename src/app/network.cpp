@@ -18,10 +18,13 @@
  */
 
 #include <QCoreApplication>
+#include <QDir>
 #include <QLocale>
+#include <QNetworkDiskCache>
 #include <QNetworkRequest>
 #include <QProcess>
 #include <QSslError>
+#include <QStandardPaths>
 
 #ifdef Q_OS_WIN
 #include <windows.h>
@@ -106,3 +109,18 @@ QString NetworkAccessManager::userAgent()
     return globalUserAgent;
 }
 
+NetworkAccessManagerFactory::NetworkAccessManagerFactory()
+{
+    const QString dataPath = QStandardPaths::standardLocations(QStandardPaths::CacheLocation)[0];
+    m_cachePath = QDir(dataPath).filePath("network");
+    QDir().mkpath(m_cachePath);
+}
+
+QNetworkAccessManager *NetworkAccessManagerFactory::create(QObject * parent)
+{
+    QNetworkAccessManager *manager = new NetworkAccessManager(parent);
+    QNetworkDiskCache *cache = new QNetworkDiskCache(manager);
+    cache->setCacheDirectory(m_cachePath);
+    manager->setCache(cache);
+    return manager;
+}
