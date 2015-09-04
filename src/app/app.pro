@@ -34,7 +34,7 @@ android {
     QMAKE_POST_LINK += cp -r $$[QT_INSTALL_QML]/QtQuick/XmlListModel wiLink.app/Contents/Resources/qml/QtQuick/;
     QMAKE_POST_LINK += cp -r $$[QT_INSTALL_QML]/QtQuick.2 wiLink.app/Contents/Resources/qml/;
     QMAKE_POST_LINK += cp -r $$[QT_INSTALL_QML]/QtWebkit wiLink.app/Contents/Resources/qml/;
-    QMAKE_POST_LINK += $$[QT_INSTALL_BINS]/macdeployqt wiLink.app -no-strip
+    QMAKE_POST_LINK += $$[QT_INSTALL_BINS]/macdeployqt wiLink.app
 } else:unix {
     desktop.path = $$PREFIX/share/applications
     desktop.files = ../data/wiLink.desktop

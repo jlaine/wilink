@@ -35,7 +35,7 @@ mac)
     rm -rf release-mac
     mkdir release-mac
     cd release-mac
-    cmake ..
+    qmake ..
     make
     make package
     ;;
