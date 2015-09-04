@@ -24,6 +24,7 @@
 #include <QTextStream>
 
 #include "settings.h"
+#include "settings_p.h"
 #include "systeminfo.h"
 
 #ifdef Q_OS_MAC
@@ -31,13 +32,6 @@ extern bool qt_mac_execute_apple_script(const QString &script, AEDesc *ret);
 #endif
 
 ApplicationSettings *wSettings = 0;
-
-class ApplicationSettingsPrivate
-{
-public:
-    QString executablePath() const;
-    QSettings *settings;
-};
 
 QString ApplicationSettingsPrivate::executablePath() const
 {
