@@ -111,7 +111,8 @@ int main(int argc, char *argv[])
 
     /* Parse command line arguments */
     QUrl openUrl;
-    QUrl qmlRoot = QUrl(QString("https://download.wifirst.net/public/%1/%2/qml/").arg(app.applicationName(), app.applicationVersion()));
+    //QUrl qmlRoot = QUrl(QString("https://download.wifirst.net/public/%1/%2/qml/").arg(app.applicationName(), app.applicationVersion()));
+    QUrl qmlRoot = QUrl("qrc:/qml/");
     for (int i = 1; i < argc; ++i) {
         if (!argv[i]) {
             break;
@@ -162,7 +163,7 @@ int main(int argc, char *argv[])
     /* Create window */
     QQmlApplicationEngine engine;
     engine.rootContext()->setContextProperty("rpcSocket", peer);
-    engine.load(QUrl("qrc:/qml/boot.qml"));
+    engine.load(qmlRoot.resolved(QUrl("boot.qml")));
 
     if (openUrl.isValid() && openUrl.scheme() == "wilink")
         QMetaObject::invokeMethod(peer, "messageReceived", Q_ARG(QString, "OPEN " + openUrl.toString()));
