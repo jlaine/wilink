@@ -1,36 +1,24 @@
 include(../../../wilink.pri)
-include(../../qsound/qsound.pri)
 include(diagnostics/diagnostics.pri)
+include(idle/idle.pri)
+include(sound/sound.pri)
 include(wallet/wallet.pri)
 
 TEMPLATE = lib
 CONFIG += qt plugin
 
-QT += network quick widgets xml
+QT += multimedia network quick widgets xml
 
 DESTDIR = ../../app/wiLink.2
 TARGET = qmlwilinkplugin
 
-# Libraries used internal by idle
 android {
     DEFINES += ANDROID
     DEFINES += WILINK_EMBEDDED
-    SOURCES += idle/idle_stub.cpp
 } else:mac {
     APPDIR = ../../app/wiLink.app
     DESTDIR = $$APPDIR/Contents/Resources/qml/wiLink.2
-    LIBS += -framework Carbon
-    SOURCES += idle/idle_mac.cpp
     OBJECTIVE_SOURCES += settings_mac.mm
-} else:unix {
-    QT += dbus x11extras
-    DEFINES += HAVE_XSS
-    SOURCES += idle/idle_x11.cpp
-    LIBS += -lXss -lX11
-} else:win32 {
-    SOURCES += idle/idle_win.cpp
-} else {
-    SOURCES += idle/idle_stub.cpp
 }
 
 SOURCES += \
@@ -87,11 +75,7 @@ HEADERS += \
 
 RESOURCES += ../../data/wiLink.qrc
 
-INCLUDEPATH += \
-    $$WILINK_INCLUDE_DIR \
-    $$QSOUND_INCLUDE_DIR
-
-LIBS += -L../../qsound/src -L../../3rdparty/libmad $$QSOUND_LIBS
+INCLUDEPATH += $$WILINK_INCLUDE_DIR
 
 android {
     qmldir.path = /assets/imports/wiLink

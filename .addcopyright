@@ -8,9 +8,8 @@
     'src/imports/wiLink',
     'src/imports/wiLink/diagnostics',
     'src/imports/wiLink/phone',
+    'src/imports/wiLink/sound',
     'src/imports/wiLink/wallet',
-    'src/qsound/src',
-    'src/qsound/tests',
     'src/tests',
 ],
 'license': """wiLink
