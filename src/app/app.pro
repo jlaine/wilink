@@ -7,16 +7,13 @@ VERSION = $$WILINK_VERSION
 DEFINES += WILINK_VERSION=\\\"$${WILINK_VERSION}\\\"
 
 RESOURCES += app.qrc ../data/qml.qrc
-SOURCES += main.cpp network.cpp
-HEADERS += network.h
+SOURCES += main.cpp network.cpp qtlocalpeer.cpp
+HEADERS += network.h qtlocalpeer.h
 
 mac {
     OBJECTIVE_SOURCES += application_mac.mm
     LIBS += -framework AppKit
 }
-
-INCLUDEPATH += ../3rdparty/qtsingleapplication
-LIBS += -L../3rdparty/qtsingleapplication -lqtsingleapplication
 
 # Installation
 QMAKE_TARGET_COMPANY="Wifirst"

@@ -1,5 +1,4 @@
 TEMPLATE = subdirs
-SUBDIRS = qtsingleapplication
 isEmpty(WILINK_SYSTEM_MAD) {
     SUBDIRS += libmad
 }
