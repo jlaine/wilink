@@ -5,8 +5,8 @@ SOURCES += wallet/wallet.cpp
 
 mac {
     DEFINES += USE_OSX_KEYCHAIN
-    HEADERS += wallet/osx.h
-    SOURCES += wallet/osx.cpp
+    HEADERS += wallet/wallet_mac.h
+    SOURCES += wallet/wallet_mac.cpp
     LIBS += -framework Foundation -framework Security
 } else:win32 {
     DEFINES += USE_WINDOWS_KEYRING

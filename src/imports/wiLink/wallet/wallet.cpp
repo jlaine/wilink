@@ -38,7 +38,7 @@
  */
 
 #if defined(USE_OSX_KEYCHAIN)
-#include "osx.h"
+#include "wallet_mac.h"
 #elif defined(USE_WINDOWS_KEYRING)
 #include "wallet_win.h"
 #else

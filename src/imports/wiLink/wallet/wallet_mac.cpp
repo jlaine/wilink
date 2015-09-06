@@ -24,7 +24,7 @@
 #include <Security/Security.h>
 #include <CoreServices/CoreServices.h>
 
-#include "wallet/osx.h"
+#include "wallet_mac.h"
 
 #if !defined(errSecSuccess)
 #define errSecSuccess 0
