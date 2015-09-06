@@ -26,6 +26,9 @@ android {
 } else:unix {
     QT += dbus
     SOURCES += diagnostics/wireless_nm.cpp
+} else:win32 {
+    SOURCES += diagnostics/wireless_stub.cpp
+    LIBS += -lws2_32
 } else {
     SOURCES += diagnostics/wireless_stub.cpp
 }
