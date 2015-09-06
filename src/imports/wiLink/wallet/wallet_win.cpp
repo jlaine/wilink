@@ -27,7 +27,7 @@
 #include <windows.h>
 #include <wincrypt.h>
 
-#include "wallet/windows.h"
+#include "wallet_win.h"
 
 typedef bool (CALLBACK* LPFNDLL_ENCRYPT)(DATA_BLOB*,LPCWSTR, DATA_BLOB*, PVOID, CRYPTPROTECT_PROMPTSTRUCT*, DWORD, DATA_BLOB*);
 typedef bool (CALLBACK* LPFNDLL_DECRYPT)(DATA_BLOB*, LPWSTR*, DATA_BLOB*, PVOID, CRYPTPROTECT_PROMPTSTRUCT*, DWORD, DATA_BLOB*);
