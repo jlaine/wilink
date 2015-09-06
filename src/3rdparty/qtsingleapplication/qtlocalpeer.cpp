@@ -102,18 +102,22 @@ QtLocalPeer::QtLocalPeer(QObject* parent, const QString &appId)
     QString lockName = QDir(QDir::tempPath()).absolutePath()
                        + QLatin1Char('/') + socketName
                        + QLatin1String("-lockfile");
-    lockFile.setFileName(lockName);
-    lockFile.open(QIODevice::ReadWrite);
+    lockFile = new QLockFile(lockName);
 }
 
+
+QtLocalPeer::~QtLocalPeer()
+{
+    delete lockFile;
+}
 
 
 bool QtLocalPeer::isClient()
 {
-    if (lockFile.isLocked())
+    if (lockFile->isLocked())
         return false;
 
-    if (!lockFile.lock(QtLP_Private::QtLockedFile::WriteLock, false))
+    if (!lockFile->tryLock())
         return true;
 
     bool res = server->listen(socketName);
