@@ -24,8 +24,10 @@
 #include "network.h"
 
 #if defined(Q_OS_WIN)
+#include <windef.h>
 #include <windows.h>
 #include <windns.h>
+#include <winsock2.h>
 typedef DNS_STATUS (WINAPI *dns_query_config_proto)(DNS_CONFIG_TYPE,DWORD,PCWSTR,PVOID,PVOID,PDWORD);
 #elif defined(Q_OS_UNIX) && !defined(Q_OS_ANDROID) && !defined(Q_OS_SYMBIAN)
 #include <sys/types.h>
@@ -187,7 +189,7 @@ QList<QHostAddress> NetworkInfo::nameServers()
         if (err == 0) {
             dns_servers = (IP4_ARRAY*)malloc(length);
             if (local_dns_query_config(DnsConfigDnsServerList, 0, NULL, NULL, dns_servers, &length) == 0) {
-                for (int i = 0; i < dns_servers->AddrCount; ++i)
+                for (unsigned int i = 0; i < dns_servers->AddrCount; ++i)
                     servers << QHostAddress(htonl(dns_servers->AddrArray[i]));
             }
             free(dns_servers);
