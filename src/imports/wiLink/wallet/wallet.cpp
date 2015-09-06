@@ -38,11 +38,11 @@
  */
 
 #if defined(USE_OSX_KEYCHAIN)
-#include "wallet/osx.h"
+#include "osx.h"
 #elif defined(USE_WINDOWS_KEYRING)
-#include "wallet/windows.h"
+#include "wallet_win.h"
 #else
-#include "wallet/dummy.h"
+#include "dummy.h"
 #endif
 
 using namespace QNetIO;

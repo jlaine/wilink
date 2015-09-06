@@ -10,8 +10,8 @@ mac {
     LIBS += -framework Foundation -framework Security
 } else:win32 {
     DEFINES += USE_WINDOWS_KEYRING
-    HEADERS += wallet/windows.h
-    SOURCES += wallet/windows.cpp
+    HEADERS += wallet/wallet_win.h
+    SOURCES += wallet/wallet_win.cpp
 } else {
     HEADERS += wallet/dummy.h
     SOURCES += wallet/dummy.cpp
