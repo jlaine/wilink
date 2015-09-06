@@ -25,7 +25,6 @@
 
 #if defined(Q_OS_WIN)
 #include <windef.h>
-#include <windows.h>
 #include <windns.h>
 #include <winsock2.h>
 typedef DNS_STATUS (WINAPI *dns_query_config_proto)(DNS_CONFIG_TYPE,DWORD,PCWSTR,PVOID,PVOID,PDWORD);

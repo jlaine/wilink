@@ -21,7 +21,9 @@
 #include "idle.h"
 
 #include <qlibrary.h>
-#include <windows.h>
+#include <windef.h>
+#include <winbase.h>
+#include <winuser.h>
 
 #if defined(Q_OS_WIN32) && !defined(Q_CC_GNU) && (_WIN32_WINNT < 0x0500)
 typedef struct tagLASTINPUTINFO {
