@@ -17,9 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <windows.h>
+#include <windef.h>
+#include <winbase.h>
+#include <wingdi.h>
+#include <winuser.h>
 #include <objbase.h>
 #include <initguid.h>
+#include <dshow.h>
 
 #include "QVideoGrabber.h"
 #include "QVideoGrabber_p.h"
@@ -66,11 +70,14 @@ public:
 
     STDMETHODIMP SampleCB(double Time, IMediaSample *pSample)
     {
+        Q_UNUSED(Time);
+        Q_UNUSED(pSample);
         return E_NOTIMPL;
     }
 
     STDMETHODIMP BufferCB(double Time, BYTE *pBuffer, long BufferLen)
     {
+        Q_UNNUSED(Time);
         //qDebug("got data %li", BufferLen);
         if (BufferLen != currentFrame.mappedBytes()) {
             qWarning("Bad data length");
