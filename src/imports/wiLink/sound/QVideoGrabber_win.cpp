@@ -49,6 +49,7 @@ class QVideoGrabberPrivate : public ISampleGrabberCB
 {
 public:
     QVideoGrabberPrivate(QVideoGrabber *qq);
+    virtual ~QVideoGrabberPrivate();
 
     STDMETHODIMP_(ULONG) AddRef() { return 1; }
     STDMETHODIMP_(ULONG) Release() { return 2; }
@@ -129,6 +130,10 @@ QVideoGrabberPrivate::QVideoGrabberPrivate(QVideoGrabber *qq)
     sampleGrabberFilter(0),
     source(0),
     q(qq)
+{
+}
+
+QVideoGrabberPrivate::~QVideoGrabberPrivate()
 {
 }
 
