@@ -77,7 +77,7 @@ public:
 
     STDMETHODIMP BufferCB(double Time, BYTE *pBuffer, long BufferLen)
     {
-        Q_UNNUSED(Time);
+        Q_UNUSED(Time);
         //qDebug("got data %li", BufferLen);
         if (BufferLen != currentFrame.mappedBytes()) {
             qWarning("Bad data length");
