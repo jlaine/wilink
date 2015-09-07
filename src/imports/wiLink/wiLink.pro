@@ -91,9 +91,13 @@ QMAKE_POST_LINK += $$QMAKE_COPY $$shell_path($$shell_quote($$PWD/qmldir) $$shell
 } else {
     include(../../3rdparty/qxmpp/qxmpp.pri)
     QXMPP_LIBRARY_DIR = ../../3rdparty/qxmpp/src
-    mac: QXMPP_LIBRARY_FILE = lib$${QXMPP_LIBRARY_NAME}.0.dylib
-    win32: QXMPP_LIBRARY_FILE = $${QXMPP_LIBRARY_NAME}0.dll
-    else: QXMPP_LIBRARY_FILE = lib$${QXMPP_LIBRARY_NAME}.so.0
+    mac {
+        QXMPP_LIBRARY_FILE = lib$${QXMPP_LIBRARY_NAME}.0.dylib
+    } else:win32 {
+        QXMPP_LIBRARY_FILE = $${QXMPP_LIBRARY_NAME}0.dll
+    } else:unix {
+        QXMPP_LIBRARY_FILE = lib$${QXMPP_LIBRARY_NAME}.so.0
+    }
 
     INCLUDEPATH += $$QXMPP_INCLUDEPATH
     LIBS += -L$$QXMPP_LIBRARY_DIR $$QXMPP_LIBS
