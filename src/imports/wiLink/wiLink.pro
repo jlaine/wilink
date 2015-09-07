@@ -12,10 +12,8 @@ TARGET = qmlwilinkplugin
 DESTDIR = $$WILINK_QML_PATH/wiLink.2
 
 android {
-    DEFINES += ANDROID
     DEFINES += WILINK_EMBEDDED
 } else:mac {
-    APPDIR = ../../app/wiLink.app
     OBJECTIVE_SOURCES += settings_mac.mm
 }
 
