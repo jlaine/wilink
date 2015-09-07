@@ -24,14 +24,7 @@ android {
     ICON = ../data/wiLink.icns
     QMAKE_POST_LINK += sed -e \"s,@ICON@,wiLink.icns,g\" -e \"s,@EXECUTABLE@,wiLink,g\" -e \"s,@TYPEINFO@,????,g\" -e \"s,@VERSION@,$$VERSION,g\" -e \"s,@COPYRIGHT@,$$QMAKE_TARGET_COPYRIGHT,g\" $$PWD/app.plist > $$DESTDIR/wiLink.app/Contents/Info.plist;
     QMAKE_POST_LINK += mkdir -p $$WILINK_QML_PATH/QtQuick;
-    QMAKE_POST_LINK += cp -r $$[QT_INSTALL_QML]/QtQuick/Controls $$WILINK_QML_PATH/QtQuick/;
-    QMAKE_POST_LINK += cp -r $$[QT_INSTALL_QML]/QtQuick/Layouts $$WILINK_QML_PATH/QtQuick/;
-    QMAKE_POST_LINK += cp -r $$[QT_INSTALL_QML]/QtQuick/LocalStorage $$WILINK_QML_PATH/QtQuick/;
-    QMAKE_POST_LINK += cp -r $$[QT_INSTALL_QML]/QtQuick/Window.2 $$WILINK_QML_PATH/QtQuick/;
-    QMAKE_POST_LINK += cp -r $$[QT_INSTALL_QML]/QtQuick/XmlListModel $$WILINK_QML_PATH/QtQuick/;
-    QMAKE_POST_LINK += cp -r $$[QT_INSTALL_QML]/QtQuick.2 $$WILINK_QML_PATH/;
-    QMAKE_POST_LINK += cp -r $$[QT_INSTALL_QML]/QtWebkit $$WILINK_QML_PATH/;
-    QMAKE_POST_LINK += $$[QT_INSTALL_BINS]/macdeployqt --qmldir $$WILINK_SOURCE_TREE/src/data/qml $$DESTDIR/wiLink.app
+    QMAKE_POST_LINK += $$[QT_INSTALL_BINS]/macdeployqt $$DESTDIR/wiLink.app -qmldir=$$WILINK_SOURCE_TREE/src/data/qml
 } else:win32 {
     QMAKE_POST_LINK += $$[QT_INSTALL_BINS]/windeployqt --qmldir $$WILINK_SOURCE_TREE/src/data/qml $$DESTDIR/wiLink.exe
 } else:unix {
