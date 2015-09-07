@@ -1,4 +1,4 @@
-WILINK_VERSION = 2.4.90
+WILINK_VERSION = 2.4.91
 
 isEmpty(PREFIX) {
     unix {
