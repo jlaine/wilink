@@ -298,6 +298,7 @@ Traceroute NetworkInfo::traceroute(const QHostAddress &host, int maxPackets, int
     QString program;
     QStringList arguments;
 #ifdef Q_OS_WIN
+    Q_UNUSED(maxPackets);
     program = "tracert";
     arguments << "-d";
     if (maxHops > 0)
