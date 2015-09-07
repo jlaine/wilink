@@ -1,6 +1,6 @@
 include(../../wilink.pri)
 
-QT += multimedia network quick widgets xml
+QT += multimedia network quick webkitwidgets widgets xml
 
 TARGET = wiLink
 DESTDIR = $$WILINK_APP_PATH
@@ -31,7 +31,17 @@ android {
     QMAKE_POST_LINK += cp -r $$[QT_INSTALL_QML]/QtQuick/XmlListModel $$WILINK_QML_PATH/QtQuick/;
     QMAKE_POST_LINK += cp -r $$[QT_INSTALL_QML]/QtQuick.2 $$WILINK_QML_PATH/;
     QMAKE_POST_LINK += cp -r $$[QT_INSTALL_QML]/QtWebkit $$WILINK_QML_PATH/;
-    QMAKE_POST_LINK += $$[QT_INSTALL_BINS]/macdeployqt $$DESTDIR/wiLink.app
+    QMAKE_POST_LINK += $$[QT_INSTALL_BINS]/macdeployqt $$DESTDIR/wiLink.app -qmldir=$$WILINK_SOURCE_TREE/src/data/qml;
+
+    # QtWebProcess
+    WEBPROCESS_DIR = $$DESTDIR/wiLink.app/Contents/libexec
+    WEBPROCESS_PATH = $$WEBPROCESS_DIR/QtWebProcess
+    QMAKE_POST_LINK += mkdir -p $$DESTDIR/wiLink.app/Contents/libexec;
+    QMAKE_POST_LINK += cp $$[QT_INSTALL_LIBEXECS]/QtWebProcess $$WEBPROCESS_DIR;
+    QMAKE_POST_LINK += install_name_tool -delete_rpath /work/build/qt5_workdir/w/s/qtwebkit/lib $$WEBPROCESS_PATH;
+    QMAKE_POST_LINK += install_name_tool -delete_rpath @loader_path/../lib $$WEBPROCESS_PATH;
+    QMAKE_POST_LINK += install_name_tool -add_rpath @executable_path/../Frameworks $$WEBPROCESS_PATH;
+    QMAKE_POST_LINK += (echo '[Paths]'; echo 'Plugins = ../PlugIns') > $$WEBPROCESS_DIR/qt.conf;
 } else:win32 {
     QMAKE_POST_LINK += $$[QT_INSTALL_BINS]/windeployqt --qmldir $$WILINK_SOURCE_TREE/src/data/qml $$DESTDIR/wiLink.exe
 } else:unix {
