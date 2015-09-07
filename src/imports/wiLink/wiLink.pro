@@ -84,17 +84,22 @@ android {
     INSTALLS += qmldir target
 }
 
-QMAKE_POST_LINK += $$QMAKE_COPY $$replace($$list($$quote($$PWD/qmldir) $$DESTDIR), /, $$QMAKE_DIR_SEP);
+EOL = $$escape_expand(\n\t)
+QMAKE_POST_LINK += $$QMAKE_COPY $$shell_path($$shell_quote($$PWD/qmldir) $$shell_quote($$DESTDIR)) $$EOL
 
 !isEmpty(WILINK_SYSTEM_QXMPP) {
     INCLUDEPATH += /usr/include/qxmpp
     LIBS += -lqxmpp
 } else {
     include(../../3rdparty/qxmpp/qxmpp.pri)
+    QXMPP_LIBRARY_DIR = ../../3rdparty/qxmpp/src
+    mac: QXMPP_LIBRARY_FILE = lib$${QXMPP_LIBRARY_NAME}.0.dylib
+    win32: QXMPP_LIBRARY_FILE = $${QXMPP_LIBRARY_NAME}0.dll
+    else: QXMPP_LIBRARY_FILE = lib$${QXMPP_LIBRARY_NAME}.so.0
+
     INCLUDEPATH += $$QXMPP_INCLUDEPATH
-    LIBS += -L../../3rdparty/qxmpp/src $$QXMPP_LIBS
-    mac {
-        QMAKE_POST_LINK += mkdir -p $$WILINK_LIB_PATH;
-        QMAKE_POST_LINK += cp ../../3rdparty/qxmpp/src/lib$${QXMPP_LIBRARY_NAME}.0.dylib $$WILINK_LIB_PATH;
-    }
+    LIBS += -L$$QXMPP_LIBRARY_DIR $$QXMPP_LIBS
+
+    QMAKE_POST_LINK += $$sprintf($$QMAKE_MKDIR_CMD, $$shell_path($$shell_quote($$WILINK_LIB_PATH))) $$EOL
+    QMAKE_POST_LINK += $$QMAKE_COPY $$shell_path($$shell_quote($$QXMPP_LIBRARY_DIR/$$QXMPP_LIBRARY_FILE) $$shell_quote($$WILINK_LIB_PATH))
 }
