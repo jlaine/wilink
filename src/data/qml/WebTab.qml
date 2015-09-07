@@ -155,32 +155,27 @@ Panel {
             WebView {
                 id: webView
 
-                // FIXME: port to Qt5
-/*
-                javaScriptWindowObjects: QtObject {
-                    WebView.windowObjectName: "qml"
-
-                    function openUrl(url) {
-                        Qt.openUrlExternally(url);
-                    }
-                }
-*/
                 anchors.fill: parent
+                experimental.preferences.navigatorQtObjectEnabled: true
 
                 onLoadingChanged: {
                     if (loadRequest.status == WebView.LoadFailedStatus) {
                         webView.loadHtml('<html><head><title>Error loading page</title></head><body>There was an error loading the page.<br/>' + url + '</body></html>', '', url);
                     } else if (loadRequest.status == WebView.LoadSucceededStatus) {
                         if (panel.loadScript) {
+                            // automatic login
                             var js = panel.loadScript;
                             panel.loadScript = '';
                             webView.experimental.evaluateJavaScript(js);
                         } else {
                             // catch links to wilink:// urls
-                            // FIXME: port to Qt5
-                            //webView.experimental.evaluateJavaScript('$("a[href^=\\"wilink:\\"]").live("click", function() { window.qml.openUrl(this.href); return false; })');
+                            webView.experimental.evaluateJavaScript('$("a[href^=\\"wilink:\\"]").live("click", function() { navigator.qt.postMessage(this.href); return false; })');
                         }
                     }
+                }
+
+                experimental.onMessageReceived: {
+                    Qt.openUrlExternally(message.data);
                 }
             }
         }

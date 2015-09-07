@@ -67,6 +67,11 @@ ApplicationWindow {
         uiLoader.source = 'Main.qml';
     }
 
+    function showAndRaise() {
+        show();
+        raise();
+    }
+
     TranslationLoader {
         Component.onCompleted: {
             if (localeName == 'fr')
