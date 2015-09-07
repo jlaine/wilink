@@ -25,13 +25,13 @@ android {
     ICON = ../data/wiLink.icns
     QMAKE_POST_LINK += sed -e \"s,@ICON@,wiLink.icns,g\" -e \"s,@EXECUTABLE@,wiLink,g\" -e \"s,@TYPEINFO@,????,g\" -e \"s,@VERSION@,$$VERSION,g\" -e \"s,@COPYRIGHT@,$$QMAKE_TARGET_COPYRIGHT,g\" $$PWD/app.plist > $$DESTDIR/wiLink.app/Contents/Info.plist $$EOL
     QMAKE_POST_LINK += mkdir -p $$WILINK_QML_PATH/QtQuick $$EOL
-    QMAKE_POST_LINK += cp -r $$[QT_INSTALL_QML]/QtQuick/Controls $$WILINK_QML_PATH/QtQuick/ $$EOL
-    QMAKE_POST_LINK += cp -r $$[QT_INSTALL_QML]/QtQuick/Layouts $$WILINK_QML_PATH/QtQuick/ $$EOL
-    QMAKE_POST_LINK += cp -r $$[QT_INSTALL_QML]/QtQuick/LocalStorage $$WILINK_QML_PATH/QtQuick/ $$EOL
-    QMAKE_POST_LINK += cp -r $$[QT_INSTALL_QML]/QtQuick/Window.2 $$WILINK_QML_PATH/QtQuick/ $$EOL
-    QMAKE_POST_LINK += cp -r $$[QT_INSTALL_QML]/QtQuick/XmlListModel $$WILINK_QML_PATH/QtQuick/ $$EOL
-    QMAKE_POST_LINK += cp -r $$[QT_INSTALL_QML]/QtQuick.2 $$WILINK_QML_PATH/ $$EOL
-    QMAKE_POST_LINK += cp -r $$[QT_INSTALL_QML]/QtWebkit $$WILINK_QML_PATH/ $$EOL
+    QMAKE_POST_LINK += cp -a $$[QT_INSTALL_QML]/QtQuick/Controls $$WILINK_QML_PATH/QtQuick/ $$EOL
+    QMAKE_POST_LINK += cp -a $$[QT_INSTALL_QML]/QtQuick/Layouts $$WILINK_QML_PATH/QtQuick/ $$EOL
+    QMAKE_POST_LINK += cp -a $$[QT_INSTALL_QML]/QtQuick/LocalStorage $$WILINK_QML_PATH/QtQuick/ $$EOL
+    QMAKE_POST_LINK += cp -a $$[QT_INSTALL_QML]/QtQuick/Window.2 $$WILINK_QML_PATH/QtQuick/ $$EOL
+    QMAKE_POST_LINK += cp -a $$[QT_INSTALL_QML]/QtQuick/XmlListModel $$WILINK_QML_PATH/QtQuick/ $$EOL
+    QMAKE_POST_LINK += cp -a $$[QT_INSTALL_QML]/QtQuick.2 $$WILINK_QML_PATH/ $$EOL
+    QMAKE_POST_LINK += cp -a $$[QT_INSTALL_QML]/QtWebkit $$WILINK_QML_PATH/ $$EOL
 
     # QtWebProcess
     WEBPROCESS_DIR = $$DESTDIR/wiLink.app/Contents/libexec
