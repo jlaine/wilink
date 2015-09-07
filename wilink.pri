@@ -14,3 +14,10 @@ isEmpty(WILINK_BUILD_TREE) {
     WILINK_BUILD_TREE ~= s,$$re_escape($$sub_dir)$,,
 }
 WILINK_APP_PATH = $$WILINK_BUILD_TREE/bin
+mac {
+    WILINK_LIB_PATH = $$WILINK_APP_PATH/wiLink.app/Contents/Frameworks
+    WILINK_QML_PATH = $$WILINK_APP_PATH/wiLink.app/Contents/Resources/qml
+} else {
+    WILINK_LIB_PATH = $$WILINK_APP_PATH
+    WILINK_QML_PATH = $$WILINK_APP_PATH
+}

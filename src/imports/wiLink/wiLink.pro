@@ -6,18 +6,16 @@ include(wallet/wallet.pri)
 
 TEMPLATE = lib
 CONFIG += qt plugin
-
 QT += multimedia network quick widgets xml
 
-DESTDIR = ../../app/wiLink.2
 TARGET = qmlwilinkplugin
+DESTDIR = $$WILINK_QML_PATH/wiLink.2
 
 android {
     DEFINES += ANDROID
     DEFINES += WILINK_EMBEDDED
 } else:mac {
     APPDIR = ../../app/wiLink.app
-    DESTDIR = $$APPDIR/Contents/Resources/qml/wiLink.2
     OBJECTIVE_SOURCES += settings_mac.mm
 }
 
@@ -96,7 +94,7 @@ QMAKE_POST_LINK += $$QMAKE_COPY $$replace($$list($$quote($$PWD/qmldir) $$DESTDIR
     INCLUDEPATH += $$QXMPP_INCLUDEPATH
     LIBS += -L../../3rdparty/qxmpp/src $$QXMPP_LIBS
     mac {
-        QMAKE_POST_LINK += mkdir -p $$APPDIR/Contents/Frameworks;
-        QMAKE_POST_LINK += cp ../../3rdparty/qxmpp/src/lib$${QXMPP_LIBRARY_NAME}.0.dylib $$APPDIR/Contents/Frameworks/;
+        QMAKE_POST_LINK += mkdir -p $$WILINK_LIB_PATH;
+        QMAKE_POST_LINK += cp ../../3rdparty/qxmpp/src/lib$${QXMPP_LIBRARY_NAME}.0.dylib $$WILINK_LIB_PATH;
     }
 }
