@@ -94,9 +94,9 @@ ContactView {
                 anchors.fill: parent
                 hoverEnabled: true
                 onClicked: {
-                    if (mouse.button == Qt.LeftButton) {
+                    if (mouse.button === Qt.LeftButton) {
                         block.itemClicked(model);
-                    } else if (mouse.button == Qt.RightButton) {
+                    } else if (mouse.button === Qt.RightButton) {
                         block.itemContextMenu(model, block.mapFromItem(item, mouse.x, mouse.y));
                     }
                 }
@@ -114,7 +114,7 @@ ContactView {
             onTriggered: {
                 // Update the currently selected item after delay.
                 for (var i = 0; i < block.model.count; i++) {
-                    if (block.model.get(i).jid == currentJid) {
+                    if (block.model.get(i).jid === currentJid) {
                         block.currentIndex = i;
                         return;
                     }

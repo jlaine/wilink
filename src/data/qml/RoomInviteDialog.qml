@@ -59,7 +59,7 @@ Dialog {
 
                 function isSelected() {
                     for (var i = 0; i < selection.length; i += 1) {
-                        if (selection[i] == model.jid)
+                        if (selection[i] === model.jid)
                             return true;
                     }
                     return false;
@@ -82,7 +82,7 @@ Dialog {
                     anchors.right: status.left
                     checked: {
                         for (var i = 0; i < selection.length; i += 1) {
-                            if (selection[i] == model.jid)
+                            if (selection[i] === model.jid)
                                 return true;
                         }
                         return false;
@@ -109,7 +109,7 @@ Dialog {
                         var newSelection = [];
                         var wasSelected = false;
                         for (var i = 0; i < selection.length; i += 1) {
-                            if (selection[i] == model.jid) {
+                            if (selection[i] === model.jid) {
                                 wasSelected = true;
                             } else {
                                 newSelection[newSelection.length] = selection[i];

@@ -71,7 +71,7 @@ Item {
             }
 
             delegate: Item {
-                property bool isLast: model.index == crumbs.count - 1
+                property bool isLast: model.index === crumbs.count - 1
 
                 height: row.height
                 width: crumb.width + row.spacing + separator.width
@@ -110,7 +110,7 @@ Item {
                         }
 
                         onClicked: {
-                            if (mouse.button == Qt.LeftButton) {
+                            if (mouse.button === Qt.LeftButton) {
                                 parent.state = '';
 
                                 // remove crumbs below current location

@@ -36,7 +36,7 @@ Dialog {
             if (panel) {
                 console.log("Saving " + panel);
                 panel.save()
-                if (source == 'AccountPreferencePanel.qml' && panel.changed) {
+                if (source === 'AccountPreferencePanel.qml' && panel.changed) {
                     reloadWindow = true;
                 }
             }
@@ -106,7 +106,7 @@ Dialog {
             onCurrentIndexChanged: {
                 var currentSource = prefSwapper.model.get(prefSwapper.currentIndex).source;
                 for (var i = 0; i < tabList.model.count; i++) {
-                    if (tabList.model.get(i).source == currentSource) {
+                    if (tabList.model.get(i).source === currentSource) {
                         tabList.currentIndex = i;
                         return;
                     }

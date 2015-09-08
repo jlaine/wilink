@@ -131,7 +131,7 @@ Panel {
 
             states: State {
                 name: 'details'
-                when: view.currentIndex == model.index
+                when: view.currentIndex === model.index
 
                 PropertyChanges {
                     target: descriptionLabel

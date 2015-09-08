@@ -75,13 +75,13 @@ Item {
             height: frame.height
             verticalAlignment: Text.AlignVCenter
             text: {
-                if (!call || call.state == QXmppCall.ConnectingState) {
+                if (!call || call.state === QXmppCall.ConnectingState) {
                     return qsTr('Connecting..');
-                } else if (call.state == QXmppCall.ActiveState) {
+                } else if (call.state === QXmppCall.ActiveState) {
                     return qsTr('Call connected.');
-                } else if (call.state == QXmppCall.DisconnectingState) {
+                } else if (call.state === QXmppCall.DisconnectingState) {
                     return qsTr('Disconnecting..');
-                } else if (call.state == QXmppCall.FinishedState) {
+                } else if (call.state === QXmppCall.FinishedState) {
                     return qsTr('Call finished.');
                 }
             }
@@ -173,7 +173,7 @@ Item {
             Button {
                 id: cameraButton
 
-                enabled: Qt.isQtObject(call) && call.state == QXmppCall.ActiveState
+                enabled: Qt.isQtObject(call) && call.state === QXmppCall.ActiveState
                 iconStyle: 'icon-facetime-video'
 
                 onClicked: {
@@ -193,13 +193,13 @@ Item {
             Button {
                 id: fullScreenButton
 
-                enabled: Qt.isQtObject(call) && call.state == QXmppCall.ActiveState
+                enabled: Qt.isQtObject(call) && call.state === QXmppCall.ActiveState
                 iconStyle: 'icon-fullscreen'
 
                 onClicked: {
-                    if (callWidget.state == '')
+                    if (callWidget.state === '')
                         callWidget.state = 'fullscreen';
-                    else if (callWidget.state == 'fullscreen')
+                    else if (callWidget.state === 'fullscreen')
                         callWidget.state = '';
                 }
             }
@@ -220,8 +220,8 @@ Item {
 
     onCallChanged: {
         // play a sound
-        if (callWidget.call.direction == QXmppCall.OutgoingDirection &&
-            callWidget.call.state == QXmppCall.ConnectingState) {
+        if (callWidget.call.direction === QXmppCall.OutgoingDirection &&
+            callWidget.call.state === QXmppCall.ConnectingState) {
             soundLoader.start();
         }
     }
@@ -229,7 +229,7 @@ Item {
     states: [
         State {
             name: 'inactive'
-            when: Qt.isQtObject(call) && call.state == QXmppCall.FinishedState
+            when: Qt.isQtObject(call) && call.state === QXmppCall.FinishedState
             PropertyChanges { target: callWidget; opacity: 0 }
         },
         State {

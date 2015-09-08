@@ -82,7 +82,7 @@ Dialog {
 
                     Component.onCompleted: {
                         for (var i = 0; i < model.count; i++) {
-                            if (label.affiliation == model.get(i).value) {
+                            if (label.affiliation === model.get(i).value) {
                                 combo.currentIndex = i;
                                 break;
                             }

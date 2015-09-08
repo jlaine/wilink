@@ -74,14 +74,14 @@ ApplicationWindow {
 
     TranslationLoader {
         Component.onCompleted: {
-            if (localeName == 'fr')
+            if (localeName === 'fr')
                 source = 'i18n/' + localeName + '.qm';
             else
                 uiLoader.source = 'Main.qml';
         }
 
         onStatusChanged: {
-            if (status == TranslationLoader.Ready || status == TranslationLoader.Error) {
+            if (status === TranslationLoader.Ready || status === TranslationLoader.Error) {
                 uiLoader.source = 'Main.qml';
             }
         }
