@@ -29,10 +29,10 @@ Icon {
 
     onJidChanged: {
         var domain = Utils.jidToDomain(jid);
-        if (domain == 'chat.facebook.com') {
+        if (domain === 'chat.facebook.com') {
             color = '#3d589d';
             style = 'icon-facebook-sign';
-        } else if (domain == 'gmail.com') {
+        } else if (domain === 'gmail.com') {
             color = '#f71100';
             style = 'icon-google-plus-sign';
         } else {

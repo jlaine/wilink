@@ -65,7 +65,7 @@ Panel {
             target: Qt.isQtObject(conversation.client) ? conversation.client.callManager : null
 
             onCallStarted: {
-                if (Utils.jidToBareJid(call.jid) == conversation.jid) {
+                if (Utils.jidToBareJid(call.jid) === conversation.jid) {
                     // NOTE: for some reason, if we don't store the call in a local
                     // variable, finishCreation seems to receive an incomplete call
                     // object.
@@ -79,7 +79,7 @@ Panel {
                         component.createObject(widgetBar, {call: currentCall});
                     }
 
-                    if (component.status == Component.Loading)
+                    if (component.status === Component.Loading)
                         component.statusChanged.connect(finishCreation);
                     else
                         finishCreation();
@@ -94,7 +94,7 @@ Panel {
             target: Qt.isQtObject(conversation.client) ? conversation.client.transferManager : null
 
             onJobStarted: {
-                if (Utils.jidToBareJid(job.jid) == conversation.jid) {
+                if (Utils.jidToBareJid(job.jid) === conversation.jid) {
                     // NOTE: for some reason, if we don't store the job in a local
                     // variable, finishCreation seems to receive an incomplete job
                     // object.
@@ -108,7 +108,7 @@ Panel {
                         component.createObject(widgetBar, {job: currentJob});
                     }
 
-                    if (component.status == Component.Loading)
+                    if (component.status === Component.Loading)
                         component.statusChanged.connect(finishCreation);
                     else
                         finishCreation();
@@ -127,7 +127,7 @@ Panel {
         model: conversation.historyModel
 
         onParticipantClicked: {
-            if (mouse.button == Qt.LeftButton) {
+            if (mouse.button === Qt.LeftButton) {
                 chatInput.talkAt(participant.name);
             }
         }
@@ -176,7 +176,7 @@ Panel {
                 hoverEnabled: true
 
                 onClicked: {
-                    if (fetchPrevious.state == 'active') {
+                    if (fetchPrevious.state === 'active') {
                         conversation.historyModel.fetchPreviousPage();
                     }
                 }
@@ -227,13 +227,13 @@ Panel {
             states: [
                 State {
                     name: 'composing'
-                    when: conversation.remoteState == QXmppMessage.Composing
+                    when: conversation.remoteState === QXmppMessage.Composing
                     PropertyChanges { target: footer; opacity: 1; height: 48; iconStyle: 'icon-comment-alt' }
                     StateChangeScript { script: view.positionViewAtEnd() }
                 },
                 State {
                     name: 'paused'
-                    when: conversation.remoteState == QXmppMessage.Paused
+                    when: conversation.remoteState === QXmppMessage.Paused
                     PropertyChanges { target: footer; opacity: 0.7; height: 48; iconStyle: 'icon-cloud' }
                 }
             ]
@@ -294,10 +294,10 @@ Panel {
 
             onItemClicked: {
                 var item = menu.model.get(index);
-                if (item.action == 'call') {
+                if (item.action === 'call') {
                     var fullJid = vcard.jidForFeature(VCard.VoiceFeature);
                     conversation.client.callManager.call(fullJid);
-                } else if (item.action == 'send') {
+                } else if (item.action === 'send') {
                     var dialog = appNotifier.fileDialog();
                     dialog.windowTitle = qsTr('Send a file');
                     dialog.fileMode = QFileDialog.ExistingFile;
@@ -308,7 +308,7 @@ Panel {
                             conversation.client.transferManager.sendFile(fullJid, filePath);
                         }
                     }
-                } else if (item.action == 'clear') {
+                } else if (item.action === 'clear') {
                     conversation.historyModel.clear();
                 }
             }

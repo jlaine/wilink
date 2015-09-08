@@ -84,9 +84,9 @@ Panel {
             model: participantModel.historyModel
 
             onParticipantClicked: {
-                if (mouse.button == Qt.LeftButton) {
+                if (mouse.button === Qt.LeftButton) {
                     chatInput.talkAt(participant.name);
-                } else if (mouse.button == Qt.RightButton) {
+                } else if (mouse.button === Qt.RightButton) {
                     var pos = mouseArea.mapToItem(menuLoader.parent, mouse.x, mouse.y);
                     menuLoader.sourceComponent = participantMenu;
                     menuLoader.item.jid = participant.jid;
@@ -153,16 +153,16 @@ Panel {
 
             onItemClicked: {
                 var item = menu.model.get(index);
-                if (item.action == 'invite') {
+                if (item.action === 'invite') {
                     dialogSwapper.showPanel('RoomInviteDialog.qml', {
                         contacts: onlineContacts,
                         room: room,
                     });
-                } else if (item.action == 'subject') {
+                } else if (item.action === 'subject') {
                     dialogSwapper.showPanel('RoomSubjectDialog.qml', {room: room});
-                } else if (item.action == 'configuration') {
+                } else if (item.action === 'configuration') {
                     dialogSwapper.showPanel('RoomConfigurationDialog.qml', {room: room});
-                } else if (item.action == 'permission') {
+                } else if (item.action === 'permission') {
                     dialogSwapper.showPanel('RoomPermissionDialog.qml', {room: room});
                 }
             }
@@ -231,9 +231,9 @@ Panel {
 
             onItemClicked: {
                 var item = menu.model.get(index);
-                if (item.action == 'profile') {
+                if (item.action === 'profile') {
                     Qt.openUrlExternally(vcard.url)
-                } else if (item.action == 'kick') {
+                } else if (item.action === 'kick') {
                     dialogSwapper.showPanel('RoomKickDialog.qml', {
                         jid: jid,
                         room: room,

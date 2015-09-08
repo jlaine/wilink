@@ -62,7 +62,7 @@ Dialog {
                 model: ListModel {}
 
                 onCurrentIndexChanged: {
-                    var wasDefault = (bar.text == bar.defaultText);
+                    var wasDefault = (bar.text === bar.defaultText);
                     if (currentIndex >= 0) {
                         var accountJid = model.get(currentIndex).text;
                         bar.defaultText = '@' + Utils.jidToDomain(accountJid);

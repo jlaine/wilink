@@ -44,7 +44,7 @@ Item {
             if (start > 0)
                 newText += text.slice(0, start);
             for (var i in bits) {
-                if (bits[i] == '@' + participant)
+                if (bits[i] === '@' + participant)
                     return;
                 if (bits[i].length)
                     newText += bits[i] + ', ';
@@ -94,7 +94,7 @@ Item {
             interval: 5000
 
             onTriggered: {
-                if (chatEdit.chatState == QXmppMessage.Composing) {
+                if (chatEdit.chatState === QXmppMessage.Composing) {
                     chatEdit.chatState = QXmppMessage.Paused;
                 }
             }
@@ -143,7 +143,7 @@ Item {
             }
 
             Keys.onReturnPressed: {
-                if (event.modifiers == Qt.NoModifier) {
+                if (event.modifiers === Qt.NoModifier) {
                     chatEdit.returnPressed();
                 } else {
                     event.accepted = false;
@@ -170,11 +170,11 @@ Item {
                 var matches = [];
                 for (var i = 0; i < chatEdit.model.count; i += 1) {
                     var name = chatEdit.model.getProperty(i, 'name');
-                    if (name.slice(0, needle.length).toLowerCase() == needle) {
+                    if (name.slice(0, needle.length).toLowerCase() === needle) {
                         matches[matches.length] = name;
                     }
                 }
-                if (matches.length == 1) {
+                if (matches.length === 1) {
                     var replacement = matches[0] + ': ';
                     input.text = text.slice(0, start) + replacement + text.slice(end);
                     input.cursorPosition = start + replacement.length;
@@ -196,7 +196,7 @@ Item {
                     menuLoader.show(pos.x, pos.y - menuLoader.item.height);
                 }
 
-                if (component.status == Component.Loading)
+                if (component.status === Component.Loading)
                     component.statusChanged.connect(finishCreation);
                 else
                     finishCreation();
@@ -205,11 +205,11 @@ Item {
             anchors.fill: parent
             acceptedButtons: Qt.LeftButton | Qt.RightButton
             onPressed: {
-                if (mouse.button == Qt.LeftButton) {
+                if (mouse.button === Qt.LeftButton) {
                     if (!input.activeFocus)
                         input.forceActiveFocus();
                     mouse.accepted = false;
-                } else if (mouse.button == Qt.RightButton) {
+                } else if (mouse.button === Qt.RightButton) {
                     showMenu(mouse);
                 }
             }

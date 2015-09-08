@@ -26,11 +26,11 @@ Menu {
 
     onItemClicked: {
         var item = menu.model.get(index);
-        if (item.action == 'cut') {
+        if (item.action === 'cut') {
             target.cut();
-        } else if (item.action == 'copy') {
+        } else if (item.action === 'copy') {
             target.copy();
-        } else if (item.action == 'paste') {
+        } else if (item.action === 'paste') {
             target.paste();
         }
     }

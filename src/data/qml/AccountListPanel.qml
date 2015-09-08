@@ -63,9 +63,9 @@ Item {
                     anchors.left: parent.left
                     anchors.verticalCenter: parent.verticalCenter
                     style: {
-                        if (model.realm == 'www.wifirst.net')
+                        if (model.realm === 'www.wifirst.net')
                             return 'icon-home';
-                        else if (model.realm == 'www.google.com')
+                        else if (model.realm === 'www.google.com')
                             return 'icon-google-plus';
                         else
                             return 'icon-user';

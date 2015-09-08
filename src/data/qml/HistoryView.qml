@@ -83,7 +83,7 @@ Item {
 
                     // copy selection
                     var text = '';
-                    if (selection.length == 1) {
+                    if (selection.length === 1) {
                         text = historyView.model.getProperty(selection[0], 'body');
                     } else {
                         for (var i in selection) {
@@ -210,7 +210,7 @@ Item {
 
                         MouseArea {
                             anchors.fill: parent
-                            hoverEnabled: block.state == 'selection'
+                            hoverEnabled: block.state === 'selection'
 
                             onDoubleClicked: {
                                 // start selection
@@ -221,7 +221,7 @@ Item {
                             }
 
                             onEntered: {
-                                if (block.state == 'selection') {
+                                if (block.state === 'selection') {
                                     // update selection
                                     historyView.currentIndex = model.index;
                                     historyView.model.select(historyView.selectionStart, historyView.currentIndex);

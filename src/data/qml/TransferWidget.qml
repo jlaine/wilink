@@ -48,7 +48,7 @@ Item {
         anchors.left: parent.left
         anchors.leftMargin: appStyle.margin.normal
         anchors.verticalCenter: parent.verticalCenter
-        style: (Qt.isQtObject(job) && job.direction == QXmppTransferJob.OutgoingDirection) ? 'icon-upload' : 'icon-download'
+        style: (Qt.isQtObject(job) && job.direction === QXmppTransferJob.OutgoingDirection) ? 'icon-upload' : 'icon-download'
     }
 
     ProgressBar {
@@ -84,8 +84,8 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         iconStyle: 'icon-file'
         text: qsTr('Open')
-        //visible: job && job.state == QXmppTransferJob.FinishedState && job.error == QXmppTransferJob.NoError
-        visible: Qt.isQtObject(job) && job.state == QXmppTransferJob.FinishedState && job.direction == QXmppTransferJob.IncomingDirection
+        //visible: job && job.state === QXmppTransferJob.FinishedState && job.error === QXmppTransferJob.NoError
+        visible: Qt.isQtObject(job) && job.state === QXmppTransferJob.FinishedState && job.direction === QXmppTransferJob.IncomingDirection
 
         onClicked: Qt.openUrlExternally(job.localFileUrl)
 
@@ -115,7 +115,7 @@ Item {
         anchors.rightMargin: appStyle.margin.normal
         anchors.verticalCenter: parent.verticalCenter
         text: qsTr('Close')
-        visible: Qt.isQtObject(job) && job.state == QXmppTransferJob.FinishedState
+        visible: Qt.isQtObject(job) && job.state === QXmppTransferJob.FinishedState
 
         onClicked: {
             item.height = 0

@@ -108,7 +108,7 @@ Panel {
 
             states: State {
                 name: 'current'
-                when: (model.index == tabView.currentIndex)
+                when: (model.index === tabView.currentIndex)
 
                 PropertyChanges { target: frame; opacity: 1 }
             }
@@ -145,7 +145,7 @@ Panel {
         for (var i = 0; i < accountModel.count; ++i) {
             var account = accountModel.get(i);
 
-            if (account.type == 'web' && account.realm == 'www.wifirst.net') {
+            if (account.type === 'web' && account.realm === 'www.wifirst.net') {
                 var js = "var f = document.getElementsByTagName('form')[0];\n";
                 js += "f.login.value = '" + account.username + "';\n";
                 js += "f.password.value = '" + account.password + "';\n";
@@ -156,17 +156,17 @@ Panel {
     }
 
     Keys.onPressed: {
-        if (event.modifiers == Qt.ControlModifier && event.key == Qt.Key_T) {
+        if (event.modifiers === Qt.ControlModifier && event.key === Qt.Key_T) {
             tabSwapper.addPanel('WebTab.qml', {}, true);
-        } else if (((event.modifiers == Qt.ControlModifier) && (event.key == Qt.Key_W))
-                || ((event.modifiers == Qt.ControlModifier) && (event.key == Qt.Key_F4))) {
+        } else if (((event.modifiers === Qt.ControlModifier) && (event.key === Qt.Key_W))
+                || ((event.modifiers === Qt.ControlModifier) && (event.key === Qt.Key_F4))) {
             if (tabSwapper.model.count > 1)
                 tabSwapper.model.get(tabSwapper.currentIndex).panel.close();
-        } else if (((event.modifiers & Qt.ControlModifier) && (event.modifiers & Qt.AltModifier) && (event.key == Qt.Key_Left))
-                || ((event.modifiers & Qt.ControlModifier) && (event.key == Qt.Key_PageUp))) {
+        } else if (((event.modifiers & Qt.ControlModifier) && (event.modifiers & Qt.AltModifier) && (event.key === Qt.Key_Left))
+                || ((event.modifiers & Qt.ControlModifier) && (event.key === Qt.Key_PageUp))) {
             tabSwapper.decrementCurrentIndex();
-        } else if (((event.modifiers & Qt.ControlModifier) && (event.modifiers & Qt.AltModifier) && (event.key == Qt.Key_Right))
-                || ((event.modifiers & Qt.ControlModifier) && (event.key == Qt.Key_PageDown))) {
+        } else if (((event.modifiers & Qt.ControlModifier) && (event.modifiers & Qt.AltModifier) && (event.key === Qt.Key_Right))
+                || ((event.modifiers & Qt.ControlModifier) && (event.key === Qt.Key_PageDown))) {
             tabSwapper.incrementCurrentIndex();
         }
     }

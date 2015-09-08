@@ -35,7 +35,7 @@ Rectangle {
     function removeClient(client) {
         for (var i = 0; i < clients.count; ++i) {
             var chatClient = clients.get(i).client;
-            if (chatClient == client) {
+            if (chatClient === client) {
                 clients.remove(i);
                 break;
             }
@@ -177,7 +177,7 @@ Rectangle {
 
         onIdleTimeChanged: {
             if (idle.idleTime >= 300) {
-                if (statusPill.presenceStatus == 'available') {
+                if (statusPill.presenceStatus === 'available') {
                     autoAway = true;
                     setPresenceStatus('away');
                 }

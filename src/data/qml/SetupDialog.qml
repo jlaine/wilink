@@ -92,9 +92,9 @@ Dialog {
                         var hasGoogle = false;
                         for (var i = 0; i < accountModel.count; i++) {
                             var account = accountModel.get(i);
-                            if (account.type == 'web' && account.realm == 'www.wifirst.net') {
+                            if (account.type === 'web' && account.realm === 'www.wifirst.net') {
                                 hasWifirst = true;
-                            } else if (account.type == 'web' && account.realm == 'www.google.com') {
+                            } else if (account.type === 'web' && account.realm === 'www.google.com') {
                                 hasGoogle = true;
                             }
                         }
@@ -206,7 +206,7 @@ Dialog {
         dialog.state = 'testing';
 
         var accountType = accountCombo.model.get(accountCombo.currentIndex).type;
-        if (accountType == 'wifirst') {
+        if (accountType === 'wifirst') {
             // validate input
             if (usernameInput.text.indexOf('@') < 0) {
                 usernameInput.text += '@wifirst.net';
@@ -216,14 +216,14 @@ Dialog {
 
             var xhr = new XMLHttpRequest();
             xhr.onreadystatechange = function() {
-                if (xhr.readyState == 4) {
-                    if (xhr.status == 200) {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
                         accountModel.append({type: 'web',
                             username: username,
                             password: password,
                             realm: 'www.wifirst.net'});
                         dialog.save();
-                    } else if (xhr.status == 401) {
+                    } else if (xhr.status === 401) {
                         dialog.state = 'authError';
                     } else {
                         dialog.state = 'unknownError';
@@ -233,7 +233,7 @@ Dialog {
             xhr.open('GET', 'https://apps.wifirst.net/wilink/credentials', true, username, password);
             xhr.setRequestHeader('Accept', 'application/xml');
             xhr.send();
-        } else if (accountType == 'google') {
+        } else if (accountType === 'google') {
             // validate input
             if (usernameInput.text.indexOf('@') < 0) {
                 usernameInput.text += '@gmail.com';
@@ -257,7 +257,7 @@ Dialog {
             // check for duplicate account
             for (var i = 0; i < accountModel.count; i++) {
                 var account = accountModel.get(i);
-                if (account.type == 'xmpp' && account.realm == Utils.jidToDomain(username)) {
+                if (account.type === 'xmpp' && account.realm === Utils.jidToDomain(username)) {
                     dialog.state = 'dupe';
                     return;
                 }
@@ -279,7 +279,7 @@ Dialog {
 
             onConnected: {
                 var accountType = accountCombo.model.get(accountCombo.currentIndex).type;
-                if (accountType == 'google') {
+                if (accountType === 'google') {
                     console.log("google ok");
                     accountModel.append({type: 'web',
                         username: usernameInput.text,
@@ -296,7 +296,7 @@ Dialog {
             }
 
             onDisconnected: {
-                if (dialog.state == 'testing') {
+                if (dialog.state === 'testing') {
                     dialog.state = 'authError';
                 }
             }

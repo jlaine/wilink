@@ -109,7 +109,7 @@ ContactView {
             Item {
                 id: status
 
-                property bool pending: (model.subscriptionStatus == 'subscribe')
+                property bool pending: (model.subscriptionStatus === 'subscribe')
 
                 anchors.right: parent.right
                 anchors.rightMargin: appStyle.margin.normal
@@ -137,9 +137,9 @@ ContactView {
                 anchors.fill: parent
                 hoverEnabled: true
                 onClicked: {
-                    if (mouse.button == Qt.LeftButton) {
+                    if (mouse.button === Qt.LeftButton) {
                         block.itemClicked(model);
-                    } else if (mouse.button == Qt.RightButton) {
+                    } else if (mouse.button === Qt.RightButton) {
                         block.itemContextMenu(model, block.mapFromItem(item, mouse.x, mouse.y));
                     }
                 }
@@ -162,7 +162,7 @@ ContactView {
             onTriggered: {
                 // Update the currently selected item after delay.
                 for (var i = 0; i < listHelper.count; i++) {
-                    if (listHelper.getProperty(i, 'jid') == currentJid) {
+                    if (listHelper.getProperty(i, 'jid') === currentJid) {
                         block.currentIndex = i;
                         return;
                     }

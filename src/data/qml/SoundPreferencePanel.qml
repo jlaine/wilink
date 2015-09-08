@@ -43,9 +43,9 @@ Panel {
         id: tester
 
         onStateChanged: {
-            if (tester.state == SoundTester.RecordingState) {
+            if (tester.state === SoundTester.RecordingState) {
                 devices.state = 'recording';
-            } else if (tester.state == SoundTester.PlayingState) {
+            } else if (tester.state === SoundTester.PlayingState) {
                 devices.state = 'playing';
             } else {
                 devices.state = '';
@@ -85,7 +85,7 @@ Panel {
                     for (var i in names) {
                         var device = names[i];
                         model.append({text: device});
-                        if (device == appSettings.audioOutputDeviceName) {
+                        if (device === appSettings.audioOutputDeviceName) {
                             output.currentIndex = i;
                         }
                     }
@@ -113,7 +113,7 @@ Panel {
                     for (var i in names) {
                         var device = names[i];
                         model.append({text: device});
-                        if (device == appSettings.audioInputDeviceName) {
+                        if (device === appSettings.audioInputDeviceName) {
                             input.currentIndex = i;
                         }
                     }

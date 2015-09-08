@@ -29,23 +29,23 @@ Item {
     property bool moveRepeat: false
     property variant orientation: Qt.Vertical
 
-    property real contentPos: orientation == Qt.Horizontal ? flickableItem.contentX : flickableItem.contentY
-    property real position: orientation == Qt.Horizontal ? flickableItem.visibleArea.xPosition : flickableItem.visibleArea.yPosition
-    property real pageSize: Math.min(1, orientation == Qt.Horizontal ? (flickableItem.visibleArea.widthRatio > 0 ? flickableItem.visibleArea.widthRatio : 1) : (flickableItem.visibleArea.heightRatio > 0 ? flickableItem.visibleArea.heightRatio : 1))
+    property real contentPos: orientation === Qt.Horizontal ? flickableItem.contentX : flickableItem.contentY
+    property real position: orientation === Qt.Horizontal ? flickableItem.visibleArea.xPosition : flickableItem.visibleArea.yPosition
+    property real pageSize: Math.min(1, orientation === Qt.Horizontal ? (flickableItem.visibleArea.widthRatio > 0 ? flickableItem.visibleArea.widthRatio : 1) : (flickableItem.visibleArea.heightRatio > 0 ? flickableItem.visibleArea.heightRatio : 1))
 
     clip: true
-    height: orientation == Qt.Horizontal ? 8 : 100
-    width: orientation == Qt.Horizontal ? 100 : 8
+    height: orientation === Qt.Horizontal ? 8 : 100
+    width: orientation === Qt.Horizontal ? 100 : 8
 
     Item {
         id: container
 
-        x: orientation == Qt.Horizontal ? 0 : 8
-        width: orientation == Qt.Horizontal ? parent.width : parent.height
+        x: orientation === Qt.Horizontal ? 0 : 8
+        width: orientation === Qt.Horizontal ? parent.width : parent.height
         height: 8
 
         transform: Rotation {
-            angle: orientation == Qt.Horizontal ? 0: 90
+            angle: orientation === Qt.Horizontal ? 0: 90
         }
 
         Item {
@@ -114,7 +114,7 @@ Item {
                 }
 
                 onPositionChanged: {
-                    if (moveAction == 'drag') {
+                    if (moveAction === 'drag') {
                         scrollBar.moveBy((pressContentPos - scrollBar.contentPos) + (mouse.x - pressMouseX) / pressPageSize);
                     }
                 }
@@ -126,7 +126,7 @@ Item {
         id: delayTimer
 
         interval: 350
-        running: moveAction == 'up' || moveAction == 'down'
+        running: moveAction === 'up' || moveAction === 'down'
 
         onTriggered: moveRepeat = true
     }
@@ -142,7 +142,7 @@ Item {
     }
 
     function moveBy(delta) {
-        var contentSize = (orientation == Qt.Horizontal) ? flickableItem.contentWidth : flickableItem.contentHeight;
+        var contentSize = (orientation === Qt.Horizontal) ? flickableItem.contentWidth : flickableItem.contentHeight;
 
         // do not exceed bottom
         delta = Math.min((1 - position - pageSize) * contentSize, delta);
@@ -151,7 +151,7 @@ Item {
         delta = Math.max(-position * contentSize, delta);
 
         // move
-        if (orientation == Qt.Horizontal)
+        if (orientation === Qt.Horizontal)
             flickableItem.contentX = Math.round(flickableItem.contentX + delta);
         else
             flickableItem.contentY = Math.round(flickableItem.contentY + delta);
@@ -159,7 +159,7 @@ Item {
 
     states: State {
         name: 'collapsed'
-        when: pageSize == 1
+        when: pageSize === 1
         PropertyChanges { target: scrollBar; width: 0; opacity: 0 }
     }
 
@@ -167,25 +167,25 @@ Item {
         if (event.modifiers != Qt.NoModifier && event.modifiers != Qt.KeypadModifier)
             return;
 
-        if (scrollBar.orientation == Qt.Horizontal) {
-            if (event.key == Qt.Key_Left) {
+        if (scrollBar.orientation === Qt.Horizontal) {
+            if (event.key === Qt.Key_Left) {
                 scrollBar.moveBy(-defaultQuantity);
                 event.accepted = true;
-            } else if (event.key == Qt.Key_Right) {
+            } else if (event.key === Qt.Key_Right) {
                 scrollBar.moveBy(defaultQuantity);
                 event.accepted = true;
             }
         } else {
-            if (event.key == Qt.Key_Up) {
+            if (event.key === Qt.Key_Up) {
                 scrollBar.moveBy(-defaultQuantity);
                 event.accepted = true;
-            } else if (event.key == Qt.Key_Down) {
+            } else if (event.key === Qt.Key_Down) {
                 scrollBar.moveBy(defaultQuantity);
                 event.accepted = true;
-            } else if (event.key == Qt.Key_PageUp) {
+            } else if (event.key === Qt.Key_PageUp) {
                 scrollBar.moveBy(-flickableItem.height);
                 event.accepted = true;
-            } else if (event.key == Qt.Key_PageDown) {
+            } else if (event.key === Qt.Key_PageDown) {
                 scrollBar.moveBy(flickableItem.height);
                 event.accepted = true;
             }
