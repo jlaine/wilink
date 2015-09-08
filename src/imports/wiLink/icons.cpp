@@ -29,7 +29,7 @@ IconImageProvider::IconImageProvider()
 QImage IconImageProvider::requestImage(const QString &id, QSize *size, const QSize &requestedSize)
 {
     QString filePath;
-    const QList<int> allSizes = QList<int>() << 128 << 64 << 32 << 16;
+    const QList<int> allSizes = QList<int>() << 128 << 64 << 32;
     foreach (const int size, allSizes) {
         const QString testPath = QString(":/images/%1x%2/%3.png").arg(QString::number(size), QString::number(size), id);
         const bool sizeSufficient = !requestedSize.isValid() || (size >= requestedSize.width() && size >= requestedSize.height());
