@@ -86,7 +86,9 @@ Panel {
 
                 anchors.left: parent.left
                 anchors.verticalCenter: parent.verticalCenter
-                source: 'image://icon/peer'
+                source: 'images/peer.png'
+                width: appStyle.icon.smallSize
+                height: appStyle.icon.smallSize
             }
 
             Label {

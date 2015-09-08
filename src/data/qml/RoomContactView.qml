@@ -60,7 +60,7 @@ ContactView {
                     width: parent.width - 1
                     height: parent.height - 1
                     asynchronous: true
-                    source: 'image://icon/chat'
+                    source: 'images/chat.png'
                 }
 
             }

@@ -14,18 +14,9 @@
     <file>images/32x32/face-uncertain.png</file>
     <file>images/32x32/face-wink.png</file>
     <file>images/32x32/wiLink.png</file>
-    <file>images/64x64/audio-input.png</file>
-    <file>images/64x64/audio-output.png</file>
-    <file>images/64x64/call-incoming.png</file>
-    <file>images/64x64/call-outgoing.png</file>
-    <file>images/64x64/chat.png</file>
     <file>images/64x64/close.png</file>
-    <file>images/64x64/moderator.png</file>
-    <file>images/64x64/tip.png</file>
-    <file>images/64x64/web.png</file>
     <file>images/64x64/wiLink-black.png</file>
     <file>images/64x64/wiLink.png</file>
-    <file>images/128x128/peer.png</file>
     <file>images/128x128/wiLink.png</file>
 </qresource>
 </RCC>

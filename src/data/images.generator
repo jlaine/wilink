@@ -23,15 +23,8 @@ import os
 import subprocess
 
 ICONS_64 = [
-    'audio-input.svg',
-    'audio-output.svg',
-    'call-incoming.svg',
-    'call-outgoing.svg',
     'chat.svg',
     'close.svg',
-    'moderator.svg',
-    'tip.svg',
-    'web.svg',
     'wiLink-black.svg',
 ]
 
@@ -86,6 +79,18 @@ def generate_xpm(input_name, output_path):
     subprocess.check_call(['rm', '-f', output_png, output_alpha])
 
 # PNG icons
+generate_png([
+    'audio-input.svg',
+    'audio-output.svg',
+    'call-incoming.svg',
+    'call-outgoing.svg',
+    'chat.svg',
+    'close.svg',
+    'moderator.svg',
+    'tip.svg',
+    'web.svg',
+], 'qml/images', 64)
+generate_png(['peer.svg'], 'qml/images', 128)
 generate_png(['spinner.svg'], 'qml/images', 256)
 
 for size in [32, 64, 128, 256]:

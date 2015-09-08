@@ -62,7 +62,7 @@ ScrollView {
             anchors.right: parent.right
             asynchronous: true
             anchors.rightMargin: 10
-            source: 'image://icon/moderator'
+            source: 'images/moderator.png'
             height: appStyle.icon.smallSize
             width: appStyle.icon.smallSize
             visible: moderator

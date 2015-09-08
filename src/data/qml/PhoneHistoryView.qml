@@ -67,7 +67,7 @@ GroupBox {
                     anchors.left: parent.left
                     anchors.leftMargin: appStyle.margin.normal
                     anchors.verticalCenter: parent.verticalCenter
-                    source: (model.flags & 1) == SipCall.OutgoingDirection ? 'image://icon/call-outgoing' : 'image://icon/call-incoming'
+                    source: (model.flags & 1) == SipCall.OutgoingDirection ? 'images/call-outgoing.png' : 'images/call-incoming.png'
                     width: appStyle.icon.smallSize
                     height: appStyle.icon.smallSize
                 }
