@@ -29,11 +29,7 @@
 
 #define HISTORY_DAYS 365
 #define HISTORY_PAGE 2
-#ifdef WILINK_EMBEDDED
 #define SMILEY_ROOT "qrc:/images/32x32"
-#else
-#define SMILEY_ROOT "qrc:/images/16x16"
-#endif
 
 typedef QPair<QRegExp, QString> TextTransform;
 static QList<TextTransform> textTransforms;
@@ -112,7 +108,7 @@ static QString transformToken(const QString &token)
     // handle smileys
     foreach (const QString &smiley, smileys.keys()) {
         if (smileys.value(smiley).contains(token))
-            return QString("<img alt=\"%1\" src=\"%2/%3\" />").arg(token, SMILEY_ROOT, smiley);
+            return QString("<img alt=\"%1\" src=\"%2/%3\" height=\"16\" width=\"16\" />").arg(token, SMILEY_ROOT, smiley);
     }
 
     // handle links

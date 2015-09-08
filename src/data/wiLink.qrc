@@ -1,18 +1,5 @@
 <!DOCTYPE RCC><RCC version="1.0">
 <qresource>
-    <file>images/16x16/face-angry.png</file>
-    <file>images/16x16/face-cool.png</file>
-    <file>images/16x16/face-crying.png</file>
-    <file>images/16x16/face-embarrassed.png</file>
-    <file>images/16x16/face-laughing.png</file>
-    <file>images/16x16/face-plain.png</file>
-    <file>images/16x16/face-raspberry.png</file>
-    <file>images/16x16/face-sad.png</file>
-    <file>images/16x16/face-sleeping.png</file>
-    <file>images/16x16/face-smile.png</file>
-    <file>images/16x16/face-surprise.png</file>
-    <file>images/16x16/face-uncertain.png</file>
-    <file>images/16x16/face-wink.png</file>
     <file>images/32x32/audio-input.png</file>
     <file>images/32x32/audio-output.png</file>
     <file>images/32x32/call-incoming.png</file>
@@ -32,7 +19,6 @@
     <file>images/32x32/face-surprise.png</file>
     <file>images/32x32/face-uncertain.png</file>
     <file>images/32x32/face-wink.png</file>
-    <file>images/32x32/file.png</file>
     <file>images/32x32/moderator.png</file>
     <file>images/32x32/peer.png</file>
     <file>images/32x32/tip.png</file>
@@ -45,14 +31,12 @@
     <file>images/64x64/call-outgoing.png</file>
     <file>images/64x64/chat.png</file>
     <file>images/64x64/close.png</file>
-    <file>images/64x64/file.png</file>
     <file>images/64x64/moderator.png</file>
     <file>images/64x64/peer.png</file>
     <file>images/64x64/tip.png</file>
     <file>images/64x64/web.png</file>
     <file>images/64x64/wiLink-black.png</file>
     <file>images/64x64/wiLink.png</file>
-    <file>images/128x128/file.png</file>
     <file>images/128x128/peer.png</file>
     <file>images/128x128/spinner.png</file>
     <file>images/128x128/wiLink.png</file>

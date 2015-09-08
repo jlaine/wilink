@@ -57,7 +57,7 @@ if m:
 
 for rect in group.findall('{http://www.w3.org/2000/svg}rect'):
     id = rect.attrib['id']
-    for size in [16, 32]:
+    for size in [32]:
         if id in EMOTES:
             png_path = os.path.join("%ix%i" % (size, size), "%s.png" % id)
             if os.path.exists(png_path):
