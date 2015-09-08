@@ -1,5 +1,7 @@
 WILINK_VERSION = 2.4.91
 
+EOL = $$escape_expand(\n\t)
+
 isEmpty(PREFIX) {
     unix {
         PREFIX = /usr/local

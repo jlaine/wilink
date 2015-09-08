@@ -82,7 +82,6 @@ android {
     INSTALLS += qmldir target
 }
 
-EOL = $$escape_expand(\n\t)
 QMAKE_POST_LINK += $$QMAKE_COPY $$shell_path($$shell_quote($$PWD/qmldir) $$shell_quote($$DESTDIR)) $$EOL
 
 !isEmpty(WILINK_SYSTEM_QXMPP) {
