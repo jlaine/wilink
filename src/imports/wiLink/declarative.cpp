@@ -164,7 +164,6 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterType<PhoneAudioHelper>(uri, 2, 4, "PhoneAudioHelper");
     qmlRegisterType<SipClient>(uri, 2, 4, "SipClient");
     qmlRegisterUncreatableType<SipCall>(uri, 2, 4, "SipCall", "");
-    qmlRegisterType<PlaceModel>(uri, 2, 4, "PlaceModel");
     qmlRegisterType<RoomConfigurationModel>(uri, 2, 4, "RoomConfigurationModel");
     qmlRegisterType<RoomModel>(uri, 2, 4, "RoomModel");
     qmlRegisterType<RoomPermissionModel>(uri, 2, 4, "RoomPermissionModel");
