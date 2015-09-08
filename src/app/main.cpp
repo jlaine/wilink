@@ -21,6 +21,7 @@
 #include <csignal>
 
 #include <QApplication>
+#include <QDomDocument>
 #include <QFileOpenEvent>
 #include <QFontDatabase>
 #include <QIcon>
@@ -108,6 +109,11 @@ int main(int argc, char *argv[])
     /* Hack around font issue on Android simulator */
     QFontDatabase db;
     db.addApplicationFont(":/DroidSans.ttf");
+#endif
+#ifdef Q_OS_WIN
+    /* Force linking against QtXml so it get deployed */
+    QDomDocument doc;
+    Q_UNUSED(doc);
 #endif
 
     /* Parse command line arguments */
