@@ -17,14 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import QtQuick 1.1
+import QtQuick 2.3
 
 QtObject {
     property bool fullScreen
-    property int minimumWidth
-    property int minimumHeight
 
-    signal messageReceived
     signal showAbout
     signal showHelp
     signal showPreferences
