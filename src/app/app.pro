@@ -45,6 +45,7 @@ android {
 
     QMAKE_POST_LINK += $$[QT_INSTALL_BINS]/macdeployqt $$DESTDIR/wiLink.app -qmldir=$$WILINK_SOURCE_TREE/src/data/qml;
 } else:win32 {
+    RC_ICONS = ../data/wiLink.ico
     SSL_DIR = $$[QT_INSTALL_PREFIX]/../../Tools/QtCreator/bin
     QMAKE_POST_LINK += $$QMAKE_COPY $$shell_quote($$shell_path($$SSL_DIR/libeay32.dll)) $$shell_quote($$shell_path($$DESTDIR)) $$EOL
     QMAKE_POST_LINK += $$QMAKE_COPY $$shell_quote($$shell_path($$SSL_DIR/ssleay32.dll)) $$shell_quote($$shell_path($$DESTDIR)) $$EOL
