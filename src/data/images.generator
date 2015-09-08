@@ -58,13 +58,13 @@ def inkscape(input_svg, output_png, size):
         '--export-width=%d' % size,
         '--export-height=%d' % size])
 
-def generate_png(input_names, size):
+def generate_png(input_names, output_dir, size):
     """
     Generate PNG icons from SVG files.
     """
     for name in input_names:
         input_svg = os.path.join('images', 'scalable', name)
-        output_png = os.path.join('images', '%dx%d' % (size, size), os.path.splitext(name)[0] + '.png')
+        output_png = os.path.join(output_dir, os.path.splitext(name)[0] + '.png')
         inkscape(input_svg, output_png, size)
 
 def generate_ico(input_name, output_path):
@@ -98,10 +98,10 @@ def generate_xpm(input_name, output_path):
     subprocess.check_call(['rm', '-f', output_png, output_alpha])
 
 # PNG icons
-generate_png(ICONS_32, 32)
-generate_png(ICONS_64, 64)
-generate_png(ICONS_128, 128)
-generate_png(ICONS_256, 256)
+generate_png(ICONS_32, 'images/32x32', 32)
+generate_png(ICONS_64, 'images/64x64', 64)
+generate_png(ICONS_128, 'images/128x128', 128)
+generate_png(ICONS_256, 'images/256x256', 256)
 
 # other icons
 generate_ico('wiLink.svg', 'wiLink.ico')
