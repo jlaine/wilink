@@ -41,13 +41,9 @@ ICONS = [
 
 LARGE_ICONS = [
     'album.svg',
-    'audio-x-generic.svgz',
     'file.svg',
-    'image-x-generic.svgz',
     'peer.svg',
     'spinner.svg',
-    'text-x-generic.svgz',
-    'video-x-generic.svgz',
     'wiLink.svg',
 ]
 
