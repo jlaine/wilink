@@ -23,7 +23,7 @@ import wiLink 2.4
 Dialog {
     id: dialog
 
-    property bool prompting: Qt.isQtObject(appUpdater) && appUpdater.state == Updater.PromptState
+    property bool prompting: Qt.isQtObject(appUpdater) && appUpdater.state === Updater.PromptState
 
     footerComponent: Item {
         anchors.fill: parent
@@ -35,7 +35,7 @@ Dialog {
             Button {
                 id: refreshButton
 
-                enabled: Qt.isQtObject(appUpdater) && appUpdater.state == Updater.IdleState
+                enabled: Qt.isQtObject(appUpdater) && appUpdater.state === Updater.IdleState
                 iconStyle: 'icon-refresh'
                 style: 'primary'
                 text: qsTr('Check for updates')
@@ -120,14 +120,14 @@ Dialog {
 
                 switch (appUpdater.state) {
                 case Updater.IdleState: {
-                    if (appUpdater.error == Updater.NoError) {
+                    if (appUpdater.error === Updater.NoError) {
                         return "<p>Copyright (C) 2009-2015 Wifirst<br/>"
                         + "See AUTHORS file for a full list of contributors.</p>"
                         + "<p>This program is free software: you can redistribute it and/or modify "
                         + "it under the terms of the GNU General Public License as published by "
                         + "the Free Software Foundation, either version 3 of the License, or "
                         + "(at your option) any later version.</p>";
-                    } else if (appUpdater.error == Updater.NoUpdateError) {
+                    } else if (appUpdater.error === Updater.NoUpdateError) {
                         return qsTr('Your version of %1 is up to date.').replace('%1', Qt.application.name);
                     } else {
                         var text = '<p>' + qsTr('Could not run software update, please try again later.') + '</p>'
@@ -160,14 +160,14 @@ Dialog {
             anchors.right: parent.right
             maximumValue: Qt.isQtObject(appUpdater) ? appUpdater.progressMaximum : 100
             value: Qt.isQtObject(appUpdater) ? appUpdater.progressValue : 0
-            visible: Qt.isQtObject(appUpdater) && appUpdater.state == Updater.DownloadState
+            visible: Qt.isQtObject(appUpdater) && appUpdater.state === Updater.DownloadState
         }
     }
 
     onAccepted: {
         if (prompting)
             appUpdater.install();
-        else if (Qt.isQtObject(appUpdater) && appUpdater.state == Updater.IdleState)
+        else if (Qt.isQtObject(appUpdater) && appUpdater.state === Updater.IdleState)
             appUpdater.check();
     }
 
