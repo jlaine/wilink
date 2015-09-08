@@ -40,8 +40,8 @@ Dialog {
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
             source: 'image://icon/peer'
-            sourceSize.width: 64
-            sourceSize.height: 64
+            width: 64
+            height: 64
         }
 
         Column {

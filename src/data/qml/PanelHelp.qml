@@ -39,8 +39,8 @@ Rectangle {
         anchors.top: parent.top
         anchors.margins: 8
         source: 'image://icon/tip'
-        sourceSize.height: iconSize
-        sourceSize.width: iconSize
+        height: iconSize
+        width: iconSize
     }
 
     Label {

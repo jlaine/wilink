@@ -42,8 +42,6 @@ ScrollView {
                 anchors.horizontalCenter: parent.horizontalCenter
                 asynchronous: true
                 source: model.avatar
-                sourceSize.height: appStyle.icon.normalSize
-                sourceSize.width: appStyle.icon.normalSize
                 height: appStyle.icon.normalSize
                 width: appStyle.icon.normalSize
              }
@@ -65,8 +63,8 @@ ScrollView {
             asynchronous: true
             anchors.rightMargin: 10
             source: 'image://icon/moderator'
-            sourceSize.height: appStyle.icon.smallSize
-            sourceSize.width: appStyle.icon.smallSize
+            height: appStyle.icon.smallSize
+            width: appStyle.icon.smallSize
             visible: moderator
         }
 

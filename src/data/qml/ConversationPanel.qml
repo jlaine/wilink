@@ -206,8 +206,6 @@ Panel {
                 anchors.bottomMargin: 6
                 asynchronous: true
                 source: vcard.avatar
-                sourceSize.height: appStyle.icon.normalSize
-                sourceSize.width: appStyle.icon.normalSize
                 height: appStyle.icon.normalSize
                 width: appStyle.icon.normalSize
 

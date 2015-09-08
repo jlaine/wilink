@@ -79,8 +79,6 @@ ContactView {
                     height: parent.height - 1
                     asynchronous: true
                     source: model.avatar
-                    sourceSize.width: appStyle.icon.smallSize - 1
-                    sourceSize.height: appStyle.icon.smallSize- 1
                 }
 
             }

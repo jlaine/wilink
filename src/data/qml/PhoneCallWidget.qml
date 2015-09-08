@@ -65,8 +65,8 @@ Item {
             anchors.leftMargin: appStyle.margin.normal
             anchors.verticalCenter: parent.verticalCenter
             source: (call && call.direction == SipCall.IncomingDirection) ? 'image://icon/call-incoming' : 'image://icon/call-outgoing'
-            sourceSize.width: appStyle.icon.smallSize
-            sourceSize.height: appStyle.icon.smallSize
+            width: appStyle.icon.smallSize
+            height: appStyle.icon.smallSize
         }
 
         Label {

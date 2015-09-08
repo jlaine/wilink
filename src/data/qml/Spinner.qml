@@ -26,8 +26,8 @@ Image {
 
     opacity: spinner.busy ? 1.0 : 0.0
     source: 'image://icon/spinner'
-    sourceSize.width: 128
-    sourceSize.height: 128
+    width: 128
+    height: 128
 
     Behavior on opacity {
         NumberAnimation {

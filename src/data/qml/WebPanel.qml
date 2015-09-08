@@ -70,8 +70,8 @@ Panel {
                 anchors.verticalCenter: parent.verticalCenter
                 smooth: true
                 source: model.panel.iconSource
-                sourceSize.height: appStyle.icon.tinySize
-                sourceSize.width: appStyle.icon.tinySize
+                height: appStyle.icon.tinySize
+                width: appStyle.icon.tinySize
             }
 
             Label {

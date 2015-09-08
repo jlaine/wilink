@@ -68,8 +68,8 @@ GroupBox {
                     anchors.leftMargin: appStyle.margin.normal
                     anchors.verticalCenter: parent.verticalCenter
                     source: (model.flags & 1) == SipCall.OutgoingDirection ? 'image://icon/call-outgoing' : 'image://icon/call-incoming'
-                    sourceSize.width: appStyle.icon.smallSize
-                    sourceSize.height: appStyle.icon.smallSize
+                    width: appStyle.icon.smallSize
+                    height: appStyle.icon.smallSize
                 }
 
                 Label {

@@ -61,8 +61,6 @@ ContactView {
                     height: parent.height - 1
                     asynchronous: true
                     source: 'image://icon/chat'
-                    sourceSize.width: appStyle.icon.smallSize - 1
-                    sourceSize.height: appStyle.icon.smallSize- 1
                 }
 
             }

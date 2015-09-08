@@ -147,8 +147,6 @@ Item {
                     id: avatar
                     asynchronous: true
                     source: model.avatar
-                    sourceSize.height: appStyle.icon.normalSize
-                    sourceSize.width: appStyle.icon.normalSize
                     height: appStyle.icon.normalSize
                     width: appStyle.icon.normalSize
 
