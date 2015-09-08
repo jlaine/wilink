@@ -23,14 +23,12 @@ import os
 import subprocess
 
 ICONS = [
-    'album.svg',
     'audio-input.svg',
     'audio-output.svg',
     'call-incoming.svg',
     'call-outgoing.svg',
     'chat.svg',
     'close.svg',
-    'file.svg',
     'moderator.svg',
     'peer.svg',
     'tip.svg',
@@ -40,8 +38,6 @@ ICONS = [
 ]
 
 LARGE_ICONS = [
-    'album.svg',
-    'file.svg',
     'peer.svg',
     'spinner.svg',
     'wiLink.svg',

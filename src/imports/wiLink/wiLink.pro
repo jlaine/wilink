@@ -36,7 +36,6 @@ SOURCES += \
     notifications.cpp \
     phone.cpp \
     phone/sip.cpp \
-    places.cpp \
     rooms.cpp \
     roster.cpp \
     settings.cpp \
@@ -61,7 +60,6 @@ HEADERS += \
     model.h \
     notifications.h \
     phone.h \
-    places.h \
     phone/sip.h \
     phone/sip_p.h \
     rooms.h \
