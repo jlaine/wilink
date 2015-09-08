@@ -9,7 +9,7 @@ InstallDir "$PROGRAMFILES\wiLink"
 !include "MUI.nsh"
 !define MUI_ABORTWARNING
 
-!insertmacro MUI_PAGE_LICENSE "COPYING"
+!insertmacro MUI_PAGE_LICENSE "${PRODUCT_LICENSE}"
 !insertmacro MUI_PAGE_DIRECTORY
 
 !define MUI_FINISHPAGE_RUN "$INSTDIR\bin\wiLink.exe";
