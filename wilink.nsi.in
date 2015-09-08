@@ -1,5 +1,4 @@
 !define PRODUCT_NAME "wiLink"
-!define PRODUCT_VERSION "2.4.902"
 
 Name "${PRODUCT_NAME}"
 OutFile "..\${PRODUCT_NAME}-${PRODUCT_VERSION}-win32.exe"

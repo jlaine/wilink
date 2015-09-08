@@ -5,21 +5,24 @@ TEMPLATE = subdirs
 SUBDIRS = src
 
 # Package generation
-PACKAGE = wiLink
-VERSION = $$WILINK_VERSION
-package.tmp = $${PACKAGE}.tmp
 mac {
     package.depends = first
-    package.output = $$PACKAGE-$$VERSION-mac-10.6.dmg
-    package.bundle = $${PACKAGE}.app
+    package.output = wiLink-$$WILINK_VERSION-mac-10.6.dmg
+    package.tmp = wiLink.tmp
     package.commands =  \
         rm -rf $$package.tmp $$package.output; \
         $(MKDIR) $$package.tmp; \
         ln -s /Applications $$package.tmp/Applications; \
-        cp -a $$WILINK_APP_PATH/$$package.bundle $$package.tmp; \
-        hdiutil create $$package.output -srcdir $$package.tmp -format UDBZ -volname \"$$PACKAGE $$VERSION\"; \
+        cp -a $$WILINK_APP_PATH/wiLink.app $$package.tmp; \
+        hdiutil create $$package.output -srcdir $$package.tmp -format UDBZ -volname \"wiLink $$WILINK_VERSION\"; \
         rm -rf $$package.tmp
     QMAKE_EXTRA_TARGETS = package
+} else:win32 {
+    NSI_HEADER = "!define PRODUCT_VERSION \"$$WILINK_VERSION\""
+    NSI_HEADER += "!define PRODUCT_LICENSE \"$$WILINK_SOURCE_TREE/COPYING\""
+    NSI_BODY = $$cat($$WILINK_SOURCE_TREE/wilink.nsi.in, blob)
+    write_file($$WILINK_BUILD_TREE/wilink.nsi, NSI_HEADER)
+    write_file($$WILINK_BUILD_TREE/wilink.nsi, NSI_BODY, append)
 }
 
 OTHER_FILES += \
