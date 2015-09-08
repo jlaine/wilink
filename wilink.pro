@@ -16,8 +16,8 @@ mac {
         rm -rf $$package.tmp $$package.output; \
         $(MKDIR) $$package.tmp; \
         ln -s /Applications $$package.tmp/Applications; \
-        cp -r $$WILINK_APP_PATH/$$package.bundle $$package.tmp; \
-        hdiutil create $$package.output -srcdir $$package.tmp -fs HFS+ -volname \"$$PACKAGE $$VERSION\"; \
+        cp -a $$WILINK_APP_PATH/$$package.bundle $$package.tmp; \
+        hdiutil create $$package.output -srcdir $$package.tmp -format UDBZ -volname \"$$PACKAGE $$VERSION\"; \
         rm -rf $$package.tmp
     QMAKE_EXTRA_TARGETS = package
 } else:win32 {

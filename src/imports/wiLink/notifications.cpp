@@ -174,9 +174,8 @@ Notification *Notifier::showMessage(const QString &title, const QString &message
 void Notifier::_q_trayActivated(QSystemTrayIcon::ActivationReason reason)
 {
     if (reason != QSystemTrayIcon::Context) {
-        foreach (QWindow *widget, QGuiApplication::topLevelWindows()) {
-            QMetaObject::invokeMethod(widget, "showAndRaise");
-        }
+        foreach (QWindow *window, QGuiApplication::topLevelWindows())
+            QMetaObject::invokeMethod(window, "showAndRaise");
     }
 }
 

@@ -35,10 +35,8 @@
     Q_UNUSED(app);
     Q_UNUSED(flag);
 
-    foreach (QWindow *window, QGuiApplication::topLevelWindows()) {
-        window->show();
-        window->raise();
-    }
+    foreach (QWindow *window, QGuiApplication::topLevelWindows())
+        QMetaObject::invokeMethod(window, "showAndRaise");
 
     return NO;
 }
