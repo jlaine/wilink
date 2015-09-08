@@ -47,7 +47,6 @@
 #include "diagnostics.h"
 #include "discovery.h"
 #include "history.h"
-#include "icons.h"
 #include "menubar.h"
 #include "notifications.h"
 #include "phone.h"
@@ -131,7 +130,6 @@ void ListHelper::setModel(QAbstractItemModel *model)
 void Plugin::initializeEngine(QQmlEngine *engine, const char *uri)
 {
     Q_UNUSED(uri);
-    engine->addImageProvider("icon", new IconImageProvider);
     engine->addImageProvider("roster", new RosterImageProvider);
 
     // initialise wallet

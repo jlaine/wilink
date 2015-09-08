@@ -29,7 +29,6 @@ SOURCES += \
     diagnostics.cpp \
     discovery.cpp \
     history.cpp \
-    icons.cpp \
     idle/idle.cpp \
     menubar.cpp \
     model.cpp \
@@ -54,7 +53,6 @@ HEADERS += \
     diagnostics.h \
     discovery.h \
     history.h \
-    icons.h \
     idle/idle.h \
     menubar.h \
     model.h \
