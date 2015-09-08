@@ -91,11 +91,7 @@ generate_png([
     'web.svg',
 ], 'qml/images', 64)
 generate_png(['peer.svg'], 'qml/images', 128)
-<<<<<<< HEAD
 generate_png(['spinner.svg', 'wiLink.svg'], 'qml/images', 256)
-=======
-generate_png(['spinner.svg'], 'qml/images', 256)
->>>>>>> d4e6404458994a54b3f6079deef1d2fe81e0c546
 
 for size in [32, 64, 128, 256]:
     generate_png(['wiLink.svg'], 'images/%dx%d' % (size, size), size)
