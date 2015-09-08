@@ -22,10 +22,6 @@
 import os
 import subprocess
 
-ICONS_32 = [
-    'wiLink.svg',
-]
-
 ICONS_64 = [
     'audio-input.svg',
     'audio-output.svg',
@@ -37,18 +33,11 @@ ICONS_64 = [
     'peer.svg',
     'tip.svg',
     'web.svg',
-    'wiLink.svg',
     'wiLink-black.svg',
 ]
 
 ICONS_128 = [
     'peer.svg',
-    'spinner.svg',
-    'wiLink.svg',
-]
-
-ICONS_256 = [
-    'wiLink.svg',
 ]
 
 def inkscape(input_svg, output_png, size):
@@ -98,10 +87,13 @@ def generate_xpm(input_name, output_path):
     subprocess.check_call(['rm', '-f', output_png, output_alpha])
 
 # PNG icons
-generate_png(ICONS_32, 'images/32x32', 32)
+generate_png(['spinner.svg'], 'qml/images', 256)
+
+for size in [32, 64, 128, 256]:
+    generate_png(['wiLink.svg'], 'images/%dx%d' % (size, size), size)
+
 generate_png(ICONS_64, 'images/64x64', 64)
 generate_png(ICONS_128, 'images/128x128', 128)
-generate_png(ICONS_256, 'images/256x256', 256)
 
 # other icons
 generate_ico('wiLink.svg', 'wiLink.ico')

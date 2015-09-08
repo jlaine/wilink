@@ -99,6 +99,7 @@
     <file>qml/images/login.jpg</file>
     <file>qml/images/logo_header.png</file>
     <file>qml/images/shadow.png</file>
+    <file>qml/images/spinner.png</file>
     <file>qml/scripts/sip.js</file>
     <file>qml/scripts/storage.js</file>
     <file>qml/scripts/utils.js</file>

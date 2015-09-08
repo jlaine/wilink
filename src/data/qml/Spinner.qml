@@ -25,7 +25,7 @@ Image {
     property bool busy: false
 
     opacity: spinner.busy ? 1.0 : 0.0
-    source: 'image://icon/spinner'
+    source: 'images/spinner.png'
     width: 128
     height: 128
 
