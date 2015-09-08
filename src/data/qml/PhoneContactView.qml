@@ -41,7 +41,7 @@ ContactView {
             anchors.leftMargin: 6
             anchors.verticalCenter: parent.verticalCenter
             asynchronous: true
-            source: 'image://icon/peer'
+            source: 'images/peer.png'
             width: appStyle.icon.smallSize
             height: appStyle.icon.smallSize
         }

@@ -134,7 +134,7 @@ QPixmap RosterImageProvider::requestPixmap(const QString &id, QSize *size, const
     }
     if (pixmap.isNull()) {
         qWarning("Could not get roster picture for %s", qPrintable(id));
-        pixmap = QPixmap(":/images/128x128/peer.png");
+        pixmap = QPixmap("qrc:/qml/images/peer.png");
         if (requestedSize.isValid())
             pixmap = pixmap.scaled(requestedSize.width(), requestedSize.height(), Qt::KeepAspectRatio);
     }
@@ -595,7 +595,7 @@ void VCard::update()
             newNickName = vcard.nickName();
             newUrl = QUrl(vcard.url());
         } else {
-            newAvatar = QUrl("image://icon/peer");
+            newAvatar = QUrl("images/peer.png");
         }
         foreach (ChatClient *client, m_cache->d->clients) {
             const QString name = client->rosterManager()->getRosterEntry(QXmppUtils::jidToBareJid(m_jid)).name();
@@ -726,7 +726,7 @@ QUrl VCardCache::imageUrl(const QString &jid)
     if (get(jid))
         return QUrl("image://roster/" + jid);
     else
-        return QUrl("image://icon/peer");
+        return QUrl("images/peer.png");
 }
 
 VCardCache *VCardCache::instance()

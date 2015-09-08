@@ -39,7 +39,7 @@ Dialog {
 
             anchors.verticalCenter: parent.verticalCenter
             anchors.left: parent.left
-            source: 'image://icon/peer'
+            source: 'images/peer.png'
             width: 64
             height: 64
         }

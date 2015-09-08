@@ -83,7 +83,7 @@ Dialog {
                 anchors.left: parent.left
                 height: 48
                 width: 48
-                source: 'image://icon/wiLink'
+                source: 'images/wiLink.png'
             }
 
             Label {

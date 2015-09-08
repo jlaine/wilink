@@ -140,7 +140,7 @@ Item {
                 Image {
                     id: inputIcon
 
-                    source: 'image://icon/audio-input'
+                    source: 'images/audio-input.png'
                     height: appStyle.icon.tinySize
                     width: appStyle.icon.tinySize
                 }
@@ -148,7 +148,7 @@ Item {
                 Image {
                     id: outputIcon
 
-                    source: 'image://icon/audio-output'
+                    source: 'images/audio-output.png'
                     height: appStyle.icon.tinySize
                     width: appStyle.icon.tinySize
                 }

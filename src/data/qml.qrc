@@ -96,10 +96,20 @@
     <file>qml/boot.qml</file>
     <file>qml/fonts/fontawesome-webfont.ttf</file>
     <file>qml/i18n/fr.qm</file>
+    <file>qml/images/audio-input.png</file>
+    <file>qml/images/audio-output.png</file>
+    <file>qml/images/call-incoming.png</file>
+    <file>qml/images/call-outgoing.png</file>
+    <file>qml/images/chat.png</file>
     <file>qml/images/login.jpg</file>
     <file>qml/images/logo_header.png</file>
+    <file>qml/images/moderator.png</file>
+    <file>qml/images/peer.png</file>
     <file>qml/images/shadow.png</file>
     <file>qml/images/spinner.png</file>
+    <file>qml/images/tip.png</file>
+    <file>qml/images/web.png</file>
+    <file>qml/images/wiLink.png</file>
     <file>qml/scripts/sip.js</file>
     <file>qml/scripts/storage.js</file>
     <file>qml/scripts/utils.js</file>

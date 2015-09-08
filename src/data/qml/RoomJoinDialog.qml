@@ -88,7 +88,7 @@ Dialog {
                     anchors.left: parent.left
                     anchors.leftMargin: 4
                     anchors.verticalCenter: parent.verticalCenter
-                    source: 'image://icon/chat'
+                    source: 'images/chat.png'
                     width: appStyle.icon.smallSize
                     height: appStyle.icon.smallSize
                 }

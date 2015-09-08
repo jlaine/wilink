@@ -64,7 +64,7 @@ Item {
             anchors.left: parent.left
             anchors.leftMargin: appStyle.margin.normal
             anchors.verticalCenter: parent.verticalCenter
-            source: (call && call.direction == SipCall.IncomingDirection) ? 'image://icon/call-incoming' : 'image://icon/call-outgoing'
+            source: (call && call.direction == SipCall.IncomingDirection) ? 'images/call-incoming.png' : 'images/call-outgoing.png'
             width: appStyle.icon.smallSize
             height: appStyle.icon.smallSize
         }
@@ -121,7 +121,7 @@ Item {
                 Image {
                     id: inputIcon
 
-                    source: 'image://icon/audio-input'
+                    source: 'images/audio-input.png'
                     height: appStyle.icon.tinySize
                     width: appStyle.icon.tinySize
                 }
@@ -129,7 +129,7 @@ Item {
                 Image {
                     id: outputIcon
 
-                    source: 'image://icon/audio-output'
+                    source: 'images/audio-output.png'
                     height: appStyle.icon.tinySize
                     width: appStyle.icon.tinySize
                 }

@@ -38,7 +38,7 @@ Rectangle {
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.margins: 8
-        source: 'image://icon/tip'
+        source: 'images/tip.png'
         height: iconSize
         width: iconSize
     }
