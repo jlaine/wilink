@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="fr_FR">
+<TS version="2.1" language="fr_FR">
 <context>
     <name>AboutDialog</name>
     <message>
@@ -354,17 +354,6 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>FolderQueueView</name>
-    <message>
-        <source>%1 files</source>
-        <translation>%1 fichiers</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Annuler</translation>
-    </message>
-</context>
-<context>
     <name>GeneralPreferencePanel</name>
     <message>
         <source>Open at login</source>
@@ -570,82 +559,6 @@ Acceptez-vous?</translation>
     </message>
 </context>
 <context>
-    <name>PhotoAlbumDialog</name>
-    <message>
-        <source>Create an album</source>
-        <translation>Créer un album</translation>
-    </message>
-    <message>
-        <source>Album name:</source>
-        <translation>Nom de l&apos;album :</translation>
-    </message>
-</context>
-<context>
-    <name>PhotoDeleteDialog</name>
-    <message>
-        <source>Delete photo</source>
-        <translation>Supprimer la photo</translation>
-    </message>
-    <message>
-        <source>Do you want to delete %1 from your photos?</source>
-        <translation>Souhaitez-vous supprimer %1 de vos photos ?</translation>
-    </message>
-</context>
-<context>
-    <name>PhotoPanel</name>
-    <message>
-        <source>Photos</source>
-        <translation>Photos</translation>
-    </message>
-    <message>
-        <source>Go back</source>
-        <translation>Retour</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation>Annuler</translation>
-    </message>
-    <message>
-        <source>Upload photos</source>
-        <translation>Envoi de photos</translation>
-    </message>
-    <message>
-        <source>Upload</source>
-        <translation>Envoyer</translation>
-    </message>
-    <message>
-        <source>Home</source>
-        <translation>Accueil</translation>
-    </message>
-    <message>
-        <source>Create</source>
-        <translation>Créer</translation>
-    </message>
-    <message>
-        <source>Image files</source>
-        <translation>Fichiers images</translation>
-    </message>
-    <message>
-        <source>All files</source>
-        <translation>Tous les fichiers</translation>
-    </message>
-    <message>
-        <source>To upload your photos, simply drag and drop them to an album.</source>
-        <translation>Pour transférer vos photos, il vous suffit de les faire glisser sur un album.</translation>
-    </message>
-</context>
-<context>
-    <name>PhotoPlugin</name>
-    <message>
-        <source>Photos</source>
-        <translation>Photos</translation>
-    </message>
-    <message>
-        <source>This plugin allows you to access your photos.</source>
-        <translation>Ce module vous permet d&apos;accéder à vos photos.</translation>
-    </message>
-</context>
-<context>
     <name>PluginPreferencePanel</name>
     <message>
         <source>Plugins</source>
@@ -673,10 +586,6 @@ Acceptez-vous?</translation>
     <message>
         <source>Plugins</source>
         <translation>Modules</translation>
-    </message>
-    <message>
-        <source>Shares</source>
-        <translation>Partages</translation>
     </message>
 </context>
 <context>
@@ -738,7 +647,7 @@ Acceptez-vous?</translation>
     </message>
     <message>
         <source>Ban user from the room:</source>
-        <translation>Bannir l'utilisateur du salon :</translation>
+        <translation>Bannir l&apos;utilisateur du salon :</translation>
     </message>
 </context>
 <context>
@@ -783,9 +692,6 @@ Acceptez-vous?</translation>
         <source>Show this room</source>
         <translation>Afficher le salon</translation>
     </message>
-</context>
-<context>
-    <name>RoomParticipantView</name>
     <message>
         <source>Show profile</source>
         <translation>Accéder au profil</translation>
@@ -878,90 +784,6 @@ Acceptez-vous?</translation>
     <message>
         <source>If you need help, please refer to the &lt;a href=&quot;%1&quot;&gt;wiLink FAQ&lt;/a&gt;.</source>
         <translation>Si vous avez besoin d&apos;aide, merci de consulter la &lt;a href=&quot;%1&quot;&gt;FAQ wiLink&lt;/a&gt;.</translation>
-    </message>
-</context>
-<context>
-    <name>SharePanel</name>
-    <message>
-        <source>Shares</source>
-        <translation>Partages</translation>
-    </message>
-    <message>
-        <source>Enter the name of the file you are looking for.</source>
-        <translation>Saisissez le nom du fichier que vous cherchez.</translation>
-    </message>
-    <message>
-        <source>You can select the folders you want to share with other users from the shares options.</source>
-        <translation>Vous pouvez sélectionner les dossiers que vous souhaitez partager avec les autres utilisateurs depuis les options de partages.</translation>
-    </message>
-    <message>
-        <source>Options</source>
-        <translation>Options</translation>
-    </message>
-    <message>
-        <source>Received files are stored in your &lt;a href=&quot;%1&quot;&gt;downloads folder&lt;/a&gt;.</source>
-        <translation>Les fichiers reçus sont stockés dans votre &lt;a href=&quot;%1&quot;&gt;dossier de téléchargement&lt;/a&gt;.</translation>
-    </message>
-    <message>
-        <source>Go back</source>
-        <translation>Retour</translation>
-    </message>
-    <message>
-        <source>Home</source>
-        <translation>Accueil</translation>
-    </message>
-</context>
-<context>
-    <name>SharePlugin</name>
-    <message>
-        <source>Shares</source>
-        <translation>Partages</translation>
-    </message>
-    <message>
-        <source>This plugin allows you to share documents.</source>
-        <translation>Ce module vous permet de partager des documents.</translation>
-    </message>
-</context>
-<context>
-    <name>SharePreferencePanel</name>
-    <message>
-        <source>Shared folders</source>
-        <translation>Dossier partagés</translation>
-    </message>
-    <message>
-        <source>Downloads folder</source>
-        <translation>Dossier de téléchargement</translation>
-    </message>
-    <message>
-        <source>Select the folders you want to share. The files you share will only be visible in your residence, they can never be accessed outside your residence.</source>
-        <translation>Sélectionnez les dossiers que vous voulez partager. Les fichiers que vous partagez ne seront visibles que dans votre résidence, il ne sont en aucun cas accessibles hors de la résidence.</translation>
-    </message>
-    <message>
-        <source>Select the folder in which received files will be stored.</source>
-        <translation>Sélectionnez le dossier qui contiendra les fichiers reçus.</translation>
-    </message>
-    <message>
-        <source>More folders..</source>
-        <translation>Plus de dossiers..</translation>
-    </message>
-    <message>
-        <source>Fewer folders..</source>
-        <translation>Moins de dossiers..</translation>
-    </message>
-    <message>
-        <source>My computer</source>
-        <translation>Poste de travail</translation>
-    </message>
-    <message>
-        <source>Browse..</source>
-        <translation>Parcourir..</translation>
-    </message>
-</context>
-<context>
-    <name>ShareView</name>
-    <message>
-        <source>Download</source>
-        <translation>Télécharger</translation>
     </message>
 </context>
 <context>
@@ -1073,6 +895,33 @@ Acceptez-vous?</translation>
     <message>
         <source>This plugin allows you to access the web.</source>
         <translation>Ce module vous permet d&apos;accéder au web.</translation>
+    </message>
+</context>
+<context>
+    <name>boot</name>
+    <message>
+        <source>&amp;File</source>
+        <translation>&amp;Fichier</translation>
+    </message>
+    <message>
+        <source>&amp;Preferences</source>
+        <translation>&amp;Préférences</translation>
+    </message>
+    <message>
+        <source>&amp;Quit</source>
+        <translation>&amp;Quitter</translation>
+    </message>
+    <message>
+        <source>&amp;Help</source>
+        <translation>&amp;Aide</translation>
+    </message>
+    <message>
+        <source>%1 FAQ</source>
+        <translation>FAQ %1</translation>
+    </message>
+    <message>
+        <source>About %1</source>
+        <translation>À propos de %1</translation>
     </message>
 </context>
 </TS>
