@@ -70,6 +70,9 @@ Section "-Core installation"
 
   ;Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"
+  Push "DisplayIcon"
+  Push "$INSTDIR\bin\wiLink.exe"
+  Call ConditionalAddToRegisty
   Push "DisplayName"
   Push "${PRODUCT_NAME}"
   Call ConditionalAddToRegisty
@@ -84,20 +87,6 @@ Section "-Core installation"
   Call ConditionalAddToRegisty
   Push "NoRepair"
   Push "1"
-  Call ConditionalAddToRegisty
-
-  ; Optional registration
-  Push "DisplayIcon"
-  Push "$INSTDIR\"
-  Call ConditionalAddToRegisty
-  Push "HelpLink"
-  Push ""
-  Call ConditionalAddToRegisty
-  Push "URLInfoAbout"
-  Push ""
-  Call ConditionalAddToRegisty
-  Push "Contact"
-  Push ""
   Call ConditionalAddToRegisty
 
   ;Create shortcuts
