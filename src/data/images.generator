@@ -26,7 +26,7 @@ ICONS_32 = [
     'wiLink.svg',
 ]
 
-ICONS = [
+ICONS_64 = [
     'audio-input.svg',
     'audio-output.svg',
     'call-incoming.svg',
@@ -41,13 +41,13 @@ ICONS = [
     'wiLink-black.svg',
 ]
 
-LARGE_ICONS = [
+ICONS_128 = [
     'peer.svg',
     'spinner.svg',
     'wiLink.svg',
 ]
 
-HUGE_ICONS = [
+ICONS_256 = [
     'wiLink.svg',
 ]
 
@@ -99,9 +99,9 @@ def generate_xpm(input_name, output_path):
 
 # PNG icons
 generate_png(ICONS_32, 32)
-generate_png(ICONS, 64)
-generate_png(LARGE_ICONS, 128)
-generate_png(HUGE_ICONS, 256)
+generate_png(ICONS_64, 64)
+generate_png(ICONS_128, 128)
+generate_png(ICONS_256, 256)
 
 # other icons
 generate_ico('wiLink.svg', 'wiLink.ico')
