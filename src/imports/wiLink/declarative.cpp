@@ -52,7 +52,6 @@
 #include "notifications.h"
 #include "phone.h"
 #include "phone/sip.h"
-#include "places.h"
 #include "rooms.h"
 #include "roster.h"
 #include "settings.h"
