@@ -26,9 +26,9 @@
 #endif
 
 #include <QApplication>
-#include <QMainWindow>
 #include <QMenu>
 #include <QSystemTrayIcon>
+#include <QWindow>
 
 QString QDeclarativeFileDialog::directory() const
 {
@@ -127,10 +127,8 @@ void Notifier::alert()
 {
     QWidget *window = 0;
     foreach (QWidget *widget, QApplication::topLevelWidgets()) {
-        if (qobject_cast<QMainWindow*>(widget)) {
-            window = widget;
-            break;
-        }
+        window = widget;
+        break;
     }
 
     // show the chat window
@@ -176,10 +174,8 @@ Notification *Notifier::showMessage(const QString &title, const QString &message
 void Notifier::_q_trayActivated(QSystemTrayIcon::ActivationReason reason)
 {
     if (reason != QSystemTrayIcon::Context) {
-        foreach (QWidget *widget, QApplication::topLevelWidgets()) {
-            if (qobject_cast<QMainWindow*>(widget)) {
-                QMetaObject::invokeMethod(widget, "showAndRaise");
-            }
+        foreach (QWindow *widget, QGuiApplication::topLevelWindows()) {
+            QMetaObject::invokeMethod(widget, "showAndRaise");
         }
     }
 }

@@ -15,6 +15,8 @@ android {
     DEFINES += WILINK_EMBEDDED
 } else:mac {
     OBJECTIVE_SOURCES += settings_mac.mm
+} else {
+    DEFINES += USE_SYSTRAY
 }
 
 SOURCES += \
