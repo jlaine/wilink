@@ -32,9 +32,9 @@ QImage IconImageProvider::requestImage(const QString &id, QSize *size, const QSi
     const QList<int> allSizes = QList<int>() << 128 << 64 << 32;
     foreach (const int size, allSizes) {
         const QString testPath = QString(":/images/%1x%2/%3.png").arg(QString::number(size), QString::number(size), id);
-        const bool sizeSufficient = !requestedSize.isValid() || (size >= requestedSize.width() && size >= requestedSize.height());
-        if ((filePath.isEmpty() || sizeSufficient) && QFileInfo(testPath).exists()) {
+        if (QFileInfo(testPath).exists()) {
             filePath = testPath;
+            break;
         }
     }
     if (filePath.isEmpty())
