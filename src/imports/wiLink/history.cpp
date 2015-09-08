@@ -30,9 +30,9 @@
 #define HISTORY_DAYS 365
 #define HISTORY_PAGE 2
 #ifdef WILINK_EMBEDDED
-#define SMILEY_ROOT ":/images/32x32"
+#define SMILEY_ROOT "qrc:/images/32x32"
 #else
-#define SMILEY_ROOT ":/images/16x16"
+#define SMILEY_ROOT "qrc:/images/16x16"
 #endif
 
 typedef QPair<QRegExp, QString> TextTransform;
