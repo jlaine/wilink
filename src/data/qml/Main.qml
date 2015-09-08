@@ -362,7 +362,6 @@ FocusScope {
         /** Start handling RPC messages.
          */
         onTriggered: {
-            window.show();
             //window.startMessages();
         }
     }
