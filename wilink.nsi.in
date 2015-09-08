@@ -1,64 +1,38 @@
-;--------------------------------
-; You must define these values
+!define PRODUCT_NAME "wiLink"
+!define PRODUCT_VERSION "2.4.90"
 
-  !define PRODUCT_NAME "wiLink"
-  !define VERSION "2.4.90"
-  !define PATCH  "90"
-  !define INST_DIR ""
+Name "${PRODUCT_NAME}"
+OutFile "..\${PRODUCT_NAME}-${PRODUCT_VERSION}-win32.exe"
+SetCompressor lzma
 
-;--------------------------------
-;Variables
+InstallDir "$PROGRAMFILES\wiLink"
 
-  Var START_MENU
-;--------------------------------
-;Include Modern UI
+!include "MUI.nsh"
+!define MUI_ABORTWARNING
 
-  !include "MUI.nsh"
+!insertmacro MUI_PAGE_LICENSE "COPYING"
+!insertmacro MUI_PAGE_DIRECTORY
 
-  ;Default installation folder
-  InstallDir "$PROGRAMFILES\wiLink"
+!define MUI_FINISHPAGE_RUN "$INSTDIR\bin\wiLink.exe";
 
-;--------------------------------
-;General
+!insertmacro MUI_PAGE_INSTFILES
+!insertmacro MUI_PAGE_FINISH
 
-  ;Name and file
-  Name "wiLink"
-  OutFile "..\wiLink-2.4.90.exe"
+!insertmacro MUI_UNPAGE_CONFIRM
+!insertmacro MUI_UNPAGE_INSTFILES
 
-  ;Set compression
-  SetCompressor lzma
+!insertmacro MUI_LANGUAGE "English"
+!insertmacro MUI_LANGUAGE "French"
 
-  ;Require administrator access
-  RequestExecutionLevel admin
+RequestExecutionLevel admin
 
-  VIProductVersion 2.4.90.0
-  VIAddVersionKey CompanyName "Wifirst"
-  VIAddVersionKey FileDescription "wiLink 2.4.90"
-  VIAddVersionKey FileVersion "2.4.90"
-  VIAddVersionKey LegalCopyright "Copyright 2009-2015 Wifirst"
-  VIAddVersionKey ProductName "wiLink"
-  VIAddVersionKey ProductVersion "2.4.90"
-
-;--------------------------------
-;Interface Settings
-
-  !define MUI_HEADERIMAGE
-  !define MUI_ABORTWARNING
-
-;--------------------------------
-; path functions
-
-!verbose 3
-!include "WinMessages.NSH"
-!verbose 4
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Uninstall sutff
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-###########################################
-#            Utility Functions            #
-###########################################
+VIProductVersion ${PRODUCT_VERSION}.0
+VIAddVersionKey CompanyName "Wifirst"
+VIAddVersionKey FileDescription "${PRODUCT_NAME} ${PRODUCT_VERSION}"
+VIAddVersionKey FileVersion "${PRODUCT_VERSION}"
+VIAddVersionKey LegalCopyright "Copyright 2009-2015 Wifirst"
+VIAddVersionKey ProductName "${PRODUCT_NAME}"
+VIAddVersionKey ProductVersion "${PRODUCT_VERSION}"
 
 Function ConditionalAddToRegisty
   Pop $0
@@ -70,28 +44,6 @@ Function ConditionalAddToRegisty
     DetailPrint "Set install registry entry: '$1' to '$0'"
   ConditionalAddToRegisty_EmptyString:
 FunctionEnd
-
-;--------------------------------
-;Pages
-  !insertmacro MUI_PAGE_LICENSE "COPYING"
-  !insertmacro MUI_PAGE_DIRECTORY
-
-  !define MUI_FINISHPAGE_RUN "$INSTDIR\bin\wiLink.exe";
-
-  !insertmacro MUI_PAGE_INSTFILES
-  !insertmacro MUI_PAGE_FINISH
-
-  !insertmacro MUI_UNPAGE_CONFIRM
-  !insertmacro MUI_UNPAGE_INSTFILES
-
-;--------------------------------
-;Languages
-
-  !insertmacro MUI_LANGUAGE "English" ;first language is the default language
-  !insertmacro MUI_LANGUAGE "French"
-
-;--------------------------------
-;Installer Sections
 
 Section "-Core installation"
   ;Use the entire tree produced by the INSTALL target.  Keep the
@@ -119,10 +71,10 @@ Section "-Core installation"
   ;Create uninstaller
   WriteUninstaller "$INSTDIR\Uninstall.exe"
   Push "DisplayName"
-  Push "wiLink"
+  Push "${PRODUCT_NAME}"
   Call ConditionalAddToRegisty
   Push "DisplayVersion"
-  Push "2.4.90"
+  Push "${PRODUCT_VERSION}"
   Call ConditionalAddToRegisty
   Push "Publisher"
   Push "Wifirst"
