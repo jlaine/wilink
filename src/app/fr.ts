@@ -2,7 +2,7 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="fr_FR">
 <context>
-    <name>CustomWindow</name>
+    <name>boot</name>
     <message>
         <source>&amp;File</source>
         <translation>&amp;Fichier</translation>
