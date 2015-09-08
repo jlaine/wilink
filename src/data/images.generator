@@ -22,6 +22,10 @@
 import os
 import subprocess
 
+ICONS_32 = [
+    'wiLink.svg',
+]
+
 ICONS = [
     'audio-input.svg',
     'audio-output.svg',
@@ -94,7 +98,7 @@ def generate_xpm(input_name, output_path):
     subprocess.check_call(['rm', '-f', output_png, output_alpha])
 
 # PNG icons
-generate_png(ICONS, 32)
+generate_png(ICONS_32, 32)
 generate_png(ICONS, 64)
 generate_png(LARGE_ICONS, 128)
 generate_png(HUGE_ICONS, 256)
