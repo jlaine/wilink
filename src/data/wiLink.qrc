@@ -17,6 +17,5 @@
     <file>images/64x64/close.png</file>
     <file>images/64x64/wiLink-black.png</file>
     <file>images/64x64/wiLink.png</file>
-    <file>images/128x128/wiLink.png</file>
 </qresource>
 </RCC>

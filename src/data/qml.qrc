@@ -109,7 +109,10 @@
     <file>qml/images/spinner.png</file>
     <file>qml/images/tip.png</file>
     <file>qml/images/web.png</file>
+<<<<<<< HEAD
     <file>qml/images/wiLink.png</file>
+=======
+>>>>>>> d4e6404458994a54b3f6079deef1d2fe81e0c546
     <file>qml/scripts/sip.js</file>
     <file>qml/scripts/storage.js</file>
     <file>qml/scripts/utils.js</file>
