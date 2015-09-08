@@ -30,7 +30,6 @@ ICONS_64 = [
     'chat.svg',
     'close.svg',
     'moderator.svg',
-    'peer.svg',
     'tip.svg',
     'web.svg',
     'wiLink-black.svg',
