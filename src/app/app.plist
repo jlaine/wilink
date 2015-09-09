@@ -20,5 +20,7 @@
 	<string>@VERSION@</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>@COPYRIGHT@</string>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
 </dict>
 </plist>
