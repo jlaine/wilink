@@ -17,6 +17,8 @@ target=$1
 if [ -z "$target" ]; then
     if [ -n "`which sw_vers 2> /dev/null`" ]; then
         target="mac"
+    elif [ -n "`which cmd.exe 2> /dev/null`" ]; then
+        target="win32"
     elif [ "`uname`" = "Linux" ]; then
         target="linux"
     fi
