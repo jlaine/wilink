@@ -22,7 +22,8 @@ import QtQuick.Controls 1.0
 import QtWebKit 3.0
 import QtWebKit.experimental 1.0
 import wiLink 2.4
-import '.' as Legacy
+import '.' as Custom
+import 'scripts/utils.js' as Utils
 
 Panel {
     id: panel
@@ -51,7 +52,7 @@ Panel {
             color: '#dfdfdf'
         }
 
-        Legacy.ToolBar {
+        Custom.ToolBar {
             id: toolBar
 
             anchors.margins: appStyle.margin.normal
@@ -59,65 +60,60 @@ Panel {
             anchors.bottom: parent.bottom
             anchors.left: parent.left
 
-            Legacy.ToolButton {
+            ToolButton {
                 anchors.top: parent.top
                 anchors.topMargin: 2
                 anchors.bottom: parent.bottom
-                iconStyle: 'icon-home'
-                width: iconSize
+                text: Utils.iconText('icon-home')
 
                 onClicked: {
                     webView.url = appSettings.wifirstBaseUrl;
                 }
             }
 
-            Legacy.ToolButton {
+            ToolButton {
                 anchors.top: parent.top
                 anchors.topMargin: 2
                 anchors.bottom: parent.bottom
                 enabled: webView.canGoBack
-                iconStyle: 'icon-chevron-left'
-                width: iconSize
+                text: Utils.iconText('icon-chevron-left')
 
                 onClicked: webView.goBack()
             }
 
-            Legacy.ToolButton {
+            ToolButton {
                 anchors.top: parent.top
                 anchors.topMargin: 2
                 anchors.bottom: parent.bottom
                 enabled: webView.canGoForward
-                iconStyle: 'icon-chevron-right'
-                width: iconSize
+                text: Utils.iconText('icon-chevron-right')
 
                 onClicked: webView.goForward()
             }
 
-            Legacy.ToolButton {
+            ToolButton {
                 anchors.top: parent.top
                 anchors.topMargin: 2
                 anchors.bottom: parent.bottom
                 enabled: webView.url != ''
-                iconStyle: 'icon-refresh'
+                text: Utils.iconText('icon-refresh')
                 visible: !webView.stop.enabled
-                width: iconSize
 
                 onClicked: webView.reload()
             }
 
-            Legacy.ToolButton {
+            ToolButton {
                 anchors.top: parent.top
                 anchors.topMargin: 2
                 anchors.bottom: parent.bottom
-                iconStyle: 'icon-stop'
+                text: Utils.iconText('icon-stop')
                 visible: webView.loading
-                width: iconSize
 
                 onClicked: webView.stop()
             }
         }
 
-        Legacy.InputBar {
+        Custom.InputBar {
             id: urlInput
 
             anchors.margins: appStyle.margin.normal
