@@ -54,48 +54,5 @@ QString SystemInfo::osType()
 
 QString SystemInfo::osVersion()
 {
-#if defined(Q_OS_LINUX)
-    QProcess process;
-    process.start(QString("uname"), QStringList(QString("-r")), QIODevice::ReadOnly);
-    process.waitForFinished();
-    return QString::fromLocal8Bit(process.readAllStandardOutput());
-#elif defined(Q_OS_MAC)
-    switch (QSysInfo::MacintoshVersion)
-    {
-    case QSysInfo::MV_10_4:
-        return QString::fromLatin1("10.4");
-    case QSysInfo::MV_10_5:
-        return QString::fromLatin1("10.5");
-    case QSysInfo::MV_10_6:
-        return QString::fromLatin1("10.6");
-    case QSysInfo::MV_10_7:
-        return QString::fromLatin1("10.7");
-    case QSysInfo::MV_10_8:
-        return QString::fromLatin1("10.8");
-    case QSysInfo::MV_10_9:
-        return QString::fromLatin1("10.9");
-    case QSysInfo::MV_10_10:
-        return QString::fromLatin1("10.10");
-    default:
-        return QString();
-    }
-#elif defined(Q_OS_WIN)
-    switch (QSysInfo::WindowsVersion)
-    {
-    case QSysInfo::WV_XP:
-        return QString::fromLatin1("XP");
-    case QSysInfo::WV_2003:
-        return QString::fromLatin1("2003");
-    case QSysInfo::WV_VISTA:
-        return QString::fromLatin1("Vista");
-    case QSysInfo::WV_WINDOWS7:
-        return QString::fromLatin1("7");
-    default:
-        return QString();
-    }
-#else
-    return QString();
-#endif
+    return QSysInfo::productVersion();
 }
-
-
