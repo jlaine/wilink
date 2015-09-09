@@ -227,7 +227,7 @@ Panel {
                     name: 'composing'
                     when: conversation.remoteState === QXmppMessage.Composing
                     PropertyChanges { target: footer; opacity: 1; height: 48; iconStyle: 'icon-comment-alt' }
-                    StateChangeScript { script: view.positionViewAtEnd() }
+                    StateChangeScript { script: historyView.positionViewAtEnd() }
                 },
                 State {
                     name: 'paused'
