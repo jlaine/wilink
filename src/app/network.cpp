@@ -97,6 +97,15 @@ QString NetworkAccessManager::userAgent()
         case QSysInfo::MV_10_7:
             osDetails += QLatin1String("; Mac OS X 10.7");
             break;
+        case QSysInfo::MV_10_8:
+            osDetails += QLatin1String("; Mac OS X 10.8");
+            break;
+        case QSysInfo::MV_10_9:
+            osDetails += QLatin1String("; Mac OS X 10.9");
+            break;
+        case QSysInfo::MV_10_10:
+            osDetails += QLatin1String("; Mac OS X 10.10");
+            break;
         }
 #elif defined(Q_OS_WIN)
         DWORD dwVersion = GetVersion();
