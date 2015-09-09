@@ -34,6 +34,11 @@ Item {
 
     signal participantClicked(variant participant, variant mouse, variant mouseArea)
 
+    function positionViewAtEnd()
+    {
+        historyView.positionViewAtEnd();
+    }
+
     clip: true
 
     Clipboard {
