@@ -17,34 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __DIAGNOSTICS_SOFTWARE_H__
-#define __DIAGNOSTICS_SOFTWARE_H__
+import QtQuick 2.3
+import wiLink 2.4
 
-#include <QJsonObject>
-#include <QXmlStreamWriter>
+CallWidget {
+    id: callWidget
 
-class QDomElement;
-
-class Software
-{
-public:
-    QString type() const;
-    void setType(const QString &type);
-
-    QString name() const;
-    void setName(const QString &name);
-
-    QString version() const;
-    void setVersion(const QString &version);
-
-    void parse(const QDomElement &element);
-    QJsonObject toJson() const;
-    void toXml(QXmlStreamWriter *writer) const;
-
-private:
-    QString m_type;
-    QString m_name;
-    QString m_version;
-};
-
-#endif
+    audio: CallAudioHelper {
+        call: callWidget.call
+    }
+    video: CallVideoHelper {
+        call: callWidget.call
+        monitor: videoMonitor
+        output: videoOutput
+    }
+    videoEnabled: true
+}

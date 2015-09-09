@@ -18,6 +18,7 @@
  */
 
 #include <QDomElement>
+#include <QJsonObject>
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 
@@ -88,6 +89,17 @@ void Transfer::parse(const QDomElement &element)
     m_size = element.attribute("size").toLongLong();
     m_time = element.attribute("time").toInt();
     m_url = QUrl(element.attribute("url"));
+}
+
+QJsonObject Transfer::toJson() const
+{
+    QJsonObject transfer;
+    transfer.insert("direction", (m_direction == Transfer::Upload) ? "upload" : "download");
+    transfer.insert("error", m_error);
+    transfer.insert("size", m_size);
+    transfer.insert("time", m_time);
+    transfer.insert("url", m_url.toString());
+    return transfer;
 }
 
 void Transfer::toXml(QXmlStreamWriter *writer) const

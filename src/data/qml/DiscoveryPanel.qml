@@ -64,7 +64,7 @@ Panel {
         z: 1
     }
 
-    ScrollView {
+    ScrollListView {
         id: discoView
 
         anchors.left: parent.left

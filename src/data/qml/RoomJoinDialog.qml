@@ -63,7 +63,7 @@ Dialog {
             focus: true
         }
 
-        ScrollView {
+        ScrollListView {
             id: roomView
 
             anchors.top: roomEdit.bottom

@@ -19,6 +19,7 @@
 
 #include <QCoreApplication>
 #include <QDateTime>
+#include <QJsonDocument>
 #include <QDomElement>
 #include <QNetworkInterface>
 #include <QShortcut>
@@ -458,7 +459,10 @@ QStringList DiagnosticManager::discoveryFeatures() const
 void DiagnosticManager::handleResults(const QXmppDiagnosticIq &results)
 {
     m_html = dumpResults(results);
-    emit htmlChanged(m_html);
+    m_json = QJsonDocument(results.toJson()).toJson();
+
+    emit htmlChanged();
+    emit jsonChanged();
 
     if (!results.to().isEmpty())
         client()->sendPacket(results);
@@ -509,6 +513,11 @@ bool DiagnosticManager::handleStanza(const QDomElement &stanza)
 QString DiagnosticManager::html() const
 {
     return m_html;
+}
+
+QString DiagnosticManager::json() const
+{
+    return m_json;
 }
 
 void DiagnosticManager::refresh()

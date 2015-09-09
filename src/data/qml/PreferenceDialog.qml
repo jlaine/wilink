@@ -51,7 +51,7 @@ Dialog {
     Item {
         anchors.fill: parent
 
-        ScrollView {
+        ScrollListView {
             id: tabList
 
             anchors.top: parent.top

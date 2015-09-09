@@ -28,7 +28,7 @@ Dialog {
     title: qsTr('Chat room configuration')
     minimumHeight: 220
 
-    ScrollView {
+    ScrollListView {
         id: view
 
         anchors.fill: parent

@@ -39,11 +39,28 @@ public:
     QString inputName;
     QString outputName;
     QThread *soundThread;
+
+    QList<QAudioDeviceInfo> cachedDevices(QAudio::Mode mode);
+
+private:
+    QList<QAudioDeviceInfo> availableDevices[2];
+    bool availableDevicesFetched[2];
 };
 
 QSoundPlayerPrivate::QSoundPlayerPrivate()
     : soundThread(0)
 {
+    availableDevicesFetched[0] = false;
+    availableDevicesFetched[1] = false;
+}
+
+QList<QAudioDeviceInfo> QSoundPlayerPrivate::cachedDevices(QAudio::Mode mode)
+{
+    if (!availableDevicesFetched[mode]) {
+        availableDevices[mode] = QAudioDeviceInfo::availableDevices(mode);
+        availableDevicesFetched[mode] = true;
+    }
+    return availableDevices[mode];
 }
 
 QSoundPlayer::QSoundPlayer(QObject *parent)
@@ -75,7 +92,7 @@ QSoundPlayer* QSoundPlayer::instance()
 
 QAudioDeviceInfo QSoundPlayer::inputDevice() const
 {
-    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioInput)) {
+    foreach (const QAudioDeviceInfo &info, d->cachedDevices(QAudio::AudioInput)) {
         if (info.deviceName() == d->inputName)
             return info;
     }
@@ -98,14 +115,14 @@ void QSoundPlayer::setInputDeviceName(const QString &name)
 QStringList QSoundPlayer::inputDeviceNames() const
 {
     QStringList names;
-    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioInput))
+    foreach (const QAudioDeviceInfo &info, d->cachedDevices(QAudio::AudioInput))
         names << info.deviceName();
     return names;
 }
 
 QAudioDeviceInfo QSoundPlayer::outputDevice() const
 {
-    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioOutput)) {
+    foreach (const QAudioDeviceInfo &info, d->cachedDevices(QAudio::AudioOutput)) {
         if (info.deviceName() == d->outputName)
             return info;
     }
@@ -128,7 +145,7 @@ void QSoundPlayer::setOutputDeviceName(const QString &name)
 QStringList QSoundPlayer::outputDeviceNames() const
 {
     QStringList names;
-    foreach (const QAudioDeviceInfo &info, QAudioDeviceInfo::availableDevices(QAudio::AudioOutput))
+    foreach (const QAudioDeviceInfo &info, d->cachedDevices(QAudio::AudioOutput))
         names << info.deviceName();
     return names;
 }

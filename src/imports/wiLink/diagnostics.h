@@ -36,6 +36,7 @@ class DiagnosticManager : public QXmppClientExtension
 {
     Q_OBJECT
     Q_PROPERTY(QString html READ html NOTIFY htmlChanged)
+    Q_PROPERTY(QString json READ json NOTIFY jsonChanged)
     Q_PROPERTY(bool running READ running NOTIFY runningChanged)
     Q_PROPERTY(QStringList pingHosts READ pingHosts WRITE setPingHosts NOTIFY pingHostsChanged)
     Q_PROPERTY(QStringList tracerouteHosts READ tracerouteHosts WRITE setTracerouteHosts NOTIFY tracerouteHostsChanged)
@@ -45,6 +46,7 @@ public:
     DiagnosticManager();
 
     QString html() const;
+    QString json() const;
     bool running() const;
 
     QStringList pingHosts() const;
@@ -67,7 +69,8 @@ protected:
     /// \endcond
 
 signals:
-    void htmlChanged(const QString &html);
+    void htmlChanged();
+    void jsonChanged();
     void pingHostsChanged(const QStringList &pingHosts);
     void runningChanged(bool running);
     void tracerouteHostsChanged(const QStringList &pingHosts);
@@ -85,6 +88,7 @@ private:
 
     DiagnosticConfig m_config;
     QString m_diagnosticsServer;
+    QString m_json;
     QString m_html;
     QThread *m_thread;
 };

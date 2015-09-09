@@ -8,6 +8,7 @@
     <file>qml/Button.qml</file>
     <file>qml/CallNotification.qml</file>
     <file>qml/CallWidget.qml</file>
+    <file>qml/ChatCallWidget.qml</file>
     <file>qml/ChatContactView.qml</file>
     <file>qml/ChatEdit.qml</file>
     <file>qml/ChatPanel.qml</file>
@@ -76,7 +77,7 @@
     <file>qml/RoomPermissionDialog.qml</file>
     <file>qml/RoomSubjectDialog.qml</file>
     <file>qml/ScrollBar.qml</file>
-    <file>qml/ScrollView.qml</file>
+    <file>qml/ScrollListView.qml</file>
     <file>qml/SetupBackground.qml</file>
     <file>qml/SetupDialog.qml</file>
     <file>qml/SocialIcon.qml</file>

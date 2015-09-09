@@ -128,8 +128,24 @@ Panel {
             // variable, finishCreation seems to receive an incomplete call
             // object.
             var currentCall = call;
-            var component = Qt.createComponent('PhoneCallWidget.qml');
 
+            // log call
+            var callId = 0;
+            historyView.model.addItem({address: currentCall.recipient, duration: 0, flags: currentCall.direction}, function(id) {
+                callId = id;
+            });
+
+            call.finished.connect(function() {
+                if (callId) {
+                    var flags = currentCall.direction;
+                    if (currentCall.errorString)
+                        flags += 2;
+                    historyView.model.updateItem(callId, {address: currentCall.recipient, duration: currentCall.duration, flags: flags});
+                }
+            });
+
+            // create widget
+            var component = Qt.createComponent('PhoneCallWidget.qml');
             function finishCreation() {
                 if (component.status != Component.Ready)
                     return;

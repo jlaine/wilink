@@ -25,6 +25,7 @@
 #include <QXmlStreamWriter>
 
 class QDomElement;
+class QJsonObject;
 
 /** The Ping class represents an ICMP ping result.
  *
@@ -54,6 +55,7 @@ public:
     void setReceivedPackets(int receivedPackets);
 
     void parse(const QDomElement &element);
+    QJsonObject toJson() const;
     void toXml(QXmlStreamWriter *writer) const;
 
 private:
@@ -74,6 +76,7 @@ public:
     void setHostAddress(const QHostAddress &hostAddress);
 
     void parse(const QDomElement &element);
+    QJsonObject toJson() const;
     void toXml(QXmlStreamWriter *writer) const;
 
 private:

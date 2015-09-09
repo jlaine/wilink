@@ -18,6 +18,8 @@
  */
 
 #include <QDomElement>
+#include <QJsonArray>
+#include <QJsonObject>
 #include <QLibrary>
 #include <QProcess>
 
@@ -120,6 +122,18 @@ void Ping::parse(const QDomElement &element)
     m_receivedPackets = element.attribute("receivedPackets").toInt();
 }
 
+QJsonObject Ping::toJson() const
+{
+    QJsonObject ping;
+    ping.insert("host_address", m_hostAddress.toString());
+    ping.insert("minimum_time", QString::number(m_minimumTime));
+    ping.insert("maximum_time", QString::number(m_maximumTime));
+    ping.insert("average_time", QString::number(m_averageTime));
+    ping.insert("sent_packets", QString::number(m_sentPackets));
+    ping.insert("received_packets", QString::number(m_receivedPackets));
+    return ping;
+}
+
 void Ping::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("ping");
@@ -155,6 +169,18 @@ void Traceroute::parse(const QDomElement &element)
         append(ping);
         pingElement = pingElement.nextSiblingElement("ping");
     }
+}
+
+QJsonObject Traceroute::toJson() const
+{
+    QJsonObject traceroute;
+    traceroute.insert("host_address", m_hostAddress.toString());
+
+    QJsonArray hops;
+    for (int i = 0; i < size(); ++i)
+        hops << at(i).toJson();
+    traceroute.insert("hops", hops);
+    return traceroute;
 }
 
 void Traceroute::toXml(QXmlStreamWriter *writer) const

@@ -77,7 +77,7 @@ Panel {
         }
     }
 
-    ScrollView {
+    ScrollListView {
         id: view
 
         anchors.top: header.bottom

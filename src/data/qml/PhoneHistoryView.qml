@@ -43,7 +43,7 @@ GroupBox {
         return phone;
     }
 
-    ScrollView {
+    ScrollListView {
         id: historyView
 
         anchors.fill: parent

@@ -18,6 +18,8 @@
  */
 
 #include <QDomElement>
+#include <QJsonObject>
+
 #include "wireless.h"
 
 void WirelessNetwork::parse(const QDomElement &element)
@@ -26,6 +28,16 @@ void WirelessNetwork::parse(const QDomElement &element)
     w_cinr = element.attribute("cinr").toInt();
     w_rssi = element.attribute("rssi").toInt();
     w_ssid = element.attribute("ssid");
+}
+
+QJsonObject WirelessNetwork::toJson() const
+{
+    QJsonObject network;
+    network.insert("current", w_isCurrent);
+    network.insert("cinr", w_cinr);
+    network.insert("rssi", w_rssi);
+    network.insert("ssid", w_ssid);
+    return network;
 }
 
 void WirelessNetwork::toXml(QXmlStreamWriter *writer) const
