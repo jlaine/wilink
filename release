@@ -35,8 +35,9 @@ mac)
 	export PATH=~/Qt/5.5/clang_64/bin:$PATH
     ;;
 win32)
-	export PATH=/c/Qt/5.5/mingw492_32/bin:$PATH
-	export PATH=/c/Qt/Tools/mingw492_32/bin:$PATH
+	export PATH="/c/Qt/5.5/mingw492_32/bin:$PATH"
+	export PATH="/c/Qt/Tools/mingw492_32/bin:$PATH"
+	export PATH="/c/Program Files (x86)/NSIS:$PATH"
     MAKE=mingw32-make
     ;;
 esac

@@ -19,11 +19,15 @@ mac {
     QMAKE_EXTRA_TARGETS = package
 } else:win32 {
     NSI_HEADER = "!define PRODUCT_VERSION \"$$WILINK_VERSION\""
-    NSI_HEADER += "!define PRODUCT_LICENSE \"$$shell_path($$WILINK_SOURCE_TREE/COPYING)\""
+    NSI_HEADER += "!define PRODUCT_LICENSE \"$$system_path($$WILINK_SOURCE_TREE/COPYING)\""
     NSI_BODY = $$cat($$WILINK_SOURCE_TREE/wilink.nsi.in, blob)
     write_file($$WILINK_BUILD_TREE/wilink.nsi, NSI_HEADER)
     write_file($$WILINK_BUILD_TREE/wilink.nsi, NSI_BODY, append)
     QMAKE_CLEAN += wilink.nsi
+
+    package.depends = first
+    package.commands = makensis wilink.nsi
+    QMAKE_EXTRA_TARGETS = package
 }
 
 OTHER_FILES += \
