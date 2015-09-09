@@ -38,7 +38,7 @@ Item {
         id: soundLoader
 
         repeat: true
-        source: 'sounds/call-outgoing.ogg'
+        source: 'sounds/call-outgoing.wav'
     }
 
     PhoneAudioHelper {

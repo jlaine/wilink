@@ -113,9 +113,9 @@
     <file>qml/scripts/sip.js</file>
     <file>qml/scripts/storage.js</file>
     <file>qml/scripts/utils.js</file>
-    <file>qml/sounds/call-incoming.ogg</file>
-    <file>qml/sounds/call-outgoing.ogg</file>
-    <file>qml/sounds/message-incoming.ogg</file>
-    <file>qml/sounds/message-outgoing.ogg</file>
+    <file>qml/sounds/call-incoming.wav</file>
+    <file>qml/sounds/call-outgoing.wav</file>
+    <file>qml/sounds/message-incoming.wav</file>
+    <file>qml/sounds/message-outgoing.wav</file>
 </qresource>
 </RCC>

@@ -22,7 +22,7 @@
 import os
 import re
 
-EXTENSIONS = ('ogg', 'jpg', 'js', 'png', 'qm', 'qml', 'ttf')
+EXTENSIONS = ('jpg', 'js', 'png', 'qm', 'qml', 'ttf', 'wav')
 
 def find_files(dirnames):
     paths = []

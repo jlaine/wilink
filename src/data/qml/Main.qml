@@ -20,6 +20,7 @@
 import QtQuick 2.3
 import QtQuick.LocalStorage 2.0
 import QtQuick.Window 2.2
+import QtMultimedia 5.4
 
 import wiLink 2.4
 import 'scripts/storage.js' as Storage
@@ -66,6 +67,16 @@ FocusScope {
         id: appSettings
 
         property string wifirstBaseUrl: 'https://apps.wifirst.net'
+    }
+
+    SoundEffect {
+        id: incomingMessageSound
+        source: appSettings.incomingMessageSound ? 'sounds/message-incoming.wav' : ''
+    }
+
+    SoundEffect {
+        id: outgoingMessageSound
+        source: appSettings.outgoingMessageSound ? 'sounds/message-outgoing.wav' : ''
     }
 
     SoundPlayer {

@@ -29,16 +29,6 @@ Panel {
     property alias title: vcard.name
     property alias presenceStatus: vcard.status
 
-    SoundLoader {
-        id: incomingMessageSound
-        source: appSettings.incomingMessageSound ? 'sounds/message-incoming.ogg' : ''
-    }
-
-    SoundLoader {
-        id: outgoingMessageSound
-        source: appSettings.outgoingMessageSound ? 'sounds/message-outgoing.ogg' : ''
-    }
-
     Conversation {
         id: conversation
 
@@ -256,7 +246,7 @@ Panel {
                     appNotifier.alert();
 
                     // play a sound
-                    incomingMessageSound.start();
+                    incomingMessageSound.play();
 
                     // add pending message
                     rosterModel.addPendingMessage(jid);
@@ -339,7 +329,7 @@ Panel {
                 var text = chatInput.text;
                 if (conversation.sendMessage(text)) {
                     chatInput.text = '';
-                    outgoingMessageSound.start();
+                    outgoingMessageSound.play();
                 }
             }
         }

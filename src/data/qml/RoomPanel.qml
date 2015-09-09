@@ -31,16 +31,6 @@ Panel {
     property string title: room.name ? room.name : Utils.jidToUser(jid)
     property string presenceStatus
 
-    SoundLoader {
-        id: incomingMessageSound
-        source: appSettings.incomingMessageSound ? 'sounds/message-incoming.ogg' : ''
-    }
-
-    SoundLoader {
-        id: outgoingMessageSound
-        source: appSettings.outgoingMessageSound ? 'sounds/message-outgoing.ogg' : ''
-    }
-
     RoomModel {
         id: participantModel
 
@@ -115,7 +105,7 @@ Panel {
                         appNotifier.alert();
 
                         // play a sound
-                        incomingMessageSound.start();
+                        incomingMessageSound.play();
 
                         // add pending message
                         roomListModel.addPendingMessage(jid);
@@ -198,7 +188,7 @@ Panel {
             var text = chatInput.text;
             if (room.sendMessage(text)) {
                 chatInput.text = '';
-                outgoingMessageSound.start();
+                outgoingMessageSound.play();
             }
         }
     }

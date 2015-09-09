@@ -41,7 +41,7 @@ NotificationDialog {
             id: soundLoader
 
             repeat: true
-            source: 'sounds/call-incoming.ogg'
+            source: 'sounds/call-incoming.wav'
             Component.onCompleted: soundLoader.start()
         },
         Connections {
