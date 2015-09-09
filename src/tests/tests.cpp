@@ -21,8 +21,6 @@
 #include <QDomDocument>
 #include <QtTest/QtTest>
 
-#include "QSoundFile.h"
-
 #include "diagnostics/iq.h"
 #include "plugins/updates.h"
 #include "plugins/utils.h"
@@ -121,61 +119,6 @@ void TestIndent::checkJid()
     QCOMPARE(isFullJid("foo@bar/wiz"), true);
     QCOMPARE(isFullJid("foo@bar/wiz/woo"), false);
     QCOMPARE(isFullJid("foo/wiz"), false);
-}
-
-void TestSound::copyWav()
-{
-    const QString inputPath(":/tones.wav");
-    const QString outputPath("output.wav");
-
-    // read input
-    QSoundFile input(inputPath);
-    QCOMPARE(input.open(QIODevice::ReadOnly), true);
-    const QByteArray data = input.readAll();
-    input.close();
-
-    // write output
-    QSoundFile output(outputPath);
-    output.setFormat(input.format());
-    output.setMetaData(input.metaData());
-    QCOMPARE(output.open(QIODevice::WriteOnly), true);
-    output.write(data);
-    output.close();
-
-    // compare
-    QFile inputFile(inputPath);
-    QCOMPARE(inputFile.open(QIODevice::ReadOnly), true);
-    QFile outputFile(outputPath);
-    QCOMPARE(outputFile.open(QIODevice::ReadOnly), true);
-    QCOMPARE(inputFile.readAll(), outputFile.readAll());
-    outputFile.remove();
-}
-
-void TestSound::readWav()
-{
-    // read input
-    QSoundFile input(":/tones.wav");
-    QCOMPARE(input.open(QIODevice::ReadOnly), true);
-
-    // check format
-    QCOMPARE(input.format().channels(), 1);
-    QCOMPARE(input.format().frequency(), 44100);
-    QCOMPARE(input.format().sampleSize(), 16);
-
-    // check info
-    const QList<QPair<QSoundFile::MetaData, QString> > info = input.metaData();
-    QCOMPARE(info.size(), 4);
-    QCOMPARE(info[0].first, QSoundFile::TitleMetaData);
-    QCOMPARE(info[0].second, QLatin1String("Track"));
-    QCOMPARE(info[1].first, QSoundFile::ArtistMetaData);
-    QCOMPARE(info[1].second, QLatin1String("Artist"));
-    QCOMPARE(info[2].first, QSoundFile::DescriptionMetaData);
-    QCOMPARE(info[2].second, QLatin1String("Comments"));
-    QCOMPARE(info[3].first, QSoundFile::DateMetaData);
-    QCOMPARE(info[3].second, QLatin1String("Year"));
-
-    const QByteArray data = input.readAll();
-    input.close();
 }
 
 void TestUpdates::compareVersions()

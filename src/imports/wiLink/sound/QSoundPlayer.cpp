@@ -28,7 +28,6 @@
 #include <QUrl>
 #include <QVariant>
 
-#include "QSoundFile.h"
 #include "QSoundPlayer.h"
 
 static QSoundPlayer *thePlayer = 0;

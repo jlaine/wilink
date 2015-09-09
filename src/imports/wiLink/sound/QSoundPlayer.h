@@ -26,7 +26,6 @@
 
 class QAudioDeviceInfo;
 class QNetworkAccessManager;
-class QSoundFile;
 class QSoundPlayer;
 class QSoundPlayerPrivate;
 
