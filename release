@@ -2,11 +2,20 @@
 
 set -e
 
+# FIXME: check code is up to date
+if false; then
+    if [ -n "`git diff`" ]; then
+        echo "working copy is dirty!"
+        exit 1
+    fi
+    git pull
+    git submodule update --init
+fi
+
 # determine target
 target=$1
 if [ -z "$target" ]; then
-    if [ -n "`which sw_vers`" ]; then
-	export PATH=~/Qt/5.5/clang_64/bin:$PATH
+    if [ -n "`which sw_vers 2> /dev/null`" ]; then
         target="mac"
     elif [ "`uname`" = "Linux" ]; then
         target="linux"
@@ -18,15 +27,20 @@ if [ -z "$target" ]; then
 fi
 echo "Target: $target"
 
-# check code is up to date
-if [ -n "`git diff`" ]; then
-    echo "working copy is dirty!"
-    exit 1
-fi
-git pull
-git submodule update --init
+# configure
+MAKE=make
+QMAKE=qmake
+case "$target" in
+mac)
+	export PATH=~/Qt/5.5/clang_64/bin:$PATH
+    ;;
+win32)
+	export PATH=/c/Qt/5.5/mingw492_32/bin:$PATH
+	export PATH=/c/Qt/Tools/mingw492_32/bin:$PATH
+    MAKE=mingw32-make
+    ;;
+esac
 
-# build release
 case "$target" in
 android)
     cd android
@@ -36,20 +50,12 @@ android)
     zipalign -v 4 bin/wiLink-release-unaligned.apk bin/wiLink-release-signed.apk
     rm bin/wiLink-release-unaligned.apk
     ;;
-windows)
-    rm -rf release-win32
-    mkdir release-win32
-    cd release-win32
-    PKG_CONFIG_LIBDIR=/usr/i586-mingw32msvc/lib/pkgconfig cmake .. -DCMAKE_TOOLCHAIN_FILE=../cmake/mingw32.toolchain
-    make
-    make package
-    ;;
 *)
     rm -rf release-$target
     mkdir release-$target
     cd release-$target
-    qmake .. QXMPP_NO_EXAMPLES=1 QXMPP_NO_TESTS=1
-    make
-    make package
+    $QMAKE .. QXMPP_NO_EXAMPLES=1 QXMPP_NO_TESTS=1
+    $MAKE
+    $MAKE package
     ;;
 esac
