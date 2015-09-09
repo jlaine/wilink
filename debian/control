@@ -16,7 +16,8 @@ Homepage: https://github.com/jlaine/wilink
 
 Package: wilink
 Architecture: any
-Depends: qml-module-qtquick-localstorage,
+Depends: qml-module-qtquick-controls,
+         qml-module-qtquick-localstorage,
          qml-module-qtquick-xmllistmodel,
          qml-module-qtwebkit,
          ${shlibs:Depends}
