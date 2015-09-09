@@ -30,7 +30,6 @@
 #include "QXmppTransferManager.h"
 #include "QXmppUtils.h"
 
-#include "QSoundLoader.h"
 #include "QSoundPlayer.h"
 #include "QSoundTester.h"
 
@@ -165,7 +164,6 @@ void Plugin::registerTypes(const char *uri)
     qmlRegisterType<RoomModel>(uri, 2, 4, "RoomModel");
     qmlRegisterType<RoomPermissionModel>(uri, 2, 4, "RoomPermissionModel");
     qmlRegisterType<RosterModel>(uri, 2, 4, "RosterModel");
-    qmlRegisterType<QSoundLoader>(uri, 2, 4, "SoundLoader");
     qmlRegisterType<QSoundPlayer>(uri, 2, 4, "SoundPlayer");
     qmlRegisterType<QSoundTester>(uri, 2, 4, "SoundTester");
     qmlRegisterType<TranslationLoader>(uri, 2, 4, "TranslationLoader");

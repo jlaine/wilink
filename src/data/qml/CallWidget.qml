@@ -19,6 +19,7 @@
 
 import QtQuick 2.3
 import QtQuick.Window 2.2
+import QtMultimedia 5.4
 import wiLink 2.4
 
 Item {
@@ -32,10 +33,10 @@ Item {
     height: video.openMode != CallVideoHelper.NotOpen ? (240 + 2 * appStyle.margin.normal) : frame.height
     z: 5
 
-    SoundLoader {
+    SoundEffect {
         id: soundLoader
 
-        repeat: true
+        loops: SoundEffect.Infinite
         source: 'sounds/call-outgoing.wav'
     }
 
@@ -224,7 +225,7 @@ Item {
         // play a sound
         if (callWidget.call.direction === QXmppCall.OutgoingDirection &&
             callWidget.call.state === QXmppCall.ConnectingState) {
-            soundLoader.start();
+            soundLoader.play();
         }
     }
 

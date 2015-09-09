@@ -2,7 +2,6 @@ INCLUDEPATH += sound
 
 HEADERS += \
     sound/QSoundFile.h \
-    sound/QSoundLoader.h \
     sound/QSoundMeter.h \
     sound/QSoundPlayer.h \
     sound/QSoundStream.h \
@@ -11,7 +10,6 @@ HEADERS += \
     sound/QVideoGrabber_p.h
 SOURCES += \
     sound/QSoundFile.cpp \
-    sound/QSoundLoader.cpp \
     sound/QSoundMeter.cpp \
     sound/QSoundPlayer.cpp \
     sound/QSoundStream.cpp \
