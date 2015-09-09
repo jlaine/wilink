@@ -186,14 +186,14 @@ FocusScope {
 
         function hide() {
             menuCancelArea.enabled = false;
-            menuLoader.item.visible = false;
+            menuLoader.visible = false;
         }
 
         function show(x, y) {
             menuCancelArea.enabled = true;
             menuLoader.x = x;
             menuLoader.y = y;
-            menuLoader.item.visible = true;
+            menuLoader.visible = true;
         }
 
         Connections {
