@@ -31,6 +31,7 @@ android {
     QMAKE_POST_LINK += cp -a $$[QT_INSTALL_QML]/QtQuick/Window.2 $$WILINK_QML_PATH/QtQuick/ $$EOL
     QMAKE_POST_LINK += cp -a $$[QT_INSTALL_QML]/QtQuick/XmlListModel $$WILINK_QML_PATH/QtQuick/ $$EOL
     QMAKE_POST_LINK += cp -a $$[QT_INSTALL_QML]/QtQuick.2 $$WILINK_QML_PATH/ $$EOL
+    QMAKE_POST_LINK += cp -a $$[QT_INSTALL_QML]/QtMultimedia $$WILINK_QML_PATH/ $$EOL
     QMAKE_POST_LINK += cp -a $$[QT_INSTALL_QML]/QtWebkit $$WILINK_QML_PATH/ $$EOL
 
     # QtWebProcess
