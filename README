@@ -40,7 +40,7 @@ wiLink requires Qt >= 5.4 to build.
 On Debian/Ubuntu
 ----------------
 
-$ sudo apt-get install libmad0-dev libqxmpp-dev libvorbis-dev libxss-dev pkg-config qtbase5-dev qtmultimedia5-dev
+$ sudo apt-get install libqxmpp-dev libxss-dev qtbase5-dev qtmultimedia5-dev
 
 On Mac OS X
 -----------

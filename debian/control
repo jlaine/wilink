@@ -4,12 +4,9 @@ Priority: optional
 Maintainer: Jeremy Lainé <jeremy.laine@m4x.org>
 Standards-Version: 3.9.6
 Build-Depends: debhelper (>= 7),
-               libmad0-dev,
                libqt5x11extras5-dev,
                libqxmpp-dev (>= 0.9.1),
-               libvorbis-dev,
                libxss-dev,
-               pkg-config,
                qtbase5-dev,
                qtmultimedia5-dev
 Homepage: https://github.com/jlaine/wilink

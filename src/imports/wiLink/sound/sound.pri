@@ -14,13 +14,6 @@ SOURCES += \
     sound/QSoundTester.cpp \
     sound/QVideoGrabber.cpp
 
-# Libraries used internally by QSound
-QSOUND_INTERNAL_DEFINES += QSOUND_USE_MAD
-isEmpty(WILINK_SYSTEM_MAD) {
-    QSOUND_INCLUDE_DIR += $$PWD/../3rdparty/libmad
-}
-QSOUND_INTERNAL_LIBS += -lmad
-
 mac {
     OBJECTIVE_SOURCES += sound/QVideoGrabber_mac.mm
     LIBS += -framework QTKit -framework QuartzCore -framework Cocoa
