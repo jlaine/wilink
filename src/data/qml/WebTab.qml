@@ -23,7 +23,6 @@ import QtWebKit 3.0
 import QtWebKit.experimental 1.0
 import wiLink 2.4
 import '.' as Custom
-import 'scripts/utils.js' as Utils
 
 Panel {
     id: panel
@@ -60,54 +59,59 @@ Panel {
             anchors.bottom: parent.bottom
             anchors.left: parent.left
 
-            ToolButton {
+            Custom.ToolButton {
                 anchors.top: parent.top
                 anchors.topMargin: 2
                 anchors.bottom: parent.bottom
-                text: Utils.iconText('icon-home')
+                iconStyle: 'icon-home'
+                width: iconSize
 
                 onClicked: {
                     webView.url = appSettings.wifirstBaseUrl;
                 }
             }
 
-            ToolButton {
+            Custom.ToolButton {
                 anchors.top: parent.top
                 anchors.topMargin: 2
                 anchors.bottom: parent.bottom
                 enabled: webView.canGoBack
-                text: Utils.iconText('icon-chevron-left')
+                iconStyle: 'icon-chevron-left'
+                width: iconSize
 
                 onClicked: webView.goBack()
             }
 
-            ToolButton {
+            Custom.ToolButton {
                 anchors.top: parent.top
                 anchors.topMargin: 2
                 anchors.bottom: parent.bottom
                 enabled: webView.canGoForward
-                text: Utils.iconText('icon-chevron-right')
+                iconStyle: 'icon-chevron-right'
+                width: iconSize
 
                 onClicked: webView.goForward()
             }
 
-            ToolButton {
+            Custom.ToolButton {
                 anchors.top: parent.top
                 anchors.topMargin: 2
                 anchors.bottom: parent.bottom
                 enabled: webView.url != ''
-                text: Utils.iconText('icon-refresh')
+                iconStyle: 'icon-refresh'
                 visible: !webView.stop.enabled
+                width: iconSize
 
                 onClicked: webView.reload()
             }
 
-            ToolButton {
+            Custom.ToolButton {
                 anchors.top: parent.top
                 anchors.topMargin: 2
                 anchors.bottom: parent.bottom
-                text: Utils.iconText('icon-stop')
+                iconStyle: 'icon-stop'
                 visible: webView.loading
+                width: iconSize
 
                 onClicked: webView.stop()
             }
