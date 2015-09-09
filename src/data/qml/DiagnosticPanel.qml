@@ -18,7 +18,10 @@
  */
 
 import QtQuick 2.3
+import QtQuick.Controls 1.0
+import QtWebKit 3.0
 import wiLink 2.4
+import '.' as Custom
 
 Panel {
     id: panel
@@ -38,15 +41,15 @@ Panel {
         anchors.right: parent.right
         iconStyle: 'icon-info-sign'
         title: qsTr('Diagnostics')
-        toolBar: ToolBar {
-            ToolButton {
+        toolBar: Custom.ToolBar {
+            Custom.ToolButton {
                 iconStyle: 'icon-copy'
                 enabled: !panel.busy
                 text: qsTr('Copy')
 
                 onClicked: clipboard.copy(diagnostic.text)
             }
-            ToolButton {
+            Custom.ToolButton {
                 iconStyle: 'icon-refresh'
                 enabled: !panel.busy
                 text: qsTr('Refresh')
@@ -56,30 +59,28 @@ Panel {
         }
     }
 
-    Flickable {
+    ScrollView {
         id: flickable
 
         anchors.margins: appStyle.margin.normal
         anchors.left: parent.left
-        anchors.right: scrollBar.left
+        anchors.right: parent.right
         anchors.top: header.bottom
         anchors.bottom: parent.bottom
-        contentHeight: diagnostic.height
 
-        Label {
+        WebView {
             id: diagnostic
 
-            text: Qt.isQtObject(panel.client) ? panel.client.diagnosticManager.html : ''
+            anchors.fill: parent
+
+            Connections {
+                target: panel.client.diagnosticManager
+
+                onHtmlChanged: {
+                    diagnostic.loadHtml(panel.client.diagnosticManager.html);
+                }
+            }
         }
-    }
-
-    ScrollBar {
-        id: scrollBar
-
-        anchors.top: header.bottom
-        anchors.bottom: parent.bottom
-        anchors.right: parent.right
-        flickableItem: flickable
     }
 
     Spinner {
@@ -91,7 +92,5 @@ Panel {
         panel.client = accountModel.clientForJid('wifirst.net');
         panel.client.diagnosticManager.refresh()
     }
-
-    Keys.forwardTo: scrollBar
 }
 
