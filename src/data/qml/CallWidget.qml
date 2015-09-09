@@ -59,6 +59,7 @@ Item {
         border.color: '#93b9f2'
         border.width: 1
         gradient: Gradient {
+            id: backgroundGradient
             GradientStop { position: 0; color: '#e7effd' }
             GradientStop { position: 1; color: '#cbdaf1' }
         }
@@ -123,7 +124,7 @@ Item {
             height: appStyle.icon.smallSize + 4 * appStyle.margin.normal
             border.color: background.border.color
             border.width: background.border.width
-            gradient: background.gradient
+            gradient: backgroundGradient
             smooth: true
         }
 
