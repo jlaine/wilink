@@ -18,9 +18,11 @@
  */
 
 import QtQuick 2.3
+import QtQuick.Controls 1.0
 import QtWebKit 3.0
 import QtWebKit.experimental 1.0
 import wiLink 2.4
+import '.' as Legacy
 
 Panel {
     id: panel
@@ -49,7 +51,7 @@ Panel {
             color: '#dfdfdf'
         }
 
-        ToolBar {
+        Legacy.ToolBar {
             id: toolBar
 
             anchors.margins: appStyle.margin.normal
@@ -57,7 +59,7 @@ Panel {
             anchors.bottom: parent.bottom
             anchors.left: parent.left
 
-            ToolButton {
+            Legacy.ToolButton {
                 anchors.top: parent.top
                 anchors.topMargin: 2
                 anchors.bottom: parent.bottom
@@ -69,7 +71,7 @@ Panel {
                 }
             }
 
-            ToolButton {
+            Legacy.ToolButton {
                 anchors.top: parent.top
                 anchors.topMargin: 2
                 anchors.bottom: parent.bottom
@@ -80,7 +82,7 @@ Panel {
                 onClicked: webView.goBack()
             }
 
-            ToolButton {
+            Legacy.ToolButton {
                 anchors.top: parent.top
                 anchors.topMargin: 2
                 anchors.bottom: parent.bottom
@@ -91,7 +93,7 @@ Panel {
                 onClicked: webView.goForward()
             }
 
-            ToolButton {
+            Legacy.ToolButton {
                 anchors.top: parent.top
                 anchors.topMargin: 2
                 anchors.bottom: parent.bottom
@@ -103,7 +105,7 @@ Panel {
                 onClicked: webView.reload()
             }
 
-            ToolButton {
+            Legacy.ToolButton {
                 anchors.top: parent.top
                 anchors.topMargin: 2
                 anchors.bottom: parent.bottom
@@ -115,7 +117,7 @@ Panel {
             }
         }
 
-        InputBar {
+        Legacy.InputBar {
             id: urlInput
 
             anchors.margins: appStyle.margin.normal
@@ -147,9 +149,7 @@ Panel {
         anchors.right: parent.right
         focus: webView.url != ''
 
-        Flickable {
-            id: webFlickable
-
+        ScrollView {
             anchors.fill: parent
 
             WebView {
@@ -179,28 +179,6 @@ Panel {
                 }
             }
         }
-
-/*
-        ScrollBar {
-            id: verticalScrollBar
-
-            anchors.top: parent.top
-            anchors.bottom: parent.bottom
-            anchors.right: parent.right
-            flickableItem: webFlickable
-        }
-
-        ScrollBar {
-            id: horizontalScrollBar
-
-            anchors.bottom: parent.bottom
-            anchors.left: parent.left
-            anchors.right: verticalScrollBar.left
-            flickableItem: webFlickable
-            orientation: Qt.Horizontal
-        }
-        Keys.forwardTo: [verticalScrollBar, horizontalScrollBar]
-*/
 
         Keys.onPressed: {
             if (((event.modifiers & Qt.ControlModifier) && event.key == Qt.Key_R)
