@@ -1,7 +1,7 @@
 !define PRODUCT_NAME "wiLink"
 
 Name "${PRODUCT_NAME}"
-OutFile "${PRODUCT_NAME}-${PRODUCT_VERSION}-win32.exe"
+OutFile "${PRODUCT_OUTPUT}"
 SetCompressor lzma
 
 InstallDir "$PROGRAMFILES\wiLink"
