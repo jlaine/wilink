@@ -18,6 +18,7 @@
  */
 
 import QtQuick 2.3
+import QtQuick.Window 2.2
 import wiLink 2.4
 
 Item {
@@ -250,7 +251,7 @@ Item {
 
             PropertyChanges {
                 target: window
-                fullScreen: true
+                visibility: Window.FullScreen
             }
         }
     ]
