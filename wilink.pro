@@ -7,7 +7,7 @@ SUBDIRS = src
 # Package generation
 mac {
     package.depends = first
-    package.output = wiLink-$$WILINK_VERSION-mac-10.6.dmg
+    package.output = wiLink-$$WILINK_VERSION-mac.dmg
     package.tmp = wiLink.tmp
     package.commands =  \
         rm -rf $$package.tmp $$package.output; \
