@@ -29,7 +29,6 @@ Rectangle {
     border.color: Qt.rgba(0, 0, 0, 0.2)
     border.width: 1
     color: 'white'
-    opacity: 0
     radius: 5
     height: model.count * (appStyle.icon.tinySize + 4) + 1
     width: 150
