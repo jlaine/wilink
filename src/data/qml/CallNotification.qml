@@ -18,6 +18,7 @@
  */
 
 import QtQuick 2.3
+import QtMultimedia 5.4
 import wiLink 2.4
 import 'scripts/utils.js' as Utils
 
@@ -37,12 +38,10 @@ NotificationDialog {
 
             jid: Qt.isQtObject(call) ? call.jid : ''
         },
-        SoundLoader {
-            id: soundLoader
-
-            repeat: true
+        SoundEffect {
+            loops: SoundEffect.Infinite
             source: 'sounds/call-incoming.wav'
-            Component.onCompleted: soundLoader.start()
+            Component.onCompleted: play()
         },
         Connections {
             target: call

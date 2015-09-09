@@ -18,6 +18,7 @@
  */
 
 import QtQuick 2.3
+import QtMultimedia 5.4
 import wiLink 2.4
 
 NotificationDialog {
@@ -32,12 +33,10 @@ NotificationDialog {
     title: qsTr('Call from %1').replace('%1', caller)
 
     resources: [
-        SoundLoader {
-            id: soundLoader
-
-            repeat: true
+        SoundEffect {
+            loops: SoundEffect.Infinite
             source: 'sounds/call-incoming.wav'
-            Component.onCompleted: soundLoader.start()
+            Component.onCompleted: play()
         },
         Connections {
             target: call
