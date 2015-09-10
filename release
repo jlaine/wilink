@@ -2,16 +2,6 @@
 
 set -e
 
-# FIXME: check code is up to date
-if false; then
-    if [ -n "`git diff`" ]; then
-        echo "working copy is dirty!"
-        exit 1
-    fi
-    git pull
-    git submodule update --init
-fi
-
 # determine target
 target=$1
 if [ -z "$target" ]; then
@@ -44,21 +34,9 @@ win32)
     ;;
 esac
 
-case "$target" in
-android)
-    cd android
-    ant release
-    cp bin/wiLink-release-unsigned.apk bin/wiLink-release-unaligned.apk
-    jarsigner -verbose bin/wiLink-release-unaligned.apk wifirst
-    zipalign -v 4 bin/wiLink-release-unaligned.apk bin/wiLink-release-signed.apk
-    rm bin/wiLink-release-unaligned.apk
-    ;;
-*)
-    rm -rf release-$target
-    mkdir release-$target
-    cd release-$target
-    $QMAKE .. QXMPP_NO_EXAMPLES=1 QXMPP_NO_TESTS=1
-    $MAKE
-    $MAKE package
-    ;;
-esac
+rm -rf release-$target
+mkdir release-$target
+cd release-$target
+$QMAKE .. QXMPP_NO_EXAMPLES=1 QXMPP_NO_TESTS=1
+$MAKE
+$MAKE package
