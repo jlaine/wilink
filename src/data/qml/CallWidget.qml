@@ -29,14 +29,8 @@ Item {
     property QtObject call: null
     property string caller
 
-    property QtObject audio: CallAudioHelper {
-        call: callWidget.call
-    }
-    property QtObject video: CallVideoHelper {
-        call: callWidget.call
-        monitor: videoMonitor
-        output: videoOutput
-    }
+    property QtObject audio: null
+    property QtObject video: null
     property bool videoEnabled: true
 
     anchors.left: parent ? parent.left : undefined

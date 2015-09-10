@@ -60,7 +60,7 @@ Panel {
                     // variable, finishCreation seems to receive an incomplete call
                     // object.
                     var currentCall = call;
-                    var component = Qt.createComponent('CallWidget.qml');
+                    var component = Qt.createComponent('ChatCallWidget.qml');
 
                     function finishCreation() {
                         if (component.status != Component.Ready)
