@@ -29,6 +29,7 @@ Item {
     property QtObject call: null
     property string caller
     property int callId: 0
+    property bool videoEnabled: false
 
     anchors.left: parent ? parent.left : undefined
     anchors.right: parent ? parent.right : undefined
@@ -74,16 +75,17 @@ Item {
             anchors.left: parent.left
             anchors.leftMargin: appStyle.margin.normal
             anchors.verticalCenter: parent.verticalCenter
-            source: (call && call.direction == SipCall.IncomingDirection) ? 'images/call-incoming.png' : 'images/call-outgoing.png'
+            source: (call && call.direction == QXmppCall.IncomingDirection) ? 'images/call-incoming.png' : 'images/call-outgoing.png'
             width: appStyle.icon.smallSize
             height: appStyle.icon.smallSize
+            visible: !videoEnabled
         }
 
         Label {
             id: status
 
             anchors.left: image.right
-            anchors.leftMargin: appStyle.spacing.horizontal
+            anchors.leftMargin: appStyle.margin.normal
             anchors.top: parent.top
             anchors.right: controls.left
             elide: Text.ElideRight
@@ -192,6 +194,7 @@ Item {
 
                 enabled: Qt.isQtObject(call) && call.state == QXmppCall.ActiveState
                 iconStyle: 'icon-facetime-video'
+                visible: videoEnabled
 
                 onClicked: {
                     if (video.openMode & CallVideoHelper.WriteOnly)
@@ -212,6 +215,7 @@ Item {
 
                 enabled: Qt.isQtObject(call) && call.state == QXmppCall.ActiveState
                 iconStyle: 'icon-fullscreen'
+                visible: videoEnabled
 
                 onClicked: {
                     if (callWidget.state == '')
