@@ -28,6 +28,13 @@ Item {
 
     property QtObject call: null
     property string caller
+
+    property QtObject audio: PhoneAudioHelper {
+        call: callWidget.call
+    }
+    property QtObject video: QtObject {
+        property int openMode: 0
+    }
     property bool videoEnabled: false
 
     anchors.left: parent ? parent.left : undefined
@@ -41,18 +48,6 @@ Item {
 
         loops: SoundEffect.Infinite
         source: 'sounds/call-outgoing.wav'
-    }
-
-    PhoneAudioHelper {
-        id: audio
-
-        call: callWidget.call
-    }
-
-    QtObject {
-        id: video
-
-        property int openMode: 0
     }
 
     Rectangle {
