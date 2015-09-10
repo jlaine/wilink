@@ -22,9 +22,9 @@
 #include <QLocale>
 #include <QNetworkDiskCache>
 #include <QNetworkRequest>
-#include <QProcess>
 #include <QSslError>
 #include <QStandardPaths>
+#include <QSysInfo>
 
 #include "network.h"
 
@@ -70,13 +70,7 @@ QString NetworkAccessManager::userAgent()
 #if defined(Q_OS_ANDROID)
         osDetails = QLatin1String("Linux; Android");
 #elif defined(Q_OS_LINUX)
-        osDetails = QLatin1String("X11; Linux");
-        QProcess process;
-        process.start(QString("uname"), QStringList(QString("-m")), QIODevice::ReadOnly);
-        process.waitForFinished();
-        const QString arch = QString::fromLocal8Bit(process.readAllStandardOutput()).trimmed();
-        if (!arch.isEmpty())
-            osDetails += " " + arch;
+        osDetails = QString("X11; Linux %1").arg(QSysInfo::currentCpuArchitecture());
 #elif defined(Q_OS_MAC)
         osDetails = QString("Macintosh; Mac OS X %1").arg(QSysInfo::productVersion());
 #elif defined(Q_OS_WIN)
