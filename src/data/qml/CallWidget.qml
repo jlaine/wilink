@@ -222,6 +222,9 @@ Item {
     }
 
     onCallChanged: {
+        if (!callWidget.call)
+            return;
+
         // play a sound
         if (callWidget.call.direction === QXmppCall.OutgoingDirection &&
             callWidget.call.state === QXmppCall.ConnectingState) {
