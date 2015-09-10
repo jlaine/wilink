@@ -27,6 +27,7 @@ Item {
     id: callWidget
 
     property QtObject call: null
+    property string caller
     property bool videoEnabled: true
 
     anchors.left: parent ? parent.left : undefined
@@ -96,13 +97,19 @@ Item {
                 if (!call || call.state == QXmppCall.ConnectingState) {
                     status = qsTr('Connecting..');
                 } else if (call.state == QXmppCall.ActiveState) {
-                    status = Utils.formatDuration(call.duration);
+                    if (call.duration)
+                        status = Utils.formatDuration(call.duration);
+                    else
+                        status = qsTr('Call connected.');
                 } else if (call.state == QXmppCall.DisconnectingState) {
                     status = qsTr('Disconnecting..');
                 } else if (call.state == QXmppCall.FinishedState) {
                     status = qsTr('Call finished.');
                 }
-                return status;
+                if (caller)
+                    return caller + '<br/><small>' + status + '</small>';
+                else
+                    return status;
             }
         }
 

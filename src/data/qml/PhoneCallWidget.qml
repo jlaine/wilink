@@ -28,7 +28,6 @@ Item {
 
     property QtObject call: null
     property string caller
-    property int callId: 0
     property bool videoEnabled: false
 
     anchors.left: parent ? parent.left : undefined
@@ -96,13 +95,19 @@ Item {
                 if (!call || call.state == QXmppCall.ConnectingState) {
                     status = qsTr('Connecting..');
                 } else if (call.state == QXmppCall.ActiveState) {
-                    status = Utils.formatDuration(call.duration);
+                    if (call.duration)
+                        status = Utils.formatDuration(call.duration);
+                    else
+                        status = qsTr('Call connected.');
                 } else if (call.state == QXmppCall.DisconnectingState) {
                     status = qsTr('Disconnecting..');
                 } else if (call.state == QXmppCall.FinishedState) {
                     status = qsTr('Call finished.');
                 }
-                return caller + '<br/><small>' + status + '</small>';
+                if (caller)
+                    return caller + '<br/><small>' + status + '</small>';
+                else
+                    return status;
             }
         }
 
@@ -239,16 +244,11 @@ Item {
         onStateChanged: {
             soundLoader.stop();
             if (call.state == QXmppCall.FinishedState) {
-                if (callWidget.callId) {
-                    var flags = call.direction;
-                    if (call.errorString) {
-                        flags += 2;
-                        dialogSwapper.showPanel('ErrorNotification.qml', {
-                            title: qsTr('Call failed'),
-                            text: qsTr('Sorry, but the call could not be completed.') + '\n\n' + call.errorString,
-                        });
-                    }
-                    historyView.model.updateItem(callWidget.callId, {address: call.recipient, duration: call.duration, flags: flags});
+                if (call.errorString) {
+                    dialogSwapper.showPanel('ErrorNotification.qml', {
+                        title: qsTr('Call failed'),
+                        text: qsTr('Sorry, but the call could not be completed.') + '\n\n' + call.errorString,
+                    });
                 }
 
                 // destroy call
@@ -283,11 +283,6 @@ Item {
             callWidget.call.state == QXmppCall.ConnectingState) {
             soundLoader.play();
         }
-
-        // log call
-        historyView.model.addItem({address: call.recipient, duration: 0, flags: call.direction}, function(id) {
-            callId = id;
-        });
     }
 
     states: [
