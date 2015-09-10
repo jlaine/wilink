@@ -47,7 +47,7 @@ Panel {
                 enabled: !panel.busy
                 text: qsTr('Copy')
 
-                onClicked: clipboard.copy(diagnostic.text)
+                onClicked: clipboard.copy(panel.client.diagnosticManager.html)
             }
             Custom.ToolButton {
                 iconStyle: 'icon-refresh'
@@ -74,6 +74,7 @@ Panel {
             anchors.fill: parent
 
             Connections {
+                ignoreUnknownSignals: true
                 target: panel.client.diagnosticManager
 
                 onHtmlChanged: {
