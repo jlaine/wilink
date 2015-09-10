@@ -91,6 +91,7 @@ ApplicationWindow {
         id: uiLoader
 
         anchors.fill: parent
+        clip: true
         focus: true
     }
 
