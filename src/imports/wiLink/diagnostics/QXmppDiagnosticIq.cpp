@@ -23,6 +23,7 @@
 #include <QNetworkInterface>
 
 #include "QXmppDiagnosticIq.h"
+#include "json.h"
 
 const char* ns_diagnostics = "http://wifirst.net/protocol/diagnostics";
 
@@ -156,6 +157,40 @@ void QXmppDiagnosticIq::parseElementFromChild(const QDomElement &element)
         }
         child = child.nextSiblingElement();
     }
+}
+
+QJsonObject QXmppDiagnosticIq::toJson() const
+{
+    QJsonObject iq;
+
+    iq.insert("softwares", listToJson(m_softwares));
+    iq.insert("interfaces", listToJson(m_interfaces));
+
+    QJsonArray lookups;
+    foreach (const QHostInfo &info, m_lookups) {
+        QJsonObject lookup;
+        lookup.insert("hostname", info.hostName());
+
+        QJsonArray addresses;
+        foreach (const QHostAddress &address, info.addresses())
+            addresses << address.toString();
+        lookup.insert("addresses", addresses);
+
+        lookups << lookup;
+    }
+    iq.insert("lookups", lookups);
+
+    QJsonArray nameservers;
+    foreach (const QHostAddress &server, m_nameServers) {
+        nameservers << server.toString();
+    }
+    iq.insert("nameservers", nameservers);
+
+    iq.insert("pings", listToJson(m_pings));
+    iq.insert("traceroutes", listToJson(m_traceroutes));
+    iq.insert("transfers", listToJson(m_transfers));
+
+    return iq;
 }
 
 void QXmppDiagnosticIq::toXmlElementFromChild(QXmlStreamWriter *writer) const

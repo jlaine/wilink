@@ -26,6 +26,7 @@
 #include <QXmlStreamWriter>
 
 class QDomElement;
+class QJsonObject;
 
 class WirelessNetwork
 {
@@ -46,6 +47,7 @@ public:
     void setSsid(const QString &ssid) { w_ssid = ssid; };
 
     void parse(const QDomElement &element);
+    QJsonObject toJson() const;
     void toXml(QXmlStreamWriter *writer) const;
 
     bool operator==(const WirelessNetwork &other) const { return w_ssid == other.w_ssid; };

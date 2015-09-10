@@ -20,6 +20,7 @@
 #ifndef __DIAGNOSTICS_SOFTWARE_H__
 #define __DIAGNOSTICS_SOFTWARE_H__
 
+#include <QJsonObject>
 #include <QXmlStreamWriter>
 
 class QDomElement;
@@ -37,6 +38,7 @@ public:
     void setVersion(const QString &version);
 
     void parse(const QDomElement &element);
+    QJsonObject toJson() const;
     void toXml(QXmlStreamWriter *writer) const;
 
 private:

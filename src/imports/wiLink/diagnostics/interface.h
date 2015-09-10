@@ -41,6 +41,8 @@ public:
 
     void parse(const QDomElement &element);
     void toXml(QXmlStreamWriter *writer) const;
+    
+    QJsonObject toJson() const;
 
 private:
     QList<QNetworkAddressEntry> m_addressEntries;

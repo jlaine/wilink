@@ -58,6 +58,15 @@ void Software::parse(const QDomElement &element)
     m_version = element.attribute("version");
 }
 
+QJsonObject Software::toJson() const
+{
+    QJsonObject software;
+    software.insert("type", m_type);
+    software.insert("name", m_name);
+    software.insert("version", m_version);
+    return software;
+}
+
 void Software::toXml(QXmlStreamWriter *writer) const
 {
     writer->writeStartElement("software");

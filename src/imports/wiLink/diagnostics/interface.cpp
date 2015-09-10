@@ -18,8 +18,10 @@
  */
 
 #include <QDomElement>
+#include <QJsonObject>
 
 #include "interface.h"
+#include "json.h"
 
 QList<QNetworkAddressEntry> Interface::addressEntries() const
 {
@@ -88,6 +90,29 @@ void Interface::parse(const QDomElement &element)
         m_wirelessNetworks << network;
         networkElement = networkElement.nextSiblingElement("network");
     }
+}
+
+QJsonObject Interface::toJson() const
+{
+    // addresses
+    QJsonArray addresses;
+    foreach (const QNetworkAddressEntry &entry, m_addressEntries) {
+        QJsonObject address;
+        address.insert("broadcast", entry.broadcast().toString());
+        address.insert("ip", entry.ip().toString());
+        address.insert("netmask", entry.netmask().toString());
+        addresses << address;
+    }
+
+    // wireless
+    QJsonObject wireless;
+    wireless.insert("standards", m_wirelessStandards.toString());
+    wireless.insert("networks", listToJson(m_wirelessNetworks));
+
+    QJsonObject interface;
+    interface.insert("addresses", addresses);
+    interface.insert("wireless", wireless);
+    return interface;
 }
 
 void Interface::toXml(QXmlStreamWriter *writer) const

@@ -26,6 +26,7 @@
 #include <QXmlStreamWriter>
 
 class QDomElement;
+class QJsonObject;
 class QNetworkAccessManager;
 
 /** The Transfer class represents an HTTP transfer result.
@@ -59,6 +60,7 @@ public:
     void setUrl(const QUrl &url);
 
     void parse(const QDomElement &element);
+    QJsonObject toJson() const;
     void toXml(QXmlStreamWriter *writer) const;
 
 private:

@@ -58,6 +58,8 @@ public:
 
     static bool isDiagnosticIq(const QDomElement &element);
 
+    QJsonObject toJson() const;
+
 protected:
     void parseElementFromChild(const QDomElement &element);
     void toXmlElementFromChild(QXmlStreamWriter *writer) const;
