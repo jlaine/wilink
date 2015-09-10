@@ -31,7 +31,7 @@ Dialog {
     Item {
         anchors.fill: parent
 
-        ScrollView {
+        ScrollListView {
             id: view
 
             anchors.top: parent.top

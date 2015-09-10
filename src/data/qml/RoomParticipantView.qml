@@ -20,7 +20,7 @@
 import QtQuick 2.3
 import wiLink 2.4
 
-ScrollView {
+ScrollListView {
     id: block
 
     signal participantClicked(variant participant, variant mouse, variant mouseArea)

@@ -42,7 +42,7 @@ Dialog {
             text: "Let's talk"
         }
 
-        ScrollView {
+        ScrollListView {
             anchors.top: reasonEdit.bottom
             anchors.topMargin: 8
             anchors.bottom: parent.bottom

@@ -38,7 +38,7 @@ Item {
         text: qsTr('In addition to your Wifirst account, you can use additional chat accounts such as Google Talk.')
     }
 
-    ScrollView {
+    ScrollListView {
         id: accountView
 
         anchors.top: help.bottom

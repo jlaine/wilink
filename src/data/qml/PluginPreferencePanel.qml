@@ -42,7 +42,7 @@ Panel {
         anchors.bottom: parent.bottom
         title: qsTr('Plugins')
 
-        ScrollView {
+        ScrollListView {
             id: view
 
             anchors.fill: parent

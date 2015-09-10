@@ -76,7 +76,7 @@
     <file>qml/RoomPermissionDialog.qml</file>
     <file>qml/RoomSubjectDialog.qml</file>
     <file>qml/ScrollBar.qml</file>
-    <file>qml/ScrollView.qml</file>
+    <file>qml/ScrollListView.qml</file>
     <file>qml/SetupBackground.qml</file>
     <file>qml/SetupDialog.qml</file>
     <file>qml/SocialIcon.qml</file>
