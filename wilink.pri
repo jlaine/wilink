@@ -1,4 +1,4 @@
-WILINK_VERSION = 2.4.904
+WILINK_VERSION = 2.4.905
 
 EOL = $$escape_expand(\n\t)
 
