@@ -35,7 +35,6 @@ class ApplicationSettings : public QObject
     Q_PROPERTY(QString downloadsLocation READ downloadsLocation CONSTANT)
     Q_PROPERTY(QUrl homeUrl READ homeUrl CONSTANT)
     Q_PROPERTY(bool isMobile READ isMobile CONSTANT)
-    Q_PROPERTY(QString osType READ osType CONSTANT)
 
     Q_PROPERTY(QString audioInputDeviceName READ audioInputDeviceName WRITE setAudioInputDeviceName NOTIFY audioInputDeviceNameChanged)
     Q_PROPERTY(QString audioOutputDeviceName READ audioOutputDeviceName WRITE setAudioOutputDeviceName NOTIFY audioOutputDeviceNameChanged)
@@ -54,7 +53,6 @@ public:
     QString downloadsLocation() const;
     QUrl homeUrl() const;
     bool isMobile() const;
-    QString osType() const;
 
     QString audioInputDeviceName() const;
     void setAudioInputDeviceName(const QString &name);

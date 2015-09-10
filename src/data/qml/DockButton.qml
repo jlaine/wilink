@@ -88,7 +88,7 @@ Item {
         function shortcutText(shortcut) {
             var text = '';
             if (shortcut & Qt.ControlModifier)
-                text += appSettings.osType == 'mac' ? 'Cmd-' : 'Ctrl-';
+                text += Qt.platform.os == 'osx' ? 'Cmd-' : 'Ctrl-';
             var key = shortcut & 0xffffff;
             if (key >= Qt.Key_A && key <= Qt.Key_Z) {
                 var alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';

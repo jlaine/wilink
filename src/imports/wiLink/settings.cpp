@@ -24,7 +24,6 @@
 #include <QTextStream>
 
 #include "settings.h"
-#include "systeminfo.h"
 
 #ifdef Q_OS_MAC
 extern bool qt_mac_execute_apple_script(const QString &script);
@@ -72,11 +71,6 @@ bool ApplicationSettings::isMobile() const
 #else
     return false;
 #endif
-}
-
-QString ApplicationSettings::osType() const
-{
-    return SystemInfo::osType();
 }
 
 /** Returns the name of the audio input device.
