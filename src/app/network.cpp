@@ -26,10 +26,6 @@
 #include <QStandardPaths>
 #include <QSysInfo>
 
-#ifdef Q_OS_WIN
-#include <windows.h>
-#endif
-
 #include "network.h"
 
 NetworkAccessManager::NetworkAccessManager(QObject *parent)
@@ -78,10 +74,7 @@ QString NetworkAccessManager::userAgent()
 #elif defined(Q_OS_MAC)
         osDetails = QString("Macintosh; Mac OS X %1").arg(QSysInfo::productVersion());
 #elif defined(Q_OS_WIN)
-        DWORD dwVersion = GetVersion();
-        DWORD dwMajorVersion = (DWORD)(LOBYTE(LOWORD(dwVersion)));
-        DWORD dwMinorVersion = (DWORD)(HIBYTE(LOWORD(dwVersion)));
-        osDetails = QString("Windows NT %1.%2").arg(QString::number(dwMajorVersion), QString::number(dwMinorVersion));
+        osDetails = QString("Windows NT %1").arg(QSysInfo::kernelVersion());
 #endif
         globalUserAgent = QString("Mozilla/5.0 (%1) %2/%3").arg(osDetails, qApp->applicationName(), qApp->applicationVersion());
     }
