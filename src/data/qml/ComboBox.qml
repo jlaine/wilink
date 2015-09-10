@@ -57,12 +57,9 @@ Item {
         smooth: true
     }
 
-    Loader {
+    // The current item
+    MenuDelegate {
         id: view
-
-        sourceComponent: MenuDelegate {
-            onClicked: itemClicked(index)
-        }
 
         property QtObject model: emptyItem
 
