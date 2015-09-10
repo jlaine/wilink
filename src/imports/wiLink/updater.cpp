@@ -31,6 +31,7 @@
 #include <QQmlEngine>
 #include <QQmlInfo>
 #include <QStringList>
+#include <QSysInfo>
 #include <QUrl>
 #include <QUrlQuery>
 #include <QTimer>
@@ -40,11 +41,25 @@
 #endif
 
 #include "settings.h"
-#include "systeminfo.h"
 #include "updater.h"
 
 #define CHUNK_SIZE 16384
 #define PROGRESS_MAX 100
+
+static QString osType()
+{
+#if defined(Q_OS_ANDROID)
+    return QString::fromLatin1("android");
+#elif defined(Q_OS_LINUX)
+    return QString::fromLatin1("linux");
+#elif defined(Q_OS_MAC)
+    return QString::fromLatin1("mac");
+#elif defined(Q_OS_WIN)
+    return QString::fromLatin1("win32");
+#else
+    return QString();
+#endif
+}
 
 class Release
 {
@@ -172,8 +187,8 @@ void Updater::check()
 
     QUrl statusUrl = d->updatesUrl;
     QUrlQuery query;
-    query.addQueryItem(QString::fromLatin1("ostype"), SystemInfo::osType());
-    query.addQueryItem(QString::fromLatin1("osversion"), SystemInfo::osVersion());
+    query.addQueryItem(QString::fromLatin1("ostype"), osType());
+    query.addQueryItem(QString::fromLatin1("osversion"), QSysInfo::productVersion());
     query.addQueryItem(QString::fromLatin1("version"), qApp->applicationVersion());
     statusUrl.setQuery(query);
 

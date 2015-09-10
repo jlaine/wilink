@@ -38,7 +38,6 @@ SOURCES += \
     rooms.cpp \
     roster.cpp \
     settings.cpp \
-    systeminfo.cpp \
     translations.cpp \
     updater.cpp
 
@@ -63,7 +62,6 @@ HEADERS += \
     rooms.h \
     roster.h \
     settings.h \
-    systeminfo.h \
     translations.h \
     updater.h
 

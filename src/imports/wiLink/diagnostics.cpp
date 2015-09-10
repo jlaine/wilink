@@ -23,6 +23,7 @@
 #include <QDomElement>
 #include <QNetworkInterface>
 #include <QShortcut>
+#include <QSysInfo>
 #include <QTimer>
 #include <QThread>
 
@@ -30,7 +31,6 @@
 #include "QXmppUtils.h"
 
 #include "diagnostics.h"
-#include "systeminfo.h"
 
 Q_DECLARE_METATYPE(QList<QHostInfo>)
 Q_DECLARE_METATYPE(QList<Ping>)
@@ -41,6 +41,21 @@ static int id1 = qRegisterMetaType< QList<QHostInfo> >();
 static int id2 = qRegisterMetaType< QList<Ping> >();
 static int id3 = qRegisterMetaType< QList<Traceroute> >();
 static int id4 = qRegisterMetaType< Interface >();
+
+static QString osName()
+{
+#if defined(Q_OS_ANDROID)
+    return QString::fromLatin1("Android");
+#elif defined(Q_OS_LINUX)
+    return QString::fromLatin1("Linux");
+#elif defined(Q_OS_MAC)
+    return QString::fromLatin1("Mac OS");
+#elif defined(Q_OS_WIN)
+    return QString::fromLatin1("Windows");
+#else
+    return QString::fromLatin1("Unknown");
+#endif
+}
 
 /* NETWORK */
 
@@ -61,8 +76,8 @@ void DiagnosticsAgent::handle(const QXmppDiagnosticIq &request)
     QList<Software> softwares;
     Software os;
     os.setType("os");
-    os.setName(SystemInfo::osName());
-    os.setVersion(SystemInfo::osVersion());
+    os.setName(osName());
+    os.setVersion(QSysInfo::productVersion());
     softwares << os;
 
     Software app;
