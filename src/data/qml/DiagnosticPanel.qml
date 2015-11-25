@@ -80,6 +80,19 @@ Panel {
                 onHtmlChanged: {
                     diagnostic.loadHtml(panel.client.diagnosticManager.html);
                 }
+
+                onJsonChanged: {
+                    for (var i = 0; i < accountModel.count; ++i) {
+                        var account = accountModel.get(i);
+                        if (account.type == 'web' && account.realm == 'www.wifirst.net') {
+                            var xhr = new XMLHttpRequest();
+                            xhr.open('POST', 'https://support.wifirst.net/diagnostics', true, account.username, account.password);
+                            xhr.setRequestHeader("Content-Type", "application/json");
+                            xhr.send();
+                            break;
+                        }
+                    }
+                }
             }
         }
     }
