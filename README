@@ -10,7 +10,6 @@ Mac OS X, Linux and Android. It features:
 
  * a chat client which supports:
    - file transfers
-   - document sharing
    - voice and video calls
  * a soft phone (SIP) for telephone calls
  * a diagnostic tool which performs tests to diagnostic connectivity
