@@ -19,7 +19,7 @@
 
 import QtQuick 2.3
 import QtMultimedia 5.4
-import wiLink 2.4
+import wiLink 2.5
 
 NotificationDialog {
     id: dialog

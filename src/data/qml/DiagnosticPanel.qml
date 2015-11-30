@@ -20,7 +20,7 @@
 import QtQuick 2.3
 import QtQuick.Controls 1.0
 import QtWebKit 3.0
-import wiLink 2.4
+import wiLink 2.5
 import '.' as Custom
 
 Panel {

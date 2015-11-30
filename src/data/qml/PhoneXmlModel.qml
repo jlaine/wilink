@@ -19,7 +19,7 @@
 
 import QtQuick 2.3
 import QtQuick.XmlListModel 2.0
-import wiLink 2.4
+import wiLink 2.5
 
 XmlListModel {
     id: xmlModel

@@ -22,7 +22,7 @@ import QtQuick.LocalStorage 2.0
 import QtQuick.Window 2.2
 import QtMultimedia 5.4
 
-import wiLink 2.4
+import wiLink 2.5
 import 'scripts/storage.js' as Storage
 import 'scripts/utils.js' as Utils
 

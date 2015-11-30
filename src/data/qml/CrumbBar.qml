@@ -18,7 +18,7 @@
  */
 
 import QtQuick 2.3
-import wiLink 2.4
+import wiLink 2.5
 
 Item {
     id: crumbBar

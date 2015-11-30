@@ -19,7 +19,7 @@
 
 import QtQuick 2.3
 import QtQuick.LocalStorage 2.0
-import wiLink 2.4
+import wiLink 2.5
 import 'scripts/storage.js' as Storage
 import 'scripts/utils.js' as Utils
 
